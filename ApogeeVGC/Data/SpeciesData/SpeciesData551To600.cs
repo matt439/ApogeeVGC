@@ -884,35 +884,6 @@ public partial record SpeciesData
                 Color = "Green",
                 Prevo = SpecieId.Trubbish,
             },
-            [SpecieId.GarbodorGmax] = new()
-            {
-                Id = SpecieId.GarbodorGmax,
-                Num = 569,
-                Name = "Garbodor-Gmax",
-                Types = [PokemonType.Poison],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 80,
-                    Atk = 95,
-                    Def = 82,
-                    SpA = 60,
-                    SpD = 82,
-                    Spe = 75,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Stench,
-                    Slot1 = AbilityId.WeakArmor,
-                    Hidden = AbilityId.Aftermath,
-                },
-                HeightM = 21,
-                WeightKg = 0,
-                Color = "Green",
-                BaseSpecies = SpecieId.Garbodor,
-                Forme = FormeId.Gmax,
-                ChangesFrom = FormeId.Standard,
-            },
             [SpecieId.Zorua] = new()
             {
                 Id = SpecieId.Zorua,

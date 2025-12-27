@@ -253,32 +253,6 @@ public partial record SpeciesData
                 WeightKg = 800,
                 Color = "Gray",
             },
-            [SpecieId.MelmetalGmax] = new()
-            {
-                Id = SpecieId.MelmetalGmax,
-                Num = 809,
-                Name = "Melmetal-Gmax",
-                BaseSpecies = SpecieId.Melmetal,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Steel],
-                Gender = GenderId.N,
-                BaseStats = new StatsTable
-                {
-                    Hp = 135,
-                    Atk = 143,
-                    Def = 143,
-                    SpA = 80,
-                    SpD = 65,
-                    Spe = 34,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.IronFist,
-                },
-                HeightM = 25,
-                WeightKg = 0,
-                Color = "Gray",
-            },
             [SpecieId.Grookey] = new()
             {
                 Id = SpecieId.Grookey,
@@ -352,33 +326,6 @@ public partial record SpeciesData
                 },
                 HeightM = 2.1,
                 WeightKg = 90,
-                Color = "Green",
-            },
-            [SpecieId.RillaboomGmax] = new()
-            {
-                Id = SpecieId.RillaboomGmax,
-                Num = 812,
-                Name = "Rillaboom-Gmax",
-                BaseSpecies = SpecieId.Rillaboom,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 100,
-                    Atk = 125,
-                    Def = 90,
-                    SpA = 60,
-                    SpD = 70,
-                    Spe = 85,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Overgrow,
-                    Hidden = AbilityId.GrassySurge,
-                },
-                HeightM = 28,
-                WeightKg = 0,
                 Color = "Green",
             },
             [SpecieId.Scorbunny] = new()
@@ -456,33 +403,6 @@ public partial record SpeciesData
                 WeightKg = 33,
                 Color = "White",
             },
-            [SpecieId.CinderaceGmax] = new()
-            {
-                Id = SpecieId.CinderaceGmax,
-                Num = 815,
-                Name = "Cinderace-Gmax",
-                BaseSpecies = SpecieId.Cinderace,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 80,
-                    Atk = 116,
-                    Def = 75,
-                    SpA = 65,
-                    SpD = 75,
-                    Spe = 119,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Blaze,
-                    Hidden = AbilityId.Libero,
-                },
-                HeightM = 27,
-                WeightKg = 0,
-                Color = "White",
-            },
             [SpecieId.Sobble] = new()
             {
                 Id = SpecieId.Sobble,
@@ -556,33 +476,6 @@ public partial record SpeciesData
                 },
                 HeightM = 1.9,
                 WeightKg = 45.2,
-                Color = "Blue",
-            },
-            [SpecieId.InteleonGmax] = new()
-            {
-                Id = SpecieId.InteleonGmax,
-                Num = 818,
-                Name = "Inteleon-Gmax",
-                BaseSpecies = SpecieId.Inteleon,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 70,
-                    Atk = 85,
-                    Def = 65,
-                    SpA = 125,
-                    SpD = 65,
-                    Spe = 120,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Torrent,
-                    Hidden = AbilityId.Sniper,
-                },
-                HeightM = 40,
-                WeightKg = 0,
                 Color = "Blue",
             },
             [SpecieId.Skwovet] = new()
@@ -713,34 +606,6 @@ public partial record SpeciesData
                 WeightKg = 75,
                 Color = "Purple",
             },
-            [SpecieId.CorviknightGmax] = new()
-            {
-                Id = SpecieId.CorviknightGmax,
-                Num = 823,
-                Name = "Corviknight-Gmax",
-                BaseSpecies = SpecieId.Corviknight,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Flying, PokemonType.Steel],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 98,
-                    Atk = 87,
-                    Def = 105,
-                    SpA = 53,
-                    SpD = 85,
-                    Spe = 67,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Pressure,
-                    Slot1 = AbilityId.Unnerve,
-                    Hidden = AbilityId.MirrorArmor,
-                },
-                HeightM = 14,
-                WeightKg = 0,
-                Color = "Purple",
-            },
             [SpecieId.Blipbug] = new()
             {
                 Id = SpecieId.Blipbug,
@@ -817,34 +682,6 @@ public partial record SpeciesData
                 },
                 HeightM = 0.4,
                 WeightKg = 40.8,
-                Color = "Red",
-            },
-            [SpecieId.OrbeetleGmax] = new()
-            {
-                Id = SpecieId.OrbeetleGmax,
-                Num = 826,
-                Name = "Orbeetle-Gmax",
-                BaseSpecies = SpecieId.Orbeetle,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Bug, PokemonType.Psychic],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 60,
-                    Atk = 45,
-                    Def = 110,
-                    SpA = 80,
-                    SpD = 120,
-                    Spe = 90,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Swarm,
-                    Slot1 = AbilityId.Frisk,
-                    Hidden = AbilityId.Telepathy,
-                },
-                HeightM = 14,
-                WeightKg = 0,
                 Color = "Red",
             },
             [SpecieId.Nickit] = new()
@@ -1055,34 +892,6 @@ public partial record SpeciesData
                 WeightKg = 115.5,
                 Color = "Green",
             },
-            [SpecieId.DrednawGmax] = new()
-            {
-                Id = SpecieId.DrednawGmax,
-                Num = 834,
-                Name = "Drednaw-Gmax",
-                BaseSpecies = SpecieId.Drednaw,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Water, PokemonType.Rock],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 90,
-                    Atk = 115,
-                    Def = 90,
-                    SpA = 48,
-                    SpD = 68,
-                    Spe = 74,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.StrongJaw,
-                    Slot1 = AbilityId.ShellArmor,
-                    Hidden = AbilityId.SwiftSwim,
-                },
-                HeightM = 24,
-                WeightKg = 0,
-                Color = "Green",
-            },
             [SpecieId.Yamper] = new()
             {
                 Id = SpecieId.Yamper,
@@ -1211,34 +1020,6 @@ public partial record SpeciesData
                 WeightKg = 310.5,
                 Color = "Black",
             },
-            [SpecieId.CoalossalGmax] = new()
-            {
-                Id = SpecieId.CoalossalGmax,
-                Num = 839,
-                Name = "Coalossal-Gmax",
-                BaseSpecies = SpecieId.Coalossal,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Rock, PokemonType.Fire],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 110,
-                    Atk = 80,
-                    Def = 120,
-                    SpA = 80,
-                    SpD = 90,
-                    Spe = 30,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.SteamEngine,
-                    Slot1 = AbilityId.FlameBody,
-                    Hidden = AbilityId.FlashFire,
-                },
-                HeightM = 42,
-                WeightKg = 0,
-                Color = "Black",
-            },
             [SpecieId.Applin] = new()
             {
                 Id = SpecieId.Applin,
@@ -1291,34 +1072,6 @@ public partial record SpeciesData
                 WeightKg = 1,
                 Color = "Green",
             },
-            [SpecieId.FlappleGmax] = new()
-            {
-                Id = SpecieId.FlappleGmax,
-                Num = 841,
-                Name = "Flapple-Gmax",
-                BaseSpecies = SpecieId.Flapple,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Grass, PokemonType.Dragon],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 70,
-                    Atk = 110,
-                    Def = 80,
-                    SpA = 95,
-                    SpD = 60,
-                    Spe = 70,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Ripen,
-                    Slot1 = AbilityId.Gluttony,
-                    Hidden = AbilityId.Hustle,
-                },
-                HeightM = 24,
-                WeightKg = 0,
-                Color = "Green",
-            },
             [SpecieId.Appletun] = new()
             {
                 Id = SpecieId.Appletun,
@@ -1343,34 +1096,6 @@ public partial record SpeciesData
                 },
                 HeightM = 0.4,
                 WeightKg = 13,
-                Color = "Green",
-            },
-            [SpecieId.AppletunGmax] = new()
-            {
-                Id = SpecieId.AppletunGmax,
-                Num = 842,
-                Name = "Appletun-Gmax",
-                BaseSpecies = SpecieId.Appletun,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Grass, PokemonType.Dragon],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 110,
-                    Atk = 85,
-                    Def = 80,
-                    SpA = 100,
-                    SpD = 80,
-                    Spe = 30,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Ripen,
-                    Slot1 = AbilityId.Gluttony,
-                    Hidden = AbilityId.ThickFat,
-                },
-                HeightM = 24,
-                WeightKg = 0,
                 Color = "Green",
             },
             [SpecieId.Silicobra] = new()
@@ -1423,34 +1148,6 @@ public partial record SpeciesData
                 },
                 HeightM = 3.8,
                 WeightKg = 65.5,
-                Color = "Green",
-            },
-            [SpecieId.SandacondaGmax] = new()
-            {
-                Id = SpecieId.SandacondaGmax,
-                Num = 844,
-                Name = "Sandaconda-Gmax",
-                BaseSpecies = SpecieId.Sandaconda,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Ground],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 72,
-                    Atk = 107,
-                    Def = 125,
-                    SpA = 65,
-                    SpD = 70,
-                    Spe = 71,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.SandSpit,
-                    Slot1 = AbilityId.ShedSkin,
-                    Hidden = AbilityId.SandVeil,
-                },
-                HeightM = 22,
-                WeightKg = 0,
                 Color = "Green",
             },
             [SpecieId.Cramorant] = new()
@@ -1658,62 +1355,6 @@ public partial record SpeciesData
                 },
                 HeightM = 1.6,
                 WeightKg = 40,
-                Color = "Purple",
-            },
-            [SpecieId.ToxtricityGmax] = new()
-            {
-                Id = SpecieId.ToxtricityGmax,
-                Num = 849,
-                Name = "Toxtricity-Gmax",
-                BaseSpecies = SpecieId.Toxtricity,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Electric, PokemonType.Poison],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 75,
-                    Atk = 98,
-                    Def = 70,
-                    SpA = 114,
-                    SpD = 70,
-                    Spe = 75,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.PunkRock,
-                    Slot1 = AbilityId.Plus,
-                    Hidden = AbilityId.Technician,
-                },
-                HeightM = 24,
-                WeightKg = 0,
-                Color = "Purple",
-            },
-            [SpecieId.ToxtricityLowKeyGmax] = new()
-            {
-                Id = SpecieId.ToxtricityLowKeyGmax,
-                Num = 849,
-                Name = "Toxtricity-Low-Key-Gmax",
-                BaseSpecies = SpecieId.Toxtricity,
-                Forme = FormeId.LowKeyGmax,
-                Types = [PokemonType.Electric, PokemonType.Poison],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 75,
-                    Atk = 98,
-                    Def = 70,
-                    SpA = 114,
-                    SpD = 70,
-                    Spe = 75,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.PunkRock,
-                    Slot1 = AbilityId.Minus,
-                    Hidden = AbilityId.Technician,
-                },
-                HeightM = 24,
-                WeightKg = 0,
                 Color = "Purple",
             },
             [SpecieId.Sizzlipede] = new()

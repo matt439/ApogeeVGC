@@ -237,36 +237,9 @@ public partial record SpeciesData
                 },
                 HeightM = 1.7,
                 WeightKg = 100.5,
-                Color = "Red",
-            },
-            [SpecieId.CharizardGmax] = new()
-            {
-                Id = SpecieId.CharizardGmax,
-                Num = 6,
-                Name = "Charizard-Gmax",
-                BaseSpecies = SpecieId.Charizard,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Fire, PokemonType.Flying],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 78,
-                    Atk = 84,
-                    Def = 78,
-                    SpA = 109,
-                    SpD = 85,
-                    Spe = 100,
+                    Color = "Red",
                 },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Blaze,
-                    Hidden = AbilityId.SolarPower,
-                },
-                HeightM = 28,
-                WeightKg = 0,
-                Color = "Red",
-            },
-            [SpecieId.Squirtle] = new()
+                [SpecieId.Squirtle] = new()
             {
                 Id = SpecieId.Squirtle,
                 Num = 7,
@@ -1276,36 +1249,9 @@ public partial record SpeciesData
                 },
                 HeightM = 0.4,
                 WeightKg = 6,
-                Color = "Yellow",
-            },
-            [SpecieId.PikachuGmax] = new()
-            {
-                Id = SpecieId.PikachuGmax,
-                Num = 25,
-                Name = "Pikachu-Gmax",
-                BaseSpecies = SpecieId.Pikachu,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Electric],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 35,
-                    Atk = 55,
-                    Def = 40,
-                    SpA = 50,
-                    SpD = 50,
-                    Spe = 90,
+                    Color = "Yellow",
                 },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Static,
-                    Hidden = AbilityId.LightningRod,
-                },
-                HeightM = 21,
-                WeightKg = 0,
-                Color = "Yellow",
-            },
-            [SpecieId.PikachuWorld] = new()
+                [SpecieId.PikachuWorld] = new()
             {
                 Id = SpecieId.PikachuWorld,
                 Num = 25,

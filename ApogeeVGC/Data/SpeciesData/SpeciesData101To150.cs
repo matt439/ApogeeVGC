@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -1166,34 +1166,6 @@ public partial record SpeciesData
                 WeightKg = 220,
                 Color = "Blue",
             },
-            [SpecieId.LaprasGmax] = new()
-            {
-                Id = SpecieId.LaprasGmax,
-                Num = 131,
-                Name = "Lapras-Gmax",
-                BaseSpecies = SpecieId.Lapras,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Water, PokemonType.Ice],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 130,
-                    Atk = 85,
-                    Def = 80,
-                    SpA = 85,
-                    SpD = 95,
-                    Spe = 60,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.WaterAbsorb,
-                    Slot1 = AbilityId.ShellArmor,
-                    Hidden = AbilityId.Hydration,
-                },
-                HeightM = 24,
-                WeightKg = 0,
-                Color = "Blue",
-            },
             [SpecieId.Ditto] = new()
             {
                 Id = SpecieId.Ditto,
@@ -1271,34 +1243,6 @@ public partial record SpeciesData
                 },
                 HeightM = 0.3,
                 WeightKg = 6.5,
-                Color = "Brown",
-            },
-            [SpecieId.EeveeGmax] = new()
-            {
-                Id = SpecieId.EeveeGmax,
-                Num = 133,
-                Name = "Eevee-Gmax",
-                BaseSpecies = SpecieId.Eevee,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 55,
-                    Atk = 55,
-                    Def = 50,
-                    SpA = 45,
-                    SpD = 65,
-                    Spe = 55,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.RunAway,
-                    Slot1 = AbilityId.Adaptability,
-                    Hidden = AbilityId.Anticipation,
-                },
-                HeightM = 18,
-                WeightKg = 0,
                 Color = "Brown",
             },
             [SpecieId.Vaporeon] = new()
@@ -1582,34 +1526,6 @@ public partial record SpeciesData
                 },
                 HeightM = 2.1,
                 WeightKg = 460,
-                Color = "Black",
-            },
-            [SpecieId.SnorlaxGmax] = new()
-            {
-                Id = SpecieId.SnorlaxGmax,
-                Num = 143,
-                Name = "Snorlax-Gmax",
-                BaseSpecies = SpecieId.Snorlax,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 160,
-                    Atk = 110,
-                    Def = 65,
-                    SpA = 65,
-                    SpD = 110,
-                    Spe = 30,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Immunity,
-                    Slot1 = AbilityId.ThickFat,
-                    Hidden = AbilityId.Gluttony,
-                },
-                HeightM = 35,
-                WeightKg = 0,
                 Color = "Black",
             },
             [SpecieId.Articuno] = new()

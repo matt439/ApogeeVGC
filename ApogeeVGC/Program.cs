@@ -29,6 +29,13 @@ public class Program
             return;
         }
 
+        // Identify Gigantamax forms
+        if (args.Length > 0 && args[0] == "--identify-gmax")
+        {
+            IdentifyGigantamaxForms.Run();
+            return;
+        }
+
         //// Debug test to investigate Player 2 bias
         //DebugRandomBias.RunDebugTest();
 

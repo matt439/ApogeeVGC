@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -145,37 +145,9 @@ public partial record SpeciesData
                 },
                 HeightM = 0.4,
                 WeightKg = 7.5,
-                Color = "Brown",
-            },
-            [SpecieId.MeowthGmax] = new()
-            {
-                Id = SpecieId.MeowthGmax,
-                Num = 52,
-                Name = "Meowth-Gmax",
-                BaseSpecies = SpecieId.Meowth,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 40,
-                    Atk = 45,
-                    Def = 35,
-                    SpA = 40,
-                    SpD = 40,
-                    Spe = 90,
+                    Color = "Brown",
                 },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Pickup,
-                    Slot1 = AbilityId.Technician,
-                    Hidden = AbilityId.Unnerve,
-                },
-                HeightM = 33,
-                WeightKg = 0,
-                Color = "Yellow",
-            },
-            [SpecieId.Persian] = new()
+                [SpecieId.Persian] = new()
             {
                 Id = SpecieId.Persian,
                 Num = 53,
@@ -699,34 +671,6 @@ public partial record SpeciesData
                 },
                 HeightM = 1.6,
                 WeightKg = 130,
-                Color = "Gray",
-            },
-            [SpecieId.MachampGmax] = new()
-            {
-                Id = SpecieId.MachampGmax,
-                Num = 68,
-                Name = "Machamp-Gmax",
-                BaseSpecies = SpecieId.Machamp,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 90,
-                    Atk = 130,
-                    Def = 80,
-                    SpA = 65,
-                    SpD = 85,
-                    Spe = 55,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Guts,
-                    Slot1 = AbilityId.NoGuard,
-                    Hidden = AbilityId.Steadfast,
-                },
-                HeightM = 25,
-                WeightKg = 0,
                 Color = "Gray",
             },
             [SpecieId.Bellsprout] = new()
@@ -1754,32 +1698,6 @@ public partial record SpeciesData
                 WeightKg = 40.5,
                 Color = "Purple",
             },
-            [SpecieId.GengarGmax] = new()
-            {
-                Id = SpecieId.GengarGmax,
-                Num = 94,
-                Name = "Gengar-Gmax",
-                BaseSpecies = SpecieId.Gengar,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Ghost, PokemonType.Poison],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 60,
-                    Atk = 65,
-                    Def = 60,
-                    SpA = 130,
-                    SpD = 75,
-                    Spe = 110,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.CursedBody,
-                },
-                HeightM = 20,
-                WeightKg = 0,
-                Color = "Purple",
-            },
             [SpecieId.Onix] = new()
             {
                 Id = SpecieId.Onix,
@@ -1908,34 +1826,6 @@ public partial record SpeciesData
                 },
                 HeightM = 1.3,
                 WeightKg = 60,
-                Color = "Red",
-            },
-            [SpecieId.KinglerGmax] = new()
-            {
-                Id = SpecieId.KinglerGmax,
-                Num = 99,
-                Name = "Kingler-Gmax",
-                BaseSpecies = SpecieId.Kingler,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
-                BaseStats = new StatsTable
-                {
-                    Hp = 55,
-                    Atk = 130,
-                    Def = 115,
-                    SpA = 50,
-                    SpD = 50,
-                    Spe = 75,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.HyperCutter,
-                    Slot1 = AbilityId.ShellArmor,
-                    Hidden = AbilityId.SheerForce,
-                },
-                HeightM = 19,
-                WeightKg = 0,
                 Color = "Red",
             },
             [SpecieId.Voltorb] = new()

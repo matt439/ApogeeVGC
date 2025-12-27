@@ -37,33 +37,6 @@ public partial record SpeciesData
                 WeightKg = 120,
                 Color = "Red",
             },
-            [SpecieId.CentiskorchGmax] = new()
-            {
-                Id = SpecieId.CentiskorchGmax,
-                Num = 851,
-                Name = "Centiskorch-Gmax",
-                BaseSpecies = SpecieId.Centiskorch,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Fire, PokemonType.Bug],
-                BaseStats = new StatsTable
-                {
-                    Hp = 100,
-                    Atk = 115,
-                    Def = 65,
-                    SpA = 90,
-                    SpD = 90,
-                    Spe = 65,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.FlashFire,
-                    Slot1 = AbilityId.WhiteSmoke,
-                    Hidden = AbilityId.FlameBody,
-                },
-                HeightM = 75,
-                WeightKg = 0,
-                Color = "Red",
-            },
             // 852 - Clobbopus
             [SpecieId.Clobbopus] = new()
             {
@@ -301,34 +274,6 @@ public partial record SpeciesData
                 WeightKg = 5.1,
                 Color = "Pink",
             },
-            [SpecieId.HattereneGmax] = new()
-            {
-                Id = SpecieId.HattereneGmax,
-                Num = 858,
-                Name = "Hatterene-Gmax",
-                BaseSpecies = SpecieId.Hatterene,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Psychic, PokemonType.Fairy],
-                Gender = GenderId.F,
-                BaseStats = new StatsTable
-                {
-                    Hp = 57,
-                    Atk = 90,
-                    Def = 95,
-                    SpA = 136,
-                    SpD = 103,
-                    Spe = 29,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Healer,
-                    Slot1 = AbilityId.Anticipation,
-                    Hidden = AbilityId.MagicBounce,
-                },
-                HeightM = 26,
-                WeightKg = 0,
-                Color = "Pink",
-            },
             // 859 - Impidimp
             [SpecieId.Impidimp] = new()
             {
@@ -408,34 +353,6 @@ public partial record SpeciesData
                 },
                 HeightM = 1.5,
                 WeightKg = 61,
-                Color = "Purple",
-            },
-            [SpecieId.GrimmsnarlGmax] = new()
-            {
-                Id = SpecieId.GrimmsnarlGmax,
-                Num = 861,
-                Name = "Grimmsnarl-Gmax",
-                BaseSpecies = SpecieId.Grimmsnarl,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Dark, PokemonType.Fairy],
-                Gender = GenderId.M,
-                BaseStats = new StatsTable
-                {
-                    Hp = 95,
-                    Atk = 120,
-                    Def = 65,
-                    SpA = 95,
-                    SpD = 75,
-                    Spe = 60,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Prankster,
-                    Slot1 = AbilityId.Frisk,
-                    Hidden = AbilityId.Pickpocket,
-                },
-                HeightM = 32,
-                WeightKg = 0,
                 Color = "Purple",
             },
             // 862 - Obstagoon
@@ -642,33 +559,6 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 0.5,
                 Color = "White",
-            },
-            [SpecieId.AlcremieGmax] = new()
-            {
-                Id = SpecieId.AlcremieGmax,
-                Num = 869,
-                Name = "Alcremie-Gmax",
-                BaseSpecies = SpecieId.Alcremie,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Fairy],
-                Gender = GenderId.F,
-                BaseStats = new StatsTable
-                {
-                    Hp = 65,
-                    Atk = 60,
-                    Def = 75,
-                    SpA = 110,
-                    SpD = 121,
-                    Spe = 64,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.SweetVeil,
-                    Hidden = AbilityId.AromaVeil,
-                },
-                HeightM = 30,
-                WeightKg = 0,
-                Color = "Yellow",
             },
             // 870 - Falinks
             [SpecieId.Falinks] = new()
@@ -1002,32 +892,6 @@ public partial record SpeciesData
                 WeightKg = 650,
                 Color = "Green",
             },
-            [SpecieId.CopperajahGmax] = new()
-            {
-                Id = SpecieId.CopperajahGmax,
-                Num = 879,
-                Name = "Copperajah-Gmax",
-                BaseSpecies = SpecieId.Copperajah,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Steel],
-                BaseStats = new StatsTable
-                {
-                    Hp = 122,
-                    Atk = 130,
-                    Def = 69,
-                    SpA = 80,
-                    SpD = 69,
-                    Spe = 30,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.SheerForce,
-                    Hidden = AbilityId.HeavyMetal,
-                },
-                HeightM = 23,
-                WeightKg = 0,
-                Color = "Green",
-            },
             // 880 - Dracozolt
             [SpecieId.Dracozolt] = new()
             {
@@ -1160,33 +1024,6 @@ public partial record SpeciesData
                 },
                 HeightM = 1.8,
                 WeightKg = 40,
-                Color = "White",
-            },
-            [SpecieId.DuraludonGmax] = new()
-            {
-                Id = SpecieId.DuraludonGmax,
-                Num = 884,
-                Name = "Duraludon-Gmax",
-                BaseSpecies = SpecieId.Duraludon,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Steel, PokemonType.Dragon],
-                BaseStats = new StatsTable
-                {
-                    Hp = 70,
-                    Atk = 95,
-                    Def = 115,
-                    SpA = 120,
-                    SpD = 50,
-                    Spe = 85,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.LightMetal,
-                    Slot1 = AbilityId.HeavyMetal,
-                    Hidden = AbilityId.Stalwart,
-                },
-                HeightM = 43,
-                WeightKg = 0,
                 Color = "White",
             },
             // 885 - Dreepy
@@ -1491,56 +1328,6 @@ public partial record SpeciesData
                 },
                 HeightM = 1.9,
                 WeightKg = 105,
-                Color = "Gray",
-            },
-            [SpecieId.UrshifuGmax] = new()
-            {
-                Id = SpecieId.UrshifuGmax,
-                Num = 892,
-                Name = "Urshifu-Gmax",
-                BaseSpecies = SpecieId.Urshifu,
-                Forme = FormeId.Gmax,
-                Types = [PokemonType.Fighting, PokemonType.Dark],
-                BaseStats = new StatsTable
-                {
-                    Hp = 100,
-                    Atk = 130,
-                    Def = 100,
-                    SpA = 63,
-                    SpD = 60,
-                    Spe = 97,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.UnseenFist,
-                },
-                HeightM = 29,
-                WeightKg = 0,
-                Color = "Gray",
-            },
-            [SpecieId.UrshifuRapidStrikeGmax] = new()
-            {
-                Id = SpecieId.UrshifuRapidStrikeGmax,
-                Num = 892,
-                Name = "Urshifu-Rapid-Strike-Gmax",
-                BaseSpecies = SpecieId.Urshifu,
-                Forme = FormeId.RapidStrikeGmax,
-                Types = [PokemonType.Fighting, PokemonType.Water],
-                BaseStats = new StatsTable
-                {
-                    Hp = 100,
-                    Atk = 130,
-                    Def = 100,
-                    SpA = 63,
-                    SpD = 60,
-                    Spe = 97,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.UnseenFist,
-                },
-                HeightM = 26,
-                WeightKg = 0,
                 Color = "Gray",
             },
             // 893 - Zarude
