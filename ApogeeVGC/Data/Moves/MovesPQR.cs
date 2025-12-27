@@ -239,13 +239,12 @@ public partial record Moves
                     NoAssist = true,
                     FailInstruct = true,
                 },
-                BreaksProtect = true,
-                // TODO: onTryMove - vanish on turn 1, attack on turn 2
-                Condition = _library.Conditions[ConditionId.PhantomForce],
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ghost,
-            },
+                    BreaksProtect = true,
+                    // TODO: onTryMove - vanish on turn 1, attack on turn 2
+                    Secondary = null,
+                    Target = MoveTarget.Normal,
+                    Type = MoveType.Ghost,
+                },
             [MoveId.PhotonGeyser] = new()
             {
                 Id = MoveId.PhotonGeyser,
@@ -1071,16 +1070,15 @@ public partial record Moves
                 Name = "Psychic Terrain",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    NonSky = true,
-                    Metronome = true,
+                    Flags = new MoveFlags
+                    {
+                        NonSky = true,
+                        Metronome = true,
+                    },
+                    // TODO: Set terrain to PsychicTerrain
+                    Target = MoveTarget.All,
+                    Type = MoveType.Psychic,
                 },
-                Condition = _library.Conditions[ConditionId.PsychicTerrain],
-                Secondary = null,
-                Target = MoveTarget.All,
-                Type = MoveType.Psychic,
-            },
             [MoveId.PsychoBoost] = new()
             {
                 Id = MoveId.PsychoBoost,
@@ -1343,19 +1341,18 @@ public partial record Moves
                 Name = "Rage Powder",
                 BasePp = 20,
                 Priority = 2,
-                Flags = new MoveFlags
-                {
-                    NoAssist = true,
-                    FailCopycat = true,
-                    Powder = true,
+                    Flags = new MoveFlags
+                    {
+                        NoAssist = true,
+                        FailCopycat = true,
+                        Powder = true,
+                    },
+                    VolatileStatus = ConditionId.RagePowder,
+                    // TODO: onTry - fail if not in doubles
+                    Secondary = null,
+                    Target = MoveTarget.Self,
+                    Type = MoveType.Bug,
                 },
-                VolatileStatus = ConditionId.RagePowder,
-                Condition = _library.Conditions[ConditionId.RagePowder],
-                // TODO: onTry - fail if not in doubles
-                Secondary = null,
-                Target = MoveTarget.Self,
-                Type = MoveType.Bug,
-            },
             [MoveId.RagingBull] = new()
             {
                 Id = MoveId.RagingBull,
@@ -1826,21 +1823,20 @@ public partial record Moves
                 Name = "Rollout",
                 BasePp = 20,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                    FailInstruct = true,
-                    NoParentalBond = true,
+                    Flags = new MoveFlags
+                    {
+                        Contact = true,
+                        Protect = true,
+                        Mirror = true,
+                        Metronome = true,
+                        FailInstruct = true,
+                        NoParentalBond = true,
+                    },
+                    // TODO: basePowerCallback - doubles each turn for 5 turns, 2x if Defense Curl used
+                    Secondary = null,
+                    Target = MoveTarget.Normal,
+                    Type = MoveType.Rock,
                 },
-                // TODO: basePowerCallback - doubles each turn for 5 turns, 2x if Defense Curl used
-                Condition = _library.Conditions[ConditionId.Rollout],
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Rock,
-            },
             [MoveId.Ruination] = new()
             {
                 Id = MoveId.Ruination,

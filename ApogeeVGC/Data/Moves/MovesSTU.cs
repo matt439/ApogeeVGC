@@ -74,17 +74,17 @@ public partial record Moves
                 Name = "Safeguard",
                 BasePp = 25,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Snatch = true,
-                    Metronome = true,
+                    Flags = new MoveFlags
+                    {
+                        Snatch = true,
+                        Metronome = true,
+                    },
+                    SideCondition = ConditionId.Safeguard,
+                    // TODO: Implement Safeguard condition
+                    Secondary = null,
+                    Target = MoveTarget.AllySide,
+                    Type = MoveType.Normal,
                 },
-                SideCondition = ConditionId.Safeguard,
-                Condition = _library.Conditions[ConditionId.Safeguard],
-                Secondary = null,
-                Target = MoveTarget.AllySide,
-                Type = MoveType.Normal,
-            },
             [MoveId.SaltCure] = new()
             {
                 Id = MoveId.SaltCure,
@@ -1501,19 +1501,19 @@ public partial record Moves
                 Name = "Spikes",
                 BasePp = 20,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Reflectable = true,
-                    NonSky = true,
-                    Metronome = true,
-                    MustPressure = true,
+                    Flags = new MoveFlags
+                    {
+                        Reflectable = true,
+                        NonSky = true,
+                        Metronome = true,
+                        MustPressure = true,
+                    },
+                    SideCondition = ConditionId.Spikes,
+                    // TODO: Implement Spikes condition
+                    Secondary = null,
+                    Target = MoveTarget.FoeSide,
+                    Type = MoveType.Ground,
                 },
-                SideCondition = ConditionId.Spikes,
-                Condition = _library.Conditions[ConditionId.Spikes],
-                Secondary = null,
-                Target = MoveTarget.FoeSide,
-                Type = MoveType.Ground,
-            },
             [MoveId.SpikyShield] = new()
             {
                 Id = MoveId.SpikyShield,
@@ -1730,18 +1730,18 @@ public partial record Moves
                 Name = "Stealth Rock",
                 BasePp = 20,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Reflectable = true,
-                    Metronome = true,
-                    MustPressure = true,
+                    Flags = new MoveFlags
+                    {
+                        Reflectable = true,
+                        Metronome = true,
+                        MustPressure = true,
+                    },
+                    SideCondition = ConditionId.StealthRock,
+                    // TODO: Implement StealthRock condition
+                    Secondary = null,
+                    Target = MoveTarget.FoeSide,
+                    Type = MoveType.Rock,
                 },
-                SideCondition = ConditionId.StealthRock,
-                Condition = _library.Conditions[ConditionId.StealthRock],
-                Secondary = null,
-                Target = MoveTarget.FoeSide,
-                Type = MoveType.Rock,
-            },
             [MoveId.SteamEruption] = new()
             {
                 Id = MoveId.SteamEruption,
@@ -1849,17 +1849,17 @@ public partial record Moves
                 Name = "Sticky Web",
                 BasePp = 20,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Reflectable = true,
-                    Metronome = true,
+                    Flags = new MoveFlags
+                    {
+                        Reflectable = true,
+                        Metronome = true,
+                    },
+                    SideCondition = ConditionId.StickyWeb,
+                    // TODO: Implement StickyWeb condition
+                    Secondary = null,
+                    Target = MoveTarget.FoeSide,
+                    Type = MoveType.Bug,
                 },
-                SideCondition = ConditionId.StickyWeb,
-                Condition = _library.Conditions[ConditionId.StickyWeb],
-                Secondary = null,
-                Target = MoveTarget.FoeSide,
-                Type = MoveType.Bug,
-            },
             [MoveId.Stockpile] = new()
             {
                 Id = MoveId.Stockpile,
@@ -3441,19 +3441,19 @@ public partial record Moves
                 Name = "Toxic Spikes",
                 BasePp = 20,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Reflectable = true,
-                    NonSky = true,
-                    Metronome = true,
-                    MustPressure = true,
+                    Flags = new MoveFlags
+                    {
+                        Reflectable = true,
+                        NonSky = true,
+                        Metronome = true,
+                        MustPressure = true,
+                    },
+                    SideCondition = ConditionId.ToxicSpikes,
+                    // TODO: Implement ToxicSpikes condition
+                    Secondary = null,
+                    Target = MoveTarget.FoeSide,
+                    Type = MoveType.Poison,
                 },
-                SideCondition = ConditionId.ToxicSpikes,
-                Condition = _library.Conditions[ConditionId.ToxicSpikes],
-                Secondary = null,
-                Target = MoveTarget.FoeSide,
-                Type = MoveType.Poison,
-            },
             [MoveId.ToxicThread] = new()
             {
                 Id = MoveId.ToxicThread,

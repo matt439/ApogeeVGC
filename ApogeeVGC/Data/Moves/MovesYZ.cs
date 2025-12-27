@@ -22,20 +22,19 @@ public partial record Moves
                 Name = "Yawn",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Reflectable = true,
-                    Mirror = true,
-                    Metronome = true,
+                    Flags = new MoveFlags
+                    {
+                        Protect = true,
+                        Reflectable = true,
+                        Mirror = true,
+                        Metronome = true,
+                    },
+                    VolatileStatus = ConditionId.Yawn,
+                    // TODO: onTryHit - fail if target has status or is immune to sleep
+                    Secondary = null,
+                    Target = MoveTarget.Normal,
+                    Type = MoveType.Normal,
                 },
-                VolatileStatus = ConditionId.Yawn,
-                Condition = _library.Conditions[ConditionId.Yawn],
-                // TODO: onTryHit - fail if target has status or is immune to sleep
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
 
             // ===== Z MOVES =====
 

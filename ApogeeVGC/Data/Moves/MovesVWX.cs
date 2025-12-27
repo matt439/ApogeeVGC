@@ -273,13 +273,13 @@ public partial record Moves
                     PledgeCombo = true,
                 },
                 // TODO: basePowerCallback - increase to 150 if combined with Fire/Grass Pledge
-                // TODO: onPrepareHit - wait for ally's Fire/Grass Pledge
-                // TODO: onModifyMove - change type and add side condition based on combo
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Water,
-                Condition = _library.Conditions[ConditionId.WaterPledge],
-            },
+                    // TODO: onPrepareHit - wait for ally's Fire/Grass Pledge
+                    // TODO: onModifyMove - change type and add side condition based on combo
+                    Secondary = null,
+                    Target = MoveTarget.Normal,
+                    Type = MoveType.Water,
+                    // TODO: Implement WaterPledge condition
+                },
             [MoveId.WaterPulse] = new()
             {
                 Id = MoveId.WaterPulse,
@@ -565,18 +565,17 @@ public partial record Moves
                 Name = "Wish",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Snatch = true,
-                    Heal = true,
-                    Metronome = true,
+                    Flags = new MoveFlags
+                    {
+                        Snatch = true,
+                        Heal = true,
+                        Metronome = true,
+                    },
+                    // TODO: Wish applies a slot condition - needs special implementation
+                    Secondary = null,
+                    Target = MoveTarget.Self,
+                    Type = MoveType.Normal,
                 },
-                // TODO: Wish applies a slot condition - needs special implementation
-                Condition = _library.Conditions[ConditionId.Wish],
-                Secondary = null,
-                Target = MoveTarget.Self,
-                Type = MoveType.Normal,
-            },
             [MoveId.Withdraw] = new()
             {
                 Id = MoveId.Withdraw,
@@ -610,17 +609,17 @@ public partial record Moves
                 Name = "Wonder Room",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Mirror = true,
-                    Metronome = true,
+                    Flags = new MoveFlags
+                    {
+                        Mirror = true,
+                        Metronome = true,
+                    },
+                    PseudoWeather = ConditionId.WonderRoom,
+                    // TODO: Implement WonderRoom condition
+                    Secondary = null,
+                    Target = MoveTarget.All,
+                    Type = MoveType.Psychic,
                 },
-                PseudoWeather = ConditionId.WonderRoom,
-                Condition = _library.Conditions[ConditionId.WonderRoom],
-                Secondary = null,
-                Target = MoveTarget.All,
-                Type = MoveType.Psychic,
-            },
             [MoveId.WoodHammer] = new()
             {
                 Id = MoveId.WoodHammer,
