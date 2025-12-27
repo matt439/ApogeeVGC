@@ -621,6 +621,54 @@ public partial record Abilities
                         battle.Boost(boostTable, source);
                     }),
             },
+            [AbilityId.Berserk] = new()
+            {
+                Id = AbilityId.Berserk,
+                Name = "Berserk",
+                Num = 201,
+                Rating = 2.0,
+                OnDamage = new OnDamageEventInfo((battle, damage, target, source, effect) =>
+                {
+                    if (effect.EffectType == EffectType.Move &&
+                        !effect.Multihit &&
+                        !(effect.HasSheerForce && source != null && source.HasAbility(AbilityId.SheerForce)))
+                    {
+                        battle.EffectState.CheckedBerserk = false;
+                    }
+                    else
+                    {
+                        battle.EffectState.CheckedBerserk = true;
+                    }
+                    return new IntVoidUnion(damage);
+                }),
+                OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, pokemon, item) =>
+                {
+                    var healingItems = new[]
+                    {
+                        ItemId.AguavBerry, ItemId.EnigmaBerry, ItemId.FigyBerry, ItemId.IapapaBerry,
+                        ItemId.MagoBerry, ItemId.SitrusBerry, ItemId.WikiBerry, ItemId.OranBerry, ItemId.BerryJuice
+                    };
+                    if (healingItems.Contains(item.Id))
+                    {
+                        return BoolVoidUnion.FromBool(battle.EffectState.CheckedBerserk ?? true);
+                    }
+                    return BoolVoidUnion.FromBool(true);
+                })),
+                OnAfterMoveSecondary = new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
+                {
+                    battle.EffectState.CheckedBerserk = true;
+                    if (source == null || source == target || target.Hp == 0 || move.TotalDamage == null) return;
+
+                    var lastAttackedBy = target.GetLastAttackedBy();
+                    if (lastAttackedBy == null) return;
+
+                    int damage = move.Multihit && !move.SmartTarget ? move.TotalDamage.Value : lastAttackedBy.Damage;
+                    if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
+                    {
+                        battle.Boost(new SparseBoostsTable { SpA = 1 }, target, target);
+                    }
+                }),
+            },
             [AbilityId.BigPecks] = new()
             {
                 Id = AbilityId.BigPecks,

@@ -293,6 +293,7 @@ public enum AbilityId
                                                     FullMetalBody,
                                                     ShadowShield,
                                                     BeastBoost,
+                                                    Berserk,
                                                     PrismArmor,
                                                     Neuroforce,
 
