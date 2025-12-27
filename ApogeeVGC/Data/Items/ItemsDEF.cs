@@ -301,6 +301,7 @@ public partial record Items
                                 battle.Heal(target.BaseMaxHp / 4);
                             }
                         }
+                        return BoolEmptyVoidUnion.FromVoid();
                     }),
                     OnTryEatItem = new OnTryEatItemEventInfo(
                         OnTryEatItem.FromFunc((battle, item, pokemon) =>

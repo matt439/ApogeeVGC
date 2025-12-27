@@ -20,6 +20,32 @@ public partial record Items
     {
         return new Dictionary<ItemId, Item>
         {
+            // M items
+            [ItemId.MachoBrace] = new()
+            {
+                Id = ItemId.MachoBrace,
+                Name = "Macho Brace",
+                SpriteNum = 269,
+                IgnoreKlutz = true,
+                Fling = new FlingData { BasePower = 60 },
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                {
+                    battle.ChainModify(0.5);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                }),
+                Num = 215,
+                Gen = 3,
+                // IsNonstandard = "Past", // Used for EV training, may not be in Gen 9
+            },
+            [ItemId.Magmarizer] = new()
+            {
+                Id = ItemId.Magmarizer,
+                Name = "Magmarizer",
+                SpriteNum = 272,
+                Fling = new FlingData { BasePower = 80 },
+                Num = 323,
+                Gen = 4,
+            },
             [ItemId.Magnet] = new()
             {
                 Id = ItemId.Magnet,
@@ -77,10 +103,19 @@ public partial record Items
                     //     pokemon.AddVolatile(ConditionId.Confusion);
                     // }
                 })),
-                Num = 161,
-                Gen = 3,
-            },
-            [ItemId.MarangaBerry] = new()
+                    Num = 161,
+                    Gen = 3,
+                },
+                [ItemId.MaliciousArmor] = new()
+                {
+                    Id = ItemId.MaliciousArmor,
+                    Name = "Malicious Armor",
+                    SpriteNum = 744,
+                    Fling = new FlingData { BasePower = 30 },
+                    Num = 1861,
+                    Gen = 9,
+                },
+                [ItemId.MarangaBerry] = new()
             {
                 Id = ItemId.MarangaBerry,
                 Name = "Maranga Berry",
@@ -478,8 +513,18 @@ public partial record Items
                 Name = "Normal Gem",
                 SpriteNum = 307,
                 IsGem = true,
-                // OnSourceTryPrimaryHit - Normal Gem logic
-                // TODO: Implement gem boost logic
+                OnSourceTryPrimaryHit = new OnSourceTryPrimaryHitEventInfo(
+                    (battle, target, source, move) =>
+                    {
+                        if (target == source || move.Category == MoveCategory.Status || 
+                            move.Flags.PledgeCombo == true) 
+                            return IntBoolVoidUnion.FromVoid();
+                        if (move.Type == MoveType.Normal && source.UseItem())
+                        {
+                            source.AddVolatile(ConditionId.Gem);
+                        }
+                        return IntBoolVoidUnion.FromVoid();
+                    }),
                 Num = 564,
                 Gen = 5,
             },
@@ -511,12 +556,12 @@ public partial record Items
                             }
                         }
 
-                        return damage;
-                    }),
-                // OnEat: empty function
-                Num = 184,
-                Gen = 4,
-            },
+                                    return damage;
+                                }),
+                            OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                            Num = 184,
+                            Gen = 4,
+                        },
             [ItemId.OddIncense] = new()
             {
                 Id = ItemId.OddIncense,

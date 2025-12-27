@@ -454,18 +454,8 @@ public partial record Items
                 Fling = new FlingData { BasePower = 30 },
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
-                    // Mark that OnStart has been called
-                    pokemon.ItemState.Started = true;
-                    // Call OnUpdate immediately
-                    var item = _library.Items[ItemId.BoosterEnergy];
-                    if (item.OnUpdate != null)
-                    {
-                        item.OnUpdate.Handler(battle, pokemon);
-                    }
-                }, -2),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
-                {
-                    if (!pokemon.ItemState.Started || pokemon.Transformed) return;
+                    // Check conditions on switch-in
+                    if (pokemon.Transformed) return;
 
                     if (pokemon.HasAbility(AbilityId.Protosynthesis) && 
                         !battle.Field.IsWeather(ConditionId.SunnyDay) && 
@@ -473,13 +463,14 @@ public partial record Items
                     {
                         pokemon.AddVolatile(ConditionId.Protosynthesis);
                     }
-                    if (pokemon.HasAbility(AbilityId.QuarkDrive) && 
+                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) && 
                         !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) && 
                         pokemon.UseItem())
                     {
                         pokemon.AddVolatile(ConditionId.QuarkDrive);
                     }
-                }),
+                }, -2),
+                // TODO: OnUpdate for turn-by-turn checks
                 // TODO: OnTakeItem - only Paradox Pokemon can have this removed
                 Num = 1880,
                 Gen = 9,
