@@ -12,6 +12,92 @@ public partial record Moves
     {
         return new Dictionary<MoveId, Move>
         {
+            [MoveId.JawLock] = new()
+            {
+                Id = MoveId.JawLock,
+                Num = 746,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Jaw Lock",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Bite = true,
+                },
+                // TODO: onHit - add 'trapped' volatile to both source and target
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.JetPunch] = new()
+            {
+                Id = MoveId.JetPunch,
+                Num = 857,
+                Accuracy = 100,
+                BasePower = 60,
+                Category = MoveCategory.Physical,
+                Name = "Jet Punch",
+                BasePp = 15,
+                Priority = 1,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Punch = true,
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Water,
+            },
+            [MoveId.Judgment] = new()
+            {
+                Id = MoveId.Judgment,
+                Num = 449,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Special,
+                Name = "Judgment",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: onModifyType - change type based on plate held (item.onPlate)
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.JungleHealing] = new()
+            {
+                Id = MoveId.JungleHealing,
+                Num = 816,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Jungle Healing",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Heal = true,
+                    BypassSub = true,
+                    AllyAnim = true,
+                },
+                // TODO: onHit - heal 25% of target's max HP and cure status
+                Secondary = null,
+                Target = MoveTarget.Allies,
+                Type = MoveType.Grass,
+            },
             [MoveId.LeechSeed] = new()
             {
                 Id = MoveId.LeechSeed,

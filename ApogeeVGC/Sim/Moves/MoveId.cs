@@ -456,4 +456,8 @@ public enum MoveId
                             MetalBurst,
                             Surf,
                             Dive,
+                            JawLock,
+                            JetPunch,
+                            Judgment,
+                            JungleHealing,
                         }
