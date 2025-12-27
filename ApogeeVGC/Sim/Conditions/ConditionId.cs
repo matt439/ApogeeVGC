@@ -144,4 +144,9 @@ public enum ConditionId
                                                 Grudge,
                                                 LockOn,
                                                 LunarDance,
+                                                MagmaStorm,
+                                                Mist,
+                                                MirrorCoat,
+                                                Mimic,
+                                                MeanLook,
                                                 }
