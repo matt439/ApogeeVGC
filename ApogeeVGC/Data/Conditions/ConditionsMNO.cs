@@ -1,7 +1,9 @@
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
@@ -133,6 +135,70 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sideend", side, "Mist");
+                    }
+                }),
+            },
+            [ConditionId.MistyTerrain] = new()
+            {
+                Id = ConditionId.MistyTerrain,
+                Name = "Misty Terrain",
+                EffectType = EffectType.Terrain,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                    source.HasItem(ItemId.TerrainExtender) ? 8 : 5),
+                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, _) =>
+                {
+                    if ((target.IsGrounded() ?? false) && !target.IsSemiInvulnerable())
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Misty Terrain");
+                        }
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                //OnBasePowerPriority = 6,
+                OnBasePower = new OnBasePowerEventInfo((battle, _, attacker, defender, move) =>
+                    {
+                        if (move.Type == MoveType.Dragon &&
+                            (defender.IsGrounded() ?? false) &&
+                            !defender.IsSemiInvulnerable())
+                        {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Debug("misty terrain weaken");
+                            }
+                            return battle.ChainModify([2048, 4096]);
+                        }
+                        return new VoidReturn();
+                    },
+                    6),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (!battle.DisplayUi) return;
+                    if (effect is Ability)
+                    {
+                        battle.Add("-fieldstart", "move: Misty Terrain", "[from] ability: " +
+                            effect.Name, $"[of] {source}");
+                    }
+                    else
+                    {
+                        battle.Add("-fieldstart", "move: Misty Terrain");
+                    }
+                }),
+                //OnFieldResidualOrder = 27,
+                //OnFieldResidualSubOrder = 7,
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 27,
+                    SubOrder = 7,
+                },
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Misty Terrain");
                     }
                 }),
             },
