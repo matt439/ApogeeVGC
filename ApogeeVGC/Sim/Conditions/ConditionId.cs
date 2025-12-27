@@ -118,6 +118,7 @@ public enum ConditionId
                         Encore,
                         Endure,
                         Taunt,
+                        Imprison,
                                                                 Octolock,
                                                                 FlashFire,
                                                     ToxicSpikes,
