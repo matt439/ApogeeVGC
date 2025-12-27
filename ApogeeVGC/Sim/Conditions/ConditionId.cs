@@ -156,4 +156,11 @@ public enum ConditionId
                                                 Poltergeist,
                                                 PowerTrick,
                                                 PsychicNoise,
+                                                Safeguard,
+                                                SaltCure,
+                                                SimpleBeam,
+                                                SparklingAria,
+                                                StockpileStorage,
+                                                StickyWeb,
+                                                SyrupBomb,
                                                 }
