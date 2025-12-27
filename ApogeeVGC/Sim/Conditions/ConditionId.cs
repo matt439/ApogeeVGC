@@ -150,4 +150,9 @@ public enum ConditionId
                                                 MirrorCoat,
                                                 Mimic,
                                                 MeanLook,
+                                                PerishSong,
+                                                PetalDance,
+                                                Poltergeist,
+                                                PowerTrick,
+                                                PsychicNoise,
                                                 }

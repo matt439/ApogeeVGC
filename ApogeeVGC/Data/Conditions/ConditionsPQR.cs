@@ -481,6 +481,58 @@ public partial record Conditions
                     return bp;
                 }),
             },
+
+            // New P and Q conditions
+            [ConditionId.PerishSong] = new()
+            {
+                Id = ConditionId.PerishSong,
+                Name = "Perish Song",
+                EffectType = EffectType.Condition,
+                Duration = 4,
+                AssociatedMove = MoveId.PerishSong,
+                // TODO: implement perish song countdown and faint
+            },
+            [ConditionId.Poltergeist] = new()
+            {
+                Id = ConditionId.Poltergeist,
+                Name = "Poltergeist",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Poltergeist,
+                // TODO: implement item check
+            },
+            [ConditionId.Powder] = new()
+            {
+                Id = ConditionId.Powder,
+                Name = "Powder",
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                // TODO: implement fire move prevention and damage
+            },
+            [ConditionId.PowerTrick] = new()
+            {
+                Id = ConditionId.PowerTrick,
+                Name = "Power Trick",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.PowerTrick,
+                // TODO: implement Atk/Def stat swap
+            },
+            [ConditionId.PsychicNoise] = new()
+            {
+                Id = ConditionId.PsychicNoise,
+                Name = "Psychic Noise",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.PsychicNoise,
+                // TODO: same as HealBlock
+            },
+            [ConditionId.QuickGuard] = new()
+            {
+                Id = ConditionId.QuickGuard,
+                Name = "Quick Guard",
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                AssociatedMove = MoveId.QuickGuard,
+                // TODO: implement priority move blocking
+            },
         };
     }
 }
