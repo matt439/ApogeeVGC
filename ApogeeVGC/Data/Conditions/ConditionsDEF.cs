@@ -109,6 +109,47 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.DestinyBond] = new()
+            {
+                Id = ConditionId.DestinyBond,
+                Name = "Destiny Bond",
+                EffectType = EffectType.Condition,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singlemove", pokemon, "Destiny Bond");
+                    }
+                    return new VoidReturn();
+                }),
+                OnFaint = new OnFaintEventInfo((battle, target, source, effect) =>
+                {
+                    if (source == null || effect == null || target.IsAlly(source)) return;
+                    if (effect.EffectType == EffectType.Move && !(effect is Move { Flags.FutureMove: true }))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Destiny Bond");
+                        }
+                        source.Faint();
+                    }
+                }),
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                {
+                    if (move.Id == MoveId.DestinyBond) return new VoidReturn();
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("removing Destiny Bond before attack");
+                    }
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.DestinyBond]);
+                    return new VoidReturn();
+                }, -1),
+                OnMoveAborted = new OnMoveAbortedEventInfo((_, pokemon, _, _) =>
+                {
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.DestinyBond]);
+                }),
+            },
             [ConditionId.Flinch] = new()
             {
                 Id = ConditionId.Flinch,

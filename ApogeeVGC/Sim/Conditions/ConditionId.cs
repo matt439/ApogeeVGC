@@ -112,6 +112,7 @@ public enum ConditionId
                         AllySwitch,
                         AquaRing,
                         AuroraVeil,
+                        DestinyBond,
                         Disable,
                         Encore,
                         Taunt,
