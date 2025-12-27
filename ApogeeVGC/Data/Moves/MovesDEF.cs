@@ -840,6 +840,361 @@ public partial record Moves
                                                 Target = MoveTarget.Normal,
                                                 Type = MoveType.Normal,
                                             },
+            [MoveId.EarthPower] = new()
+            {
+                Id = MoveId.EarthPower,
+                Num = 414,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Earth Power",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, NonSky = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Boosts = new SparseBoostsTable { SpD = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ground,
+            },
+            [MoveId.Earthquake] = new()
+            {
+                Id = MoveId.Earthquake,
+                Num = 89,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Physical,
+                Name = "Earthquake",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, NonSky = true, Metronome = true },
+                Target = MoveTarget.AllAdjacent,
+                Type = MoveType.Ground,
+            },
+            [MoveId.EchoedVoice] = new()
+            {
+                Id = MoveId.EchoedVoice,
+                Num = 497,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Echoed Voice",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Sound = true, BypassSub = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+                // TODO: onTryMove - add pseudoWeather 'echoedvoice'
+                // TODO: basePowerCallback - scales with multiplier from pseudoWeather
+            },
+            [MoveId.EerieImpulse] = new()
+            {
+                Id = MoveId.EerieImpulse,
+                Num = 598,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Eerie Impulse",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { SpA = -2 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.EerieSpell] = new()
+            {
+                Id = MoveId.EerieSpell,
+                Num = 826,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Eerie Spell",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Sound = true, BypassSub = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    // TODO: onHit - deduct 3 PP from target's last move
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.ElectroBall] = new()
+            {
+                Id = MoveId.ElectroBall,
+                Num = 486,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Special,
+                Name = "Electro Ball",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true, Bullet = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+                // TODO: basePowerCallback - varies based on speed ratio (40, 60, 80, 120, 150)
+            },
+            [MoveId.ElectricTerrain] = new()
+            {
+                Id = MoveId.ElectricTerrain,
+                Num = 604,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Electric Terrain",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { NonSky = true, Metronome = true },
+                // TODO: Set terrain to ElectricTerrain
+                Target = MoveTarget.All,
+                Type = MoveType.Electric,
+            },
+            [MoveId.ElectroShot] = new()
+            {
+                Id = MoveId.ElectroShot,
+                Num = 905,
+                Accuracy = 100,
+                BasePower = 130,
+                Category = MoveCategory.Special,
+                Name = "Electro Shot",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Charge = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+                // TODO: onTryMove - two-turn attack logic, boosts SpA, skips charge in rain
+            },
+            [MoveId.Electroweb] = new()
+            {
+                Id = MoveId.Electroweb,
+                Num = 527,
+                Accuracy = 95,
+                BasePower = 55,
+                Category = MoveCategory.Special,
+                Name = "Electroweb",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Spe = -1 },
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Electric,
+            },
+            [MoveId.Ember] = new()
+            {
+                Id = MoveId.Ember,
+                Num = 52,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Ember",
+                BasePp = 25,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Burn,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
+            [MoveId.Encore] = new()
+            {
+                Id = MoveId.Encore,
+                Num = 227,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Encore",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, BypassSub = true, Metronome = true, FailEncore = true },
+                VolatileStatus = ConditionId.Encore,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Endeavor] = new()
+            {
+                Id = MoveId.Endeavor,
+                Num = 283,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Physical,
+                Name = "Endeavor",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true, NoParentalBond = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+                // TODO: damageCallback - target.hp - pokemon.hp
+                // TODO: onTryImmunity - only works if pokemon.hp < target.hp
+            },
+            [MoveId.Endure] = new()
+            {
+                Id = MoveId.Endure,
+                Num = 203,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Endure",
+                BasePp = 10,
+                Priority = 4,
+                Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
+                StallingMove = true,
+                VolatileStatus = ConditionId.Endure,
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+                // TODO: onPrepareHit and onHit for stalling logic
+            },
+            [MoveId.EnergyBall] = new()
+            {
+                Id = MoveId.EnergyBall,
+                Num = 412,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Energy Ball",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true, Bullet = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Boosts = new SparseBoostsTable { SpD = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.Entrainment] = new()
+            {
+                Id = MoveId.Entrainment,
+                Num = 494,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Entrainment",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, AllyAnim = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+                // TODO: onTryHit - check for valid ability transfer
+                // TODO: onHit - copy user's ability to target
+            },
+            [MoveId.Eruption] = new()
+            {
+                Id = MoveId.Eruption,
+                Num = 284,
+                Accuracy = 100,
+                BasePower = 150,
+                Category = MoveCategory.Special,
+                Name = "Eruption",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Fire,
+                // TODO: basePowerCallback - scales with user's HP
+            },
+            [MoveId.EsperWing] = new()
+            {
+                Id = MoveId.EsperWing,
+                Num = 840,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Esper Wing",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                CritRatio = 2,
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Self = new SecondaryEffect
+                    {
+                        Boosts = new SparseBoostsTable { Spe = 1 },
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.ExpandingForce] = new()
+            {
+                Id = MoveId.ExpandingForce,
+                Num = 797,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Expanding Force",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+                // TODO: onBasePower - 1.5x in Psychic Terrain
+                // TODO: onModifyMove - change target to allAdjacentFoes in Psychic Terrain
+            },
+            [MoveId.Explosion] = new()
+            {
+                Id = MoveId.Explosion,
+                Num = 153,
+                Accuracy = 100,
+                BasePower = 250,
+                Category = MoveCategory.Physical,
+                Name = "Explosion",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true, NoParentalBond = true },
+                SelfDestruct = MoveSelfDestruct.FromAlways(),
+                Target = MoveTarget.AllAdjacent,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Extrasensory] = new()
+            {
+                Id = MoveId.Extrasensory,
+                Num = 326,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Extrasensory",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    VolatileStatus = ConditionId.Flinch,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.ExtremeSpeed] = new()
+            {
+                Id = MoveId.ExtremeSpeed,
+                Num = 245,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Extreme Speed",
+                BasePp = 5,
+                Priority = 2,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
                                         };
                                     }
                                 }

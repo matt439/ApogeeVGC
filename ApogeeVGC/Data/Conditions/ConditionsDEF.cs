@@ -456,6 +456,50 @@ public partial record Conditions
             //        }
             //    }),
             //},
+            [ConditionId.Encore] = new()
+            {
+                Id = ConditionId.Encore,
+                Name = "Encore",
+                EffectType = EffectType.Condition,
+                Duration = 3,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    // TODO: Check if target's last move is valid for Encore
+                    // For now, just add the start message
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "Encore");
+                    }
+                    return new VoidReturn();
+                }),
+                // TODO: OnOverrideAction - force encored move
+                // TODO: OnResidual - check if PP is depleted
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "Encore");
+                    }
+                }),
+                // TODO: OnDisableMove - disable all moves except encored move
+            },
+            [ConditionId.Endure] = new()
+            {
+                Id = ConditionId.Endure,
+                Name = "Endure",
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "move: Endure");
+                    }
+                    return new VoidReturn();
+                }),
+                // TODO: OnDamage (priority -10) - prevent fainting, leave at 1 HP
+            },
         };
     }
 }
