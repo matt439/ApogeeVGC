@@ -1,3 +1,4 @@
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
@@ -6,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -200,16 +202,16 @@ public partial record Conditions
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
                     if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
-                    target.AddVolatile(_library.Conditions[ConditionId.Confusion]);
+                    target.AddVolatile(ConditionId.Confusion);
                 }),
-                OnLockMove = new OnLockMoveEventInfo((battle, pokemon) =>
+                OnLockMove = (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, pokemon) =>
                 {
                     // TODO: Check for Dynamax volatile - if present, don't lock
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.LockedMove, out var state))
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.LockedMove, out var state) && state.Move.HasValue)
                     {
-                        return state.Move;
+                        return state.Move.Value;
                     }
-                    return null;
+                    return MoveIdVoidUnion.FromVoid();
                 }),
             },
             [ConditionId.KingsShield] = new()
@@ -233,7 +235,7 @@ public partial record Conditions
                     {
                         // TODO: Check for gmaxoneblow, gmaxrapidflow
                         // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
                     if (battle.DisplayUi)
                     {
@@ -244,7 +246,7 @@ public partial record Conditions
                     // if (this.checkMoveMakesContact(move, source, target)) {
                     //     this.boost({ atk: -1 }, source, target, this.dex.getActiveMove("King's Shield"));
                     // }
-                    return BoolVoidUnion.FromBool(false);
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }, 3),
                 // TODO: OnHit - if move is Z or Max powered and makes contact, lower Attack
             },
@@ -263,19 +265,19 @@ public partial record Conditions
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                {
-                    // TODO: Check for moves that bypass Max Guard
-                    // bypassesMaxGuard = ['acupressure', 'afteryou', 'allyswitch', 'aromatherapy', ...many more]
-                    if (battle.DisplayUi)
+                    OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                     {
-                        battle.Add("-activate", target, "move: Max Guard");
-                    }
-                    // TODO: Check for lockedmove volatile and reset Outrage counter
-                    return BoolVoidUnion.FromBool(false);
-                }, 3),
-            },
-            [ConditionId.Metronome] = new()
+                        // TODO: Check for moves that bypass Max Guard
+                        // bypassesMaxGuard = ['acupressure', 'afteryou', 'allyswitch', 'aromatherapy', ...many more]
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Max Guard");
+                        }
+                        // TODO: Check for lockedmove volatile and reset Outrage counter
+                        return BoolIntEmptyVoidUnion.FromBool(false);
+                    }, 3),
+                },
+                [ConditionId.Metronome] = new()
             {
                 Id = ConditionId.Metronome,
                 Name = "Metronome",
@@ -313,7 +315,7 @@ public partial record Conditions
                     {
                         // TODO: Check for gmaxoneblow, gmaxrapidflow
                         // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
                     if (battle.DisplayUi)
                     {
@@ -324,7 +326,7 @@ public partial record Conditions
                     // if (this.checkMoveMakesContact(move, source, target)) {
                     //     this.boost({ def: -2 }, source, target, this.dex.getActiveMove("Obstruct"));
                     // }
-                    return BoolVoidUnion.FromBool(false);
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }, 3),
                 // TODO: OnHit - if move is Z or Max powered and makes contact, lower Defense by 2
             },
@@ -355,12 +357,12 @@ public partial record Conditions
                         }
                         return;
                     }
-                    battle.Boost(new Dictionary<BoostedStat, int>
-                    {
-                        [BoostedStat.Def] = -1,
-                        [BoostedStat.SpD] = -1
-                    }, pokemon, source);
-                }, 14),
+                        battle.Boost(new SparseBoostsTable
+                        {
+                            Def = -1,
+                            SpD = -1
+                        }, pokemon, source);
+                    }, 14),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {
                     if (battle.EffectState.Source?.IsActive ?? false)

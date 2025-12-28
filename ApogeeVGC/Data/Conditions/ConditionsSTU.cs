@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -10,6 +11,7 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -98,16 +100,12 @@ public partial record Conditions
                 Duration = 2,
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Weather immunity is handled elsewhere; this is a void handler
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
                     // Phantom Force can only be hit by certain moves
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 // TODO: OnTryHit - ignore Protect/Detect on the attack turn
             },
@@ -120,16 +118,12 @@ public partial record Conditions
                 Duration = 2,
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Weather immunity is handled elsewhere; this is a void handler
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
                     // Shadow Force can only be hit by certain moves
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 // TODO: OnTryHit - ignore Protect/Detect on the attack turn
             },
@@ -141,13 +135,13 @@ public partial record Conditions
                 OnType = new OnTypeEventInfo((battle, types, pokemon) =>
                 {
                     if (pokemon.Transformed ||
-                        (pokemon.Ability != AbilityId.RKSSystem && battle.Gen >= 8))
+                        (pokemon.Ability != AbilityId.RksSystem && battle.Gen >= 8))
                     {
                         return types;
                     }
 
                     PokemonType type = PokemonType.Normal;
-                    if (pokemon.Ability == AbilityId.RKSSystem)
+                    if (pokemon.Ability == AbilityId.RksSystem)
                     {
                         var item = pokemon.GetItem();
                         // TODO: Get type from item.OnMemory property when implemented
@@ -178,7 +172,7 @@ public partial record Conditions
                     if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
                     {
                         // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
                     if (battle.DisplayUi)
                     {
@@ -189,7 +183,7 @@ public partial record Conditions
                     // if (this.checkMoveMakesContact(move, source, target)) {
                     //     this.boost({ spe: -1 }, source, target, this.dex.getActiveMove("Silk Trap"));
                     // }
-                    return BoolVoidUnion.FromBool(false);
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }, 3),
                 // TODO: OnHit - if move is Z or Max powered and makes contact, lower Speed
             },
@@ -202,11 +196,7 @@ public partial record Conditions
                 Duration = 2,
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Weather immunity is handled elsewhere; this is a void handler
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -215,9 +205,9 @@ public partial record Conditions
                         move.Id == MoveId.Hurricane || move.Id == MoveId.SmackDown ||
                         move.Id == MoveId.ThousandArrows)
                     {
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                 {
@@ -318,7 +308,7 @@ public partial record Conditions
                 }),
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    battle.Boost(new Dictionary<BoostedStat, int> { [BoostedStat.Spe] = -1 },
+                    battle.Boost(new SparseBoostsTable { Spe = -1 },
                         pokemon, battle.EffectState.Source);
                 }, 14),
                 OnEnd = new OnEndEventInfo((battle, pokemon) =>
@@ -374,7 +364,7 @@ public partial record Conditions
                 {
                     if (target == source || (move.Flags.BypassSub ?? false) || (move.Infiltrates ?? false))
                     {
-                        return BoolVoidUnion.FromVoid();
+                        return IntBoolVoidUnion.FromVoid();
                     }
 
                     // TODO: Implement full Substitute damage blocking logic:
@@ -388,7 +378,7 @@ public partial record Conditions
                     // 8. Trigger AfterSubDamage events
                     // 9. Return HIT_SUBSTITUTE
 
-                    return BoolVoidUnion.FromVoid();
+                    return IntBoolVoidUnion.FromVoid();
                 }, -1),
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
@@ -468,11 +458,7 @@ public partial record Conditions
                 // TODO: OnAccuracy - if move is not OHKO, return true (perfect accuracy)
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Ground)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Ground immunity is handled by Pokemon.IsGrounded() for Telekinesis
                 }),
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
@@ -728,17 +714,16 @@ public partial record Conditions
                 }),
                 OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
                 {
-                    if ((battle.EffectState.Layers ?? 0) >= 2) return BoolVoidUnion.FromBool(false);
+                    if ((battle.EffectState.Layers ?? 0) >= 2) return;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sidestart", side, "move: Toxic Spikes");
                     }
                     battle.EffectState.Layers = (battle.EffectState.Layers ?? 0) + 1;
-                    return BoolVoidUnion.FromVoid();
                 }),
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
-                    if (!pokemon.IsGrounded()) return;
+                    if (pokemon.IsGrounded() != true) return;
                     if (pokemon.HasType(PokemonType.Poison))
                     {
                         if (battle.DisplayUi)
@@ -1120,7 +1105,7 @@ public partial record Conditions
                         var moveConditionId = Enum.TryParse<ConditionId>(move.Id.ToString(), out var cid) ? cid : (ConditionId?)null;
                         if (moveConditionId.HasValue && _library.Conditions.ContainsKey(moveConditionId.Value))
                         {
-                            attacker.AddVolatile(_library.Conditions[moveConditionId.Value]);
+                            attacker.AddVolatile(moveConditionId.Value);
                         }
                     }
 
@@ -1142,16 +1127,20 @@ public partial record Conditions
                 {
                     if (battle.EffectState.Move != null)
                     {
-                        target.RemoveVolatile(_library.Conditions[(ConditionId)battle.EffectState.Move]);
+                        target.RemoveVolatile((ConditionId)battle.EffectState.Move);
                     }
                 }),
-                OnLockMove = new OnLockMoveEventInfo((battle, pokemon) =>
+                OnLockMove = (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, pokemon) =>
                 {
-                    return battle.EffectState.Move;
+                    if (battle.EffectState.Move.HasValue)
+                    {
+                        return battle.EffectState.Move.Value;
+                    }
+                    return MoveIdVoidUnion.FromVoid();
                 }),
                 OnMoveAborted = new OnMoveAbortedEventInfo((battle, pokemon, _, _) =>
                 {
-                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
+                    pokemon.RemoveVolatile(ConditionId.TwoTurnMove);
                 }),
             },
             [ConditionId.Spikes] = new()
@@ -1170,17 +1159,16 @@ public partial record Conditions
                 }),
                 OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
                 {
-                    if ((battle.EffectState.Layers ?? 0) >= 3) return BoolVoidUnion.FromBool(false);
+                    if ((battle.EffectState.Layers ?? 0) >= 3) return;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sidestart", side, "Spikes");
                     }
                     battle.EffectState.Layers = (battle.EffectState.Layers ?? 0) + 1;
-                    return BoolVoidUnion.FromVoid();
                 }),
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
-                    if (!pokemon.IsGrounded() || pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
+                    if (pokemon.IsGrounded() != true || pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
                     int[] damageAmounts = { 0, 3, 4, 6 }; // 1/8, 1/6, 1/4
                     int layers = battle.EffectState.Layers ?? 0;
                     battle.Damage(damageAmounts[layers] * pokemon.MaxHp / 24, pokemon, null);
@@ -1201,27 +1189,27 @@ public partial record Conditions
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                {
-                    if (!(move.Flags.Protect ?? false))
+                    OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                     {
-                        // TODO: Check for gmaxoneblow, gmaxrapidflow
-                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
-                        return BoolVoidUnion.FromVoid();
-                    }
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-activate", target, "move: Protect");
-                    }
-                    // TODO: Check for lockedmove volatile and reset Outrage counter
-                    // TODO: Check if move makes contact and damage source
-                    // if (this.checkMoveMakesContact(move, source, target)) {
-                    //     this.damage(source.baseMaxhp / 8, source, target);
-                    // }
-                    // return this.NOT_FAIL;
-                    return BoolVoidUnion.FromBool(false);
-                }, 3),
-            },
+                        if (!(move.Flags.Protect ?? false))
+                        {
+                            // TODO: Check for gmaxoneblow, gmaxrapidflow
+                            // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
+                            return BoolIntEmptyVoidUnion.FromVoid();
+                        }
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Protect");
+                        }
+                        // TODO: Check for lockedmove volatile and reset Outrage counter
+                        // TODO: Check if move makes contact and damage source
+                        // if (this.checkMoveMakesContact(move, source, target)) {
+                        //     this.damage(source.baseMaxhp / 8, source, target);
+                        // }
+                        // return this.NOT_FAIL;
+                        return BoolIntEmptyVoidUnion.FromBool(false);
+                    }, 3),
+                },
             [ConditionId.StealthRock] = new()
             {
                 Id = ConditionId.StealthRock,
@@ -1259,18 +1247,17 @@ public partial record Conditions
                         battle.Add("-sidestart", side, "move: Sticky Web");
                     }
                 }),
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
-                {
-                    if (!pokemon.IsGrounded() || pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
-                    if (battle.DisplayUi)
+                    OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                     {
-                        battle.Add("-activate", pokemon, "move: Sticky Web");
-                    }
-                    // TODO: Get opponent Pokemon for source parameter
-                    // battle.Boost(new Dictionary<BoostedStat, int> { [BoostedStat.Spe] = -1 }, pokemon, pokemon.Side.Foe.Active[0]);
-                    battle.Boost(new Dictionary<BoostedStat, int> { [BoostedStat.Spe] = -1 }, pokemon, pokemon);
-                }),
-            },
+                        if (pokemon.IsGrounded() != true || pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "move: Sticky Web");
+                        }
+                        // TODO: Get opponent Pokemon for source parameter
+                        battle.Boost(new SparseBoostsTable { Spe = -1 }, pokemon, pokemon);
+                    }),
+                },
             [ConditionId.StockpileStorage] = new()
             {
                 Id = ConditionId.StockpileStorage,
@@ -1287,16 +1274,16 @@ public partial record Conditions
                     {
                         battle.Add("-start", target, $"stockpile{battle.EffectState.Layers}");
                     }
-                    var curDef = target.Boosts[BoostedStat.Def];
-                    var curSpD = target.Boosts[BoostedStat.SpD];
-                    battle.Boost(new Dictionary<BoostedStat, int>
+                    var curDef = target.Boosts.GetBoost(BoostId.Def);
+                    var curSpD = target.Boosts.GetBoost(BoostId.SpD);
+                    battle.Boost(new SparseBoostsTable
                     {
-                        [BoostedStat.Def] = 1,
-                        [BoostedStat.SpD] = 1
+                        Def = 1,
+                        SpD = 1
                     }, target, target);
-                    if (curDef != target.Boosts[BoostedStat.Def])
+                    if (curDef != target.Boosts.GetBoost(BoostId.Def))
                         battle.EffectState.Def = (battle.EffectState.Def ?? 0) - 1;
-                    if (curSpD != target.Boosts[BoostedStat.SpD])
+                    if (curSpD != target.Boosts.GetBoost(BoostId.SpD))
                         battle.EffectState.Spd = (battle.EffectState.Spd ?? 0) - 1;
                     return BoolVoidUnion.FromVoid();
                 }),
@@ -1308,16 +1295,16 @@ public partial record Conditions
                     {
                         battle.Add("-start", target, $"stockpile{battle.EffectState.Layers}");
                     }
-                    var curDef = target.Boosts[BoostedStat.Def];
-                    var curSpD = target.Boosts[BoostedStat.SpD];
-                    battle.Boost(new Dictionary<BoostedStat, int>
+                    var curDef = target.Boosts.GetBoost(BoostId.Def);
+                    var curSpD = target.Boosts.GetBoost(BoostId.SpD);
+                    battle.Boost(new SparseBoostsTable
                     {
-                        [BoostedStat.Def] = 1,
-                        [BoostedStat.SpD] = 1
+                        Def = 1,
+                        SpD = 1
                     }, target, target);
-                    if (curDef != target.Boosts[BoostedStat.Def])
+                    if (curDef != target.Boosts.GetBoost(BoostId.Def))
                         battle.EffectState.Def = (battle.EffectState.Def ?? 0) - 1;
-                    if (curSpD != target.Boosts[BoostedStat.SpD])
+                    if (curSpD != target.Boosts.GetBoost(BoostId.SpD))
                         battle.EffectState.Spd = (battle.EffectState.Spd ?? 0) - 1;
                     return BoolVoidUnion.FromVoid();
                 }),
@@ -1325,11 +1312,11 @@ public partial record Conditions
                 {
                     if ((battle.EffectState.Def ?? 0) != 0 || (battle.EffectState.Spd ?? 0) != 0)
                     {
-                        var boosts = new Dictionary<BoostedStat, int>();
+                        var boosts = new SparseBoostsTable();
                         if ((battle.EffectState.Def ?? 0) != 0)
-                            boosts[BoostedStat.Def] = battle.EffectState.Def ?? 0;
+                            boosts.Def = battle.EffectState.Def ?? 0;
                         if ((battle.EffectState.Spd ?? 0) != 0)
-                            boosts[BoostedStat.SpD] = battle.EffectState.Spd ?? 0;
+                            boosts.SpD = battle.EffectState.Spd ?? 0;
                         battle.Boost(boosts, target, target);
                     }
                     if (battle.DisplayUi)

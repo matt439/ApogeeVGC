@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -176,7 +177,6 @@ public partial record Conditions
                         {
                             battle.Add("cant", pokemon, "move: Heal Block", move.Name);
                         }
-                        return false;
                     }
                 }),
                 OnResidual = new OnResidualEventInfo((_, _, _, _) =>
@@ -304,9 +304,10 @@ public partial record Conditions
                 }),
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    if (pokemon.IsGrounded() && !pokemon.IsSemiInvulnerable)
+                    if (pokemon.IsGrounded() == true && !pokemon.IsSemiInvulnerable())
                     {
                         battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
+                    }
                     }
                     else
                     {

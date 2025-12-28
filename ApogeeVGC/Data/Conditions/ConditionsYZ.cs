@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
+using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;

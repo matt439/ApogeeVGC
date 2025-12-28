@@ -736,6 +736,12 @@ public enum MoveId
                             IvyCudgel,
                             MuddyWater,
                             MudSlap,
-                            VacuumWave,
-                            ViseGrip,
-                        }
+                                VacuumWave,
+                                ViseGrip,
+
+                                // Additional moves for conditions
+                                IceBall,
+                                HealBlock,
+                                Telekinesis,
+                                GMaxMeltdown,
+                            }

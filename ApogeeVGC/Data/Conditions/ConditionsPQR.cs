@@ -500,7 +500,7 @@ public partial record Conditions
                 }),
                 OnType = new OnTypeEventInfo((battle, types, pokemon) =>
                 {
-                    battle.EffectState.TypeWas = types;
+                    battle.EffectState.TypeWas = types.FirstOrDefault();
                     // Filter out Flying type
                     return types.Where(t => t != PokemonType.Flying).ToArray();
                 }, -1),
@@ -699,8 +699,8 @@ public partial record Conditions
                 }),
                 OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
                 {
-                    if (effect == null || source == null) return status;
-                    if (effect is Condition { Id: ConditionId.Yawn }) return status;
+                    if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                    if (effect is Condition { Id: ConditionId.Yawn }) return BoolVoidUnion.FromVoid();
                     // TODO: Check if effect.infiltrates && !target.isAlly(source)
                     if (target != source)
                     {
@@ -710,9 +710,9 @@ public partial record Conditions
                             // TODO: Check for Synchronize ability or move without secondaries
                             battle.Add("-activate", target, "move: Safeguard");
                         }
-                        return null;
+                        return BoolVoidUnion.FromBool(false);
                     }
-                    return status;
+                    return BoolVoidUnion.FromVoid();
                 }),
                 OnTryAddVolatile = new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
                 {
@@ -777,7 +777,7 @@ public partial record Conditions
                     // TODO: Check if target is semi-invulnerable or ally of source
                     // TODO: Check if target is not grounded
                     // For now, this is a placeholder
-                    return BoolVoidUnion.FromVoid();
+                    return BoolIntEmptyVoidUnion.FromVoid();
                 }, 4),
                 // TODO: OnBasePower - boost Psychic moves if attacker is grounded (1.3x boost: 5325/4096)
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
