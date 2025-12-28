@@ -48,11 +48,21 @@ public partial record Abilities
                 Num = 184,
                 Rating = 4.0,
                 //OnModifyTypePriority = -1,
-                OnModifyType = new OnModifyTypeEventInfo((battle, move, _, _) =>
+                OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                     {
+                        // List of moves that should not be affected by type-changing abilities
+                        MoveId[] noModifyType =
+                        [
+                            MoveId.Judgment,
+                            MoveId.RevelationDance, MoveId.TerrainPulse,
+                            MoveId.WeatherBall,
+                        ];
+
                         // Change Normal-type moves to Flying
-                        // TODO: Add checks for specific moves like Judgment, Multi-Attack, etc.
-                        if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status)
+                        if (move.Type == MoveType.Normal &&
+                            !noModifyType.Contains(move.Id) &&
+                            !(move.Name == "Tera Blast" && pokemon.Terastallized != null) &&
+                            move.Category != MoveCategory.Status)
                         {
                             move.Type = MoveType.Flying;
                             move.TypeChangerBoosted = battle.Effect;
@@ -747,7 +757,7 @@ public partial record Abilities
                 Name = "Cheek Pouch",
                 Num = 167,
                 Rating = 2.0,
-                OnEatItem = new OnEatItemEventInfo((battle, _, pokemon) =>
+                OnEatItem = new OnEatItemEventInfo((battle, _, pokemon, _, _) =>
                 {
                     battle.Heal(pokemon.BaseMaxHp / 3, pokemon);
                 }),
@@ -1116,11 +1126,13 @@ public partial record Abilities
                 Name = "Cud Chew",
                 Num = 291,
                 Rating = 2.0,
-                OnEatItem = new OnEatItemEventInfo((battle, item, _) =>
+                OnEatItem = new OnEatItemEventInfo((battle, item, pokemon, source, effect) =>
                 {
-                    // TODO: Check if item is berry and not stolen by bugbite/pluck
-                    // For now, simplified implementation
-                    if (item.IsBerry)
+                    // Only trigger for berries that weren't stolen by Bug Bite or Pluck
+                    bool isStolenBerry = effect is ActiveMove move &&
+                                         (move.Id == MoveId.BugBite || move.Id == MoveId.Pluck);
+
+                    if (item.IsBerry && !isStolenBerry)
                     {
                         battle.EffectState.Berry = item;
                         battle.EffectState.Counter = 2;
@@ -1141,10 +1153,19 @@ public partial record Abilities
                         Item? item = battle.EffectState.Berry;
                         battle.Add("-activate", pokemon, "ability: Cud Chew");
                         battle.Add("-enditem", pokemon, item.Name, "[eat]");
-                        // TODO: Trigger berry eat effects
-                        // battle.SingleEvent(EventId.Eat, item, null, pokemon, null, null);
-                        // battle.RunEvent(EventId.EatItem, pokemon, null, null, item);
-                        pokemon.AteBerry = true;
+
+                        // Trigger berry eat effects
+                        if (battle.SingleEvent(EventId.Eat, item, null, pokemon, null, null) is BoolRelayVar)
+                        {
+                            battle.RunEvent(EventId.EatItem, pokemon, null, null, item);
+                        }
+
+                        // Mark that the pokemon ate a berry (for item-related effects)
+                        if (item.OnEat != null)
+                        {
+                            pokemon.AteBerry = true;
+                        }
+
                         battle.EffectState.Berry = null;
                         battle.EffectState.Counter = null;
                     }

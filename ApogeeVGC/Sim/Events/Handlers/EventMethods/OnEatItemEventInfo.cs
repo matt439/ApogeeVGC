@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 
@@ -7,7 +8,8 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnEatItem event.
 /// Triggered when a Pokemon eats an item (like a berry).
-/// Signature: (Battle battle, Item item, Pokemon pokemon) => void
+/// TypeScript signature: onEatItem?: (this: Battle, item: Item, pokemon: Pokemon, source?: Pokemon, effect?: Effect) => void
+/// C# Signature: (Battle battle, Item item, Pokemon pokemon, Pokemon? source, IEffect? effect) => void
 /// </summary>
 public sealed record OnEatItemEventInfo : EventHandlerInfo
 {
@@ -18,27 +20,29 @@ public sealed record OnEatItemEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnEatItemEventInfo(
- Action<Battle, Item, Pokemon> handler,
-  int? priority = null,
+        Action<Battle, Item, Pokemon, Pokemon?, IEffect?> handler,
+        int? priority = null,
         bool usesSpeed = true)
     {
-Id = EventId.EatItem;
-  Handler = handler;
-    Priority = priority;
+        Id = EventId.EatItem;
+        Handler = handler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
- ExpectedParameterTypes =
-    [
-   typeof(Battle),
-   typeof(Item),
+        ExpectedParameterTypes =
+        [
+            typeof(Battle),
+            typeof(Item),
             typeof(Pokemon),
-     ];
-     ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false];
+            typeof(Pokemon),
+            typeof(IEffect),
+        ];
+        ExpectedReturnType = typeof(void);
+
+        // Nullability: source and effect are optional (nullable)
+        ParameterNullability = [false, false, false, true, true];
         ReturnTypeNullable = false;
-    
-    // Validate configuration
+
+        // Validate configuration
         ValidateConfiguration();
-  }
+    }
 }
