@@ -232,6 +232,30 @@ public partial record Conditions
                 }),
                 OnLockMove = new OnLockMoveEventInfo(MoveId.Recharge),
             },
+            [ConditionId.Nightmare] = new()
+            {
+                Id = ConditionId.Nightmare,
+                Name = "Nightmare",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Nightmare,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.Status != ConditionId.Sleep && !pokemon.HasAbility(AbilityId.Comatose))
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Nightmare");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Damage(pokemon.BaseMaxHp / 4);
+                }, 11),
+            },
             [ConditionId.NoRetreat] = new()
             {
                 Id = ConditionId.NoRetreat,

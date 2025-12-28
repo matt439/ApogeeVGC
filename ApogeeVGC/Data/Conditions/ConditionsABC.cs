@@ -457,6 +457,41 @@ public partial record Conditions
                 // TODO: Implement Bide full logic - requires OnLockMove, OnDamage tracking, OnBeforeMove
                 // This is complex logic that would need multiple event handlers and state tracking
             },
+            [ConditionId.Bounce] = new()
+            {
+                Id = ConditionId.Bounce,
+                Name = "Bounce",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Bounce,
+                Duration = 2,
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    if (move.Id == MoveId.Gust || move.Id == MoveId.Twister ||
+                        move.Id == MoveId.SkyUppercut || move.Id == MoveId.Thunder ||
+                        move.Id == MoveId.Hurricane || move.Id == MoveId.SmackDown ||
+                        move.Id == MoveId.ThousandArrows)
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    return false;
+                }),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Id == MoveId.Gust || move.Id == MoveId.Twister)
+                    {
+                        return battle.ChainModify(2);
+                    }
+                    return damage;
+                }),
+            },
             [ConditionId.BurningBulwark] = new()
             {
                 Id = ConditionId.BurningBulwark,
@@ -520,6 +555,69 @@ public partial record Conditions
                     return BoolVoidUnion.FromVoid();
                 }),
                 // TODO: OnResidual - deals 1/4 max HP damage per turn
+            },
+            [ConditionId.Commanded] = new()
+            {
+                Id = ConditionId.Commanded,
+                Name = "Commanded",
+                EffectType = EffectType.Condition,
+                NoCopy = true,
+                // This is applied to Dondozo when Tatsugiri uses Commander
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    // Boost all stats by 2 stages
+                    battle.Boost(new BoostTable
+                    {
+                        Atk = 2,
+                        Def = 2,
+                        SpA = 2,
+                        SpD = 2,
+                        Spe = 2
+                    }, pokemon);
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-block", pokemon, "Commanded");
+                    }
+                    return false;
+                }, 2),
+                OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
+                {
+                    pokemon.Trapped = true;
+                }, -11),
+            },
+            [ConditionId.Commanding] = new()
+            {
+                Id = ConditionId.Commanding,
+                Name = "Commanding",
+                EffectType = EffectType.Condition,
+                NoCopy = true,
+                // This is applied to Tatsugiri when it uses Commander (hides inside Dondozo)
+                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-block", pokemon, "Commanding");
+                    }
+                    return false;
+                }, 2),
+                OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
+                {
+                    pokemon.Trapped = true;
+                }, -11),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
+                {
+                    // Tatsugiri is invulnerable while commanding
+                    return false;
+                }),
+                OnBeforeTurn = new OnBeforeTurnEventInfo((battle, pokemon) =>
+                {
+                    // Cancel Tatsugiri's action since it's hiding
+                    // TODO: Implement battle.queue.cancelAction(pokemon)
+                }),
             },
         };
     }

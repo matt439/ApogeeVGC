@@ -89,6 +89,113 @@ public partial record Conditions
                     },
                     10),
             },
+            [ConditionId.PhantomForce] = new()
+            {
+                Id = ConditionId.PhantomForce,
+                Name = "Phantom Force",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.PhantomForce,
+                Duration = 2,
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    // Phantom Force can only be hit by certain moves
+                    return false;
+                }),
+                // TODO: OnTryHit - ignore Protect/Detect on the attack turn
+            },
+            [ConditionId.ShadowForce] = new()
+            {
+                Id = ConditionId.ShadowForce,
+                Name = "Shadow Force",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.ShadowForce,
+                Duration = 2,
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    // Shadow Force can only be hit by certain moves
+                    return false;
+                }),
+                // TODO: OnTryHit - ignore Protect/Detect on the attack turn
+            },
+            [ConditionId.Silvally] = new()
+            {
+                Id = ConditionId.Silvally,
+                Name = "Silvally",
+                EffectType = EffectType.Condition,
+                OnType = new OnTypeEventInfo((battle, types, pokemon) =>
+                {
+                    if (pokemon.Transformed ||
+                        (pokemon.Ability != AbilityId.RKSSystem && battle.Gen >= 8))
+                    {
+                        return types;
+                    }
+
+                    PokemonType type = PokemonType.Normal;
+                    if (pokemon.Ability == AbilityId.RKSSystem)
+                    {
+                        var item = pokemon.GetItem();
+                        // TODO: Get type from item.OnMemory property when implemented
+                        // For now, default to Normal type
+                        type = PokemonType.Normal;
+                    }
+
+                    return new PokemonType[] { type };
+                }, 1),
+            },
+            [ConditionId.SkyDrop] = new()
+            {
+                Id = ConditionId.SkyDrop,
+                Name = "Sky Drop",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.SkyDrop,
+                Duration = 2,
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    if (move.Id == MoveId.Gust || move.Id == MoveId.Twister ||
+                        move.Id == MoveId.SkyUppercut || move.Id == MoveId.Thunder ||
+                        move.Id == MoveId.Hurricane || move.Id == MoveId.SmackDown ||
+                        move.Id == MoveId.ThousandArrows)
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    return false;
+                }),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Id == MoveId.Gust || move.Id == MoveId.Twister)
+                    {
+                        return battle.ChainModify(2);
+                    }
+                    return damage;
+                }),
+                // TODO: OnRedirectTarget - Sky Drop carries the target into the air with the user
+                // TODO: OnDragOut - release the target if user is forced out
+                // TODO: OnFaint - release the target if user faints
+            },
             [ConditionId.Stall] = new()
             {
                 // Protect, Detect, Endure counter
@@ -155,6 +262,71 @@ public partial record Conditions
             {
                 Id = ConditionId.StruggleRecoil,
             },
+            [ConditionId.Substitute] = new()
+            {
+                Id = ConditionId.Substitute,
+                Name = "Substitute",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Substitute,
+                OnStart = new OnStartEventInfo((battle, target, source, effect) =>
+                {
+                    if (effect?.Id == EffectId.ShedTail)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", target, "Substitute", "[from] move: Shed Tail");
+                        }
+                    }
+                    else
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", target, "Substitute");
+                        }
+                    }
+                    battle.EffectState.Hp = (int)Math.Floor(target.MaxHp / 4.0);
+
+                    // Remove partially trapped condition when substitute is created
+                    if (target.Volatiles.ContainsKey(ConditionId.PartiallyTrapped))
+                    {
+                        var sourceEffect = target.Volatiles[ConditionId.PartiallyTrapped].SourceEffect;
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", target, sourceEffect?.Name ?? "Partially Trapped",
+                                "[partiallytrapped]", "[silent]");
+                        }
+                        target.DeleteVolatile(ConditionId.PartiallyTrapped);
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryPrimaryHit = new OnTryPrimaryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (target == source || (move.Flags.BypassSub ?? false) || (move.Infiltrates ?? false))
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+
+                    // TODO: Implement full Substitute damage blocking logic:
+                    // 1. Calculate damage with actions.getDamage
+                    // 2. If no damage, fail the move
+                    // 3. Cap damage at substitute HP
+                    // 4. Subtract from substitute HP
+                    // 5. If substitute breaks, remove it
+                    // 6. Otherwise show activate message
+                    // 7. Handle recoil and drain
+                    // 8. Trigger AfterSubDamage events
+                    // 9. Return HIT_SUBSTITUTE
+
+                    return BoolVoidUnion.FromVoid();
+                }, -1),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "Substitute");
+                    }
+                }),
+            },
             [ConditionId.Tailwind] = new()
             {
                 Id = ConditionId.Tailwind,
@@ -191,6 +363,58 @@ public partial record Conditions
                         battle.Add("-sideend", side, "move: Tailwind");
                     }
                 }),
+            },
+            [ConditionId.Taunt] = new()
+            {
+                Id = ConditionId.Taunt,
+                Name = "Taunt",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Taunt,
+                Duration = 3,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    // TODO: If target has already taken its turn and won't move again this turn, increase duration by 1
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "move: Taunt");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                }, 15),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "move: Taunt");
+                    }
+                }),
+                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        var move = _library.Moves[moveSlot.Id];
+                        if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // TODO: Check if move is Z-move
+                    if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", attacker, "move: Taunt", move.Name);
+                        }
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }, 5),
             },
             [ConditionId.Toxic] = new()
             {
@@ -521,6 +745,62 @@ public partial record Conditions
                     {
                         battle.Add("-end", target, "Throat Chop", "[silent]");
                     }
+                }),
+            },
+            [ConditionId.Trapper] = new()
+            {
+                Id = ConditionId.Trapper,
+                Name = "Trapper",
+                EffectType = EffectType.Condition,
+                NoCopy = true,
+                // This condition has no event handlers - it's just a marker
+            },
+            [ConditionId.TwoTurnMove] = new()
+            {
+                Id = ConditionId.TwoTurnMove,
+                Name = "Two Turn Move",
+                EffectType = EffectType.Condition,
+                // Skull Bash, SolarBeam, Sky Drop, etc.
+                Duration = 2,
+                OnStart = new OnStartEventInfo((battle, attacker, defender, effect) =>
+                {
+                    // attacker is the Pokemon using the two turn move and the Pokemon this condition is being applied to
+                    battle.EffectState.Move = effect?.Id;
+
+                    // Add the move-specific volatile (e.g., 'fly', 'dig', 'dive')
+                    if (effect?.Id != null)
+                    {
+                        attacker.AddVolatile(_library.Conditions[(ConditionId)effect.Id]);
+                    }
+
+                    // TODO: Handle lastMoveTargetLoc for targeting
+                    // lastMoveTargetLoc is the location of the originally targeted slot before any redirection
+                    // note that this is not updated for moves called by other moves (e.g., Metronome calling Dig)
+
+                    // TODO: If move was called by another move (like Metronome), determine random target
+                    // and store in volatiles[effect.id].targetLoc
+
+                    battle.AttrLastMove("[still]");
+
+                    // Run side-effects normally associated with hitting (e.g., Protean, Libero)
+                    battle.RunEvent(EventId.PrepareHit, attacker, defender, effect);
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.EffectState.Move != null)
+                    {
+                        target.RemoveVolatile(_library.Conditions[(ConditionId)battle.EffectState.Move]);
+                    }
+                }),
+                OnLockMove = new OnLockMoveEventInfo((battle, pokemon) =>
+                {
+                    return battle.EffectState.Move;
+                }),
+                OnMoveAborted = new OnMoveAbortedEventInfo((battle, pokemon, _, _) =>
+                {
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
                 }),
             },
         };

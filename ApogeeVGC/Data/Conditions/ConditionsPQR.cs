@@ -460,6 +460,42 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.Roost] = new()
+            {
+                Id = ConditionId.Roost,
+                Name = "Roost",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Roost,
+                Duration = 1,
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                }, 25),
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    // TODO: Check if pokemon is terastallized - if so and has Flying type, show hint and return false
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "move: Roost");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnType = new OnTypeEventInfo((battle, types, pokemon) =>
+                {
+                    battle.EffectState.TypeWas = types;
+                    // Filter out Flying type
+                    return types.Where(t => t != PokemonType.Flying).ToArray();
+                }, -1),
+            },
+            [ConditionId.Rollout] = new()
+            {
+                Id = ConditionId.Rollout,
+                Name = "Rollout",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Rollout,
+                // Rollout uses LockedMove for the locking behavior and RolloutStorage for damage scaling
+                // This is just a marker condition
+            },
             [ConditionId.RolloutStorage] = new()
             {
                 Id = ConditionId.RolloutStorage,
@@ -532,6 +568,73 @@ public partial record Conditions
                 Duration = 1,
                 AssociatedMove = MoveId.QuickGuard,
                 // TODO: implement priority move blocking
+            },
+            [ConditionId.PartiallyTrapped] = new()
+            {
+                Id = ConditionId.PartiallyTrapped,
+                Name = "Partially Trapped",
+                EffectType = EffectType.Condition,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((battle, target, source, _) =>
+                {
+                    if (source != null && source.HasItem(ItemId.GripClaw))
+                    {
+                        return 8;
+                    }
+                    return battle.Random(5, 7);
+                }),
+                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon,
+                            $"move: {battle.EffectState.SourceEffect?.Name ?? "unknown"}",
+                            $"[of] {source}");
+                    }
+                    battle.EffectState.BoundDivisor =
+                        (source != null && source.HasItem(ItemId.BindingBand)) ? 6 : 8;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    var source = battle.EffectState.Source;
+                    // G-Max Centiferno and G-Max Sandblast continue even after the user leaves the field
+                    var sourceEffect = battle.EffectState.SourceEffect;
+                    var gmaxEffect = sourceEffect != null &&
+                        (sourceEffect.Name == "G-Max Centiferno" || sourceEffect.Name == "G-Max Sandblast");
+
+                    if (source != null && (!source.IsActive || source.Hp <= 0 || source.ActiveTurns <= 0) && !gmaxEffect)
+                    {
+                        pokemon.DeleteVolatile(ConditionId.PartiallyTrapped);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, sourceEffect?.Name ?? "Partially Trapped",
+                                "[partiallytrapped]", "[silent]");
+                        }
+                        return;
+                    }
+                    battle.Damage(pokemon.BaseMaxHp / (battle.EffectState.BoundDivisor ?? 8));
+                }, 13),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon,
+                            battle.EffectState.SourceEffect?.Name ?? "Partially Trapped",
+                            "[partiallytrapped]");
+                    }
+                }),
+                OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
+                {
+                    var sourceEffect = battle.EffectState.SourceEffect;
+                    var gmaxEffect = sourceEffect != null &&
+                        (sourceEffect.Name == "G-Max Centiferno" || sourceEffect.Name == "G-Max Sandblast");
+                    var source = battle.EffectState.Source;
+                    if ((source != null && source.IsActive) || gmaxEffect)
+                    {
+                        pokemon.TryTrap();
+                    }
+                }),
             },
         };
     }

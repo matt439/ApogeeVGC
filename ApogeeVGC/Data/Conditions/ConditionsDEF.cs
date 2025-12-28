@@ -109,6 +109,64 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.DefenseCurl] = new()
+            {
+                Id = ConditionId.DefenseCurl,
+                Name = "Defense Curl",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.DefenseCurl,
+                NoCopy = true,
+                // This is a marker condition used by Rollout and Ice Ball to double their damage
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Defense Curl");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+            },
+            [ConditionId.Detect] = new()
+            {
+                Id = ConditionId.Detect,
+                Name = "Detect",
+                Duration = 1,
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Detect,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Protect");
+                    }
+                    return new VoidReturn();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false))
+                    {
+                        return new VoidReturn();
+                    }
+
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+
+                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                    if (lockedMove is not null &&
+                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+
+                    return new Empty();
+                }, 3),
+            },
             [ConditionId.DestinyBond] = new()
             {
                 Id = ConditionId.DestinyBond,
@@ -149,6 +207,265 @@ public partial record Conditions
                 {
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.DestinyBond]);
                 }),
+            },
+            [ConditionId.Disable] = new()
+            {
+                Id = ConditionId.Disable,
+                Name = "Disable",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Disable,
+                Duration = 5,
+                NoCopy = true, // doesn't get copied by Baton Pass
+                OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
+                {
+                    // TODO: Check if target will move this turn or is active pokemon
+                    // If so, decrease duration by 1
+
+                    if (pokemon.LastMove == null)
+                    {
+                        battle.Debug("Pokemon hasn't moved yet");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    // Check if the last move has PP
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        if (moveSlot.Id == pokemon.LastMove.Id)
+                        {
+                            if (moveSlot.Pp <= 0)
+                            {
+                                battle.Debug("Move out of PP");
+                                return BoolVoidUnion.FromBool(false);
+                            }
+                        }
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        if (effect?.EffectType == EffectType.Ability)
+                        {
+                            battle.Add("-start", pokemon, "Disable", pokemon.LastMove.Name,
+                                $"[from] ability: {effect.Name}", $"[of] {source}");
+                        }
+                        else
+                        {
+                            battle.Add("-start", pokemon, "Disable", pokemon.LastMove.Name);
+                        }
+                    }
+
+                    battle.EffectState.Move = pokemon.LastMove.Id;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                }, 17),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Disable");
+                    }
+                }),
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // TODO: Check if move is Z-move
+                    if (move.Id == battle.EffectState.Move)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", attacker, "Disable", move.Name);
+                        }
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }, 7),
+                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        if (moveSlot.Id == battle.EffectState.Move)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
+            },
+            [ConditionId.Dig] = new()
+            {
+                Id = ConditionId.Dig,
+                Name = "Dig",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Dig,
+                Duration = 2,
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    if (move.Id == MoveId.Earthquake || move.Id == MoveId.Magnitude)
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    return false;
+                }),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Id == MoveId.Earthquake || move.Id == MoveId.Magnitude)
+                    {
+                        return battle.ChainModify(2);
+                    }
+                    return damage;
+                }),
+            },
+            [ConditionId.Dive] = new()
+            {
+                Id = ConditionId.Dive,
+                Name = "Dive",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Dive,
+                Duration = 2,
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    if (move.Id == MoveId.Surf || move.Id == MoveId.Whirlpool)
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    return false;
+                }),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Id == MoveId.Surf || move.Id == MoveId.Whirlpool)
+                    {
+                        return battle.ChainModify(2);
+                    }
+                    return damage;
+                }),
+            },
+            [ConditionId.Fly] = new()
+            {
+                Id = ConditionId.Fly,
+                Name = "Fly",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Fly,
+                Duration = 2,
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    if (move.Id == MoveId.Gust || move.Id == MoveId.Twister ||
+                        move.Id == MoveId.SkyUppercut || move.Id == MoveId.Thunder ||
+                        move.Id == MoveId.Hurricane || move.Id == MoveId.SmackDown ||
+                        move.Id == MoveId.ThousandArrows)
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    return false;
+                }),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Id == MoveId.Gust || move.Id == MoveId.Twister)
+                    {
+                        return battle.ChainModify(2);
+                    }
+                    return damage;
+                }),
+            },
+            [ConditionId.FocusEnergy] = new()
+            {
+                Id = ConditionId.FocusEnergy,
+                Name = "Focus Energy",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.FocusEnergy,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Focus Energy");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnModifyCritRatio - increase crit ratio by 2 stages
+            },
+            [ConditionId.FocusPunch] = new()
+            {
+                Id = ConditionId.FocusPunch,
+                Name = "Focus Punch",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.FocusPunch,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", pokemon, "move: Focus Punch");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                {
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.FocusPunch, out var state) &&
+                        state.LostFocus == true)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "Focus Punch", "Focus Punch");
+                        }
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }, 8),
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                {
+                    if (target.Volatiles.ContainsKey(ConditionId.FocusPunch))
+                    {
+                        target.Volatiles[ConditionId.FocusPunch].LostFocus = true;
+                    }
+                }),
+            },
+            [ConditionId.FuryCutter] = new()
+            {
+                Id = ConditionId.FuryCutter,
+                Name = "Fury Cutter",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.FuryCutter,
+                Duration = 2,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.EffectState.HitCount = 1;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if ((battle.EffectState.HitCount ?? 0) < 4)
+                    {
+                        battle.EffectState.HitCount = (battle.EffectState.HitCount ?? 0) + 1;
+                    }
+                    battle.EffectState.Duration = 2;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnBasePower - multiply base power by 2^(hitCount-1)
             },
             [ConditionId.Flinch] = new()
             {
@@ -484,6 +801,13 @@ public partial record Conditions
                 }),
                 // TODO: OnDisableMove - disable all moves except encored move
             },
+            [ConditionId.Drain] = new()
+            {
+                Id = ConditionId.Drain,
+                Name = "Drain",
+                EffectType = EffectType.Condition,
+                // Marker condition for drain moves
+            },
             [ConditionId.Endure] = new()
             {
                 Id = ConditionId.Endure,
@@ -499,6 +823,45 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 // TODO: OnDamage (priority -10) - prevent fainting, leave at 1 HP
+            },
+            [ConditionId.FutureMove] = new()
+            {
+                Id = ConditionId.FutureMove,
+                Name = "Future Move",
+                EffectType = EffectType.Condition,
+                // This is a slot condition
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    battle.EffectState.TargetSlot = target.GetSlot();
+                    battle.EffectState.EndingTurn = (battle.Turn - 1) + 2;
+                    if (battle.EffectState.EndingTurn >= 254)
+                    {
+                        // In Gen 8+, Future attacks will never resolve when used on the 255th turn or later
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                {
+                    // TODO: Implement GetOverflowedTurnCount if needed
+                    if (battle.Turn < battle.EffectState.EndingTurn) return;
+                    var slotTarget = battle.GetAtSlot(battle.EffectState.TargetSlot);
+                    if (slotTarget != null)
+                    {
+                        target.Side.RemoveSlotCondition(slotTarget, _library.Conditions[ConditionId.FutureMove]);
+                    }
+                }, 3),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    // TODO: Implement full Future Move logic:
+                    // 1. Get move data from effectState
+                    // 2. Check if target is fainted or is the source
+                    // 3. Remove Protect/Endure volatiles
+                    // 4. Apply Infiltrator ability if source has it (Gen 6+)
+                    // 5. Apply Normalize ability if source has it (Gen 6+)
+                    // 6. Execute the move with trySpreadMoveHit
+                    // 7. Trigger Life Orb recoil if applicable (Gen 5+)
+                    // 8. Check for win condition
+                }),
             },
         };
     }

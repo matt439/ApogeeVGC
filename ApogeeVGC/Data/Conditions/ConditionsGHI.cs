@@ -26,6 +26,15 @@ public partial record Conditions
                 // TODO: onCopy - remove if pokemon has cantsuppress ability flag
                 // Ability suppression should be implemented in Pokemon.IgnoringAbility()
             },
+            [ConditionId.IceBall] = new()
+            {
+                Id = ConditionId.IceBall,
+                Name = "Ice Ball",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.IceBall,
+                // Ice Ball uses LockedMove for the locking behavior and RolloutStorage for damage scaling
+                // This is just a marker condition
+            },
             [ConditionId.Gem] = new()
             {
                 Id = ConditionId.Gem,

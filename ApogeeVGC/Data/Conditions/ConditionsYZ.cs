@@ -13,6 +13,76 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
+            [ConditionId.Yawn] = new()
+            {
+                Id = ConditionId.Yawn,
+                Name = "Yawn",
+                EffectType = EffectType.Condition,
+                NoCopy = true, // doesn't get copied by Baton Pass
+                Duration = 2,
+                OnStart = new OnStartEventInfo((battle, target, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "move: Yawn", $"[of] {source}");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                {
+                    // Yawn resolves at the end of the turn after it was applied
+                }, 23),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "move: Yawn", "[silent]");
+                    }
+                    // Try to set sleep status
+                    target.TrySetStatus(ConditionId.Sleep, battle.EffectState.Source);
+                }),
+            },
+            [ConditionId.Wish] = new()
+            {
+                Id = ConditionId.Wish,
+                Name = "Wish",
+                EffectType = EffectType.Condition,
+                // This is a slot condition
+                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                {
+                    battle.EffectState.Hp = source != null ? source.MaxHp / 2 : pokemon.MaxHp / 2;
+                    battle.EffectState.StartingTurn = battle.Turn; // TODO: Use GetOverflowedTurnCount() if available
+                    if (battle.EffectState.StartingTurn >= 255)
+                    {
+                        // In Gen 8+, Wish will never resolve when used on the 255th turn
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                {
+                    // TODO: Use GetOverflowedTurnCount() if available
+                    if (battle.Turn <= battle.EffectState.StartingTurn) return;
+                    var slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
+                    if (slotTarget != null)
+                    {
+                        target.Side.RemoveSlotCondition(slotTarget, _library.Conditions[ConditionId.Wish]);
+                    }
+                }, 4),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (target != null && !target.Fainted)
+                    {
+                        var healAmount = battle.EffectState.Hp ?? 0;
+                        var damage = battle.Heal(healAmount, target, target);
+                        if (damage > 0 && battle.DisplayUi)
+                        {
+                            var wisherName = battle.EffectState.Source?.Name ?? "unknown";
+                            battle.Add("-heal", target, target.GetHealth,
+                                "[from] move: Wish", $"[wisher] {wisherName}");
+                        }
+                    }
+                }),
+            },
             [ConditionId.ZenMode] = new()
             {
                 Id = ConditionId.ZenMode,

@@ -16,6 +16,31 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
+            [ConditionId.LaserFocus] = new()
+            {
+                Id = ConditionId.LaserFocus,
+                Name = "Laser Focus",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.LaserFocus,
+                Duration = 2,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Laser Focus");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnModifyCritRatio - guarantee critical hit for next move
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "move: Laser Focus", "[silent]");
+                    }
+                }),
+            },
             [ConditionId.LeechSeed] = new()
             {
                 Id = ConditionId.LeechSeed,
@@ -131,6 +156,61 @@ public partial record Conditions
                 AssociatedMove = MoveId.LunarDance,
                 // TODO: onSwitchIn - trigger Swap event
                 // TODO: onSwap - heal HP to max, cure status, restore PP if needed
+            },
+            [ConditionId.LockedMove] = new()
+            {
+                Id = ConditionId.LockedMove,
+                Name = "Locked Move",
+                EffectType = EffectType.Condition,
+                // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
+                Duration = 2,
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                {
+                    if (target.Status == ConditionId.Sleep)
+                    {
+                        // Don't lock, and bypass confusion for calming
+                        target.DeleteVolatile(ConditionId.LockedMove);
+                    }
+                    if (target.Volatiles.TryGetValue(ConditionId.LockedMove, out var state))
+                    {
+                        state.TrueDuration = (state.TrueDuration ?? 0) - 1;
+                    }
+                }),
+                OnStart = new OnStartEventInfo((battle, target, source, effect) =>
+                {
+                    battle.EffectState.TrueDuration = battle.Random(2, 4);
+                    battle.EffectState.Move = effect?.Id;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if ((battle.EffectState.TrueDuration ?? 0) >= 2)
+                    {
+                        battle.EffectState.Duration = 2;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnAfterMove = new OnAfterMoveEventInfo((battle, source, target, move) =>
+                {
+                    if ((battle.EffectState.Duration ?? 0) == 1)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+                }),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
+                    target.AddVolatile(_library.Conditions[ConditionId.Confusion]);
+                }),
+                OnLockMove = new OnLockMoveEventInfo((battle, pokemon) =>
+                {
+                    // TODO: Check for Dynamax volatile - if present, don't lock
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.LockedMove, out var state))
+                    {
+                        return state.Move;
+                    }
+                    return null;
+                }),
             },
         };
     }
