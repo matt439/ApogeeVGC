@@ -308,7 +308,6 @@ public partial record Conditions
                     {
                         battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
                     }
-                    }
                     else
                     {
                         if (battle.DisplayUi)

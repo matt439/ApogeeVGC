@@ -1127,20 +1127,20 @@ public partial record Conditions
                 {
                     if (battle.EffectState.Move != null)
                     {
-                        target.RemoveVolatile((ConditionId)battle.EffectState.Move);
+                        target.DeleteVolatile((ConditionId)battle.EffectState.Move);
                     }
                 }),
-                OnLockMove = (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, pokemon) =>
+                OnLockMove = new OnLockMoveEventInfo((Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, pokemon) =>
                 {
                     if (battle.EffectState.Move.HasValue)
                     {
                         return battle.EffectState.Move.Value;
                     }
                     return MoveIdVoidUnion.FromVoid();
-                }),
+                })),
                 OnMoveAborted = new OnMoveAbortedEventInfo((battle, pokemon, _, _) =>
                 {
-                    pokemon.RemoveVolatile(ConditionId.TwoTurnMove);
+                    pokemon.DeleteVolatile(ConditionId.TwoTurnMove);
                 }),
             },
             [ConditionId.Spikes] = new()

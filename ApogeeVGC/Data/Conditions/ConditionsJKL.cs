@@ -204,7 +204,7 @@ public partial record Conditions
                     if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
                     target.AddVolatile(ConditionId.Confusion);
                 }),
-                OnLockMove = (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, pokemon) =>
+                OnLockMove = new OnLockMoveEventInfo((Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, pokemon) =>
                 {
                     // TODO: Check for Dynamax volatile - if present, don't lock
                     if (pokemon.Volatiles.TryGetValue(ConditionId.LockedMove, out var state) && state.Move.HasValue)
@@ -212,7 +212,7 @@ public partial record Conditions
                         return state.Move.Value;
                     }
                     return MoveIdVoidUnion.FromVoid();
-                }),
+                })),
             },
             [ConditionId.KingsShield] = new()
             {

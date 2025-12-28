@@ -75,7 +75,7 @@ public partial record Conditions
                     {
                         var healAmount = battle.EffectState.Hp ?? 0;
                         var damage = battle.Heal(healAmount, target, target);
-                        if (damage > 0 && battle.DisplayUi)
+                        if (damage is IntIntFalseUnion { Value: > 0 } && battle.DisplayUi)
                         {
                             var wisherName = battle.EffectState.Source?.Name ?? "unknown";
                             battle.Add("-heal", target, target.GetHealth,
