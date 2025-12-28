@@ -784,6 +784,25 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.RagePowder] = new()
+            {
+                Id = ConditionId.RagePowder,
+                Name = "Rage Powder",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.RagePowder,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", pokemon, "move: Rage Powder");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnFoeRedirectTarget - redirect attacks to this Pokemon (priority 1)
+                // Check if source has powder immunity, check if ragePowderUser is sky dropped
+                // Check if ragePowderUser is valid target, then redirect
+            },
         };
     }
 }

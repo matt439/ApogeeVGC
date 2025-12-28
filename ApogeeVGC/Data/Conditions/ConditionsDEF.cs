@@ -488,6 +488,30 @@ public partial record Conditions
                 // TODO: OnFoeRedirectTarget - redirect attacks to this Pokemon
                 // Priority 1, check if target is valid and not sky dropped
             },
+            [ConditionId.FlashFire] = new()
+            {
+                Id = ConditionId.FlashFire,
+                Name = "Flash Fire",
+                EffectType = EffectType.Condition,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "ability: Flash Fire");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnModifyAtk (priority 5) - boost Fire moves by 1.5x if attacker has Flash Fire
+                // TODO: OnModifySpA (priority 5) - boost Fire moves by 1.5x if attacker has Flash Fire
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "ability: Flash Fire", "[silent]");
+                    }
+                }),
+            },
             [ConditionId.FuryCutter] = new()
             {
                 Id = ConditionId.FuryCutter,

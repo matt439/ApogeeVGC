@@ -311,6 +311,47 @@ public partial record Conditions
                 }, 3),
                 // TODO: OnHit - if move is Z or Max powered and makes contact, lower Defense by 2
             },
+            [ConditionId.Octolock] = new()
+            {
+                Id = ConditionId.Octolock,
+                Name = "Octolock",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Octolock,
+                // TODO: OnTryImmunity - check trap immunity
+                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Octolock", $"[of] {source}");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    var source = battle.EffectState.Source;
+                    if (source == null || !source.IsActive || source.Hp <= 0 || source.ActiveTurns <= 0)
+                    {
+                        pokemon.DeleteVolatile(ConditionId.Octolock);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, "Octolock", "[partiallytrapped]", "[silent]");
+                        }
+                        return;
+                    }
+                    battle.Boost(new Dictionary<BoostedStat, int>
+                    {
+                        [BoostedStat.Def] = -1,
+                        [BoostedStat.SpD] = -1
+                    }, pokemon, source);
+                }, 14),
+                OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
+                {
+                    if (battle.EffectState.Source?.IsActive ?? false)
+                    {
+                        pokemon.TryTrap();
+                    }
+                }),
+            },
         };
     }
 }

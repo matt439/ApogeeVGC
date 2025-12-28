@@ -293,6 +293,42 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
             },
+            [ConditionId.SyrupBomb] = new()
+            {
+                Id = ConditionId.SyrupBomb,
+                Name = "Syrup Bomb",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.SyrupBomb,
+                NoCopy = true,
+                Duration = 4,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Syrup Bomb");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (battle.EffectState.Source != null && !battle.EffectState.Source.IsActive)
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.SyrupBomb]);
+                    }
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Boost(new Dictionary<BoostedStat, int> { [BoostedStat.Spe] = -1 },
+                        pokemon, battle.EffectState.Source);
+                }, 14),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Syrup Bomb", "[silent]");
+                    }
+                }),
+            },
             [ConditionId.StruggleRecoil] = new()
             {
                 Id = ConditionId.StruggleRecoil,
