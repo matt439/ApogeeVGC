@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
@@ -10,6 +11,8 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
+
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
 
@@ -30,7 +33,8 @@ public partial record Abilities
                 {
                     MoveId[] blockedMoves =
                     [
-                        MoveId.Explosion, MoveId.MindBlown, MoveId.MistyExplosion, MoveId.SelfDestruct
+                        MoveId.Explosion, MoveId.MindBlown, MoveId.MistyExplosion,
+                        MoveId.SelfDestruct
                     ];
                     if (blockedMoves.Contains(move.Id))
                     {
@@ -40,10 +44,13 @@ public partial record Abilities
                                 Pokemon: var dampHolder
                             })
                         {
-                            battle.Add("cant", dampHolder, "ability: Damp", move.Name, $"[of] {target}");
+                            battle.Add("cant", dampHolder, "ability: Damp", move.Name,
+                                $"[of] {target}");
                         }
+
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
                 OnAnyDamage = new OnAnyDamageEventInfo((_, _, _, _, effect) =>
@@ -53,6 +60,7 @@ public partial record Abilities
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
             },
@@ -62,8 +70,7 @@ public partial record Abilities
                 Name = "Dancer",
                 Num = 216,
                 Rating = 1.5,
-                // Implemented in runMove in scripts.js / Battle.RunMove
-                // TODO: Implement Dancer logic in Battle.RunMove
+                // implementation is in Battle.RunMove
             },
             [AbilityId.DarkAura] = new()
             {
@@ -76,24 +83,26 @@ public partial record Abilities
                     if (battle.SuppressingAbility(pokemon)) return;
                     battle.Add("-ability", pokemon, "Dark Aura");
                 }),
-                OnAnyBasePower = new OnAnyBasePowerEventInfo((battle, basePower, source, target, move) =>
-                {
-                    if (target == source || move.Category == MoveCategory.Status || move.Type != MoveType.Dark)
-                        return basePower;
+                OnAnyBasePower = new OnAnyBasePowerEventInfo(
+                    (battle, basePower, source, target, move) =>
+                    {
+                        if (target == source || move.Category == MoveCategory.Status ||
+                            move.Type != MoveType.Dark)
+                            return basePower;
 
-                    if (battle.EffectState.Target is not PokemonEffectStateTarget
-                        {
-                            Pokemon: var abilityHolder
-                        })
-                        return basePower;
+                        if (battle.EffectState.Target is not PokemonEffectStateTarget
+                            {
+                                Pokemon: var abilityHolder
+                            })
+                            return basePower;
 
-                    if (move.AuraBooster?.HasAbility(AbilityId.DarkAura) != true)
-                        move.AuraBooster = abilityHolder;
-                    if (move.AuraBooster != abilityHolder) return basePower;
+                        if (move.AuraBooster?.HasAbility(AbilityId.DarkAura) != true)
+                            move.AuraBooster = abilityHolder;
+                        if (move.AuraBooster != abilityHolder) return basePower;
 
-                    battle.ChainModify(move.HasAuraBreak == true ? [3072, 4096] : [5448, 4096]);
-                    return battle.FinalModify(basePower);
-                }, 20),
+                        battle.ChainModify(move.HasAuraBreak == true ? [3072, 4096] : [5448, 4096]);
+                        return battle.FinalModify(basePower);
+                    }, 20),
             },
             [AbilityId.DauntlessShield] = new()
             {
@@ -157,6 +166,7 @@ public partial record Abilities
                         battle.ChainModify(0.5);
                         return battle.FinalModify(atk);
                     }
+
                     return atk;
                 }, 5),
                 // OnModifySpAPriority = 5
@@ -167,6 +177,7 @@ public partial record Abilities
                         battle.ChainModify(0.5);
                         return battle.FinalModify(spa);
                     }
+
                     return spa;
                 }, 5),
             },
@@ -182,7 +193,8 @@ public partial record Abilities
                         if (source == null || target.IsAlly(source)) return;
 
                         bool statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
-                                            || boost.SpD is < 0 || boost.Spe is < 0 || boost.Accuracy is < 0
+                                            || boost.SpD is < 0 || boost.Spe is < 0 ||
+                                            boost.Accuracy is < 0
                                             || boost.Evasion is < 0;
 
                         if (statsLowered)
@@ -205,19 +217,23 @@ public partial record Abilities
                 OnAnySetWeather = new OnAnySetWeatherEventInfo((battle, _, _, weather) =>
                 {
                     ConditionId[] strongWeathers =
-                        [ConditionId.DesolateLand, ConditionId.PrimordialSea, ConditionId.DeltaStream];
-                    if (battle.Field.GetWeather()?.Id == ConditionId.DeltaStream &&
+                    [
+                        ConditionId.DesolateLand, ConditionId.PrimordialSea,
+                        ConditionId.DeltaStream,
+                    ];
+                    if (battle.Field.GetWeather().Id == ConditionId.DeltaStream &&
                         !strongWeathers.Contains(weather.Id))
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
                     Pokemon pokemon = psfp.Pokemon;
-                    if (battle.Field.WeatherState?.Source != pokemon) return;
+                    if (battle.Field.WeatherState.Source != pokemon) return;
                     foreach (Pokemon target in battle.GetAllActive())
                     {
                         if (target == pokemon) continue;
@@ -227,6 +243,7 @@ public partial record Abilities
                             return;
                         }
                     }
+
                     battle.Field.ClearWeather();
                 }),
             },
@@ -243,19 +260,22 @@ public partial record Abilities
                 OnAnySetWeather = new OnAnySetWeatherEventInfo((battle, _, _, weather) =>
                 {
                     ConditionId[] strongWeathers =
-                        [ConditionId.DesolateLand, ConditionId.PrimordialSea, ConditionId.DeltaStream];
-                    if (battle.Field.GetWeather()?.Id == ConditionId.DesolateLand &&
+                    [
+                        ConditionId.DesolateLand, ConditionId.PrimordialSea, ConditionId.DeltaStream
+                    ];
+                    if (battle.Field.GetWeather().Id == ConditionId.DesolateLand &&
                         !strongWeathers.Contains(weather.Id))
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
                     Pokemon pokemon = psfp.Pokemon;
-                    if (battle.Field.WeatherState?.Source != pokemon) return;
+                    if (battle.Field.WeatherState.Source != pokemon) return;
                     foreach (Pokemon target in battle.GetAllActive())
                     {
                         if (target == pokemon) continue;
@@ -265,6 +285,7 @@ public partial record Abilities
                             return;
                         }
                     }
+
                     battle.Field.ClearWeather();
                 }),
             },
@@ -285,11 +306,58 @@ public partial record Abilities
                     Breakable = true,
                     NoTransform = true,
                 },
-                // TODO: Implement Disguise - requires forme change logic for Mimikyu
                 // OnDamagePriority = 1
-                // OnCriticalHit
-                // OnEffectiveness
-                // OnUpdate
+                OnDamage = new OnDamageEventInfo((battle, damage, target, _, effect) =>
+                {
+                    if (effect.EffectType == EffectType.Move &&
+                        (target.Species.Id == SpecieId.Mimikyu ||
+                         target.Species.Id == SpecieId.MimikyuTotem))
+                    {
+                        battle.Add("-activate", target, "ability: Disguise");
+                        battle.EffectState.Busted = true;
+                        return 0;
+                    }
+
+                    return damage;
+                }, 1),
+                OnCriticalHit = new OnCriticalHitEventInfo(
+                    (Func<Battle, Pokemon, object?, Move, BoolVoidUnion>)((_, target, _,
+                        move) =>
+                    {
+                        if (target is null) return new VoidReturn();
+                        if (target.Species.Id != SpecieId.Mimikyu &&
+                            target.Species.Id != SpecieId.MimikyuTotem)
+                        {
+                            return new VoidReturn();
+                        }
+
+                        bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                      (move.Flags.BypassSub != true);
+                        if (hitSub) return new VoidReturn();
+
+                        if (move is ActiveMove activeMove && !target.RunImmunity(activeMove))
+                            return new VoidReturn();
+                        return BoolVoidUnion.FromBool(false);
+                    })),
+                OnEffectiveness = new OnEffectivenessEventInfo((_, _, target, _, move) =>
+                {
+                    if (target is null || move.Category == MoveCategory.Status)
+                        return new VoidReturn();
+                    if (target.Species.Id != SpecieId.Mimikyu &&
+                        target.Species.Id != SpecieId.MimikyuTotem)
+                    {
+                        return new VoidReturn();
+                    }
+
+                    bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                  (move.Flags.BypassSub != true) && move.Infiltrates == true;
+                    if (hitSub) return new VoidReturn();
+
+                    if (!target.RunImmunity(move)) return new VoidReturn();
+                    return 0;
+                }),
+                // OnUpdate - forme change not implemented (requires forme change system)
+                // TODO: Implement forme change from Mimikyu to Mimikyu-Busted when busted state is set
             },
             [AbilityId.Download] = new()
             {
@@ -306,6 +374,7 @@ public partial record Abilities
                         totalDef += target.GetStat(StatIdExceptHp.Def, false, true);
                         totalSpd += target.GetStat(StatIdExceptHp.SpD, false, true);
                     }
+
                     if (totalDef > 0 && totalDef >= totalSpd)
                     {
                         battle.Boost(new SparseBoostsTable { SpA = 1 });
@@ -331,6 +400,7 @@ public partial record Abilities
                         battle.ChainModify(1.5);
                         return battle.FinalModify(atk);
                     }
+
                     return atk;
                 }, 5),
                 // OnModifySpAPriority = 5
@@ -342,6 +412,7 @@ public partial record Abilities
                         battle.ChainModify(1.5);
                         return battle.FinalModify(spa);
                     }
+
                     return spa;
                 }, 5),
             },
@@ -358,631 +429,855 @@ public partial record Abilities
             },
             [AbilityId.Drought] = new()
             {
-                    Id = AbilityId.Drought,
-                    Name = "Drought",
-                    Num = 70,
-                    Rating = 4.0,
-                    OnStart = new OnStartEventInfo((battle, _) =>
-                    {
-                        battle.Field.SetWeather(ConditionId.SunnyDay);
-                    }),
-                },
-                [AbilityId.DrySkin] = new()
+                Id = AbilityId.Drought,
+                Name = "Drought",
+                Num = 70,
+                Rating = 4.0,
+                OnStart = new OnStartEventInfo((battle, _) =>
                 {
-                    Id = AbilityId.DrySkin,
-                    Name = "Dry Skin",
-                    Num = 87,
-                    Rating = 3.0,
-                    Flags = new AbilityFlags { Breakable = true },
-                    OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                                    {
-                                        if (target != source && move.Type == MoveType.Water)
-                                        {
-                                            var healResult = battle.Heal(target.BaseMaxHp / 4, target);
-                                            if (healResult is FalseIntFalseUnion)
-                                            {
-                                                battle.Add("-immune", target, "[from] ability: Dry Skin");
-                                            }
-                                            return null;
-                                        }
-                                        return new VoidReturn();
-                                    }),
-                    // OnSourceBasePowerPriority = 17
-                    OnSourceBasePower = new OnSourceBasePowerEventInfo((battle, basePower, _, _, move) =>
+                    battle.Field.SetWeather(ConditionId.SunnyDay);
+                }),
+            },
+            [AbilityId.DrySkin] = new()
+            {
+                Id = AbilityId.DrySkin,
+                Name = "Dry Skin",
+                Num = 87,
+                Rating = 3.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (target != source && move.Type == MoveType.Water)
+                    {
+                        var healResult = battle.Heal(target.BaseMaxHp / 4, target);
+                        if (healResult is FalseIntFalseUnion)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Dry Skin");
+                        }
+
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
+                // OnSourceBasePowerPriority = 17
+                OnSourceBasePower = new OnSourceBasePowerEventInfo(
+                    (battle, basePower, _, _, move) =>
                     {
                         if (move.Type == MoveType.Fire)
                         {
                             battle.ChainModify(1.25);
                             return battle.FinalModify(basePower);
                         }
+
                         return basePower;
                     }, 17),
-                    OnWeather = new OnWeatherEventInfo((battle, target, _, effect) =>
-                    {
-                        if (target.HasItem(ItemId.UtilityUmbrella)) return;
-                    if (effect.Id == ConditionId.RainDance || effect.Id == ConditionId.PrimordialSea)
+                OnWeather = new OnWeatherEventInfo((battle, target, _, effect) =>
+                {
+                    if (target.HasItem(ItemId.UtilityUmbrella)) return;
+                    if (effect.Id == ConditionId.RainDance ||
+                        effect.Id == ConditionId.PrimordialSea)
                     {
                         battle.Heal(target.BaseMaxHp / 8, target);
                     }
-                    else if (effect.Id == ConditionId.SunnyDay || effect.Id == ConditionId.DesolateLand)
+                    else if (effect.Id == ConditionId.SunnyDay ||
+                             effect.Id == ConditionId.DesolateLand)
                     {
                         battle.Damage(target.BaseMaxHp / 8, target, target);
                     }
-                                }),
-                            },
-                            [AbilityId.EarlyBird] = new()
-                            {
-                                Id = AbilityId.EarlyBird,
-                                Name = "Early Bird",
-                                Num = 48,
-                                Rating = 1.5,
-                                // Implementation is in statuses.ts (Sleep condition)
-                                // Early Bird causes sleep to count down twice as fast
-                            },
-                            [AbilityId.EarthEater] = new()
-                            {
-                                Id = AbilityId.EarthEater,
-                                Name = "Earth Eater",
-                                Num = 297,
-                                Rating = 3.5,
-                                Flags = new AbilityFlags { Breakable = true },
-                                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                                {
-                                    if (target != source && move.Type == MoveType.Ground)
-                                    {
-                                        var healResult = battle.Heal(target.BaseMaxHp / 4, target);
-                                        if (healResult is FalseIntFalseUnion)
-                                        {
-                                            battle.Add("-immune", target, "[from] ability: Earth Eater");
-                                        }
-                                        return null;
-                                    }
-                                    return new VoidReturn();
-                                }),
-                                },
-                                [AbilityId.EffectSpore] = new()
-                                {
-                                    Id = AbilityId.EffectSpore,
-                                    Name = "Effect Spore",
-                                    Num = 27,
-                                    Rating = 2.0,
-                                    OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
-                                    {
-                                        if (battle.CheckMoveMakesContact(move, source, target) &&
-                                            source.Status == ConditionId.None &&
-                                            source.RunStatusImmunity(ConditionId.Powder))
-                                        {
-                                            int r = battle.Random(100);
-                                            if (r < 11)
-                                            {
-                                                source.SetStatus(ConditionId.Sleep, target);
-                                            }
-                                            else if (r < 21)
-                                            {
-                                                source.SetStatus(ConditionId.Paralysis, target);
-                                            }
-                                            else if (r < 30)
-                                            {
-                                                source.SetStatus(ConditionId.Poison, target);
-                                            }
-                                        }
-                                    }),
-                                },
-                                [AbilityId.ElectricSurge] = new()
-                            {
-                                Id = AbilityId.ElectricSurge,
-                                Name = "Electric Surge",
-                                Num = 226,
-                                Rating = 4.0,
-                                OnStart = new OnStartEventInfo((battle, _) =>
-                                {
-                                    battle.Field.SetTerrain(battle.Library.Conditions[ConditionId.ElectricTerrain]);
-                                }),
-                            },
-                            [AbilityId.Electromorphosis] = new()
-                            {
-                                Id = AbilityId.Electromorphosis,
-                                Name = "Electromorphosis",
-                                Num = 280,
-                                Rating = 3.0,
-                                // OnDamagingHitOrder = 1
-                                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, _) =>
-                                {
-                                    target.AddVolatile(ConditionId.Charge);
-                                }, 1),
-                            },
-                            [AbilityId.EmbodyAspectCornerstone] = new()
-                            {
-                                Id = AbilityId.EmbodyAspectCornerstone,
-                                Name = "Embody Aspect (Cornerstone)",
-                                Num = 304,
-                                Rating = 3.5,
-                                Flags = new AbilityFlags
-                                {
-                                    FailRolePlay = true,
-                                    NoReceiver = true,
-                                    NoEntrain = true,
-                                    NoTrace = true,
-                                    FailSkillSwap = true,
-                                    NoTransform = true,
-                                },
-                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                    {
-                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Cornerstone-Tera" &&
-                                            pokemon.Terastallized != null &&
-                                            !(battle.EffectState.Embodied ?? false))
-                                        {
-                                            battle.EffectState.Embodied = true;
-                                            battle.Boost(new SparseBoostsTable { Def = 1 }, pokemon);
-                                        }
-                                    }),
-                                },
-                                [AbilityId.EmbodyAspectHearthflame] = new()
-                            {
-                                Id = AbilityId.EmbodyAspectHearthflame,
-                                Name = "Embody Aspect (Hearthflame)",
-                                Num = 303,
-                                Rating = 3.5,
-                                Flags = new AbilityFlags
-                                {
-                                    FailRolePlay = true,
-                                    NoReceiver = true,
-                                    NoEntrain = true,
-                                    NoTrace = true,
-                                    FailSkillSwap = true,
-                                    NoTransform = true,
-                                },
-                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                    {
-                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Hearthflame-Tera" &&
-                                            pokemon.Terastallized != null &&
-                                            !(battle.EffectState.Embodied ?? false))
-                                        {
-                                            battle.EffectState.Embodied = true;
-                                            battle.Boost(new SparseBoostsTable { Atk = 1 }, pokemon);
-                                        }
-                                    }),
-                                },
-                                [AbilityId.EmbodyAspectTeal] = new()
-                            {
-                                Id = AbilityId.EmbodyAspectTeal,
-                                Name = "Embody Aspect (Teal)",
-                                Num = 301,
-                                Rating = 3.5,
-                                Flags = new AbilityFlags
-                                {
-                                    FailRolePlay = true,
-                                    NoReceiver = true,
-                                    NoEntrain = true,
-                                    NoTrace = true,
-                                    FailSkillSwap = true,
-                                    NoTransform = true,
-                                },
-                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                    {
-                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Teal-Tera" &&
-                                            pokemon.Terastallized != null &&
-                                            !(battle.EffectState.Embodied ?? false))
-                                        {
-                                            battle.EffectState.Embodied = true;
-                                            battle.Boost(new SparseBoostsTable { Spe = 1 }, pokemon);
-                                        }
-                                    }),
-                                },
-                                [AbilityId.EmbodyAspectWellspring] = new()
-                            {
-                                Id = AbilityId.EmbodyAspectWellspring,
-                                Name = "Embody Aspect (Wellspring)",
-                                Num = 302,
-                                Rating = 3.5,
-                                Flags = new AbilityFlags
-                                {
-                                    FailRolePlay = true,
-                                    NoReceiver = true,
-                                    NoEntrain = true,
-                                    NoTrace = true,
-                                    FailSkillSwap = true,
-                                    NoTransform = true,
-                                },
-                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                    {
-                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Wellspring-Tera" &&
-                                            pokemon.Terastallized != null &&
-                                            !(battle.EffectState.Embodied ?? false))
-                                        {
-                                            battle.EffectState.Embodied = true;
-                                            battle.Boost(new SparseBoostsTable { SpD = 1 }, pokemon);
-                                        }
-                                    }),
-                                },
-                                        [AbilityId.EmergencyExit] = new()
-                                    {
-                                        Id = AbilityId.EmergencyExit,
-                                        Name = "Emergency Exit",
-                                        Num = 194,
-                                        Rating = 1.0,
-                                        OnEmergencyExit = new OnEmergencyExitEventInfo((battle, target) =>
-                                        {
-                                            if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag || target.SwitchFlag.IsTrue())
-                                                return;
+                }),
+            },
+            [AbilityId.EarlyBird] = new()
+            {
+                Id = AbilityId.EarlyBird,
+                Name = "Early Bird",
+                Num = 48,
+                Rating = 1.5,
+                // Implementation is in statuses.ts (Sleep condition)
+                // Early Bird causes sleep to count down twice as fast
+            },
+            [AbilityId.EarthEater] = new()
+            {
+                Id = AbilityId.EarthEater,
+                Name = "Earth Eater",
+                Num = 297,
+                Rating = 3.5,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (target != source && move.Type == MoveType.Ground)
+                    {
+                        var healResult = battle.Heal(target.BaseMaxHp / 4, target);
+                        if (healResult is FalseIntFalseUnion)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Earth Eater");
+                        }
 
-                                            // Clear all switch flags
-                                            foreach (var side in battle.Sides)
-                                            {
-                                                foreach (var active in side.Active)
-                                                {
-                                                    if (active != null)
-                                                        active.SwitchFlag = false;
-                                                }
-                                            }
+                        return null;
+                    }
 
-                                            target.SwitchFlag = true;
-                                            battle.Add("-activate", target, "ability: Emergency Exit");
-                                        }),
-                                    },
-                                    [AbilityId.FairyAura] = new()
-                                    {
-                                        Id = AbilityId.FairyAura,
-                                        Name = "Fairy Aura",
-                                        Num = 187,
-                                        Rating = 3.0,
-                                        OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                        {
-                                            if (battle.SuppressingAbility(pokemon)) return;
-                                            battle.Add("-ability", pokemon, "Fairy Aura");
-                                        }),
-                                        OnAnyBasePower = new OnAnyBasePowerEventInfo((battle, basePower, source, target, move) =>
-                                        {
-                                            if (target == source || move.Category == MoveCategory.Status || move.Type != MoveType.Fairy)
-                                                return basePower;
+                    return new VoidReturn();
+                }),
+            },
+            [AbilityId.EffectSpore] = new()
+            {
+                Id = AbilityId.EffectSpore,
+                Name = "Effect Spore",
+                Num = 27,
+                Rating = 2.0,
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    if (battle.CheckMoveMakesContact(move, source, target) &&
+                        source.Status == ConditionId.None &&
+                        source.RunStatusImmunity(ConditionId.Powder))
+                    {
+                        int r = battle.Random(100);
+                        if (r < 11)
+                        {
+                            source.SetStatus(ConditionId.Sleep, target);
+                        }
+                        else if (r < 21)
+                        {
+                            source.SetStatus(ConditionId.Paralysis, target);
+                        }
+                        else if (r < 30)
+                        {
+                            source.SetStatus(ConditionId.Poison, target);
+                        }
+                    }
+                }),
+            },
+            [AbilityId.ElectricSurge] = new()
+            {
+                Id = AbilityId.ElectricSurge,
+                Name = "Electric Surge",
+                Num = 226,
+                Rating = 4.0,
+                OnStart = new OnStartEventInfo((battle, _) =>
+                {
+                    battle.Field.SetTerrain(
+                        battle.Library.Conditions[ConditionId.ElectricTerrain]);
+                }),
+            },
+            [AbilityId.Electromorphosis] = new()
+            {
+                Id = AbilityId.Electromorphosis,
+                Name = "Electromorphosis",
+                Num = 280,
+                Rating = 3.0,
+                // OnDamagingHitOrder = 1
+                OnDamagingHit = new OnDamagingHitEventInfo(
+                    (_, _, target, _, _) => { target.AddVolatile(ConditionId.Charge); }, 1),
+            },
+            [AbilityId.EmbodyAspectCornerstone] = new()
+            {
+                Id = AbilityId.EmbodyAspectCornerstone,
+                Name = "Embody Aspect (Cornerstone)",
+                Num = 304,
+                Rating = 3.5,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    NoTransform = true,
+                },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Name == "Ogerpon-Cornerstone-Tera" &&
+                        pokemon.Terastallized != null &&
+                        !(battle.EffectState.Embodied ?? false))
+                    {
+                        battle.EffectState.Embodied = true;
+                        battle.Boost(new SparseBoostsTable { Def = 1 }, pokemon);
+                    }
+                }),
+            },
+            [AbilityId.EmbodyAspectHearthflame] = new()
+            {
+                Id = AbilityId.EmbodyAspectHearthflame,
+                Name = "Embody Aspect (Hearthflame)",
+                Num = 303,
+                Rating = 3.5,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    NoTransform = true,
+                },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Name == "Ogerpon-Hearthflame-Tera" &&
+                        pokemon.Terastallized != null &&
+                        !(battle.EffectState.Embodied ?? false))
+                    {
+                        battle.EffectState.Embodied = true;
+                        battle.Boost(new SparseBoostsTable { Atk = 1 }, pokemon);
+                    }
+                }),
+            },
+            [AbilityId.EmbodyAspectTeal] = new()
+            {
+                Id = AbilityId.EmbodyAspectTeal,
+                Name = "Embody Aspect (Teal)",
+                Num = 301,
+                Rating = 3.5,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    NoTransform = true,
+                },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Name == "Ogerpon-Teal-Tera" &&
+                        pokemon.Terastallized != null &&
+                        !(battle.EffectState.Embodied ?? false))
+                    {
+                        battle.EffectState.Embodied = true;
+                        battle.Boost(new SparseBoostsTable { Spe = 1 }, pokemon);
+                    }
+                }),
+            },
+            [AbilityId.EmbodyAspectWellspring] = new()
+            {
+                Id = AbilityId.EmbodyAspectWellspring,
+                Name = "Embody Aspect (Wellspring)",
+                Num = 302,
+                Rating = 3.5,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    NoTransform = true,
+                },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Name == "Ogerpon-Wellspring-Tera" &&
+                        pokemon.Terastallized != null &&
+                        !(battle.EffectState.Embodied ?? false))
+                    {
+                        battle.EffectState.Embodied = true;
+                        battle.Boost(new SparseBoostsTable { SpD = 1 }, pokemon);
+                    }
+                }),
+            },
+            [AbilityId.EmergencyExit] = new()
+            {
+                Id = AbilityId.EmergencyExit,
+                Name = "Emergency Exit",
+                Num = 194,
+                Rating = 1.0,
+                OnEmergencyExit = new OnEmergencyExitEventInfo((battle, target) =>
+                {
+                    if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag ||
+                        target.SwitchFlag.IsTrue())
+                        return;
 
-                                            if (battle.EffectState.Target is not PokemonEffectStateTarget
-                                                {
-                                                    Pokemon: var abilityHolder
-                                                })
-                                                return basePower;
+                    // Clear all switch flags
+                    foreach (var side in battle.Sides)
+                    {
+                        foreach (var active in side.Active)
+                        {
+                            if (active != null)
+                                active.SwitchFlag = false;
+                        }
+                    }
 
-                                            if (move.AuraBooster?.HasAbility(AbilityId.FairyAura) != true)
-                                                move.AuraBooster = abilityHolder;
-                                            if (move.AuraBooster != abilityHolder) return basePower;
+                    target.SwitchFlag = true;
+                    battle.Add("-activate", target, "ability: Emergency Exit");
+                }),
+            },
+            [AbilityId.FairyAura] = new()
+            {
+                Id = AbilityId.FairyAura,
+                Name = "Fairy Aura",
+                Num = 187,
+                Rating = 3.0,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (battle.SuppressingAbility(pokemon)) return;
+                    battle.Add("-ability", pokemon, "Fairy Aura");
+                }),
+                OnAnyBasePower = new OnAnyBasePowerEventInfo(
+                    (battle, basePower, source, target, move) =>
+                    {
+                        if (target == source || move.Category == MoveCategory.Status ||
+                            move.Type != MoveType.Fairy)
+                            return basePower;
 
-                                            battle.ChainModify(move.HasAuraBreak == true ? [3072, 4096] : [5448, 4096]);
-                                            return battle.FinalModify(basePower);
-                                        }, 20),
-                                    },
-                                    [AbilityId.Filter] = new()
-                                    {
-                                        Id = AbilityId.Filter,
-                                        Name = "Filter",
-                                        Num = 111,
-                                        Rating = 3.0,
-                                        Flags = new AbilityFlags { Breakable = true },
-                                        OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
-                                        {
-                                            if (target.GetMoveHitData(move).TypeMod > 0)
-                                            {
-                                                battle.Debug("Filter neutralize");
-                                                battle.ChainModify(0.75);
-                                                return battle.FinalModify(damage);
-                                            }
-                                            return damage;
-                                        }),
-                                    },
-                                    [AbilityId.FlameBody] = new()
+                        if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Id = AbilityId.FlameBody,
-                                Name = "Flame Body",
-                                Num = 49,
-                                Rating = 2.0,
-                                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
-                                {
-                                    if (!battle.CheckMoveMakesContact(move, source, target)) return;
+                                Pokemon: var abilityHolder
+                            })
+                            return basePower;
 
-                                                            if (battle.RandomChance(3, 10))
-                                                            {
-                                                                source.TrySetStatus(ConditionId.Burn, target);
-                                                            }
-                                                        }),
-                                                    },
-                                    [AbilityId.FlareBoost] = new()
-                                    {
-                                        Id = AbilityId.FlareBoost,
-                                        Name = "Flare Boost",
-                                        Num = 138,
-                                        Rating = 2.0,
-                                        // OnBasePowerPriority = 19
-                                        OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
-                                        {
-                                            if (attacker.Status == ConditionId.Burn && move.Category == MoveCategory.Special)
-                                            {
-                                                battle.ChainModify(1.5);
-                                                return battle.FinalModify(basePower);
-                                            }
-                                                                                        return basePower;
-                                                                                    }, 19),
-                                                                                },
-                                                        [AbilityId.FlashFire] = new()
-                                                        {
-                                                            Id = AbilityId.FlashFire,
-                                                            Name = "Flash Fire",
-                                                            Num = 18,
-                                                            Rating = 3.5,
-                                                            Flags = new AbilityFlags { Breakable = true },
-                                                            Condition = ConditionId.FlashFire,
-                                                            OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                                                            {
-                                                                if (target != source && move.Type == MoveType.Fire)
-                                                                {
-                                                                    // Note: In TS, move.accuracy is set to true here
-                                                                    // We cannot modify init-only Accuracy, but the hit will still be blocked
-                                                                    var addResult = target.AddVolatile(ConditionId.FlashFire);
-                                                                    if (addResult is BoolRelayVar { Value: false })
-                                                                    {
-                                                                        battle.Add("-immune", target, "[from] ability: Flash Fire");
-                                                                    }
-                                                                    return null;
-                                                                }
-                                                                return new VoidReturn();
-                                                            }),
-                                                            OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
-                                                            {
-                                                                if (pokemonUnion is PokemonSideFieldPokemon { Pokemon: var pokemon })
-                                                                {
-                                                                    pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.FlashFire]);
-                                                                }
-                                                            }),
-                                                        },
-                                                        [AbilityId.FlowerGift] = new()
-                                                        {
-                                                            Id = AbilityId.FlowerGift,
-                                                            Name = "Flower Gift",
-                                                            Num = 122,
-                                                            Rating = 1.0,
-                                                            Flags = new AbilityFlags
-                                                            {
-                                                                FailRolePlay = true,
-                                                                NoReceiver = true,
-                                                                NoEntrain = true,
-                                                                NoTrace = true,
-                                                                Breakable = true,
-                                                            },
-                                                            // TODO: Implement forme change for Cherrim
-                                                            // OnSwitchInPriority = -2
-                                                            // OnWeatherChange for forme
-                                                            // OnAllyModifyAtkPriority = 3
-                                                            OnAllyModifyAtk = new OnAllyModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
-                                                            {
-                                                                if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var flowerGiftHolder })
-                                                                    return atk;
-                                                                if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return atk;
-                                                                ConditionId? weather = pokemon.EffectiveWeather();
-                                                                if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
-                                                                {
-                                                                    battle.ChainModify(1.5);
-                                                                    return battle.FinalModify(atk);
-                                                                }
-                                                                return atk;
-                                                            }, 3),
-                                                            // OnAllyModifySpDPriority = 4
-                                                            OnAllyModifySpD = new OnAllyModifySpDEventInfo((battle, spd, pokemon, _, _) =>
-                                                            {
-                                                                if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var flowerGiftHolder })
-                                                                    return spd;
-                                                                if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return spd;
-                                                                ConditionId? weather = pokemon.EffectiveWeather();
-                                                                if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
-                                                                {
-                                                                    battle.ChainModify(1.5);
-                                                                    return battle.FinalModify(spd);
-                                                                }
-                                                                return spd;
-                                                            }, 4),
-                                                        },
-                                                        [AbilityId.FlowerVeil] = new()
-                                                        {
-                                                            Id = AbilityId.FlowerVeil,
-                                                            Name = "Flower Veil",
-                                                            Num = 166,
-                                                            Rating = 0.0,
-                                                            Flags = new AbilityFlags { Breakable = true },
-                                                            OnAllyTryBoost = new OnAllyTryBoostEventInfo((battle, boost, target, source, effect) =>
-                                                            {
-                                                                if ((source != null && target == source) || !target.HasType(PokemonType.Grass)) return;
-                                                                bool showMsg = false;
-                                                                if (boost.Atk is < 0) { boost.Atk = null; showMsg = true; }
-                                                                if (boost.Def is < 0) { boost.Def = null; showMsg = true; }
-                                                                if (boost.SpA is < 0) { boost.SpA = null; showMsg = true; }
-                                                                if (boost.SpD is < 0) { boost.SpD = null; showMsg = true; }
-                                                                if (boost.Spe is < 0) { boost.Spe = null; showMsg = true; }
-                                                                if (boost.Accuracy is < 0) { boost.Accuracy = null; showMsg = true; }
-                                                                if (boost.Evasion is < 0) { boost.Evasion = null; showMsg = true; }
-                                                                if (showMsg && effect is ActiveMove { Secondaries: null })
-                                                                {
-                                                                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
-                                                                    {
-                                                                        battle.Add("-block", target, "ability: Flower Veil", $"[of] {effectHolder}");
-                                                                    }
-                                                                }
-                                                            }),
-                                                            OnAllySetStatus = new OnAllySetStatusEventInfo((battle, status, target, source, effect) =>
-                                                            {
-                                                                if (!target.HasType(PokemonType.Grass) || source == null || target == source ||
-                                                                    effect == null || status.Id == ConditionId.Yawn)
-                                                                    return new VoidReturn();
-                                                                battle.Debug("interrupting setStatus with Flower Veil");
-                                                                if (effect.Name == "Synchronize" || (effect.EffectType == EffectType.Move && effect is ActiveMove { Secondaries: null }))
-                                                                {
-                                                                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
-                                                                    {
-                                                                        battle.Add("-block", target, "ability: Flower Veil", $"[of] {effectHolder}");
-                                                                    }
-                                                                }
-                                                                return null;
-                                                            }),
-                                                            OnAllyTryAddVolatile = new OnAllyTryAddVolatileEventInfo((battle, status, target, _, _) =>
-                                                            {
-                                                                if (target.HasType(PokemonType.Grass) && status.Id == ConditionId.Yawn)
-                                                                {
-                                                                    battle.Debug("Flower Veil blocking yawn");
-                                                                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
-                                                                    {
-                                                                        battle.Add("-block", target, "ability: Flower Veil", $"[of] {effectHolder}");
-                                                                    }
-                                                                    return null;
-                                                                }
-                                                                return new VoidReturn();
-                                                            }),
-                                                        },
-                                                        [AbilityId.Fluffy] = new()
-                                                        {
-                                                            Id = AbilityId.Fluffy,
-                                                            Name = "Fluffy",
-                                                            Num = 218,
-                                                            Rating = 3.5,
-                                                            Flags = new AbilityFlags { Breakable = true },
-                                                            OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
-                                                            {
-                                                                double mod = 1.0;
-                                                                if (move.Type == MoveType.Fire) mod *= 2;
-                                                                if (move.Flags.Contact == true) mod /= 2;
-                                                                battle.ChainModify(mod);
-                                                                return battle.FinalModify(damage);
-                                                            }),
-                                                        },
-                                                        [AbilityId.Forecast] = new()
-                                                        {
-                                                            Id = AbilityId.Forecast,
-                                                            Name = "Forecast",
-                                                            Num = 59,
-                                                            Rating = 2.0,
-                                                            Flags = new AbilityFlags
-                                                            {
-                                                                FailRolePlay = true,
-                                                                NoReceiver = true,
-                                                                NoEntrain = true,
-                                                                NoTrace = true,
-                                                            },
-                                                            // TODO: Implement forme change for Castform
-                                                            // OnSwitchInPriority = -2
-                                                            // OnWeatherChange for forme
-                                                        },
-                                                        [AbilityId.Forewarn] = new()
-                                                        {
-                                                            Id = AbilityId.Forewarn,
-                                                            Name = "Forewarn",
-                                                            Num = 108,
-                                                            Rating = 0.5,
-                                                            OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                                            {
-                                                                List<(Move Move, Pokemon Target)> warnMoves = [];
-                                                                int warnBp = 1;
-                                                                foreach (Pokemon target in pokemon.Foes())
-                                                                {
-                                                                    foreach (MoveSlot moveSlot in target.MoveSlots)
-                                                                    {
-                                                                        Move move = battle.Library.Moves[moveSlot.Id];
-                                                                        int bp = move.BasePower;
-                                                                        if (move.Ohko != null) bp = 150;
-                                                                        MoveId[] counterMoves = [MoveId.Counter, MoveId.MetalBurst, MoveId.MirrorCoat];
-                                                                        if (counterMoves.Contains(move.Id)) bp = 120;
-                                                                        if (bp == 1) bp = 80;
-                                                                        if (bp == 0 && move.Category != MoveCategory.Status) bp = 80;
-                                                                        if (bp > warnBp)
-                                                                        {
-                                                                            warnMoves = [(move, target)];
-                                                                            warnBp = bp;
-                                                                        }
-                                                                        else if (bp == warnBp)
-                                                                        {
-                                                                            warnMoves.Add((move, target));
-                                                                        }
-                                                                    }
-                                                                }
-                                                                if (warnMoves.Count == 0) return;
-                                                                var (warnMove, warnTarget) = battle.Sample(warnMoves);
-                                                                battle.Add("-activate", pokemon, "ability: Forewarn", warnMove.Name, $"[of] {warnTarget}");
-                                                            }),
-                                                        },
-                                                        [AbilityId.FriendGuard] = new()
-                                                        {
-                                                            Id = AbilityId.FriendGuard,
-                                                            Name = "Friend Guard",
-                                                            Num = 132,
-                                                            Rating = 0.0,
-                                                            Flags = new AbilityFlags { Breakable = true },
-                                                            OnAnyModifyDamage = new OnAnyModifyDamageEventInfo((battle, damage, _, target, _) =>
-                                                            {
-                                                                if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var effectTarget })
-                                                                    return damage;
-                                                                if (target != effectTarget && target.IsAlly(effectTarget))
-                                                                {
-                                                                    battle.Debug("Friend Guard weaken");
-                                                                    battle.ChainModify(0.75);
-                                                                    return battle.FinalModify(damage);
-                                                                }
-                                                                return damage;
-                                                            }),
-                                                        },
-                                                        [AbilityId.Frisk] = new()
-                                                        {
-                                                            Id = AbilityId.Frisk,
-                                                            Name = "Frisk",
-                                                            Num = 119,
-                                                            Rating = 1.5,
-                                                            OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                                            {
-                                                                foreach (Pokemon target in pokemon.Foes())
-                                                                {
-                                                                    if (target.Item != ItemId.None)
-                                                                    {
-                                                                        battle.Add("-item", target, battle.Library.Items[target.Item].Name, "[from] ability: Frisk", $"[of] {pokemon}");
-                                                                    }
-                                                                }
-                                                            }),
-                                                        },
-                                                        [AbilityId.FullMetalBody] = new()
-                                                        {
-                                                            Id = AbilityId.FullMetalBody,
-                                                            Name = "Full Metal Body",
-                                                            Num = 230,
-                                                            Rating = 2.0,
-                                                            OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
-                                                            {
-                                                                if (source != null && target == source) return;
-                                                                bool showMsg = false;
-                                                                if (boost.Atk is < 0) { boost.Atk = null; showMsg = true; }
-                                                                if (boost.Def is < 0) { boost.Def = null; showMsg = true; }
-                                                                if (boost.SpA is < 0) { boost.SpA = null; showMsg = true; }
-                                                                if (boost.SpD is < 0) { boost.SpD = null; showMsg = true; }
-                                                                if (boost.Spe is < 0) { boost.Spe = null; showMsg = true; }
-                                                                if (boost.Accuracy is < 0) { boost.Accuracy = null; showMsg = true; }
-                                                                if (boost.Evasion is < 0) { boost.Evasion = null; showMsg = true; }
-                                                                ConditionId? effectId = effect switch
-                                                                {
-                                                                    ActiveMove am => am.VolatileStatus ?? am.Status,
-                                                                    Condition c => c.Id,
-                                                                    _ => null
-                                                                };
-                                                                if (showMsg && effect is ActiveMove { Secondaries: null } && effectId != ConditionId.Octolock)
-                                                                {
-                                                                    battle.Add("-fail", target, "unboost", "[from] ability: Full Metal Body", $"[of] {target}");
-                                                                }
-                                                            }),
-                                                        },
-                                                        [AbilityId.FurCoat] = new()
-                                                        {
-                                                            Id = AbilityId.FurCoat,
-                                                            Name = "Fur Coat",
-                                                            Num = 169,
-                                                            Rating = 4.0,
-                                                            Flags = new AbilityFlags { Breakable = true },
-                                                            // OnModifyDefPriority = 6
-                                                            OnModifyDef = new OnModifyDefEventInfo((battle, def, _, _, _) =>
-                                                            {
-                                                                battle.ChainModify(2);
-                                                                return battle.FinalModify(def);
-                                                            }, 6),
-                                                        },
-                                                    };
-                                                }
-                                            }
+                        if (move.AuraBooster?.HasAbility(AbilityId.FairyAura) != true)
+                            move.AuraBooster = abilityHolder;
+                        if (move.AuraBooster != abilityHolder) return basePower;
+
+                        battle.ChainModify(move.HasAuraBreak == true ? [3072, 4096] : [5448, 4096]);
+                        return battle.FinalModify(basePower);
+                    }, 20),
+            },
+            [AbilityId.Filter] = new()
+            {
+                Id = AbilityId.Filter,
+                Name = "Filter",
+                Num = 111,
+                Rating = 3.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
+                    {
+                        if (target.GetMoveHitData(move).TypeMod > 0)
+                        {
+                            battle.Debug("Filter neutralize");
+                            battle.ChainModify(0.75);
+                            return battle.FinalModify(damage);
+                        }
+
+                        return damage;
+                    }),
+            },
+            [AbilityId.FlameBody] = new()
+            {
+                Id = AbilityId.FlameBody,
+                Name = "Flame Body",
+                Num = 49,
+                Rating = 2.0,
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    if (!battle.CheckMoveMakesContact(move, source, target)) return;
+
+                    if (battle.RandomChance(3, 10))
+                    {
+                        source.TrySetStatus(ConditionId.Burn, target);
+                    }
+                }),
+            },
+            [AbilityId.FlareBoost] = new()
+            {
+                Id = AbilityId.FlareBoost,
+                Name = "Flare Boost",
+                Num = 138,
+                Rating = 2.0,
+                // OnBasePowerPriority = 19
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
+                {
+                    if (attacker.Status == ConditionId.Burn &&
+                        move.Category == MoveCategory.Special)
+                    {
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 19),
+            },
+            [AbilityId.FlashFire] = new()
+            {
+                Id = AbilityId.FlashFire,
+                Name = "Flash Fire",
+                Num = 18,
+                Rating = 3.5,
+                Flags = new AbilityFlags { Breakable = true },
+                Condition = ConditionId.FlashFire,
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (target != source && move.Type == MoveType.Fire)
+                    {
+                        // Note: In TS, move.accuracy is set to true here
+                        // We cannot modify init-only Accuracy, but the hit will still be blocked
+                        var addResult = target.AddVolatile(ConditionId.FlashFire);
+                        if (addResult is BoolRelayVar { Value: false })
+                        {
+                            battle.Add("-immune", target, "[from] ability: Flash Fire");
+                        }
+
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                {
+                    if (pokemonUnion is PokemonSideFieldPokemon { Pokemon: var pokemon })
+                    {
+                        pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.FlashFire]);
+                    }
+                }),
+            },
+            [AbilityId.FlowerGift] = new()
+            {
+                Id = AbilityId.FlowerGift,
+                Name = "Flower Gift",
+                Num = 122,
+                Rating = 1.0,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    Breakable = true,
+                },
+                // OnSwitchInPriority = -2
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) =>
+                {
+                    // Trigger the weather check to potentially change forme
+                    // This is implemented via OnStart which calls OnWeatherChange
+                }, -2),
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    // Check current weather and change forme if needed
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                        pokemon.Transformed) return;
+                    if (pokemon.Hp == 0) return;
+
+                    ConditionId? weather = pokemon.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    {
+                        if (pokemon.Species.Id != SpecieId.CherrimSunshine)
+                        {
+                            pokemon.FormeChange(SpecieId.CherrimSunshine, battle.Effect, false,
+                                message: "[msg]");
+                        }
+                    }
+                    else
+                    {
+                        if (pokemon.Species.Id == SpecieId.CherrimSunshine)
+                        {
+                            pokemon.FormeChange(SpecieId.Cherrim, battle.Effect, false,
+                                message: "[msg]");
+                        }
+                    }
+                }),
+                OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                        pokemon.Transformed) return;
+                    if (pokemon.Hp == 0) return;
+
+                    ConditionId? weather = pokemon.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    {
+                        if (pokemon.Species.Id != SpecieId.CherrimSunshine)
+                        {
+                            pokemon.FormeChange(SpecieId.CherrimSunshine, battle.Effect, false,
+                                message: "[msg]");
+                        }
+                    }
+                    else
+                    {
+                        if (pokemon.Species.Id == SpecieId.CherrimSunshine)
+                        {
+                            pokemon.FormeChange(SpecieId.Cherrim, battle.Effect, false,
+                                message: "[msg]");
+                        }
+                    }
+                }),
+                // OnAllyModifyAtkPriority = 3
+                OnAllyModifyAtk = new OnAllyModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var flowerGiftHolder
+                        })
+                        return atk;
+                    if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return atk;
+                    ConditionId? weather = pokemon.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    {
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(atk);
+                    }
+
+                    return atk;
+                }, 3),
+                // OnAllyModifySpDPriority = 4
+                OnAllyModifySpD = new OnAllyModifySpDEventInfo((battle, spd, pokemon, _, _) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var flowerGiftHolder
+                        })
+                        return spd;
+                    if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return spd;
+                    ConditionId? weather = pokemon.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    {
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(spd);
+                    }
+
+                    return spd;
+                }, 4),
+            },
+            [AbilityId.FlowerVeil] = new()
+            {
+                Id = AbilityId.FlowerVeil,
+                Name = "Flower Veil",
+                Num = 166,
+                Rating = 0.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnAllyTryBoost =
+                    new OnAllyTryBoostEventInfo((battle, boost, target, source, effect) =>
+                    {
+                        if ((source != null && target == source) ||
+                            !target.HasType(PokemonType.Grass)) return;
+                        bool showMsg = false;
+                        if (boost.Atk is < 0)
+                        {
+                            boost.Atk = null;
+                            showMsg = true;
+                        }
+
+                        if (boost.Def is < 0)
+                        {
+                            boost.Def = null;
+                            showMsg = true;
+                        }
+
+                        if (boost.SpA is < 0)
+                        {
+                            boost.SpA = null;
+                            showMsg = true;
+                        }
+
+                        if (boost.SpD is < 0)
+                        {
+                            boost.SpD = null;
+                            showMsg = true;
+                        }
+
+                        if (boost.Spe is < 0)
+                        {
+                            boost.Spe = null;
+                            showMsg = true;
+                        }
+
+                        if (boost.Accuracy is < 0)
+                        {
+                            boost.Accuracy = null;
+                            showMsg = true;
+                        }
+
+                        if (boost.Evasion is < 0)
+                        {
+                            boost.Evasion = null;
+                            showMsg = true;
+                        }
+
+                        if (showMsg && effect is ActiveMove { Secondaries: null })
+                        {
+                            if (battle.EffectState.Target is PokemonEffectStateTarget
+                                {
+                                    Pokemon: var effectHolder
+                                })
+                            {
+                                battle.Add("-block", target, "ability: Flower Veil",
+                                    $"[of] {effectHolder}");
+                            }
+                        }
+                    }),
+                OnAllySetStatus =
+                    new OnAllySetStatusEventInfo((battle, status, target, source, effect) =>
+                    {
+                        if (!target.HasType(PokemonType.Grass) || source == null ||
+                            target == source ||
+                            effect == null || status.Id == ConditionId.Yawn)
+                            return new VoidReturn();
+                        battle.Debug("interrupting setStatus with Flower Veil");
+                        if (effect.Name == "Synchronize" || (effect.EffectType == EffectType.Move &&
+                                                             effect is ActiveMove
+                                                             {
+                                                                 Secondaries: null
+                                                             }))
+                        {
+                            if (battle.EffectState.Target is PokemonEffectStateTarget
+                                {
+                                    Pokemon: var effectHolder
+                                })
+                            {
+                                battle.Add("-block", target, "ability: Flower Veil",
+                                    $"[of] {effectHolder}");
+                            }
+                        }
+
+                        return null;
+                    }),
+                OnAllyTryAddVolatile =
+                    new OnAllyTryAddVolatileEventInfo((battle, status, target, _, _) =>
+                    {
+                        if (target.HasType(PokemonType.Grass) && status.Id == ConditionId.Yawn)
+                        {
+                            battle.Debug("Flower Veil blocking yawn");
+                            if (battle.EffectState.Target is PokemonEffectStateTarget
+                                {
+                                    Pokemon: var effectHolder
+                                })
+                            {
+                                battle.Add("-block", target, "ability: Flower Veil",
+                                    $"[of] {effectHolder}");
+                            }
+
+                            return null;
+                        }
+
+                        return new VoidReturn();
+                    }),
+            },
+            [AbilityId.Fluffy] = new()
+            {
+                Id = AbilityId.Fluffy,
+                Name = "Fluffy",
+                Num = 218,
+                Rating = 3.5,
+                Flags = new AbilityFlags { Breakable = true },
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
+                    {
+                        double mod = 1.0;
+                        if (move.Type == MoveType.Fire) mod *= 2;
+                        if (move.Flags.Contact == true) mod /= 2;
+                        battle.ChainModify(mod);
+                        return battle.FinalModify(damage);
+                    }),
+            },
+            [AbilityId.Forecast] = new()
+            {
+                Id = AbilityId.Forecast,
+                Name = "Forecast",
+                Num = 59,
+                Rating = 2.0,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                },
+                // OnSwitchInPriority = -2
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) =>
+                {
+                    // Trigger the weather check to potentially change forme
+                    // This is implemented via OnStart which calls OnWeatherChange
+                }, -2),
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
+                        pokemon.Transformed) return;
+
+                    ConditionId? weather = pokemon.EffectiveWeather();
+                    SpecieId targetForme = weather switch
+                    {
+                        ConditionId.SunnyDay or ConditionId.DesolateLand => SpecieId.CastformSunny,
+                        ConditionId.RainDance or ConditionId.PrimordialSea =>
+                            SpecieId.CastformRainy,
+                        ConditionId.Hail or ConditionId.Snowscape => SpecieId.CastformSnowy,
+                        _ => SpecieId.Castform
+                    };
+
+                    if (pokemon.Species.Id != targetForme)
+                    {
+                        pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
+                    }
+                }),
+                OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
+                        pokemon.Transformed) return;
+
+                    ConditionId? weather = pokemon.EffectiveWeather();
+                    SpecieId targetForme = weather switch
+                    {
+                        ConditionId.SunnyDay or ConditionId.DesolateLand => SpecieId.CastformSunny,
+                        ConditionId.RainDance or ConditionId.PrimordialSea =>
+                            SpecieId.CastformRainy,
+                        ConditionId.Hail or ConditionId.Snowscape => SpecieId.CastformSnowy,
+                        _ => SpecieId.Castform
+                    };
+
+                    if (pokemon.Species.Id != targetForme)
+                    {
+                        pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
+                    }
+                }),
+            },
+            [AbilityId.Forewarn] = new()
+            {
+                Id = AbilityId.Forewarn,
+                Name = "Forewarn",
+                Num = 108,
+                Rating = 0.5,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    List<(Move Move, Pokemon Target)> warnMoves = [];
+                    int warnBp = 1;
+                    foreach (Pokemon target in pokemon.Foes())
+                    {
+                        foreach (MoveSlot moveSlot in target.MoveSlots)
+                        {
+                            Move move = battle.Library.Moves[moveSlot.Id];
+                            int bp = move.BasePower;
+                            if (move.Ohko != null) bp = 150;
+                            MoveId[] counterMoves =
+                                [MoveId.Counter, MoveId.MetalBurst, MoveId.MirrorCoat];
+                            if (counterMoves.Contains(move.Id)) bp = 120;
+                            if (bp == 1) bp = 80;
+                            if (bp == 0 && move.Category != MoveCategory.Status) bp = 80;
+                            if (bp > warnBp)
+                            {
+                                warnMoves = [(move, target)];
+                                warnBp = bp;
+                            }
+                            else if (bp == warnBp)
+                            {
+                                warnMoves.Add((move, target));
+                            }
+                        }
+                    }
+
+                    if (warnMoves.Count == 0) return;
+                    var (warnMove, warnTarget) = battle.Sample(warnMoves);
+                    battle.Add("-activate", pokemon, "ability: Forewarn", warnMove.Name,
+                        $"[of] {warnTarget}");
+                }),
+            },
+            [AbilityId.FriendGuard] = new()
+            {
+                Id = AbilityId.FriendGuard,
+                Name = "Friend Guard",
+                Num = 132,
+                Rating = 0.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnAnyModifyDamage = new OnAnyModifyDamageEventInfo((battle, damage, _, target, _) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var effectTarget
+                        })
+                        return damage;
+                    if (target != effectTarget && target.IsAlly(effectTarget))
+                    {
+                        battle.Debug("Friend Guard weaken");
+                        battle.ChainModify(0.75);
+                        return battle.FinalModify(damage);
+                    }
+
+                    return damage;
+                }),
+            },
+            [AbilityId.Frisk] = new()
+            {
+                Id = AbilityId.Frisk,
+                Name = "Frisk",
+                Num = 119,
+                Rating = 1.5,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    foreach (Pokemon target in pokemon.Foes())
+                    {
+                        if (target.Item != ItemId.None)
+                        {
+                            battle.Add("-item", target, battle.Library.Items[target.Item].Name,
+                                "[from] ability: Frisk", $"[of] {pokemon}");
+                        }
+                    }
+                }),
+            },
+            [AbilityId.FullMetalBody] = new()
+            {
+                Id = AbilityId.FullMetalBody,
+                Name = "Full Metal Body",
+                Num = 230,
+                Rating = 2.0,
+                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                {
+                    if (source != null && target == source) return;
+                    bool showMsg = false;
+                    if (boost.Atk is < 0)
+                    {
+                        boost.Atk = null;
+                        showMsg = true;
+                    }
+
+                    if (boost.Def is < 0)
+                    {
+                        boost.Def = null;
+                        showMsg = true;
+                    }
+
+                    if (boost.SpA is < 0)
+                    {
+                        boost.SpA = null;
+                        showMsg = true;
+                    }
+
+                    if (boost.SpD is < 0)
+                    {
+                        boost.SpD = null;
+                        showMsg = true;
+                    }
+
+                    if (boost.Spe is < 0)
+                    {
+                        boost.Spe = null;
+                        showMsg = true;
+                    }
+
+                    if (boost.Accuracy is < 0)
+                    {
+                        boost.Accuracy = null;
+                        showMsg = true;
+                    }
+
+                    if (boost.Evasion is < 0)
+                    {
+                        boost.Evasion = null;
+                        showMsg = true;
+                    }
+
+                    ConditionId? effectId = effect switch
+                    {
+                        ActiveMove am => am.VolatileStatus ?? am.Status,
+                        Condition c => c.Id,
+                        _ => null
+                    };
+                    if (showMsg && effect is ActiveMove { Secondaries: null } &&
+                        effectId != ConditionId.Octolock)
+                    {
+                        battle.Add("-fail", target, "unboost", "[from] ability: Full Metal Body",
+                            $"[of] {target}");
+                    }
+                }),
+            },
+            [AbilityId.FurCoat] = new()
+            {
+                Id = AbilityId.FurCoat,
+                Name = "Fur Coat",
+                Num = 169,
+                Rating = 4.0,
+                Flags = new AbilityFlags { Breakable = true },
+                // OnModifyDefPriority = 6
+                OnModifyDef = new OnModifyDefEventInfo((battle, def, _, _, _) =>
+                {
+                    battle.ChainModify(2);
+                    return battle.FinalModify(def);
+                }, 6),
+            },
+        };
+    }
+}
