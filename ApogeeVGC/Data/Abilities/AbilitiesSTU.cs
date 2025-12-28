@@ -1380,8 +1380,11 @@ public partial record Abilities
                     ItemFalseUnion myItemResult = source.TakeItem();
                     if (myItemResult is not ItemItemFalseUnion { Item: var myItem }) return;
 
-                    // TODO: SingleEvent TakeItem check
-                    if (!pokemon.SetItem(myItem.Id))
+                    // Check if the item can be received by the ally (e.g., Memory items only for Silvally)
+                    Ability symbiosis = battle.Library.Abilities[AbilityId.Symbiosis];
+                    if (battle.SingleEvent(EventId.TakeItem, myItem, null, pokemon, source,
+                            symbiosis, myItem) is BoolRelayVar { Value: false } ||
+                        !pokemon.SetItem(myItem.Id))
                     {
                         source.Item = myItem.Id;
                         return;
