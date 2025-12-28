@@ -20,6 +20,45 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
+            [ConditionId.DragonCheer] = new()
+            {
+                Id = ConditionId.DragonCheer,
+                Name = "Dragon Cheer",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.DragonCheer,
+                OnStart = new OnStartEventInfo((battle, target, _, effect) =>
+                {
+                    // Check for FocusEnergy to prevent stacking
+                    if (target.Volatiles.ContainsKey(ConditionId.FocusEnergy))
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    if (effect != null && new[] { EffectId.Costar, EffectId.Imposter, EffectId.Psychup, EffectId.Transform }.Contains(effect.Id))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", target, "move: Dragon Cheer", "[silent]");
+                        }
+                    }
+                    else
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", target, "move: Dragon Cheer");
+                        }
+                    }
+                    // Store whether the target has Dragon type at start
+                    // This doesn't change if Pokemon Terastallizes
+                    battle.EffectState.HasDragonType = target.HasType(PokemonType.Dragon);
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnModifyCritRatio = new OnModifyCritRatioEventInfo((battle, critRatio, _, _) =>
+                {
+                    // +2 crit ratio if Dragon type, +1 otherwise
+                    var hasDragonType = battle.EffectState.HasDragonType as bool? ?? false;
+                    return critRatio + (hasDragonType ? 2 : 1);
+                }),
+            },
             [ConditionId.ElectricTerrain] = new()
             {
                 Id = ConditionId.ElectricTerrain,
@@ -463,6 +502,33 @@ public partial record Conditions
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.Fling]);
                 }),
             },
+            [ConditionId.FairyLock] = new()
+            {
+                Id = ConditionId.FairyLock,
+                Name = "Fairy Lock",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.FairyLock,
+                Duration = 2,
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldactivate", "move: Fairy Lock");
+                    }
+                }),
+                OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) =>
+                {
+                    pokemon.TryTrap();
+                }),
+            },
+            [ConditionId.Fainted] = new()
+            {
+                Id = ConditionId.Fainted,
+                Name = "Fainted",
+                EffectType = EffectType.Condition,
+                // Marker condition for fainted Pokemon
+                // The actual fainted state is tracked by Pokemon.Fainted property
+            },
             [ConditionId.FollowMe] = new()
             {
                 Id = ConditionId.FollowMe,
@@ -509,6 +575,40 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-end", target, "ability: Flash Fire", "[silent]");
+                    }
+                }),
+            },
+            [ConditionId.FirePledge] = new()
+            {
+                Id = ConditionId.FirePledge,
+                Name = "Fire Pledge",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.FirePledge,
+                Duration = 4,
+                OnSideStart = new OnSideStartEventInfo((battle, targetSide, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", targetSide, "Fire Pledge");
+                    }
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (!pokemon.HasType(PokemonType.Fire))
+                    {
+                        battle.Damage(pokemon.BaseMaxHp / 8, pokemon, pokemon);
+                    }
+                }, 5, 1),
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 26,
+                    SubOrder = 8,
+                },
+                OnSideEnd = new OnSideEndEventInfo((battle, targetSide) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sideend", targetSide, "Fire Pledge");
                     }
                 }),
             },

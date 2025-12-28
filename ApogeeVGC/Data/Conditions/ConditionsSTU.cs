@@ -549,6 +549,30 @@ public partial record Conditions
                     return BoolVoidUnion.FromVoid();
                 }, 5),
             },
+            [ConditionId.ShedTail] = new()
+            {
+                Id = ConditionId.ShedTail,
+                Name = "Shed Tail",
+                EffectType = EffectType.Condition,
+                // Shed Tail creates a Substitute volatile and then switches out
+                // The condition itself may not need separate handling beyond Substitute
+            },
+            [ConditionId.SimpleBeam] = new()
+            {
+                Id = ConditionId.SimpleBeam,
+                Name = "Simple Beam",
+                EffectType = EffectType.Condition,
+                // Simple Beam doesn't create a volatile, it changes the ability directly
+                // This is a placeholder condition that may not be used
+            },
+            [ConditionId.SparklingAria] = new()
+            {
+                Id = ConditionId.SparklingAria,
+                Name = "Sparkling Aria",
+                EffectType = EffectType.Condition,
+                // Sparkling Aria applies a volatile to mark targets that will be cured of burn
+                // The volatile is cleared after processing all targets
+            },
             [ConditionId.SmackDown] = new()
             {
                 Id = ConditionId.SmackDown,
@@ -788,6 +812,21 @@ public partial record Conditions
                         battle.Add("-fieldend", "move: Trick Room");
                     }
                 }),
+            },
+            [ConditionId.Truant] = new()
+            {
+                Id = ConditionId.Truant,
+                Name = "Truant",
+                EffectType = EffectType.Condition,
+                // Truant is an ability volatile condition - empty condition marker
+                // The actual logic is in the ability handler
+            },
+            [ConditionId.Unburden] = new()
+            {
+                Id = ConditionId.Unburden,
+                Name = "Unburden",
+                EffectType = EffectType.Condition,
+                // TODO: OnModifySpe - double speed if Pokemon has no item and not ignoring ability
             },
             [ConditionId.SaltCure] = new()
             {

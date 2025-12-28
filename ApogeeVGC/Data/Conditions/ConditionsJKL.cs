@@ -275,6 +275,23 @@ public partial record Conditions
                     return BoolVoidUnion.FromBool(false);
                 }, 3),
             },
+            [ConditionId.Metronome] = new()
+            {
+                Id = ConditionId.Metronome,
+                Name = "Metronome",
+                EffectType = EffectType.Condition,
+                // Marker condition for Metronome item boost tracking
+                // Actual logic is in the item handler
+            },
+            [ConditionId.MicleBerry] = new()
+            {
+                Id = ConditionId.MicleBerry,
+                Name = "Micle Berry",
+                EffectType = EffectType.Condition,
+                Duration = 2,
+                // TODO: OnSourceAccuracy - if not OHKO move, multiply accuracy by 1.2 (4915/4096)
+                // Remove volatile after modifying accuracy
+            },
             [ConditionId.Obstruct] = new()
             {
                 Id = ConditionId.Obstruct,

@@ -654,6 +654,30 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.PartialTrappingLock] = new()
+            {
+                Id = ConditionId.PartialTrappingLock,
+                Name = "Partial Trapping Lock",
+                EffectType = EffectType.Condition,
+                // This is a marker condition for moves that create partial trapping
+                // The actual trapping is handled by PartiallyTrapped condition
+            },
+            [ConditionId.PartiallyTrappedFireSpin] = new()
+            {
+                Id = ConditionId.PartiallyTrappedFireSpin,
+                Name = "Fire Spin",
+                EffectType = EffectType.Condition,
+                // Alias/variant of PartiallyTrapped for Fire Spin
+                // Uses the same mechanics as PartiallyTrapped
+            },
+            [ConditionId.PetalDance] = new()
+            {
+                Id = ConditionId.PetalDance,
+                Name = "Petal Dance",
+                EffectType = EffectType.Condition,
+                // Petal Dance uses the LockedMove condition mechanics
+                // This is a marker for the specific move
+            },
             [ConditionId.Safeguard] = new()
             {
                 Id = ConditionId.Safeguard,
@@ -781,6 +805,51 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-fieldend", "move: Psychic Terrain");
+                    }
+                }),
+            },
+            [ConditionId.Protosynthesis] = new()
+            {
+                Id = ConditionId.Protosynthesis,
+                Name = "Protosynthesis",
+                EffectType = EffectType.Condition,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
+                {
+                    if (effect?.Id == EffectId.BoosterEnergy)
+                    {
+                        battle.EffectState.FromBooster = true;
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Protosynthesis", "[fromitem]");
+                        }
+                    }
+                    else
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Protosynthesis");
+                        }
+                    }
+                    // TODO: Get best stat from Pokemon.GetBestStat(false, true)
+                    // For now, store a placeholder
+                    battle.EffectState.BestStat = "atk";
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, $"protosynthesis{battle.EffectState.BestStat}");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnModifyAtk (priority 5) - boost by 1.3x if bestStat is atk
+                // TODO: OnModifyDef (priority 6) - boost by 1.3x if bestStat is def
+                // TODO: OnModifySpA (priority 5) - boost by 1.3x if bestStat is spa
+                // TODO: OnModifySpD (priority 6) - boost by 1.3x if bestStat is spd
+                // TODO: OnModifySpe (priority 5) - boost by 1.5x if bestStat is spe
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Protosynthesis");
                     }
                 }),
             },

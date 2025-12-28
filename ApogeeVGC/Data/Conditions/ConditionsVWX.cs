@@ -54,6 +54,35 @@ public partial record Conditions
 
             // ===== W CONDITIONS =====
 
+            [ConditionId.WaterPledge] = new()
+            {
+                Id = ConditionId.WaterPledge,
+                Name = "Water Pledge",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.WaterPledge,
+                Duration = 4,
+                OnSideStart = new OnSideStartEventInfo((battle, targetSide, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", targetSide, "Water Pledge");
+                    }
+                }),
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 26,
+                    SubOrder = 7,
+                },
+                OnSideEnd = new OnSideEndEventInfo((battle, targetSide) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sideend", targetSide, "Water Pledge");
+                    }
+                }),
+                // TODO: OnModifyMove - double secondary effect chances for moves (except Secret Power)
+                // Needs to skip Serene Grace + Flinch interaction
+            },
             [ConditionId.WideGuard] = new()
             {
                 Id = ConditionId.WideGuard,
