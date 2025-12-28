@@ -44,7 +44,7 @@ public record ActiveMove : Move, IEffect
     public IntFalseUnion? TotalDamage { get; set; }
     public IEffect? TypeChangerBoosted { get; set; }
     public bool? WillChangeForme { get; set; }
-    public bool? Infiltrates { get; init; }
+    public bool? Infiltrates { get; set; }
     public Pokemon? RuinedAtk { get; set; }
     public Pokemon? RuinedDef { get; set; }
     public Pokemon? RuinedSpA { get; set; }

@@ -44,8 +44,16 @@ public partial record Abilities
                 // OnModifyTypePriority = -1
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                 {
-                    // TODO: Add checks for specific moves like Judgment, Multi-Attack, etc.
+                    // Moves that should not have their type changed
+                    var noModifyType = new[]
+                    {
+                        MoveId.Judgment, MoveId.RevelationDance, MoveId.TerrainPulse,
+                        MoveId.WeatherBall
+                        // Note: MultiAttack, NaturalGift, and TechnoBlast are not in Gen 9 VGC
+                    };
+
                     if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
+                        !noModifyType.Contains(move.Id) &&
                         !(move.Name == "Tera Blast" && pokemon.Terastallized != null))
                     {
                         move.Type = MoveType.Electric;
@@ -720,8 +728,10 @@ public partial record Abilities
                         }
                     }
                 }),
-                // TODO: IgnoreEvasion is init-only on Move. Consider making it mutable or setting via MoveFlags.
-                // OnModifyMove: move.IgnoreEvasion = true;
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                {
+                    move.IgnoreEvasion = true;
+                }),
             },
             [AbilityId.Illusion] = new()
             {
@@ -844,8 +854,10 @@ public partial record Abilities
                 Name = "Infiltrator",
                 Num = 151,
                 Rating = 2.5,
-                // TODO: Infiltrates is init-only on ActiveMove. Consider making it mutable.
-                // OnModifyMove: move.Infiltrates = true;
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                {
+                    move.Infiltrates = true;
+                }),
             },
             [AbilityId.InnardsOut] = new()
             {
