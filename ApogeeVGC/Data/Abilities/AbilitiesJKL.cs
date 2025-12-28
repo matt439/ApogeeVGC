@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -70,12 +71,8 @@ public partial record Abilities
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
                     // End the item effect when switching in
-                    // TODO: Implement SingleEvent for Item End events
-                    // var item = pokemon.GetItem();
-                    // if (item != null)
-                    // {
-                    //     battle.SingleEvent(EventId.End, item, pokemon.ItemState, pokemon);
-                    // }
+                    var item = pokemon.GetItem();
+                    battle.SingleEvent(EventId.End, item, pokemon.ItemState, pokemon);
                 }, 1),
             },
 
