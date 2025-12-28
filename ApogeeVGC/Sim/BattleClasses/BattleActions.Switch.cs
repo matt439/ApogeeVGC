@@ -224,10 +224,17 @@ public partial class BattleActions
             return false;
         }
 
-        RelayVar? dragOutResult = Battle.RunEvent(EventId.DragOut, oldActive);
+        // Pass default relayVar of true so "no handler" = "allow drag-out"
+        RelayVar? dragOutResult = Battle.RunEvent(EventId.DragOut, oldActive, null, null,
+            new BoolRelayVar(true));
 
-        return dragOutResult is not BoolRelayVar { Value: false } &&
-               SwitchIn(pokemon, pos, null, true);
+        // null = prevent silently (Suction Cups), false = prevent
+        if (dragOutResult is null or BoolRelayVar { Value: false })
+        {
+            return false;
+        }
+
+        return SwitchIn(pokemon, pos, null, true);
     }
 
     public bool RunSwitch(Pokemon pokemon)

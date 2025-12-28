@@ -1148,8 +1148,7 @@ public partial record Abilities
                 OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
                 {
                     battle.Add("-activate", pokemon, "ability: Suction Cups");
-                    // Returning null from the delegate won't work - need to handle dragout prevention differently
-                    // TODO: Implement dragout prevention properly
+                    return null; // Prevent drag-out silently
                 }, 1),
             },
             [AbilityId.SuperLuck] = new()

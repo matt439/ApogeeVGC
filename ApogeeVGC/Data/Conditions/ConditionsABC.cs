@@ -590,6 +590,7 @@ public partial record Conditions
                     {
                         battle.Add("-block", pokemon, "Commanded");
                     }
+                    return null; // Prevent drag-out
                 }, 2),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {
@@ -609,6 +610,7 @@ public partial record Conditions
                     {
                         battle.Add("-block", pokemon, "Commanding");
                     }
+                    return null; // Prevent drag-out
                 }, 2),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {

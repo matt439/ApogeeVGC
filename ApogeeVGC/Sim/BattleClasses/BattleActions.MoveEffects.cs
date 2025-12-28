@@ -423,20 +423,30 @@ public partial class BattleActions
 
             if (target.Hp > 0 && source.Hp > 0 && Battle.CanSwitch(target.Side) != 0)
             {
-                RelayVar? hitResult = Battle.RunEvent(EventId.DragOut, target, source, move);
+                // Pass default relayVar of true so "no handler" = "allow drag-out"
+                RelayVar? hitResult = Battle.RunEvent(EventId.DragOut, target, source, move,
+                    new BoolRelayVar(true));
 
                 switch (hitResult)
                 {
-                    case BoolRelayVar { Value: true } or null:
+                    case BoolRelayVar { Value: true }:
+                        // Allow drag-out
                         target.ForceSwitchFlag = true;
                         break;
+                    case null:
+                        // null = prevent drag-out silently (e.g., Suction Cups)
+                        break;
                     case BoolRelayVar { Value: false } when move.Category == MoveCategory.Status:
+                        // false on status move = show fail message
                         if (Battle.DisplayUi)
                         {
                             Battle.Add("-fail", source);
                             Battle.AttrLastMove("[still]");
                         }
                         damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                        break;
+                    case BoolRelayVar { Value: false }:
+                        // false on non-status move = prevent silently
                         break;
                 }
             }

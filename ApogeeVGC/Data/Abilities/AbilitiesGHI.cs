@@ -240,8 +240,7 @@ public partial record Abilities
                 OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
                 {
                     battle.Add("-activate", pokemon, "ability: Guard Dog");
-                    // Return null to prevent the drag out - handled differently in C#
-                    // The event system should interpret this as blocking the drag out
+                    return null; // Prevent drag-out
                 }, 1),
                 // OnTryBoostPriority = 2
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
