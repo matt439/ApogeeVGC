@@ -180,8 +180,50 @@ public partial record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                // TODO: Schooling requires forme change logic for Wishiwashi
-                // OnStart and OnResidual check HP threshold and level to switch formes
+                // OnSwitchInPriority = -1
+                OnStart = new OnStartEventInfo((_, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Wishiwashi ||
+                        pokemon.Level < 20 || pokemon.Transformed)
+                        return;
+
+                    if (pokemon.Hp > pokemon.MaxHp / 4)
+                    {
+                        if (pokemon.Species.Id == SpecieId.Wishiwashi)
+                        {
+                            pokemon.FormeChange(SpecieId.WishiwashiSchool);
+                        }
+                    }
+                    else
+                    {
+                        if (pokemon.Species.Id == SpecieId.WishiwashiSchool)
+                        {
+                            pokemon.FormeChange(SpecieId.Wishiwashi);
+                        }
+                    }
+                }, -1),
+                // OnResidualOrder = 29
+                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Wishiwashi ||
+                        pokemon.Level < 20 || pokemon.Transformed || pokemon.Hp == 0)
+                        return;
+
+                    if (pokemon.Hp > pokemon.MaxHp / 4)
+                    {
+                        if (pokemon.Species.Id == SpecieId.Wishiwashi)
+                        {
+                            pokemon.FormeChange(SpecieId.WishiwashiSchool);
+                        }
+                    }
+                    else
+                    {
+                        if (pokemon.Species.Id == SpecieId.WishiwashiSchool)
+                        {
+                            pokemon.FormeChange(SpecieId.Wishiwashi);
+                        }
+                    }
+                }, order: 29),
             },
             [AbilityId.Scrappy] = new()
             {
@@ -433,8 +475,59 @@ public partial record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                // TODO: Shields Down requires forme change logic for Minior
-                // Also provides status immunity in Meteor forme
+                // OnSwitchInPriority = -1
+                OnStart = new OnStartEventInfo((_, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Minior || pokemon.Transformed)
+                        return;
+
+                    if (pokemon.Hp > pokemon.MaxHp / 2)
+                    {
+                        if (pokemon.Species.Forme != FormeId.Meteor)
+                        {
+                            pokemon.FormeChange(SpecieId.MiniorMeteor);
+                        }
+                    }
+                    else
+                    {
+                        if (pokemon.Species.Forme == FormeId.Meteor)
+                        {
+                            pokemon.FormeChange(pokemon.Set.Species);
+                        }
+                    }
+                }, -1),
+                // OnResidualOrder = 29
+                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Minior ||
+                        pokemon.Transformed || pokemon.Hp == 0)
+                        return;
+
+                    if (pokemon.Hp > pokemon.MaxHp / 2)
+                    {
+                        if (pokemon.Species.Forme != FormeId.Meteor)
+                        {
+                            pokemon.FormeChange(SpecieId.MiniorMeteor);
+                        }
+                    }
+                    else
+                    {
+                        if (pokemon.Species.Forme == FormeId.Meteor)
+                        {
+                            pokemon.FormeChange(pokemon.Set.Species);
+                        }
+                    }
+                }, order: 29),
+                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
+                {
+                    if (target.Species.Forme != FormeId.Meteor) return new VoidReturn();
+                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    {
+                        battle.Add("-immune", target, "[from] ability: Shields Down");
+                    }
+
+                    return false;
+                }),
             },
             [AbilityId.Simple] = new()
             {
@@ -790,8 +883,24 @@ public partial record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                // TODO: Stance Change requires forme change logic for Aegislash
-                // OnModifyMove changes forme based on whether using King's Shield or attacking
+                // OnModifyMovePriority = 1
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, attacker, _) =>
+                {
+                    if (attacker.BaseSpecies.BaseSpecies != SpecieId.Aegislash ||
+                        attacker.Transformed)
+                        return;
+                    if (move.Category == MoveCategory.Status && move.Id != MoveId.KingsShield)
+                        return;
+
+                    SpecieId targetForme = move.Id == MoveId.KingsShield
+                        ? SpecieId.Aegislash
+                        : SpecieId.AegislashBlade;
+
+                    if (attacker.Species.Id != targetForme)
+                    {
+                        attacker.FormeChange(targetForme);
+                    }
+                }, 1),
             },
             [AbilityId.Static] = new()
             {
