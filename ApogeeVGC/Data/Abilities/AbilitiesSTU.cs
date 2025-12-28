@@ -218,8 +218,7 @@ public partial record Abilities
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     bool activated = false;
-                    ConditionId[] screens = [ConditionId.Reflect, ConditionId.LightScreen];
-                    // TODO: Add AuroraVeil when available
+                    ConditionId[] screens = [ConditionId.Reflect, ConditionId.LightScreen, ConditionId.AuroraVeil];
                     foreach (ConditionId sideCondition in screens)
                     {
                         foreach (Side side in new[] { pokemon.Side }.Concat(
@@ -256,9 +255,26 @@ public partial record Abilities
                 Name = "Serene Grace",
                 Num = 32,
                 Rating = 3.5,
-                // TODO: SereneGrace requires modifying secondary effect chances
-                // The Secondaries array elements need mutable Chance properties
-                // OnModifyMove doubles secondary effect chances
+                // OnModifyMovePriority = -2
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                {
+                    if (move.Secondaries != null)
+                    {
+                        battle.Debug("doubling secondary chance");
+                        foreach (SecondaryEffect secondary in move.Secondaries)
+                        {
+                            if (secondary.Chance != null)
+                            {
+                                secondary.Chance *= 2;
+                            }
+                        }
+                    }
+
+                    if (move.Self?.Chance != null)
+                    {
+                        move.Self.Chance *= 2;
+                    }
+                }, -2),
             },
             [AbilityId.ShadowShield] = new()
             {
@@ -1647,7 +1663,7 @@ public partial record Abilities
                     {
                         // Despite not being a secondary, Shield Dust / Covert Cloak block Toxic Chain's effect
                         if (target.HasAbility(AbilityId.ShieldDust)) return;
-                        // TODO: Check for CovertCloak item
+                        if (target.HasItem(ItemId.CovertCloak)) return;
 
                         if (battle.RandomChance(3, 10))
                         {
