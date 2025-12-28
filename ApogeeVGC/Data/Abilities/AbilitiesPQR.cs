@@ -1,5 +1,7 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
@@ -933,11 +935,67 @@ public partial record Abilities
                 Name = "Ripen",
                 Num = 247,
                 Rating = 2.0,
-                // TODO: Ripen has complex berry interactions
-                // OnTryHeal doubles berry healing
-                // OnChangeBoost doubles berry stat boosts
-                // OnSourceModifyDamage halves damage when type-resist berry consumed
-                // OnEatItem tracks if a weakening berry was eaten
+                OnTryHeal = new OnTryHealEventInfo(
+                    (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
+                        target, source, effect) =>
+                    {
+                        if (effect.Name == "Berry Juice" || effect.Name == "Leftovers")
+                        {
+                            battle.Add("-activate", target, "ability: Ripen");
+                        }
+
+                        if (effect is Item item && item.IsBerry)
+                        {
+                            battle.ChainModify(2);
+                            return IntBoolUnion.FromInt(battle.FinalModify(damage));
+                        }
+
+                        return IntBoolUnion.FromInt(damage);
+                    })),
+                OnChangeBoost = new OnChangeBoostEventInfo((battle, boost, target, source, effect) =>
+                {
+                    if (effect is Item item && item.IsBerry)
+                    {
+                        if (boost.Atk != null) boost.Atk *= 2;
+                        if (boost.Def != null) boost.Def *= 2;
+                        if (boost.SpA != null) boost.SpA *= 2;
+                        if (boost.SpD != null) boost.SpD *= 2;
+                        if (boost.Spe != null) boost.Spe *= 2;
+                        if (boost.Accuracy != null) boost.Accuracy *= 2;
+                        if (boost.Evasion != null) boost.Evasion *= 2;
+                    }
+                }),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (target.AbilityState.BerryWeaken == true)
+                    {
+                        target.AbilityState.BerryWeaken = false;
+                        battle.ChainModify(0.5);
+                        return DoubleVoidUnion.FromDouble(battle.FinalModify(damage));
+                    }
+
+                    return DoubleVoidUnion.FromVoid();
+                }, -1),
+                OnTryEatItem = new OnTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    {
+                        battle.Add("-activate", pokemon, "ability: Ripen");
+                        return BoolVoidUnion.FromVoid();
+                    }), -1),
+                OnEatItem = new OnEatItemEventInfo((battle, item, pokemon, source, effect) =>
+                {
+                    ItemId[] weakenBerries =
+                    [
+                        ItemId.BabiriBerry, ItemId.ChartiBerry, ItemId.ChilanBerry,
+                        ItemId.ChopleBerry, ItemId.CobaBerry, ItemId.ColburBerry,
+                        ItemId.HabanBerry, ItemId.KasibBerry, ItemId.KebiaBerry,
+                        ItemId.OccaBerry, ItemId.PasshoBerry, ItemId.PayapaBerry,
+                        ItemId.RindoBerry, ItemId.RoseliaBerry, ItemId.ShucaBerry,
+                        ItemId.TangaBerry, ItemId.WacanBerry, ItemId.YacheBerry,
+                    ];
+                    // Record if the pokemon ate a berry to resist the attack
+                    pokemon.AbilityState.BerryWeaken = Array.Exists(weakenBerries, id => id == item.Id);
+                }),
             },
             [AbilityId.Rivalry] = new()
             {

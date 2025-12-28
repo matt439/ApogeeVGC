@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -591,16 +592,106 @@ public partial record Abilities
                 Name = "Natural Cure",
                 Num = 30,
                 Rating = 2.5,
-                // TODO: OnCheckShow is complex for hiding Natural Cure info in doubles
+                OnCheckShow = new OnCheckShowEventInfo((battle, pokemon) =>
+                {
+                    // This is complicated
+                    // For the most part, in-game, it's obvious whether or not Natural Cure activated,
+                    // since you can see how many of your opponent's pokemon are statused.
+                    // The only ambiguous situation happens in Doubles/Triples, where multiple pokemon
+                    // that could have Natural Cure switch out, but only some of them get cured.
+                    if (pokemon.Side.Active.Count == 1) return;
+                    if (pokemon.ShowCure == true || pokemon.ShowCure == false) return;
+
+                    List<Pokemon> cureList = [];
+                    int noCureCount = 0;
+
+                    foreach (Pokemon? curPoke in pokemon.Side.Active)
+                    {
+                        // pokemon not statused
+                        if (curPoke?.Status == ConditionId.None || curPoke == null)
+                        {
+                            continue;
+                        }
+
+                        if (curPoke.ShowCure != null)
+                        {
+                            continue;
+                        }
+
+                        Species species = curPoke.Species;
+                        // pokemon can't get Natural Cure
+                        bool canHaveNaturalCure =
+                            species.Abilities.Slot0 == AbilityId.NaturalCure ||
+                            species.Abilities.Slot1 == AbilityId.NaturalCure ||
+                            species.Abilities.Hidden == AbilityId.NaturalCure;
+
+                        if (!canHaveNaturalCure)
+                        {
+                            continue;
+                        }
+
+                        // pokemon's ability is known to be Natural Cure
+                        if (species.Abilities.Slot1 == null && species.Abilities.Hidden == null)
+                        {
+                            continue;
+                        }
+
+                        // pokemon isn't switching this turn
+                        if (curPoke != pokemon && battle.Queue.WillSwitch(curPoke) == null)
+                        {
+                            continue;
+                        }
+
+                        if (curPoke.HasAbility(AbilityId.NaturalCure))
+                        {
+                            cureList.Add(curPoke);
+                        }
+                        else
+                        {
+                            noCureCount++;
+                        }
+                    }
+
+                    if (cureList.Count == 0 || noCureCount == 0)
+                    {
+                        // It's possible to know what pokemon were cured
+                        foreach (Pokemon pkmn in cureList)
+                        {
+                            pkmn.ShowCure = true;
+                        }
+                    }
+                    else
+                    {
+                        // It's not possible to know what pokemon were cured
+                        // Unlike a -hint, this is real information that battlers need, so we use a -message
+                        string plural = cureList.Count == 1 ? "was" : "were";
+                        battle.Add("-message",
+                            $"({cureList.Count} of {pokemon.Side.Name}'s pokemon {plural} cured by Natural Cure.)");
+
+                        foreach (Pokemon pkmn in cureList)
+                        {
+                            pkmn.ShowCure = false;
+                        }
+                    }
+                }),
                 OnSwitchOut = new OnSwitchOutEventInfo((battle, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.None) return;
 
-                    // If pokemon.showCure is undefined, it was skipped because its ability is known
-                    // For simplicity, we just cure and show message
-                    battle.Add("-curestatus", pokemon, pokemon.Status.ToString(),
-                        "[from] ability: Natural Cure");
+                    // If pokemon.ShowCure is undefined, it was skipped because its ability is known
+                    if (pokemon.ShowCure == null) pokemon.ShowCure = true;
+
+                    if (pokemon.ShowCure == true)
+                    {
+                        battle.Add("-curestatus", pokemon, pokemon.Status.ToString(),
+                            "[from] ability: Natural Cure");
+                    }
+
                     pokemon.ClearStatus();
+
+                    // only reset .ShowCure if it's false
+                    // (once you know a Pokemon has Natural Cure, its cures are always known)
+                    if (pokemon.ShowCure == false) pokemon.ShowCure = null;
                 }),
             },
             [AbilityId.Neuroforce] = new()
