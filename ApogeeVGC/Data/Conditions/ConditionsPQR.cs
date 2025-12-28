@@ -700,7 +700,7 @@ public partial record Conditions
                 OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
                 {
                     if (effect == null || source == null) return status;
-                    if (effect.Id == EffectId.Yawn) return status;
+                    if (effect is Condition { Id: ConditionId.Yawn }) return status;
                     // TODO: Check if effect.infiltrates && !target.isAlly(source)
                     if (target != source)
                     {
@@ -816,7 +816,7 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
                 {
-                    if (effect?.Id == EffectId.BoosterEnergy)
+                    if (effect is Item { Id: ItemId.BoosterEnergy })
                     {
                         battle.EffectState.FromBooster = true;
                         if (battle.DisplayUi)
@@ -833,7 +833,7 @@ public partial record Conditions
                     }
                     // TODO: Get best stat from Pokemon.GetBestStat(false, true)
                     // For now, store a placeholder
-                    battle.EffectState.BestStat = "atk";
+                    battle.EffectState.BestStat = StatIdExceptHp.Atk;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, $"protosynthesis{battle.EffectState.BestStat}");

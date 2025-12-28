@@ -59,6 +59,20 @@ public class EffectState
     public string? LastMove { get; set; } // For Metronome item
     public int? NumConsecutive { get; set; } // For Metronome item
 
+    // Additional properties for condition states
+    public bool? LostFocus { get; set; } // For Focus Punch
+    public int? HitCount { get; set; } // For Fury Cutter
+    public int? Multiplier { get; set; } // For Echoed Voice
+    public PokemonSlot? TargetSlot { get; set; } // For Future Sight target tracking
+    public int? EndingTurn { get; set; } // For Future Sight timing
+    public int? TrueDuration { get; set; } // For LockedMove (Outrage, etc.)
+    public int? Layers { get; set; } // For entry hazards (Spikes, Toxic Spikes)
+    public int? Def { get; set; } // For Stockpile stat tracking
+    public int? Spd { get; set; } // For Stockpile stat tracking
+    public int? BoundDivisor { get; set; } // For PartiallyTrapped damage calculation
+    public int? Hp { get; set; } // For Wish and similar healing effects
+    public int? StartingTurn { get; set; } // For Wish timing
+
     public int? GetProperty(EffectStateKey? key)
     {
         return key switch

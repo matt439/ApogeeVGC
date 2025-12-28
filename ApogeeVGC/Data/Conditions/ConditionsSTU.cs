@@ -341,7 +341,7 @@ public partial record Conditions
                 AssociatedMove = MoveId.Substitute,
                 OnStart = new OnStartEventInfo((battle, target, source, effect) =>
                 {
-                    if (effect?.Id == EffectId.ShedTail)
+                    if (effect is Move { Id: MoveId.ShedTail })
                     {
                         if (battle.DisplayUi)
                         {
@@ -642,7 +642,7 @@ public partial record Conditions
                 OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
                 {
                     // TODO: Check for Dynamax volatile
-                    if (effect?.Id == EffectId.GMaxMeltdown)
+                    if (effect is Move { Id: MoveId.GMaxMeltdown })
                     {
                         battle.EffectState.Duration = 3;
                     }
@@ -1110,12 +1110,18 @@ public partial record Conditions
                 OnStart = new OnStartEventInfo((battle, attacker, defender, effect) =>
                 {
                     // attacker is the Pokemon using the two turn move and the Pokemon this condition is being applied to
-                    battle.EffectState.Move = effect?.Id;
-
-                    // Add the move-specific volatile (e.g., 'fly', 'dig', 'dive')
-                    if (effect?.Id != null)
+                    if (effect is Move move)
                     {
-                        attacker.AddVolatile(_library.Conditions[(ConditionId)effect.Id]);
+                        battle.EffectState.Move = move.Id;
+
+                        // Add the move-specific volatile (e.g., 'fly', 'dig', 'dive')
+                        // TODO: Need proper mapping from MoveId to ConditionId for two-turn moves
+                        // For now, try to find a condition with matching name
+                        var moveConditionId = Enum.TryParse<ConditionId>(move.Id.ToString(), out var cid) ? cid : (ConditionId?)null;
+                        if (moveConditionId.HasValue && _library.Conditions.ContainsKey(moveConditionId.Value))
+                        {
+                            attacker.AddVolatile(_library.Conditions[moveConditionId.Value]);
+                        }
                     }
 
                     // TODO: Handle lastMoveTargetLoc for targeting

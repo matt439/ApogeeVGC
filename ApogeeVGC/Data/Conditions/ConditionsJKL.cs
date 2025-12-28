@@ -179,7 +179,7 @@ public partial record Conditions
                 OnStart = new OnStartEventInfo((battle, target, source, effect) =>
                 {
                     battle.EffectState.TrueDuration = battle.Random(2, 4);
-                    battle.EffectState.Move = effect?.Id;
+                    battle.EffectState.Move = effect is Move move ? move.Id : null;
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>

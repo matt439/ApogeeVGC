@@ -31,6 +31,7 @@ public enum AbilityId
     AngerPoint,
     PoisonTouch,
     PerishBody,
+    Persistent,
     Stall,
     MagicBounce,
     Harvest,

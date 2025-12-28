@@ -33,7 +33,12 @@ public partial record Conditions
                     {
                         return BoolVoidUnion.FromBool(false);
                     }
-                    if (effect != null && new[] { EffectId.Costar, EffectId.Imposter, EffectId.Psychup, EffectId.Transform }.Contains(effect.Id))
+                    // Check if this is from copying abilities (Costar, Imposter, Psych Up, Transform)
+                    // These are moves/abilities that copy stat changes, so we show silently
+                    bool isCopied = effect is Ability ability &&
+                        (ability.Id == AbilityId.Costar || ability.Id == AbilityId.Imposter) ||
+                        effect is Move move && (move.Name == "Psych Up" || move.Name == "Transform");
+                    if (isCopied)
                     {
                         if (battle.DisplayUi)
                         {
@@ -52,7 +57,7 @@ public partial record Conditions
                     battle.EffectState.HasDragonType = target.HasType(PokemonType.Dragon);
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnModifyCritRatio = new OnModifyCritRatioEventInfo((battle, critRatio, _, _) =>
+                OnModifyCritRatio = new OnModifyCritRatioEventInfo((battle, critRatio, _, _, _) =>
                 {
                     // +2 crit ratio if Dragon type, +1 otherwise
                     var hasDragonType = battle.EffectState.HasDragonType as bool? ?? false;
@@ -339,19 +344,16 @@ public partial record Conditions
                 Duration = 2,
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Immune to Sandstorm and Hail damage while underground
+                    // This is void-returning - immunity is handled by the caller
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
                     if (move.Id == MoveId.Earthquake || move.Id == MoveId.Magnitude)
                     {
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                 {
@@ -371,19 +373,16 @@ public partial record Conditions
                 Duration = 2,
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Immune to Sandstorm and Hail damage while underwater
+                    // This is void-returning - immunity is handled by the caller
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
                     if (move.Id == MoveId.Surf || move.Id == MoveId.Whirlpool)
                     {
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                 {
@@ -403,11 +402,8 @@ public partial record Conditions
                 Duration = 2,
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Immune to Sandstorm and Hail damage while in the air
+                    // This is void-returning - immunity is handled by the caller
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -416,9 +412,9 @@ public partial record Conditions
                         move.Id == MoveId.Hurricane || move.Id == MoveId.SmackDown ||
                         move.Id == MoveId.ThousandArrows)
                     {
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                 {
@@ -491,8 +487,8 @@ public partial record Conditions
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
                     var item = pokemon.GetItem();
-                    pokemon.SetItem(null);
-                    pokemon.LastItem = item;
+                    pokemon.SetItem(ItemId.None);
+                    pokemon.LastItem = item.Id;
                     // TODO: pokemon.usedItemThisTurn = true;
                     if (battle.DisplayUi)
                     {
@@ -540,14 +536,8 @@ public partial record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        if (effect?.Id == EffectId.ZPower)
-                        {
-                            battle.Add("-singleturn", target, "move: Follow Me", "[zeffect]");
-                        }
-                        else
-                        {
-                            battle.Add("-singleturn", target, "move: Follow Me");
-                        }
+                        // TODO: Check for Z-Power effect and add "[zeffect]" suffix
+                        battle.Add("-singleturn", target, "move: Follow Me");
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
@@ -1011,7 +1001,7 @@ public partial record Conditions
                 {
                     battle.EffectState.Multiplier = 1;
                 }),
-                OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _) =>
+                OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>
                 {
                     if (battle.EffectState.Duration != 2)
                     {

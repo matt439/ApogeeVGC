@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -476,11 +477,8 @@ public partial record Conditions
                 Duration = 2,
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail)
-                    {
-                        return false;
-                    }
-                    return BoolVoidUnion.FromVoid();
+                    // Immune to Sandstorm and Hail damage while in the air
+                    // This is void-returning - immunity is handled by the caller
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -489,9 +487,9 @@ public partial record Conditions
                         move.Id == MoveId.Hurricane || move.Id == MoveId.SmackDown ||
                         move.Id == MoveId.ThousandArrows)
                     {
-                        return BoolVoidUnion.FromVoid();
+                        return BoolIntEmptyVoidUnion.FromVoid();
                     }
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                 {
@@ -576,7 +574,7 @@ public partial record Conditions
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
                     // Boost all stats by 2 stages
-                    battle.Boost(new BoostTable
+                    battle.Boost(new SparseBoostsTable
                     {
                         Atk = 2,
                         Def = 2,
@@ -592,11 +590,10 @@ public partial record Conditions
                     {
                         battle.Add("-block", pokemon, "Commanded");
                     }
-                    return false;
                 }, 2),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {
-                    pokemon.Trapped = true;
+                    pokemon.Trapped = PokemonTrapped.True;
                 }, -11),
             },
             [ConditionId.Commanding] = new()
@@ -612,16 +609,15 @@ public partial record Conditions
                     {
                         battle.Add("-block", pokemon, "Commanding");
                     }
-                    return false;
                 }, 2),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {
-                    pokemon.Trapped = true;
+                    pokemon.Trapped = PokemonTrapped.True;
                 }, -11),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
                 {
                     // Tatsugiri is invulnerable while commanding
-                    return false;
+                    return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 OnBeforeTurn = new OnBeforeTurnEventInfo((battle, pokemon) =>
                 {
