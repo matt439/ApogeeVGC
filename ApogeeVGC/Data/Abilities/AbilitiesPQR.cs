@@ -27,9 +27,20 @@ public partial record Abilities
                 Name = "Parental Bond",
                 Num = 185,
                 Rating = 4.5,
-                // TODO: ParentalBond requires mutable MultiHit and MultiHitType on ActiveMove
-                // OnPrepareHit sets move.MultiHit = 2 and move.MultiHitType = "parentalbond"
-                // Damage modifier implemented in BattleActions.ModifyDamage()
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, source, target, move) =>
+                {
+                    if (move.Category == MoveCategory.Status || move.MultiHit != null ||
+                        move.Flags.NoParentalBond == true || move.Flags.Charge == true ||
+                        move.Flags.FutureMove == true || move.SpreadHit == true)
+                    {
+                        return new VoidReturn();
+                    }
+
+                    move.MultiHit = 2;
+                    move.MultiHitType = MoveMultiHitType.ParentBond;
+                    return new VoidReturn();
+                }),
+                // Note: Damage modifier for second hit implemented in BattleActions.ModifyDamage()
             },
             [AbilityId.PastelVeil] = new()
             {
@@ -109,8 +120,18 @@ public partial record Abilities
                 Name = "Perish Body",
                 Num = 253,
                 Rating = 1.0,
-                // TODO: PerishBody requires ConditionId.PerishSong to be added
-                // OnDamagingHit adds PerishSong volatile to both attacker and defender on contact
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    if (!battle.CheckMoveMakesContact(move, source, target) ||
+                        source.Volatiles.ContainsKey(ConditionId.PerishSong))
+                    {
+                        return;
+                    }
+
+                    battle.Add("-ability", target, "ability: Perish Body");
+                    source.AddVolatile(ConditionId.PerishSong);
+                    target.AddVolatile(ConditionId.PerishSong);
+                }),
             },
             [AbilityId.Pickpocket] = new()
             {
