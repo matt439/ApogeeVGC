@@ -6,12 +6,14 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+using static ApogeeVGC.Sim.BattleClasses.BattleActions;
 
 namespace ApogeeVGC.Data.Abilities;
 
@@ -29,8 +31,50 @@ public partial record Abilities
                 Num = 156,
                 Rating = 4.0,
                 Flags = new AbilityFlags { Breakable = true },
-                // TODO: Magic Bounce requires battle.Dex.GetActiveMove which doesn't exist yet
-                // OnTryHit and OnAllyTryHitSide need to bounce reflectable status moves
+                // OnTryHitPriority = 1
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (target == source || move.HasBounced == true ||
+                        move.Flags.Reflectable != true || target.IsSemiInvulnerable())
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Get the base move from library and convert to active move
+                    Move baseMove = battle.Library.Moves[move.Id];
+                    ActiveMove newMove = baseMove.ToActiveMove();
+                    newMove.HasBounced = true;
+                    newMove.PranksterBoosted = false;
+
+                    // Bounce the move back to source
+                    battle.Actions.UseMove(newMove, target, new UseMoveOptions { Target = source });
+                    return null;
+                }, 1),
+                OnAllyTryHitSide = new OnAllyTryHitSideEventInfo((battle, target, source, move) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var abilityHolder
+                        })
+                        return new VoidReturn();
+
+                    if (target.IsAlly(source) || move.HasBounced == true ||
+                        move.Flags.Reflectable != true || abilityHolder.IsSemiInvulnerable())
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Get the base move from library and convert to active move
+                    Move baseMove = battle.Library.Moves[move.Id];
+                    ActiveMove newMove = baseMove.ToActiveMove();
+                    newMove.HasBounced = true;
+                    newMove.PranksterBoosted = false;
+
+                    // Bounce the move back to source from the ability holder
+                    battle.Actions.UseMove(newMove, abilityHolder, new UseMoveOptions { Target = source });
+                    move.HasBounced = true; // only bounce once in free-for-all battles
+                    return null;
+                }),
             },
             [AbilityId.MagicGuard] = new()
             {
@@ -597,7 +641,45 @@ public partial record Abilities
                     battle.Add("-ability", pokemon, "Neutralizing Gas");
                     pokemon.AbilityState.Ending = false;
                     // The actual suppression is handled in Pokemon.IgnoringAbility()
-                    // TODO: Implement the complex onSwitchIn logic for suppressing abilities
+
+                    AbilityId[] strongWeathers =
+                    [
+                        AbilityId.DesolateLand,
+                        AbilityId.PrimordialSea,
+                        AbilityId.DeltaStream
+                    ];
+
+                    foreach (Pokemon target in battle.GetAllActive())
+                    {
+                        if (target.HasItem(ItemId.AbilityShield))
+                        {
+                            battle.Add("-block", target, "item: Ability Shield");
+                            continue;
+                        }
+
+                        // Can't suppress a Tatsugiri inside of Dondozo already
+                        if (target.Volatiles.ContainsKey(ConditionId.Commanding))
+                        {
+                            continue;
+                        }
+
+                        if (target.Illusion != null)
+                        {
+                            Ability illusionAbility = battle.Library.Abilities[AbilityId.Illusion];
+                            battle.SingleEvent(EventId.End, illusionAbility, target.AbilityState,
+                                target, pokemon);
+                        }
+
+                        // Note: Slow Start is handled via ability state counter, not a volatile
+                        // Gen 9 VGC doesn't include Regigigas, so this check is omitted
+
+                        if (Array.Exists(strongWeathers, w => w == target.GetAbility().Id))
+                        {
+                            Ability targetAbility = target.GetAbility();
+                            battle.SingleEvent(EventId.End, targetAbility, target.AbilityState,
+                                target, pokemon);
+                        }
+                    }
                 }, 2),
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
