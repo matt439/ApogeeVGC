@@ -416,6 +416,100 @@ public partial record Conditions
                     return BoolVoidUnion.FromVoid();
                 }, 5),
             },
+            [ConditionId.SmackDown] = new()
+            {
+                Id = ConditionId.SmackDown,
+                Name = "Smack Down",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.SmackDown,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    bool applies = false;
+                    if (pokemon.HasType(PokemonType.Flying) || pokemon.HasAbility(AbilityId.Levitate))
+                    {
+                        applies = true;
+                    }
+                    if (pokemon.HasItem(ItemId.IronBall) || pokemon.Volatiles.ContainsKey(ConditionId.Ingrain) ||
+                        battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
+                    {
+                        applies = false;
+                    }
+                    if (pokemon.RemoveVolatile(_library.Conditions[ConditionId.Fly]) ||
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Bounce]))
+                    {
+                        applies = true;
+                        // TODO: battle.queue.cancelMove(pokemon);
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
+                    }
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.MagnetRise))
+                    {
+                        applies = true;
+                        pokemon.DeleteVolatile(ConditionId.MagnetRise);
+                    }
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.Telekinesis))
+                    {
+                        applies = true;
+                        pokemon.DeleteVolatile(ConditionId.Telekinesis);
+                    }
+                    if (!applies) return BoolVoidUnion.FromBool(false);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Smack Down");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.RemoveVolatile(_library.Conditions[ConditionId.Fly]) ||
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Bounce]))
+                    {
+                        // TODO: battle.queue.cancelMove(pokemon);
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Smack Down");
+                        }
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // Groundedness implemented in Pokemon.IsGrounded()
+            },
+            [ConditionId.Torment] = new()
+            {
+                Id = ConditionId.Torment,
+                Name = "Torment",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Torment,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
+                {
+                    // TODO: Check for Dynamax volatile
+                    if (effect?.Id == EffectId.GMaxMeltdown)
+                    {
+                        battle.EffectState.Duration = 3;
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Torment");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Torment");
+                    }
+                }),
+                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.LastMove != null && pokemon.LastMove.Id != MoveId.Struggle)
+                    {
+                        pokemon.DisableMove(pokemon.LastMove.Id);
+                    }
+                }),
+            },
             [ConditionId.Toxic] = new()
             {
                 Id = ConditionId.Toxic,

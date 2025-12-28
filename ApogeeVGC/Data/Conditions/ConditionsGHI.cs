@@ -111,6 +111,88 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 // This is handled in the move's onHit, not as a persistent condition
             },
+            [ConditionId.HealBlock] = new()
+            {
+                Id = ConditionId.HealBlock,
+                Name = "Heal Block",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.HealBlock,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((battle, _, source, effect) =>
+                {
+                    if (effect?.Name == "Psychic Noise")
+                    {
+                        return 2;
+                    }
+                    if (source != null && source.HasAbility(AbilityId.Persistent))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", source, "ability: Persistent", "[move] Heal Block");
+                        }
+                        return 7;
+                    }
+                    return 5;
+                }),
+                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Heal Block");
+                    }
+                    // TODO: source.moveThisTurnResult = true;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        var move = _library.Moves[moveSlot.Id];
+                        if (move.Flags.Heal ?? false)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                {
+                    // TODO: Check if move is Z-move or Max move
+                    if (move.Flags.Heal ?? false)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "move: Heal Block", move.Name);
+                        }
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }, 6),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    // TODO: Check if move is Z-move or Max move
+                    if (move.Flags.Heal ?? false)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "move: Heal Block", move.Name);
+                        }
+                        return false;
+                    }
+                }),
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                }, 20),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "move: Heal Block");
+                    }
+                }),
+                // TODO: OnTryHeal - prevent healing except Z-power
+                // TODO: OnRestart - handle Psychic Noise special case
+            },
             [ConditionId.Hail] = new()
             {
                 Id = ConditionId.Hail,

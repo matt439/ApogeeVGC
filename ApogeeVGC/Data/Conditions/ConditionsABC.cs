@@ -444,6 +444,16 @@ public partial record Conditions
                 }),
                 // TODO: Implement contact checking to burn attackers
             },
+            [ConditionId.Block] = new()
+            {
+                Id = ConditionId.Block,
+                Name = "Block",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Block,
+                // Block just adds the 'trapped' volatile with 'trapper' marker
+                // The actual implementation is in the Trapped condition
+                // This is a marker condition
+            },
             [ConditionId.Bide] = new()
             {
                 Id = ConditionId.Bide,

@@ -773,6 +773,36 @@ public partial record Conditions
             //        }
             //    }),
             //},
+            [ConditionId.Embargo] = new()
+            {
+                Id = ConditionId.Embargo,
+                Name = "Embargo",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Embargo,
+                Duration = 5,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Embargo");
+                    }
+                    // TODO: singleEvent('End', pokemon.getItem(), pokemon.itemState, pokemon)
+                    // to trigger item end effects
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // Item suppression implemented in Pokemon.IgnoringItem()
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                }, 21),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Embargo");
+                    }
+                }),
+            },
             [ConditionId.Encore] = new()
             {
                 Id = ConditionId.Encore,
