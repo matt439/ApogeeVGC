@@ -443,6 +443,51 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.Fling] = new()
+            {
+                Id = ConditionId.Fling,
+                Name = "Fling",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Fling,
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    var item = pokemon.GetItem();
+                    pokemon.SetItem(null);
+                    pokemon.LastItem = item;
+                    // TODO: pokemon.usedItemThisTurn = true;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-enditem", pokemon, item.Name, "[from] move: Fling");
+                    }
+                    // TODO: battle.runEvent('AfterUseItem', pokemon, null, null, item);
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.Fling]);
+                }),
+            },
+            [ConditionId.FollowMe] = new()
+            {
+                Id = ConditionId.FollowMe,
+                Name = "Follow Me",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.FollowMe,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, effect) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        if (effect?.Id == EffectId.ZPower)
+                        {
+                            battle.Add("-singleturn", target, "move: Follow Me", "[zeffect]");
+                        }
+                        else
+                        {
+                            battle.Add("-singleturn", target, "move: Follow Me");
+                        }
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnFoeRedirectTarget - redirect attacks to this Pokemon
+                // Priority 1, check if target is valid and not sky dropped
+            },
             [ConditionId.FuryCutter] = new()
             {
                 Id = ConditionId.FuryCutter,
@@ -830,6 +875,31 @@ public partial record Conditions
                     }
                 }),
                 // TODO: OnDisableMove - disable all moves except encored move
+            },
+            [ConditionId.EchoedVoice] = new()
+            {
+                Id = ConditionId.EchoedVoice,
+                Name = "Echoed Voice",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.EchoedVoice,
+                Duration = 2,
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, _, _) =>
+                {
+                    battle.EffectState.Multiplier = 1;
+                }),
+                OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _) =>
+                {
+                    if (battle.EffectState.Duration != 2)
+                    {
+                        battle.EffectState.Duration = 2;
+                        if ((battle.EffectState.Multiplier ?? 1) < 5)
+                        {
+                            battle.EffectState.Multiplier = (battle.EffectState.Multiplier ?? 1) + 1;
+                        }
+                    }
+                }),
+                // This is a field pseudo-weather condition
+                // BasePowerCallback handled in the move itself
             },
             [ConditionId.Drain] = new()
             {

@@ -158,6 +158,41 @@ public partial record Conditions
                     return new PokemonType[] { type };
                 }, 1),
             },
+            [ConditionId.SilkTrap] = new()
+            {
+                Id = ConditionId.SilkTrap,
+                Name = "Silk Trap",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.SilkTrap,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Protect");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
+                    {
+                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+                    // TODO: Check for lockedmove volatile and reset Outrage counter
+                    // TODO: Check if move makes contact and lower Speed
+                    // if (this.checkMoveMakesContact(move, source, target)) {
+                    //     this.boost({ spe: -1 }, source, target, this.dex.getActiveMove("Silk Trap"));
+                    // }
+                    return BoolVoidUnion.FromBool(false);
+                }, 3),
+                // TODO: OnHit - if move is Z or Max powered and makes contact, lower Speed
+            },
             [ConditionId.SkyDrop] = new()
             {
                 Id = ConditionId.SkyDrop,
@@ -364,6 +399,68 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.Telekinesis] = new()
+            {
+                Id = ConditionId.Telekinesis,
+                Name = "Telekinesis",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Telekinesis,
+                Duration = 3,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    // Check for immune species
+                    string[] immuneSpecies = { "Diglett", "Dugtrio", "Palossand", "Sandygast", "Gengar-Mega" };
+                    if (immuneSpecies.Contains(target.BaseSpecies.Name))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target);
+                        }
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    if (target.Volatiles.ContainsKey(ConditionId.SmackDown) ||
+                        target.Volatiles.ContainsKey(ConditionId.Ingrain))
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "Telekinesis");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnAccuracy - if move is not OHKO, return true (perfect accuracy)
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type == ConditionId.Ground)
+                    {
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Name == "Gengar-Mega")
+                    {
+                        pokemon.DeleteVolatile(ConditionId.Telekinesis);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, "Telekinesis", "[silent]");
+                        }
+                    }
+                }),
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                }, 19),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "Telekinesis");
+                    }
+                }),
+            },
             [ConditionId.Taunt] = new()
             {
                 Id = ConditionId.Taunt,
@@ -555,6 +652,57 @@ public partial record Conditions
                     },
                     9),
             },
+            [ConditionId.ToxicSpikes] = new()
+            {
+                Id = ConditionId.ToxicSpikes,
+                Name = "Toxic Spikes",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.ToxicSpikes,
+                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "move: Toxic Spikes");
+                    }
+                    battle.EffectState.Layers = 1;
+                }),
+                OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
+                {
+                    if ((battle.EffectState.Layers ?? 0) >= 2) return BoolVoidUnion.FromBool(false);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "move: Toxic Spikes");
+                    }
+                    battle.EffectState.Layers = (battle.EffectState.Layers ?? 0) + 1;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (!pokemon.IsGrounded()) return;
+                    if (pokemon.HasType(PokemonType.Poison))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-sideend", pokemon.Side, "move: Toxic Spikes", $"[of] {pokemon}");
+                        }
+                        pokemon.Side.RemoveSideCondition(ConditionId.ToxicSpikes);
+                    }
+                    else if (pokemon.HasType(PokemonType.Steel) || pokemon.HasItem(ItemId.HeavyDutyBoots))
+                    {
+                        // do nothing
+                    }
+                    else if ((battle.EffectState.Layers ?? 0) >= 2)
+                    {
+                        // TODO: Get opponent Pokemon for source parameter (pokemon.Side.Foe.Active[0])
+                        pokemon.TrySetStatus(ConditionId.Toxic, pokemon);
+                    }
+                    else
+                    {
+                        // TODO: Get opponent Pokemon for source parameter (pokemon.Side.Foe.Active[0])
+                        pokemon.TrySetStatus(ConditionId.Poison, pokemon);
+                    }
+                }),
+            },
             [ConditionId.Trapped] = new()
             {
                 Id = ConditionId.Trapped,
@@ -602,6 +750,34 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-fieldend", "move: Trick Room");
+                    }
+                }),
+            },
+            [ConditionId.SaltCure] = new()
+            {
+                Id = ConditionId.SaltCure,
+                Name = "Salt Cure",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.SaltCure,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Salt Cure");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    int divisor = (pokemon.HasType(PokemonType.Water) || pokemon.HasType(PokemonType.Steel)) ? 4 : 8;
+                    battle.Damage(pokemon.BaseMaxHp / divisor, pokemon, null);
+                }, 13),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Salt Cure");
                     }
                 }),
             },
@@ -895,6 +1071,190 @@ public partial record Conditions
                 OnMoveAborted = new OnMoveAbortedEventInfo((battle, pokemon, _, _) =>
                 {
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
+                }),
+            },
+            [ConditionId.Spikes] = new()
+            {
+                Id = ConditionId.Spikes,
+                Name = "Spikes",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Spikes,
+                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "Spikes");
+                    }
+                    battle.EffectState.Layers = 1;
+                }),
+                OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
+                {
+                    if ((battle.EffectState.Layers ?? 0) >= 3) return BoolVoidUnion.FromBool(false);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "Spikes");
+                    }
+                    battle.EffectState.Layers = (battle.EffectState.Layers ?? 0) + 1;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (!pokemon.IsGrounded() || pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
+                    int[] damageAmounts = { 0, 3, 4, 6 }; // 1/8, 1/6, 1/4
+                    int layers = battle.EffectState.Layers ?? 0;
+                    battle.Damage(damageAmounts[layers] * pokemon.MaxHp / 24, pokemon, null);
+                }),
+            },
+            [ConditionId.SpikyShield] = new()
+            {
+                Id = ConditionId.SpikyShield,
+                Name = "Spiky Shield",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.SpikyShield,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "move: Protect");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false))
+                    {
+                        // TODO: Check for gmaxoneblow, gmaxrapidflow
+                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+                    // TODO: Check for lockedmove volatile and reset Outrage counter
+                    // TODO: Check if move makes contact and damage source
+                    // if (this.checkMoveMakesContact(move, source, target)) {
+                    //     this.damage(source.baseMaxhp / 8, source, target);
+                    // }
+                    // return this.NOT_FAIL;
+                    return BoolVoidUnion.FromBool(false);
+                }, 3),
+            },
+            [ConditionId.StealthRock] = new()
+            {
+                Id = ConditionId.StealthRock,
+                Name = "Stealth Rock",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.StealthRock,
+                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "move: Stealth Rock");
+                    }
+                }),
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
+                    // TODO: Calculate type effectiveness for Stealth Rock
+                    // const typeMod = this.clampIntRange(pokemon.runEffectiveness(this.dex.getActiveMove('stealthrock')), -6, 6);
+                    // this.damage(pokemon.maxhp * (2 ** typeMod) / 8);
+
+                    // For now, just apply 1/8 damage (neutral effectiveness)
+                    battle.Damage(pokemon.MaxHp / 8, pokemon, null);
+                }),
+            },
+            [ConditionId.StickyWeb] = new()
+            {
+                Id = ConditionId.StickyWeb,
+                Name = "Sticky Web",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.StickyWeb,
+                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "move: Sticky Web");
+                    }
+                }),
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (!pokemon.IsGrounded() || pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "move: Sticky Web");
+                    }
+                    // TODO: Get opponent Pokemon for source parameter
+                    // battle.Boost(new Dictionary<BoostedStat, int> { [BoostedStat.Spe] = -1 }, pokemon, pokemon.Side.Foe.Active[0]);
+                    battle.Boost(new Dictionary<BoostedStat, int> { [BoostedStat.Spe] = -1 }, pokemon, pokemon);
+                }),
+            },
+            [ConditionId.StockpileStorage] = new()
+            {
+                Id = ConditionId.StockpileStorage,
+                Name = "Stockpile",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Stockpile,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    battle.EffectState.Layers = 1;
+                    battle.EffectState.Def = 0;
+                    battle.EffectState.Spd = 0;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, $"stockpile{battle.EffectState.Layers}");
+                    }
+                    var curDef = target.Boosts[BoostedStat.Def];
+                    var curSpD = target.Boosts[BoostedStat.SpD];
+                    battle.Boost(new Dictionary<BoostedStat, int>
+                    {
+                        [BoostedStat.Def] = 1,
+                        [BoostedStat.SpD] = 1
+                    }, target, target);
+                    if (curDef != target.Boosts[BoostedStat.Def])
+                        battle.EffectState.Def = (battle.EffectState.Def ?? 0) - 1;
+                    if (curSpD != target.Boosts[BoostedStat.SpD])
+                        battle.EffectState.Spd = (battle.EffectState.Spd ?? 0) - 1;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRestart = new OnRestartEventInfo((battle, target, _, _) =>
+                {
+                    if ((battle.EffectState.Layers ?? 0) >= 3) return BoolVoidUnion.FromBool(false);
+                    battle.EffectState.Layers = (battle.EffectState.Layers ?? 0) + 1;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, $"stockpile{battle.EffectState.Layers}");
+                    }
+                    var curDef = target.Boosts[BoostedStat.Def];
+                    var curSpD = target.Boosts[BoostedStat.SpD];
+                    battle.Boost(new Dictionary<BoostedStat, int>
+                    {
+                        [BoostedStat.Def] = 1,
+                        [BoostedStat.SpD] = 1
+                    }, target, target);
+                    if (curDef != target.Boosts[BoostedStat.Def])
+                        battle.EffectState.Def = (battle.EffectState.Def ?? 0) - 1;
+                    if (curSpD != target.Boosts[BoostedStat.SpD])
+                        battle.EffectState.Spd = (battle.EffectState.Spd ?? 0) - 1;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if ((battle.EffectState.Def ?? 0) != 0 || (battle.EffectState.Spd ?? 0) != 0)
+                    {
+                        var boosts = new Dictionary<BoostedStat, int>();
+                        if ((battle.EffectState.Def ?? 0) != 0)
+                            boosts[BoostedStat.Def] = battle.EffectState.Def ?? 0;
+                        if ((battle.EffectState.Spd ?? 0) != 0)
+                            boosts[BoostedStat.SpD] = battle.EffectState.Spd ?? 0;
+                        battle.Boost(boosts, target, target);
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "Stockpile");
+                    }
                 }),
             },
         };

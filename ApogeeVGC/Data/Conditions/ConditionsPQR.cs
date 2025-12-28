@@ -269,6 +269,24 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.Recharge] = new()
+            {
+                Id = ConditionId.Recharge,
+                Name = "Recharge",
+                EffectType = EffectType.Condition,
+                // Recharge is handled by MustRecharge condition
+                // This is just a marker condition
+            },
+            [ConditionId.Rest] = new()
+            {
+                Id = ConditionId.Rest,
+                Name = "Rest",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Rest,
+                // Rest doesn't create a volatile condition
+                // It sets sleep status with statusState.time = 3
+                // This is just a marker condition
+            },
             [ConditionId.Recoil] = new()
             {
                 Id = ConditionId.Recoil,
@@ -633,6 +651,136 @@ public partial record Conditions
                     if ((source != null && source.IsActive) || gmaxEffect)
                     {
                         pokemon.TryTrap();
+                    }
+                }),
+            },
+            [ConditionId.Safeguard] = new()
+            {
+                Id = ConditionId.Safeguard,
+                Name = "Safeguard",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Safeguard,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((battle, _, source, _) =>
+                {
+                    if (source != null && source.HasAbility(AbilityId.Persistent))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", source, "ability: Persistent", "[move] Safeguard");
+                        }
+                        return 7;
+                    }
+                    return 5;
+                }),
+                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
+                {
+                    if (effect == null || source == null) return status;
+                    if (effect.Id == EffectId.Yawn) return status;
+                    // TODO: Check if effect.infiltrates && !target.isAlly(source)
+                    if (target != source)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("interrupting setStatus");
+                            // TODO: Check for Synchronize ability or move without secondaries
+                            battle.Add("-activate", target, "move: Safeguard");
+                        }
+                        return null;
+                    }
+                    return status;
+                }),
+                OnTryAddVolatile = new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
+                {
+                    if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                    // TODO: Check if effect.infiltrates && !target.isAlly(source)
+                    if ((status?.Id == ConditionId.Confusion || status?.Id == ConditionId.Yawn) && target != source)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            // TODO: Check if effect is Move without secondaries
+                            battle.Add("-activate", target, "move: Safeguard");
+                        }
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnSideStart = new OnSideStartEventInfo((battle, side, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        if (source != null && source.HasAbility(AbilityId.Persistent))
+                        {
+                            battle.Add("-sidestart", side, "Safeguard", "[persistent]");
+                        }
+                        else
+                        {
+                            battle.Add("-sidestart", side, "Safeguard");
+                        }
+                    }
+                }),
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 26,
+                    SubOrder = 3,
+                },
+                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sideend", side, "Safeguard");
+                    }
+                }),
+            },
+            [ConditionId.PsychicTerrain] = new()
+            {
+                Id = ConditionId.PsychicTerrain,
+                Name = "Psychic Terrain",
+                EffectType = EffectType.Terrain,
+                AssociatedMove = MoveId.PsychicTerrain,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                {
+                    if (source != null && source.HasItem(ItemId.TerrainExtender))
+                    {
+                        return 8;
+                    }
+                    return 5;
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, effect) =>
+                {
+                    // TODO: Check if effect priority <= 0.1 or effect.target === 'self'
+                    // TODO: Check if target is semi-invulnerable or ally of source
+                    // TODO: Check if target is not grounded
+                    // For now, this is a placeholder
+                    return BoolVoidUnion.FromVoid();
+                }, 4),
+                // TODO: OnBasePower - boost Psychic moves if attacker is grounded (1.3x boost: 5325/4096)
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        if (effect is Ability)
+                        {
+                            battle.Add("-fieldstart", "move: Psychic Terrain",
+                                $"[from] ability: {effect.Name}", $"[of] {source}");
+                        }
+                        else
+                        {
+                            battle.Add("-fieldstart", "move: Psychic Terrain");
+                        }
+                    }
+                }),
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 27,
+                    SubOrder = 7,
+                },
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Psychic Terrain");
                     }
                 }),
             },

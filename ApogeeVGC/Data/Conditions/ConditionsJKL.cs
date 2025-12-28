@@ -212,6 +212,105 @@ public partial record Conditions
                     return null;
                 }),
             },
+            [ConditionId.KingsShield] = new()
+            {
+                Id = ConditionId.KingsShield,
+                Name = "King's Shield",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.KingsShield,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Protect");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
+                    {
+                        // TODO: Check for gmaxoneblow, gmaxrapidflow
+                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+                    // TODO: Check for lockedmove volatile and reset Outrage counter
+                    // TODO: Check if move makes contact and lower Attack
+                    // if (this.checkMoveMakesContact(move, source, target)) {
+                    //     this.boost({ atk: -1 }, source, target, this.dex.getActiveMove("King's Shield"));
+                    // }
+                    return BoolVoidUnion.FromBool(false);
+                }, 3),
+                // TODO: OnHit - if move is Z or Max powered and makes contact, lower Attack
+            },
+            [ConditionId.MaxGuard] = new()
+            {
+                Id = ConditionId.MaxGuard,
+                Name = "Max Guard",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.MaxGuard,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Max Guard");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    // TODO: Check for moves that bypass Max Guard
+                    // bypassesMaxGuard = ['acupressure', 'afteryou', 'allyswitch', 'aromatherapy', ...many more]
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Max Guard");
+                    }
+                    // TODO: Check for lockedmove volatile and reset Outrage counter
+                    return BoolVoidUnion.FromBool(false);
+                }, 3),
+            },
+            [ConditionId.Obstruct] = new()
+            {
+                Id = ConditionId.Obstruct,
+                Name = "Obstruct",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Obstruct,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Protect");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
+                    {
+                        // TODO: Check for gmaxoneblow, gmaxrapidflow
+                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
+                        return BoolVoidUnion.FromVoid();
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+                    // TODO: Check for lockedmove volatile and reset Outrage counter
+                    // TODO: Check if move makes contact and lower Defense by 2
+                    // if (this.checkMoveMakesContact(move, source, target)) {
+                    //     this.boost({ def: -2 }, source, target, this.dex.getActiveMove("Obstruct"));
+                    // }
+                    return BoolVoidUnion.FromBool(false);
+                }, 3),
+                // TODO: OnHit - if move is Z or Max powered and makes contact, lower Defense by 2
+            },
         };
     }
 }

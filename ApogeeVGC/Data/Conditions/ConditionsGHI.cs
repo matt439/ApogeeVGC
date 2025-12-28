@@ -270,6 +270,68 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.GrassyTerrain] = new()
+            {
+                Id = ConditionId.GrassyTerrain,
+                Name = "Grassy Terrain",
+                EffectType = EffectType.Terrain,
+                AssociatedMove = MoveId.GrassyTerrain,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                {
+                    if (source != null && source.HasItem(ItemId.TerrainExtender))
+                    {
+                        return 8;
+                    }
+                    return 5;
+                }),
+                // TODO: OnBasePower - weaken Earthquake, Bulldoze, Magnitude if defender is grounded
+                // TODO: OnBasePower - boost Grass moves if attacker is grounded (1.3x boost: 5325/4096)
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        if (effect is Ability)
+                        {
+                            battle.Add("-fieldstart", "move: Grassy Terrain",
+                                $"[from] ability: {effect.Name}", $"[of] {source}");
+                        }
+                        else
+                        {
+                            battle.Add("-fieldstart", "move: Grassy Terrain");
+                        }
+                    }
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.IsGrounded() && !pokemon.IsSemiInvulnerable)
+                    {
+                        battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
+                    }
+                    else
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Pokemon semi-invuln or not grounded; Grassy Terrain skipped");
+                        }
+                    }
+                }, 5)
+                {
+                    SubOrder = 2,
+                },
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 27,
+                    SubOrder = 7,
+                },
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Grassy Terrain");
+                    }
+                }),
+            },
         };
     }
 }

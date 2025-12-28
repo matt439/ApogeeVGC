@@ -65,6 +65,58 @@ public partial record Conditions
                 // TODO: OnTryHitPriority = 4
                 // TODO: OnTryHit - block spread moves (allAdjacent, allAdjacentFoes)
             },
+            [ConditionId.WonderRoom] = new()
+            {
+                Id = ConditionId.WonderRoom,
+                Name = "Wonder Room",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.WonderRoom,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((battle, _, source, _) =>
+                {
+                    if (source != null && source.HasAbility(AbilityId.Persistent))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", source, "ability: Persistent", "[move] Wonder Room");
+                        }
+                        return 7;
+                    }
+                    return 5;
+                }),
+                // TODO: OnModifyMove - swap offensive stats for moves using def/spd
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        if (source != null && source.HasAbility(AbilityId.Persistent))
+                        {
+                            battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}", "[persistent]");
+                        }
+                        else
+                        {
+                            battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}");
+                        }
+                    }
+                }),
+                OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>
+                {
+                    battle.Field.RemovePseudoWeather(ConditionId.WonderRoom);
+                }),
+                // Swapping defenses partially implemented in sim/pokemon.js:Pokemon#calculateStat and Pokemon#getStat
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 27,
+                    SubOrder = 5,
+                },
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Wonder Room");
+                    }
+                }),
+            },
 
             // ===== X CONDITIONS =====
             // No conditions needed for X moves
