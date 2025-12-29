@@ -350,7 +350,7 @@ public partial record Abilities
                     }
 
                     bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                  (move.Flags.BypassSub != true) && move.Infiltrates == true;
+                                  (move.Flags.BypassSub != true) && !(move.Infiltrates == true);
                     if (hitSub) return new VoidReturn();
 
                     if (!target.RunImmunity(move)) return new VoidReturn();
@@ -422,8 +422,11 @@ public partial record Abilities
                 Name = "Drizzle",
                 Num = 2,
                 Rating = 4.0,
-                OnStart = new OnStartEventInfo((battle, _) =>
+                OnStart = new OnStartEventInfo((battle, source) =>
                 {
+                    // Don't set weather if Kyogre with Blue Orb (Primal Reversion)
+                    if (source.Species.Id == SpecieId.Kyogre && source.Item?.Id == ItemId.BlueOrb)
+                        return;
                     battle.Field.SetWeather(ConditionId.RainDance);
                 }),
             },
@@ -433,8 +436,11 @@ public partial record Abilities
                 Name = "Drought",
                 Num = 70,
                 Rating = 4.0,
-                OnStart = new OnStartEventInfo((battle, _) =>
+                OnStart = new OnStartEventInfo((battle, source) =>
                 {
+                    // Don't set weather if Groudon with Red Orb (Primal Reversion)
+                    if (source.Species.Id == SpecieId.Groudon && source.Item?.Id == ItemId.RedOrb)
+                        return;
                     battle.Field.SetWeather(ConditionId.SunnyDay);
                 }),
             },
