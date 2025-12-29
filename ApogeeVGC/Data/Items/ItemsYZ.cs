@@ -54,7 +54,7 @@ public partial record Items
                 Id = ItemId.ZapPlate,
                 Name = "Zap Plate",
                 SpriteNum = 572,
-                OnPlate = "Electric",
+                OnPlate = PokemonType.Electric,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Electric)

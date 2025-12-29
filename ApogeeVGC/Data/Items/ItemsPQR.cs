@@ -197,7 +197,7 @@ public partial record Items
                 Id = ItemId.PixiePlate,
                 Name = "Pixie Plate",
                 SpriteNum = 610,
-                OnPlate = "Fairy",
+                OnPlate = PokemonType.Fairy,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Fairy)

@@ -299,7 +299,7 @@ public partial record Items
                 Id = ItemId.SkyPlate,
                 Name = "Sky Plate",
                 SpriteNum = 450,
-                OnPlate = "Flying",
+                OnPlate = PokemonType.Flying,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Flying)
@@ -429,7 +429,7 @@ public partial record Items
                 Id = ItemId.SplashPlate,
                 Name = "Splash Plate",
                 SpriteNum = 463,
-                OnPlate = "Water",
+                OnPlate = PokemonType.Water,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Water)
@@ -458,7 +458,7 @@ public partial record Items
                 Id = ItemId.SpookyPlate,
                 Name = "Spooky Plate",
                 SpriteNum = 464,
-                OnPlate = "Ghost",
+                OnPlate = PokemonType.Ghost,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Ghost)
@@ -604,7 +604,7 @@ public partial record Items
                 Id = ItemId.StonePlate,
                 Name = "Stone Plate",
                 SpriteNum = 477,
-                OnPlate = "Rock",
+                OnPlate = PokemonType.Rock,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Rock)
@@ -823,7 +823,7 @@ public partial record Items
                 Id = ItemId.ToxicPlate,
                 Name = "Toxic Plate",
                 SpriteNum = 516,
-                OnPlate = "Poison",
+                OnPlate = PokemonType.Poison,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Poison)

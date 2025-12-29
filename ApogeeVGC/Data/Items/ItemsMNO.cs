@@ -157,7 +157,7 @@ public partial record Items
                 Id = ItemId.MeadowPlate,
                 Name = "Meadow Plate",
                 SpriteNum = 282,
-                OnPlate = "Grass",
+                OnPlate = PokemonType.Grass,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Grass)
@@ -309,7 +309,7 @@ public partial record Items
                 Id = ItemId.MindPlate,
                 Name = "Mind Plate",
                 SpriteNum = 291,
-                OnPlate = "Psychic",
+                OnPlate = PokemonType.Psychic,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Psychic)

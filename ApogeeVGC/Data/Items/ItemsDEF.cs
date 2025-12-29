@@ -109,7 +109,7 @@ public partial record Items
                 Id = ItemId.DracoPlate,
                 Name = "Draco Plate",
                 SpriteNum = 105,
-                // OnPlate = 'Dragon', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Dragon,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Dragon)
@@ -166,7 +166,7 @@ public partial record Items
                 Id = ItemId.DreadPlate,
                 Name = "Dread Plate",
                 SpriteNum = 110,
-                // OnPlate = 'Dark', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Dark,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Dark)
@@ -233,7 +233,7 @@ public partial record Items
                 Id = ItemId.EarthPlate,
                 Name = "Earth Plate",
                 SpriteNum = 117,
-                // OnPlate = 'Ground', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Ground,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Ground)
@@ -552,7 +552,7 @@ public partial record Items
                 Id = ItemId.FistPlate,
                 Name = "Fist Plate",
                 SpriteNum = 143,
-                // OnPlate = 'Fighting', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Fighting,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Fighting)
@@ -613,7 +613,7 @@ public partial record Items
                 Id = ItemId.FlamePlate,
                 Name = "Flame Plate",
                 SpriteNum = 146,
-                // OnPlate = 'Fire', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Fire,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Fire)

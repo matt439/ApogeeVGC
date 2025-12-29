@@ -364,7 +364,7 @@ public partial record Items
                 Id = ItemId.IciclePlate,
                 Name = "Icicle Plate",
                 SpriteNum = 220,
-                // OnPlate = 'Ice', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Ice,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Ice)
@@ -402,7 +402,7 @@ public partial record Items
                 Id = ItemId.InsectPlate,
                 Name = "Insect Plate",
                 SpriteNum = 223,
-                // OnPlate = 'Bug', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Bug,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Bug)
@@ -458,7 +458,7 @@ public partial record Items
                 Id = ItemId.IronPlate,
                 Name = "Iron Plate",
                 SpriteNum = 225,
-                // OnPlate = 'Steel', // TODO: Not relevant for Gen 9 standard play
+                OnPlate = PokemonType.Steel,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     if (move.Type == MoveType.Steel)
