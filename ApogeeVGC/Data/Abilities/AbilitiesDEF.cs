@@ -561,8 +561,7 @@ public partial record Abilities
                 Rating = 4.0,
                 OnStart = new OnStartEventInfo((battle, _) =>
                 {
-                    battle.Field.SetTerrain(
-                        battle.Library.Conditions[ConditionId.ElectricTerrain]);
+                    battle.Field.SetTerrain(ConditionId.ElectricTerrain);
                 }),
             },
             [AbilityId.Electromorphosis] = new()
@@ -687,8 +686,8 @@ public partial record Abilities
                 Rating = 1.0,
                 OnEmergencyExit = new OnEmergencyExitEventInfo((battle, target) =>
                 {
-                    if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag ||
-                        target.SwitchFlag.IsTrue())
+                    if (!battle.CanSwitch(target.Side) || target.ForceSwitchFlag ||
+                        target.SwitchFlag)
                         return;
 
                     // Clear all switch flags
@@ -986,7 +985,7 @@ public partial record Abilities
                             showMsg = true;
                         }
 
-                        if (showMsg && effect is ActiveMove { Secondaries: null })
+                        if (showMsg && effect is not ActiveMove { Secondaries.Length: > 0 })
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
@@ -1003,13 +1002,13 @@ public partial record Abilities
                     {
                         if (!target.HasType(PokemonType.Grass) || source == null ||
                             target == source ||
-                            effect == null || status.Id == ConditionId.Yawn)
+                            effect == null || effect.Id == ConditionId.Yawn)
                             return new VoidReturn();
                         battle.Debug("interrupting setStatus with Flower Veil");
                         if (effect.Name == "Synchronize" || (effect.EffectType == EffectType.Move &&
                                                              effect is ActiveMove
                                                              {
-                                                                 Secondaries: null
+                                                                 Secondaries: null or { Length: 0 }
                                                              }))
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
