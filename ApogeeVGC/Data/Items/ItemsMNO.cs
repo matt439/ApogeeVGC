@@ -281,8 +281,6 @@ public partial record Items
                 {
                     pokemon.AddVolatile(ConditionId.Metronome);
                 }),
-                // TODO: Implement Metronome condition that tracks consecutive move usage and boosts damage
-                // The condition needs OnStart, OnTryMove priority -2, and OnModifyDamage handlers
                 Num = 277,
                 Gen = 4,
             },
@@ -307,7 +305,6 @@ public partial record Items
                 {
                     pokemon.AddVolatile(ConditionId.MicleBerry);
                 })),
-                // TODO: Implement Micle Berry condition that boosts accuracy on next move
                 Num = 209,
                 Gen = 4,
             },
@@ -365,11 +362,63 @@ public partial record Items
                 Name = "Mirror Herb",
                 SpriteNum = 748,
                 Fling = new FlingData { BasePower = 30 },
-                // TODO: Implement Mirror Herb logic
-                // OnFoeAfterBoost - track positive boosts from opponent
-                // OnAnySwitchIn, OnAnyAfterMega, OnAnyAfterTerastallization, OnAnyAfterMove, OnResidual - check if ready to use
-                // OnUse - copy boosts
-                // OnEnd - cleanup
+                OnFoeAfterBoost = new OnFoeAfterBoostEventInfo((battle, boost, _, pokemon, effect) =>
+                {
+                    // Don't trigger from Opportunist or Mirror Herb
+                    if (effect?.Name == "Opportunist" || effect?.Name == "Mirror Herb") return;
+
+                    pokemon.ItemState.Boosts ??= new SparseBoostsTable();
+                    var boostPlus = pokemon.ItemState.Boosts;
+
+                    foreach (BoostId stat in Enum.GetValues<BoostId>())
+                    {
+                        int? boostValue = boost.GetBoost(stat);
+                        if (boostValue is > 0)
+                        {
+                            int existing = boostPlus.GetBoost(stat) ?? 0;
+                            boostPlus.SetBoost(stat, existing + boostValue.Value);
+                            pokemon.ItemState.Ready = true;
+                        }
+                    }
+                }),
+                OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Ready != true) return;
+                    pokemon.UseItem();
+                }, -3),
+                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Ready != true) return;
+                    pokemon.UseItem();
+                }),
+                OnAnyAfterTerastallization = new OnAnyAfterTerastallizationEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Ready != true) return;
+                    pokemon.UseItem();
+                }),
+                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.ItemState.Ready != true) return BoolVoidUnion.FromVoid();
+                    pokemon.UseItem();
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.ItemState.Ready != true) return;
+                    pokemon.UseItem();
+                }, order: 29),
+                OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Boosts != null)
+                    {
+                        battle.Boost(pokemon.ItemState.Boosts, pokemon);
+                    }
+                })),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    pokemon.ItemState.Boosts = null;
+                    pokemon.ItemState.Ready = null;
+                }),
                 Num = 1883,
                 Gen = 9,
             },

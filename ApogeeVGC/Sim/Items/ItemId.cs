@@ -237,6 +237,7 @@ public enum ItemId
     RibbonSweet,
     RindoBerry,
     RingTarget,
+    RoomService,
     RootFossil,
     RoseIncense,
     RoseliaBerry,

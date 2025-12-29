@@ -263,18 +263,34 @@ public partial record Items
                 Name = "Eject Button",
                 SpriteNum = 118,
                 Fling = new FlingData { BasePower = 30 },
-                // TODO: OnAfterMoveSecondary - switches user out after being hit
-                // Complex switching logic that needs to check:
-                // - if source and target are different
-                // - if target has HP
-                // - if move is not Status category
-                // - if move is not a future move
-                // - if can switch
-                // - if not forced to switch
-                // - if not being called back
-                // - if not sky dropped
-                // - if not commanding/commanded
-                // - if no other pokemon has switchFlag
+                OnAfterMoveSecondary = new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
+                {
+                    if (source != null && source != target && target.Hp > 0 && move != null &&
+                        move.Category != MoveCategory.Status && move.Flags.FutureMove != true)
+                    {
+                        if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag ||
+                            target.BeingCalledBack || target.Volatiles.ContainsKey(ConditionId.SkyDrop))
+                            return;
+                        if (target.Volatiles.ContainsKey(ConditionId.Commanding) ||
+                            target.Volatiles.ContainsKey(ConditionId.Commanded))
+                            return;
+
+                        foreach (var pokemon in battle.GetAllActive())
+                        {
+                            if (pokemon.SwitchFlag.IsTrue()) return;
+                        }
+
+                        target.SwitchFlag = true;
+                        if (target.UseItem())
+                        {
+                            source.SwitchFlag = false;
+                        }
+                        else
+                        {
+                            target.SwitchFlag = false;
+                        }
+                    }
+                }, 2),
                 Num = 547,
                 Gen = 5,
             },
@@ -284,8 +300,53 @@ public partial record Items
                 Name = "Eject Pack",
                 SpriteNum = 714,
                 Fling = new FlingData { BasePower = 50 },
-                // TODO: OnAfterBoost - ejects if any stat is lowered
-                // Complex logic tracking negative boosts and triggering switch
+                OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, target, source, effect) =>
+                {
+                    // Don't trigger if already set to eject
+                    if (target.ItemState.Eject == true) return;
+                    // Don't trigger from Parting Shot (user switches out anyway)
+                    if (battle.ActiveMove?.Id == MoveId.PartingShot) return;
+                    // Check if any stat was lowered
+                    if ((boost.Atk.HasValue && boost.Atk < 0) ||
+                        (boost.Def.HasValue && boost.Def < 0) ||
+                        (boost.SpA.HasValue && boost.SpA < 0) ||
+                        (boost.SpD.HasValue && boost.SpD < 0) ||
+                        (boost.Spe.HasValue && boost.Spe < 0) ||
+                        (boost.Accuracy.HasValue && boost.Accuracy < 0) ||
+                        (boost.Evasion.HasValue && boost.Evasion < 0))
+                    {
+                        target.ItemState.Eject = true;
+                    }
+                }),
+                OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Eject != true) return;
+                    TryUseEjectPack(battle, pokemon);
+                }, -4),
+                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Eject != true) return;
+                    TryUseEjectPack(battle, pokemon);
+                }),
+                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, target, source, move) =>
+                {
+                    if (target.ItemState.Eject != true) return BoolVoidUnion.FromVoid();
+                    TryUseEjectPack(battle, target);
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, source, effect) =>
+                {
+                    if (pokemon.ItemState.Eject != true) return;
+                    TryUseEjectPack(battle, pokemon);
+                }, order: 29),
+                OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    pokemon.SwitchFlag = true;
+                })),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    pokemon.ItemState.Eject = null;
+                }),
                 Num = 1119,
                 Gen = 8,
             },
@@ -653,5 +714,24 @@ public partial record Items
                 IsPokeball = true,
             },
         };
+    }
+
+    /// <summary>
+    /// Helper method for Eject Pack to validate and trigger item use.
+    /// </summary>
+    private static void TryUseEjectPack(Battle battle, Pokemon pokemon)
+    {
+        // Can't switch if no available switches
+        if (battle.CanSwitch(pokemon.Side) == 0) return;
+        // Can't eject if Commanding/Commanded
+        if (pokemon.Volatiles.ContainsKey(ConditionId.Commanding) ||
+            pokemon.Volatiles.ContainsKey(ConditionId.Commanded)) return;
+        // Can't eject if another Pokemon already has switch flag set
+        foreach (var active in battle.GetAllActive())
+        {
+            if (active.SwitchFlag.IsTrue()) return;
+        }
+        // Try to use the item
+        pokemon.UseItem();
     }
 }

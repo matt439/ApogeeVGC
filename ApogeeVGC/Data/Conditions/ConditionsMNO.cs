@@ -76,6 +76,92 @@ public partial record Conditions
                 AssociatedMove = MoveId.MeanLook,
                 // Uses Trapped condition
             },
+            [ConditionId.Metronome] = new()
+            {
+                Id = ConditionId.Metronome,
+                Name = "Metronome",
+                EffectType = EffectType.Condition,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.Metronome, out var state))
+                    {
+                        state.LastMove = "";
+                        state.NumConsecutive = 0;
+                    }
+                    return new VoidReturn();
+                }),
+                OnTryMove = new OnTryMoveEventInfo((battle, source, target, move) =>
+                {
+                    if (!source.Volatiles.TryGetValue(ConditionId.Metronome, out var effectState))
+                        return null;
+
+                    // Remove volatile if no longer holding the item
+                    if (!source.HasItem(ItemId.Metronome))
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.Metronome]);
+                        return null;
+                    }
+                    // Don't track moves that call other moves
+                    if (move.CallsMove == true) return null;
+
+                    // Track consecutive move usage
+                    var lastMoveMatches = effectState.LastMove == move.Id.ToString();
+                    var moveSucceededLastTurn = source.MoveLastTurnResult?.IsTruthy() == true;
+
+                    if (lastMoveMatches && moveSucceededLastTurn)
+                    {
+                        effectState.NumConsecutive = (effectState.NumConsecutive ?? 0) + 1;
+                    }
+                    else if (source.Volatiles.ContainsKey(ConditionId.TwoTurnMove))
+                    {
+                        if (!lastMoveMatches)
+                        {
+                            effectState.NumConsecutive = 1;
+                        }
+                        else
+                        {
+                            effectState.NumConsecutive = (effectState.NumConsecutive ?? 0) + 1;
+                        }
+                    }
+                    else
+                    {
+                        effectState.NumConsecutive = 0;
+                    }
+                    effectState.LastMove = move.Id.ToString();
+                    return null;
+                }, -2),
+                OnModifyDamage = new OnModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (!source.Volatiles.TryGetValue(ConditionId.Metronome, out var effectState))
+                        return DoubleVoidUnion.FromVoid();
+
+                    int[] dmgMod = [4096, 4915, 5734, 6553, 7372, 8192];
+                    int numConsecutive = Math.Min(effectState.NumConsecutive ?? 0, 5);
+                    return battle.ChainModify([dmgMod[numConsecutive], 4096]);
+                }),
+            },
+            [ConditionId.MicleBerry] = new()
+            {
+                Id = ConditionId.MicleBerry,
+                Name = "Micle Berry",
+                EffectType = EffectType.Condition,
+                Duration = 2,
+                OnSourceAccuracy = new OnSourceAccuracyEventInfo((battle, accuracy, target, source, move) =>
+                {
+                    // OHKO moves bypass Micle Berry boost
+                    if (move.Ohko != null) return null;
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-enditem", source, "Micle Berry");
+                    }
+                    source.RemoveVolatile(_library.Conditions[ConditionId.MicleBerry]);
+
+                    // Boost accuracy by 1.2x (4915/4096 ≈ 1.2)
+                    int modifiedAccuracy = (int)Math.Floor(accuracy * 4915.0 / 4096.0);
+                    return IntBoolVoidUnion.FromInt(modifiedAccuracy);
+                }),
+            },
             [ConditionId.Mimic] = new()
             {
                 Id = ConditionId.Mimic,

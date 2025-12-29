@@ -58,6 +58,7 @@ public class EffectState
     public bool? Ready { get; set; } // For Mirror Herb and other trigger items
     public string? LastMove { get; set; } // For Metronome item
     public int? NumConsecutive { get; set; } // For Metronome item
+    public bool? Eject { get; set; } // For Eject Pack tracking
 
     // Additional properties for condition states
     public bool? LostFocus { get; set; } // For Focus Punch

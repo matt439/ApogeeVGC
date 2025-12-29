@@ -356,7 +356,15 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: OnTakeItem - Arceus can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 ForcedForme = "Arceus-Ice",
                 Num = 302,
                 Gen = 4,
@@ -386,7 +394,15 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: OnTakeItem - Arceus can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 ForcedForme = "Arceus-Bug",
                 Num = 308,
                 Gen = 4,
@@ -434,7 +450,15 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: OnTakeItem - Arceus can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 ForcedForme = "Arceus-Steel",
                 Num = 313,
                 Gen = 4,

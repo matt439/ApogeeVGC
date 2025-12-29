@@ -124,8 +124,46 @@ public partial record Items
                 {
                     BasePower = 10,
                 },
-                // TODO: Implement White Herb logic - clears negative stat changes
-                // onStart, onAnySwitchIn, onAnyAfterMega, onAnyAfterMove, onResidual, onUse
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    TryUseWhiteHerb(battle, pokemon);
+                }),
+                OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, pokemon) =>
+                {
+                    TryUseWhiteHerb(battle, pokemon);
+                }),
+                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, pokemon) =>
+                {
+                    TryUseWhiteHerb(battle, pokemon);
+                }),
+                OnAnyAfterTerastallization = new OnAnyAfterTerastallizationEventInfo((battle, pokemon) =>
+                {
+                    TryUseWhiteHerb(battle, pokemon);
+                }),
+                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, pokemon, _, _) =>
+                {
+                    TryUseWhiteHerb(battle, pokemon);
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    TryUseWhiteHerb(battle, pokemon);
+                }, order: 29),
+                OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Boosts != null)
+                    {
+                        pokemon.SetBoost(pokemon.ItemState.Boosts);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-clearnegativeboost", pokemon, "[silent]");
+                        }
+                    }
+                })),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    pokemon.ItemState.Boosts = null;
+                }),
                 Num = 214,
                 Gen = 3,
             },
@@ -207,5 +245,25 @@ public partial record Items
 
             // X items - none that start with X in the standard game
         };
+    }
+
+    private static void TryUseWhiteHerb(Battle battle, Pokemon pokemon)
+    {
+        var boosts = new SparseBoostsTable();
+        bool ready = false;
+        foreach (BoostId stat in Enum.GetValues<BoostId>())
+        {
+            if (pokemon.Boosts.GetBoost(stat) < 0)
+            {
+                ready = true;
+                boosts.SetBoost(stat, 0);
+            }
+        }
+
+        if (ready)
+        {
+            pokemon.ItemState.Boosts = boosts;
+            pokemon.UseItem();
+        }
     }
 }

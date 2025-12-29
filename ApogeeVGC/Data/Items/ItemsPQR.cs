@@ -702,13 +702,18 @@ public partial record Items
                     if (source != null && source != target && source.Hp > 0 && target.Hp > 0 &&
                         move != null && move.Category != MoveCategory.Status)
                     {
-                        if (source.IsActive && battle.CanSwitch(source.Side) != 0 &&
-                            !source.ForceSwitchFlag && !target.ForceSwitchFlag)
+                        if (!source.IsActive || battle.CanSwitch(source.Side) == 0 ||
+                            source.ForceSwitchFlag || target.ForceSwitchFlag)
                         {
-                            // The item is used up even against a pokemon with Ingrain or that otherwise can't be forced out
-                            if (target.UseItem(source))
+                            return;
+                        }
+                        // The item is used up even against a pokemon with Ingrain or that otherwise can't be forced out
+                        if (target.UseItem(source))
+                        {
+                            var dragOutResult = battle.RunEvent(EventId.DragOut, source, target, move,
+                                new BoolRelayVar(true));
+                            if (dragOutResult is BoolRelayVar boolVar && boolVar.Value)
                             {
-                                // TODO: Implement DragOut event properly
                                 source.ForceSwitchFlag = true;
                             }
                         }
@@ -775,6 +780,31 @@ public partial record Items
                 OnNegateImmunity = new OnNegateImmunityEventInfo(false),
                 Num = 543,
                 Gen = 5,
+            },
+            [ItemId.RoomService] = new()
+            {
+                Id = ItemId.RoomService,
+                Name = "Room Service",
+                SpriteNum = 717,
+                Fling = new FlingData { BasePower = 100 },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (!pokemon.IgnoringItem() &&
+                        battle.Field.GetPseudoWeather(ConditionId.TrickRoom) != null)
+                    {
+                        pokemon.UseItem();
+                    }
+                }),
+                OnAnyPseudoWeatherChange = new OnAnyPseudoWeatherChangeEventInfo((battle, pokemon, source, condition) =>
+                {
+                    if (battle.Field.GetPseudoWeather(ConditionId.TrickRoom) != null)
+                    {
+                        pokemon.UseItem(pokemon);
+                    }
+                }),
+                Boosts = new SparseBoostsTable { Spe = -1 },
+                Num = 1122,
+                Gen = 8,
             },
             [ItemId.RootFossil] = new()
             {
