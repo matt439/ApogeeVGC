@@ -661,7 +661,7 @@ public partial record Abilities
                     };
                         if (healingItems.Contains(item.Id))
                         {
-                            return BoolVoidUnion.FromBool(battle.EffectState.CheckedBerserk ?? true);
+                            return BoolVoidUnion.FromBool(battle.EffectState.CheckedBerserk ?? false);
                         }
                         return BoolVoidUnion.FromBool(true);
                     })),
@@ -673,7 +673,7 @@ public partial record Abilities
                     var lastAttackedBy = target.GetLastAttackedBy();
                     if (lastAttackedBy == null) return;
 
-                    int damage = move.MultiHit != null && move.SmartTarget != true && move.TotalDamage is IntIntFalseUnion totalDmg ? totalDmg.Value : lastAttackedBy.Damage;
+                    int damage = move.MultiHit != null && !(move.SmartTarget ?? false) && move.TotalDamage is IntIntFalseUnion totalDmg ? totalDmg.Value : lastAttackedBy.Damage;
                     if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
                     {
                         battle.Boost(new SparseBoostsTable { SpA = 1 }, target, target);
