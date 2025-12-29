@@ -569,6 +569,7 @@ public partial record Abilities
                             source.BondTriggered = true;
                         }
                     }),
+                //OnModifyMovePriority = -1,
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, attacker, _) =>
                 {
                     if (move.Id == MoveId.WaterShuriken &&
@@ -577,7 +578,7 @@ public partial record Abilities
                     {
                         move.MultiHit = 3;
                     }
-                }),
+                }, -1),
                 Flags = new AbilityFlags
                 {
                     FailRolePlay = true,
