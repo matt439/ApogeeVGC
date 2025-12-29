@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Items;
 
@@ -394,7 +395,7 @@ public partial record Items
                 Name = "Light Clay",
                 SpriteNum = 252,
                 Fling = new FlingData { BasePower = 30 },
-                // TODO: Implemented in the corresponding screens/walls logic
+                // Functionality implemented in Reflect/Light Screen conditions (extends duration from 5 to 8 turns)
                 Num = 269,
                 Gen = 4,
             },
@@ -404,8 +405,15 @@ public partial record Items
                 Name = "Loaded Dice",
                 SpriteNum = 751,
                 Fling = new FlingData { BasePower = 30 },
-                // TODO: Partially implemented in BattleActions.HitStepMoveHitLoop
-                // TODO: OnModifyMove - removes multiaccuracy property (not implemented yet)
+                // Partially implemented in BattleActions.HitStepMoveHitLoop
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    // Remove multiaccuracy property to guarantee maximum hits
+                    if (move.MultiAccuracy == true)
+                    {
+                        move.MultiAccuracy = null;
+                    }
+                }),
                 Num = 1886,
                 Gen = 9,
             },
@@ -516,7 +524,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: OnTakeItem - Palkia can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        // Palkia (num 484) can't have this item removed
+                        if (source?.BaseSpecies.Num == 484 || pokemon.BaseSpecies.Num == 484)
+                        {
+                            return BoolVoidUnion.FromBool(false); // Prevent removal
+                        }
+                        return BoolVoidUnion.FromBool(true); // Allow removal
+                    })),
                 ForcedForme = "Palkia-Origin",
                 Num = 1778,
                 Gen = 8,

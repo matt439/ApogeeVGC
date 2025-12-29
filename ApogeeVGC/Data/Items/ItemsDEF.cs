@@ -1,3 +1,4 @@
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
@@ -82,7 +83,15 @@ public partial record Items
                 Name = "Destiny Knot",
                 SpriteNum = 95,
                 Fling = new FlingData { BasePower = 10 },
-                // TODO: OnAttract handler for mutual attraction
+                OnAttract = new OnAttractEventInfo((battle, target, source) =>
+                {
+                    battle.Debug($"attract intercepted: {target.Name} from {source.Name}");
+                    if (source == null || source == target) return;
+                    if (!source.Volatiles.ContainsKey(ConditionId.Attract))
+                    {
+                        source.AddVolatile(ConditionId.Attract);
+                    }
+                }, -100),
                 Num = 280,
                 Gen = 4,
             },
@@ -279,7 +288,13 @@ public partial record Items
                         pokemon.UseItem();
                     }
                 }),
-                // TODO: OnTerrainChange - use item when Electric Terrain is set
+                OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
+                    {
+                        pokemon.UseItem();
+                    }
+                }),
                 Boosts = new SparseBoostsTable { Def = 1 },
                 Num = 881,
                 Gen = 7,
@@ -404,9 +419,37 @@ public partial record Items
                 Name = "Figy Berry",
                 SpriteNum = 140,
                 IsBerry = true,
-                // TODO: OnUpdate - use if HP <= 1/4 (or 1/2 with Gluttony)
-                // TODO: OnTryEatItem - check if healing is allowed
-                // TODO: OnEat - heal 1/3 max HP and confuse if nature lowers Attack
+                NaturalGift = (80, "Bug"),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Hp <= pokemon.MaxHp / 4 ||
+                        (pokemon.Hp <= pokemon.MaxHp / 2 &&
+                         pokemon.HasAbility(AbilityId.Gluttony) &&
+                         pokemon.AbilityState.Gluttony == true))
+                    {
+                        pokemon.EatItem();
+                    }
+                }),
+                OnTryEatItem = new OnTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    {
+                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                            pokemon.BaseMaxHp / 3);
+                        if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+
+                        return BoolVoidUnion.FromVoid();
+                    })),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    battle.Heal(pokemon.BaseMaxHp / 3);
+                    if (pokemon.Set.Nature.Minus == StatIdExceptHp.Atk)
+                    {
+                        pokemon.AddVolatile(ConditionId.Confusion);
+                    }
+                })),
                 Num = 159,
                 Gen = 3,
             },
@@ -499,8 +542,11 @@ public partial record Items
                 Name = "Float Stone",
                 SpriteNum = 147,
                 Fling = new FlingData { BasePower = 30 },
-                // TODO: OnModifyWeight - halves weight
-                // onModifyWeight(weighthg) { return this.trunc(weighthg / 2); }
+                OnModifyWeight = new OnModifyWeightEventInfo((battle, weighthg, pokemon) =>
+                {
+                    // Halve the weight (truncate to integer)
+                    return IntVoidUnion.FromInt(weighthg / 2);
+                }),
                 Num = 539,
                 Gen = 5,
             },

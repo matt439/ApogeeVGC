@@ -95,11 +95,10 @@ public partial record Items
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     battle.Heal(pokemon.BaseMaxHp / 3);
-                    // TODO: Get nature from Pokemon and check if minus stat is Spe
-                    // if (pokemon.GetNature().Minus == StatIdExceptHp.Spe)
-                    // {
-                    //     pokemon.AddVolatile(ConditionId.Confusion);
-                    // }
+                    if (pokemon.Set.Nature.Minus == StatIdExceptHp.Spe)
+                    {
+                        pokemon.AddVolatile(ConditionId.Confusion);
+                    }
                 })),
                 Num = 161,
                 Gen = 3,
@@ -199,17 +198,16 @@ public partial record Items
                             if (!pokemon.UseItem()) return;
                             foreach (var secondCondition in conditions)
                             {
-                                //TODO: Fix logic
-                                //if (pokemon.Volatiles.TryGetValue(secondCondition, out var cond))
-                                //{
-                                //    pokemon.RemoveVolatile(cond);
-                                //    if (firstCondition == ConditionId.Attract &&
-                                //        secondCondition == ConditionId.Attract)
-                                //    {
-                                //        battle.Add("-end", pokemon, "move: Attract",
-                                //            "[from] item: Mental Herb");
-                                //    }
-                                //}
+                                if (pokemon.Volatiles.ContainsKey(secondCondition))
+                                {
+                                    pokemon.RemoveVolatile(_library.Conditions[secondCondition]);
+                                    if (firstCondition == ConditionId.Attract &&
+                                        secondCondition == ConditionId.Attract)
+                                    {
+                                        battle.Add("-end", pokemon, "move: Attract",
+                                            "[from] item: Mental Herb");
+                                    }
+                                }
                             }
 
                             return;
