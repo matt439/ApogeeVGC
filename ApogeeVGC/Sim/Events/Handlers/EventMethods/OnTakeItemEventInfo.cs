@@ -17,33 +17,33 @@ public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
     /// Creates a new OnTakeItem event handler.
     /// </summary>
     /// <param name="unionValue">The union value (delegate or bool constant)</param>
- /// <param name="priority">Execution priority (higher executes first)</param>
+    /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnTakeItemEventInfo(
         OnTakeItem unionValue,
-     int? priority = null,
-bool usesSpeed = true)
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.TakeItem;
-     UnionValue = unionValue;
-Handler = ExtractDelegate();
-    Priority = priority;
-  UsesSpeed = usesSpeed;
- ExpectedParameterTypes =
-  [
-typeof(Battle),
-  typeof(Item),
-   typeof(Pokemon),
-      typeof(Pokemon),
+        UnionValue = unionValue;
+        Handler = ExtractDelegate();
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+        ExpectedParameterTypes =
+        [
+            typeof(Battle),
+            typeof(Item),
+            typeof(Pokemon),
+            typeof(Pokemon),
             typeof(Move),
-    ];
-   ExpectedReturnType = typeof(PokemonVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ];
+        ExpectedReturnType = typeof(PokemonVoidUnion);
+
+        // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false, false, false, false];
         ReturnTypeNullable = false;
-    
-    // Validate configuration
+
+        // Validate configuration
         ValidateConfiguration();
-  }
+    }
 }

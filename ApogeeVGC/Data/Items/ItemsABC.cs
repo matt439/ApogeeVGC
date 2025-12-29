@@ -29,7 +29,16 @@ public partial record Items
                 IgnoreKlutz = true,
                 // Neutralizing Gas protection implemented in Pokemon.IgnoringAbility()
                 // Mold Breaker protection implemented in Battle.SuppressingAbility()
-                // TODO: OnSetAbility handler - need to figure out how to return null to block ability change
+                OnSetAbility = new OnSetAbilityEventInfo((battle, ability, target, source, effect) =>
+                {
+                    // Block ability changes from other abilities (except Trace)
+                    if (effect.EffectType == EffectType.Ability && effect.Name != "Trace")
+                    {
+                        battle.Add("-ability", source, effect.Name);
+                    }
+                    battle.Add("-block", target, "item: Ability Shield");
+                    return null; // Return null to block the ability change
+                }),
                 Num = 1881,
                 Gen = 9,
             },
@@ -65,14 +74,15 @@ public partial record Items
                         return battle.FinalModify(basePower);
                     }
 
-                    return basePower;
-                }, 15),
-                // OnTakeItem - Dialga can't have this item removed
-                // TODO: Implement proper OnTakeItem logic to prevent item removal for Dialga
-                ForcedForme = "Dialga-Origin",
-                Num = 1777,
-                Gen = 8,
-            },
+                            return basePower;
+                        }, 15),
+                        // TODO: OnTakeItem - Dialga can't have this item removed (framework-level implementation required)
+                        // TypeScript: onTakeItem returns false if source or pokemon is Dialga (num 483)
+                        // Requires OnTakeItem event handler to be added to the Item class and event system
+                        ForcedForme = "Dialga-Origin",
+                        Num = 1777,
+                        Gen = 8,
+                    },
             [ItemId.AdamantOrb] = new()
             {
                 Id = ItemId.AdamantOrb,
@@ -150,18 +160,17 @@ public partial record Items
 
                         return BoolVoidUnion.FromVoid();
                     })),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
-                {
-                    battle.Heal(pokemon.BaseMaxHp / 3);
-                    // TODO: Get nature from Pokemon and check if minus stat is SpD
-                    // if (pokemon.GetNature().Minus == StatIdExceptHp.SpD)
-                    // {
-                    //     pokemon.AddVolatile(ConditionId.Confusion);
-                    // }
-                })),
-                Num = 162,
-                Gen = 3,
-            },
+                    OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                    {
+                        battle.Heal(pokemon.BaseMaxHp / 3);
+                        if (pokemon.Set.Nature.Minus == StatIdExceptHp.SpD)
+                        {
+                            pokemon.AddVolatile(ConditionId.Confusion);
+                        }
+                    })),
+                    Num = 162,
+                    Gen = 3,
+                },
             [ItemId.AirBalloon] = new()
             {
                 Id = ItemId.AirBalloon,
@@ -395,12 +404,13 @@ public partial record Items
             {
                 Id = ItemId.BindingBand,
                 Name = "Binding Band",
-                SpriteNum = 31,
-                Fling = new FlingData { BasePower = 30 },
-                // TODO: implemented in statuses
-                Num = 544,
-                Gen = 5,
-            },
+                    SpriteNum = 31,
+                    Fling = new FlingData { BasePower = 30 },
+                    // TODO: Binding Band effect implemented in status conditions (Bind, Wrap, etc.)
+                    // Increases damage from partial-trapping moves from 1/8 to 1/6 of target's max HP
+                    Num = 544,
+                    Gen = 5,
+                },
             [ItemId.BlackBelt] = new()
             {
                 Id = ItemId.BlackBelt,
@@ -464,30 +474,35 @@ public partial record Items
                 Id = ItemId.BlueOrb,
                 Name = "Blue Orb",
                 SpriteNum = 41,
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
-                {
-                    if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" &&
-                        !pokemon.Transformed)
+                    OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                     {
-                        // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
-                    }
-                }, -1),
-                // TODO: OnTakeItem - Kyogre can't have this item removed
-                IsPrimalOrb = true,
-                Num = 535,
-                Gen = 6,
-            },
+                        if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" &&
+                            !pokemon.Transformed)
+                        {
+                            // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
+                            // Requires FormeChange method to be implemented in Pokemon class
+                        }
+                    }, -1),
+                    // TODO: OnTakeItem - Kyogre can't have this item removed (framework-level implementation required)
+                    // TypeScript: onTakeItem returns false if source.baseSpecies.baseSpecies is 'Kyogre'
+                    // Requires OnTakeItem event handler to be added to the Item class and event system
+                    IsPrimalOrb = true,
+                    Num = 535,
+                    Gen = 6,
+                },
             [ItemId.BlunderPolicy] = new()
             {
                 Id = ItemId.BlunderPolicy,
-                Name = "Blunder Policy",
-                SpriteNum = 716,
-                Fling = new FlingData { BasePower = 80 },
-                // TODO: Item activation located in scripts - activates when move misses
-                // Boosts Speed by 2 stages when the holder's move misses due to accuracy
-                Num = 1121,
-                Gen = 8,
-            },
+                    Name = "Blunder Policy",
+                    SpriteNum = 716,
+                    Fling = new FlingData { BasePower = 80 },
+                    // TODO: Item activation located in move execution scripts - activates when move misses due to accuracy
+                    // Boosts Speed by 2 stages when the holder's move misses
+                    // TypeScript: "Item activation located in scripts.js"
+                    // Requires implementation in move miss handling (BattleActions or similar)
+                    Num = 1121,
+                    Gen = 8,
+                },
             [ItemId.BoosterEnergy] = new()
             {
                 Id = ItemId.BoosterEnergy,
@@ -512,8 +527,25 @@ public partial record Items
                         pokemon.AddVolatile(ConditionId.QuarkDrive);
                     }
                 }, -2),
-                // TODO: OnUpdate for turn-by-turn checks
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Transformed) return;
+
+                    if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
+                        !battle.Field.IsWeather(ConditionId.SunnyDay) &&
+                        pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.Protosynthesis);
+                    }
+                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
+                             !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
+                             pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.QuarkDrive);
+                    }
+                }),
                 // TODO: OnTakeItem - only Paradox Pokemon can have this removed
+                // Requires OnTakeItem event handler to be implemented in the framework
                 Num = 1880,
                 Gen = 9,
             },
