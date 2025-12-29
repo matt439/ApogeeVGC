@@ -1018,12 +1018,8 @@ public partial record Abilities
                 Num = 126,
                 Rating = 4.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnChangeBoost = new OnChangeBoostEventInfo((_, boost, _, _, effect) =>
+                OnChangeBoost = new OnChangeBoostEventInfo((_, boost, _, _, _) =>
                 {
-                    // Don't apply to Z-Power boosts
-                    if (effect is Condition { Id: ConditionId.None } &&
-                        effect.Name == "zpower") return;
-
                     // Invert all boosts
                     if (boost.Atk is not null) boost.Atk *= -1;
                     if (boost.Def is not null) boost.Def *= -1;
