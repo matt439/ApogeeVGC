@@ -637,11 +637,10 @@ public partial record Abilities
                 Name = "Berserk",
                 Num = 201,
                 Rating = 2.0,
-                OnDamage = new OnDamageEventInfo((battle, damage, target, source, effect) =>
+                OnDamage = new OnDamageEventInfo((battle, damage, _, source, effect) =>
                 {
                     if (effect.EffectType == EffectType.Move &&
-                        effect is Move move &&
-                        move.MultiHit == null &&
+                        effect is Move { MultiHit: null } move &&
                         !(move.HasSheerForce == true && source != null && source.HasAbility(AbilityId.SheerForce)))
                     {
                         battle.EffectState.CheckedBerserk = false;
@@ -652,7 +651,7 @@ public partial record Abilities
                     }
                     return damage;
                 }),
-                OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, item, _) =>
                 {
                     var healingItems = new[]
                     {
@@ -1126,7 +1125,7 @@ public partial record Abilities
                 Name = "Cud Chew",
                 Num = 291,
                 Rating = 2.0,
-                OnEatItem = new OnEatItemEventInfo((battle, item, pokemon, source, effect) =>
+                OnEatItem = new OnEatItemEventInfo((battle, item, _, _, effect) =>
                 {
                     // Only trigger for berries that weren't stolen by Bug Bite or Pluck
                     bool isStolenBerry = effect is ActiveMove move &&
@@ -1155,7 +1154,7 @@ public partial record Abilities
                         battle.Add("-enditem", pokemon, item.Name, "[eat]");
 
                         // Trigger berry eat effects
-                        if (battle.SingleEvent(EventId.Eat, item, null, pokemon, null, null) is BoolRelayVar)
+                        if (battle.SingleEvent(EventId.Eat, item, null, pokemon) is BoolRelayVar)
                         {
                             battle.RunEvent(EventId.EatItem, pokemon, null, null, item);
                         }
