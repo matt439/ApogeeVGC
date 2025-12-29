@@ -1,7 +1,9 @@
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Items;
@@ -63,7 +65,15 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: OnTakeItem - Arceus can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 ForcedForme = "Arceus-Electric",
                 Num = 300,
                 Gen = 4,

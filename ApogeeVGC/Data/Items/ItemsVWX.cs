@@ -99,7 +99,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: Implement OnTakeItem for Ogerpon
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        if (source?.BaseSpecies.Name.StartsWith("Ogerpon") == true || 
+                            pokemon.BaseSpecies.Name.StartsWith("Ogerpon"))
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 ForcedForme = "Ogerpon-Wellspring",
                 // itemUser: ["Ogerpon-Wellspring"],
                 Num = 2407,

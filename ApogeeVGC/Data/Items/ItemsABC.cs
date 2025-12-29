@@ -1082,7 +1082,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: OnTakeItem - Ogerpon can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        if (source?.BaseSpecies.Name.StartsWith("Ogerpon") == true || 
+                            pokemon.BaseSpecies.Name.StartsWith("Ogerpon"))
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 ForcedForme = "Ogerpon-Cornerstone",
                 Num = 2406,
                 Gen = 9,
