@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -78,7 +79,7 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     public MoveType? OnMemory { get; init; }
     public bool IsBerry { get; init; }
     public bool IgnoreKlutz { get; init; }
-    public string? OnPlate { get; init; }
+    public PokemonType? OnPlate { get; init; }
     public bool IsGem { get; init; }
     public bool IsPokeball { get; init; }
     public bool IsPrimalOrb { get; init; }
