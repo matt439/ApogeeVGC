@@ -1095,7 +1095,7 @@ public partial record Abilities
                         _ => SpecieId.Castform
                     };
 
-                    if (pokemon.Species.Id != targetForme)
+                    if (pokemon.IsActive && pokemon.Species.Id != targetForme)
                     {
                         pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
                     }
@@ -1115,7 +1115,7 @@ public partial record Abilities
                         _ => SpecieId.Castform
                     };
 
-                    if (pokemon.Species.Id != targetForme)
+                    if (pokemon.IsActive && pokemon.Species.Id != targetForme)
                     {
                         pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
                     }
