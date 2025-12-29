@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
@@ -183,7 +184,11 @@ public partial record Items
                 Name = "Lagging Tail",
                 SpriteNum = 237,
                 Fling = new FlingData { BasePower = 10 },
-                // TODO: OnFractionalPriority: -0.1
+                OnFractionalPriority = new OnFractionalPriorityEventInfo(
+                    (ModifierSourceMoveHandler)((battle, priority, source, target, move) =>
+                    {
+                        return DoubleVoidUnion.FromDouble(-0.1);
+                    })),
                 Num = 279,
                 Gen = 4,
             },

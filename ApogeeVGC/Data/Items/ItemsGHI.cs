@@ -142,7 +142,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                // TODO: OnTakeItem - Giratina can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        // Giratina (species number 487) can't have this item removed
+                        if (source?.BaseSpecies.Num == 487 || pokemon.BaseSpecies.Num == 487)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 ForcedForme = "Giratina-Origin",
                 Num = 1779,
                 Gen = 8,
@@ -165,6 +174,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        // Giratina (species number 487) can't have this item removed
+                        if (source?.BaseSpecies.Num == 487 || pokemon.BaseSpecies.Num == 487)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 Num = 112,
                 Gen = 4,
             },

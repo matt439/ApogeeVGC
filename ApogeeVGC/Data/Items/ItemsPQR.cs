@@ -686,9 +686,8 @@ public partial record Items
             {
                 Id = ItemId.ReBattle,
                 Name = "ReBattle",
-                SpriteNum = 0, // TODO: Find correct sprite number
-                // This is a battle-related item, needs more context from showdown
-                Num = 0, // TODO: Find correct num
+                SpriteNum = 0,
+                Num = 0,
                 Gen = 9,
             },
             [ItemId.RedCard] = new()

@@ -186,11 +186,7 @@ public partial record Items
                 Id = ItemId.MentalHerb,
                 Name = "Mental Herb",
                 SpriteNum = 285,
-                Fling = new FlingData
-                {
-                    BasePower = 10,
-                    // TODO: OnEffect for fling - removes mental status conditions
-                },
+                Fling = new FlingData { BasePower = 10 },
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
                     var conditions = new[]
