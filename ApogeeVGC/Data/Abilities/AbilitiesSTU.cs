@@ -1031,18 +1031,18 @@ public partial record Abilities
                 Rating = 1.5,
                 Flags = new AbilityFlags { Breakable = true },
                 OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion>)((battle, _,
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)((battle, _,
                         pokemon, source, _) =>
                     {
                         if (pokemon.Hp == 0 || pokemon.Item == ItemId.StickyBarb)
-                            return new VoidReturn();
+                            return BoolVoidUnion.FromVoid();
                         if (source != null && source != pokemon)
                         {
                             battle.Add("-activate", pokemon, "ability: Sticky Hold");
-                            return pokemon; // Return pokemon to indicate item was not taken
+                            return BoolVoidUnion.FromBool(false); // Return false to prevent item removal
                         }
 
-                        return new VoidReturn();
+                        return BoolVoidUnion.FromVoid();
                     })),
             },
             [AbilityId.StormDrain] = new()
@@ -1994,11 +1994,11 @@ public partial record Abilities
                     pokemon.AddVolatile(ConditionId.Unburden);
                 }),
                 OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion>)((_, _, pokemon,
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)((_, _, pokemon,
                         _, _) =>
                     {
                         pokemon.AddVolatile(ConditionId.Unburden);
-                        return new VoidReturn();
+                        return BoolVoidUnion.FromVoid();
                     })),
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {

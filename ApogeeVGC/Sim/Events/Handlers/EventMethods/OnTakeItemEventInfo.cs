@@ -9,7 +9,8 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnTakeItem event.
 /// Triggered when an item is taken from a Pokemon.
-/// Signature: (Battle, Item, Pokemon, Pokemon, Move?) => PokemonVoidUnion | bool
+/// Signature: (Battle, Item, Pokemon, Pokemon, Move?) => BoolVoidUnion | bool
+/// Returns false to prevent item removal, true to allow it.
 /// </summary>
 public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
 {
@@ -37,10 +38,10 @@ public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
             typeof(Pokemon),
             typeof(Move),
         ];
-        ExpectedReturnType = typeof(PokemonVoidUnion);
+        ExpectedReturnType = typeof(BoolVoidUnion);
 
-        // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
+        // Nullability: All parameters non-nullable except Move which is optional
+        ParameterNullability = [false, false, false, false, true];
         ReturnTypeNullable = false;
 
         // Validate configuration

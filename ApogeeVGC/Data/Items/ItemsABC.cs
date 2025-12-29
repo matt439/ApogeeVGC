@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
@@ -74,15 +75,22 @@ public partial record Items
                         return battle.FinalModify(basePower);
                     }
 
-                            return basePower;
-                        }, 15),
-                        // TODO: OnTakeItem - Dialga can't have this item removed (framework-level implementation required)
-                        // TypeScript: onTakeItem returns false if source or pokemon is Dialga (num 483)
-                        // Requires OnTakeItem event handler to be added to the Item class and event system
-                        ForcedForme = "Dialga-Origin",
-                        Num = 1777,
-                        Gen = 8,
-                    },
+                                    return basePower;
+                                }, 15),
+                                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                                    (_, item, pokemon, source, _) =>
+                                    {
+                                        // Dialga (num 483) can't have this item removed
+                                        if (source?.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
+                                        {
+                                            return BoolVoidUnion.FromBool(false); // Prevent removal
+                                        }
+                                        return BoolVoidUnion.FromBool(true); // Allow removal
+                                    })),
+                                ForcedForme = "Dialga-Origin",
+                                Num = 1777,
+                                Gen = 8,
+                            },
             [ItemId.AdamantOrb] = new()
             {
                 Id = ItemId.AdamantOrb,
@@ -474,22 +482,29 @@ public partial record Items
                 Id = ItemId.BlueOrb,
                 Name = "Blue Orb",
                 SpriteNum = 41,
-                    OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
-                    {
-                        if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" &&
-                            !pokemon.Transformed)
+                        OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                         {
-                            // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
-                            // Requires FormeChange method to be implemented in Pokemon class
-                        }
-                    }, -1),
-                    // TODO: OnTakeItem - Kyogre can't have this item removed (framework-level implementation required)
-                    // TypeScript: onTakeItem returns false if source.baseSpecies.baseSpecies is 'Kyogre'
-                    // Requires OnTakeItem event handler to be added to the Item class and event system
-                    IsPrimalOrb = true,
-                    Num = 535,
-                    Gen = 6,
-                },
+                            if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" &&
+                                !pokemon.Transformed)
+                            {
+                                // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
+                                // Requires FormeChange method to be implemented in Pokemon class
+                            }
+                        }, -1),
+                        OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                            (_, _, pokemon, source, _) =>
+                            {
+                                // Kyogre can't have this item removed
+                                if (source?.BaseSpecies.Name == "Kyogre" || pokemon.BaseSpecies.Name == "Kyogre")
+                                {
+                                    return BoolVoidUnion.FromBool(false); // Prevent removal
+                                }
+                                return BoolVoidUnion.FromBool(true); // Allow removal
+                            })),
+                        IsPrimalOrb = true,
+                        Num = 535,
+                        Gen = 6,
+                    },
             [ItemId.BlunderPolicy] = new()
             {
                 Id = ItemId.BlunderPolicy,
@@ -527,28 +542,37 @@ public partial record Items
                         pokemon.AddVolatile(ConditionId.QuarkDrive);
                     }
                 }, -2),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
-                {
-                    if (pokemon.Transformed) return;
+                    OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                    {
+                        if (pokemon.Transformed) return;
 
-                    if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
-                        !battle.Field.IsWeather(ConditionId.SunnyDay) &&
-                        pokemon.UseItem())
-                    {
-                        pokemon.AddVolatile(ConditionId.Protosynthesis);
-                    }
-                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
-                             !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
-                             pokemon.UseItem())
-                    {
-                        pokemon.AddVolatile(ConditionId.QuarkDrive);
-                    }
-                }),
-                // TODO: OnTakeItem - only Paradox Pokemon can have this removed
-                // Requires OnTakeItem event handler to be implemented in the framework
-                Num = 1880,
-                Gen = 9,
-            },
+                        if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
+                            !battle.Field.IsWeather(ConditionId.SunnyDay) &&
+                            pokemon.UseItem())
+                        {
+                            pokemon.AddVolatile(ConditionId.Protosynthesis);
+                        }
+                        else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
+                                 !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
+                                 pokemon.UseItem())
+                        {
+                            pokemon.AddVolatile(ConditionId.QuarkDrive);
+                        }
+                    }),
+                    OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, item, pokemon, source, _) =>
+                        {
+                            // Only Paradox Pokemon can have this item removed
+                            // Check if the pokemon has the Paradox tag
+                            if (pokemon.BaseSpecies.Tags?.Any(tag => tag == SpeciesTag.Paradox) == true)
+                            {
+                                return BoolVoidUnion.FromBool(false); // Prevent removal from Paradox Pokemon
+                            }
+                            return BoolVoidUnion.FromBool(true); // Allow removal from non-Paradox Pokemon
+                        })),
+                    Num = 1880,
+                    Gen = 9,
+                },
             [ItemId.BottleCap] = new()
             {
                 Id = ItemId.BottleCap,
