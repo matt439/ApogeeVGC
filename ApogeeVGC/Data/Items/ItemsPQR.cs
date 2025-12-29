@@ -383,9 +383,16 @@ public partial record Items
                 Name = "Power Herb",
                 SpriteNum = 358,
                 Fling = new FlingData { BasePower = 10 },
-                // OnChargeMove - removes charge turn for moves like Solar Beam
-                // TODO: Implement this when charge moves are implemented
-                // The handler should check if the move requires charging and skip the charge turn
+                OnChargeMove = new OnChargeMoveEventInfo((battle, pokemon, target, move) =>
+                {
+                    if (pokemon.UseItem())
+                    {
+                        battle.Debug($"power herb - remove charge turn for {move.Id}");
+                        battle.AttrLastMove("[still]");
+                        return BoolVoidUnion.FromBool(false); // skip charge turn
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
                 Num = 271,
                 Gen = 4,
             },
@@ -635,14 +642,25 @@ public partial record Items
                 Fling = new FlingData
                 {
                     BasePower = 30,
-                    // TODO: Flinch volatile status
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, target) =>
                 {
                     if (move.Category != MoveCategory.Status)
                     {
-                        // TODO: Add flinch secondary if not already present
-                        // For now, this is a placeholder - flinch needs to be implemented as a volatile
+                        if (move.Secondaries == null) move.Secondaries = [];
+
+                        // Check if flinch already exists
+                        foreach (var secondary in move.Secondaries)
+                        {
+                            if (secondary.VolatileStatus == ConditionId.Flinch) return;
+                        }
+
+                        // Add 10% flinch chance
+                        move.Secondaries = [..move.Secondaries, new SecondaryEffect
+                        {
+                            Chance = 10,
+                            VolatileStatus = ConditionId.Flinch,
+                        }];
                     }
                 }, -1),
                 Num = 327,
@@ -747,8 +765,7 @@ public partial record Items
                 Name = "Ring Target",
                 SpriteNum = 410,
                 Fling = new FlingData { BasePower = 10 },
-                // OnNegateImmunity: false - makes the holder's type immunities ignored
-                // TODO: Implement this in Pokemon.RunImmunity or similar
+                OnNegateImmunity = new OnNegateImmunityEventInfo(false),
                 Num = 543,
                 Gen = 5,
             },

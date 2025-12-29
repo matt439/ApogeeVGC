@@ -151,10 +151,27 @@ public partial record Items
                 Fling = new FlingData
                 {
                     BasePower = 30,
-                    // TODO: Flinch is a volatile status, not a status condition - need separate handling
                 },
-                // TODO: OnModifyMovePriority: -1
-                // TODO: OnModifyMove - adds 10% flinch chance to moves that don't already have it
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    if (move.Category != MoveCategory.Status)
+                    {
+                        if (move.Secondaries == null) move.Secondaries = [];
+
+                        // Check if flinch already exists
+                        foreach (var secondary in move.Secondaries)
+                        {
+                            if (secondary.VolatileStatus == ConditionId.Flinch) return;
+                        }
+
+                        // Add 10% flinch chance
+                        move.Secondaries = [..move.Secondaries, new SecondaryEffect
+                        {
+                            Chance = 10,
+                            VolatileStatus = ConditionId.Flinch,
+                        }];
+                    }
+                }, -1),
                 Num = 221,
                 Gen = 2,
             },
