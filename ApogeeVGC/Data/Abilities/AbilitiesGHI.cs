@@ -4,11 +4,14 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
+
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
 
@@ -25,9 +28,9 @@ public partial record Abilities
                 Num = 177,
                 Rating = 1.5,
                 OnModifyPriority =
-                    new OnModifyPriorityEventInfo((battle, priority, pokemon, _, move) =>
+                    new OnModifyPriorityEventInfo((_, priority, pokemon, _, move) =>
                     {
-                        if (move?.Type == MoveType.Flying && pokemon.Hp == pokemon.MaxHp)
+                        if (move.Type == MoveType.Flying && pokemon.Hp == pokemon.MaxHp)
                         {
                             return priority + 1;
                         }
@@ -78,11 +81,11 @@ public partial record Abilities
                 Name = "Gluttony",
                 Num = 82,
                 Rating = 1.5,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnStart = new OnStartEventInfo((_, pokemon) =>
                 {
                     pokemon.AbilityState.Gluttony = true;
                 }),
-                OnDamage = new OnDamageEventInfo((battle, _, target, _, _) =>
+                OnDamage = new OnDamageEventInfo((_, _, target, _, _) =>
                 {
                     target.AbilityState.Gluttony = true;
                     return new VoidReturn();
@@ -149,14 +152,14 @@ public partial record Abilities
 
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
                 {
                     if (pokemon.AbilityState.ChoiceLock != null || move.Id == MoveId.Struggle)
                         return;
                     pokemon.AbilityState.ChoiceLock = move.Id;
                 }),
                 // OnModifyAtkPriority = 1
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, _) =>
                 {
                     battle.Debug("Gorilla Tactics Atk Boost");
                     battle.ChainModify(1.5);
@@ -281,7 +284,7 @@ public partial record Abilities
                     }
                 }),
                 OnSourceTryPrimaryHit =
-                    new OnSourceTryPrimaryHitEventInfo((battle, _, source, move) =>
+                    new OnSourceTryPrimaryHitEventInfo((_, _, source, move) =>
                     {
                         if (move.Id == MoveId.Surf && source.HasAbility(AbilityId.GulpMissile) &&
                             source.Species.Id == SpecieId.Cramorant)
@@ -362,7 +365,7 @@ public partial record Abilities
                     if (pokemon.Hp == 0) return;
                     if (pokemon.Item != null) return;
 
-                    var lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
+                    Item? lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
                     if (lastItem is not { IsBerry: true }) return;
 
                     pokemon.SetItem(lastItem.Id);
@@ -379,7 +382,7 @@ public partial record Abilities
                 // OnResidualOrder = 5, OnResidualSubOrder = 3
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    foreach (var allyActive in pokemon.AdjacentAllies())
+                    foreach (Pokemon allyActive in pokemon.AdjacentAllies())
                     {
                         if (allyActive.Status != ConditionId.None && battle.RandomChance(3, 10))
                         {
@@ -420,7 +423,7 @@ public partial record Abilities
 
                     return spa;
                 }, 5),
-                OnDamage = new OnDamageEventInfo((battle, damage, target, _, effect) =>
+                OnDamage = new OnDamageEventInfo((_, damage, _, _, effect) =>
                 {
                     if (effect is Condition { Id: ConditionId.Burn })
                     {
@@ -458,7 +461,7 @@ public partial record Abilities
                 OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (var ally in pokemon.AdjacentAllies())
+                    foreach (Pokemon ally in pokemon.AdjacentAllies())
                     {
                         battle.Heal(ally.BaseMaxHp / 4, ally, pokemon);
                     }
@@ -493,7 +496,7 @@ public partial record Abilities
                     NoTransform = true,
                 },
                 // OnResidualOrder = 29
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
                 {
                     if (pokemon.Species.BaseSpecies != SpecieId.Morpeko) return;
                     if (pokemon.Terastallized != null) return;
@@ -512,11 +515,7 @@ public partial record Abilities
                 Rating = 3.5,
                 // OnModifyAtkPriority = 5
                 // Note: In TS this uses this.modify() directly instead of chainModify
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, _) =>
-                {
-                    // Apply 1.5x directly (not chain)
-                    return (int)(atk * 1.5);
-                }, 5),
+                OnModifyAtk = new OnModifyAtkEventInfo((_, atk, _, _, _) => (int)(atk * 1.5), 5),
                 // OnSourceModifyAccuracyPriority = -1
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
                     (battle, accuracy, _, _, move) =>
@@ -584,12 +583,13 @@ public partial record Abilities
                         battle.Heal(target.BaseMaxHp / 16);
                     }
                 }),
-                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
                     if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
             },
@@ -647,7 +647,7 @@ public partial record Abilities
                             return new VoidReturn();
                         return BoolVoidUnion.FromBool(false);
                     })),
-                OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, _, move) =>
+                OnEffectiveness = new OnEffectivenessEventInfo((_, _, target, _, move) =>
                 {
                     if (target is null || move.Category != MoveCategory.Physical ||
                         target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
@@ -776,7 +776,7 @@ public partial record Abilities
                     {
                         battle.Debug("illusion cleared");
                         pokemon.Illusion = null;
-                        var details = pokemon.GetUpdatedDetails();
+                        Pokemon.PokemonDetails details = pokemon.GetUpdatedDetails();
                         battle.Add("replace", pokemon, details.ToString());
                         battle.Add("-end", pokemon, "Illusion");
                     }
