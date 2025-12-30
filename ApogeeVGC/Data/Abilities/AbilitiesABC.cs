@@ -14,6 +14,7 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
@@ -233,7 +234,7 @@ public partial record Abilities
                                 SpA = 1,
                                 Spe = 1,
                                 Def = -1,
-                                SpD = -1
+                                SpD = -1,
                             }, target, target);
                         }
                     }),
@@ -248,13 +249,17 @@ public partial record Abilities
                 {
                     if (pokemon.Foes().Any(target =>
                             (from moveSlot in target.MoveSlots
-                                select battle.Library.Moves[moveSlot.Id] into move
+                                select battle.Library.Moves[moveSlot.Id]
+                                into move
                                 where move.Category != MoveCategory.Status
                                 let moveType = move.Type.ConvertToPokemonType()
-                                where (battle.Dex.GetImmunity(moveType.ConvertToMoveType(), pokemon) &&
-                                battle.Dex.GetEffectiveness(moveType.ConvertToMoveType(), pokemon)
-                                    .ToModifier() > 0) ||
-                            move.Ohko != null select move).Any()))
+                                where (battle.Dex.GetImmunity(moveType.ConvertToMoveType(),
+                                           pokemon) &&
+                                       battle.Dex.GetEffectiveness(moveType.ConvertToMoveType(),
+                                               pokemon)
+                                           .ToModifier() > 0) ||
+                                      move.Ohko != null
+                                select move).Any()))
                     {
                         battle.Add("-ability", pokemon, "Anticipation");
                     }
@@ -270,7 +275,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var abilityHolder
+                            Pokemon: var abilityHolder,
                         })
                         return;
                     if (!pokemon.IsAdjacent(abilityHolder)) return;
@@ -284,7 +289,7 @@ public partial record Abilities
                     {
                         if (source == null && battle.EffectState.Target is PokemonEffectStateTarget
                             {
-                                Pokemon: var holder
+                                Pokemon: var holder,
                             })
                         {
                             source = holder;
@@ -319,7 +324,7 @@ public partial record Abilities
 
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var armorTailHolder
+                            Pokemon: var armorTailHolder,
                         })
                         return new VoidReturn();
 
@@ -361,7 +366,7 @@ public partial record Abilities
                             {
                                 if (battle.EffectState.Target is PokemonEffectStateTarget
                                     {
-                                        Pokemon: var effectHolder
+                                        Pokemon: var effectHolder,
                                     })
                                 {
                                     battle.Add("-block", target, "ability: Aroma Veil",
@@ -483,7 +488,8 @@ public partial record Abilities
                 }),
                 OnAnyTryPrimaryHit = new OnAnyTryPrimaryHitEventInfo((_, target, source, move) =>
                 {
-                    if (target == source || move.Category == MoveCategory.Status) return new VoidReturn();
+                    if (target == source || move.Category == MoveCategory.Status)
+                        return new VoidReturn();
                     move.HasAuraBreak = true;
                     return new VoidReturn();
                 }),
@@ -528,7 +534,7 @@ public partial record Abilities
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Pokemon: var effectHolder
+                                Pokemon: var effectHolder,
                             })
                             return basePower;
                         if (attacker != effectHolder && move.Category == MoveCategory.Special)
@@ -562,7 +568,8 @@ public partial record Abilities
                         if (source.BondTriggered) return;
                         if (effect.EffectType != EffectType.Move) return;
                         if (source.Species.Id == SpecieId.GreninjaBond && source
-                                is { Hp: > 0, Transformed: false } && source.Side.FoePokemonLeft() > 0)
+                                is { Hp: > 0, Transformed: false } &&
+                            source.Side.FoePokemonLeft() > 0)
                         {
                             battle.Boost(new SparseBoostsTable { Atk = 1, SpA = 1, Spe = 1 },
                                 source, source, battle.Effect);
@@ -605,7 +612,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var abilityHolder
+                            Pokemon: var abilityHolder,
                         })
                         return spd;
                     if (target.HasAbility(AbilityId.BeadsOfRuin)) return spd;
@@ -643,7 +650,8 @@ public partial record Abilities
                 {
                     if (effect.EffectType == EffectType.Move &&
                         effect is Move { MultiHit: null } move &&
-                        !(move.HasSheerForce == true && source != null && source.HasAbility(AbilityId.SheerForce)))
+                        !(move.HasSheerForce == true && source != null &&
+                          source.HasAbility(AbilityId.SheerForce)))
                     {
                         battle.EffectState.CheckedBerserk = false;
                     }
@@ -651,6 +659,7 @@ public partial record Abilities
                     {
                         battle.EffectState.CheckedBerserk = true;
                     }
+
                     return damage;
                 }),
                 OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, item, _) =>
@@ -658,28 +667,36 @@ public partial record Abilities
                     var healingItems = new[]
                     {
                         ItemId.AguavBerry, ItemId.EnigmaBerry, ItemId.FigyBerry, ItemId.IapapaBerry,
-                        ItemId.MagoBerry, ItemId.SitrusBerry, ItemId.WikiBerry, ItemId.OranBerry, ItemId.BerryJuice
+                        ItemId.MagoBerry, ItemId.SitrusBerry, ItemId.WikiBerry, ItemId.OranBerry,
+                        ItemId.BerryJuice,
                     };
-                        if (healingItems.Contains(item.Id))
-                        {
-                            return BoolVoidUnion.FromBool(battle.EffectState.CheckedBerserk ?? false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
-                    OnAfterMoveSecondary = new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
-                {
-                    battle.EffectState.CheckedBerserk = true;
-                    if (source == null || source == target || target.Hp == 0 || move.TotalDamage == null) return;
-
-                    var lastAttackedBy = target.GetLastAttackedBy();
-                    if (lastAttackedBy == null) return;
-
-                    int damage = move.MultiHit != null && !(move.SmartTarget ?? false) && move.TotalDamage is IntIntFalseUnion totalDmg ? totalDmg.Value : lastAttackedBy.Damage;
-                    if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
+                    if (healingItems.Contains(item.Id))
                     {
-                        battle.Boost(new SparseBoostsTable { SpA = 1 }, target, target);
+                        return BoolVoidUnion.FromBool(battle.EffectState.CheckedBerserk ?? false);
                     }
-                }),
+
+                    return BoolVoidUnion.FromBool(true);
+                })),
+                OnAfterMoveSecondary =
+                    new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
+                    {
+                        battle.EffectState.CheckedBerserk = true;
+                        if (source == null || source == target || target.Hp == 0 ||
+                            move.TotalDamage == null) return;
+
+                        var lastAttackedBy = target.GetLastAttackedBy();
+                        if (lastAttackedBy == null) return;
+
+                        int damage =
+                            move.MultiHit != null && !(move.SmartTarget ?? false) &&
+                            move.TotalDamage is IntIntFalseUnion totalDmg
+                                ? totalDmg.Value
+                                : lastAttackedBy.Damage;
+                        if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
+                        {
+                            battle.Boost(new SparseBoostsTable { SpA = 1 }, target, target);
+                        }
+                    }),
             },
             [AbilityId.BigPecks] = new()
             {
@@ -965,7 +982,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is PokemonEffectStateTarget
                         {
-                            Pokemon: var pokemon
+                            Pokemon: var pokemon,
                         })
                     {
                         // Call onUpdate logic
@@ -987,7 +1004,8 @@ public partial record Abilities
                         if (source == null || target.IsAlly(source)) return;
 
                         bool statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
-                                            || boost.SpD is < 0 || boost.Spe is < 0 || boost.Accuracy is < 0
+                                            || boost.SpD is < 0 || boost.Spe is < 0 ||
+                                            boost.Accuracy is < 0
                                             || boost.Evasion is < 0;
 
                         if (statsLowered)
@@ -1083,7 +1101,8 @@ public partial record Abilities
                             pokemon.AddVolatile(volatileId);
                             // Copy layers/special data if needed
                             if (volatileId == ConditionId.DragonCheer &&
-                                pokemon.Volatiles.TryGetValue(volatileId, out EffectState? arg2Volatile))
+                                pokemon.Volatiles.TryGetValue(volatileId,
+                                    out EffectState? arg2Volatile))
                             {
                                 arg2Volatile.HasDragonType =
                                     @volatile.HasDragonType;
@@ -1199,7 +1218,7 @@ public partial record Abilities
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
-                                    Pokemon: var effectHolder
+                                    Pokemon: var effectHolder,
                                 })
                             {
                                 source.AddVolatile(ConditionId.Disable, effectHolder);
@@ -1222,7 +1241,7 @@ public partial record Abilities
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
-                                    Pokemon: var effectHolder
+                                    Pokemon: var effectHolder,
                                 })
                             {
                                 source.AddVolatile(ConditionId.Attract, effectHolder);
