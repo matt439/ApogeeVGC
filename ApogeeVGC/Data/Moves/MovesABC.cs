@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 
 namespace ApogeeVGC.Data.Moves;
 
@@ -106,6 +107,12 @@ public partial record Moves
                 Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Distance = true, Metronome = true },
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
+                {
+                    if (pokemon.Item != Sim.Items.ItemId.None) return move.BasePower;
+                    battle.Debug("BP doubled for no item");
+                    return move.BasePower * 2;
+                }),
             },
             [MoveId.Acupressure] = new()
             {
@@ -1614,7 +1621,12 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Poison,
-                // TODO: onHit - clears target's stat boosts
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    target.Boosts = new BoostsTable();
+                    battle.Add("-clearboost", target);
+                    return null;
+                }),
             },
             [MoveId.CloseCombat] = new()
             {
@@ -1662,28 +1674,38 @@ public partial record Moves
                 Category = MoveCategory.Status,
                 Name = "Coil",
                 BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, Accuracy = 1 },
-                Target = MoveTarget.Self,
-                Type = MoveType.Poison,
-            },
-            [MoveId.CollisionCourse] = new()
-            {
-                Id = MoveId.CollisionCourse,
-                Num = 878,
-                Accuracy = 100,
-                BasePower = 100,
-                Category = MoveCategory.Physical,
-                Name = "Collision Course",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-                // TODO: onBasePower - increases power on super effective hits
-            },
-            [MoveId.Comeuppance] = new()
+                    Priority = 0,
+                    Flags = new MoveFlags { Snatch = true, Metronome = true },
+                    SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, Accuracy = 1 },
+                    Target = MoveTarget.Self,
+                    Type = MoveType.Poison,
+                },
+                [MoveId.CollisionCourse] = new()
+                {
+                    Id = MoveId.CollisionCourse,
+                    Num = 878,
+                    Accuracy = 100,
+                    BasePower = 100,
+                    Category = MoveCategory.Physical,
+                    Name = "Collision Course",
+                    BasePp = 5,
+                    Priority = 0,
+                    Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true },
+                    Target = MoveTarget.Normal,
+                    Type = MoveType.Fighting,
+                    OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
+                    {
+                        if (target.RunEffectiveness(move) <= 0.0) return new VoidReturn();
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("collision course super effective buff");
+                        }
+
+                        battle.ChainModify([5461, 4096]);
+                        return new VoidReturn();
+                    }),
+                },
+                [MoveId.Comeuppance] = new()
             {
                 Id = MoveId.Comeuppance,
                 Num = 894,
@@ -1976,7 +1998,15 @@ public partial record Moves
                 Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                // TODO: basePowerCallback - scales with target's remaining HP
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                {
+                    int hp = target.Hp;
+                    int maxHp = target.MaxHp;
+                    int bp = (int)Math.Floor((int)Math.Floor((120 * (100 * (int)Math.Floor((double)hp * 4096 / maxHp)) + 2048 - 1) / 4096.0) / 100.0);
+                    bp = bp == 0 ? 1 : bp;
+                    battle.Debug($"BP for {hp}/{maxHp} HP: {bp}");
+                    return bp;
+                }),
             },
             [MoveId.Curse] = new()
             {
