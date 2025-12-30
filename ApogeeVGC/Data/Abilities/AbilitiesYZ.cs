@@ -35,7 +35,7 @@ public partial record Abilities
                 },
                 Condition = ConditionId.ZenMode,
                 // OnResidualOrder = 29
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
                 {
                     // Only works for Darmanitan that hasn't transformed
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Darmanitan ||
@@ -64,19 +64,22 @@ public partial record Abilities
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
                     Pokemon pokemon = psfp.Pokemon;
 
-                    if (!pokemon.Volatiles.ContainsKey(ConditionId.ZenMode) || pokemon.Hp == 0) return;
+                    if (!pokemon.Volatiles.ContainsKey(ConditionId.ZenMode) ||
+                        pokemon.Hp == 0) return;
 
                     pokemon.Transformed = false;
                     pokemon.Volatiles.Remove(ConditionId.ZenMode);
 
                     // If in a battle-only forme, revert
-                    if (pokemon.Species.BaseSpecies == SpecieId.Darmanitan &&
-                        pokemon.Species.Forme is FormeId.Zen or FormeId.GalarZen)
+                    if (pokemon.Species is
+                        {
+                            BaseSpecies: SpecieId.Darmanitan, Forme: FormeId.Zen or FormeId.GalarZen
+                        })
                     {
                         SpecieId baseForme = pokemon.Species.Forme == FormeId.GalarZen
                             ? SpecieId.DarmanitanGalar
                             : SpecieId.Darmanitan;
-                        pokemon.FormeChange(baseForme, battle.Effect, null, message: "[silent]");
+                        pokemon.FormeChange(baseForme, battle.Effect, message: "[silent]");
                     }
                 }),
             },
@@ -112,7 +115,7 @@ public partial record Abilities
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Palafin) return;
 
                     // Display the Hero message if in Hero forme and not already displayed
-                    if (!pokemon.HeroMessageDisplayed && pokemon.Species.Forme == FormeId.Hero)
+                    if (pokemon is { HeroMessageDisplayed: false, Species.Forme: FormeId.Hero })
                     {
                         battle.Add("-activate", pokemon, "ability: Zero to Hero");
                         pokemon.HeroMessageDisplayed = true;
