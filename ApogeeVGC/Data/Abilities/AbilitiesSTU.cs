@@ -42,17 +42,18 @@ public partial record Abilities
                         }
                     }
 
-                    return basePower;
-                }, 21),
-                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
-                {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
-                    {
-                        // Immune to sandstorm damage
-                    }
-                }),
-            },
-            [AbilityId.SandRush] = new()
+                            return basePower;
+                        }, 21),
+                        OnImmunity = new OnImmunityEventInfo((_, type, _) =>
+                        {
+                            if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
+                            {
+                                return false;
+                            }
+                            return new VoidReturn();
+                        }),
+                    },
+                    [AbilityId.SandRush] = new()
             {
                 Id = AbilityId.SandRush,
                 Name = "Sand Rush",
@@ -66,17 +67,18 @@ public partial record Abilities
                         return battle.FinalModify(spe);
                     }
 
-                    return spe;
-                }),
-                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
-                {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
-                    {
-                        // Immune to sandstorm damage
-                    }
-                }),
-            },
-            [AbilityId.SandSpit] = new()
+                            return spe;
+                        }),
+                        OnImmunity = new OnImmunityEventInfo((_, type, _) =>
+                        {
+                            if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
+                            {
+                                return false;
+                            }
+                            return new VoidReturn();
+                        }),
+                    },
+                    [AbilityId.SandSpit] = new()
             {
                 Id = AbilityId.SandSpit,
                 Name = "Sand Spit",
@@ -109,8 +111,9 @@ public partial record Abilities
                 {
                     if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
                     {
-                        // Immune to sandstorm damage
+                        return false;
                     }
+                    return new VoidReturn();
                 }),
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
@@ -672,8 +675,9 @@ public partial record Abilities
                 {
                     if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
                     {
-                        // Immune to hail damage
+                        return false;
                     }
+                    return new VoidReturn();
                 }),
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>

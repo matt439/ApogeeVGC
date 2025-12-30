@@ -346,6 +346,7 @@ public partial record Conditions
                 {
                     // Immune to Sandstorm and Hail damage while underground
                     // This is void-returning - immunity is handled by the caller
+                    return new VoidReturn();
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -375,6 +376,7 @@ public partial record Conditions
                 {
                     // Immune to Sandstorm and Hail damage while underwater
                     // This is void-returning - immunity is handled by the caller
+                    return new VoidReturn();
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -404,6 +406,7 @@ public partial record Conditions
                 {
                     // Immune to Sandstorm and Hail damage while in the air
                     // This is void-returning - immunity is handled by the caller
+                    return new VoidReturn();
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {

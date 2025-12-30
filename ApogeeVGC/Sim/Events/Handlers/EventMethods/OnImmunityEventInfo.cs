@@ -7,7 +7,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnImmunity event.
 /// Triggered to check type immunity or weather/condition immunity.
-/// Signature: (Battle battle, PokemonTypeConditionIdUnion type, Pokemon pokemon) => void
+/// Signature: (Battle battle, PokemonTypeConditionIdUnion type, Pokemon pokemon) => BoolVoidUnion
 /// </summary>
 public sealed record OnImmunityEventInfo : EventHandlerInfo
 {
@@ -18,7 +18,7 @@ public sealed record OnImmunityEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnImmunityEventInfo(
-        Action<Battle, PokemonTypeConditionIdUnion, Pokemon> handler,
+        Func<Battle, PokemonTypeConditionIdUnion, Pokemon, BoolVoidUnion> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
@@ -32,7 +32,7 @@ public sealed record OnImmunityEventInfo : EventHandlerInfo
             typeof(PokemonTypeConditionIdUnion),
             typeof(Pokemon),
         ];
-        ExpectedReturnType = typeof(void);
+        ExpectedReturnType = typeof(BoolVoidUnion);
 
         // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false, false];

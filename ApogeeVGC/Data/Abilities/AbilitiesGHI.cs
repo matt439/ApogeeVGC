@@ -584,9 +584,14 @@ public partial record Abilities
                         battle.Heal(target.BaseMaxHp / 16);
                     }
                 }),
-                // TODO: onImmunity(type, pokemon) { if (type === 'hail') return false; }
-                // OnImmunity is Action<> (void) in this codebase, not Func<bool>
-                // Need to determine correct implementation pattern for weather immunity
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
             },
             [AbilityId.IceFace] = new()
             {
@@ -620,7 +625,7 @@ public partial record Abilities
                 // OnDamagePriority = 1
                 OnDamage = new OnDamageEventInfo((battle, _, target, _, effect) =>
                 {
-                    if (effect is ActiveMove move && move.Category == MoveCategory.Physical &&
+                    if (effect is ActiveMove { Category: MoveCategory.Physical } &&
                         target.Species.Id == SpecieId.Eiscue)
                     {
                         battle.Add("-activate", target, "ability: Ice Face");
@@ -663,7 +668,7 @@ public partial record Abilities
                 OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, sourceEffect) =>
                 {
                     // Snow/hail resuming because Cloud Nine/Air Lock ended does not trigger Ice Face
-                    if (sourceEffect is Ability ability && ability.SuppressWeather == true) return;
+                    if (sourceEffect is Ability { SuppressWeather: true }) return;
                     if (pokemon.Hp == 0) return;
                     if (battle.Field.IsWeather([ConditionId.Hail, ConditionId.Snowscape]) &&
                         pokemon.Species.Id == SpecieId.EiscueNoice)

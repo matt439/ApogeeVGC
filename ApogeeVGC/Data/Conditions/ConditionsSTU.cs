@@ -101,6 +101,7 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
                     // Weather immunity is handled elsewhere; this is a void handler
+                    return new VoidReturn();
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -119,6 +120,7 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
                     // Weather immunity is handled elsewhere; this is a void handler
+                    return new VoidReturn();
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -197,6 +199,7 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
                     // Weather immunity is handled elsewhere; this is a void handler
+                    return new VoidReturn();
                 }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((battle, target, source, move) =>
                 {
@@ -459,6 +462,7 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
                     // Ground immunity is handled by Pokemon.IsGrounded() for Telekinesis
+                    return new VoidReturn();
                 }),
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
