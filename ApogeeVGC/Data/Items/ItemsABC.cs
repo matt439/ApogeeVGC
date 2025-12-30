@@ -542,46 +542,21 @@ public partial record Items
                 Name = "Booster Energy",
                 SpriteNum = 745,
                 Fling = new FlingData { BasePower = 30 },
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    // Check conditions on switch-in
-                    if (pokemon.Transformed) return;
-
-                    if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
-                        !battle.Field.IsWeather(ConditionId.SunnyDay) &&
-                        pokemon.UseItem())
-                    {
-                        pokemon.AddVolatile(ConditionId.Protosynthesis);
-                    }
-                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
-                             !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
-                             pokemon.UseItem())
-                    {
-                        pokemon.AddVolatile(ConditionId.QuarkDrive);
-                    }
-                }, -2),
+                    pokemon.ItemState.Started = true;
+                    // Call the update logic immediately after marking as started
+                    BoosterEnergyUpdate(battle, pokemon);
+                }),
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.Transformed) return;
-
-                    if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
-                        !battle.Field.IsWeather(ConditionId.SunnyDay) &&
-                        pokemon.UseItem())
-                    {
-                        pokemon.AddVolatile(ConditionId.Protosynthesis);
-                    }
-                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
-                             !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
-                             pokemon.UseItem())
-                    {
-                        pokemon.AddVolatile(ConditionId.QuarkDrive);
-                    }
+                    if (pokemon.ItemState.Started != true || pokemon.Transformed) return;
+                    BoosterEnergyUpdate(battle, pokemon);
                 }),
                 OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
                     (_, item, pokemon, source, _) =>
                     {
-                        // Only Paradox Pokemon can have this item removed
-                        // Check if the pokemon has the Paradox tag
+                        // Paradox Pokemon can't have this item removed
                         if (pokemon.BaseSpecies.Tags?.Any(tag => tag == SpeciesTag.Paradox) == true)
                         {
                             return BoolVoidUnion.FromBool(false); // Prevent removal from Paradox Pokemon
@@ -1129,44 +1104,65 @@ public partial record Items
                 Num = 1885,
                 Gen = 9,
             },
-            [ItemId.CrackedPot] = new()
-            {
-                Id = ItemId.CrackedPot,
-                Name = "Cracked Pot",
-                SpriteNum = 719,
-                Fling = new FlingData { BasePower = 80 },
-                Num = 1253,
-                Gen = 8,
-            },
-            [ItemId.CustapBerry] = new()
-            {
-                Id = ItemId.CustapBerry,
-                Name = "Custap Berry",
-                SpriteNum = 86,
-                IsBerry = true,
-                NaturalGift = (100, "Ghost"),
-                OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((battle, priority, source, target, move) =>
-                    {
-                        if (priority <= 0 &&
-                            (source.Hp <= source.MaxHp / 4 ||
-                             (source.Hp <= source.MaxHp / 2 &&
-                              source.HasAbility(AbilityId.Gluttony) &&
-                              source.AbilityState.Gluttony == true)))
+                        [ItemId.CrackedPot] = new()
                         {
-                            if (source.EatItem())
-                            {
-                                battle.Add("-activate", source, "item: Custap Berry", "[consumed]");
-                                return DoubleVoidUnion.FromDouble(0.1);
-                            }
-                        }
+                            Id = ItemId.CrackedPot,
+                            Name = "Cracked Pot",
+                            SpriteNum = 719,
+                            Fling = new FlingData { BasePower = 80 },
+                            Num = 1253,
+                            Gen = 8,
+                        },
+                        [ItemId.CustapBerry] = new()
+                        {
+                            Id = ItemId.CustapBerry,
+                            Name = "Custap Berry",
+                            SpriteNum = 86,
+                            IsBerry = true,
+                            NaturalGift = (100, "Ghost"),
+                            OnFractionalPriority = new OnFractionalPriorityEventInfo(
+                                (ModifierSourceMoveHandler)((battle, priority, source, target, move) =>
+                                {
+                                    if (priority <= 0 &&
+                                        (source.Hp <= source.MaxHp / 4 ||
+                                         (source.Hp <= source.MaxHp / 2 &&
+                                          source.HasAbility(AbilityId.Gluttony) &&
+                                          source.AbilityState.Gluttony == true)))
+                                    {
+                                        if (source.EatItem())
+                                        {
+                                            battle.Add("-activate", source, "item: Custap Berry", "[consumed]");
+                                            return DoubleVoidUnion.FromDouble(0.1);
+                                        }
+                                    }
 
-                        return DoubleVoidUnion.FromVoid();
-                    }), -2),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
-                Num = 210,
-                Gen = 4,
-            },
-        };
-    }
-}
+                                    return DoubleVoidUnion.FromVoid();
+                                }), -2),
+                            OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                            Num = 210,
+                            Gen = 4,
+                        },
+                    };
+                }
+
+                /// <summary>
+                /// Helper method for Booster Energy to avoid code duplication between OnStart and OnUpdate.
+                /// </summary>
+                private static void BoosterEnergyUpdate(Battle battle, Pokemon pokemon)
+                {
+                    if (pokemon.Transformed) return;
+
+                    if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
+                        !battle.Field.IsWeather(ConditionId.SunnyDay) &&
+                        pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.Protosynthesis);
+                    }
+                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
+                             !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
+                             pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.QuarkDrive);
+                    }
+                }
+            }
