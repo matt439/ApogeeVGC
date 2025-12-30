@@ -967,8 +967,9 @@ public partial record Items
                         showMsg = true;
                     }
 
-                    if (showMsg && effect is Move move && move.Secondaries == null &&
-                        effect.EffectStateId != ConditionId.Octolock)
+                    // Show message if: stat was lowered, effect is not a move with secondaries, and effect is not Octolock
+                    var isOctolock = effect.EffectStateId is ConditionEffectStateId { ConditionId: ConditionId.Octolock };
+                    if (showMsg && !(effect is Move move && move.Secondaries != null) && !isOctolock)
                     {
                         battle.Add("-fail", target, "unboost", "[from] item: Clear Amulet",
                             $"[of] {target}");
@@ -1078,8 +1079,9 @@ public partial record Items
                 OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
                     (_, item, pokemon, source, _) =>
                     {
-                        if (source?.BaseSpecies.Name.StartsWith("Ogerpon") == true || 
-                            pokemon.BaseSpecies.Name.StartsWith("Ogerpon"))
+                        // Ogerpon cannot have its mask removed
+                        if (source?.BaseSpecies.BaseSpecies == SpecieId.Ogerpon || 
+                            pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
