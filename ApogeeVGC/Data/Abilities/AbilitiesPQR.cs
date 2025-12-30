@@ -43,6 +43,17 @@ public partial record Abilities
                     return new VoidReturn();
                 }),
                 // Note: Damage modifier for second hit implemented in BattleActions.ModifyDamage()
+                OnSourceModifySecondaries =
+                    new OnSourceModifySecondariesEventInfo((battle, secondaries, target, source,
+                        move) =>
+                    {
+                        // Hack to prevent accidentally suppressing King's Rock/Razor Fang
+                        if (move.MultiHitType == MoveMultiHitType.ParentBond &&
+                            move.Id == MoveId.SecretPower && move.Hit < 2)
+                        {
+                            secondaries.RemoveAll(effect => effect.Self == null);
+                        }
+                    }),
             },
             [AbilityId.PastelVeil] = new()
             {
@@ -100,7 +111,8 @@ public partial record Abilities
                 OnAllySetStatus =
                     new OnAllySetStatusEventInfo((battle, status, target, _, effect) =>
                     {
-                        if (status.Id is not (ConditionId.Poison or ConditionId.Toxic)) return null;
+                        if (status.Id is not (ConditionId.Poison or ConditionId.Toxic)) 
+                            return PokemonVoidUnion.FromVoid();
                         if (effect is ActiveMove { Status: not ConditionId.None })
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
@@ -413,7 +425,7 @@ public partial record Abilities
                 OnModifyPriority = new OnModifyPriorityEventInfo((_, priority, _, _, move) =>
                 {
                     if (move.Category != MoveCategory.Status) return new VoidReturn();
-                    move.PranksterBooster = true;
+                    move.PranksterBoosted = true;
                     return priority + 1;
                 }),
             },
