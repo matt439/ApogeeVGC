@@ -518,18 +518,30 @@ public partial record Abilities
                         }
                     }
                 }, order: 29),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
-                {
-                    if (target.Species.Forme != FormeId.Meteor) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
                     {
-                        battle.Add("-immune", target, "[from] ability: Shields Down");
-                    }
+                        // Only Minior-Meteor is immune to status, and not if transformed
+                        if (target.Species.Id != SpecieId.MiniorMeteor || target.Transformed)
+                            return new VoidReturn();
+                        if (effect is ActiveMove { Status: not ConditionId.None })
+                        {
+                            battle.Add("-immune", target, "[from] ability: Shields Down");
+                        }
 
-                    return false;
-                }),
-            },
-            [AbilityId.Simple] = new()
+                        return false;
+                    }),
+                    OnTryAddVolatile =
+                        new OnTryAddVolatileEventInfo((battle, status, target, _, _) =>
+                        {
+                            // Only Minior-Meteor is immune to yawn, and not if transformed
+                            if (target.Species.Id != SpecieId.MiniorMeteor || target.Transformed)
+                                return new VoidReturn();
+                            if (status.Id != ConditionId.Yawn) return new VoidReturn();
+                            battle.Add("-immune", target, "[from] ability: Shields Down");
+                            return null;
+                        }),
+                },
+                [AbilityId.Simple] = new()
             {
                 Id = AbilityId.Simple,
                 Name = "Simple",
