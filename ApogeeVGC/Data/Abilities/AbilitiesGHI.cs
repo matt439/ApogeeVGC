@@ -540,9 +540,6 @@ public partial record Abilities
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     if (pokemon.Status != ConditionId.None &&
-                        battle.Field.IsWeather([
-                            ConditionId.RainDance, ConditionId.PrimordialSea
-                        ]) &&
                         pokemon.EffectiveWeather() is ConditionId.RainDance
                             or ConditionId.PrimordialSea)
                     {
@@ -587,13 +584,9 @@ public partial record Abilities
                         battle.Heal(target.BaseMaxHp / 16);
                     }
                 }),
-                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
-                {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
-                    {
-                        // Immune to hail damage
-                    }
-                }),
+                // TODO: onImmunity(type, pokemon) { if (type === 'hail') return false; }
+                // OnImmunity is Action<> (void) in this codebase, not Func<bool>
+                // Need to determine correct implementation pattern for weather immunity
             },
             [AbilityId.IceFace] = new()
             {
