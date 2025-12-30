@@ -14,6 +14,8 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Abilities;
 
 public partial record Abilities
@@ -29,7 +31,7 @@ public partial record Abilities
                 Name = "Parental Bond",
                 Num = 185,
                 Rating = 4.5,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, source, target, move) =>
+                OnPrepareHit = new OnPrepareHitEventInfo((_, _, _, move) =>
                 {
                     if (move.Category == MoveCategory.Status || move.MultiHit != null ||
                         move.Flags.NoParentalBond == true || move.Flags.Charge == true ||
@@ -44,12 +46,15 @@ public partial record Abilities
                 }),
                 // Note: Damage modifier for second hit implemented in BattleActions.ModifyDamage()
                 OnSourceModifySecondaries =
-                    new OnSourceModifySecondariesEventInfo((battle, secondaries, target, source,
+                    new OnSourceModifySecondariesEventInfo((_, secondaries, _, _,
                         move) =>
                     {
                         // Hack to prevent accidentally suppressing King's Rock/Razor Fang
-                        if (move.MultiHitType == MoveMultiHitType.ParentBond &&
-                            move.Id == MoveId.SecretPower && move.Hit < 2)
+                        if (move is
+                            {
+                                MultiHitType: MoveMultiHitType.ParentBond, Id: MoveId.SecretPower,
+                                Hit: < 2
+                            })
                         {
                             secondaries.RemoveAll(effect => effect.Self == null);
                         }
@@ -85,7 +90,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var target
+                            Pokemon: var target,
                         })
                         return;
                     foreach (Pokemon ally in target.AlliesAndSelf())
@@ -111,13 +116,13 @@ public partial record Abilities
                 OnAllySetStatus =
                     new OnAllySetStatusEventInfo((battle, status, target, _, effect) =>
                     {
-                        if (status.Id is not (ConditionId.Poison or ConditionId.Toxic)) 
+                        if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
                             return PokemonVoidUnion.FromVoid();
                         if (effect is ActiveMove { Status: not ConditionId.None })
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
-                                    Pokemon: var effectHolder
+                                    Pokemon: var effectHolder,
                                 })
                             {
                                 battle.Add("-block", target, "ability: Pastel Veil",
@@ -163,7 +168,7 @@ public partial record Abilities
                             source.SwitchFlag == true)
                             return;
 
-                        var yourItemResult = source.TakeItem(target);
+                        ItemFalseUnion yourItemResult = source.TakeItem(target);
                         if (yourItemResult is not ItemItemFalseUnion { Item: var yourItem })
                             return;
                         if (!target.SetItem(yourItem.Id))
@@ -189,7 +194,7 @@ public partial record Abilities
                 {
                     if (pokemon.Item != ItemId.None) return;
 
-                    List<Pokemon> pickupTargets = battle.GetAllActive()
+                    var pickupTargets = battle.GetAllActive()
                         .Where(target => target.LastItem != ItemId.None &&
                                          target.UsedItemThisTurn &&
                                          pokemon.IsAdjacent(target))
@@ -201,7 +206,7 @@ public partial record Abilities
                     ItemId item = randomTarget.LastItem;
                     randomTarget.LastItem = ItemId.None;
 
-                    if (battle.Library.Items.TryGetValue(item, out var itemData))
+                    if (battle.Library.Items.TryGetValue(item, out Item? itemData))
                     {
                         battle.Add("-item", pokemon, itemData.Name, "[from] ability: Pickup");
                     }
@@ -311,10 +316,10 @@ public partial record Abilities
                 OnAnyAfterSetStatus =
                     new OnAnyAfterSetStatusEventInfo((battle, status, target, source, effect) =>
                     {
-                        if (source?.BaseSpecies.Name != "Pecharunt") return;
+                        if (source.BaseSpecies.Name != "Pecharunt") return;
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Pokemon: var effectHolder
+                                Pokemon: var effectHolder,
                             })
                             return;
                         if (source != effectHolder || target == source || effect is not ActiveMove)
@@ -335,8 +340,8 @@ public partial record Abilities
                     new OnSourceDamagingHitEventInfo((battle, _, target, source, move) =>
                     {
                         // Despite not being a secondary, Shield Dust / Covert Cloak block Poison Touch's effect
-                        if (target.HasAbility(AbilityId.ShieldDust)) return;
-                        // TODO: Check for CovertCloak item when it's added to ItemId
+                        if (target.HasAbility(AbilityId.ShieldDust) ||
+                            target.HasItem(ItemId.CovertCloak)) return;
                         if (battle.CheckMoveMakesContact(move, target, source))
                         {
                             if (battle.RandomChance(3, 10))
@@ -388,7 +393,7 @@ public partial record Abilities
                     NoEntrain = true,
                     NoTrace = true,
                 },
-                OnAllyFaint = new OnAllyFaintEventInfo((battle, target, pokemon, _) =>
+                OnAllyFaint = new OnAllyFaintEventInfo((_, target, pokemon, _) =>
                 {
                     if (pokemon.Hp == 0) return;
                     Ability ability = target.GetAbility();
@@ -459,9 +464,10 @@ public partial record Abilities
                 {
                     ConditionId[] strongWeathers =
                     [
-                        ConditionId.DesolateLand, ConditionId.PrimordialSea, ConditionId.DeltaStream
+                        ConditionId.DesolateLand, ConditionId.PrimordialSea,
+                        ConditionId.DeltaStream,
                     ];
-                    if (battle.Field.GetWeather()?.Id == ConditionId.PrimordialSea &&
+                    if (battle.Field.GetWeather().Id == ConditionId.PrimordialSea &&
                         !strongWeathers.Contains(weather.Id))
                     {
                         return false;
@@ -772,7 +778,7 @@ public partial record Abilities
 
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var dazzlingHolder
+                            Pokemon: var dazzlingHolder,
                         })
                         return new VoidReturn();
 
@@ -856,7 +862,7 @@ public partial record Abilities
                 }),
                 OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, _, _, effect) =>
                 {
-                    if (effect?.Name == "Intimidate" && boost.Atk != null)
+                    if (effect.Name == "Intimidate" && boost.Atk != null)
                     {
                         battle.Boost(new SparseBoostsTable { Spe = 1 });
                     }
@@ -875,7 +881,7 @@ public partial record Abilities
                     NoEntrain = true,
                     NoTrace = true,
                 },
-                OnAllyFaint = new OnAllyFaintEventInfo((battle, target, pokemon, _) =>
+                OnAllyFaint = new OnAllyFaintEventInfo((_, target, pokemon, _) =>
                 {
                     if (pokemon.Hp == 0) return;
                     Ability ability = target.GetAbility();
@@ -949,14 +955,14 @@ public partial record Abilities
                 Rating = 2.0,
                 OnTryHeal = new OnTryHealEventInfo(
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
-                        target, source, effect) =>
+                        target, _, effect) =>
                     {
-                        if (effect.Name == "Berry Juice" || effect.Name == "Leftovers")
+                        if (effect.Name is "Berry Juice" or "Leftovers")
                         {
                             battle.Add("-activate", target, "ability: Ripen");
                         }
 
-                        if (effect is Item item && item.IsBerry)
+                        if (effect is Item { IsBerry: true })
                         {
                             battle.ChainModify(2);
                             return IntBoolUnion.FromInt(battle.FinalModify(damage));
@@ -964,9 +970,9 @@ public partial record Abilities
 
                         return IntBoolUnion.FromInt(damage);
                     })),
-                OnChangeBoost = new OnChangeBoostEventInfo((battle, boost, target, source, effect) =>
+                OnChangeBoost = new OnChangeBoostEventInfo((_, boost, _, _, effect) =>
                 {
-                    if (effect is Item item && item.IsBerry)
+                    if (effect is Item { IsBerry: true })
                     {
                         if (boost.Atk != null) boost.Atk *= 2;
                         if (boost.Def != null) boost.Def *= 2;
@@ -977,24 +983,25 @@ public partial record Abilities
                         if (boost.Evasion != null) boost.Evasion *= 2;
                     }
                 }),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
-                {
-                    if (target.AbilityState.BerryWeaken == true)
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo(
+                    (battle, damage, _, target, _) =>
                     {
-                        target.AbilityState.BerryWeaken = false;
-                        battle.ChainModify(0.5);
-                        return DoubleVoidUnion.FromDouble(battle.FinalModify(damage));
-                    }
+                        if (target.AbilityState.BerryWeaken == true)
+                        {
+                            target.AbilityState.BerryWeaken = false;
+                            battle.ChainModify(0.5);
+                            return DoubleVoidUnion.FromDouble(battle.FinalModify(damage));
+                        }
 
-                    return DoubleVoidUnion.FromVoid();
-                }, -1),
+                        return DoubleVoidUnion.FromVoid();
+                    }, -1),
                 OnTryEatItem = new OnTryEatItemEventInfo(
-                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    OnTryEatItem.FromFunc((battle, _, pokemon) =>
                     {
                         battle.Add("-activate", pokemon, "ability: Ripen");
                         return BoolVoidUnion.FromVoid();
                     }), -1),
-                OnEatItem = new OnEatItemEventInfo((battle, item, pokemon, source, effect) =>
+                OnEatItem = new OnEatItemEventInfo((_, item, pokemon, _, _) =>
                 {
                     ItemId[] weakenBerries =
                     [
@@ -1006,7 +1013,8 @@ public partial record Abilities
                         ItemId.TangaBerry, ItemId.WacanBerry, ItemId.YacheBerry,
                     ];
                     // Record if the pokemon ate a berry to resist the attack
-                    pokemon.AbilityState.BerryWeaken = Array.Exists(weakenBerries, id => id == item.Id);
+                    pokemon.AbilityState.BerryWeaken =
+                        Array.Exists(weakenBerries, id => id == item.Id);
                 }),
             },
             [AbilityId.Rivalry] = new()
