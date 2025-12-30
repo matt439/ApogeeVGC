@@ -27,7 +27,7 @@ public partial record Abilities
                 OnModifyPriority =
                     new OnModifyPriorityEventInfo((battle, priority, pokemon, _, move) =>
                     {
-                        if (move.Type == MoveType.Flying && pokemon.Hp == pokemon.MaxHp)
+                        if (move?.Type == MoveType.Flying && pokemon.Hp == pokemon.MaxHp)
                         {
                             return priority + 1;
                         }
@@ -158,7 +158,6 @@ public partial record Abilities
                 // OnModifyAtkPriority = 1
                 OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
                 {
-                    // PLACEHOLDER - Skip if dynamaxed (not relevant for Gen 9)
                     battle.Debug("Gorilla Tactics Atk Boost");
                     battle.ChainModify(1.5);
                     return battle.FinalModify(atk);
@@ -304,16 +303,15 @@ public partial record Abilities
                 Rating = 3.5,
                 //OnModifyAtkPriority = 5,
                 OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                {
+                    if (pokemon.Status != ConditionId.None)
                     {
-                        if (pokemon.Status is not ConditionId.None)
-                        {
-                            battle.ChainModify(1.5);
-                            return battle.FinalModify(atk);
-                        }
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(atk);
+                    }
 
-                        return atk;
-                    },
-                    5),
+                    return atk;
+                }, 5),
             },
             [AbilityId.HadronEngine] = new()
             {
@@ -323,19 +321,12 @@ public partial record Abilities
                 Rating = 4.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    battle.Debug($"[HadronEngine.OnStart] HANDLER EXECUTING for {pokemon.Name}");
-
                     bool terrainSet = battle.Field.SetTerrain(
                         _library.Conditions[ConditionId.ElectricTerrain]);
-
-                    battle.Debug($"[HadronEngine.OnStart] SetTerrain returned: {terrainSet}");
-                    battle.Debug($"[HadronEngine.OnStart] Current terrain: {battle.Field.Terrain}");
 
                     if (!terrainSet &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
-                        battle.Debug(
-                            $"[HadronEngine.OnStart] Terrain already Electric, showing activate");
                         if (battle.DisplayUi)
                         {
                             battle.Add("-activate", pokemon, "ability: Hadron Engine");
@@ -598,8 +589,10 @@ public partial record Abilities
                 }),
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    // Ice Body grants immunity to hail damage - handled via return false
-                    // The immunity check is handled by the event system
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
+                    {
+                        // Immune to hail damage
+                    }
                 }),
             },
             [AbilityId.IceFace] = new()
