@@ -1,3 +1,4 @@
+using System.Linq;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
@@ -75,22 +76,22 @@ public partial record Items
                         return battle.FinalModify(basePower);
                     }
 
-                                    return basePower;
-                                }, 15),
-                                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                                    (_, item, pokemon, source, _) =>
-                                    {
-                                        // Dialga (num 483) can't have this item removed
-                                        if (source?.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
-                                        {
-                                            return BoolVoidUnion.FromBool(false); // Prevent removal
-                                        }
-                                        return BoolVoidUnion.FromBool(true); // Allow removal
-                                    })),
-                                ForcedForme = "Dialga-Origin",
-                                Num = 1777,
-                                Gen = 8,
-                            },
+                    return basePower;
+                }, 15),
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        // Dialga (num 483) can't have this item removed
+                        if (source?.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
+                        {
+                            return BoolVoidUnion.FromBool(false); // Prevent removal
+                        }
+                        return BoolVoidUnion.FromBool(true); // Allow removal
+                    })),
+                ForcedForme = "Dialga-Origin",
+                Num = 1777,
+                Gen = 8,
+            },
             [ItemId.AdamantOrb] = new()
             {
                 Id = ItemId.AdamantOrb,
@@ -355,8 +356,9 @@ public partial record Items
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 2)
                     {
-                        // Try to heal - RunEvent returns RelayVar which can indicate if healing is prevented
-                        if (pokemon.UseItem())
+                        // Check TryHeal event first, then use item if allowed
+                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect, 20);
+                        if (canHeal is not BoolRelayVar { Value: false } && pokemon.UseItem())
                         {
                             battle.Heal(20);
                         }
@@ -394,10 +396,26 @@ public partial record Items
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
                         target, source, effect) =>
                     {
-                        var heals = new[]
-                            { "drain", "leechseed", "ingrain", "aquaring", "strengthsap" };
-                        var effectName = effect.Name.ToLower().Replace(" ", "");
-                        if (heals.Contains(effectName))
+                        // BigRoot boosts healing from: drain moves, Leech Seed, Ingrain, Aqua Ring, Strength Sap
+                        var isBigRootHeal = effect.EffectStateId switch
+                        {
+                            MoveEffectStateId moveId => moveId.MoveId == MoveId.Absorb ||
+                                                        moveId.MoveId == MoveId.MegaDrain ||
+                                                        moveId.MoveId == MoveId.GigaDrain ||
+                                                        moveId.MoveId == MoveId.LeechLife ||
+                                                        moveId.MoveId == MoveId.DrainPunch ||
+                                                        moveId.MoveId == MoveId.HornLeech ||
+                                                        moveId.MoveId == MoveId.DrainingKiss ||
+                                                        moveId.MoveId == MoveId.ParabolicCharge ||
+                                                        moveId.MoveId == MoveId.DreamEater ||
+                                                        moveId.MoveId == MoveId.StrengthSap,
+                            ConditionEffectStateId condId => condId.ConditionId == ConditionId.LeechSeed ||
+                                                             condId.ConditionId == ConditionId.Ingrain ||
+                                                             condId.ConditionId == ConditionId.AquaRing,
+                            _ => false
+                        };
+
+                        if (isBigRootHeal)
                         {
                             battle.ChainModify([5324, 4096]);
                             return IntBoolUnion.FromInt(battle.FinalModify(damage));
@@ -412,13 +430,13 @@ public partial record Items
             {
                 Id = ItemId.BindingBand,
                 Name = "Binding Band",
-                    SpriteNum = 31,
-                    Fling = new FlingData { BasePower = 30 },
-                    // TODO: Binding Band effect implemented in status conditions (Bind, Wrap, etc.)
-                    // Increases damage from partial-trapping moves from 1/8 to 1/6 of target's max HP
-                    Num = 544,
-                    Gen = 5,
-                },
+                SpriteNum = 31,
+                Fling = new FlingData { BasePower = 30 },
+                // TODO: Binding Band effect implemented in status conditions (Bind, Wrap, etc.)
+                // Increases damage from partial-trapping moves from 1/8 to 1/6 of target's max HP
+                Num = 544,
+                Gen = 5,
+            },
             [ItemId.BlackBelt] = new()
             {
                 Id = ItemId.BlackBelt,
@@ -482,42 +500,42 @@ public partial record Items
                 Id = ItemId.BlueOrb,
                 Name = "Blue Orb",
                 SpriteNum = 41,
-                        OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" &&
+                        !pokemon.Transformed)
+                    {
+                        // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
+                        // Requires FormeChange method to be implemented in Pokemon class
+                    }
+                }, -1),
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, _, pokemon, source, _) =>
+                    {
+                        // Kyogre can't have this item removed
+                        if (source?.BaseSpecies.Name == "Kyogre" || pokemon.BaseSpecies.Name == "Kyogre")
                         {
-                            if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" &&
-                                !pokemon.Transformed)
-                            {
-                                // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
-                                // Requires FormeChange method to be implemented in Pokemon class
-                            }
-                        }, -1),
-                        OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                            (_, _, pokemon, source, _) =>
-                            {
-                                // Kyogre can't have this item removed
-                                if (source?.BaseSpecies.Name == "Kyogre" || pokemon.BaseSpecies.Name == "Kyogre")
-                                {
-                                    return BoolVoidUnion.FromBool(false); // Prevent removal
-                                }
-                                return BoolVoidUnion.FromBool(true); // Allow removal
-                            })),
-                        IsPrimalOrb = true,
-                        Num = 535,
-                        Gen = 6,
-                    },
+                            return BoolVoidUnion.FromBool(false); // Prevent removal
+                        }
+                        return BoolVoidUnion.FromBool(true); // Allow removal
+                    })),
+                IsPrimalOrb = true,
+                Num = 535,
+                Gen = 6,
+            },
             [ItemId.BlunderPolicy] = new()
             {
                 Id = ItemId.BlunderPolicy,
-                    Name = "Blunder Policy",
-                    SpriteNum = 716,
-                    Fling = new FlingData { BasePower = 80 },
-                    // TODO: Item activation located in move execution scripts - activates when move misses due to accuracy
-                    // Boosts Speed by 2 stages when the holder's move misses
-                    // TypeScript: "Item activation located in scripts.js"
-                    // Requires implementation in move miss handling (BattleActions or similar)
-                    Num = 1121,
-                    Gen = 8,
-                },
+                Name = "Blunder Policy",
+                SpriteNum = 716,
+                Fling = new FlingData { BasePower = 80 },
+                // TODO: Item activation located in move execution scripts - activates when move misses due to accuracy
+                // Boosts Speed by 2 stages when the holder's move misses
+                // TypeScript: "Item activation located in scripts.js"
+                // Requires implementation in move miss handling (BattleActions or similar)
+                Num = 1121,
+                Gen = 8,
+            },
             [ItemId.BoosterEnergy] = new()
             {
                 Id = ItemId.BoosterEnergy,
@@ -542,37 +560,37 @@ public partial record Items
                         pokemon.AddVolatile(ConditionId.QuarkDrive);
                     }
                 }, -2),
-                    OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
-                    {
-                        if (pokemon.Transformed) return;
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Transformed) return;
 
-                        if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
-                            !battle.Field.IsWeather(ConditionId.SunnyDay) &&
-                            pokemon.UseItem())
+                    if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
+                        !battle.Field.IsWeather(ConditionId.SunnyDay) &&
+                        pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.Protosynthesis);
+                    }
+                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
+                             !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
+                             pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.QuarkDrive);
+                    }
+                }),
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        // Only Paradox Pokemon can have this item removed
+                        // Check if the pokemon has the Paradox tag
+                        if (pokemon.BaseSpecies.Tags?.Any(tag => tag == SpeciesTag.Paradox) == true)
                         {
-                            pokemon.AddVolatile(ConditionId.Protosynthesis);
+                            return BoolVoidUnion.FromBool(false); // Prevent removal from Paradox Pokemon
                         }
-                        else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
-                                 !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
-                                 pokemon.UseItem())
-                        {
-                            pokemon.AddVolatile(ConditionId.QuarkDrive);
-                        }
-                    }),
-                    OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                        (_, item, pokemon, source, _) =>
-                        {
-                            // Only Paradox Pokemon can have this item removed
-                            // Check if the pokemon has the Paradox tag
-                            if (pokemon.BaseSpecies.Tags?.Any(tag => tag == SpeciesTag.Paradox) == true)
-                            {
-                                return BoolVoidUnion.FromBool(false); // Prevent removal from Paradox Pokemon
-                            }
-                            return BoolVoidUnion.FromBool(true); // Allow removal from non-Paradox Pokemon
-                        })),
-                    Num = 1880,
-                    Gen = 9,
-                },
+                        return BoolVoidUnion.FromBool(true); // Allow removal from non-Paradox Pokemon
+                    })),
+                Num = 1880,
+                Gen = 9,
+            },
             [ItemId.BottleCap] = new()
             {
                 Id = ItemId.BottleCap,
