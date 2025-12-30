@@ -261,7 +261,8 @@ public partial record Abilities
                 {
                     ConditionId[] strongWeathers =
                     [
-                        ConditionId.DesolateLand, ConditionId.PrimordialSea, ConditionId.DeltaStream,
+                        ConditionId.DesolateLand, ConditionId.PrimordialSea,
+                        ConditionId.DeltaStream,
                     ];
                     if (battle.Field.GetWeather().Id == ConditionId.DesolateLand &&
                         !strongWeathers.Contains(weather.Id))
@@ -310,8 +311,7 @@ public partial record Abilities
                 OnDamage = new OnDamageEventInfo((battle, damage, target, _, effect) =>
                 {
                     if (effect.EffectType == EffectType.Move &&
-                        (target.Species.Id == SpecieId.Mimikyu ||
-                         target.Species.Id == SpecieId.MimikyuTotem))
+                        target.Species.Id is SpecieId.Mimikyu or SpecieId.MimikyuTotem)
                     {
                         battle.Add("-activate", target, "ability: Disguise");
                         battle.EffectState.Busted = true;
@@ -341,23 +341,29 @@ public partial record Abilities
                     })),
                 OnEffectiveness = new OnEffectivenessEventInfo((_, _, target, _, move) =>
                 {
-                    if (target is null || move.Category == MoveCategory.Status)
+                    if (target is null || move.Category == MoveCategory.Status ||
+                        (target.Species.Id != SpecieId.Mimikyu &&
+                         target.Species.Id != SpecieId.MimikyuTotem))
                         return new VoidReturn();
-                    if (target.Species.Id != SpecieId.Mimikyu &&
-                        target.Species.Id != SpecieId.MimikyuTotem)
-                    {
-                        return new VoidReturn();
-                    }
 
                     bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
                                   (move.Flags.BypassSub != true) && move.Infiltrates != true;
-                    if (hitSub) return new VoidReturn();
+                    if (hitSub || !target.RunImmunity(move)) return new VoidReturn();
 
-                    if (!target.RunImmunity(move)) return new VoidReturn();
                     return 0;
                 }),
-                // OnUpdate - forme change not implemented (requires forme change system)
-                // TODO: Implement forme change from Mimikyu to Mimikyu-Busted when busted state is set
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Species.Id is SpecieId.Mimikyu or SpecieId.MimikyuTotem &&
+                        (battle.EffectState.Busted ?? false))
+                    {
+                        SpecieId bustedSpeciesId = pokemon.Species.Id == SpecieId.MimikyuTotem
+                            ? SpecieId.MimikyuBustedTotem
+                            : SpecieId.MimikyuBusted;
+                        pokemon.FormeChange(bustedSpeciesId, battle.Effect, true);
+                        battle.Damage(pokemon.BaseMaxHp / 8, pokemon, pokemon);
+                    }
+                }),
             },
             [AbilityId.Download] = new()
             {
@@ -477,13 +483,11 @@ public partial record Abilities
                 OnWeather = new OnWeatherEventInfo((battle, target, _, effect) =>
                 {
                     if (target.HasItem(ItemId.UtilityUmbrella)) return;
-                    if (effect.Id == ConditionId.RainDance ||
-                        effect.Id == ConditionId.PrimordialSea)
+                    if (effect.Id is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         battle.Heal(target.BaseMaxHp / 8, target);
                     }
-                    else if (effect.Id == ConditionId.SunnyDay ||
-                             effect.Id == ConditionId.DesolateLand)
+                    else if (effect.Id is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.Damage(target.BaseMaxHp / 8, target, target);
                     }
@@ -848,7 +852,7 @@ public partial record Abilities
                     if (pokemon.Hp == 0) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         if (pokemon.Species.Id != SpecieId.CherrimSunshine)
                         {
@@ -872,7 +876,7 @@ public partial record Abilities
                     if (pokemon.Hp == 0) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         if (pokemon.Species.Id != SpecieId.CherrimSunshine)
                         {
@@ -899,7 +903,7 @@ public partial record Abilities
                         return atk;
                     if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return atk;
                     ConditionId? weather = pokemon.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.ChainModify(1.5);
                         return battle.FinalModify(atk);
@@ -917,7 +921,7 @@ public partial record Abilities
                         return spd;
                     if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return spd;
                     ConditionId? weather = pokemon.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.ChainModify(1.5);
                         return battle.FinalModify(spd);
@@ -1191,13 +1195,11 @@ public partial record Abilities
                 Rating = 1.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (Pokemon target in pokemon.Foes())
+                    foreach (Pokemon target in pokemon.Foes()
+                                 .Where(target => target.Item != ItemId.None))
                     {
-                        if (target.Item != ItemId.None)
-                        {
-                            battle.Add("-item", target, battle.Library.Items[target.Item].Name,
-                                "[from] ability: Frisk", $"[of] {pokemon}");
-                        }
+                        battle.Add("-item", target, battle.Library.Items[target.Item].Name,
+                            "[from] ability: Frisk", $"[of] {pokemon}");
                     }
                 }),
             },
