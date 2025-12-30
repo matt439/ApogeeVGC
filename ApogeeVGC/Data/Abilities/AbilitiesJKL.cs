@@ -4,11 +4,14 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
 
@@ -71,7 +74,7 @@ public partial record Abilities
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
                     // End the item effect when switching in
-                    var item = pokemon.GetItem();
+                    Item item = pokemon.GetItem();
                     battle.SingleEvent(EventId.End, item, pokemon.ItemState, pokemon);
                 }, 1),
             },
@@ -84,7 +87,7 @@ public partial record Abilities
                 Num = 102,
                 Rating = 0.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
+                OnSetStatus = new OnSetStatusEventInfo((battle, _, target, _, effect) =>
                 {
                     ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
@@ -166,7 +169,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnModifyWeight =
                     new OnModifyWeightEventInfo(
-                        (battle, weighthg, _) => { return battle.Trunc(weighthg / 2); }, 1),
+                        (battle, weighthg, _) => battle.Trunc(weighthg / 2), 1),
             },
             [AbilityId.LightningRod] = new()
             {
@@ -179,7 +182,8 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Electric)
                     {
-                        var boostResult = battle.Boost(new SparseBoostsTable { SpA = 1 });
+                        BoolZeroUnion? boostResult =
+                            battle.Boost(new SparseBoostsTable { SpA = 1 });
                         if (boostResult is ZeroBoolZeroUnion)
                         {
                             battle.Add("-immune", target, "[from] ability: Lightning Rod");
@@ -203,7 +207,7 @@ public partial record Abilities
 
                         if (battle.EffectState.Target is PokemonEffectStateTarget
                             {
-                                Pokemon: var abilityHolder
+                                Pokemon: var abilityHolder,
                             })
                         {
                             if (battle.ValidTarget(abilityHolder, source, redirectTarget))
@@ -265,15 +269,16 @@ public partial record Abilities
 
                     if (battle.CheckMoveMakesContact(move, source, target, !source.IsAlly(target)))
                     {
-                        var oldAbilityResult = source.SetAbility(AbilityId.LingeringAroma, target);
+                        AbilityIdFalseUnion? oldAbilityResult =
+                            source.SetAbility(AbilityId.LingeringAroma, target);
                         if (oldAbilityResult is AbilityIdAbilityIdFalseUnion
                             {
-                                AbilityId: var oldAbilityId
+                                AbilityId: var oldAbilityId,
                             })
                         {
                             string oldAbilityName =
                                 battle.Library.Abilities.TryGetValue(oldAbilityId,
-                                    out var oldAbilityData)
+                                    out Ability? oldAbilityData)
                                     ? oldAbilityData.Name
                                     : oldAbilityId.ToString();
                             battle.Add("-activate", target, "ability: Lingering Aroma",
@@ -300,7 +305,7 @@ public partial record Abilities
                         {
                             Condition c => c.Id is ConditionId.Drain or ConditionId.LeechSeed,
                             ActiveMove m => m.Id == MoveId.StrengthSap,
-                            _ => false
+                            _ => false,
                         };
 
                         if (shouldOoze)
@@ -309,7 +314,8 @@ public partial record Abilities
                             return 0;
                         }
 
-                        return null; // Return null to allow default heal behavior (matches TypeScript returning undefined)
+                        return
+                            null; // Return null to allow default heal behavior (matches TypeScript returning undefined)
                     })),
             },
             [AbilityId.LiquidVoice] = new()
