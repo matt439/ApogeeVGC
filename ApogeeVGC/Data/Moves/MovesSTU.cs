@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -147,7 +148,14 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                // TODO: onModifyMove - if weather is rain/primordialsea, accuracy becomes true
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                {
+                    var weather = battle.Field.EffectiveWeather();
+                    if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
+                    {
+                        move.Accuracy = IntTrueUnion.FromTrue();
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 20,
@@ -750,7 +758,33 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                // TODO: onHit - heal 1/2, or 2/3 in sandstorm
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    int healAmount;
+                    // Heal 2/3 in Sandstorm, 1/2 otherwise
+                    if (battle.Field.IsWeather(ConditionId.Sandstorm))
+                    {
+                        healAmount = battle.Modify(target.MaxHp, 2, 3);
+                    }
+                    else
+                    {
+                        healAmount = target.MaxHp / 2;
+                    }
+
+                    var result = battle.Heal(healAmount, target);
+
+                    if (result is FalseIntFalseUnion)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "heal");
+                        }
+                        // Return NOT_FAIL equivalent - move worked but heal failed
+                        return new VoidReturn();
+                    }
+
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Ground,
@@ -831,8 +865,27 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                // TODO: onTryHit - check if target can't suppress, already has simple, or has truant
-                // TODO: onHit - set ability to simple
+                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                {
+                    // Fails if ability can't be suppressed, already Simple, or has Truant
+                    var targetAbility = target.GetAbility();
+                    if (targetAbility.Flags.CantSuppress == true ||
+                        target.Ability == AbilityId.Simple ||
+                        target.Ability == AbilityId.Truant)
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((_, target, source, _) =>
+                {
+                    var oldAbility = target.SetAbility(AbilityId.Simple, source);
+                    if (oldAbility != null)
+                    {
+                        return new VoidReturn();
+                    }
+                    return false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -1383,7 +1436,14 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                // TODO: onHit - set target's type to Water
+                OnHit = new OnHitEventInfo((_, target, _, _) =>
+                {
+                    if (!target.SetType(PokemonType.Water))
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
@@ -2092,7 +2152,18 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: basePowerCallback - 20 + 20 * positive boosts
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                {
+                    // Count all positive stat boosts
+                    int positiveBoosts = 0;
+                    foreach (var (_, value) in source.Boosts.GetBoosts())
+                    {
+                        if (value > 0) positiveBoosts += value;
+                    }
+                    var bp = 20 + 20 * positiveBoosts;
+                    battle.Debug($"[Stored Power] BP: {bp}");
+                    return bp;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
@@ -2159,7 +2230,19 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                // TODO: onHit - heal by target's attack stat, lower target's attack by 1
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    // Heal by target's attack stat (with boosts)
+                    int targetAtk = target.GetStat(StatIdExceptHp.Atk);
+                    var healResult = battle.Heal(targetAtk, source, source);
+
+                    // Lower target's attack by 1
+                    var boostResult = battle.Boost(new SparseBoostsTable { Atk = -1 }, target, source, move);
+
+                    // Move succeeds if either heal or boost worked
+                    bool success = healResult is not FalseIntFalseUnion || boostResult?.IsTruthy() == true;
+                    return success ? new VoidReturn() : (BoolEmptyVoidUnion?)false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
@@ -3143,8 +3226,27 @@ public partial record Moves
                     Metronome = true,
                     Pulse = true,
                 },
-                // TODO: onModifyType - changes type based on terrain
-                // TODO: onModifyMove - doubles power on terrain
+                OnModifyType = new OnModifyTypeEventInfo((battle, move, source, _) =>
+                {
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, source))
+                        move.Type = MoveType.Electric;
+                    else if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, source))
+                        move.Type = MoveType.Grass;
+                    else if (battle.Field.IsTerrain(ConditionId.MistyTerrain, source))
+                        move.Type = MoveType.Fairy;
+                    else if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, source))
+                        move.Type = MoveType.Psychic;
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                {
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, source) ||
+                        battle.Field.IsTerrain(ConditionId.GrassyTerrain, source) ||
+                        battle.Field.IsTerrain(ConditionId.MistyTerrain, source) ||
+                        battle.Field.IsTerrain(ConditionId.PsychicTerrain, source))
+                    {
+                        move.BasePower *= 2;
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -3240,7 +3342,18 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onModifyMove - 100% accuracy in rain, 50% in sun
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                {
+                    var weather = battle.Field.EffectiveWeather();
+                    if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
+                    {
+                        move.Accuracy = IntTrueUnion.FromTrue();
+                    }
+                    else if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
+                    {
+                        move.Accuracy = 50;
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -3736,7 +3849,13 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: basePowerCallback - 20 * move.hit
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                {
+                    // BP scales with hit number: 20, 40, 60
+                    var bp = 20 * move.Hit;
+                    battle.Debug($"[Triple Axel] Hit {move.Hit}, BP: {bp}");
+                    return bp;
+                }),
                 MultiHit = 3,
                 MultiAccuracy = true,
                 Secondary = null,
@@ -3782,7 +3901,13 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: basePowerCallback - 10 * move.hit
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                {
+                    // BP scales with hit number: 10, 20, 30
+                    var bp = 10 * move.Hit;
+                    battle.Debug($"[Triple Kick] Hit {move.Hit}, BP: {bp}");
+                    return bp;
+                }),
                 MultiHit = 3,
                 MultiAccuracy = true,
                 Secondary = null,

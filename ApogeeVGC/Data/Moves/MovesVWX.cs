@@ -1,4 +1,6 @@
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -122,7 +124,16 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onBasePower - double power if target is poisoned
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, target, _) =>
+                {
+                    // Double power if target is poisoned or badly poisoned
+                    if (target.Status == ConditionId.Poison || target.Status == ConditionId.Toxic)
+                    {
+                        battle.ChainModify(2);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Poison,
@@ -352,7 +363,13 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: basePowerCallback - BP * user.hp / user.maxhp
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                {
+                    // Base power scales with user's HP percentage
+                    var bp = move.BasePower * source.Hp / source.MaxHp;
+                    battle.Debug($"[Water Spout] BP: {bp}");
+                    return (int)bp;
+                }),
                 Secondary = null,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Water,
@@ -412,8 +429,26 @@ public partial record Moves
                     Metronome = true,
                     Bullet = true,
                 },
-                // TODO: onModifyType - change type based on weather
-                // TODO: onModifyMove - double BP in weather
+                OnModifyType = new OnModifyTypeEventInfo((battle, move, source, _) =>
+                {
+                    var weather = battle.Field.EffectiveWeather();
+                    move.Type = weather switch
+                    {
+                        ConditionId.SunnyDay or ConditionId.DesolateLand => MoveType.Fire,
+                        ConditionId.RainDance or ConditionId.PrimordialSea => MoveType.Water,
+                        ConditionId.Sandstorm => MoveType.Rock,
+                        ConditionId.Snowscape or ConditionId.Hail => MoveType.Ice,
+                        _ => move.Type,
+                    };
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                {
+                    var weather = battle.Field.EffectiveWeather();
+                    if (weather != ConditionId.None)
+                    {
+                        move.BasePower *= 2;
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -526,7 +561,14 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                // TODO: onModifyMove - perfect accuracy in rain
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                {
+                    var weather = battle.Field.EffectiveWeather();
+                    if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
+                    {
+                        move.Accuracy = IntTrueUnion.FromTrue();
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 20,
@@ -730,9 +772,40 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                // TODO: onTryImmunity - fail on Truant/Insomnia
-                // TODO: onTryHit - fail if ability can't be suppressed
-                // TODO: onHit - set ability to Insomnia, cure sleep
+                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
+                {
+                    // Fails against Truant or Insomnia - can't replace those
+                    if (target.Ability is AbilityId.Truant or AbilityId.Insomnia)
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                {
+                    // Fails if target's ability can't be suppressed
+                    var targetAbility = target.GetAbility();
+                    if (targetAbility.Flags.CantSuppress == true)
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((_, target, source, _) =>
+                {
+                    // Set target's ability to Insomnia
+                    var oldAbility = target.SetAbility(AbilityId.Insomnia, source);
+                    if (oldAbility != null)
+                    {
+                        // Cure sleep if the target was asleep
+                        if (target.Status == ConditionId.Sleep)
+                        {
+                            target.CureStatus();
+                        }
+                        return new VoidReturn();
+                    }
+                    return false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,

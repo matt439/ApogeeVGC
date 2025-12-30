@@ -29,7 +29,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public int BasePower
     {
         get;
-        init
+        set
         {
             if (value < 0)
             {
@@ -41,7 +41,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public required IntTrueUnion Accuracy
     {
         get;
-        init
+        set
         {
             if (value is IntIntTrueUnion { Value: < 1 or > 100 })
             {
