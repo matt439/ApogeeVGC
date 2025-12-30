@@ -1501,11 +1501,13 @@ public partial record Abilities
                 Num = 101,
                 Rating = 3.5,
                 // OnBasePowerPriority = 30
-                // Technician boosts moves with base power 60 or less
+                // Technician boosts moves with base power 60 or less (after previous modifiers)
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
                 {
-                    battle.Debug($"Base Power: {basePower}");
-                    if (basePower <= 60)
+                    // Calculate effective base power after all previous modifiers in the chain
+                    int basePowerAfterMultiplier = battle.Modify(basePower, battle.Event.Modifier ?? 1.0);
+                    battle.Debug($"Base Power: {basePowerAfterMultiplier}");
+                    if (basePowerAfterMultiplier <= 60)
                     {
                         battle.Debug("Technician boost");
                         battle.ChainModify(1.5);
@@ -1926,8 +1928,13 @@ public partial record Abilities
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Truant]);
-                    // When switching in fresh, don't add volatile on first turn
-                    // ActiveTurns check handles this
+                    // Handle mid-battle ability gain (e.g., via Skill Swap, Entrainment)
+                    // If already active and either moved this turn or won't move, set up Truant
+                    if (pokemon.ActiveTurns > 0 &&
+                        (pokemon.MoveThisTurnResult != null || battle.Queue.WillMove(pokemon) == null))
+                    {
+                        pokemon.AddVolatile(ConditionId.Truant);
+                    }
                 }),
                 // OnBeforeMovePriority = 9
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>

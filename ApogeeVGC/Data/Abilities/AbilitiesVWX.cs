@@ -43,7 +43,7 @@ public partial record Abilities
                         })
                         return spa;
                     if (source.HasAbility(AbilityId.VesselOfRuin)) return spa;
-                    if (move.RuinedSpA?.HasAbility(AbilityId.VesselOfRuin) != true)
+                    if (move.RuinedSpA == null)
                         move.RuinedSpA = abilityHolder;
                     if (move.RuinedSpA != abilityHolder) return spa;
                     battle.Debug("Vessel of Ruin SpA drop");
@@ -561,7 +561,7 @@ public partial record Abilities
             },
 
             // ==================== 'X' Abilities ====================
-            // No abilities start with 'X' in the standard Pokémon games
+            // No abilities start with 'X' in the standard Pokï¿½mon games
         };
     }
 }
