@@ -310,11 +310,26 @@ public partial record Abilities
                 {
                     move.IgnoreEvasion = true;
                     // Set IgnoreImmunity to allow hitting Ghost types with Fighting/Normal
-                    move.IgnoreImmunity = new Dictionary<PokemonType, bool>
+                    // If IgnoreImmunity is already set to true (full immunity ignoring), don't change it
+                    if (move.IgnoreImmunity is BoolMoveDataIgnoreImmunity { Value: true })
                     {
-                        [PokemonType.Fighting] = true,
-                        [PokemonType.Normal] = true,
-                    };
+                        return;
+                    }
+
+                    // Create or update the type-specific immunity dictionary
+                    Dictionary<PokemonType, bool> typeImmunities;
+                    if (move.IgnoreImmunity is TypeMoveDataIgnoreImmunity existing)
+                    {
+                        typeImmunities = existing.TypeImmunities;
+                    }
+                    else
+                    {
+                        typeImmunities = new Dictionary<PokemonType, bool>();
+                        move.IgnoreImmunity = typeImmunities;
+                    }
+
+                    typeImmunities[PokemonType.Fighting] = true;
+                    typeImmunities[PokemonType.Normal] = true;
                 }, -5),
             },
             [AbilityId.Minus] = new()
@@ -820,9 +835,9 @@ public partial record Abilities
                 Rating = 4.0,
                 // OnAnyInvulnerabilityPriority = 1
                 OnAnyInvulnerability =
-                    new OnAnyInvulnerabilityEventInfo((battle, target, source, _) =>
+                    new OnAnyInvulnerabilityEventInfo((battle, target, source, move) =>
                     {
-                        if (battle.EffectState.Target is PokemonEffectStateTarget
+                        if (move != null && battle.EffectState.Target is PokemonEffectStateTarget
                             {
                                 Pokemon: var effectHolder
                             })
@@ -835,9 +850,9 @@ public partial record Abilities
 
                         return new VoidReturn();
                     }, 1),
-                OnAnyAccuracy = new OnAnyAccuracyEventInfo((battle, _, target, source, _) =>
+                OnAnyAccuracy = new OnAnyAccuracyEventInfo((battle, accuracy, target, source, move) =>
                 {
-                    if (battle.EffectState.Target is PokemonEffectStateTarget
+                    if (move != null && battle.EffectState.Target is PokemonEffectStateTarget
                         {
                             Pokemon: var effectHolder
                         })
@@ -848,7 +863,7 @@ public partial record Abilities
                         }
                     }
 
-                    return new VoidReturn();
+                    return accuracy;
                 }),
             },
             [AbilityId.Normalize] = new()
@@ -860,8 +875,14 @@ public partial record Abilities
                 // OnModifyTypePriority = 1
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                 {
-                    // Skip moves that shouldn't be affected by Normalize
-                    if (move.Id == MoveId.Struggle) return;
+                    // Skip certain moves that shouldn't be affected by Normalize
+                    // Note: NaturalGift and Technoblast not in Gen 9; MultiAttack handled by Silvally's RKS System
+                    MoveId[] noModifyType =
+                    [
+                        MoveId.Judgment, MoveId.RevelationDance, MoveId.TerrainPulse,
+                        MoveId.WeatherBall, MoveId.Struggle
+                    ];
+                    if (Array.Exists(noModifyType, id => id == move.Id)) return;
                     if (move.Name == "Tera Blast" && pokemon.Terastallized != null) return;
 
                     move.Type = MoveType.Normal;
@@ -904,8 +925,10 @@ public partial record Abilities
                         // Taunt's volatile already sends the -end message when removed
                     }
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, pokemon, _, move) =>
+                // OnImmunity for 'attract' is handled in Pokemon.RunImmunity
+                OnTryHit = new OnTryHitEventInfo((battle, pokemon, target, move) =>
                 {
+                    // Note: Captivate was removed from Gen 8+, so not included here
                     if (move.Id is MoveId.Attract or MoveId.Taunt)
                     {
                         battle.Add("-immune", pokemon, "[from] ability: Oblivious");
@@ -1012,8 +1035,11 @@ public partial record Abilities
                 Rating = 4.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (!battle.Field.SetWeather(_library.Conditions[ConditionId.SunnyDay]) &&
-                        battle.Field.IsWeather(ConditionId.SunnyDay))
+                    if (battle.Field.SetWeather(_library.Conditions[ConditionId.SunnyDay]))
+                    {
+                        battle.Add("-activate", pokemon, "Orichalcum Pulse", "[source]");
+                    }
+                    else if (battle.Field.IsWeather(ConditionId.SunnyDay))
                     {
                         battle.Add("-activate", pokemon, "ability: Orichalcum Pulse");
                     }
@@ -1039,10 +1065,14 @@ public partial record Abilities
                 Num = 142,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
+                // OnImmunity for 'sandstorm', 'hail', and 'powder' handled in Pokemon.RunImmunity
                 // OnTryHitPriority = 1
                 OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                 {
-                    if (move.Flags.Powder == true && target != source)
+                    // Grass types are naturally immune to powder moves, so Overcoat only shows
+                    // its message if the target is NOT Grass type (otherwise it's redundant)
+                    if (move.Flags.Powder == true && target != source &&
+                        !target.HasType(PokemonType.Grass))
                     {
                         battle.Add("-immune", target, "[from] ability: Overcoat");
                         return null;
