@@ -557,12 +557,12 @@ public partial record Abilities
                 Rating = 3.0,
                 Condition = ConditionId.Protosynthesis,
                 // OnSwitchInPriority = -2
-                OnSwitchIn = new OnSwitchInEventInfo(
-                    (battle, pokemon) =>
-                    {
-                        battle.SingleEvent(EventId.WeatherChange, battle.Effect, battle.EffectState,
-                            pokemon);
-                    }, -2),
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    battle.SingleEvent(EventId.WeatherChange, battle.Effect, battle.EffectState,
+                        pokemon);
+                }),
                 OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, _) =>
                 {
                     // Protosynthesis is not affected by Utility Umbrella
