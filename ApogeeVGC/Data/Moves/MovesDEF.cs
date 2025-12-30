@@ -162,7 +162,66 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, BypassSub = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Flying,
-                // TODO: onHit - lowers evasion, removes hazards, screens, terrain
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    bool success = false;
+
+                    // Lower evasion (unless target has Substitute and move doesn't infiltrate)
+                    if (!target.Volatiles.ContainsKey(ConditionId.Substitute) || (move.Infiltrates ?? false))
+                    {
+                        var boostResult = battle.Boost(new SparseBoostsTable { Evasion = -1 }, target, source, move);
+                        if (boostResult?.IsTruthy() == true) success = true;
+                    }
+
+                    // Conditions to remove from target's side (screens + hazards)
+                    ConditionId[] removeFromTarget = [
+                        ConditionId.Reflect, ConditionId.LightScreen, ConditionId.AuroraVeil,
+                        ConditionId.Safeguard, ConditionId.Mist,
+                        ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock, ConditionId.StickyWeb
+                    ];
+
+                    // Hazards only (to remove from both sides)
+                    ConditionId[] hazards = [
+                        ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock, ConditionId.StickyWeb
+                    ];
+
+                    // Remove conditions from target's side
+                    foreach (var condition in removeFromTarget)
+                    {
+                        if (target.Side.RemoveSideCondition(condition))
+                        {
+                            // Only show message for hazards (screens have their own end messages)
+                            if (hazards.Contains(condition))
+                            {
+                                var conditionData = battle.Library.Conditions[condition];
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-sideend", target.Side, conditionData.Name, "[from] move: Defog", $"[of] {source}");
+                                }
+                            }
+                            success = true;
+                        }
+                    }
+
+                    // Remove hazards from source's side
+                    foreach (var condition in hazards)
+                    {
+                        if (source.Side.RemoveSideCondition(condition))
+                        {
+                            var conditionData = battle.Library.Conditions[condition];
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-sideend", source.Side, conditionData.Name, "[from] move: Defog", $"[of] {source}");
+                            }
+                            success = true;
+                        }
+                    }
+
+                    // Clear terrain
+                    battle.Field.ClearTerrain();
+
+                    return success ? new VoidReturn() : (BoolEmptyVoidUnion?)false;
+                }),
             },
             [MoveId.DestinyBond] = new()
             {
@@ -377,7 +436,45 @@ public partial record Moves
                 Flags = new MoveFlags { },
                 Target = MoveTarget.AdjacentFoe,
                 Type = MoveType.Normal,
-                // TODO: onHit - copy target's ability to user and allies
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    bool? success = false;
+                    var targetAbility = target.GetAbility();
+
+                    // Check if target's ability can be role-played
+                    if (targetAbility.Flags.FailRolePlay != true)
+                    {
+                        // Try to copy ability to user and all allies
+                        foreach (var pokemon in source.AlliesAndSelf())
+                        {
+                            // Skip if already has the same ability or ability can't be suppressed
+                            if (pokemon.Ability == target.Ability) continue;
+                            if (pokemon.GetAbility().Flags.CantSuppress == true) continue;
+
+                            var oldAbility = pokemon.SetAbility(target.Ability, null, move);
+                            if (oldAbility is AbilityIdAbilityIdFalseUnion)
+                            {
+                                success = true;
+                            }
+                            else if (success == false && oldAbility == null)
+                            {
+                                success = null;
+                            }
+                        }
+                    }
+
+                    if (success != true)
+                    {
+                        if (success == false && battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source);
+                        }
+                        // Return NOT_FAIL equivalent - the move still "worked" just didn't change anything
+                        return new VoidReturn();
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.DoomDesire] = new()
             {
@@ -1089,7 +1186,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { NonSky = true, Metronome = true },
-                // TODO: Set terrain to ElectricTerrain
+                Condition = _library.Conditions[ConditionId.ElectricTerrain],
                 Target = MoveTarget.All,
                 Type = MoveType.Electric,
             },
@@ -1248,8 +1345,41 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, AllyAnim = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                // TODO: onTryHit - check for valid ability transfer
-                // TODO: onHit - copy user's ability to target
+                OnTryHit = new OnTryHitEventInfo((_, target, source, _) =>
+                {
+                    // Fails if targeting self (Dynamax check skipped - not in Gen 9 VGC)
+                    if (target == source) return false;
+
+                    // Fails if abilities are the same
+                    if (target.Ability == source.Ability) return false;
+
+                    // Fails if target's ability can't be suppressed or is Truant
+                    var targetAbility = target.GetAbility();
+                    if (targetAbility.Flags.CantSuppress == true || target.Ability == AbilityId.Truant)
+                    {
+                        return false;
+                    }
+
+                    // Fails if source's ability can't be entrained
+                    var sourceAbility = source.GetAbility();
+                    if (sourceAbility.Flags.NoEntrain == true) return false;
+
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((_, target, source, _) =>
+                {
+                    // Set target's ability to source's ability
+                    var oldAbility = target.SetAbility(source.Ability, source);
+                    if (oldAbility is FalseAbilityIdFalseUnion or null) return false;
+
+                    // Mark staleness if targeting opponent
+                    if (!target.IsAlly(source))
+                    {
+                        target.VolatileStaleness = StalenessId.External;
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Eruption] = new()
             {
@@ -1319,8 +1449,14 @@ public partial record Moves
                     }
                     return basePower;
                 }),
-                // TODO: onModifyMove - change target to allAdjacentFoes in Psychic Terrain
-                // Cannot implement: Move.Target is init-only and cannot be modified in event handlers
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                {
+                    // Change target to hit all adjacent foes in Psychic Terrain if user is grounded
+                    if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, source) && (source.IsGrounded() ?? false))
+                    {
+                        move.Target = MoveTarget.AllAdjacentFoes;
+                    }
+                }),
             },
             [MoveId.Explosion] = new()
             {

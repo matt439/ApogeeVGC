@@ -81,7 +81,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
             field = value;
         }
     }
-    public MoveTarget Target { get; init; }
+    public MoveTarget Target { get; set; }
     public MoveFlags Flags { get; set; } = new();
     
     public MoveDamage? Damage { get; init; }
