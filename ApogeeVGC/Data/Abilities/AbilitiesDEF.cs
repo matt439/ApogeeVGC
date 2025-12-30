@@ -34,14 +34,14 @@ public partial record Abilities
                     MoveId[] blockedMoves =
                     [
                         MoveId.Explosion, MoveId.MindBlown, MoveId.MistyExplosion,
-                        MoveId.SelfDestruct
+                        MoveId.SelfDestruct,
                     ];
                     if (blockedMoves.Contains(move.Id))
                     {
                         battle.AttrLastMove("[still]");
                         if (battle.EffectState.Target is PokemonEffectStateTarget
                             {
-                                Pokemon: var dampHolder
+                                Pokemon: var dampHolder,
                             })
                         {
                             battle.Add("cant", dampHolder, "ability: Damp", move.Name,
@@ -92,7 +92,7 @@ public partial record Abilities
 
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Pokemon: var abilityHolder
+                                Pokemon: var abilityHolder,
                             })
                             return basePower;
 
@@ -136,7 +136,7 @@ public partial record Abilities
 
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var dazzlingHolder
+                            Pokemon: var dazzlingHolder,
                         })
                         return new VoidReturn();
 
@@ -261,7 +261,7 @@ public partial record Abilities
                 {
                     ConditionId[] strongWeathers =
                     [
-                        ConditionId.DesolateLand, ConditionId.PrimordialSea, ConditionId.DeltaStream
+                        ConditionId.DesolateLand, ConditionId.PrimordialSea, ConditionId.DeltaStream,
                     ];
                     if (battle.Field.GetWeather().Id == ConditionId.DesolateLand &&
                         !strongWeathers.Contains(weather.Id))
@@ -350,7 +350,7 @@ public partial record Abilities
                     }
 
                     bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                  (move.Flags.BypassSub != true) && !(move.Infiltrates == true);
+                                  (move.Flags.BypassSub != true) && move.Infiltrates != true;
                     if (hitSub) return new VoidReturn();
 
                     if (!target.RunImmunity(move)) return new VoidReturn();
@@ -720,7 +720,7 @@ public partial record Abilities
 
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Pokemon: var abilityHolder
+                                Pokemon: var abilityHolder,
                             })
                             return basePower;
 
@@ -894,7 +894,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var flowerGiftHolder
+                            Pokemon: var flowerGiftHolder,
                         })
                         return atk;
                     if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return atk;
@@ -912,7 +912,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var flowerGiftHolder
+                            Pokemon: var flowerGiftHolder,
                         })
                         return spd;
                     if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return spd;
@@ -985,7 +985,7 @@ public partial record Abilities
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
-                                    Pokemon: var effectHolder
+                                    Pokemon: var effectHolder,
                                 })
                             {
                                 battle.Add("-block", target, "ability: Flower Veil",
@@ -994,7 +994,7 @@ public partial record Abilities
                         }
                     }),
                 OnAllySetStatus =
-                    new OnAllySetStatusEventInfo((battle, status, target, source, effect) =>
+                    new OnAllySetStatusEventInfo((battle, _, target, source, effect) =>
                     {
                         // Check if effect is Yawn by checking if it's a Condition with the Yawn ID
                         bool isYawn = effect is Condition { Id: ConditionId.Yawn };
@@ -1006,12 +1006,12 @@ public partial record Abilities
                         if (effect.Name == "Synchronize" || (effect.EffectType == EffectType.Move &&
                                                              effect is ActiveMove
                                                              {
-                                                                 Secondaries: null or { Length: 0 }
+                                                                 Secondaries: null or { Length: 0 },
                                                              }))
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
-                                    Pokemon: var effectHolder
+                                    Pokemon: var effectHolder,
                                 })
                             {
                                 battle.Add("-block", target, "ability: Flower Veil",
@@ -1029,7 +1029,7 @@ public partial record Abilities
                             battle.Debug("Flower Veil blocking yawn");
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
-                                    Pokemon: var effectHolder
+                                    Pokemon: var effectHolder,
                                 })
                             {
                                 battle.Add("-block", target, "ability: Flower Veil",
@@ -1090,7 +1090,7 @@ public partial record Abilities
                         ConditionId.RainDance or ConditionId.PrimordialSea =>
                             SpecieId.CastformRainy,
                         ConditionId.Hail or ConditionId.Snowscape => SpecieId.CastformSnowy,
-                        _ => SpecieId.Castform
+                        _ => SpecieId.Castform,
                     };
 
                     if (pokemon.IsActive && pokemon.Species.Id != targetForme)
@@ -1110,7 +1110,7 @@ public partial record Abilities
                         ConditionId.RainDance or ConditionId.PrimordialSea =>
                             SpecieId.CastformRainy,
                         ConditionId.Hail or ConditionId.Snowscape => SpecieId.CastformSnowy,
-                        _ => SpecieId.Castform
+                        _ => SpecieId.Castform,
                     };
 
                     if (pokemon.IsActive && pokemon.Species.Id != targetForme)
@@ -1170,7 +1170,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var effectTarget
+                            Pokemon: var effectTarget,
                         })
                         return damage;
                     if (target != effectTarget && target.IsAlly(effectTarget))
@@ -1253,11 +1253,11 @@ public partial record Abilities
                         showMsg = true;
                     }
 
-                    ConditionId? effectId = effect switch
+                    var effectId = effect switch
                     {
                         ActiveMove am => am.VolatileStatus ?? am.Status,
                         Condition c => c.Id,
-                        _ => null
+                        _ => null,
                     };
                     if (showMsg && effect is ActiveMove { Secondaries: null } &&
                         effectId != ConditionId.Octolock)
