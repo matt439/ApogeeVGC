@@ -1,19 +1,15 @@
-using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
-using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
-using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
 
@@ -39,12 +35,10 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
-                            Pokemon: var abilityHolder
-                        })
+                            Pokemon: var abilityHolder,
+                        } || source.HasAbility(AbilityId.VesselOfRuin))
                         return spa;
-                    if (source.HasAbility(AbilityId.VesselOfRuin)) return spa;
-                    if (move.RuinedSpA == null)
-                        move.RuinedSpA = abilityHolder;
+                    move.RuinedSpA ??= abilityHolder;
                     if (move.RuinedSpA != abilityHolder) return spa;
                     battle.Debug("Vessel of Ruin SpA drop");
                     battle.ChainModify(0.75);
@@ -63,13 +57,13 @@ public partial record Abilities
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Pokemon: var abilityHolder
+                                Pokemon: var abilityHolder,
                             })
                             return accuracy;
-                        if (source.IsAlly(abilityHolder) && accuracy is int acc)
+                        if (source.IsAlly(abilityHolder))
                         {
                             battle.ChainModify([4506, 4096]);
-                            return battle.FinalModify(acc);
+                            return battle.FinalModify(accuracy);
                         }
 
                         return accuracy;
@@ -148,14 +142,14 @@ public partial record Abilities
 
                     if (battle.CheckMoveMakesContact(move, source, target, !source.IsAlly(target)))
                     {
-                        var targetCanBeSet =
+                        RelayVar? targetCanBeSet =
                             battle.RunEvent(EventId.SetAbility, target, source, battle.Effect,
                                 sourceAbility);
                         if (targetCanBeSet is BoolRelayVar { Value: false }) return;
 
-                        AbilityIdFalseUnion oldAbilityResult =
+                        AbilityIdFalseUnion? oldAbilityResult =
                             source.SetAbility(AbilityId.WanderingSpirit, target);
-                        if (oldAbilityResult is FalseAbilityIdFalseUnion) return;
+                        if (oldAbilityResult is null or FalseAbilityIdFalseUnion) return;
                         AbilityId oldAbility =
                             ((AbilityIdAbilityIdFalseUnion)oldAbilityResult).AbilityId;
 
@@ -165,7 +159,7 @@ public partial record Abilities
                         }
                         else
                         {
-                            var oldAbilityData =
+                            Ability? oldAbilityData =
                                 battle.Library.Abilities.GetValueOrDefault(oldAbility);
                             battle.Add("-activate", target, "ability: Wandering Spirit",
                                 oldAbilityData?.Name ?? oldAbility.ToString(),
@@ -331,7 +325,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Fire)
                     {
-                        if (!battle.Boost(new SparseBoostsTable { Def = 2 }).IsTruthy())
+                        if (!(battle.Boost(new SparseBoostsTable { Def = 2 })?.IsTruthy() ?? false))
                         {
                             battle.Add("-immune", target, "[from] ability: Well-Baked Body");
                         }
@@ -414,15 +408,10 @@ public partial record Abilities
                     if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag ||
                         target.SwitchFlag == true)
                         return;
-                    foreach (Side side in battle.Sides)
+                    foreach (Pokemon active in battle.Sides.SelectMany(side =>
+                                 side.Active.OfType<Pokemon>()))
                     {
-                        foreach (Pokemon active in side.Active)
-                        {
-                            if (active != null)
-                            {
-                                active.SwitchFlag = false;
-                            }
-                        }
+                        active.SwitchFlag = false;
                     }
 
                     target.SwitchFlag = true;
@@ -436,7 +425,7 @@ public partial record Abilities
                 Num = 277,
                 Rating = 1.0,
                 // OnDamagingHitOrder = 1
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, _, move) =>
+                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
                 {
                     if (move.Flags.Wind == true)
                     {
@@ -448,7 +437,7 @@ public partial record Abilities
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Pokemon: var pokemon
+                                Pokemon: var pokemon,
                             })
                             return;
                         if (sideCondition.Id == ConditionId.Tailwind)
@@ -475,8 +464,8 @@ public partial record Abilities
                 {
                     if (target != source && move.Flags.Wind == true)
                     {
-                        if (!battle.Boost(new SparseBoostsTable { Atk = 1 }, target, target)
-                                .IsTruthy())
+                        if (!(battle.Boost(new SparseBoostsTable { Atk = 1 }, target, target)
+                                ?.IsTruthy() ?? false))
                         {
                             battle.Add("-immune", target, "[from] ability: Wind Rider");
                         }
@@ -491,7 +480,7 @@ public partial record Abilities
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
-                                Pokemon: var pokemon
+                                Pokemon: var pokemon,
                             })
                             return;
                         if (sideCondition.Id == ConditionId.Tailwind)
@@ -550,7 +539,7 @@ public partial record Abilities
                 // OnModifyAccuracyPriority = 10
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, move) =>
                 {
-                    if (move.Category == MoveCategory.Status && accuracy is int)
+                    if (move.Category == MoveCategory.Status)
                     {
                         battle.Debug("Wonder Skin - setting accuracy to 50");
                         return 50;
