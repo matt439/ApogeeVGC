@@ -290,11 +290,20 @@ public partial record Abilities
                 Rating = 2.5,
                 OnSourceTryHeal = new OnSourceTryHealEventInfo(
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
-                        target, _, effect) =>
+                        target, source, effect) =>
                     {
-                        battle.Debug($"Heal is occurring: {target} :: {effect.Name}");
-                        string[] canOoze = ["drain", "leechseed", "strengthsap"];
-                        if (canOoze.Contains(effect.Name.ToLower()))
+                        battle.Debug($"Heal is occurring: {target} <- {source} :: {effect.Name}");
+
+                        // Check if this healing effect should trigger Liquid Ooze damage
+                        // TypeScript: const canOoze = ['drain', 'leechseed', 'strengthsap'];
+                        bool shouldOoze = effect switch
+                        {
+                            Condition c => c.Id is ConditionId.Drain or ConditionId.LeechSeed,
+                            ActiveMove m => m.Id == MoveId.StrengthSap,
+                            _ => false
+                        };
+
+                        if (shouldOoze)
                         {
                             battle.Damage(damage);
                             return 0;
