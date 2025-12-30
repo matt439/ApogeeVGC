@@ -140,8 +140,13 @@ public partial record Abilities
                     PokemonType pokemonType = type.ConvertToPokemonType();
                     PokemonType[] currentTypes = source.GetTypes();
 
-                    if (type != MoveType.Unknown &&
-                        !(currentTypes.Length == 1 && currentTypes[0] == pokemonType))
+                    // TypeScript: source.getTypes().join() !== type
+                    // Only change type if current types (joined) don't match the move type
+                    // This means: only skip type change if Pokemon is mono-typed with exactly that type
+                    string joinedTypes = string.Join(",", currentTypes.Select(t => t.ToString()));
+                    string moveTypeStr = pokemonType.ToString();
+
+                    if (type != MoveType.Unknown && joinedTypes != moveTypeStr)
                     {
                         if (!source.SetType(pokemonType)) return new VoidReturn();
                         battle.EffectState.Libero = true;
@@ -295,7 +300,7 @@ public partial record Abilities
                             return 0;
                         }
 
-                        return damage; // Return original damage to allow heal
+                        return null; // Return null to allow default heal behavior (matches TypeScript returning undefined)
                     })),
             },
             [AbilityId.LiquidVoice] = new()
