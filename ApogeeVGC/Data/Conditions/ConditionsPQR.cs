@@ -814,6 +814,7 @@ public partial record Conditions
                 Name = "Protosynthesis",
                 EffectType = EffectType.Condition,
                 NoCopy = true,
+                AssociatedAbility = AbilityId.Protosynthesis,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
                 {
                     if (effect is Item { Id: ItemId.BoosterEnergy })
@@ -824,27 +825,107 @@ public partial record Conditions
                             battle.Add("-activate", pokemon, "ability: Protosynthesis", "[fromitem]");
                         }
                     }
-                    else
+                    else if (battle.DisplayUi)
                     {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-activate", pokemon, "ability: Protosynthesis");
-                        }
+                        battle.Add("-activate", pokemon, "ability: Protosynthesis");
                     }
-                    // TODO: Get best stat from Pokemon.GetBestStat(false, true)
-                    // For now, store a placeholder
-                    battle.EffectState.BestStat = StatIdExceptHp.Atk;
+
+                    battle.EffectState.BestStat = pokemon.GetBestStat(false, true);
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, $"protosynthesis{battle.EffectState.BestStat}");
+                        battle.Add("-start", pokemon, "protosynthesis" + battle.EffectState.BestStat);
                     }
-                    return BoolVoidUnion.FromVoid();
+
+                    return new VoidReturn();
                 }),
-                // TODO: OnModifyAtk (priority 5) - boost by 1.3x if bestStat is atk
-                // TODO: OnModifyDef (priority 6) - boost by 1.3x if bestStat is def
-                // TODO: OnModifySpA (priority 5) - boost by 1.3x if bestStat is spa
-                // TODO: OnModifySpD (priority 6) - boost by 1.3x if bestStat is spd
-                // TODO: OnModifySpe (priority 5) - boost by 1.5x if bestStat is spe
+                // OnModifyAtkPriority = 5
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                    {
+                        if (battle.EffectState.BestStat != StatIdExceptHp.Atk ||
+                            pokemon.IgnoringAbility())
+                        {
+                            return atk;
+                        }
+
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Protosynthesis atk boost");
+                        }
+
+                        battle.ChainModify([5325, 4096]);
+                        return battle.FinalModify(atk);
+                    },
+                    5),
+                // OnModifyDefPriority = 6
+                OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
+                    {
+                        if (battle.EffectState.BestStat != StatIdExceptHp.Def ||
+                            pokemon.IgnoringAbility())
+                        {
+                            return def;
+                        }
+
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Protosynthesis def boost");
+                        }
+
+                        battle.ChainModify([5325, 4096]);
+                        return battle.FinalModify(def);
+                    },
+                    6),
+                // OnModifySpAPriority = 5
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
+                    {
+                        if (battle.EffectState.BestStat != StatIdExceptHp.SpA ||
+                            pokemon.IgnoringAbility())
+                        {
+                            return spa;
+                        }
+
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Protosynthesis spa boost");
+                        }
+
+                        battle.ChainModify([5325, 4096]);
+                        return battle.FinalModify(spa);
+                    },
+                    5),
+                // OnModifySpDPriority = 6
+                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
+                    {
+                        if (battle.EffectState.BestStat != StatIdExceptHp.SpD ||
+                            pokemon.IgnoringAbility())
+                        {
+                            return spd;
+                        }
+
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Protosynthesis spd boost");
+                        }
+
+                        battle.ChainModify([5325, 4096]);
+                        return battle.FinalModify(spd);
+                    },
+                    6),
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                {
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Spe ||
+                        pokemon.IgnoringAbility())
+                    {
+                        return spe;
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("Protosynthesis spe boost");
+                    }
+
+                    battle.ChainModify(1.5);
+                    return battle.FinalModify(spe);
+                }),
                 OnEnd = new OnEndEventInfo((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)

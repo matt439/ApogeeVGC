@@ -815,7 +815,15 @@ public partial record Conditions
                 Id = ConditionId.Unburden,
                 Name = "Unburden",
                 EffectType = EffectType.Condition,
-                // TODO: OnModifySpe - double speed if Pokemon has no item and not ignoring ability
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                {
+                    if (pokemon.Item == ItemId.None && !pokemon.IgnoringAbility())
+                    {
+                        battle.ChainModify(2);
+                        return battle.FinalModify(spe);
+                    }
+                    return spe;
+                }),
             },
             [ConditionId.SaltCure] = new()
             {

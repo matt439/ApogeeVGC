@@ -561,8 +561,34 @@ public partial record Conditions
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnModifyAtk (priority 5) - boost Fire moves by 1.5x if attacker has Flash Fire
-                // TODO: OnModifySpA (priority 5) - boost Fire moves by 1.5x if attacker has Flash Fire
+                // OnModifyAtkPriority = 5
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, attacker, _, move) =>
+                {
+                    if (move.Type == MoveType.Fire && attacker.HasAbility(AbilityId.FlashFire))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Flash Fire boost");
+                        }
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(atk);
+                    }
+                    return atk;
+                }, 5),
+                // OnModifySpAPriority = 5
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, attacker, _, move) =>
+                {
+                    if (move.Type == MoveType.Fire && attacker.HasAbility(AbilityId.FlashFire))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Flash Fire boost");
+                        }
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(spa);
+                    }
+                    return spa;
+                }, 5),
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
                     if (battle.DisplayUi)
