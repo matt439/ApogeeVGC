@@ -55,6 +55,40 @@ public class SparseBoostsTable
         }
     }
 
+    /// <summary>
+    /// Clears (sets to null) a specific boost stat, effectively removing it from the table.
+    /// This is equivalent to 'delete boost[stat]' in TypeScript.
+    /// </summary>
+    public void ClearBoost(BoostId boostId)
+    {
+        switch (boostId)
+        {
+            case BoostId.Atk:
+                Atk = null;
+                break;
+            case BoostId.Def:
+                Def = null;
+                break;
+            case BoostId.SpA:
+                SpA = null;
+                break;
+            case BoostId.SpD:
+                SpD = null;
+                break;
+            case BoostId.Spe:
+                Spe = null;
+                break;
+            case BoostId.Accuracy:
+                Accuracy = null;
+                break;
+            case BoostId.Evasion:
+                Evasion = null;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(boostId), "Invalid stat ID.");
+        }
+    }
+
     public double? GetBoostMultiplier(BoostId stat)
     {
         int? boost = GetBoost(stat);

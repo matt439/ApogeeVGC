@@ -422,12 +422,10 @@ public partial record Abilities
                 Name = "Drizzle",
                 Num = 2,
                 Rating = 4.0,
-                OnStart = new OnStartEventInfo((battle, source) =>
+                OnStart = new OnStartEventInfo((battle, _) =>
                 {
-                    // Don't set weather if Kyogre with Blue Orb (Primal Reversion)
-                    if (source.Species.Id == SpecieId.Kyogre && source.Item?.Id == ItemId.BlueOrb)
-                        return;
-                    battle.Field.SetWeather(ConditionId.RainDance);
+                    // Note: Primal Reversion was removed in Gen 9
+                    battle.Field.SetWeather(_library.Conditions[ConditionId.RainDance]);
                 }),
             },
             [AbilityId.Drought] = new()
@@ -436,12 +434,10 @@ public partial record Abilities
                 Name = "Drought",
                 Num = 70,
                 Rating = 4.0,
-                OnStart = new OnStartEventInfo((battle, source) =>
+                OnStart = new OnStartEventInfo((battle, _) =>
                 {
-                    // Don't set weather if Groudon with Red Orb (Primal Reversion)
-                    if (source.Species.Id == SpecieId.Groudon && source.Item?.Id == ItemId.RedOrb)
-                        return;
-                    battle.Field.SetWeather(ConditionId.SunnyDay);
+                    // Note: Primal Reversion was removed in Gen 9
+                    battle.Field.SetWeather(_library.Conditions[ConditionId.SunnyDay]);
                 }),
             },
             [AbilityId.DrySkin] = new()
@@ -561,7 +557,7 @@ public partial record Abilities
                 Rating = 4.0,
                 OnStart = new OnStartEventInfo((battle, _) =>
                 {
-                    battle.Field.SetTerrain(ConditionId.ElectricTerrain);
+                    battle.Field.SetTerrain(_library.Conditions[ConditionId.ElectricTerrain]);
                 }),
             },
             [AbilityId.Electromorphosis] = new()
@@ -686,8 +682,8 @@ public partial record Abilities
                 Rating = 1.0,
                 OnEmergencyExit = new OnEmergencyExitEventInfo((battle, target) =>
                 {
-                    if (!battle.CanSwitch(target.Side) || target.ForceSwitchFlag ||
-                        target.SwitchFlag)
+                    if (battle.CanSwitch(target.Side) <= 0 || target.ForceSwitchFlag ||
+                        target.SwitchFlag.IsTrue())
                         return;
 
                     // Clear all switch flags
@@ -1000,9 +996,11 @@ public partial record Abilities
                 OnAllySetStatus =
                     new OnAllySetStatusEventInfo((battle, status, target, source, effect) =>
                     {
+                        // Check if effect is Yawn by checking if it's a Condition with the Yawn ID
+                        bool isYawn = effect is Condition { Id: ConditionId.Yawn };
                         if (!target.HasType(PokemonType.Grass) || source == null ||
                             target == source ||
-                            effect == null || effect.Id == ConditionId.Yawn)
+                            effect == null || isYawn)
                             return new VoidReturn();
                         battle.Debug("interrupting setStatus with Flower Veil");
                         if (effect.Name == "Synchronize" || (effect.EffectType == EffectType.Move &&

@@ -376,7 +376,7 @@ public partial record Abilities
 
                             var negativeBoost = new SparseBoostsTable();
                             negativeBoost.SetBoost(b, boostValue.Value);
-                            boost.SetBoost(b, 0); // Clear this boost
+                            boost.ClearBoost(b); // Delete this boost entry
                             if (source.Hp > 0)
                             {
                                 battle.Add("-ability", target, "Mirror Armor");
