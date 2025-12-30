@@ -1048,7 +1048,9 @@ public partial record Abilities
                     {
                         if (pokemon.Hp == 0 || pokemon.Item == ItemId.StickyBarb)
                             return BoolVoidUnion.FromVoid();
-                        if (source != null && source != pokemon)
+                        // Prevent item theft if source is another Pokemon OR if the move is Knock Off
+                        if ((source != null && source != pokemon) ||
+                            battle.ActiveMove?.Id == MoveId.KnockOff)
                         {
                             battle.Add("-activate", pokemon, "ability: Sticky Hold");
                             return BoolVoidUnion.FromBool(false); // Return false to prevent item removal
@@ -1078,30 +1080,34 @@ public partial record Abilities
 
                     return new VoidReturn();
                 }, 1),
-                OnAnyRedirectTarget =
-                    new OnAnyRedirectTargetEventInfo((battle, _, source, _, move) =>
-                    {
-                        if (move.Type != MoveType.Water || move.Flags.PledgeCombo == true)
-                            return null;
-                        if (battle.EffectState.Target is not PokemonEffectStateTarget
-                            {
-                                Pokemon: var abilityHolder
-                            })
-                            return null;
-                        MoveTarget redirectTarget =
-                            move.Target is MoveTarget.RandomNormal or MoveTarget.AdjacentFoe
-                                ? MoveTarget.Normal
-                                : move.Target;
-                        if (battle.ValidTarget(abilityHolder, source, redirectTarget))
+                    OnAnyRedirectTarget =
+                        new OnAnyRedirectTargetEventInfo((battle, target, source, _, move) =>
                         {
-                            if (move.SmartTarget == true) move.SmartTarget = false;
-                            battle.Add("-activate", abilityHolder, "ability: Storm Drain");
-                            return abilityHolder;
-                        }
+                            if (move.Type != MoveType.Water || move.Flags.PledgeCombo == true)
+                                return null;
+                            if (battle.EffectState.Target is not PokemonEffectStateTarget
+                                {
+                                    Pokemon: var abilityHolder
+                                })
+                                return null;
+                            MoveTarget redirectTarget =
+                                move.Target is MoveTarget.RandomNormal or MoveTarget.AdjacentFoe
+                                    ? MoveTarget.Normal
+                                    : move.Target;
+                            if (battle.ValidTarget(abilityHolder, source, redirectTarget))
+                            {
+                                if (move.SmartTarget == true) move.SmartTarget = false;
+                                // Only show activation message if actually redirecting to a different target
+                                if (abilityHolder != target)
+                                {
+                                    battle.Add("-activate", abilityHolder, "ability: Storm Drain");
+                                }
+                                return abilityHolder;
+                            }
 
-                        return null;
-                    }),
-            },
+                            return null;
+                        }),
+                },
             [AbilityId.StrongJaw] = new()
             {
                 Id = AbilityId.StrongJaw,
