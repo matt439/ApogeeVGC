@@ -11,6 +11,9 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Items;
 
 public partial record Items
@@ -35,9 +38,10 @@ public partial record Items
                 Name = "Safety Goggles",
                 SpriteNum = 604,
                 Fling = new FlingData { BasePower = 80 },
-                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail || type == ConditionId.Powder)
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail ||
+                        type == ConditionId.Powder)
                     {
                         return BoolVoidUnion.FromBool(false);
                     }
@@ -75,7 +79,7 @@ public partial record Items
                 SpriteNum = 426,
                 IsBerry = true,
                 NaturalGift = (100, "Fighting"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -85,7 +89,7 @@ public partial record Items
                         pokemon.EatItem();
                     }
                 }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, _) =>
                 {
                     battle.Boost(new SparseBoostsTable { Spe = 1 });
                 })),
@@ -100,10 +104,8 @@ public partial record Items
                 SpriteNum = 429,
                 Fling = new FlingData { BasePower = 30 },
                 OnModifyCritRatio =
-                    new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
-                    {
-                        return DoubleVoidUnion.FromDouble(critRatio + 1);
-                    }),
+                    new OnModifyCritRatioEventInfo((_, critRatio, _, _, _) =>
+                        DoubleVoidUnion.FromDouble(critRatio + 1)),
                 Num = 232,
                 Gen = 2,
             },
@@ -113,7 +115,7 @@ public partial record Items
                 Name = "Sea Incense",
                 SpriteNum = 430,
                 Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Water)
                     {
@@ -133,7 +135,7 @@ public partial record Items
                 Name = "Sharp Beak",
                 SpriteNum = 436,
                 Fling = new FlingData { BasePower = 50 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Flying)
                     {
@@ -155,10 +157,10 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnTrapPokemon =
                     new OnTrapPokemonEventInfo(
-                        (battle, pokemon) => { pokemon.Trapped = PokemonTrapped.False; }, -10),
+                        (_, pokemon) => { pokemon.Trapped = PokemonTrapped.False; }, -10),
                 OnMaybeTrapPokemon =
                     new OnMaybeTrapPokemonEventInfo(
-                        (battle, pokemon) => { pokemon.MaybeTrapped = false; }, -10),
+                        (_, pokemon) => { pokemon.MaybeTrapped = false; }, -10),
                 Num = 295,
                 Gen = 4,
             },
@@ -169,9 +171,10 @@ public partial record Items
                 SpriteNum = 438,
                 Fling = new FlingData { BasePower = 30 },
                 OnAfterMoveSecondarySelf = new OnAfterMoveSecondarySelfEventInfo(
-                    (battle, pokemon, target, move) =>
+                    (battle, pokemon, _, move) =>
                     {
-                        if (move.TotalDamage.ToInt() > 0 && !pokemon.ForceSwitchFlag)
+                        if (move.TotalDamage != null && move.TotalDamage.ToInt() > 0 &&
+                            !pokemon.ForceSwitchFlag)
                         {
                             battle.Heal(move.TotalDamage.ToInt() / 8, pokemon);
                         }
@@ -197,13 +200,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Ground"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Ground && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -227,7 +230,7 @@ public partial record Items
                 Name = "Silk Scarf",
                 SpriteNum = 444,
                 Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Normal)
                     {
@@ -246,7 +249,7 @@ public partial record Items
                 Name = "Silver Powder",
                 SpriteNum = 447,
                 Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Bug)
                     {
@@ -266,7 +269,7 @@ public partial record Items
                 SpriteNum = 448,
                 IsBerry = true,
                 NaturalGift = (80, "Psychic"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 2)
                     {
@@ -274,11 +277,12 @@ public partial record Items
                     }
                 }),
                 OnTryEatItem = new OnTryEatItemEventInfo(
-                    (Func<Battle, Item, Pokemon, BoolVoidUnion>)((battle, item, pokemon) =>
+                    (Func<Battle, Item, Pokemon, BoolVoidUnion>)((battle, _, pokemon) =>
                     {
-                        var result = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                        RelayVar? result = battle.RunEvent(EventId.TryHeal, pokemon, null,
+                            battle.Effect,
                             pokemon.BaseMaxHp / 4);
-                        if (result is BoolRelayVar boolResult && !boolResult.Value)
+                        if (result is BoolRelayVar { Value: false })
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
@@ -300,7 +304,7 @@ public partial record Items
                 Name = "Sky Plate",
                 SpriteNum = 450,
                 OnPlate = PokemonType.Flying,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Flying)
                     {
@@ -310,15 +314,17 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Arceus-Flying",
                 Num = 306,
                 Gen = 4,
@@ -340,7 +346,7 @@ public partial record Items
                 Name = "Snowball",
                 SpriteNum = 606,
                 Fling = new FlingData { BasePower = 30 },
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
                 {
                     if (move.Type == MoveType.Ice)
                     {
@@ -357,7 +363,7 @@ public partial record Items
                 Name = "Soft Sand",
                 SpriteNum = 456,
                 Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Ground)
                     {
@@ -377,11 +383,11 @@ public partial record Items
                 Name = "Soul Dew",
                 SpriteNum = 459,
                 Fling = new FlingData { BasePower = 30 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, move) =>
                 {
                     // Latios (#380) or Latias (#381)
-                    if ((user.BaseSpecies.Num == 380 || user.BaseSpecies.Num == 381) &&
-                        (move.Type == MoveType.Psychic || move.Type == MoveType.Dragon))
+                    if (user.BaseSpecies.Num is 380 or 381 &&
+                        move.Type is MoveType.Psychic or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -399,7 +405,7 @@ public partial record Items
                 Name = "Spell Tag",
                 SpriteNum = 461,
                 Fling = new FlingData { BasePower = 30 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Ghost)
                     {
@@ -430,7 +436,7 @@ public partial record Items
                 Name = "Splash Plate",
                 SpriteNum = 463,
                 OnPlate = PokemonType.Water,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Water)
                     {
@@ -440,15 +446,17 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Arceus-Water",
                 Num = 299,
                 Gen = 4,
@@ -459,7 +467,7 @@ public partial record Items
                 Name = "Spooky Plate",
                 SpriteNum = 464,
                 OnPlate = PokemonType.Ghost,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Ghost)
                     {
@@ -469,15 +477,17 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Arceus-Ghost",
                 Num = 310,
                 Gen = 4,
@@ -498,7 +508,7 @@ public partial record Items
                 SpriteNum = 472,
                 IsBerry = true,
                 NaturalGift = (100, "Psychic"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -511,13 +521,13 @@ public partial record Items
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     var stats = new List<StatIdExceptHp>();
-                    foreach (var stat in new[]
+                    foreach (StatIdExceptHp stat in new[]
                              {
                                  StatIdExceptHp.Atk, StatIdExceptHp.Def, StatIdExceptHp.SpA,
-                                 StatIdExceptHp.SpD, StatIdExceptHp.Spe
+                                 StatIdExceptHp.SpD, StatIdExceptHp.Spe,
                              })
                     {
-                        var currentBoost = pokemon.Boosts.GetBoost((BoostId)stat);
+                        int currentBoost = pokemon.Boosts.GetBoost((BoostId)stat);
                         if (currentBoost < 6)
                         {
                             stats.Add(stat);
@@ -526,7 +536,7 @@ public partial record Items
 
                     if (stats.Count > 0)
                     {
-                        var randomStat = battle.Sample(stats);
+                        StatIdExceptHp randomStat = battle.Sample(stats);
                         var boost = new SparseBoostsTable();
                         boost.SetBoost((BoostId)randomStat, 2);
                         battle.Boost(boost);
@@ -553,7 +563,7 @@ public partial record Items
                 SpriteNum = 475,
                 Fling = new FlingData { BasePower = 60 },
                 OnModifyCritRatio =
-                    new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
+                    new OnModifyCritRatioEventInfo((_, critRatio, source, _, _) =>
                     {
                         // Farfetch'd check (base species only, not Sirfetch'd)
                         if (source.BaseSpecies.BaseSpecies == SpecieId.Farfetchd)
@@ -574,7 +584,7 @@ public partial record Items
                 Name = "Sticky Barb",
                 SpriteNum = 476,
                 Fling = new FlingData { BasePower = 80 },
-                OnResidual = new OnResidualEventInfo((battle, pokemon, source, effect) =>
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     battle.Damage(pokemon.BaseMaxHp / 8, pokemon);
                 })
@@ -587,7 +597,7 @@ public partial record Items
                     if (source != null && source != target && source.Item == ItemId.None &&
                         battle.CheckMoveMakesContact(move, source, target))
                     {
-                        var barb = target.TakeItem();
+                        ItemFalseUnion barb = target.TakeItem();
                         if (barb is not ItemItemFalseUnion itemUnion)
                             return null; // Gen 4 Multitype
                         source.SetItem(itemUnion.Item.Id);
@@ -605,7 +615,7 @@ public partial record Items
                 Name = "Stone Plate",
                 SpriteNum = 477,
                 OnPlate = PokemonType.Rock,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Rock)
                     {
@@ -615,15 +625,17 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Arceus-Rock",
                 Num = 309,
                 Gen = 4,
@@ -696,13 +708,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Bug"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Bug && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -745,11 +757,10 @@ public partial record Items
                 Name = "Thick Club",
                 SpriteNum = 491,
                 Fling = new FlingData { BasePower = 90 },
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, target, move) =>
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
                 {
                     // Cubone or Marowak (includes Alola forms via BaseSpecies check)
-                    if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Cubone ||
-                        pokemon.BaseSpecies.BaseSpecies == SpecieId.Marowak)
+                    if (pokemon.BaseSpecies.BaseSpecies is SpecieId.Cubone or SpecieId.Marowak)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(atk);
@@ -769,7 +780,7 @@ public partial record Items
                 SpriteNum = 713,
                 Fling = new FlingData { BasePower = 30 },
                 OnAfterMoveSecondarySelf =
-                    new OnAfterMoveSecondarySelfEventInfo((battle, pokemon, target, move) =>
+                    new OnAfterMoveSecondarySelfEventInfo((_, pokemon, _, move) =>
                     {
                         if (move.Flags.Sound == true)
                         {
@@ -806,9 +817,9 @@ public partial record Items
                 Fling = new FlingData
                 {
                     BasePower = 30,
-                    Status = ConditionId.Toxic
+                    Status = ConditionId.Toxic,
                 },
-                OnResidual = new OnResidualEventInfo((battle, pokemon, source, effect) =>
+                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
                 {
                     pokemon.TrySetStatus(ConditionId.Toxic, pokemon);
                 })
@@ -825,7 +836,7 @@ public partial record Items
                 Name = "Toxic Plate",
                 SpriteNum = 516,
                 OnPlate = PokemonType.Poison,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Poison)
                     {
@@ -835,15 +846,17 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Arceus-Poison",
                 Num = 304,
                 Gen = 4,
@@ -855,7 +868,7 @@ public partial record Items
                 Name = "Twisted Spoon",
                 SpriteNum = 520,
                 Fling = new FlingData { BasePower = 30 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Psychic)
                     {
@@ -908,9 +921,9 @@ public partial record Items
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     if (pokemon.IgnoringItem()) return;
-                    var weather = battle.Field.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.RainDance ||
-                        weather == ConditionId.DesolateLand || weather == ConditionId.PrimordialSea)
+                    ConditionId weather = battle.Field.EffectiveWeather();
+                    if (weather is ConditionId.SunnyDay or ConditionId.RainDance
+                        or ConditionId.DesolateLand or ConditionId.PrimordialSea)
                     {
                         battle.RunEvent(EventId.WeatherChange, pokemon, pokemon, battle.Effect);
                     }
@@ -919,21 +932,22 @@ public partial record Items
                 {
                     if (pokemon.ItemState.Inactive != true) return;
                     pokemon.ItemState.Inactive = false;
-                    var weather = battle.Field.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.RainDance ||
-                        weather == ConditionId.DesolateLand || weather == ConditionId.PrimordialSea)
+                    ConditionId weather = battle.Field.EffectiveWeather();
+                    if (weather is ConditionId.SunnyDay or ConditionId.RainDance
+                        or ConditionId.DesolateLand or ConditionId.PrimordialSea)
                     {
                         battle.RunEvent(EventId.WeatherChange, pokemon, pokemon, battle.Effect);
                     }
                 }),
                 OnEnd = new OnEndEventInfo((battle, pokemon) =>
                 {
-                    var weather = battle.Field.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.RainDance ||
-                        weather == ConditionId.DesolateLand || weather == ConditionId.PrimordialSea)
+                    ConditionId weather = battle.Field.EffectiveWeather();
+                    if (weather is ConditionId.SunnyDay or ConditionId.RainDance
+                        or ConditionId.DesolateLand or ConditionId.PrimordialSea)
                     {
                         battle.RunEvent(EventId.WeatherChange, pokemon, pokemon, battle.Effect);
                     }
+
                     pokemon.ItemState.Inactive = true;
                 }),
                 Num = 1123,
