@@ -13,6 +13,7 @@ public record FlingData
 {
     public int BasePower { get; init; }
     public ConditionId? Status { get; init; }
+    public ConditionId? VolatileStatus { get; init; }
 }
 
 public partial record Item : IEffect, IBasicEffect, ICopyable<Item>

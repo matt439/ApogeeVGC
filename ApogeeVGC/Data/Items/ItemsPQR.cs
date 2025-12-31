@@ -649,6 +649,7 @@ public partial record Items
                 Fling = new FlingData
                 {
                     BasePower = 30,
+                    VolatileStatus = ConditionId.Flinch,
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, target) =>
                 {

@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -152,6 +153,7 @@ public partial record Items
                 Fling = new FlingData
                 {
                     BasePower = 30,
+                    VolatileStatus = ConditionId.Flinch,
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
@@ -251,9 +253,9 @@ public partial record Items
                 OnModifyCritRatio =
                     new OnModifyCritRatioEventInfo((battle, critRatio, user, target, move) =>
                     {
-                        var baseSpeciesName = user.BaseSpecies.Name.ToLower();
-                        if (baseSpeciesName == "farfetch'd" || baseSpeciesName == "sirfetch'd" ||
-                            baseSpeciesName == "farfetchd" || baseSpeciesName == "sirfetchd")
+                        // Check for Farfetch'd and Sirfetch'd species (including Galarian forme)
+                        var baseSpecies = user.BaseSpecies.BaseSpecies;
+                        if (baseSpecies == SpecieId.Farfetchd || baseSpecies == SpecieId.Sirfetchd)
                         {
                             return critRatio + 2;
                         }
@@ -306,20 +308,19 @@ public partial record Items
                         pokemon.EatItem();
                     }
                 }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
-                {
-                    var moveSlot = pokemon.MoveSlots.FirstOrDefault(move => move.Pp == 0) ??
-                                   pokemon.MoveSlots.FirstOrDefault(move => move.Pp < move.MaxPp);
-                    if (moveSlot == null) return;
+                    OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                    {
+                        var moveSlot = pokemon.MoveSlots.FirstOrDefault(move => move.Pp == 0) ??
+                                       pokemon.MoveSlots.FirstOrDefault(move => move.Pp < move.MaxPp);
+                        if (moveSlot == null) return;
 
-                    moveSlot.Pp += 10;
-                    if (moveSlot.Pp > moveSlot.MaxPp) moveSlot.Pp = moveSlot.MaxPp;
-                    // TODO: Fix battle.Add to include move name
-                    battle.Add("-activate", pokemon, "item: Leppa Berry", "[consumed]");
-                })),
-                Num = 154,
-                Gen = 3,
-            },
+                        moveSlot.Pp += 10;
+                        if (moveSlot.Pp > moveSlot.MaxPp) moveSlot.Pp = moveSlot.MaxPp;
+                        battle.Add("-activate", pokemon, "item: Leppa Berry", moveSlot.Move.ToString(), "[consumed]");
+                    })),
+                    Num = 154,
+                    Gen = 3,
+                },
             [ItemId.LevelBall] = new()
             {
                 Id = ItemId.LevelBall,
@@ -390,7 +391,8 @@ public partial record Items
                 },
                 OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, target, move) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Pikachu")
+                    // TypeScript checks baseSpecies.baseSpecies which is the base form name
+                    if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Pikachu)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(atk);
@@ -400,7 +402,8 @@ public partial record Items
                 }, 1),
                 OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, target, move) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Pikachu")
+                    // TypeScript checks baseSpecies.baseSpecies which is the base form name
+                    if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Pikachu)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(spa);
