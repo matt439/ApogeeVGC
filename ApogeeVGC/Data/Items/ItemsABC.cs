@@ -1,4 +1,3 @@
-using System.Linq;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
@@ -13,6 +12,8 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
+
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Items;
 
@@ -31,13 +32,14 @@ public partial record Items
                 IgnoreKlutz = true,
                 // Neutralizing Gas protection implemented in Pokemon.IgnoringAbility()
                 // Mold Breaker protection implemented in Battle.SuppressingAbility()
-                OnSetAbility = new OnSetAbilityEventInfo((battle, ability, target, source, effect) =>
+                OnSetAbility = new OnSetAbilityEventInfo((battle, _, target, source, effect) =>
                 {
                     // Block ability changes from other abilities (except Trace)
                     if (effect.EffectType == EffectType.Ability && effect.Name != "Trace")
                     {
                         battle.Add("-ability", source, effect.Name);
                     }
+
                     battle.Add("-block", target, "item: Ability Shield");
                     return null; // Return null to block the ability change
                 }),
@@ -50,7 +52,7 @@ public partial record Items
                 Name = "Absorb Bulb",
                 SpriteNum = 2,
                 Fling = new FlingData { BasePower = 30 },
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
                 {
                     if (move.Type == MoveType.Water)
                     {
@@ -66,11 +68,11 @@ public partial record Items
                 Id = ItemId.AdamantCrystal,
                 Name = "Adamant Crystal",
                 SpriteNum = 741,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, move) =>
                 {
                     // Dialga has species number 483
                     if (user.BaseSpecies.Num == 483 &&
-                        (move.Type == MoveType.Steel || move.Type == MoveType.Dragon))
+                        move.Type is MoveType.Steel or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -78,16 +80,18 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        // Dialga (num 483) can't have this item removed
-                        if (source?.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false); // Prevent removal
-                        }
-                        return BoolVoidUnion.FromBool(true); // Allow removal
-                    })),
+                            // Dialga (num 483) can't have this item removed
+                            if (source.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
+                            {
+                                return BoolVoidUnion.FromBool(false); // Prevent removal
+                            }
+
+                            return BoolVoidUnion.FromBool(true); // Allow removal
+                        })),
                 ForcedForme = "Dialga-Origin",
                 Num = 1777,
                 Gen = 8,
@@ -98,11 +102,11 @@ public partial record Items
                 Name = "Adamant Orb",
                 SpriteNum = 4,
                 Fling = new FlingData { BasePower = 60 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, move) =>
                 {
                     // Dialga has species number 483
                     if (user.BaseSpecies.Num == 483 &&
-                        (move.Type == MoveType.Steel || move.Type == MoveType.Dragon))
+                        move.Type is MoveType.Steel or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -119,7 +123,7 @@ public partial record Items
                 Name = "Adrenaline Orb",
                 SpriteNum = 660,
                 Fling = new FlingData { BasePower = 30 },
-                OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, target, source, effect) =>
+                OnAfterBoost = new OnAfterBoostEventInfo((_, boost, target, _, effect) =>
                 {
                     // Adrenaline Orb activates if Intimidate is blocked by an ability like Hyper Cutter,
                     // which deletes boost.atk,
@@ -147,7 +151,7 @@ public partial record Items
                 SpriteNum = 5,
                 IsBerry = true,
                 NaturalGift = (80, "Dragon"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -158,28 +162,29 @@ public partial record Items
                     }
                 }),
                 OnTryEatItem = new OnTryEatItemEventInfo(
-                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    OnTryEatItem.FromFunc((battle, _, pokemon) =>
                     {
-                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                        RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
+                            battle.Effect,
                             pokemon.BaseMaxHp / 3);
-                        if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
+                        if (canHeal is BoolRelayVar { Value: false })
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
 
                         return BoolVoidUnion.FromVoid();
                     })),
-                    OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    battle.Heal(pokemon.BaseMaxHp / 3);
+                    if (pokemon.Set.Nature.Minus == StatIdExceptHp.SpD)
                     {
-                        battle.Heal(pokemon.BaseMaxHp / 3);
-                        if (pokemon.Set.Nature.Minus == StatIdExceptHp.SpD)
-                        {
-                            pokemon.AddVolatile(ConditionId.Confusion);
-                        }
-                    })),
-                    Num = 162,
-                    Gen = 3,
-                },
+                        pokemon.AddVolatile(ConditionId.Confusion);
+                    }
+                })),
+                Num = 162,
+                Gen = 3,
+            },
             [ItemId.AirBalloon] = new()
             {
                 Id = ItemId.AirBalloon,
@@ -195,24 +200,24 @@ public partial record Items
                     }
                 }),
                 // Airborneness implemented in Pokemon.IsGrounded()
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, _, _) =>
                 {
                     battle.Add("-enditem", target, "Air Balloon");
                     target.Item = ItemId.None;
-                    var itemState = target.ItemState;
+                    EffectState itemState = target.ItemState;
                     battle.ClearEffectState(ref itemState);
                     battle.RunEvent(EventId.AfterUseItem, target, null, null,
                         _library.Items[ItemId.AirBalloon]);
                 }),
                 OnAfterSubDamage =
-                    new OnAfterSubDamageEventInfo((battle, damage, target, source, effect) =>
+                    new OnAfterSubDamageEventInfo((battle, _, target, _, effect) =>
                     {
                         battle.Debug($"effect: {effect.Id}");
                         if (effect.EffectType == EffectType.Move)
                         {
                             battle.Add("-enditem", target, "Air Balloon");
                             target.Item = ItemId.None;
-                            var itemState = target.ItemState;
+                            EffectState itemState = target.ItemState;
                             battle.ClearEffectState(ref itemState);
                             battle.RunEvent(EventId.AfterUseItem, target, null, null,
                                 _library.Items[ItemId.AirBalloon]);
@@ -228,7 +233,7 @@ public partial record Items
                 SpriteNum = 10,
                 IsBerry = true,
                 NaturalGift = (100, "Ground"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -238,7 +243,7 @@ public partial record Items
                         pokemon.EatItem();
                     }
                 }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, _) =>
                 {
                     battle.Boost(new SparseBoostsTable { SpD = 1 });
                 })),
@@ -252,14 +257,14 @@ public partial record Items
                 SpriteNum = 13,
                 IsBerry = true,
                 NaturalGift = (80, "Ice"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Freeze)
                     {
                         pokemon.EatItem();
                     }
                 }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Freeze)
                     {
@@ -313,13 +318,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Steel"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Steel && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -357,7 +362,8 @@ public partial record Items
                     if (pokemon.Hp <= pokemon.MaxHp / 2)
                     {
                         // Check TryHeal event first, then use item if allowed
-                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect, 20);
+                        RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
+                            battle.Effect, 20);
                         if (canHeal is not BoolRelayVar { Value: false } && pokemon.UseItem())
                         {
                             battle.Heal(20);
@@ -394,24 +400,19 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnTryHeal = new OnTryHealEventInfo(
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
-                        target, source, effect) =>
+                        _, _, effect) =>
                     {
                         // BigRoot boosts healing from: drain moves, Leech Seed, Ingrain, Aqua Ring, Strength Sap
-                        var isBigRootHeal = effect.EffectStateId switch
+                        bool isBigRootHeal = effect.EffectStateId switch
                         {
-                            MoveEffectStateId moveId => moveId.MoveId == MoveId.Absorb ||
-                                                        moveId.MoveId == MoveId.MegaDrain ||
-                                                        moveId.MoveId == MoveId.GigaDrain ||
-                                                        moveId.MoveId == MoveId.LeechLife ||
-                                                        moveId.MoveId == MoveId.DrainPunch ||
-                                                        moveId.MoveId == MoveId.HornLeech ||
-                                                        moveId.MoveId == MoveId.DrainingKiss ||
-                                                        moveId.MoveId == MoveId.ParabolicCharge ||
-                                                        moveId.MoveId == MoveId.DreamEater ||
-                                                        moveId.MoveId == MoveId.StrengthSap,
-                            ConditionEffectStateId condId => condId.ConditionId == ConditionId.LeechSeed ||
-                                                             condId.ConditionId == ConditionId.Ingrain ||
-                                                             condId.ConditionId == ConditionId.AquaRing,
+                            MoveEffectStateId moveId => moveId.MoveId is MoveId.Absorb
+                                or MoveId.MegaDrain or MoveId.GigaDrain or MoveId.LeechLife
+                                or MoveId.DrainPunch or MoveId.HornLeech or MoveId.DrainingKiss
+                                or MoveId.ParabolicCharge or MoveId.DreamEater
+                                or MoveId.StrengthSap,
+                            ConditionEffectStateId condId => condId.ConditionId is
+                                ConditionId.LeechSeed or ConditionId.Ingrain
+                                or ConditionId.AquaRing,
                             _ => false
                         };
 
@@ -432,8 +433,7 @@ public partial record Items
                 Name = "Binding Band",
                 SpriteNum = 31,
                 Fling = new FlingData { BasePower = 30 },
-                // TODO: Binding Band effect implemented in status conditions (Bind, Wrap, etc.)
-                // Increases damage from partial-trapping moves from 1/8 to 1/6 of target's max HP
+                // Binding Band effect implemented in status conditions
                 Num = 544,
                 Gen = 5,
             },
@@ -443,7 +443,7 @@ public partial record Items
                 Name = "Black Belt",
                 SpriteNum = 32,
                 Fling = new FlingData { BasePower = 30 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Fighting)
                     {
@@ -462,7 +462,7 @@ public partial record Items
                 Name = "Black Glasses",
                 SpriteNum = 35,
                 Fling = new FlingData { BasePower = 30 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Dark)
                     {
@@ -502,23 +502,25 @@ public partial record Items
                 SpriteNum = 41,
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" &&
-                        !pokemon.Transformed)
+                    if (pokemon is
+                        { IsActive: true, BaseSpecies.Name: "Kyogre", Transformed: false })
                     {
-                        // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
-                        // Requires FormeChange method to be implemented in Pokemon class
+                        pokemon.FormeChange(SpecieId.KyogrePrimal, battle.Effect, true);
                     }
                 }, -1),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, _, pokemon, source, _) =>
-                    {
-                        // Kyogre can't have this item removed
-                        if (source?.BaseSpecies.Name == "Kyogre" || pokemon.BaseSpecies.Name == "Kyogre")
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false); // Prevent removal
-                        }
-                        return BoolVoidUnion.FromBool(true); // Allow removal
-                    })),
+                            // Kyogre can't have this item removed
+                            if (source.BaseSpecies.Name == "Kyogre" ||
+                                pokemon.BaseSpecies.Name == "Kyogre")
+                            {
+                                return BoolVoidUnion.FromBool(false); // Prevent removal
+                            }
+
+                            return BoolVoidUnion.FromBool(true); // Allow removal
+                        })),
                 IsPrimalOrb = true,
                 Num = 535,
                 Gen = 6,
@@ -529,10 +531,7 @@ public partial record Items
                 Name = "Blunder Policy",
                 SpriteNum = 716,
                 Fling = new FlingData { BasePower = 80 },
-                // TODO: Item activation located in move execution scripts - activates when move misses due to accuracy
-                // Boosts Speed by 2 stages when the holder's move misses
-                // TypeScript: "Item activation located in scripts.js"
-                // Requires implementation in move miss handling (BattleActions or similar)
+                // Item activation located in move execution scripts
                 Num = 1121,
                 Gen = 8,
             },
@@ -553,16 +552,22 @@ public partial record Items
                     if (pokemon.ItemState.Started != true || pokemon.Transformed) return;
                     BoosterEnergyUpdate(battle, pokemon);
                 }),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        // Paradox Pokemon can't have this item removed
-                        if (pokemon.BaseSpecies.Tags?.Any(tag => tag == SpeciesTag.Paradox) == true)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, _, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false); // Prevent removal from Paradox Pokemon
-                        }
-                        return BoolVoidUnion.FromBool(true); // Allow removal from non-Paradox Pokemon
-                    })),
+                            // Paradox Pokemon can't have this item removed
+                            if (pokemon.BaseSpecies.Tags.Any(tag => tag == SpeciesTag.Paradox))
+                            {
+                                return
+                                    BoolVoidUnion
+                                        .FromBool(false); // Prevent removal from Paradox Pokemon
+                            }
+
+                            return
+                                BoolVoidUnion
+                                    .FromBool(true); // Allow removal from non-Paradox Pokemon
+                        })),
                 Num = 1880,
                 Gen = 9,
             },
@@ -598,7 +603,7 @@ public partial record Items
                 Name = "Cell Battery",
                 SpriteNum = 60,
                 Fling = new FlingData { BasePower = 30 },
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
                 {
                     if (move.Type == MoveType.Electric)
                     {
@@ -615,7 +620,7 @@ public partial record Items
                 Name = "Charcoal",
                 SpriteNum = 61,
                 Fling = new FlingData { BasePower = 30 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Fire)
                     {
@@ -636,13 +641,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Rock"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Rock && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -667,14 +672,14 @@ public partial record Items
                 SpriteNum = 63,
                 IsBerry = true,
                 NaturalGift = (80, "Fire"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Paralysis)
                     {
                         pokemon.EatItem();
                     }
                 }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Paralysis)
                     {
@@ -701,14 +706,14 @@ public partial record Items
                 SpriteNum = 65,
                 IsBerry = true,
                 NaturalGift = (80, "Water"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Sleep)
                     {
                         pokemon.EatItem();
                     }
                 }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Sleep)
                     {
@@ -726,7 +731,7 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Normal"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Normal &&
                             (!target.Volatiles.ContainsKey(ConditionId.Substitute) ||
@@ -782,10 +787,8 @@ public partial record Items
                         pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
                     }
                 }),
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, pokemon, _) =>
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, _) =>
                 {
-                    // TODO: Check if pokemon has dynamax volatile
-                    // if (pokemon.Volatiles.ContainsKey(ConditionId.Dynamax)) return atk;
                     battle.ChainModify(1.5);
                     return battle.FinalModify(atk);
                 }, 1),
@@ -818,10 +821,8 @@ public partial record Items
                         pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
                     }
                 }),
-                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
                 {
-                    // TODO: Check if pokemon has dynamax volatile
-                    // if (pokemon.Volatiles.ContainsKey(ConditionId.Dynamax)) return IntVoidUnion.FromInt(spe);
                     battle.ChainModify(1.5);
                     return IntVoidUnion.FromInt(battle.FinalModify(spe));
                 }),
@@ -878,14 +879,14 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Fighting"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Fighting &&
                             target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -968,8 +969,11 @@ public partial record Items
                     }
 
                     // Show message if: stat was lowered, effect is not a move with secondaries, and effect is not Octolock
-                    var isOctolock = effect.EffectStateId is ConditionEffectStateId { ConditionId: ConditionId.Octolock };
-                    if (showMsg && !(effect is Move move && move.Secondaries != null) && !isOctolock)
+                    bool isOctolock = effect.EffectStateId is ConditionEffectStateId
+                    {
+                        ConditionId: ConditionId.Octolock
+                    };
+                    if (showMsg && !(effect is Move { Secondaries: not null }) && !isOctolock)
                     {
                         battle.Add("-fail", target, "unboost", "[from] item: Clear Amulet",
                             $"[of] {target}");
@@ -1004,13 +1008,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Flying"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Flying && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -1036,13 +1040,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Dark"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Dark && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -1066,7 +1070,7 @@ public partial record Items
                 Name = "Cornerstone Mask",
                 SpriteNum = 758,
                 Fling = new FlingData { BasePower = 60 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
                 {
                     if (user.BaseSpecies.Name.StartsWith("Ogerpon-Cornerstone"))
                     {
@@ -1076,17 +1080,19 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        // Ogerpon cannot have its mask removed
-                        if (source?.BaseSpecies.BaseSpecies == SpecieId.Ogerpon || 
-                            pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            // Ogerpon cannot have its mask removed
+                            if (source.BaseSpecies.BaseSpecies == SpecieId.Ogerpon ||
+                                pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Ogerpon-Cornerstone",
                 Num = 2406,
                 Gen = 9,
@@ -1106,65 +1112,65 @@ public partial record Items
                 Num = 1885,
                 Gen = 9,
             },
-                        [ItemId.CrackedPot] = new()
-                        {
-                            Id = ItemId.CrackedPot,
-                            Name = "Cracked Pot",
-                            SpriteNum = 719,
-                            Fling = new FlingData { BasePower = 80 },
-                            Num = 1253,
-                            Gen = 8,
-                        },
-                        [ItemId.CustapBerry] = new()
-                        {
-                            Id = ItemId.CustapBerry,
-                            Name = "Custap Berry",
-                            SpriteNum = 86,
-                            IsBerry = true,
-                            NaturalGift = (100, "Ghost"),
-                            OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                                (ModifierSourceMoveHandler)((battle, priority, source, target, move) =>
-                                {
-                                    if (priority <= 0 &&
-                                        (source.Hp <= source.MaxHp / 4 ||
-                                         (source.Hp <= source.MaxHp / 2 &&
-                                          source.HasAbility(AbilityId.Gluttony) &&
-                                          source.AbilityState.Gluttony == true)))
-                                    {
-                                        if (source.EatItem())
-                                        {
-                                            battle.Add("-activate", source, "item: Custap Berry", "[consumed]");
-                                            return DoubleVoidUnion.FromDouble(0.1);
-                                        }
-                                    }
-
-                                    return DoubleVoidUnion.FromVoid();
-                                }), -2),
-                            OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
-                            Num = 210,
-                            Gen = 4,
-                        },
-                    };
-                }
-
-                /// <summary>
-                /// Helper method for Booster Energy to avoid code duplication between OnStart and OnUpdate.
-                /// </summary>
-                private static void BoosterEnergyUpdate(Battle battle, Pokemon pokemon)
-                {
-                    if (pokemon.Transformed) return;
-
-                    if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
-                        !battle.Field.IsWeather(ConditionId.SunnyDay) &&
-                        pokemon.UseItem())
+            [ItemId.CrackedPot] = new()
+            {
+                Id = ItemId.CrackedPot,
+                Name = "Cracked Pot",
+                SpriteNum = 719,
+                Fling = new FlingData { BasePower = 80 },
+                Num = 1253,
+                Gen = 8,
+            },
+            [ItemId.CustapBerry] = new()
+            {
+                Id = ItemId.CustapBerry,
+                Name = "Custap Berry",
+                SpriteNum = 86,
+                IsBerry = true,
+                NaturalGift = (100, "Ghost"),
+                OnFractionalPriority = new OnFractionalPriorityEventInfo(
+                    (ModifierSourceMoveHandler)((battle, priority, source, _, _) =>
                     {
-                        pokemon.AddVolatile(ConditionId.Protosynthesis);
-                    }
-                    else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
-                             !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
-                             pokemon.UseItem())
-                    {
-                        pokemon.AddVolatile(ConditionId.QuarkDrive);
-                    }
-                }
-            }
+                        if (priority <= 0 &&
+                            (source.Hp <= source.MaxHp / 4 ||
+                             (source.Hp <= source.MaxHp / 2 &&
+                              source.HasAbility(AbilityId.Gluttony) &&
+                              source.AbilityState.Gluttony == true)))
+                        {
+                            if (source.EatItem())
+                            {
+                                battle.Add("-activate", source, "item: Custap Berry", "[consumed]");
+                                return DoubleVoidUnion.FromDouble(0.1);
+                            }
+                        }
+
+                        return DoubleVoidUnion.FromVoid();
+                    }), -2),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 210,
+                Gen = 4,
+            },
+        };
+    }
+
+    /// <summary>
+    /// Helper method for Booster Energy to avoid code duplication between OnStart and OnUpdate.
+    /// </summary>
+    private static void BoosterEnergyUpdate(Battle battle, Pokemon pokemon)
+    {
+        if (pokemon.Transformed) return;
+
+        if (pokemon.HasAbility(AbilityId.Protosynthesis) &&
+            !battle.Field.IsWeather(ConditionId.SunnyDay) &&
+            pokemon.UseItem())
+        {
+            pokemon.AddVolatile(ConditionId.Protosynthesis);
+        }
+        else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
+                 !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
+                 pokemon.UseItem())
+        {
+            pokemon.AddVolatile(ConditionId.QuarkDrive);
+        }
+    }
+}
