@@ -378,10 +378,10 @@ public partial record Items
                     }
                 }),
                 OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, pokemon) =>
-                {
-                    if (pokemon.ItemState.Ready != true) return;
-                    pokemon.UseItem();
-                }, -3),
+                    {
+                        if (pokemon.ItemState.Ready != true) return;
+                        pokemon.UseItem();
+                    }, -4),
                 OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, pokemon) =>
                 {
                     if (pokemon.ItemState.Ready != true) return;
