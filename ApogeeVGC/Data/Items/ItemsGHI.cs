@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
@@ -257,11 +258,12 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
                     (_, item, pokemon, source, _) =>
                     {
-                        if (source?.BaseSpecies.Name.StartsWith("Ogerpon") == true || 
-                            pokemon.BaseSpecies.Name.StartsWith("Ogerpon"))
+                        // Ogerpon cannot have its mask removed
+                        // TypeScript only checks the holder (pokemon), not the source
+                        if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                         {
                             return BoolVoidUnion.FromBool(false);
                         }

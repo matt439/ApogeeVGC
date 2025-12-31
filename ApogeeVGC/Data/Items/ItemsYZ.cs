@@ -87,7 +87,8 @@ public partial record Items
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
                     (battle, accuracy, target, source, move) =>
                     {
-                        if (battle.Queue.WillMove(target) == null)
+                        // Only modify if move doesn't always hit and target hasn't moved yet
+                        if (move.AlwaysHit != true && battle.Queue.WillMove(target) == null)
                         {
                             battle.Debug("Zoom Lens boosting accuracy");
                             battle.ChainModify([4915, 4096]);

@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -73,7 +74,9 @@ public partial record Items
                 Fling = new FlingData { BasePower = 80 },
                 OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
                 {
-                    if (move.Damage == 0 && move.DamageCallback == null &&
+                    // Only trigger if the move doesn't have fixed damage (like Seismic Toss)
+                    // TypeScript: !move.damage && !move.damageCallback
+                    if (move.Damage == null && move.DamageCallback == null &&
                         target.GetMoveHitData(move).TypeMod > 0)
                     {
                         target.UseItem();
@@ -99,11 +102,12 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
                     (_, item, pokemon, source, _) =>
                     {
-                        if (source?.BaseSpecies.Name.StartsWith("Ogerpon") == true || 
-                            pokemon.BaseSpecies.Name.StartsWith("Ogerpon"))
+                        // Ogerpon cannot have its mask removed
+                        // TypeScript only checks the holder (pokemon), not the source
+                        if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
@@ -131,7 +135,7 @@ public partial record Items
                 OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, pokemon) =>
                 {
                     TryUseWhiteHerb(battle, pokemon);
-                }),
+                }, priority: -2),
                 OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, pokemon) =>
                 {
                     TryUseWhiteHerb(battle, pokemon);
@@ -176,9 +180,15 @@ public partial record Items
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
                     (battle, accuracy, target, source, move) =>
                     {
-                        battle.ChainModify([4505, 4096]);
-                        var result = battle.FinalModify(accuracy);
-                        return DoubleVoidUnion.FromDouble(result);
+                        // Only modify if move doesn't always hit
+                        if (move.AlwaysHit != true)
+                        {
+                            battle.ChainModify([4505, 4096]);
+                            var result = battle.FinalModify(accuracy);
+                            return DoubleVoidUnion.FromDouble(result);
+                        }
+
+                        return DoubleVoidUnion.FromVoid();
                     }, -2),
                 Num = 265,
                 Gen = 4,
