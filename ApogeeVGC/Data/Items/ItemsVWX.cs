@@ -30,14 +30,14 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Electric"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Electric &&
                             target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -72,7 +72,7 @@ public partial record Items
                 Name = "Weakness Policy",
                 SpriteNum = 609,
                 Fling = new FlingData { BasePower = 80 },
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
                 {
                     // Only trigger if the move doesn't have fixed damage (like Seismic Toss)
                     // TypeScript: !move.damage && !move.damageCallback
@@ -92,7 +92,7 @@ public partial record Items
                 Name = "Wellspring Mask",
                 SpriteNum = 759,
                 Fling = new FlingData { BasePower = 60 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
                 {
                     if (user.Species.Name.StartsWith("Ogerpon-Wellspring"))
                     {
@@ -102,17 +102,19 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        // Ogerpon cannot have its mask removed
-                        // TypeScript only checks the holder (pokemon), not the source
-                        if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, _, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            // Ogerpon cannot have its mask removed
+                            // TypeScript only checks the holder (pokemon), not the source
+                            if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Ogerpon-Wellspring",
                 // itemUser: ["Ogerpon-Wellspring"],
                 Num = 2407,
@@ -128,31 +130,18 @@ public partial record Items
                 {
                     BasePower = 10,
                 },
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    TryUseWhiteHerb(battle, pokemon);
-                }),
-                OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, pokemon) =>
-                {
-                    TryUseWhiteHerb(battle, pokemon);
-                }, priority: -2),
-                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, pokemon) =>
-                {
-                    TryUseWhiteHerb(battle, pokemon);
-                }),
-                OnAnyAfterTerastallization = new OnAnyAfterTerastallizationEventInfo((battle, pokemon) =>
-                {
-                    TryUseWhiteHerb(battle, pokemon);
-                }),
+                OnStart = new OnStartEventInfo(TryUseWhiteHerb),
+                OnAnySwitchIn = new OnAnySwitchInEventInfo(TryUseWhiteHerb, priority: -2),
+                OnAnyAfterMega = new OnAnyAfterMegaEventInfo(TryUseWhiteHerb),
+                OnAnyAfterTerastallization =
+                    new OnAnyAfterTerastallizationEventInfo(TryUseWhiteHerb),
                 OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, pokemon, _, _) =>
                 {
                     TryUseWhiteHerb(battle, pokemon);
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
-                {
-                    TryUseWhiteHerb(battle, pokemon);
-                }, order: 29),
+                OnResidual = new OnResidualEventInfo(
+                    (battle, pokemon, _, _) => { TryUseWhiteHerb(battle, pokemon); }, order: 29),
                 OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     if (pokemon.ItemState.Boosts != null)
@@ -164,10 +153,7 @@ public partial record Items
                         }
                     }
                 })),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
-                {
-                    pokemon.ItemState.Boosts = null;
-                }),
+                OnEnd = new OnEndEventInfo((_, pokemon) => { pokemon.ItemState.Boosts = null; }),
                 Num = 214,
                 Gen = 3,
             },
@@ -178,13 +164,13 @@ public partial record Items
                 SpriteNum = 537,
                 Fling = new FlingData { BasePower = 10 },
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
-                    (battle, accuracy, target, source, move) =>
+                    (battle, accuracy, _, _, move) =>
                     {
                         // Only modify if move doesn't always hit
                         if (move.AlwaysHit != true)
                         {
                             battle.ChainModify([4505, 4096]);
-                            var result = battle.FinalModify(accuracy);
+                            int result = battle.FinalModify(accuracy);
                             return DoubleVoidUnion.FromDouble(result);
                         }
 
@@ -200,7 +186,7 @@ public partial record Items
                 SpriteNum = 538,
                 IsBerry = true,
                 NaturalGift = (80, "Rock"),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -211,11 +197,12 @@ public partial record Items
                     }
                 }),
                 OnTryEatItem = new OnTryEatItemEventInfo(
-                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    OnTryEatItem.FromFunc((battle, _, pokemon) =>
                     {
-                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                        RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
+                            battle.Effect,
                             pokemon.BaseMaxHp / 3);
-                        if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
+                        if (canHeal is BoolRelayVar { Value: false })
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
@@ -239,7 +226,7 @@ public partial record Items
                 Name = "Wise Glasses",
                 SpriteNum = 539,
                 Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Category == MoveCategory.Special)
                     {
