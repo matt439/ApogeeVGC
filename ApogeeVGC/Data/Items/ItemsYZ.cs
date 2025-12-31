@@ -6,6 +6,8 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+
 namespace ApogeeVGC.Data.Items;
 
 public partial record Items
@@ -23,13 +25,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Ice"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Ice && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -55,7 +57,7 @@ public partial record Items
                 Name = "Zap Plate",
                 SpriteNum = 572,
                 OnPlate = PokemonType.Electric,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Electric)
                     {
@@ -65,15 +67,17 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                        (_, _, pokemon, source, _) =>
                         {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            {
+                                return BoolVoidUnion.FromBool(false);
+                            }
+
+                            return BoolVoidUnion.FromBool(true);
+                        })),
                 ForcedForme = "Arceus-Electric",
                 Num = 300,
                 Gen = 4,
@@ -85,14 +89,14 @@ public partial record Items
                 SpriteNum = 574,
                 Fling = new FlingData { BasePower = 10 },
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
-                    (battle, accuracy, target, source, move) =>
+                    (battle, accuracy, target, _, move) =>
                     {
                         // Only modify if move doesn't always hit and target hasn't moved yet
                         if (move.AlwaysHit != true && battle.Queue.WillMove(target) == null)
                         {
                             battle.Debug("Zoom Lens boosting accuracy");
                             battle.ChainModify([4915, 4096]);
-                            var result = battle.FinalModify(accuracy);
+                            int result = battle.FinalModify(accuracy);
                             return DoubleVoidUnion.FromDouble(result);
                         }
 
