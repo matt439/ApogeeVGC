@@ -363,7 +363,8 @@ public partial record Abilities
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
                 {
                     // Don't bounce self stat changes, or boosts that have already bounced
-                    if (source == null || target == source || effect.Name == "Mirror Armor") return;
+                    if (source == null || target == source ||
+                        effect.EffectStateId == AbilityId.MirrorArmor) return;
 
                     foreach (BoostId b in Enum.GetValues<BoostId>())
                     {
@@ -885,7 +886,7 @@ public partial record Abilities
                         MoveId.WeatherBall, MoveId.Struggle,
                     ];
                     if (Array.Exists(noModifyType, id => id == move.Id)) return;
-                    if (move.Name == "Tera Blast" && pokemon.Terastallized != null) return;
+                    if (move.Id == MoveId.TeraBlast && pokemon.Terastallized != null) return;
 
                     move.Type = MoveType.Normal;
                     move.TypeChangerBoosted = battle.Effect;
@@ -941,7 +942,7 @@ public partial record Abilities
                 }),
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.Name == "Intimidate" && boost.Atk != null)
+                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
                         battle.Add("-fail", target, "unboost", "Attack",
@@ -957,7 +958,8 @@ public partial record Abilities
                 Rating = 3.0,
                 OnFoeAfterBoost = new OnFoeAfterBoostEventInfo((battle, boost, _, _, effect) =>
                 {
-                    if (effect.Name is "Opportunist" or "Mirror Herb") return;
+                    if (effect.EffectStateId == AbilityId.Opportunist ||
+                        effect.EffectStateId == ItemId.MirrorHerb) return;
                     battle.EffectState.Boosts ??= new SparseBoostsTable();
 
                     SparseBoostsTable boostPlus = battle.EffectState.Boosts;
@@ -1149,7 +1151,7 @@ public partial record Abilities
                 }),
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.Name == "Intimidate" && boost.Atk != null)
+                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
                         battle.Add("-fail", target, "unboost", "Attack",

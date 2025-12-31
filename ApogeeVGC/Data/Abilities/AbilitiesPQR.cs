@@ -224,7 +224,7 @@ public partial record Abilities
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                 {
                     if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
-                        !(move.Name == "Tera Blast" && pokemon.Terastallized != null))
+                        !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                     {
                         move.Type = MoveType.Fairy;
                         move.TypeChangerBoosted = battle.Effect;
@@ -316,7 +316,7 @@ public partial record Abilities
                 OnAnyAfterSetStatus =
                     new OnAnyAfterSetStatusEventInfo((battle, status, target, source, effect) =>
                     {
-                        if (source.BaseSpecies.Name != "Pecharunt") return;
+                        if (source.BaseSpecies.Id != SpecieId.Pecharunt) return;
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
                                 Pokemon: var effectHolder,
@@ -862,7 +862,7 @@ public partial record Abilities
                 }),
                 OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, _, _, effect) =>
                 {
-                    if (effect.Name == "Intimidate" && boost.Atk != null)
+                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         battle.Boost(new SparseBoostsTable { Spe = 1 });
                     }
@@ -918,7 +918,7 @@ public partial record Abilities
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                 {
                     if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
-                        !(move.Name == "Tera Blast" && pokemon.Terastallized != null))
+                        !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                     {
                         move.Type = MoveType.Ice;
                         move.TypeChangerBoosted = battle.Effect;
@@ -957,7 +957,8 @@ public partial record Abilities
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
                         target, _, effect) =>
                     {
-                        if (effect.Name is "Berry Juice" or "Leftovers")
+                        if (effect.EffectStateId == ItemId.BerryJuice ||
+                            effect.EffectStateId == ItemId.Leftovers)
                         {
                             battle.Add("-activate", target, "ability: Ripen");
                         }

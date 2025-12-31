@@ -57,7 +57,7 @@ public partial record Abilities
 
                     if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
                         !noModifyType.Contains(move.Id) &&
-                        !(move.Name == "Tera Blast" && pokemon.Terastallized != null))
+                        !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                     {
                         move.Type = MoveType.Electric;
                         move.TypeChangerBoosted = battle.Effect;
@@ -247,7 +247,7 @@ public partial record Abilities
                 // OnTryBoostPriority = 2
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.Name == "Intimidate" && boost.Atk != null)
+                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null; // Delete the atk boost
                         battle.Boost(new SparseBoostsTable { Atk = 1 }, target, target, null, false,
@@ -878,7 +878,7 @@ public partial record Abilities
                 }),
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.Name == "Intimidate" && boost.Atk != null)
+                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
                         battle.Add("-fail", target, "unboost", "Attack",

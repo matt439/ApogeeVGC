@@ -247,7 +247,7 @@ public partial record Abilities
                 }, -5),
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.Name == "Intimidate" && boost.Atk != null)
+                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
                         battle.Add("-fail", target, "unboost", "Attack", "[from] ability: Scrappy",
