@@ -591,7 +591,7 @@ public partial record Abilities
                 },
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Ogerpon-Cornerstone-Tera" &&
+                    if (pokemon.BaseSpecies.Id == SpecieId.OgerponCornerstoneTera &&
                         pokemon.Terastallized != null &&
                         !(battle.EffectState.Embodied ?? false))
                     {
@@ -617,7 +617,7 @@ public partial record Abilities
                 },
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Ogerpon-Hearthflame-Tera" &&
+                    if (pokemon.BaseSpecies.Id == SpecieId.OgerponHearthflameTera &&
                         pokemon.Terastallized != null &&
                         !(battle.EffectState.Embodied ?? false))
                     {
@@ -643,7 +643,7 @@ public partial record Abilities
                 },
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Ogerpon-Teal-Tera" &&
+                    if (pokemon.BaseSpecies.Id == SpecieId.OgerponTealTera &&
                         pokemon.Terastallized != null &&
                         !(battle.EffectState.Embodied ?? false))
                     {
@@ -669,7 +669,7 @@ public partial record Abilities
                 },
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Ogerpon-Wellspring-Tera" &&
+                    if (pokemon.BaseSpecies.Id == SpecieId.OgerponWellspringTera &&
                         pokemon.Terastallized != null &&
                         !(battle.EffectState.Embodied ?? false))
                     {
@@ -1007,11 +1007,12 @@ public partial record Abilities
                             effect == null || isYawn)
                             return new VoidReturn();
                         battle.Debug("interrupting setStatus with Flower Veil");
-                        if (effect.Name == "Synchronize" || (effect.EffectType == EffectType.Move &&
-                                                             effect is ActiveMove
-                                                             {
-                                                                 Secondaries: null or { Length: 0 },
-                                                             }))
+                        if (effect.EffectStateId == AbilityId.Synchronize ||
+                            (effect.EffectType == EffectType.Move &&
+                             effect is ActiveMove
+                             {
+                                 Secondaries: null or { Length: 0 },
+                             }))
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {

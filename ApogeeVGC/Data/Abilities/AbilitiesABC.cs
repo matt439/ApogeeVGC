@@ -62,7 +62,7 @@ public partial record Abilities
                         // Change Normal-type moves to Flying
                         if (move.Type == MoveType.Normal &&
                             !noModifyType.Contains(move.Id) &&
-                            !(move.Name == "Tera Blast" && pokemon.Terastallized != null) &&
+                            !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null) &&
                             move.Category != MoveCategory.Status)
                         {
                             move.Type = MoveType.Flying;
