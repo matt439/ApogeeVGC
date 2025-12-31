@@ -548,10 +548,10 @@ public partial record Items
                     if (pokemon.Species.Name == "Ditto" && !pokemon.Transformed)
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spe);
+                        return IntVoidUnion.FromInt(battle.FinalModify(spe));
                     }
 
-                    return spe;
+                    return IntVoidUnion.FromInt(spe);
                 }),
                 Num = 274,
                 Gen = 4,
@@ -783,14 +783,14 @@ public partial record Items
                 Name = "Room Service",
                 SpriteNum = 717,
                 Fling = new FlingData { BasePower = 100 },
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
                     if (!pokemon.IgnoringItem() &&
                         battle.Field.GetPseudoWeather(ConditionId.TrickRoom) != null)
                     {
                         pokemon.UseItem();
                     }
-                }),
+                }, -1),
                 OnAnyPseudoWeatherChange = new OnAnyPseudoWeatherChangeEventInfo((battle, pokemon, source, condition) =>
                 {
                     if (battle.Field.GetPseudoWeather(ConditionId.TrickRoom) != null)
@@ -832,9 +832,9 @@ public partial record Items
                 Gen = 4,
                 // isNonstandard: "Past"
             },
-            [ItemId.RoseliaBerry] = new()
+            [ItemId.RoseliBerry] = new()
             {
-                Id = ItemId.RoseliaBerry,
+                Id = ItemId.RoseliBerry,
                 Name = "Roseli Berry",
                 SpriteNum = 603,
                 IsBerry = true,
@@ -892,7 +892,16 @@ public partial record Items
                 Id = ItemId.RustedShield,
                 Name = "Rusted Shield",
                 SpriteNum = 699,
-                // OnTakeItem - Zamazenta can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        // Zamazenta (species num 889) can't have this item removed
+                        if (source?.BaseSpecies.Num == 889 || pokemon.BaseSpecies.Num == 889)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 // itemUser: ["Zamazenta-Crowned"],
                 Num = 1104,
                 Gen = 8,
@@ -902,7 +911,16 @@ public partial record Items
                 Id = ItemId.RustedSword,
                 Name = "Rusted Sword",
                 SpriteNum = 698,
-                // OnTakeItem - Zacian can't have this item removed
+                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (_, item, pokemon, source, _) =>
+                    {
+                        // Zacian (species num 888) can't have this item removed
+                        if (source?.BaseSpecies.Num == 888 || pokemon.BaseSpecies.Num == 888)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
                 // itemUser: ["Zacian-Crowned"],
                 Num = 1103,
                 Gen = 8,

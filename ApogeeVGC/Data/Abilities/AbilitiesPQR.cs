@@ -1009,7 +1009,7 @@ public partial record Abilities
                         ItemId.ChopleBerry, ItemId.CobaBerry, ItemId.ColburBerry,
                         ItemId.HabanBerry, ItemId.KasibBerry, ItemId.KebiaBerry,
                         ItemId.OccaBerry, ItemId.PasshoBerry, ItemId.PayapaBerry,
-                        ItemId.RindoBerry, ItemId.RoseliaBerry, ItemId.ShucaBerry,
+                        ItemId.RindoBerry, ItemId.RoseliBerry, ItemId.ShucaBerry,
                         ItemId.TangaBerry, ItemId.WacanBerry, ItemId.YacheBerry,
                     ];
                     // Record if the pokemon ate a berry to resist the attack

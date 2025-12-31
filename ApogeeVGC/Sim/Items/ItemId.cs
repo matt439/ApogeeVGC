@@ -240,7 +240,7 @@ public enum ItemId
     RoomService,
     RootFossil,
     RoseIncense,
-    RoseliaBerry,
+    RoseliBerry,
 
     // S items
     SafariBall,
