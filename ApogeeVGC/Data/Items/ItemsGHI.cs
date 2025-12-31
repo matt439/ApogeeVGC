@@ -174,16 +174,7 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo((Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                    (_, item, pokemon, source, _) =>
-                    {
-                        // Giratina (species number 487) can't have this item removed
-                        if (source?.BaseSpecies.Num == 487 || pokemon.BaseSpecies.Num == 487)
-                        {
-                            return BoolVoidUnion.FromBool(false);
-                        }
-                        return BoolVoidUnion.FromBool(true);
-                    })),
+                // Note: Unlike GriseousCore, GriseousOrb does NOT prevent item removal
                 Num = 112,
                 Gen = 4,
             },
@@ -341,11 +332,10 @@ public partial record Items
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     battle.Heal(pokemon.BaseMaxHp / 3);
-                    // TODO: Get nature from Pokemon and check if minus stat is Def
-                    // if (pokemon.GetNature().Minus == StatIdExceptHp.Def)
-                    // {
-                    //     pokemon.AddVolatile(ConditionId.Confusion);
-                    // }
+                    if (pokemon.GetNature().Minus == StatIdExceptHp.Def)
+                    {
+                        pokemon.AddVolatile(ConditionId.Confusion);
+                    }
                 })),
                 Num = 163,
                 Gen = 3,
