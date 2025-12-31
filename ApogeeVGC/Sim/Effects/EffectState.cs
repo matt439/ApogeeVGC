@@ -59,6 +59,7 @@ public class EffectState
     public string? LastMove { get; set; } // For Metronome item
     public int? NumConsecutive { get; set; } // For Metronome item
     public bool? Eject { get; set; } // For Eject Pack tracking
+    public bool? Inactive { get; set; } // For Utility Umbrella tracking
 
     // Additional properties for condition states
     public bool? LostFocus { get; set; } // For Focus Punch

@@ -288,7 +288,9 @@ public enum ItemId
 
     // U items
     UltraBall,
+    UnremarkableTeacup,
     UpGrade,
+    UtilityUmbrella,
 
     StickyBarb,
 
@@ -328,7 +330,6 @@ public enum ItemId
     PowerHerb,
     RowapBerry,
     BlunderPolicy,
-    UtilityUmbrella,
 
     // Mega Stones
     Sablenite,

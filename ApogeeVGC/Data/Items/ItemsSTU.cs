@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -554,8 +555,8 @@ public partial record Items
                 OnModifyCritRatio =
                     new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
                     {
-                        // Farfetch'd check
-                        if (source.Species.Name.Contains("Farfetch"))
+                        // Farfetch'd check (base species only, not Sirfetch'd)
+                        if (source.BaseSpecies.BaseSpecies == SpecieId.Farfetchd)
                         {
                             return DoubleVoidUnion.FromDouble(critRatio + 2);
                         }
@@ -746,8 +747,9 @@ public partial record Items
                 Fling = new FlingData { BasePower = 90 },
                 OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, target, move) =>
                 {
-                    if (pokemon.Species.Name == "Cubone" || pokemon.Species.Name == "Marowak" ||
-                        pokemon.Species.Name.StartsWith("Marowak-"))
+                    // Cubone or Marowak (includes Alola forms via BaseSpecies check)
+                    if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Cubone ||
+                        pokemon.BaseSpecies.BaseSpecies == SpecieId.Marowak)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(atk);
@@ -878,6 +880,15 @@ public partial record Items
                 IsPokeball = true,
             },
             // Skip ultranecroziumz - z-move
+            [ItemId.UnremarkableTeacup] = new()
+            {
+                Id = ItemId.UnremarkableTeacup,
+                Name = "Unremarkable Teacup",
+                SpriteNum = 756,
+                Fling = new FlingData { BasePower = 80 },
+                Num = 2403,
+                Gen = 9,
+            },
             [ItemId.UpGrade] = new()
             {
                 Id = ItemId.UpGrade,
@@ -893,7 +904,38 @@ public partial record Items
                 Name = "Utility Umbrella",
                 SpriteNum = 718,
                 Fling = new FlingData { BasePower = 60 },
-                // Weather immunity implemented in battle logic
+                // Weather immunity partially implemented in Pokemon.EffectiveWeather()
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.IgnoringItem()) return;
+                    var weather = battle.Field.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.RainDance ||
+                        weather == ConditionId.DesolateLand || weather == ConditionId.PrimordialSea)
+                    {
+                        battle.RunEvent(EventId.WeatherChange, pokemon, pokemon, battle.Effect);
+                    }
+                }),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.ItemState.Inactive != true) return;
+                    pokemon.ItemState.Inactive = false;
+                    var weather = battle.Field.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.RainDance ||
+                        weather == ConditionId.DesolateLand || weather == ConditionId.PrimordialSea)
+                    {
+                        battle.RunEvent(EventId.WeatherChange, pokemon, pokemon, battle.Effect);
+                    }
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    var weather = battle.Field.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.RainDance ||
+                        weather == ConditionId.DesolateLand || weather == ConditionId.PrimordialSea)
+                    {
+                        battle.RunEvent(EventId.WeatherChange, pokemon, pokemon, battle.Effect);
+                    }
+                    pokemon.ItemState.Inactive = true;
+                }),
                 Num = 1123,
                 Gen = 8,
             },
