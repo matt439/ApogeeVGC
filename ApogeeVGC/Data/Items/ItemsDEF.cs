@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -49,7 +50,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 30 },
                 OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Clamperl")
+                    if (pokemon.BaseSpecies.Id == SpecieId.Clamperl)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(spd);
@@ -69,7 +70,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 90 },
                 OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.Name == "Clamperl")
+                    if (pokemon.BaseSpecies.Id == SpecieId.Clamperl)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(spa);

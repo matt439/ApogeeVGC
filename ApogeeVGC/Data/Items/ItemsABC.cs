@@ -35,7 +35,8 @@ public partial record Items
                 OnSetAbility = new OnSetAbilityEventInfo((battle, _, target, source, effect) =>
                 {
                     // Block ability changes from other abilities (except Trace)
-                    if (effect.EffectType == EffectType.Ability && effect.Name != "Trace")
+                    if (effect.EffectType == EffectType.Ability &&
+                        effect.EffectStateId != AbilityId.Trace)
                     {
                         battle.Add("-ability", source, effect.Name);
                     }
@@ -135,7 +136,7 @@ public partial record Items
                         return;
                     }
 
-                    if (effect.Name == "Intimidate")
+                    if (effect.EffectStateId == AbilityId.Intimidate)
                     {
                         target.UseItem();
                     }
@@ -503,7 +504,7 @@ public partial record Items
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
                     if (pokemon is
-                        { IsActive: true, BaseSpecies.Name: "Kyogre", Transformed: false })
+                        { IsActive: true, BaseSpecies.Id: SpecieId.Kyogre, Transformed: false })
                     {
                         pokemon.FormeChange(SpecieId.KyogrePrimal, battle.Effect, true);
                     }
@@ -513,8 +514,8 @@ public partial record Items
                         (_, _, pokemon, source, _) =>
                         {
                             // Kyogre can't have this item removed
-                            if (source.BaseSpecies.Name == "Kyogre" ||
-                                pokemon.BaseSpecies.Name == "Kyogre")
+                            if (source.BaseSpecies.Id == SpecieId.Kyogre ||
+                                pokemon.BaseSpecies.Id == SpecieId.Kyogre)
                             {
                                 return BoolVoidUnion.FromBool(false); // Prevent removal
                             }
@@ -1072,7 +1073,8 @@ public partial record Items
                 Fling = new FlingData { BasePower = 60 },
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
                 {
-                    if (user.BaseSpecies.Name.StartsWith("Ogerpon-Cornerstone"))
+                    if (user.BaseSpecies.Id == SpecieId.OgerponCornerstone ||
+                        user.BaseSpecies.Id == SpecieId.OgerponCornerstoneTera)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);

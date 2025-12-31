@@ -138,7 +138,7 @@ public partial record Items
                 {
                     // Giratina has species number 487
                     if (user.BaseSpecies.Num == 487 &&
-                        (move.Type == MoveType.Ghost || move.Type == MoveType.Dragon))
+                        move.Type is MoveType.Ghost or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -172,7 +172,7 @@ public partial record Items
                 {
                     // Giratina has species number 487
                     if (user.BaseSpecies.Num == 487 &&
-                        (move.Type == MoveType.Ghost || move.Type == MoveType.Dragon))
+                        move.Type is MoveType.Ghost or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -254,7 +254,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 60 },
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
                 {
-                    if (user.BaseSpecies.Name.StartsWith("Ogerpon-Hearthflame"))
+                    if (user.BaseSpecies.Id is SpecieId.OgerponHearthflame or SpecieId.OgerponHearthflameTera)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);

@@ -477,7 +477,7 @@ public partial record Items
                 OnModifyCritRatio =
                     new OnModifyCritRatioEventInfo((_, critRatio, user, _, _) =>
                     {
-                        if (user.BaseSpecies.Name == "Chansey")
+                        if (user.BaseSpecies.Id == SpecieId.Chansey)
                         {
                             return critRatio + 2;
                         }

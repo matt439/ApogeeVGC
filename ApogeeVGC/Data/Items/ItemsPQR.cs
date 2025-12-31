@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -549,7 +550,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
-                    if (pokemon.Species.Name == "Ditto" && !pokemon.Transformed)
+                    if (pokemon.Species.Id == SpecieId.Ditto && !pokemon.Transformed)
                     {
                         battle.ChainModify(2);
                         return IntVoidUnion.FromInt(battle.FinalModify(spe));

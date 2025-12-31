@@ -94,7 +94,8 @@ public partial record Items
                 Fling = new FlingData { BasePower = 60 },
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
                 {
-                    if (user.Species.Name.StartsWith("Ogerpon-Wellspring"))
+                    if (user.Species.EffectStateId == SpecieId.OgerponWellspring ||
+                        user.Species.EffectStateId == SpecieId.OgerponWellspringTera)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);

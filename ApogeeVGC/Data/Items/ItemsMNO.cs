@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -261,7 +262,7 @@ public partial record Items
                 OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
                 {
                     // Ditto has species number 132
-                    if (pokemon.Species.Name == "Ditto" && !pokemon.Transformed)
+                    if (pokemon.Species.Id == SpecieId.Ditto && !pokemon.Transformed)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(def);
@@ -368,7 +369,8 @@ public partial record Items
                 OnFoeAfterBoost = new OnFoeAfterBoostEventInfo((_, boost, _, pokemon, effect) =>
                 {
                     // Don't trigger from Opportunist or Mirror Herb
-                    if (effect?.Name == "Opportunist" || effect?.Name == "Mirror Herb") return;
+                    if (effect?.EffectStateId == AbilityId.Opportunist ||
+                        effect?.EffectStateId == ItemId.MirrorHerb) return;
 
                     pokemon.ItemState.Boosts ??= new SparseBoostsTable();
                     SparseBoostsTable? boostPlus = pokemon.ItemState.Boosts;
