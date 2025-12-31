@@ -34,15 +34,14 @@ public partial record Items
                 Name = "Safety Goggles",
                 SpriteNum = 604,
                 Fling = new FlingData { BasePower = 80 },
-                OnDamage = new OnDamageEventInfo((battle, damage, target, source, effect) =>
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
-                    if (effect is Condition condition && (condition.Id == ConditionId.Sandstorm ||
-                                                          condition.Id == ConditionId.Hail))
+                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail || type == ConditionId.Powder)
                     {
-                        return IntBoolVoidUnion.FromBool(false);
+                        return BoolVoidUnion.FromBool(false);
                     }
 
-                    return IntBoolVoidUnion.FromVoid();
+                    return BoolVoidUnion.FromVoid();
                 }),
                 OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                 {
@@ -380,7 +379,7 @@ public partial record Items
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
                 {
                     // Latios (#380) or Latias (#381)
-                    if ((user.Species.Num == 380 || user.Species.Num == 381) &&
+                    if ((user.BaseSpecies.Num == 380 || user.BaseSpecies.Num == 381) &&
                         (move.Type == MoveType.Psychic || move.Type == MoveType.Dragon))
                     {
                         battle.ChainModify([4915, 4096]);
