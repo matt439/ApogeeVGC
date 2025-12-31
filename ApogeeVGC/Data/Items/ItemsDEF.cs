@@ -85,11 +85,11 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnAttract = new OnAttractEventInfo((battle, target, source) =>
                 {
-                    battle.Debug($"attract intercepted: {target.Name} from {source.Name}");
+                    battle.Debug($"attract intercepted: {target} from {source}");
                     if (source == null || source == target) return;
                     if (!source.Volatiles.ContainsKey(ConditionId.Attract))
                     {
-                        source.AddVolatile(ConditionId.Attract);
+                        source.AddVolatile(ConditionId.Attract, target);
                     }
                 }, -100),
                 Num = 280,
@@ -365,14 +365,14 @@ public partial record Items
                 Name = "Electric Seed",
                 SpriteNum = 664,
                 Fling = new FlingData { BasePower = 10 },
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
                     if (!pokemon.IgnoringItem() &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         pokemon.UseItem();
                     }
-                }),
+                }, -1),
                 OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
