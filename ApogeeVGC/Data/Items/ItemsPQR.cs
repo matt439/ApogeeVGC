@@ -285,7 +285,7 @@ public partial record Items
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
                     battle.ChainModify(0.5);
-                    return battle.FinalModify(spe);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
                 }),
                 Num = 293,
                 Gen = 4,
@@ -300,7 +300,7 @@ public partial record Items
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
                     battle.ChainModify(0.5);
-                    return battle.FinalModify(spe);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
                 }),
                 Num = 292,
                 Gen = 4,
@@ -315,7 +315,7 @@ public partial record Items
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
                     battle.ChainModify(0.5);
-                    return battle.FinalModify(spe);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
                 }),
                 Num = 290,
                 Gen = 4,
@@ -330,7 +330,7 @@ public partial record Items
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
                     battle.ChainModify(0.5);
-                    return battle.FinalModify(spe);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
                 }),
                 Num = 289,
                 Gen = 4,
@@ -345,7 +345,7 @@ public partial record Items
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
                     battle.ChainModify(0.5);
-                    return battle.FinalModify(spe);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
                 }),
                 Num = 291,
                 Gen = 4,
@@ -360,7 +360,7 @@ public partial record Items
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
                     battle.ChainModify(0.5);
-                    return battle.FinalModify(spe);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
                 }),
                 Num = 294,
                 Gen = 4,
@@ -396,6 +396,10 @@ public partial record Items
                     {
                         battle.Debug($"power herb - remove charge turn for {move.Id}");
                         battle.AttrLastMove("[still]");
+                        battle.AddMove("-anim", 
+                            StringNumberDelegateObjectUnion.FromObject(pokemon), 
+                            move.Name, 
+                            StringNumberDelegateObjectUnion.FromObject(target));
                         return BoolVoidUnion.FromBool(false); // skip charge turn
                     }
                     return BoolVoidUnion.FromVoid();
@@ -448,14 +452,6 @@ public partial record Items
                         pokemon.UseItem();
                     }
                 }, -1),
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    if (!pokemon.IgnoringItem() &&
-                        battle.Field.IsTerrain(ConditionId.PsychicTerrain, null))
-                    {
-                        pokemon.UseItem();
-                    }
-                }),
                 OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, source, effect) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, null))
