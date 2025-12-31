@@ -373,7 +373,8 @@ public partial record Items
                             move.Category != MoveCategory.Status && !source.ForceSwitchFlag)
                         {
                             // Life Orb recoil damage
-                            battle.Damage(source.BaseMaxHp / 10, source, source, null);
+                            battle.Damage(source.BaseMaxHp / 10, source, source, 
+                                BattleDamageEffect.FromIEffect(_library.Items[ItemId.LifeOrb]));
                         }
                     }),
                 Num = 270,
