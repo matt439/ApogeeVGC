@@ -2193,7 +2193,18 @@ public partial record Moves
                     Mirror = true,
                 },
                 MindBlownRecoil = true,
-                // TODO: onAfterMove - recoil 1/2 maxhp with emergency exit check
+                OnAfterMove = new OnAfterMoveEventInfo((battle, source, target, move) =>
+                {
+                    if (move.MindBlownRecoil == true && source.Hp > 0 && !source.Volatiles.ContainsKey(ConditionId.MagicBounce))
+                    {
+                        int hpBeforeRecoil = source.Hp;
+                        battle.Damage(source.MaxHp / 2, source, source, battle.Dex.Conditions.Get(ConditionId.Recoil), true);
+                        if (source.Hp <= source.MaxHp / 2 && hpBeforeRecoil > source.MaxHp / 2)
+                        {
+                            battle.RunEvent("EmergencyExit", source);
+                        }
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
@@ -2354,7 +2365,15 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: basePowerCallback - double if last move failed
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, move) =>
+                {
+                    if (source.MoveLastTurnResult?.IsFalse() == true)
+                    {
+                        battle.Debug("doubling Stomping Tantrum BP due to previous move failure");
+                        return move.BasePower * 2;
+                    }
+                    return move.BasePower;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
@@ -3580,9 +3599,40 @@ public partial record Moves
                     Metronome = true,
                     MustPressure = true,
                 },
-                // TODO: basePowerCallback - 100 if Stellar Terastallized
-                // TODO: onModifyType - changes type based on Tera type
-                // TODO: onModifyMove - changes category if atk > spa when Terastallized, self boosts if Stellar
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, move) =>
+                {
+                    if (source.Terastallized == MoveType.Stellar)
+                    {
+                        return 100;
+                    }
+                    return move.BasePower;
+                }),
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, source, target, move) =>
+                {
+                    if (source.Terastallized != null)
+                    {
+                        battle.AttrLastMove("[anim] Tera Blast " + source.TeraType);
+                    }
+                    return new VoidReturn();
+                }),
+                OnModifyType = new OnModifyTypeEventInfo((battle, move, source, target) =>
+                {
+                    if (source.Terastallized != null)
+                    {
+                        move.Type = source.TeraType;
+                    }
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, target) =>
+                {
+                    if (source.Terastallized != null && source.GetStat(StatIdExceptHp.Atk, false, true) > source.GetStat(StatIdExceptHp.SpA, false, true))
+                    {
+                        move.Category = MoveCategory.Physical;
+                    }
+                    if (source.Terastallized == MoveType.Stellar)
+                    {
+                        move.Self = new SecondaryEffect { Boosts = new SparseBoostsTable { Atk = -1, SpA = -1 } };
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -3598,8 +3648,24 @@ public partial record Moves
                 BasePp = 5,
                 Priority = 0,
                 Flags = new MoveFlags { Protect = true, Mirror = true, NoSleepTalk = true, NoAssist = true, FailCopycat = true, FailMimic = true, FailInstruct = true },
-                // TODO: onModifyType - becomes Stellar type if used by Terapagos-Stellar
-                // TODO: onModifyMove - targets all adjacent foes if Stellar
+                OnModifyType = new OnModifyTypeEventInfo((battle, move, source, target) =>
+                {
+                    if (source.Species.Name == "Terapagos-Stellar")
+                    {
+                        move.Type = MoveType.Stellar;
+                        if (source.Terastallized != null && source.GetStat(StatIdExceptHp.Atk, false, true) > source.GetStat(StatIdExceptHp.SpA, false, true))
+                        {
+                            move.Category = MoveCategory.Physical;
+                        }
+                    }
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, target) =>
+                {
+                    if (source.Species.Name == "Terapagos-Stellar")
+                    {
+                        move.Target = MoveTarget.AllAdjacentFoes;
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -3665,7 +3731,26 @@ public partial record Moves
                     NoAssist = true,
                     FailCopycat = true,
                 },
-                // TODO: onAfterHit - steal target's item
+                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, move) =>
+                {
+                    if (source.Item != ItemId.None || source.Volatiles.ContainsKey(ConditionId.Gem))
+                    {
+                        return new VoidReturn();
+                    }
+                    var yourItem = target.TakeItem(source);
+                    if (yourItem == null)
+                    {
+                        return new VoidReturn();
+                    }
+                    if (!source.SetItem(yourItem))
+                    {
+                        target.Item = yourItem.Id;
+                        return new VoidReturn();
+                    }
+                    battle.Add("-enditem", target, yourItem, "[silent]", "[from] move: Thief", $"[of] {source}");
+                    battle.Add("-item", source, yourItem, "[from] move: Thief", $"[of] {target}");
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
@@ -3817,7 +3902,18 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onTry - fails if target isn't using a damaging move
+                OnTry = new OnTryEventInfo((battle, source, target, move) =>
+                {
+                    var action = battle.Queue.WillMove(target);
+                    var targetMove = action?.Choice == "move" ? action.Move : null;
+                    if (targetMove == null || (targetMove.Category == MoveCategory.Status && targetMove.Id != MoveId.MeFirst) || target.Volatiles.ContainsKey(ConditionId.MustRecharge))
+                    {
+                        battle.Add("-fail", source);
+                        battle.AttrLastMove("[still]");
+                        return false;
+                    }
+                    return true;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
@@ -3941,7 +4037,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                // TODO: boosts atk -1, def -1
+                Boosts = new SparseBoostsTable { Atk = -1, Def = -1 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -4208,8 +4304,27 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: secondary - 20% chance to randomly inflict burn/paralysis/freeze
-                Secondary = null,
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 20,
+                    OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                    {
+                        int result = battle.Random(3);
+                        if (result == 0)
+                        {
+                            target.TrySetStatus(ConditionId.Burn, source);
+                        }
+                        else if (result == 1)
+                        {
+                            target.TrySetStatus(ConditionId.Paralysis, source);
+                        }
+                        else
+                        {
+                            target.TrySetStatus(ConditionId.Freeze, source);
+                        }
+                        return new VoidReturn();
+                    }),
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -4231,8 +4346,41 @@ public partial record Moves
                     NoAssist = true,
                     FailCopycat = true,
                 },
-                // TODO: onTryImmunity - check sticky hold
-                // TODO: onHit - swap items with target
+                OnTryImmunity = new OnTryImmunityEventInfo((battle, target, source, move) =>
+                {
+                    return !target.HasAbility(AbilityId.StickyHold);
+                }),
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    var yourItem = target.TakeItem(source);
+                    var myItem = source.TakeItem();
+                    if (target.Item != ItemId.None || source.Item != ItemId.None || (yourItem == null && myItem == null))
+                    {
+                        if (yourItem != null) target.Item = yourItem.Id;
+                        if (myItem != null) source.Item = myItem.Id;
+                        return false;
+                    }
+                    battle.Add("-activate", source, "move: Trick", $"[of] {target}");
+                    if (myItem != null)
+                    {
+                        target.SetItem(myItem);
+                        battle.Add("-item", target, myItem, "[from] move: Trick");
+                    }
+                    else
+                    {
+                        battle.Add("-enditem", target, yourItem, "[silent]", "[from] move: Trick");
+                    }
+                    if (yourItem != null)
+                    {
+                        source.SetItem(yourItem);
+                        battle.Add("-item", source, yourItem, "[from] move: Trick");
+                    }
+                    else
+                    {
+                        battle.Add("-enditem", source, myItem, "[silent]", "[from] move: Trick");
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
