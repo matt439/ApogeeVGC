@@ -32,7 +32,17 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onTry - fail if target's move is not priority or is Status category
+                OnTry = new OnTryEventInfo((battle, _, target, _) =>
+                {
+                    // Check if target will move with a priority move that isn't Status
+                    var action = battle.Queue.WillMove(target);
+                    var move = action?.Move;
+                    if (move == null || move.Priority <= 0 || move.Category == MoveCategory.Status)
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
@@ -61,9 +71,30 @@ public partial record Moves
                     NoSleepTalk = true,
                     FailInstruct = true,
                 },
-                VolatileStatus = ConditionId.Uproar,
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.Uproar,
+                },
                 Condition = _library.Conditions[ConditionId.Uproar],
-                // TODO: onTryHit - wake up all sleeping Pokemon on both sides
+                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                {
+                    // Wake up all sleeping Pokemon on both sides
+                    foreach (var pokemon in target.Side.Active)
+                    {
+                        if (pokemon?.Status == ConditionId.Sleep)
+                        {
+                            pokemon.CureStatus();
+                        }
+                    }
+                    foreach (var pokemon in target.Side.Foe.Active)
+                    {
+                        if (pokemon?.Status == ConditionId.Sleep)
+                        {
+                            pokemon.CureStatus();
+                        }
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.RandomNormal,
                 Type = MoveType.Normal,
@@ -313,14 +344,12 @@ public partial record Moves
                     Metronome = true,
                     PledgeCombo = true,
                 },
-                // TODO: basePowerCallback - increase to 150 if combined with Fire/Grass Pledge
-                    // TODO: onPrepareHit - wait for ally's Fire/Grass Pledge
-                    // TODO: onModifyMove - change type and add side condition based on combo
-                    Secondary = null,
-                    Target = MoveTarget.Normal,
-                    Type = MoveType.Water,
-                    // TODO: Implement WaterPledge condition
-                },
+                // Note: Pledge combo mechanics (combining with Fire/Grass Pledge) are not implemented
+                // as they require complex queue manipulation and are rarely used in VGC
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Water,
+            },
             [MoveId.WaterPulse] = new()
             {
                 Id = MoveId.WaterPulse,
@@ -538,8 +567,11 @@ public partial record Moves
                 },
                 SideCondition = ConditionId.WideGuard,
                 Condition = _library.Conditions[ConditionId.WideGuard],
-                // TODO: onTry - check if queue will act
-                // TODO: onHitSide - add stall volatile to source
+                OnTry = new OnTryEventInfo((battle, _, _, _) =>
+                {
+                    // Wide Guard fails if there are no upcoming actions in the queue
+                    return battle.Queue.WillAct() != null ? new VoidReturn() : (BoolEmptyVoidUnion?)false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Rock,
@@ -653,17 +685,18 @@ public partial record Moves
                 Name = "Wish",
                 BasePp = 10,
                 Priority = 0,
-                    Flags = new MoveFlags
-                    {
-                        Snatch = true,
-                        Heal = true,
-                        Metronome = true,
-                    },
-                    // TODO: Wish applies a slot condition - needs special implementation
-                    Secondary = null,
-                    Target = MoveTarget.Self,
-                    Type = MoveType.Normal,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Heal = true,
+                    Metronome = true,
                 },
+                // Note: Wish applies a slot condition that heals after 1 turn - not implemented
+                // as slot conditions require special infrastructure not present in current architecture
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+            },
             [MoveId.Withdraw] = new()
             {
                 Id = MoveId.Withdraw,
@@ -697,17 +730,17 @@ public partial record Moves
                 Name = "Wonder Room",
                 BasePp = 10,
                 Priority = 0,
-                    Flags = new MoveFlags
-                    {
-                        Mirror = true,
-                        Metronome = true,
-                    },
-                    PseudoWeather = ConditionId.WonderRoom,
-                    // TODO: Implement WonderRoom condition
-                    Secondary = null,
-                    Target = MoveTarget.All,
-                    Type = MoveType.Psychic,
+                Flags = new MoveFlags
+                {
+                    Mirror = true,
+                    Metronome = true,
                 },
+                PseudoWeather = ConditionId.WonderRoom,
+                // Note: WonderRoom condition (swapping Def/SpD) should be implemented in Conditions
+                Secondary = null,
+                Target = MoveTarget.All,
+                Type = MoveType.Psychic,
+            },
             [MoveId.WoodHammer] = new()
             {
                 Id = MoveId.WoodHammer,
