@@ -2092,6 +2092,7 @@ public partial record Moves
                 OnAfterMove = new OnAfterMoveEventInfo((_, source, _, _) =>
                 {
                     source.RemoveVolatile(_library.Conditions[ConditionId.StockpileStorage]);
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -2286,6 +2287,8 @@ public partial record Moves
                             battle.RunEvent(EventId.EmergencyExit, source);
                         }
                     }
+
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -2490,6 +2493,8 @@ public partial record Moves
                             side.AddSideCondition(ConditionId.StealthRock);
                         }
                     }
+
+                    return new VoidReturn();
                 }),
                 OnAfterSubDamage =
                     new OnAfterSubDamageEventInfo((_, damage, target, source, move) =>
@@ -2937,7 +2942,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                DamageCallback = new DamageCallbackEventInfo((battle, pokemon, target) =>
+                DamageCallback = new DamageCallbackEventInfo((battle, pokemon, target, move) =>
                 {
                     return battle.ClampIntRange(target.GetUndynamaxedHp() / 2, 1, int.MaxValue);
                 }),
@@ -3088,7 +3093,7 @@ public partial record Moves
                     int layers =
                         target.Volatiles.TryGetValue(ConditionId.StockpileStorage,
                             out EffectState? vol)
-                            ? vol.Layers
+                            ? vol.Layers ?? 1
                             : 1;
                     double[] healAmount = new[] { 0.25, 0.5, 1.0 };
                     bool success =
@@ -3195,23 +3200,26 @@ public partial record Moves
                     if (target.Item != ItemId.None || source.Item != ItemId.None ||
                         (yourItem == null && myItem == null))
                     {
-                        if (yourItem != null) target.Item = yourItem.Id;
-                        if (myItem != null) source.Item = myItem.Id;
+                        if (yourItem is ItemItemFalseUnion yourItemVal)
+                            target.Item = yourItemVal.Item.Id;
+                        if (myItem is ItemItemFalseUnion myItemVal) source.Item = myItemVal.Item.Id;
                         return false;
                     }
 
                     // SingleEvent TakeItem checks...
                     battle.Add("-activate", source, "move: Trick", $"[of] {target}");
-                    if (myItem != null)
+                    if (myItem is ItemItemFalseUnion myItemUnion)
                     {
-                        target.SetItem(myItem);
-                        battle.Add("-item", target, myItem, "[from] move: Switcheroo");
+                        target.SetItem(myItemUnion.Item.Id);
+                        battle.Add("-item", target, myItemUnion.Item.Name,
+                            "[from] move: Switcheroo");
                     }
 
-                    if (yourItem != null)
+                    if (yourItem is ItemItemFalseUnion yourItemUnion)
                     {
-                        source.SetItem(yourItem);
-                        battle.Add("-item", source, yourItem, "[from] move: Switcheroo");
+                        source.SetItem(yourItemUnion.Item.Id);
+                        battle.Add("-item", source, yourItemUnion.Item.Name,
+                            "[from] move: Switcheroo");
                     }
 
                     return new VoidReturn();
@@ -3611,7 +3619,7 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                OnHitField = new OnHitFieldEventInfo((battle, _, _) =>
+                OnHitField = new OnHitFieldEventInfo((battle, target, source, move) =>
                 {
                     foreach (Pokemon pokemon in battle.GetAllActive())
                     {
@@ -3870,20 +3878,22 @@ public partial record Moves
                     }
 
                     ItemFalseUnion? yourItem = target.TakeItem(source);
-                    if (yourItem == null)
+                    if (yourItem is not ItemItemFalseUnion yourItemUnion)
                     {
                         return new VoidReturn();
                     }
 
-                    if (!source.SetItem(yourItem))
+                    if (!source.SetItem(yourItemUnion.Item.Id))
                     {
-                        target.Item = yourItem.Id;
+                        target.Item = yourItemUnion.Item.Id;
                         return new VoidReturn();
                     }
 
-                    battle.Add("-enditem", target, yourItem, "[silent]", "[from] move: Thief",
+                    battle.Add("-enditem", target, yourItemUnion.Item.Name, "[silent]",
+                        "[from] move: Thief",
                         $"[of] {source}");
-                    battle.Add("-item", source, yourItem, "[from] move: Thief", $"[of] {target}");
+                    battle.Add("-item", source, yourItemUnion.Item.Name, "[from] move: Thief",
+                        $"[of] {target}");
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -4457,7 +4467,7 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 20,
-                    OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                    OnHit = (battle, target, source, move) =>
                     {
                         int result = battle.Random(3);
                         if (result == 0)
@@ -4474,7 +4484,7 @@ public partial record Moves
                         }
 
                         return new VoidReturn();
-                    }),
+                    },
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -4508,30 +4518,33 @@ public partial record Moves
                     if (target.Item != ItemId.None || source.Item != ItemId.None ||
                         (yourItem == null && myItem == null))
                     {
-                        if (yourItem != null) target.Item = yourItem.Id;
-                        if (myItem != null) source.Item = myItem.Id;
+                        if (yourItem is ItemItemFalseUnion yourItemVal)
+                            target.Item = yourItemVal.Item.Id;
+                        if (myItem is ItemItemFalseUnion myItemVal) source.Item = myItemVal.Item.Id;
                         return false;
                     }
 
                     battle.Add("-activate", source, "move: Trick", $"[of] {target}");
-                    if (myItem != null)
+                    if (myItem is ItemItemFalseUnion myItemUnion)
                     {
-                        target.SetItem(myItem);
-                        battle.Add("-item", target, myItem, "[from] move: Trick");
+                        target.SetItem(myItemUnion.Item.Id);
+                        battle.Add("-item", target, myItemUnion.Item.Name, "[from] move: Trick");
                     }
-                    else
+                    else if (yourItem is ItemItemFalseUnion yourItemForEnditem)
                     {
-                        battle.Add("-enditem", target, yourItem, "[silent]", "[from] move: Trick");
+                        battle.Add("-enditem", target, yourItemForEnditem.Item.Name, "[silent]",
+                            "[from] move: Trick");
                     }
 
-                    if (yourItem != null)
+                    if (yourItem is ItemItemFalseUnion yourItemUnion)
                     {
-                        source.SetItem(yourItem);
-                        battle.Add("-item", source, yourItem, "[from] move: Trick");
+                        source.SetItem(yourItemUnion.Item.Id);
+                        battle.Add("-item", source, yourItemUnion.Item.Name, "[from] move: Trick");
                     }
-                    else
+                    else if (myItem is ItemItemFalseUnion myItemForEnditem)
                     {
-                        battle.Add("-enditem", source, myItem, "[silent]", "[from] move: Trick");
+                        battle.Add("-enditem", source, myItemForEnditem.Item.Name, "[silent]",
+                            "[from] move: Trick");
                     }
 
                     return new VoidReturn();
