@@ -1,6 +1,9 @@
-﻿using ApogeeVGC.Sim.Conditions;
+﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -33,7 +36,23 @@ public partial record Moves
                 VolatileStatus = ConditionId.GastroAcid,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Poison,
-                // TODO: onTryHit - check for Ability Shield and cantsuppress flag
+                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                {
+                    // Check if ability can't be suppressed
+                    if (target.GetAbility().Flags.CantSuppress == true)
+                    {
+                        return false;
+                    }
+
+                    // Check for Ability Shield
+                    if (target.HasItem(ItemId.AbilityShield))
+                    {
+                        battle.Add("-block", target, "item: Ability Shield");
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.GigaDrain] = new()
             {
@@ -96,10 +115,10 @@ public partial record Moves
                     Protect = true,
                     Mirror = true,
                     Metronome = true,
+                    CantUseTwice = true,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
-                // TODO: cantusetwice flag - cannot be used twice in a row
             },
             [MoveId.GlacialLance] = new()
             {
@@ -292,7 +311,16 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                // TODO: onModifyPriority - +1 priority if Grassy Terrain and user is grounded
+                OnModifyPriority = new OnModifyPriorityEventInfo((battle, priority, source, _, _) =>
+                {
+                    if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, source) &&
+                        (source.IsGrounded() ?? false))
+                    {
+                        return priority + 1;
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.GrassyTerrain] = new()
             {
@@ -309,7 +337,7 @@ public partial record Moves
                     NonSky = true,
                     Metronome = true,
                 },
-                // TODO: Set terrain to GrassyTerrain
+                Condition = _library.Conditions[ConditionId.GrassyTerrain],
                 Target = MoveTarget.All,
                 Type = MoveType.Grass,
             },
@@ -338,7 +366,16 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                // TODO: onBasePower - 1.5x if Gravity is active
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                {
+                    if (battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
+                    {
+                        battle.ChainModify(3, 2); // 1.5x = 3/2
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }),
             },
             [MoveId.Gravity] = new()
             {
@@ -411,7 +448,17 @@ public partial record Moves
                 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                // TODO: onModifyMove - boost becomes +2/+2 in sun
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                {
+                    // In sun, add an extra +1/+1 boost (SelfBoost already provides +1/+1)
+                    var weather = source.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    {
+                        battle.Boost(new SparseBoostsTable { Atk = 1, SpA = 1 }, source, source);
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.GuardSplit] = new()
             {
@@ -431,7 +478,17 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                // TODO: onHit - average def/spd stats between user and target
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    int newDef = (target.StoredStats.Def + source.StoredStats.Def) / 2;
+                    target.StoredStats.Def = newDef;
+                    source.StoredStats.Def = newDef;
+                    int newSpD = (target.StoredStats.SpD + source.StoredStats.SpD) / 2;
+                    target.StoredStats.SpD = newSpD;
+                    source.StoredStats.SpD = newSpD;
+                    battle.Add("-activate", source, "move: Guard Split", $"[of] {target}");
+                    return new VoidReturn();
+                }),
             },
             [MoveId.GuardSwap] = new()
             {
@@ -453,7 +510,20 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                // TODO: onHit - swap def/spd boosts
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    // Swap def and spd boosts
+                    int targetDef = target.Boosts.Def;
+                    int targetSpD = target.Boosts.SpD;
+                    int sourceDef = source.Boosts.Def;
+                    int sourceSpD = source.Boosts.SpD;
+
+                    source.SetBoost(new SparseBoostsTable { Def = targetDef, SpD = targetSpD });
+                    target.SetBoost(new SparseBoostsTable { Def = sourceDef, SpD = sourceSpD });
+
+                    battle.Add("-swapboost", source, target, "def, spd", "[from] move: Guard Swap");
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Guillotine] = new()
             {
@@ -622,7 +692,8 @@ public partial record Moves
                 Name = "Headbutt",
                 BasePp = 15,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -641,7 +712,8 @@ public partial record Moves
                 Name = "Head Smash",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Recoil = (1, 2),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Rock,
@@ -656,7 +728,10 @@ public partial record Moves
                 Name = "Heal Bell",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Distance = true, Sound = true, BypassSub = true, Metronome = true },
+                Flags = new MoveFlags
+                {
+                    Snatch = true, Distance = true, Sound = true, BypassSub = true, Metronome = true
+                },
                 Target = MoveTarget.AllyTeam,
                 Type = MoveType.Normal,
             },
@@ -685,7 +760,11 @@ public partial record Moves
                 Name = "Heart Swap",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, BypassSub = true, AllyAnim = true, Metronome = true },
+                Flags = new MoveFlags
+                {
+                    Protect = true, Mirror = true, BypassSub = true, AllyAnim = true,
+                    Metronome = true
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
             },
@@ -732,7 +811,10 @@ public partial record Moves
                 Name = "Heat Crash",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, NonSky = true, Metronome = true },
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, NonSky = true, Metronome = true
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
@@ -766,168 +848,197 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
             },
-                        [MoveId.HeavySlam] = new()
-                        {
-                            Id = MoveId.HeavySlam,
-                            Num = 484,
-                            Accuracy = 100,
-                            BasePower = 0,
-                            BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
-                            {
-                                int targetWeight = target.GetWeight();
-                                int pokemonWeight = pokemon.GetWeight();
-                                int bp;
-                                if (pokemonWeight >= targetWeight * 5)
-                                {
-                                    bp = 120;
-                                }
-                                else if (pokemonWeight >= targetWeight * 4)
-                                {
-                                    bp = 100;
-                                }
-                                else if (pokemonWeight >= targetWeight * 3)
-                                {
-                                    bp = 80;
-                                }
-                                else if (pokemonWeight >= targetWeight * 2)
-                                {
-                                    bp = 60;
-                                }
-                                else
-                                {
-                                    bp = 40;
-                                }
+            [MoveId.HeavySlam] = new()
+            {
+                Id = MoveId.HeavySlam,
+                Num = 484,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
+                {
+                    int targetWeight = target.GetWeight();
+                    int pokemonWeight = pokemon.GetWeight();
+                    int bp;
+                    if (pokemonWeight >= targetWeight * 5)
+                    {
+                        bp = 120;
+                    }
+                    else if (pokemonWeight >= targetWeight * 4)
+                    {
+                        bp = 100;
+                    }
+                    else if (pokemonWeight >= targetWeight * 3)
+                    {
+                        bp = 80;
+                    }
+                    else if (pokemonWeight >= targetWeight * 2)
+                    {
+                        bp = 60;
+                    }
+                    else
+                    {
+                        bp = 40;
+                    }
 
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Debug($"BP: {bp}");
-                                }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug($"BP: {bp}");
+                    }
 
-                                return bp;
-                            }),
-                            Category = MoveCategory.Physical,
-                            Name = "Heavy Slam",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Contact = true,
-                                Protect = true,
-                                Mirror = true,
-                                NonSky = true,
-                                Metronome = true,
-                            },
-                            // OnTryHit only applies to dynamax
-                            Secondary = null,
-                            Target = MoveTarget.Normal,
-                            Type = MoveType.Steel,
-                        },
-                        [MoveId.HammerArm] = new()
-                        {
-                            Id = MoveId.HammerArm,
-                            Num = 359,
-                            Accuracy = 90,
-                            BasePower = 100,
-                            Category = MoveCategory.Physical,
-                            Name = "Hammer Arm",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Contact = true,
-                                Protect = true,
-                                Mirror = true,
-                                Punch = true,
-                                Metronome = true,
-                            },
-                            Self = new SecondaryEffect
-                            {
-                                Boosts = new SparseBoostsTable
-                                {
-                                    Spe = -1,
-                                },
-                            },
-                            Target = MoveTarget.Normal,
-                            Type = MoveType.Fighting,
-                        },
-                        [MoveId.HardPress] = new()
-                        {
-                            Id = MoveId.HardPress,
-                            Num = 876,
-                            Accuracy = 100,
-                            BasePower = 0,
-                            BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
-                            {
-                                int power = Math.Max((int)Math.Floor(100.0 * target.Hp / target.MaxHp) + 1, 1);
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Debug($"BP: {power}");
-                                }
-                                return power;
-                            }),
-                            Category = MoveCategory.Physical,
-                            Name = "Hard Press",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Contact = true,
-                                Protect = true,
-                                Mirror = true,
-                                Metronome = true,
-                            },
-                            Target = MoveTarget.Normal,
-                            Type = MoveType.Steel,
-                        },
-                        [MoveId.HealPulse] = new()
-                        {
-                            Id = MoveId.HealPulse,
-                            Num = 505,
-                            Accuracy = IntTrueUnion.FromTrue(),
-                            BasePower = 0,
-                            Category = MoveCategory.Status,
-                            Name = "Heal Pulse",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Protect = true,
-                                Reflectable = true,
-                                Distance = true,
-                                Heal = true,
-                                AllyAnim = true,
-                                Pulse = true,
-                                Metronome = true,
-                            },
-                            Target = MoveTarget.Any,
-                            Type = MoveType.Psychic,
-                            // TODO: onHit - heal target by 50% of its max HP, or 75% if user has Mega Launcher
-                        },
-                        [MoveId.Heatwave] = new()
-                        {
-                            Id = MoveId.Heatwave,
-                            Num = 257,
-                            Accuracy = 90,
-                            BasePower = 95,
-                            Category = MoveCategory.Special,
-                            Name = "Heat Wave",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Protect = true,
-                                Mirror = true,
-                                Wind = true,
-                                Metronome = true,
-                            },
-                            Secondary = new SecondaryEffect
-                            {
-                                Chance = 10,
-                                Status = ConditionId.Burn,
-                            },
-                            Target = MoveTarget.AllAdjacentFoes,
-                            Type = MoveType.Fire,
-                        },
+                    return bp;
+                }),
+                Category = MoveCategory.Physical,
+                Name = "Heavy Slam",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    NonSky = true,
+                    Metronome = true,
+                },
+                // OnTryHit only applies to dynamax
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
+            },
+            [MoveId.HammerArm] = new()
+            {
+                Id = MoveId.HammerArm,
+                Num = 359,
+                Accuracy = 90,
+                BasePower = 100,
+                Category = MoveCategory.Physical,
+                Name = "Hammer Arm",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Punch = true,
+                    Metronome = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    Boosts = new SparseBoostsTable
+                    {
+                        Spe = -1,
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.HardPress] = new()
+            {
+                Id = MoveId.HardPress,
+                Num = 876,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
+                {
+                    int power = Math.Max((int)Math.Floor(100.0 * target.Hp / target.MaxHp) + 1, 1);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug($"BP: {power}");
+                    }
+
+                    return power;
+                }),
+                Category = MoveCategory.Physical,
+                Name = "Hard Press",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
+            },
+            [MoveId.HealPulse] = new()
+            {
+                Id = MoveId.HealPulse,
+                Num = 505,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Heal Pulse",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Distance = true,
+                    Heal = true,
+                    AllyAnim = true,
+                    Pulse = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Any,
+                Type = MoveType.Psychic,
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    bool success;
+                    int healAmount;
+                    if (source.HasAbility(AbilityId.MegaLauncher))
+                    {
+                        healAmount = battle.Modify(target.BaseMaxHp, 3, 4); // 75%
+                    }
+                    else
+                    {
+                        healAmount = (int)Math.Ceiling(target.BaseMaxHp * 0.5);
+                    }
+
+                    var healResult = battle.Heal(healAmount, target);
+                    success = healResult is not FalseIntFalseUnion;
+
+                    if (success && !target.IsAlly(source))
+                    {
+                        target.Staleness = StalenessId.External;
+                    }
+
+                    if (!success)
+                    {
+                        battle.Add("-fail", target, "heal");
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
+            [MoveId.Heatwave] = new()
+            {
+                Id = MoveId.Heatwave,
+                Num = 257,
+                Accuracy = 90,
+                BasePower = 95,
+                Category = MoveCategory.Special,
+                Name = "Heat Wave",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Wind = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Burn,
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Fire,
+            },
             [MoveId.HelpingHand] = new()
             {
                 Id = MoveId.HelpingHand,
@@ -966,31 +1077,34 @@ public partial record Moves
                 Name = "High Jump Kick",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Gravity = true, Metronome = true },
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, Gravity = true, Metronome = true
+                },
                 HasCrashDamage = true,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
-                        [MoveId.HighHorsepower] = new()
-                        {
-                            Id = MoveId.HighHorsepower,
-                            Num = 667,
-                            Accuracy = 95,
-                            BasePower = 95,
-                            Category = MoveCategory.Physical,
-                            Name = "High Horsepower",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Contact = true,
-                                Protect = true,
-                                Mirror = true,
-                                Metronome = true,
-                            },
-                            Target = MoveTarget.Normal,
-                            Type = MoveType.Ground,
-                        },
+            [MoveId.HighHorsepower] = new()
+            {
+                Id = MoveId.HighHorsepower,
+                Num = 667,
+                Accuracy = 95,
+                BasePower = 95,
+                Category = MoveCategory.Physical,
+                Name = "High Horsepower",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ground,
+            },
             [MoveId.HoneClaws] = new()
             {
                 Id = MoveId.HoneClaws,
@@ -1016,7 +1130,8 @@ public partial record Moves
                 Name = "Horn Attack",
                 BasePp = 25,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -1030,7 +1145,8 @@ public partial record Moves
                 Name = "Horn Drill",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Ohko = true,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -1045,7 +1161,10 @@ public partial record Moves
                 Name = "Horn Leech",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Heal = true, Metronome = true },
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, Heal = true, Metronome = true
+                },
                 Drain = (1, 2),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
@@ -1064,32 +1183,32 @@ public partial record Moves
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Normal,
             },
-                        [MoveId.Hurricane] = new()
-                        {
-                            Id = MoveId.Hurricane,
-                            Num = 542,
-                            Accuracy = 70,
-                            BasePower = 110,
-                            Category = MoveCategory.Special,
-                            Name = "Hurricane",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Protect = true,
-                                Mirror = true,
-                                Distance = true,
-                                Wind = true,
-                                Metronome = true,
-                            },
-                            Secondary = new SecondaryEffect
-                            {
-                                Chance = 30,
-                                VolatileStatus = ConditionId.Confusion,
-                            },
-                            Target = MoveTarget.Any,
-                            Type = MoveType.Flying,
-                        },
+            [MoveId.Hurricane] = new()
+            {
+                Id = MoveId.Hurricane,
+                Num = 542,
+                Accuracy = 70,
+                BasePower = 110,
+                Category = MoveCategory.Special,
+                Name = "Hurricane",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Distance = true,
+                    Wind = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 30,
+                    VolatileStatus = ConditionId.Confusion,
+                },
+                Target = MoveTarget.Any,
+                Type = MoveType.Flying,
+            },
             [MoveId.HydroCannon] = new()
             {
                 Id = MoveId.HydroCannon,
@@ -1100,7 +1219,8 @@ public partial record Moves
                 Name = "Hydro Cannon",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Recharge = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Recharge = true, Protect = true, Mirror = true, Metronome = true },
                 Self = new SecondaryEffect
                 {
                     VolatileStatus = ConditionId.MustRecharge,
@@ -1132,7 +1252,8 @@ public partial record Moves
                 Name = "Hydro Steam",
                 BasePp = 15,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Protect = true, Mirror = true, Defrost = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
             },
@@ -1150,51 +1271,51 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
-                        [MoveId.HyperBeam] = new()
-                        {
-                            Id = MoveId.HyperBeam,
-                            Num = 63,
-                            Accuracy = 90,
-                            BasePower = 150,
-                            Category = MoveCategory.Special,
-                            Name = "Hyper Beam",
-                            BasePp = 5,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Recharge = true,
-                                Protect = true,
-                                Mirror = true,
-                                Metronome = true,
-                            },
-                            Self = new SecondaryEffect
-                            {
-                                VolatileStatus = ConditionId.MustRecharge,
-                            },
-                            Target = MoveTarget.Normal,
-                            Type = MoveType.Normal,
-                        },
-                        [MoveId.HyperVoice] = new()
-                        {
-                            Id = MoveId.HyperVoice,
-                            Num = 304,
-                            Accuracy = 100,
-                            BasePower = 90,
-                            Category = MoveCategory.Special,
-                            Name = "Hyper Voice",
-                            BasePp = 10,
-                            Priority = 0,
-                            Flags = new MoveFlags
-                            {
-                                Protect = true,
-                                Mirror = true,
-                                Sound = true,
-                                BypassSub = true,
-                                Metronome = true,
-                            },
-                            Target = MoveTarget.AllAdjacentFoes,
-                            Type = MoveType.Normal,
-                        },
+            [MoveId.HyperBeam] = new()
+            {
+                Id = MoveId.HyperBeam,
+                Num = 63,
+                Accuracy = 90,
+                BasePower = 150,
+                Category = MoveCategory.Special,
+                Name = "Hyper Beam",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Recharge = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.MustRecharge,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.HyperVoice] = new()
+            {
+                Id = MoveId.HyperVoice,
+                Num = 304,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Hyper Voice",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Sound = true,
+                    BypassSub = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Normal,
+            },
             [MoveId.HyperspaceFury] = new()
             {
                 Id = MoveId.HyperspaceFury,
@@ -1239,7 +1360,8 @@ public partial record Moves
                 Name = "Hypnosis",
                 BasePp = 20,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
                 Status = ConditionId.Sleep,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
@@ -1254,7 +1376,11 @@ public partial record Moves
                 Name = "Ice Burn",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Charge = true, Protect = true, Mirror = true, NoSleepTalk = true, FailInstruct = true },
+                Flags = new MoveFlags
+                {
+                    Charge = true, Protect = true, Mirror = true, NoSleepTalk = true,
+                    FailInstruct = true
+                },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -1273,7 +1399,10 @@ public partial record Moves
                 Name = "Ice Fang",
                 BasePp = 15,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true, Bite = true },
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, Metronome = true, Bite = true
+                },
                 Secondaries = new[]
                 {
                     new SecondaryEffect { Chance = 10, Status = ConditionId.Freeze },
@@ -1292,7 +1421,8 @@ public partial record Moves
                 Name = "Ice Hammer",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Punch = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Punch = true },
                 Self = new SecondaryEffect
                 {
                     Boosts = new SparseBoostsTable { Spe = -1 },
@@ -1324,7 +1454,8 @@ public partial record Moves
                 Name = "Ice Spinner",
                 BasePp = 15,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
             },
@@ -1357,7 +1488,11 @@ public partial record Moves
                 Name = "Instruct",
                 BasePp = 15,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, BypassSub = true, AllyAnim = true, Metronome = true, FailInstruct = true },
+                Flags = new MoveFlags
+                {
+                    Protect = true, BypassSub = true, AllyAnim = true, Metronome = true,
+                    FailInstruct = true
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
             },
@@ -1371,7 +1506,8 @@ public partial record Moves
                 Name = "Iron Tail",
                 BasePp = 15,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -1395,6 +1531,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
             },
-                    };
-                }
-            }
+        };
+    }
+}
