@@ -1857,7 +1857,7 @@ public partial record Moves
                         MustPressure = true,
                     },
                     SideCondition = ConditionId.Spikes,
-                    // TODO: Implement Spikes condition
+                    Condition = _library.Conditions[ConditionId.Spikes],
                     Secondary = null,
                     Target = MoveTarget.FoeSide,
                     Type = MoveType.Ground,
@@ -2147,7 +2147,7 @@ public partial record Moves
                         MustPressure = true,
                     },
                     SideCondition = ConditionId.StealthRock,
-                    // TODO: Implement StealthRock condition
+                    Condition = _library.Conditions[ConditionId.StealthRock],
                     Secondary = null,
                     Target = MoveTarget.FoeSide,
                     Type = MoveType.Rock,
@@ -2292,7 +2292,7 @@ public partial record Moves
                         Metronome = true,
                     },
                     SideCondition = ConditionId.StickyWeb,
-                    // TODO: Implement StickyWeb condition
+                    Condition = _library.Conditions[ConditionId.StickyWeb],
                     Secondary = null,
                     Target = MoveTarget.FoeSide,
                     Type = MoveType.Bug,
@@ -3577,7 +3577,15 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: basePowerCallback - doubles if previous move failed
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, move) =>
+                {
+                    if (source.MoveLastTurnResult?.IsFalse() == true)
+                    {
+                        battle.Debug("doubling Temper Flare BP due to previous move failure");
+                        return move.BasePower * 2;
+                    }
+                    return move.BasePower;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
@@ -4202,7 +4210,7 @@ public partial record Moves
                         MustPressure = true,
                     },
                     SideCondition = ConditionId.ToxicSpikes,
-                    // TODO: Implement ToxicSpikes condition
+                    Condition = _library.Conditions[ConditionId.ToxicSpikes],
                     Secondary = null,
                     Target = MoveTarget.FoeSide,
                     Type = MoveType.Poison,
