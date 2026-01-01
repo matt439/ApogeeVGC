@@ -7,7 +7,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public partial record Move : IBasicEffect, ICopyable<Move>
+public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
 {
    public MoveId Id { get; init; }
     public EffectStateId EffectStateId => Id;
@@ -67,7 +67,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
         }
     }
     public bool NoPpBoosts { get; init; }
-    public MoveCategory Category { get; init; }
+    public MoveCategory Category { get; set; }
     public MoveType Type { get; set; }
     public int Priority
     {
@@ -145,10 +145,10 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public bool? IsConfusionSelfHit { get; init; }
     public bool? StallingMove { get; init; }
     public MoveId? BaseMove { get; init; }
-    public ConditionId? PseudoWeather { get; init; }
-    public ConditionId? VolatileStatus { get; init; }
-    public ConditionId? SideCondition { get; init; }
-    public ConditionId? Status { get; init; }
+    //public ConditionId? PseudoWeather { get; init; }
+    //public ConditionId? VolatileStatus { get; init; }
+    //public ConditionId? SideCondition { get; init; }
+    //public ConditionId? Status { get; init; }
 
     public bool AffectsFainted { get; init; }
 

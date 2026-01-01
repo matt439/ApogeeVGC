@@ -224,6 +224,14 @@ public partial record Conditions
                 // TODO: OnDragOut - release the target if user is forced out
                 // TODO: OnFaint - release the target if user faints
             },
+            [ConditionId.Snatch] = new()
+            {
+                Id = ConditionId.Snatch,
+            },
+            [ConditionId.SupercellSlam] = new()
+            {
+                Id = ConditionId.SupercellSlam,
+            },
             [ConditionId.Stall] = new()
             {
                 // Protect, Detect, Endure counter

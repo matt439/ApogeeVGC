@@ -168,4 +168,6 @@ public enum ConditionId
                                                 TarShot,
                                                 ThroatChop,
                                                 Uproar,
+                                                Snatch,
+                                                SupercellSlam,
                                                 }
