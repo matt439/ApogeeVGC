@@ -1,5 +1,10 @@
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -86,7 +91,22 @@ public partial record Moves
                     Metronome = true,
                     Powder = true,
                 },
-                // TODO: onHit - set target type to Psychic
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Check if target is already pure Psychic type
+                    var types = target.GetTypes();
+                    if (types.Length == 1 && types[0] == PokemonType.Psychic)
+                    {
+                        return false;
+                    }
+                    // Attempt to set type to Psychic
+                    if (!target.SetType(PokemonType.Psychic))
+                    {
+                        return false;
+                    }
+                    battle.Add("-start", target, "typechange", "Psychic");
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
@@ -150,7 +170,29 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                // TODO: onHitSide - boost Def and SpD of allies with Plus or Minus abilities
+                OnHitSide = new OnHitSideEventInfo((battle, side, source, move) =>
+                {
+                    // Find allies with Plus or Minus abilities
+                    var targets = side.Allies().Where(ally =>
+                        ally.HasAbility(AbilityId.Plus) || ally.HasAbility(AbilityId.Minus))
+                        .ToList();
+
+                    if (targets.Count == 0)
+                    {
+                        return false;
+                    }
+
+                    bool didSomething = false;
+                    foreach (var target in targets)
+                    {
+                        var result = battle.Boost(new SparseBoostsTable { Def = 1, SpD = 1 }, target, source, move);
+                        if (result?.IsTruthy() == true)
+                        {
+                            didSomething = true;
+                        }
+                    }
+                    return didSomething;
+                }),
                 Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Electric,
@@ -173,7 +215,24 @@ public partial record Moves
                 },
                 VolatileStatus = ConditionId.MagnetRise,
                 Condition = _library.Conditions[ConditionId.MagnetRise],
-                // TODO: onTry - check if target has smackdown or ingrain, or if gravity is active
+                OnTry = new OnTryEventInfo((battle, target, source, move) =>
+                {
+                    // Fail if source has Smack Down or Ingrain
+                    if (source.Volatiles.ContainsKey(ConditionId.SmackDown) ||
+                        source.Volatiles.ContainsKey(ConditionId.Ingrain))
+                    {
+                        return false;
+                    }
+
+                    // Fail if Gravity is active
+                    if (battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
+                    {
+                        battle.Add("cant", source, "move: Gravity", move);
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Electric,
@@ -269,7 +328,11 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onHit - add 'trapped' volatile to target
+                OnHit = new OnHitEventInfo((_, target, source, move) =>
+                {
+                    var result = target.AddVolatile(ConditionId.Trapped, source, move, ConditionId.Trapper);
+                    return result is BoolRelayVar { Value: true } ? new VoidReturn() : false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -376,9 +439,12 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: boosts - lower target's Atk and SpA by 2
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
-                Secondary = null,
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Atk = -2, SpA = -2 },
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
@@ -454,8 +520,11 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                // TODO: boosts - lower target's SpD by 2
-                Secondary = null,
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { SpD = -2 },
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
             },
@@ -476,7 +545,27 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onTryMove - boost SpA by 1 on charge turn, then attack on next turn
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // If already charged (TwoTurnMove volatile exists with this move), remove it and execute the attack
+                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    {
+                        return new VoidReturn();
+                    }
+                    // Starting the charge turn - show prepare message
+                    battle.Add("-prepare", attacker, move.Name);
+                    // Boost SpA by 1 on charge turn
+                    battle.Boost(new SparseBoostsTable { SpA = 1 }, attacker, attacker, move);
+                    // Run ChargeMove event (for Power Herb, etc.)
+                    var chargeResult = battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+                    // Add the volatile for charging state
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    return null; // Return null to skip the attack this turn
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Rock,
@@ -635,7 +724,7 @@ public partial record Moves
                 },
                 VolatileStatus = ConditionId.Minimize,
                 Condition = _library.Conditions[ConditionId.Minimize],
-                // TODO: boosts - raise evasion by 2
+                SelfBoost = new SparseBoostsTable { Evasion = 2 },
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
@@ -727,7 +816,17 @@ public partial record Moves
                     Metronome = true,
                 },
                 SelfDestruct = MoveSelfDestruct.FromAlways(),
-                // TODO: onBasePower - 1.5x if Misty Terrain is active and source is grounded
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                {
+                    if (battle.Field.IsTerrain(ConditionId.MistyTerrain, source) &&
+                        (source.IsGrounded() ?? false))
+                    {
+                        battle.Debug("misty terrain boost");
+                        battle.ChainModify(3, 2); // 1.5x
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }),
                 Secondary = null,
                 Target = MoveTarget.AllAdjacent,
                 Type = MoveType.Fairy,
@@ -812,7 +911,36 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                // TODO: onHit - heal 50% in normal weather, 66.7% in sun, 25% in other weather
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                {
+                    // Determine heal factor based on weather
+                    int numerator = 1;
+                    int denominator = 2; // Default 50%
+
+                    var weather = source.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    {
+                        // 66.7% = 2/3
+                        numerator = 2;
+                        denominator = 3;
+                    }
+                    else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
+                                      or ConditionId.Sandstorm or ConditionId.Hail or ConditionId.Snowscape)
+                    {
+                        // 25% = 1/4
+                        numerator = 1;
+                        denominator = 4;
+                    }
+
+                    int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                    var healResult = battle.Heal(healAmount, source);
+                    if (healResult is FalseIntFalseUnion)
+                    {
+                        battle.Add("-fail", source, "heal");
+                        return new VoidReturn();
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Fairy,
@@ -833,7 +961,36 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                // TODO: onHit - heal 50% in normal weather, 66.7% in sun, 25% in other weather
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                {
+                    // Determine heal factor based on weather
+                    int numerator = 1;
+                    int denominator = 2; // Default 50%
+
+                    var weather = source.EffectiveWeather();
+                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    {
+                        // 66.7% = 2/3
+                        numerator = 2;
+                        denominator = 3;
+                    }
+                    else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
+                                      or ConditionId.Sandstorm or ConditionId.Hail or ConditionId.Snowscape)
+                    {
+                        // 25% = 1/4
+                        numerator = 1;
+                        denominator = 4;
+                    }
+
+                    int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                    var healResult = battle.Heal(healAmount, source);
+                    if (healResult is FalseIntFalseUnion)
+                    {
+                        battle.Add("-fail", source, "heal");
+                        return new VoidReturn();
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
@@ -855,8 +1012,66 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onAfterHit - remove hazards from user's side and leech seed
-                // TODO: onAfterSubDamage - remove hazards from user's side and leech seed
+                OnAfterHit = new OnAfterHitEventInfo((battle, _, source, move) =>
+                {
+                    if (move.HasSheerForce ?? false) return new VoidReturn();
+
+                    // Remove Leech Seed
+                    if (source.Hp > 0 && source.RemoveVolatile(battle.Library.Conditions[ConditionId.LeechSeed]))
+                    {
+                        battle.Add("-end", source, "Leech Seed", "[from] move: Mortal Spin", $"[of] {source}");
+                    }
+
+                    // Remove hazards from user's side
+                    ConditionId[] hazards = [
+                        ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock, ConditionId.StickyWeb
+                    ];
+                    foreach (var hazard in hazards)
+                    {
+                        if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
+                        {
+                            var conditionData = battle.Library.Conditions[hazard];
+                            battle.Add("-sideend", source.Side, conditionData.Name, "[from] move: Mortal Spin", $"[of] {source}");
+                        }
+                    }
+
+                    // Remove partial trap
+                    if (source.Hp > 0 && source.Volatiles.ContainsKey(ConditionId.PartiallyTrapped))
+                    {
+                        source.RemoveVolatile(battle.Library.Conditions[ConditionId.PartiallyTrapped]);
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, _, source, move) =>
+                {
+                    if (move.HasSheerForce ?? false) return;
+
+                    // Remove Leech Seed
+                    if (source.Hp > 0 && source.RemoveVolatile(battle.Library.Conditions[ConditionId.LeechSeed]))
+                    {
+                        battle.Add("-end", source, "Leech Seed", "[from] move: Mortal Spin", $"[of] {source}");
+                    }
+
+                    // Remove hazards from user's side
+                    ConditionId[] hazards = [
+                        ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock, ConditionId.StickyWeb
+                    ];
+                    foreach (var hazard in hazards)
+                    {
+                        if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
+                        {
+                            var conditionData = battle.Library.Conditions[hazard];
+                            battle.Add("-sideend", source.Side, conditionData.Name, "[from] move: Mortal Spin", $"[of] {source}");
+                        }
+                    }
+
+                    // Remove partial trap
+                    if (source.Hp > 0 && source.Volatiles.ContainsKey(ConditionId.PartiallyTrapped))
+                    {
+                        source.RemoveVolatile(battle.Library.Conditions[ConditionId.PartiallyTrapped]);
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
@@ -1057,7 +1272,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: damage = level
+                Damage = MoveDamage.FromLevel(),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ghost,
@@ -1127,9 +1342,24 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                VolatileStatus = ConditionId.NoRetreat,
-                Condition = _library.Conditions[ConditionId.NoRetreat],
-                // TODO: onTry - fail if source already has noretreat, remove volatileStatus if already trapped
+                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                {
+                    // Fail if source already has No Retreat
+                    if (source.Volatiles.ContainsKey(ConditionId.NoRetreat))
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((_, _, source, _) =>
+                {
+                    // Only apply volatile status if not already trapped
+                    if (!source.Volatiles.ContainsKey(ConditionId.Trapped))
+                    {
+                        source.AddVolatile(ConditionId.NoRetreat);
+                    }
+                    return new VoidReturn();
+                }),
                 SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
                 Secondary = null,
                 Target = MoveTarget.Self,
@@ -1174,7 +1404,37 @@ public partial record Moves
                 {
                     Protect = true,
                 },
-                // TODO: onAfterMoveSecondarySelf - boost based on Tatsugiri forme if user is commanded
+                OnAfterMoveSecondarySelf = new OnAfterMoveSecondarySelfEventInfo((battle, source, _, _) =>
+                {
+                    // Check if Dondozo is commanded by Tatsugiri
+                    if (!source.Volatiles.TryGetValue(ConditionId.Commanded, out var commandedState))
+                    {
+                        return new VoidReturn();
+                    }
+
+                    var tatsugiri = commandedState.Source;
+                    if (tatsugiri == null || tatsugiri.Species.BaseSpecies != SpecieId.Tatsugiri)
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Boost based on Tatsugiri's forme
+                    var forme = tatsugiri.Species.Forme;
+                    switch (forme)
+                    {
+                        case FormeId.Droopy:
+                            battle.Boost(new SparseBoostsTable { Def = 1 }, source, source);
+                            break;
+                        case FormeId.Stretchy:
+                            battle.Boost(new SparseBoostsTable { Spe = 1 }, source, source);
+                            break;
+                        default: // Curly or any other forme
+                            battle.Boost(new SparseBoostsTable { Atk = 1 }, source, source);
+                            break;
+                    }
+
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 HasSheerForce = true,
                 Target = MoveTarget.Normal,
