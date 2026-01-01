@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -153,7 +154,23 @@ public partial record Moves
                 },
                 VolatileStatus = ConditionId.Imprison,
                 Condition = _library.Conditions[ConditionId.Imprison],
-                // TODO: onTryHit - check if at least one foe has one of the user's moves
+                OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>
+                {
+                    // Check if at least one foe has one of the user's moves
+                    foreach (var foe in source.Foes())
+                    {
+                        foreach (var moveSlot in source.MoveSlots)
+                        {
+                            if (moveSlot.Id == MoveId.Struggle) continue;
+                            if (foe.HasMove(moveSlot.Id))
+                            {
+                                return new VoidReturn();
+                            }
+                        }
+                    }
+                    // No foe shares a move - fail
+                    return false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
@@ -174,7 +191,19 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onAfterHit - destroy target's Berry
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    var item = target.GetItem();
+                    if ((item.IsBerry || item.IsGem))
+                    {
+                        var takeResult = target.TakeItem(source);
+                        if (takeResult is ItemItemFalseUnion takenItem)
+                        {
+                            battle.Add("-enditem", target, takenItem.Item.Name, "[from] move: Incinerate");
+                        }
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Fire,
