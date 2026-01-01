@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
@@ -31,7 +32,12 @@ public partial record Moves
                     Metronome = true,
                     Bite = true,
                 },
-                // TODO: onHit - add 'trapped' volatile to both source and target
+                OnHit = new OnHitEventInfo((_, target, source, move) =>
+                {
+                    source.AddVolatile(ConditionId.Trapped, target, move, ConditionId.Trapper);
+                    target.AddVolatile(ConditionId.Trapped, source, move, ConditionId.Trapper);
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
@@ -73,7 +79,15 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onModifyType - change type based on plate held (item.onPlate)
+                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
+                {
+                    if (pokemon.IgnoringItem()) return;
+                    var item = pokemon.GetItem();
+                    if (item.Id != ItemId.None && item.OnPlate != null)
+                    {
+                        move.Type = (MoveType)item.OnPlate.Value;
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -94,7 +108,14 @@ public partial record Moves
                     BypassSub = true,
                     AllyAnim = true,
                 },
-                // TODO: onHit - heal 25% of target's max HP and cure status
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
+                    var healResult = battle.Heal(healAmount, target);
+                    bool success = healResult is not FalseIntFalseUnion;
+                    bool cured = target.CureStatus();
+                    return (cured || success) ? new VoidReturn() : false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Allies,
                 Type = MoveType.Grass,
@@ -116,8 +137,31 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onBasePower - 1.5x if target has a removable item
-                // TODO: onAfterHit - remove target's item if source is not fainted
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, target, move) =>
+                {
+                    var item = target.GetItem();
+                    // Check if item can be taken (TakeItem event check)
+                    var takeResult = battle.SingleEvent(Sim.Events.EventId.TakeItem, item, target.ItemState, target, target, move, item);
+                    if (takeResult is BoolRelayVar { Value: false }) return basePower;
+                    if (item.Id != ItemId.None)
+                    {
+                        battle.ChainModify(3, 2); // 1.5x
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }),
+                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, _) =>
+                {
+                    if (source.Hp > 0)
+                    {
+                        var takeResult = target.TakeItem();
+                        if (takeResult is ItemItemFalseUnion takenItem)
+                        {
+                            battle.Add("-enditem", target, takenItem.Item.Name, "[from] move: Knock Off", $"[of] {source}");
+                        }
+                    }
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
@@ -248,7 +292,23 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onTry - check if user knows at least 2 moves and all other moves have been used
+                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                {
+                    // Last Resort fails unless the user knows at least 2 moves
+                    if (source.MoveSlots.Count < 2) return false;
+                    bool hasLastResort = false;
+                    foreach (var moveSlot in source.MoveSlots)
+                    {
+                        if (moveSlot.Id == MoveId.LastResort)
+                        {
+                            hasLastResort = true;
+                            continue;
+                        }
+                        // All other moves must have been used
+                        if (!moveSlot.Used) return false;
+                    }
+                    return hasLastResort ? new VoidReturn() : false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -269,7 +329,12 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: basePowerCallback - 50 + 50 * pokemon.side.totalFainted
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                {
+                    int bp = 50 + 50 * source.Side.TotalFainted;
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ghost,
@@ -470,9 +535,21 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // TODO: onTryHit - check if source already has lockon volatile
-                // TODO: onHit - add lockon volatile to source targeting the target
-                VolatileStatus = ConditionId.LockOn,
+                OnTryHit = new OnTryHitEventInfo((_, _, source, _) =>
+                {
+                    // Fails if source already has lockon volatile
+                    if (source.Volatiles.ContainsKey(ConditionId.LockOn))
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    source.AddVolatile(ConditionId.LockOn, target);
+                    battle.Add("-activate", source, "move: Lock-On", $"[of] {target}");
+                    return new VoidReturn();
+                }),
                 Condition = _library.Conditions[ConditionId.LockOn],
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -521,7 +598,14 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                // TODO: onHit - heal 25% of target's max HP and cure status
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
+                    var healResult = battle.Heal(healAmount, target);
+                    bool success = healResult is not FalseIntFalseUnion;
+                    bool cured = target.CureStatus();
+                    return (cured || success) ? new VoidReturn() : false;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Allies,
                 Type = MoveType.Psychic,
@@ -543,9 +627,19 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                // TODO: onTryHit - check if user can switch
+                OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>
+                {
+                    // Fails if user cannot switch
+                    if (battle.CanSwitch(source.Side) == 0)
+                    {
+                        battle.Add("-fail", source);
+                        return new VoidReturn(); // NOT_FAIL equivalent - move "worked" but did nothing
+                    }
+                    return new VoidReturn();
+                }),
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
                 // TODO: slotCondition - lunardance that heals replacement pokemon
+                // This requires slot condition infrastructure to heal the incoming Pokemon
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
