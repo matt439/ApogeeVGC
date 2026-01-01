@@ -311,7 +311,27 @@ public partial record Moves
                 Flags = new MoveFlags { Contact = true, Charge = true, Protect = true, Mirror = true, NonSky = true, Metronome = true, NoSleepTalk = true, NoAssist = true, FailInstruct = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
-                // TODO: onTryMove - two-turn attack logic
+                Condition = _library.Conditions[ConditionId.Dig],
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // If already underground (volatile exists), remove it and execute the attack
+                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Dig]))
+                    {
+                        return new VoidReturn();
+                    }
+                    // Starting the charge turn - show prepare message
+                    battle.Add("-prepare", attacker, move.Name);
+                    // Run ChargeMove event (for Power Herb, etc.)
+                    var chargeResult = battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+                    // Add the volatile for underground state
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    attacker.AddVolatile(ConditionId.Dig);
+                    return null; // Return null to skip the attack this turn
+                }),
             },
             [MoveId.Disable] = new()
             {
@@ -421,7 +441,28 @@ public partial record Moves
                 Flags = new MoveFlags { Contact = true, Charge = true, Protect = true, Mirror = true, NonSky = true, AllyAnim = true, Metronome = true, NoSleepTalk = true, NoAssist = true, FailInstruct = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
-                // TODO: onTryMove - two-turn attack logic, Cramorant interaction
+                Condition = _library.Conditions[ConditionId.Dive],
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // If already underwater (volatile exists), remove it and execute the attack
+                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Dive]))
+                    {
+                        return new VoidReturn();
+                    }
+                    // Note: Cramorant Gulp Missile forme change is handled by the ability, not the move
+                    // Starting the charge turn - show prepare message
+                    battle.Add("-prepare", attacker, move.Name);
+                    // Run ChargeMove event (for Power Herb, etc.)
+                    var chargeResult = battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+                    // Add the volatile for underwater state
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    attacker.AddVolatile(ConditionId.Dive);
+                    return null; // Return null to skip the attack this turn
+                }),
             },
             [MoveId.Doodle] = new()
             {
@@ -489,7 +530,9 @@ public partial record Moves
                 Flags = new MoveFlags { Metronome = true, FutureMove = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
-                // TODO: onTry - future move setup
+                // Future move setup requires slot condition infrastructure
+                // For now, this move will not function as a future move
+                // TODO: Implement AddSlotCondition and FutureMove handling in Side class
             },
             [MoveId.DoubleEdge] = new()
             {
@@ -1080,8 +1123,25 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Sound = true, BypassSub = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                // TODO: onTryMove - add pseudoWeather 'echoedvoice'
-                // TODO: basePowerCallback - scales with multiplier from pseudoWeather
+                OnTryMove = new OnTryMoveEventInfo((battle, _, _, _) =>
+                {
+                    // Add the pseudo-weather to track consecutive uses
+                    battle.Field.AddPseudoWeather(ConditionId.EchoedVoice);
+                    return new VoidReturn();
+                }),
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                {
+                    int bp = move.BasePower;
+                    var echoedVoiceState = battle.Field.PseudoWeather.GetValueOrDefault(ConditionId.EchoedVoice);
+                    if (echoedVoiceState != null)
+                    {
+                        // Multiplier is stored in the pseudo-weather state
+                        int multiplier = echoedVoiceState.Multiplier ?? 1;
+                        bp = move.BasePower * multiplier;
+                    }
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
             },
             [MoveId.EerieImpulse] = new()
             {
@@ -1203,7 +1263,36 @@ public partial record Moves
                 Flags = new MoveFlags { Charge = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                // TODO: onTryMove - two-turn attack logic, boosts SpA, skips charge in rain
+                HasSheerForce = true,
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // If already charged (volatile exists), remove it and execute the attack
+                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.ElectroShot]))
+                    {
+                        return new VoidReturn();
+                    }
+                    // Starting the charge turn - show prepare message
+                    battle.Add("-prepare", attacker, move.Name);
+                    // Boost SpA by 1 during charge
+                    battle.Boost(new SparseBoostsTable { SpA = 1 }, attacker, attacker, move);
+                    // Check if rain allows skipping the charge turn
+                    var weather = attacker.EffectiveWeather();
+                    if (weather == ConditionId.RainDance || weather == ConditionId.PrimordialSea)
+                    {
+                        // Skip charge turn in rain - execute immediately
+                        return new VoidReturn();
+                    }
+                    // Run ChargeMove event (for Power Herb, etc.)
+                    var chargeResult = battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+                    // Add the volatile for charging state
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    attacker.AddVolatile(ConditionId.ElectroShot);
+                    return null; // Return null to skip the attack this turn
+                }),
             },
             [MoveId.Electroweb] = new()
             {
@@ -2313,7 +2402,26 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
-                // TODO: onTryMove - two-turn attack logic
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // If already charged (volatile exists), remove it and execute the attack
+                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.FreezeShock]))
+                    {
+                        return new VoidReturn();
+                    }
+                    // Starting the charge turn - show prepare message
+                    battle.Add("-prepare", attacker, move.Name);
+                    // Run ChargeMove event (for Power Herb, etc.)
+                    var chargeResult = battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+                    // Add the volatile for charging state
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    attacker.AddVolatile(ConditionId.FreezeShock);
+                    return null; // Return null to skip the attack this turn
+                }),
             },
             [MoveId.FreezingGlare] = new()
             {

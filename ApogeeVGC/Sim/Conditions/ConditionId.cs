@@ -49,6 +49,8 @@ public enum ConditionId
     Dig,
     PhantomForce,
     ShadowForce,
+    ElectroShot,
+    FreezeShock,
     RevivalBlessing,
     HealBlock,
     Trapped,

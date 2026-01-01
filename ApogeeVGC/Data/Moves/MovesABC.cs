@@ -3,6 +3,10 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Utils.Unions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
+using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Items;
+using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Moves;
 
@@ -1432,7 +1436,23 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
-                // TODO: onAfterHit - sets up Spikes on target's side
+                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, move) =>
+                {
+                    if ((move.HasSheerForce ?? false) || source.Hp <= 0) return new VoidReturn();
+                    foreach (var side in source.Side.FoeSidesWithConditions())
+                    {
+                        side.AddSideCondition(ConditionId.Spikes);
+                    }
+                    return new VoidReturn();
+                }),
+                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, target, source, move) =>
+                {
+                    if ((move.HasSheerForce ?? false) || source.Hp <= 0) return;
+                    foreach (var side in source.Side.FoeSidesWithConditions())
+                    {
+                        side.AddSideCondition(ConditionId.Spikes);
+                    }
+                }),
             },
             [MoveId.Celebrate] = new()
             {
@@ -1447,7 +1467,11 @@ public partial record Moves
                 Flags = new MoveFlags { NoSleepTalk = true, NoAssist = true, FailCopycat = true, FailMimic = true, FailInstruct = true },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                // TODO: onTryHit - displays celebration message
+                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                {
+                    battle.Add("-activate", target, "move: Celebrate");
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Charge] = new()
             {
@@ -1539,8 +1563,15 @@ public partial record Moves
                 SelfSwitch = true,
                 Target = MoveTarget.All,
                 Type = MoveType.Ice,
-                // TODO: priorityChargeCallback - sets up volatile for preparation
-                // TODO: weather - sets Snowscape
+                PriorityChargeCallback = new PriorityChargeCallbackEventInfo((battle, source) =>
+                {
+                    source.AddVolatile(ConditionId.ChillyReception);
+                }),
+                OnHitField = new OnHitFieldEventInfo((battle, _, source, _) =>
+                {
+                    battle.Field.SetWeather(ConditionId.Snowscape, source);
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Chloroblast] = new()
             {
@@ -1604,9 +1635,28 @@ public partial record Moves
                 SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Dragon,
-                // TODO: onTry - HP threshold check
-                // TODO: onTryHit - boost application
-                // TODO: onHit - 33% HP recoil damage
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    // Fails if HP is 33% or less, or if maxhp is 1 (Shedinja)
+                    if (source.Hp <= source.MaxHp * 33 / 100 || source.MaxHp == 1)
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, _, source, move) =>
+                {
+                    // Apply boosts first, fail if boosts couldn't be applied
+                    var boostResult = battle.Boost(move.SelfBoost, source, source, move);
+                    if (boostResult == null || !boostResult.IsTruthy()) return false;
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                {
+                    // Deal 33% recoil damage
+                    battle.DirectDamage(source.MaxHp * 33 / 100, source);
+                    return new VoidReturn();
+                }),
             },
             [MoveId.ClearSmog] = new()
             {
@@ -1718,9 +1768,22 @@ public partial record Moves
                 Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, FailMeFirst = true },
                 Target = MoveTarget.Scripted,
                 Type = MoveType.Dark,
-                // TODO: damageCallback - returns 1.5x damage received
-                // TODO: onTry - checks if damage was taken
-                // TODO: onModifyTarget - redirects to attacker
+                DamageCallback = new DamageCallbackEventInfo((battle, pokemon, target, move) =>
+                {
+                    var lastDamagedBy = pokemon.GetLastDamagedBy(true);
+                    if (lastDamagedBy != null)
+                    {
+                        int damage = (int)(lastDamagedBy.Damage * 1.5);
+                        return damage == 0 ? 1 : damage;
+                    }
+                    return 0;
+                }),
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    var lastDamagedBy = source.GetLastDamagedBy(true);
+                    if (lastDamagedBy == null || !lastDamagedBy.ThisTurn) return false;
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Confide] = new()
             {
@@ -1817,7 +1880,21 @@ public partial record Moves
                 CallsMove = true,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                // TODO: onHit - copies last move used
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                {
+                    var lastMove = battle.LastMove;
+                    if (lastMove == null) return false;
+
+                    // Get the move to use - if it has a base move, use that
+                    var moveId = lastMove.BaseMove ?? lastMove.Id;
+                    var moveToUse = battle.Library.Moves[moveId];
+
+                    // Check if the move can be copied
+                    if (moveToUse.Flags.FailCopycat == true) return false;
+
+                    battle.Actions.UseMove(moveToUse.Id, source);
+                    return new VoidReturn();
+                }),
             },
             [MoveId.CosmicPower] = new()
             {
@@ -1899,7 +1976,55 @@ public partial record Moves
                 Flags = new MoveFlags { Mirror = true, Metronome = true },
                 Target = MoveTarget.All,
                 Type = MoveType.Normal,
-                // TODO: onHitField - swaps side conditions between teams
+                OnHitField = new OnHitFieldEventInfo((battle, _, source, _) =>
+                {
+                    ConditionId[] sideConditions = [
+                        ConditionId.Mist, ConditionId.LightScreen, ConditionId.Reflect, ConditionId.Spikes,
+                        ConditionId.Safeguard, ConditionId.Tailwind, ConditionId.ToxicSpikes, ConditionId.StealthRock,
+                        ConditionId.StickyWeb, ConditionId.AuroraVeil
+                    ];
+                    bool success = false;
+
+                    var sourceSide = source.Side;
+                    var targetSide = source.Side.Foe;
+
+                    // Store conditions from both sides
+                    var sourceConditions = new Dictionary<ConditionId, EffectState>();
+                    var targetConditions = new Dictionary<ConditionId, EffectState>();
+
+                    foreach (var id in sideConditions)
+                    {
+                        if (sourceSide.SideConditions.TryGetValue(id, out var sourceState))
+                        {
+                            sourceConditions[id] = sourceState;
+                            sourceSide.SideConditions.Remove(id);
+                            success = true;
+                        }
+                        if (targetSide.SideConditions.TryGetValue(id, out var targetState))
+                        {
+                            targetConditions[id] = targetState;
+                            targetSide.SideConditions.Remove(id);
+                            success = true;
+                        }
+                    }
+
+                    // Swap conditions
+                    foreach (var (id, state) in sourceConditions)
+                    {
+                        state.Target = targetSide;
+                        targetSide.SideConditions[id] = state;
+                    }
+                    foreach (var (id, state) in targetConditions)
+                    {
+                        state.Target = sourceSide;
+                        sourceSide.SideConditions[id] = state;
+                    }
+
+                    if (!success) return false;
+                    battle.Add("-swapsideconditions");
+                    battle.Add("-activate", source, "move: Court Change");
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Covet] = new()
             {
@@ -1914,7 +2039,28 @@ public partial record Moves
                 Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, FailMeFirst = true, NoAssist = true, FailCopycat = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                // TODO: onAfterHit - steals target's item
+                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, move) =>
+                {
+                    // Can't steal if source already has an item or used a gem
+                    if (source.Item != ItemId.None || source.Volatiles.ContainsKey(ConditionId.Gem))
+                    {
+                        return new VoidReturn();
+                    }
+                    var yourItemResult = target.TakeItem(source);
+                    if (yourItemResult is not ItemItemFalseUnion yourItemUnion)
+                    {
+                        return new VoidReturn();
+                    }
+                    var yourItem = yourItemUnion.Item;
+                    var takeItemResult = battle.SingleEvent(EventId.TakeItem, yourItem, target.ItemState, source, target, move);
+                    if (takeItemResult is BoolRelayVar { Value: false } || !source.SetItem(yourItem.Id))
+                    {
+                        target.Item = yourItem.Id; // Bypass setItem so we don't break choice lock
+                        return new VoidReturn();
+                    }
+                    battle.Add("-item", source, yourItem.Name, "[from] move: Covet", $"[of] {target}");
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Crabhammer] = new()
             {
@@ -2023,9 +2169,46 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 NonGhostTarget = MoveTarget.Self,
                 Type = MoveType.Ghost,
-                // TODO: onModifyMove - Ghost vs Non-Ghost variants
-                // TODO: onTryHit - move variant selection
-                // TODO: onHit - Ghost type loses 50% HP
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, target) =>
+                {
+                    if (!source.HasType(PokemonType.Ghost))
+                    {
+                        // Non-Ghost: change target to self
+                        move.Target = move.NonGhostTarget ?? MoveTarget.Self;
+                    }
+                    else if (source.IsAlly(target))
+                    {
+                        // Ghost targeting ally: pick random foe instead
+                        move.Target = MoveTarget.RandomNormal;
+                    }
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!source.HasType(PokemonType.Ghost))
+                    {
+                        // Non-Ghost variant: add stat boosts instead of curse
+                        // The volatile status will still try to apply but target is self
+                        move.Self = new SecondaryEffect
+                        {
+                            Boosts = new SparseBoostsTable { Spe = -1, Atk = 1, Def = 1 }
+                        };
+                    }
+                    else if (target.Volatiles.ContainsKey(ConditionId.Curse))
+                    {
+                        // Ghost variant: fail if target already cursed
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    // Ghost variant: user loses 50% HP
+                    if (source.HasType(PokemonType.Ghost))
+                    {
+                        battle.DirectDamage(source.MaxHp / 2, source, source);
+                    }
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Crunch] = new()
             {

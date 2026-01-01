@@ -392,10 +392,29 @@ public partial record Conditions
                     {
                         return battle.ChainModify(2);
                     }
-                    return damage;
-                }),
-            },
-            [ConditionId.Fly] = new()
+                            return damage;
+                        }),
+                    },
+                    [ConditionId.ElectroShot] = new()
+                    {
+                        Id = ConditionId.ElectroShot,
+                        Name = "Electro Shot",
+                        EffectType = EffectType.Condition,
+                        AssociatedMove = MoveId.ElectroShot,
+                        Duration = 2,
+                        // ElectroShot is a charging move without invulnerability
+                        // The SpA boost is handled by the move itself
+                    },
+                    [ConditionId.FreezeShock] = new()
+                    {
+                        Id = ConditionId.FreezeShock,
+                        Name = "Freeze Shock",
+                        EffectType = EffectType.Condition,
+                        AssociatedMove = MoveId.FreezeShock,
+                        Duration = 2,
+                        // FreezeShock is a charging move without invulnerability
+                    },
+                    [ConditionId.Fly] = new()
             {
                 Id = ConditionId.Fly,
                 Name = "Fly",
