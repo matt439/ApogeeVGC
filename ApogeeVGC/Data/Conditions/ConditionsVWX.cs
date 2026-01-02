@@ -10,6 +10,8 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
@@ -33,6 +35,7 @@ public partial record Conditions
                     {
                         battle.Add("-start", pokemon, "Uproar");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
@@ -43,12 +46,14 @@ public partial record Conditions
                         target.RemoveVolatile(_library.Conditions[ConditionId.Uproar]);
                         return;
                     }
+
                     // Check if last move was Struggle - if so, don't lock (end the volatile)
-                    if (target.LastMove != null && target.LastMove.Id == MoveId.Struggle)
+                    if (target.LastMove is { Id: MoveId.Struggle })
                     {
                         target.DeleteVolatile(ConditionId.Uproar);
                         return;
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", target, "Uproar", "[upkeep]");
@@ -62,12 +67,11 @@ public partial record Conditions
                     }
                 }),
                 // Lock the Pokemon into using Uproar
-                OnLockMove = new OnLockMoveEventInfo((Func<Battle, Pokemon, MoveIdVoidUnion>)((_, _) =>
-                {
-                    return MoveId.Uproar;
-                })),
+                OnLockMove =
+                    new OnLockMoveEventInfo(
+                        (Func<Battle, Pokemon, MoveIdVoidUnion>)((_, _) => MoveId.Uproar)),
                 // Prevent sleep on all Pokemon while Uproar is active
-                OnAnySetStatus = new OnAnySetStatusEventInfo((battle, status, pokemon, source, _) =>
+                OnAnySetStatus = new OnAnySetStatusEventInfo((battle, status, pokemon, _, _) =>
                 {
                     if (status.Id == ConditionId.Sleep)
                     {
@@ -82,8 +86,10 @@ public partial record Conditions
                                 battle.Add("-fail", pokemon, "slp", "[from] Uproar");
                             }
                         }
+
                         return BoolVoidUnion.FromBool(false);
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
             },
@@ -112,99 +118,103 @@ public partial record Conditions
                     Order = 26,
                     SubOrder = 7,
                 },
-                    OnSideEnd = new OnSideEndEventInfo((battle, targetSide) =>
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-sideend", targetSide, "Water Pledge");
-                        }
-                    }),
-                    // Double secondary effect chances for moves (except Secret Power)
-                    // Skip Serene Grace + Flinch interaction
-                    OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
-                    {
-                        if (move.Secondaries != null && move.Id != MoveId.SecretPower)
-                        {
-                            battle.Debug("doubling secondary chance");
-                            foreach (var secondary in move.Secondaries)
-                            {
-                                // Skip Serene Grace + Flinch interaction
-                                if (pokemon.HasAbility(AbilityId.SereneGrace) &&
-                                    secondary.VolatileStatus == ConditionId.Flinch)
-                                {
-                                    continue;
-                                }
-                                if (secondary.Chance.HasValue)
-                                {
-                                    secondary.Chance *= 2;
-                                }
-                            }
-                            // Also double Self chance if present
-                            if (move.Self?.Chance != null)
-                            {
-                                move.Self.Chance *= 2;
-                            }
-                        }
-                    }),
-                },
-                [ConditionId.WideGuard] = new()
+                OnSideEnd = new OnSideEndEventInfo((battle, targetSide) =>
                 {
-                    Id = ConditionId.WideGuard,
-                    Name = "Wide Guard",
-                    EffectType = EffectType.Condition,
-                    Duration = 1,
-                    AssociatedMove = MoveId.WideGuard,
-                    OnSideStart = new OnSideStartEventInfo((battle, _, source, _) =>
+                    if (battle.DisplayUi)
                     {
-                        if (battle.DisplayUi && source != null)
-                        {
-                            battle.Add("-singleturn", source, "Wide Guard");
-                        }
-                    }),
-                    // OnTryHitPriority = 4
-                    OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                        battle.Add("-sideend", targetSide, "Water Pledge");
+                    }
+                }),
+                // Double secondary effect chances for moves (except Secret Power)
+                // Skip Serene Grace + Flinch interaction
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    if (move.Secondaries != null && move.Id != MoveId.SecretPower)
                     {
-                        // Wide Guard blocks all spread moves (allAdjacent, allAdjacentFoes)
-                        if (move.Target != MoveTarget.AllAdjacent && move.Target != MoveTarget.AllAdjacentFoes)
+                        battle.Debug("doubling secondary chance");
+                        foreach (var secondary in move.Secondaries)
                         {
-                            return BoolIntEmptyVoidUnion.FromVoid();
-                        }
-
-                        // Check if move has protect flag
-                        if (!(move.Flags.Protect ?? false))
-                        {
-                            return BoolIntEmptyVoidUnion.FromVoid();
-                        }
-
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-activate", target, "move: Wide Guard");
-                        }
-
-                        // Reset Outrage counter if source has lockedmove volatile
-                        if (source.Volatiles.TryGetValue(ConditionId.LockedMove, out var lockedMoveState))
-                        {
-                            if (lockedMoveState.Duration == 2)
+                            // Skip Serene Grace + Flinch interaction
+                            if (pokemon.HasAbility(AbilityId.SereneGrace) &&
+                                secondary.VolatileStatus == ConditionId.Flinch)
                             {
-                                source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                                continue;
+                            }
+
+                            if (secondary.Chance.HasValue)
+                            {
+                                secondary.Chance *= 2;
                             }
                         }
 
-                        return new Empty(); // Equivalent to Battle.NOT_FAIL
-                    }, 4),
-                    OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
+                        // Also double Self chance if present
+                        if (move.Self?.Chance != null)
+                        {
+                            move.Self.Chance *= 2;
+                        }
+                    }
+                }),
+            },
+            [ConditionId.WideGuard] = new()
+            {
+                Id = ConditionId.WideGuard,
+                Name = "Wide Guard",
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                AssociatedMove = MoveId.WideGuard,
+                OnSideStart = new OnSideStartEventInfo((battle, _, source, _) =>
+                {
+                    if (battle.DisplayUi && source != null)
                     {
-                        // Duration handled automatically
-                    })
+                        battle.Add("-singleturn", source, "Wide Guard");
+                    }
+                }),
+                // OnTryHitPriority = 4
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    // Wide Guard blocks all spread moves (allAdjacent, allAdjacentFoes)
+                    if (move.Target != MoveTarget.AllAdjacent &&
+                        move.Target != MoveTarget.AllAdjacentFoes)
                     {
-                        Order = 26,
-                        SubOrder = 3,
-                    },
-                    OnSideEnd = new OnSideEndEventInfo((_, _) =>
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    // Check if move has protect flag
+                    if (!(move.Flags.Protect ?? false))
                     {
-                        // Silent end - Wide Guard doesn't announce when it ends
-                    }),
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Wide Guard");
+                    }
+
+                    // Reset Outrage counter if source has lockedmove volatile
+                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
+                            out var lockedMoveState))
+                    {
+                        if (lockedMoveState.Duration == 2)
+                        {
+                            source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                        }
+                    }
+
+                    return new Empty(); // Equivalent to Battle.NOT_FAIL
+                }, 4),
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                })
+                {
+                    Order = 26,
+                    SubOrder = 3,
                 },
+                OnSideEnd = new OnSideEndEventInfo((_, _) =>
+                {
+                    // Silent end - Wide Guard doesn't announce when it ends
+                }),
+            },
             [ConditionId.WonderRoom] = new()
             {
                 Id = ConditionId.WonderRoom,
@@ -218,10 +228,13 @@ public partial record Conditions
                     {
                         if (battle.DisplayUi)
                         {
-                            battle.Add("-activate", source, "ability: Persistent", "[move] Wonder Room");
+                            battle.Add("-activate", source, "ability: Persistent",
+                                "[move] Wonder Room");
                         }
+
                         return 7;
                     }
+
                     return 5;
                 }),
                 // TODO: Wonder Room's defensive stat swapping is NOT implemented via OnModifyMove.
@@ -236,7 +249,8 @@ public partial record Conditions
                     {
                         if (source != null && source.HasAbility(AbilityId.Persistent))
                         {
-                            battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}", "[persistent]");
+                            battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}",
+                                "[persistent]");
                         }
                         else
                         {
