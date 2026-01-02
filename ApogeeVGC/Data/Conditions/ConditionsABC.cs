@@ -302,13 +302,21 @@ public partial record Conditions
                 }),
                 OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
                 {
+                    // Check if the volatile exists first
+                    if (!pokemon.Volatiles.TryGetValue(ConditionId.ChoiceLock,
+                            out EffectState? effectState))
+                    {
+                        battle.Debug(
+                            $"[ChoiceLock.OnDisableMove] {pokemon.Name}: No ChoiceLock volatile found");
+                        return;
+                    }
+
                     battle.Debug(
-                        $"[ChoiceLock.OnDisableMove] {pokemon.Name}: LockedMove={pokemon.Volatiles[ConditionId.ChoiceLock].Move}");
+                        $"[ChoiceLock.OnDisableMove] {pokemon.Name}: LockedMove={effectState.Move}");
 
                     // Check if Pokemon still has a choice item and the locked move
                     if (!(pokemon.GetItem().IsChoice ?? false) ||
-                        (pokemon.Volatiles[ConditionId.ChoiceLock].Move != null &&
-                         !pokemon.HasMove((MoveId)pokemon.Volatiles[ConditionId.ChoiceLock].Move)))
+                        (effectState.Move != null && !pokemon.HasMove((MoveId)effectState.Move)))
                     {
                         battle.Debug(
                             $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Removing volatile");
@@ -319,7 +327,7 @@ public partial record Conditions
                     if (pokemon.IgnoringItem()) return;
 
                     // Only disable moves if a move has been locked
-                    if (pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+                    if (effectState.Move == null)
                     {
                         battle.Debug(
                             $"[ChoiceLock.OnDisableMove] {pokemon.Name}: No move locked yet");
@@ -327,14 +335,14 @@ public partial record Conditions
                     }
 
                     battle.Debug(
-                        $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Disabling all except {pokemon.Volatiles[ConditionId.ChoiceLock].Move}");
+                        $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Disabling all except {effectState.Move}");
 
                     // Disable all moves except the locked move
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
-                                 moveSlot.Move != pokemon.Volatiles[ConditionId.ChoiceLock].Move))
+                                 moveSlot.Move != effectState.Move))
                     {
                         pokemon.DisableMove(moveSlot.Id, false,
-                            pokemon.Volatiles[ConditionId.ChoiceLock].SourceEffect);
+                            effectState.SourceEffect);
                     }
                 }),
             },
@@ -590,10 +598,12 @@ public partial record Conditions
                 OnDamage = new OnDamageEventInfo((_, damage, target, source, move) =>
                 {
                     // Only track damage from moves, from other Pokemon
-                    if (move is not ActiveMove || source == null) return IntBoolVoidUnion.FromVoid();
+                    if (move is not ActiveMove || source == null)
+                        return IntBoolVoidUnion.FromVoid();
 
                     // Accumulate damage
-                    if (!target.Volatiles.TryGetValue(ConditionId.Bide, out EffectState? effectState))
+                    if (!target.Volatiles.TryGetValue(ConditionId.Bide,
+                            out EffectState? effectState))
                         return IntBoolVoidUnion.FromVoid();
 
                     effectState.TotalDamage = (effectState.TotalDamage ?? 0) + damage;
@@ -602,7 +612,8 @@ public partial record Conditions
                 }, -101),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
                 {
-                    if (!pokemon.Volatiles.TryGetValue(ConditionId.Bide, out EffectState? effectState))
+                    if (!pokemon.Volatiles.TryGetValue(ConditionId.Bide,
+                            out EffectState? effectState))
                         return BoolVoidUnion.FromVoid();
 
                     // On last turn (duration = 1), unleash Bide
@@ -816,7 +827,16 @@ public partial record Conditions
             {
                 Id = ConditionId.ChillyReception,
                 Name = "Chilly Reception",
-                // TODO: Implement ChillyReception volatile for preparation phase
+                AssociatedMove = MoveId.ChillyReception,
+                Duration = 1,
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, source, _, move) =>
+                {
+                    // Only show preparation animation for Chilly Reception move
+                    if (move.Id != MoveId.ChillyReception) return BoolVoidUnion.FromVoid();
+
+                    battle.Add("-prepare", source, "Chilly Reception", "[premajor]");
+                    return BoolVoidUnion.FromVoid();
+                }, 100),
             },
             [ConditionId.Curse] = new()
             {
