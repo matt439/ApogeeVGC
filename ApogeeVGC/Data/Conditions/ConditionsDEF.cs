@@ -1,5 +1,4 @@
 using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -1128,15 +1127,15 @@ public partial record Conditions
                     battle.EffectState.EndingTurn = (battle.Turn - 1) + 2;
                     if (battle.EffectState.EndingTurn >= 254)
                     {
-                        // In Gen 8+, Future attacks will never resolve when used on the 255th turn or later
+                        battle.Hint(
+                            "In Gen 8+, Future attacks will never resolve when used on the 255th turn or later.");
                     }
 
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
                 {
-                    // TODO: Implement GetOverflowedTurnCount if needed
-                    if (battle.Turn < battle.EffectState.EndingTurn) return;
+                    if (battle.GetOverflowedTurnCount() < battle.EffectState.EndingTurn) return;
                     Pokemon? slotTarget = battle.GetAtSlot(battle.EffectState.TargetSlot);
                     if (slotTarget != null)
                     {
