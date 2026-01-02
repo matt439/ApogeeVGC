@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
@@ -8,6 +9,7 @@ using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -27,14 +29,38 @@ public partial record Conditions
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
                 {
-                    // TODO: Check for Persistent ability
+                    // Persistent ability is CAP-only (non-standard), so always return 5
                     return 5;
                 }),
-                // TODO: onFieldStart - trigger item End events for all active pokemon
-                // TODO: onFieldRestart - remove Magic Room if used again
-                // TODO: onFieldResidualOrder = 27
-                // TODO: onFieldResidualSubOrder = 6
-                // TODO: onFieldEnd - display end message
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldstart", "move: Magic Room", $"[of] {source}");
+                    }
+                    // Trigger item End events for all active Pokemon
+                    foreach (var pokemon in battle.GetAllActive())
+                    {
+                        battle.SingleEvent(EventId.End, pokemon.GetItem(), pokemon.ItemState, pokemon);
+                    }
+                }),
+                OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>
+                {
+                    // Using Magic Room again removes it
+                    battle.Field.RemovePseudoWeather(ConditionId.MagicRoom);
+                }),
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 27,
+                    SubOrder = 6,
+                },
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Magic Room", "[of] " + battle.EffectState.Source);
+                    }
+                }),
             },
             [ConditionId.MagmaStorm] = new()
             {
@@ -59,8 +85,19 @@ public partial record Conditions
                     }
                     return new VoidReturn();
                 }),
-                // TODO: onImmunity - if type is Ground, return false
-                // TODO: onResidualOrder = 18
+                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                {
+                    // Grant immunity to Ground-type moves
+                    if (type.IsPokemonType && type.AsPokemonType == PokemonType.Ground)
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 18,
+                },
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
                     if (battle.DisplayUi)
@@ -180,9 +217,39 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Minimize,
                 NoCopy = true,
-                // TODO: onRestart - return null
-                // TODO: onSourceModifyDamage - double damage from stomping moves
-                // TODO: onAccuracy - guarantee hit from stomping moves
+                OnRestart = new OnRestartEventInfo((_, _, _, _) => null),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    // Moves that deal double damage to Minimized targets
+                    // Note: Steamroller and MaliciousMoonsault are not in Gen 9 VGC
+                    MoveId[] stompingMoves =
+                    [
+                        MoveId.Stomp, MoveId.BodySlam, MoveId.FlyingPress,
+                        MoveId.DragonRush, MoveId.HeatCrash, MoveId.HeavySlam,
+                        MoveId.SupercellSlam
+                    ];
+                    if (stompingMoves.Contains(move.Id))
+                    {
+                        return battle.ChainModify(2);
+                    }
+                    return DoubleVoidUnion.FromVoid();
+                }),
+                OnAccuracy = new OnAccuracyEventInfo((battle, accuracy, target, source, move) =>
+                {
+                    // Moves that bypass accuracy check against Minimized targets
+                    // Note: Steamroller and MaliciousMoonsault are not in Gen 9 VGC
+                    MoveId[] stompingMoves =
+                    [
+                        MoveId.Stomp, MoveId.BodySlam, MoveId.FlyingPress,
+                        MoveId.DragonRush, MoveId.HeatCrash, MoveId.HeavySlam,
+                        MoveId.SupercellSlam
+                    ];
+                    if (stompingMoves.Contains(move.Id))
+                    {
+                        return IntBoolVoidUnion.FromBool(true); // Always hit
+                    }
+                    return IntBoolVoidUnion.FromInt(accuracy);
+                }),
             },
             [ConditionId.MirrorCoat] = new()
             {
@@ -233,7 +300,35 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Mist,
                 Duration = 5,
-                // TODO: onTryBoost - prevent negative stat changes from opponents
+                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                {
+                    // Allow infiltrating moves to bypass Mist
+                    if (effect is ActiveMove move && (move.Infiltrates ?? false) && !target.IsAlly(source))
+                    {
+                        return;
+                    }
+                    // Only block stat drops from opponents
+                    if (source != null && target != source)
+                    {
+                        bool showMsg = false;
+                        foreach (var (boostId, value) in boost.GetNonNullBoosts().ToList())
+                        {
+                            if (value < 0)
+                            {
+                                boost.ClearBoost(boostId);
+                                showMsg = true;
+                            }
+                        }
+                        // Show message if stat drops were blocked and move has no secondaries
+                        if (showMsg && effect is ActiveMove activeMove && activeMove.Secondaries == null)
+                        {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", target, "move: Mist");
+                            }
+                        }
+                    }
+                }),
                 OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
                 {
                     if (battle.DisplayUi)
@@ -389,7 +484,10 @@ public partial record Conditions
                     }
                     return new VoidReturn();
                 }),
-                // TODO: onTrapPokemon - trap the pokemon
+                OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
+                {
+                    pokemon.TryTrap();
+                }),
             },
             [ConditionId.None] = new()
             {
