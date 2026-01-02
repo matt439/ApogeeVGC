@@ -55,17 +55,18 @@ public partial record Conditions
                 OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
                 {
                     battle.EffectState.Hp = source != null ? source.MaxHp / 2 : pokemon.MaxHp / 2;
-                    battle.EffectState.StartingTurn = battle.Turn; // TODO: Use GetOverflowedTurnCount() if available
-                    if (battle.EffectState.StartingTurn >= 255)
+                    battle.EffectState.StartingTurn = battle.GetOverflowedTurnCount();
+                    if (battle.EffectState.StartingTurn == 255)
                     {
                         // In Gen 8+, Wish will never resolve when used on the 255th turn
+                        // The hint is not displayed since this is a rare edge case
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
                 {
-                    // TODO: Use GetOverflowedTurnCount() if available
-                    if (battle.Turn <= battle.EffectState.StartingTurn) return;
+                    // Use GetOverflowedTurnCount for proper Gen 8+ turn overflow handling
+                    if (battle.GetOverflowedTurnCount() <= battle.EffectState.StartingTurn) return;
                     var slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
                     if (slotTarget != null)
                     {
