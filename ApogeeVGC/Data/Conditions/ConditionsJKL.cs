@@ -35,7 +35,8 @@ public partial record Conditions
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnModifyCritRatio - guarantee critical hit for next move
+                // Guarantees critical hit for next move by returning max crit ratio
+                OnModifyCritRatio = new OnModifyCritRatioEventInfo((_, _, _, _, _) => 5),
                 OnEnd = new OnEndEventInfo((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -147,9 +148,32 @@ public partial record Conditions
                 AssociatedMove = MoveId.LockOn,
                 NoCopy = true, // doesn't get copied by Baton Pass
                 Duration = 2,
-                // TODO: onSourceInvulnerabilityPriority = 1
-                // TODO: onSourceInvulnerability - if move is from target to source, return 0
-                // TODO: onSourceAccuracy - if move is from target to source, return true
+                // If the move user is the Lock-On user and target is the locked Pokemon, 
+                // bypass invulnerability (return 0 means not invulnerable)
+                OnSourceInvulnerability = new OnSourceInvulnerabilityEventInfo((battle, target, source, move) =>
+                {
+                    // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
+                    if (move != null && 
+                        source == battle.EffectState.Target && 
+                        target == battle.EffectState.Source)
+                    {
+                        return 0;
+                    }
+                    return BoolIntEmptyVoidUnion.FromVoid();
+                }, 1),
+                // If the move user is the Lock-On user and target is the locked Pokemon,
+                // bypass accuracy checks (return true)
+                OnSourceAccuracy = new OnSourceAccuracyEventInfo((battle, _, target, source, move) =>
+                {
+                    // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
+                    if (move != null && 
+                        source == battle.EffectState.Target && 
+                        target == battle.EffectState.Source)
+                    {
+                        return true;
+                    }
+                    return IntBoolVoidUnion.FromVoid();
+                }),
             },
             [ConditionId.LunarDance] = new()
             {
@@ -250,22 +274,38 @@ public partial record Conditions
                 {
                     if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
                     {
-                        // TODO: Check for gmaxoneblow, gmaxrapidflow
-                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
+                        // G-Max moves not in Gen 9 VGC, omit check
+                        // Z/Max moves not in Gen 9 VGC, omit zBrokeProtect
                         return BoolIntEmptyVoidUnion.FromVoid();
                     }
-                    if (battle.DisplayUi)
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
                     {
                         battle.Add("-activate", target, "move: Protect");
                     }
-                    // TODO: Check for lockedmove volatile and reset Outrage counter
-                    // TODO: Check if move makes contact and lower Attack
-                    // if (this.checkMoveMakesContact(move, source, target)) {
-                    //     this.boost({ atk: -1 }, source, target, this.dex.getActiveMove("King's Shield"));
-                    // }
-                    return BoolIntEmptyVoidUnion.FromBool(false);
+
+                    // Check for lockedmove volatile and reset Outrage counter
+                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove, out var lockedMove))
+                    {
+                        if (lockedMove.Duration == 2)
+                        {
+                            source.DeleteVolatile(ConditionId.LockedMove);
+                        }
+                    }
+
+                    // If move makes contact, lower attacker's Attack by 1
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        battle.Boost(new SparseBoostsTable { Atk = -1 }, source, target, 
+                            _library.Conditions[ConditionId.KingsShield]);
+                    }
+
+                    return new Empty(); // NOT_FAIL equivalent
                 }, 3),
-                // TODO: OnHit - if move is Z or Max powered and makes contact, lower Attack
+                // Note: Z/Max move OnHit handler omitted as not applicable to Gen 9 VGC
             },
             [ConditionId.MaxGuard] = new()
             {
@@ -308,8 +348,27 @@ public partial record Conditions
                 Name = "Micle Berry",
                 EffectType = EffectType.Condition,
                 Duration = 2,
-                // TODO: OnSourceAccuracy - if not OHKO move, multiply accuracy by 1.2 (4915/4096)
-                // Remove volatile after modifying accuracy
+                OnSourceAccuracy = new OnSourceAccuracyEventInfo((battle, accuracy, _, source, move) =>
+                {
+                    // Don't modify accuracy for OHKO moves
+                    if (move.Ohko is not null)
+                    {
+                        return IntBoolVoidUnion.FromVoid();
+                    }
+
+                    // Announce the berry was consumed
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-enditem", source, "Micle Berry");
+                    }
+
+                    // Remove the volatile from the source (the attacker)
+                    source.RemoveVolatile(_library.Conditions[ConditionId.MicleBerry]);
+
+                    // Multiply accuracy by 1.2 (4915/4096)
+                    battle.ChainModify([4915, 4096]);
+                    return battle.FinalModify(accuracy);
+                }),
             },
             [ConditionId.Obstruct] = new()
             {
@@ -330,22 +389,38 @@ public partial record Conditions
                 {
                     if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
                     {
-                        // TODO: Check for gmaxoneblow, gmaxrapidflow
-                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
+                        // G-Max moves not in Gen 9 VGC, omit check
+                        // Z/Max moves not in Gen 9 VGC, omit zBrokeProtect
                         return BoolIntEmptyVoidUnion.FromVoid();
                     }
-                    if (battle.DisplayUi)
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
                     {
                         battle.Add("-activate", target, "move: Protect");
                     }
-                    // TODO: Check for lockedmove volatile and reset Outrage counter
-                    // TODO: Check if move makes contact and lower Defense by 2
-                    // if (this.checkMoveMakesContact(move, source, target)) {
-                    //     this.boost({ def: -2 }, source, target, this.dex.getActiveMove("Obstruct"));
-                    // }
-                    return BoolIntEmptyVoidUnion.FromBool(false);
+
+                    // Check for lockedmove volatile and reset Outrage counter
+                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove, out var lockedMove))
+                    {
+                        if (lockedMove.Duration == 2)
+                        {
+                            source.DeleteVolatile(ConditionId.LockedMove);
+                        }
+                    }
+
+                    // If move makes contact, lower attacker's Defense by 2
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        battle.Boost(new SparseBoostsTable { Def = -2 }, source, target, 
+                            _library.Conditions[ConditionId.Obstruct]);
+                    }
+
+                    return new Empty(); // NOT_FAIL equivalent
                 }, 3),
-                // TODO: OnHit - if move is Z or Max powered and makes contact, lower Defense by 2
+                // Note: Z/Max move OnHit handler omitted as not applicable to Gen 9 VGC
             },
             [ConditionId.Octolock] = new()
             {
