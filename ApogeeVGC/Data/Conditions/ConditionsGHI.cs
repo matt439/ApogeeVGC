@@ -1,10 +1,12 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
+using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -24,9 +26,34 @@ public partial record Conditions
                 Name = "Gastro Acid",
                 AssociatedMove = MoveId.GastroAcid,
                 EffectType = EffectType.Condition,
-                // TODO: onStart - end the pokemon's ability
-                // TODO: onCopy - remove if pokemon has cantsuppress ability flag
-                // Ability suppression should be implemented in Pokemon.IgnoringAbility()
+                // Ability suppression is implemented in Pokemon.IgnoringAbility()
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    // Check if pokemon has Ability Shield
+                    if (pokemon.HasItem(ItemId.AbilityShield))
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-endability", pokemon);
+                    }
+                    // End the pokemon's current ability
+                    var ability = pokemon.GetAbility();
+                    battle.SingleEvent(EventId.End, ability, pokemon.AbilityState,
+                        new PokemonSingleEventTarget(pokemon), new PokemonSingleEventSource(pokemon),
+                        _library.Conditions[ConditionId.GastroAcid]);
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnCopy = new OnCopyEventInfo((battle, pokemon) =>
+                {
+                    // Remove Gastro Acid if the pokemon has an ability with cantsuppress flag
+                    var ability = pokemon.GetAbility();
+                    if (ability.Flags.CantSuppress ?? false)
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.GastroAcid]);
+                    }
+                }),
             },
             [ConditionId.IceBall] = new()
             {
@@ -68,9 +95,23 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
-                // TODO: onAccuracy - always hit (return true)
-                // TODO: onSourceModifyDamage - double damage (chainModify 2)
-                // TODO: onBeforeMovePriority 100, onBeforeMove - remove this condition before attack
+                // Moves always hit the Glaive Rush user
+                OnAccuracy = new OnAccuracyEventInfo((_, _, _, _, _) =>
+                {
+                    return IntBoolVoidUnion.FromBool(true);
+                }),
+                // Damage is doubled against the Glaive Rush user
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, _, _, _, _) =>
+                {
+                    return battle.ChainModify(2);
+                }),
+                // Remove the Glaive Rush drawback before the pokemon attacks
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Debug("removing Glaive Rush drawback before attack");
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.GlaiveRush]);
+                    return BoolVoidUnion.FromVoid();
+                }, 100),
             },
             [ConditionId.GrassPledge] = new()
             {
@@ -79,10 +120,29 @@ public partial record Conditions
                 AssociatedMove = MoveId.GrassPledge,
                 EffectType = EffectType.Condition,
                 Duration = 4,
-                // TODO: onSideStart - display message
-                // TODO: onModifySpe - quarter speed (chainModify 0.25)
-                // TODO: onSideResidualOrder 26, onSideResidualSubOrder 9
-                // TODO: onSideEnd - display message
+                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "Grass Pledge");
+                    }
+                }),
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
+                {
+                    // Quarter speed (0.25x)
+                    return (int)Math.Floor(spe * 0.25);
+                }),
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                }, 26, 9),
+                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sideend", side, "Grass Pledge");
+                    }
+                }),
             },
             [ConditionId.Gravity] = new()
             {
@@ -91,23 +151,165 @@ public partial record Conditions
                 AssociatedMove = MoveId.Gravity,
                 EffectType = EffectType.Condition,
                 Duration = 5,
-                // TODO: durationCallback - 7 if source has Persistent ability
-                // TODO: onFieldStart - remove Bounce, Fly, Sky Drop, Magnet Rise, Telekinesis
-                // TODO: onModifyAccuracy - increase accuracy (chainModify [6840, 4096])
-                // TODO: onDisableMove - disable moves with gravity flag
-                // TODO: onBeforeMovePriority 6, onBeforeMove - prevent gravity-affected moves
-                // TODO: onModifyMove - prevent gravity-affected moves
-                // TODO: onFieldResidualOrder 27, onFieldResidualSubOrder 2
-                // TODO: onFieldEnd - display message
+                DurationCallback = new DurationCallbackEventInfo((battle, source, _, _) =>
+                {
+                    if (source != null && source.HasAbility(AbilityId.Persistent))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", source, "ability: Persistent", "[move] Gravity");
+                        }
+                        return 7;
+                    }
+                    return 5;
+                }),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
+                {
+                    if (source != null && source.HasAbility(AbilityId.Persistent))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fieldstart", "move: Gravity", "[persistent]");
+                        }
+                    }
+                    else if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldstart", "move: Gravity");
+                    }
+
+                    // Remove airborne-related volatiles from all active Pokemon
+                    foreach (var pokemon in battle.GetAllActive())
+                    {
+                        bool applies = false;
+                        if (pokemon.RemoveVolatile(_library.Conditions[ConditionId.Bounce]) ||
+                            pokemon.RemoveVolatile(_library.Conditions[ConditionId.Fly]))
+                        {
+                            applies = true;
+                            battle.Queue.CancelMove(pokemon);
+                            pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
+                        }
+                        // TODO: Handle SkyDrop volatile when implemented
+                        if (pokemon.Volatiles.ContainsKey(ConditionId.MagnetRise))
+                        {
+                            applies = true;
+                            pokemon.DeleteVolatile(ConditionId.MagnetRise);
+                        }
+                        if (pokemon.Volatiles.ContainsKey(ConditionId.Telekinesis))
+                        {
+                            applies = true;
+                            pokemon.DeleteVolatile(ConditionId.Telekinesis);
+                        }
+                        if (applies && battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "move: Gravity");
+                        }
+                    }
+                }),
+                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
+                {
+                    // Accuracy boost: 6840/4096 ? 1.67x
+                    return battle.ChainModify([6840, 4096]);
+                }),
+                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        var move = _library.Moves[moveSlot.Id];
+                        if (move.Flags.Gravity ?? false)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
+                // Groundedness is implemented in Pokemon.IsGrounded()
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                {
+                    // TODO: Check if move is Z-move (move.IsZ)
+                    if (move.Flags.Gravity ?? false)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "move: Gravity", move.Name);
+                        }
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }, 6),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    // TODO: Check if move is Z-move (move.IsZ)
+                    if (move.Flags.Gravity ?? false)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "move: Gravity", move.Name);
+                        }
+                        // Note: In TypeScript this returns false to prevent the move
+                        // In C# we can't return from OnModifyMove to prevent the move
+                        // The OnBeforeMove handler above handles the prevention
+                    }
+                }),
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                })
+                {
+                    Order = 27,
+                    SubOrder = 2,
+                },
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Gravity");
+                    }
+                }),
             },
             [ConditionId.Grudge] = new()
             {
                 Id = ConditionId.Grudge,
                 Name = "Grudge",
                 EffectType = EffectType.Condition,
-                // TODO: onStart - display singlemove message
-                // TODO: onFaint - if fainted by a move, set that move's PP to 0 for the attacker
-                // TODO: onBeforeMovePriority 100, onBeforeMove - remove this condition before attack
+                // Note: Grudge move is marked as isNonstandard: "Past" in TypeScript
+                // AssociatedMove not set since MoveId.Grudge doesn't exist in gen 9 VGC
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singlemove", pokemon, "Grudge");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnFaint = new OnFaintEventInfo((battle, target, source, effect) =>
+                {
+                    if (source == null || source.Fainted || effect == null) return;
+                    // Check if fainted by a move (not a future move)
+                    if (effect.EffectType == EffectType.Move &&
+                        !(effect is Move { Flags.FutureMove: true }) &&
+                        source.LastMove != null)
+                    {
+                        var move = source.LastMove;
+                        // TODO: Handle Max moves - if (move.IsMax && move.BaseMove != null) get base move
+
+                        foreach (var moveSlot in source.MoveSlots)
+                        {
+                            if (moveSlot.Id == move.Id)
+                            {
+                                moveSlot.Pp = 0;
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-activate", source, "move: Grudge", move.Name);
+                                }
+                            }
+                        }
+                    }
+                }),
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Debug("removing Grudge before attack");
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.Grudge]);
+                    return BoolVoidUnion.FromVoid();
+                }, 100),
             },
             [ConditionId.GuardSplit] = new()
             {
@@ -187,16 +389,37 @@ public partial record Conditions
                 {
                     // Duration handled automatically
                 }, 20),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", pokemon, "move: Heal Block");
-                    }
-                }),
-                // TODO: OnTryHeal - prevent healing except Z-power
-                // TODO: OnRestart - handle Psychic Noise special case
-            },
+                        OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                        {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-end", pokemon, "move: Heal Block");
+                            }
+                        }),
+                        OnTryHeal = new OnTryHealEventInfo(
+                            (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage, target, source, effect) =>
+                            {
+                                // Z-power healing bypasses Heal Block
+                                // TODO: Check for effect.IsZ when implemented
+                                // if (effect != null && (effect.Id == "zpower" || effect is Move { IsZ: true })) return damage;
+
+                                // Pollen Puff healing is blocked with a special message
+                                if (source != null && target != source && target.Hp != target.MaxHp &&
+                                    effect is Move { Id: MoveId.PollenPuff })
+                                {
+                                    battle.AttrLastMove("[still]");
+                                    if (battle.DisplayUi)
+                                    {
+                                        // FIXME: Wrong error message in TypeScript, but following the same pattern
+                                        battle.Add("cant", source, "move: Heal Block", effect.Name);
+                                    }
+                                    return null;
+                                }
+                                // Block all other healing
+                                return IntBoolUnion.FromBool(false);
+                            })),
+                        // OnRestart is not needed - Psychic Noise duration is handled by DurationCallback
+                    },
             [ConditionId.Hail] = new()
             {
                 Id = ConditionId.Hail,
@@ -289,8 +512,26 @@ public partial record Conditions
                     }
                     return 5;
                 }),
-                // TODO: OnBasePower - weaken Earthquake, Bulldoze, Magnitude if defender is grounded
-                // TODO: OnBasePower - boost Grass moves if attacker is grounded (1.3x boost: 5325/4096)
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, defender, move) =>
+                {
+                    // Weaken Earthquake, Bulldoze, Magnitude if defender is grounded
+                    MoveId[] weakenedMoves = [MoveId.Earthquake, MoveId.Bulldoze, MoveId.Magnitude];
+                    if (weakenedMoves.Contains(move.Id) &&
+                        defender != null &&
+                        (defender.IsGrounded() ?? false) &&
+                        !defender.IsSemiInvulnerable())
+                    {
+                        battle.Debug("move weakened by grassy terrain");
+                        return battle.ChainModify(0.5);
+                    }
+                    // Boost Grass moves if attacker is grounded
+                    if (move.Type == MoveType.Grass && (attacker.IsGrounded() ?? false))
+                    {
+                        battle.Debug("grassy terrain boost");
+                        return battle.ChainModify([5325, 4096]);
+                    }
+                    return new VoidReturn();
+                }, 6),
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
                 {
                     if (battle.DisplayUi)
