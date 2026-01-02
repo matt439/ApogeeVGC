@@ -1160,24 +1160,6 @@ public partial record Moves
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
             },
-            [MoveId.SkyDrop] = new()
-            {
-                Id = MoveId.SkyDrop,
-                Num = 507,
-                Accuracy = 100,
-                BasePower = 60,
-                Category = MoveCategory.Physical,
-                Name = "Sky Drop",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Charge = true, Protect = true, Mirror = true, Gravity = true, Distance = true,
-                    Metronome = true, NoSleepTalk = true, NoAssist = true, FailInstruct = true,
-                },
-                Target = MoveTarget.Any,
-                Type = MoveType.Flying,
-            },
             [MoveId.SlackOff] = new()
             {
                 Id = MoveId.SlackOff,

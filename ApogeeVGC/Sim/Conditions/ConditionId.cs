@@ -41,7 +41,6 @@ public enum ConditionId
     Roost,
     MagnetRise,
     Telekinesis,
-    SkyDrop,
     Fly,
     Bounce,
     Dive,

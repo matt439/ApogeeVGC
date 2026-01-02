@@ -190,39 +190,6 @@ public partial record Conditions
                     return BoolIntEmptyVoidUnion.FromBool(false);
                 }, 3),
             },
-            [ConditionId.SkyDrop] = new()
-            {
-                Id = ConditionId.SkyDrop,
-                Name = "Sky Drop",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.SkyDrop,
-                Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
-                OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
-                {
-                    if (move.Id is MoveId.Gust or MoveId.Twister or MoveId.SkyUppercut
-                        or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown
-                        or MoveId.ThousandArrows)
-                    {
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    return BoolIntEmptyVoidUnion.FromBool(false);
-                }),
-                OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
-                    {
-                        if (move.Id == MoveId.Gust || move.Id == MoveId.Twister)
-                        {
-                            return battle.ChainModify(2);
-                        }
-
-                        return damage;
-                    }),
-                // TODO: OnRedirectTarget - Sky Drop carries the target into the air with the user
-                // TODO: OnDragOut - release the target if user is forced out
-                // TODO: OnFaint - release the target if user faints
-            },
             [ConditionId.Snatch] = new()
             {
                 Id = ConditionId.Snatch,
