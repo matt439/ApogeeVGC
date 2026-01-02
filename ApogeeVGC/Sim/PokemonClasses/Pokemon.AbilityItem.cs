@@ -371,9 +371,6 @@ EffectStateId effectId = effect.EffectStateId;
         // In Gen 5+, inactive Pokemon ignore their items
         if (Battle.Gen >= 5 && !IsActive) return true;
 
-        // Embargo volatile condition causes item ignoring
-        if (Volatiles.ContainsKey(ConditionId.Embargo)) return true;
-
         // Magic Room pseudo-weather causes item ignoring
         if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.MagicRoom)) return true;
 

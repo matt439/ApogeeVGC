@@ -830,7 +830,6 @@ public class PlayerConsole : IPlayer
             ConditionId.LeechSeed => "Seeded",
             ConditionId.ChoiceLock => "ChoiceLock",
             ConditionId.HealBlock => "HealBlock",
-            ConditionId.Embargo => "Embargo",
             ConditionId.Ingrain => "Ingrain",
             ConditionId.MagnetRise => "MagRise",
             ConditionId.Telekinesis => "Telekns",
@@ -895,7 +894,7 @@ public class PlayerConsole : IPlayer
             ConditionId.Substitute or ConditionId.ShedTail => "green",
             ConditionId.LeechSeed => "darkgreen",
             ConditionId.ChoiceLock => "red",
-            ConditionId.HealBlock or ConditionId.Embargo => "darkred",
+            ConditionId.HealBlock => "darkred",
             ConditionId.Ingrain or ConditionId.Wish => "cyan",
             ConditionId.FocusEnergy or ConditionId.LaserFocus or ConditionId.DragonCheer =>
                 "orange",
