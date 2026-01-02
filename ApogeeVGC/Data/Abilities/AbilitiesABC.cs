@@ -711,8 +711,7 @@ public partial record Abilities
                     if (boost.Def is not null && boost.Def < 0)
                     {
                         boost.Def = null;
-                        if (effect is not ActiveMove { Secondaries: not null } &&
-                            effect is not Condition { Id: ConditionId.Octolock })
+                        if (effect is not ActiveMove { Secondaries: not null })
                         {
                             battle.Add("-fail", target, "unboost", "Defense",
                                 "[from] ability: Big Pecks", $"[of] {target}");
@@ -863,12 +862,11 @@ public partial record Abilities
                     if (boost.Evasion is not null && boost.Evasion < 0)
                     {
                         boost.Evasion = null;
-                        showMsg = true;
-                    }
+                            showMsg = true;
+                        }
 
-                    if (showMsg && effect is not ActiveMove { Secondaries: not null } &&
-                        effect is not Condition { Id: ConditionId.Octolock })
-                    {
+                        if (showMsg && effect is not ActiveMove { Secondaries: not null })
+                        {
                         battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
                             $"[of] {target}");
                     }

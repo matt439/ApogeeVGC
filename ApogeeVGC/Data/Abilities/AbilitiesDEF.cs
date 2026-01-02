@@ -1262,8 +1262,7 @@ public partial record Abilities
                         Condition c => c.Id,
                         _ => null,
                     };
-                    if (showMsg && effect is ActiveMove { Secondaries: null } &&
-                        effectId != ConditionId.Octolock)
+                    if (showMsg && effect is ActiveMove { Secondaries: null })
                     {
                         battle.Add("-fail", target, "unboost", "[from] ability: Full Metal Body",
                             $"[of] {target}");

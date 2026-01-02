@@ -386,12 +386,11 @@ public partial record Abilities
                     if (boost.Evasion is < 0)
                     {
                         boost.Evasion = null;
-                        showMsg = true;
-                    }
+                            showMsg = true;
+                        }
 
-                    if (showMsg && effect is not ActiveMove { Secondaries: not null } &&
-                        effect is not Condition { Id: ConditionId.Octolock })
-                    {
+                        if (showMsg && effect is not ActiveMove { Secondaries: not null })
+                        {
                         battle.Add("-fail", target, "unboost", "[from] ability: White Smoke",
                             $"[of] {target}");
                     }

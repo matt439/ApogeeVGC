@@ -851,7 +851,6 @@ public class PlayerConsole : IPlayer
             ConditionId.Commanding => "Commanding",
             ConditionId.Commanded => "Commanded",
             ConditionId.Detect => "Detect",
-            ConditionId.MaxGuard => "MaxGuard",
             ConditionId.KingsShield => "KingsShield",
             ConditionId.SpikyShield => "SpikyShield",
             ConditionId.BanefulBunker => "BanefulBunker",
@@ -886,7 +885,7 @@ public class PlayerConsole : IPlayer
         return condition switch
         {
             ConditionId.Stall or ConditionId.Protect or ConditionId.Detect or
-                ConditionId.MaxGuard or ConditionId.KingsShield or ConditionId.SpikyShield or
+                ConditionId.KingsShield or ConditionId.SpikyShield or
                 ConditionId.BanefulBunker or ConditionId.Obstruct or ConditionId.SilkTrap or
                 ConditionId.BurningBulwark or ConditionId.QuickGuard
                 or ConditionId.WideGuard => "blue",

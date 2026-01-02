@@ -338,7 +338,6 @@ public partial class Pokemon
     {
         return Volatiles.ContainsKey(ConditionId.Protect) ||
                Volatiles.ContainsKey(ConditionId.Detect) ||
-               Volatiles.ContainsKey(ConditionId.MaxGuard) ||
                Volatiles.ContainsKey(ConditionId.KingsShield) ||
                Volatiles.ContainsKey(ConditionId.SpikyShield) ||
                Volatiles.ContainsKey(ConditionId.BanefulBunker) ||
