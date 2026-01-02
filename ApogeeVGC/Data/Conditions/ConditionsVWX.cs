@@ -237,12 +237,15 @@ public partial record Conditions
 
                     return 5;
                 }),
-                // TODO: Wonder Room's defensive stat swapping is NOT implemented via OnModifyMove.
-                // Instead, it should be implemented in Pokemon.GetStat() or Pokemon.CalculateStat() methods:
-                // When Wonder Room is active (battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom)),
-                // Def and SpD should be swapped. This affects damage calculations where the target's
-                // defensive stats are used. Check Pokemon.GetStat() and modify to swap Def<->SpD when
-                // Wonder Room is active. See TypeScript: sim/pokemon.js:Pokemon#getStat and Pokemon#calculateStat.
+                // Wonder Room's defensive stat swapping is implemented in Pokemon.CalculateStat():
+                // When Wonder Room is active, Defense and Special Defense stat VALUES are swapped
+                // BEFORE any calculations. This affects all damage calculations.
+                // 
+                // Note: The TypeScript version also has an OnModifyMove handler that swaps
+                // move.overrideOffensiveStat for moves like Body Press. In C#, since Move properties
+                // are init-only, this swap would need to be handled in the damage calculation code
+                // where OverrideOffensiveStat is used. The stat swapping in CalculateStat handles
+                // most cases correctly.
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
                 {
                     if (battle.DisplayUi)

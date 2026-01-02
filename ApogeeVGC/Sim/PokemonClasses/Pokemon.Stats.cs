@@ -75,9 +75,12 @@ public partial class Pokemon
 
     public int GetStat(StatIdExceptHp statName, bool unboosted = false, bool unmodified = false)
     {
+        // Get base stat from stored stats
         int stat = StoredStats[statName];
 
-        // Wonder Room swaps Def and SpD
+        // Download ignores Wonder Room's effect, but this results in
+        // stat stages being calculated on the opposite defensive stat
+        // When unmodified=true, we swap the stat NAME for boost calculations
         if (unmodified && Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
         {
             statName = statName switch
@@ -106,13 +109,13 @@ public partial class Pokemon
                     throw new InvalidOperationException("boosts must be a BoostsTableRelayVar");
                 }
             }
-            stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
-        }
+                    stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
+                }
 
-        // Stat modifier effects
-        if (!unmodified)
-        {
-            EventId eventId = statName switch
+                // Stat modifier effects
+                if (!unmodified)
+                {
+                    EventId eventId = statName switch
             {
                 StatIdExceptHp.Atk => EventId.ModifyAtk,
                 StatIdExceptHp.Def => EventId.ModifyDef,
@@ -128,13 +131,13 @@ public partial class Pokemon
             }
             else
             {
-                string relayVarType = relayVar?.GetType().Name ?? "null";
-                throw new InvalidOperationException(
-                    $"stat must be an IntRelayVar, but got {relayVarType} for {Name}'s {statName} (Event: {eventId})");
-            }
-        }
+                                string relayVarType = relayVar?.GetType().Name ?? "null";
+                                throw new InvalidOperationException(
+                                    $"stat must be an IntRelayVar, but got {relayVarType} for {Name}'s {statName} (Event: {eventId})");
+                            }
+                        }
 
-        if (statName == StatIdExceptHp.Spe && stat > 10000) stat = 10000;
+                        if (statName == StatIdExceptHp.Spe && stat > 10000) stat = 10000;
         return stat;
     }
 

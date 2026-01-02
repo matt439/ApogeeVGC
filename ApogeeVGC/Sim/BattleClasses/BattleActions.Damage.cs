@@ -165,6 +165,32 @@ public partial class BattleActions
         StatIdExceptHp defenseStat = move.OverrideDefensiveStat ??
                                      (isPhysical ? StatIdExceptHp.Def : StatIdExceptHp.SpD);
 
+        // Wonder Room: If the move uses a defensive stat as offensive stat (e.g. Body Press),
+        // swap which stat is used for both value and boosts
+        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
+        {
+            if (move.OverrideOffensiveStat.HasValue)
+            {
+                var overrideStat = move.OverrideOffensiveStat.Value;
+                if (overrideStat == StatIdExceptHp.Def)
+                {
+                    attackStat = StatIdExceptHp.SpD;
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Hint($"{move.Name} uses Def boosts when Wonder Room is active.");
+                    }
+                }
+                else if (overrideStat == StatIdExceptHp.SpD)
+                {
+                    attackStat = StatIdExceptHp.Def;
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Hint($"{move.Name} uses Sp. Def boosts when Wonder Room is active.");
+                    }
+                }
+            }
+        }
+
         // Get boost values
         int atkBoosts = attacker.Boosts.GetBoost(attackStat.ConvertToBoostId());
         int defBoosts = defender.Boosts.GetBoost(defenseStat.ConvertToBoostId());
