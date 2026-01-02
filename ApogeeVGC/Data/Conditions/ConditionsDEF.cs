@@ -605,9 +605,6 @@ public partial record Conditions
 
                         if (followMeTarget == null) return PokemonVoidUnion.FromVoid();
 
-                        // Don't redirect if the Follow Me user is sky dropped
-                        if (followMeTarget.IsSkyDropped()) return PokemonVoidUnion.FromVoid();
-
                         // Check if the Follow Me user is a valid target for this move
                         if (battle.ValidTarget(followMeTarget, source, move.Target))
                         {

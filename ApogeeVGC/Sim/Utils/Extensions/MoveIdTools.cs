@@ -23,7 +23,6 @@ public static class MoveIdTools
             MoveId.Reflect => ConditionId.Reflect,
             MoveId.LightScreen => ConditionId.LightScreen,
             MoveId.Yawn => ConditionId.Yawn,
-            MoveId.SkyDrop => ConditionId.SkyDrop,
             MoveId.RevivalBlessing => ConditionId.RevivalBlessing,
             _ => throw new ArgumentException($"MoveId '{moveId}' does not have a corresponding ConditionId.",
                 nameof(moveId)),

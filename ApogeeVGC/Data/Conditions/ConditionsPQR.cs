@@ -1207,10 +1207,6 @@ public partial record Conditions
                             return PokemonVoidUnion.FromVoid();
                         }
 
-                        // Don't redirect if the Rage Powder user is sky dropped
-                        if (ragePowderUser.IsSkyDropped())
-                            return PokemonVoidUnion.FromVoid();
-
                         // Check if the Rage Powder user is a valid target for this move
                         if (battle.ValidTarget(ragePowderUser, source, move.Target))
                         {

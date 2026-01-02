@@ -309,24 +309,7 @@ public partial class Pokemon
             ConditionId.ShadowForce,
         ];
 
-        return semiInvulnerableConditions.Any(Volatiles.ContainsKey) || IsSkyDropped();
-    }
-
-    /// <summary>
-    /// Checks if this Pokemon is affected by Sky Drop (either as target or source).
-    /// </summary>
-    public bool IsSkyDropped()
-    {
-        // Check if this Pokemon is the target of Sky Drop
-        if (Volatiles.ContainsKey(ConditionId.SkyDrop))
-        {
-            return true;
-        }
-
-        // Check if this Pokemon is the source of Sky Drop on any opponent
-        return Side.Foe.Active.Any(foeActive =>
-            foeActive != null && foeActive.Volatiles.TryGetValue(ConditionId.SkyDrop, out EffectState? state) &&
-            state.Source == this);
+        return semiInvulnerableConditions.Any(Volatiles.ContainsKey);
     }
 
     /// <summary>

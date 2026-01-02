@@ -872,7 +872,6 @@ public class PlayerConsole : IPlayer
             ConditionId.Dig => "Dig",
             ConditionId.PhantomForce => "PhantomForce",
             ConditionId.ShadowForce => "ShadowForce",
-            ConditionId.SkyDrop => "SkyDrop",
             _ => condition.ToString()
         };
     }
