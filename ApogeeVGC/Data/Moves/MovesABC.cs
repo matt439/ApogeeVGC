@@ -1966,21 +1966,21 @@ public partial record Moves
                         Target = MoveTarget.Scripted,
                         Type = MoveType.Fighting,
                         Condition = _library.Conditions[ConditionId.Counter],
-                        DamageCallback = new DamageCallbackEventInfo((battle, pokemon, _, _) =>
+                        DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
                         {
-                            if (!pokemon.Volatiles.TryGetValue(ConditionId.Counter, out var effectState))
+                            if (!pokemon.Volatiles.TryGetValue(ConditionId.Counter, out EffectState? effectState))
                             {
                                 return IntFalseUnion.FromInt(0);
                             }
                             return IntFalseUnion.FromInt(effectState.TotalDamage ?? 1);
                         }),
-                        BeforeTurnCallback = new BeforeTurnCallbackEventInfo((battle, pokemon, _, _) =>
+                        BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _, _) =>
                         {
                             pokemon.AddVolatile(ConditionId.Counter);
                         }),
-                        OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                        OnTry = new OnTryEventInfo((_, source, _, _) =>
                         {
-                            if (!source.Volatiles.TryGetValue(ConditionId.Counter, out var effectState))
+                            if (!source.Volatiles.TryGetValue(ConditionId.Counter, out EffectState? effectState))
                             {
                                 return BoolEmptyVoidUnion.FromBool(false);
                             }
