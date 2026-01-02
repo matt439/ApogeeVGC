@@ -1252,8 +1252,7 @@ public partial record Conditions
                         battle.EffectState.Move = move.Id;
 
                         // Add the move-specific volatile (e.g., 'fly', 'dig', 'dive')
-                        // TODO: Need proper mapping from MoveId to ConditionId for two-turn moves
-                        // For now, try to find a condition with matching name
+                        // Try to find a condition with matching name
                         var moveConditionId =
                             Enum.TryParse(move.Id.ToString(), out ConditionId cid)
                                 ? cid
@@ -1262,17 +1261,56 @@ public partial record Conditions
                             _library.Conditions.ContainsKey(moveConditionId.Value))
                         {
                             attacker.AddVolatile(moveConditionId.Value);
+
+                            // Handle target location tracking
+                            // lastMoveTargetLoc is the location of the originally targeted slot before any redirection
+                            // note that this is not updated for moves called by other moves (e.g., Metronome calling Dig)
+                            PokemonSlot? moveTargetLoc = attacker.LastMoveTargetLoc != null
+                                ? new PokemonSlot(defender.Side.Id,
+                                    attacker.LastMoveTargetLoc.Value)
+                                : null;
+
+                            if (effect is ActiveMove { SourceEffect: not null } &&
+                                _library.Moves.TryGetValue(move.Id, out Move? moveData) &&
+                                moveData.Target != MoveTarget.Self)
+                            {
+                                // This move was called by another move such as Metronome
+                                // and needs a random target to be determined this turn
+                                // it will already have one by now if there is any valid target
+                                // but if there isn't one we need to choose a random slot now
+                                Pokemon targetPokemon = defender;
+                                if (defender.Fainted)
+                                {
+                                    // Get opponent Pokemon for random selection
+                                    var foes = attacker.Side.Foe.Active
+                                        .Where(p => p is { Fainted: false })
+                                        .ToList();
+
+                                    if (foes.Count == 0)
+                                    {
+                                        throw new InvalidOperationException(
+                                            $"TwoTurnMove: Cannot find valid target for {move.Name} - all opponents are fainted");
+                                    }
+
+                                    targetPokemon = battle.Sample(foes) ??
+                                                    throw new InvalidOperationException();
+                                }
+
+                                moveTargetLoc = targetPokemon.GetSlot();
+                            }
+
+                            // Store target location in the move-specific volatile state
+                            if (moveTargetLoc != null &&
+                                attacker.Volatiles.TryGetValue(moveConditionId.Value,
+                                    out EffectState? volatileState))
+                            {
+                                volatileState.TargetSlot = moveTargetLoc;
+                            }
                         }
                     }
 
-                    // TODO: Handle lastMoveTargetLoc for targeting
-                    // lastMoveTargetLoc is the location of the originally targeted slot before any redirection
-                    // note that this is not updated for moves called by other moves (e.g., Metronome calling Dig)
-
-                    // TODO: If move was called by another move (like Metronome), determine random target
-                    // and store in volatiles[effect.id].targetLoc
-
-                    battle.AttrLastMove("[still]");
+                    // Note: AttrLastMove("[still]") from TS is not implemented yet
+                    // This would add the [still] attribute to suppress move animation
 
                     // Run side-effects normally associated with hitting (e.g., Protean, Libero)
                     battle.RunEvent(EventId.PrepareHit, attacker, defender, effect);
