@@ -22,6 +22,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Uproar,
                 Name = "Uproar",
+                AssociatedMove = MoveId.Uproar,
                 EffectType = EffectType.Condition,
                 Duration = 3,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>

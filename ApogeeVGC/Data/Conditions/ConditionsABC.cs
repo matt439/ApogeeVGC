@@ -26,6 +26,7 @@ public partial record Conditions
             {
                 Id = ConditionId.AllySwitch,
                 Name = "Ally Switch",
+                AssociatedMove = MoveId.AllySwitch,
                 Duration = 2,
                 OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
                 {
@@ -51,6 +52,7 @@ public partial record Conditions
             {
                 Id = ConditionId.AquaRing,
                 Name = "Aqua Ring",
+                AssociatedMove = MoveId.AquaRing,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
                     battle.Add("-start", pokemon, "Aqua Ring");
@@ -66,6 +68,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Attract,
                 Name = "Attract",
+                AssociatedMove = MoveId.Attract,
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
                 {
@@ -132,6 +135,7 @@ public partial record Conditions
             {
                 Id = ConditionId.AuroraVeil,
                 Name = "Aurora Veil",
+                AssociatedMove = MoveId.AuroraVeil,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((battle, target, source, _) =>
                 {
@@ -491,6 +495,7 @@ public partial record Conditions
             {
                 Id = ConditionId.BanefulBunker,
                 Name = "Baneful Bunker",
+                AssociatedMove = MoveId.BanefulBunker,
                 Duration = 1,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
@@ -574,6 +579,7 @@ public partial record Conditions
             {
                 Id = ConditionId.BurningBulwark,
                 Name = "Burning Bulwark",
+                AssociatedMove = MoveId.BurningBulwark,
                 Duration = 1,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
@@ -586,6 +592,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Charge,
                 Name = "Charge",
+                AssociatedMove = MoveId.Charge,
                 OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
                 {
                     if (effect != null &&
@@ -631,6 +638,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Curse,
                 Name = "Curse",
+                AssociatedMove = MoveId.Curse,
                 OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
                 {
                     battle.Add("-start", pokemon, "Curse", $"[of] {source}");

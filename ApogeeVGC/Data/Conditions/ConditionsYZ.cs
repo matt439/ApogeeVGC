@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -19,6 +20,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Yawn,
                 Name = "Yawn",
+                AssociatedMove = MoveId.Yawn,
                 EffectType = EffectType.Condition,
                 NoCopy = true, // doesn't get copied by Baton Pass
                 Duration = 2,

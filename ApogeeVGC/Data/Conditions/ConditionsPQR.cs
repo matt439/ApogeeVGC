@@ -423,6 +423,7 @@ public partial record Conditions
             {
                 Id = ConditionId.RainDance,
                 Name = "RainDance",
+                AssociatedMove = MoveId.RainDance,
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>

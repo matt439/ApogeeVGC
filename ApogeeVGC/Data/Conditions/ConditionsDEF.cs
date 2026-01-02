@@ -68,6 +68,7 @@ public partial record Conditions
             {
                 Id = ConditionId.ElectricTerrain,
                 Name = "Electric Terrain",
+                AssociatedMove = MoveId.ElectricTerrain,
                 EffectType = EffectType.Terrain,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
@@ -215,6 +216,7 @@ public partial record Conditions
             {
                 Id = ConditionId.DestinyBond,
                 Name = "Destiny Bond",
+                AssociatedMove = MoveId.DestinyBond,
                 EffectType = EffectType.Condition,
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
@@ -1015,6 +1017,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Encore,
                 Name = "Encore",
+                AssociatedMove = MoveId.Encore,
                 EffectType = EffectType.Condition,
                 Duration = 3,
                 NoCopy = true,
@@ -1075,6 +1078,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Endure,
                 Name = "Endure",
+                AssociatedMove = MoveId.Endure,
                 EffectType = EffectType.Condition,
                 Duration = 1,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>

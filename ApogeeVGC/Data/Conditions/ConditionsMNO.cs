@@ -260,6 +260,7 @@ public partial record Conditions
             {
                 Id = ConditionId.MistyTerrain,
                 Name = "Misty Terrain",
+                AssociatedMove = MoveId.MistyTerrain,
                 EffectType = EffectType.Terrain,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>

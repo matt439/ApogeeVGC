@@ -22,6 +22,7 @@ public partial record Conditions
             {
                 Id = ConditionId.GastroAcid,
                 Name = "Gastro Acid",
+                AssociatedMove = MoveId.GastroAcid,
                 EffectType = EffectType.Condition,
                 // TODO: onStart - end the pokemon's ability
                 // TODO: onCopy - remove if pokemon has cantsuppress ability flag
@@ -55,6 +56,7 @@ public partial record Conditions
             {
                 Id = ConditionId.GlaiveRush,
                 Name = "Glaive Rush",
+                AssociatedMove = MoveId.GlaiveRush,
                 EffectType = EffectType.Condition,
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
@@ -74,6 +76,7 @@ public partial record Conditions
             {
                 Id = ConditionId.GrassPledge,
                 Name = "Grass Pledge",
+                AssociatedMove = MoveId.GrassPledge,
                 EffectType = EffectType.Condition,
                 Duration = 4,
                 // TODO: onSideStart - display message
@@ -85,6 +88,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Gravity,
                 Name = "Gravity",
+                AssociatedMove = MoveId.Gravity,
                 EffectType = EffectType.Condition,
                 Duration = 5,
                 // TODO: durationCallback - 7 if source has Persistent ability

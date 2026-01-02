@@ -227,6 +227,7 @@ public partial record Conditions
             [ConditionId.Snatch] = new()
             {
                 Id = ConditionId.Snatch,
+                AssociatedMove = MoveId.Snatch,
             },
             [ConditionId.SupercellSlam] = new()
             {
@@ -567,6 +568,7 @@ public partial record Conditions
             {
                 Id = ConditionId.SparklingAria,
                 Name = "Sparkling Aria",
+                AssociatedMove = MoveId.SparklingAria,
                 EffectType = EffectType.Condition,
                 // Sparkling Aria applies a volatile to mark targets that will be cured of burn
                 // The volatile is cleared after processing all targets
@@ -775,6 +777,7 @@ public partial record Conditions
             {
                 Id = ConditionId.TrickRoom,
                 Name = "Trick Room",
+                AssociatedMove = MoveId.TrickRoom,
                 EffectType = EffectType.Condition,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, _, _, _) => 5),
@@ -865,6 +868,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Sandstorm,
                 Name = "Sandstorm",
+                AssociatedMove = MoveId.Sandstorm,
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
@@ -927,6 +931,7 @@ public partial record Conditions
             {
                 Id = ConditionId.Snowscape,
                 Name = "Snowscape",
+                AssociatedMove = MoveId.Snowscape,
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
@@ -983,6 +988,7 @@ public partial record Conditions
             {
                 Id = ConditionId.SunnyDay,
                 Name = "SunnyDay",
+                AssociatedMove = MoveId.SunnyDay,
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
