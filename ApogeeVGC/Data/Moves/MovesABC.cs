@@ -6,6 +6,8 @@ using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Moves;
@@ -113,7 +115,7 @@ public partial record Moves
                 Type = MoveType.Flying,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
                 {
-                    if (pokemon.Item != Sim.Items.ItemId.None) return move.BasePower;
+                    if (pokemon.Item != ItemId.None) return move.BasePower;
                     battle.Debug("BP doubled for no item");
                     return move.BasePower * 2;
                 }),
@@ -1436,19 +1438,19 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
-                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, move) =>
+                OnAfterHit = new OnAfterHitEventInfo((_, _, source, move) =>
                 {
                     if ((move.HasSheerForce ?? false) || source.Hp <= 0) return new VoidReturn();
-                    foreach (var side in source.Side.FoeSidesWithConditions())
+                    foreach (Side side in source.Side.FoeSidesWithConditions())
                     {
                         side.AddSideCondition(ConditionId.Spikes);
                     }
                     return new VoidReturn();
                 }),
-                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, target, source, move) =>
+                OnAfterSubDamage = new OnAfterSubDamageEventInfo((_, _, _, source, move) =>
                 {
                     if ((move.HasSheerForce ?? false) || source.Hp <= 0) return;
-                    foreach (var side in source.Side.FoeSidesWithConditions())
+                    foreach (Side side in source.Side.FoeSidesWithConditions())
                     {
                         side.AddSideCondition(ConditionId.Spikes);
                     }
@@ -1559,11 +1561,11 @@ public partial record Moves
                 Name = "Chilly Reception",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { },
+                Flags = new MoveFlags(),
                 SelfSwitch = true,
                 Target = MoveTarget.All,
                 Type = MoveType.Ice,
-                PriorityChargeCallback = new PriorityChargeCallbackEventInfo((battle, source) =>
+                PriorityChargeCallback = new PriorityChargeCallbackEventInfo((_, source) =>
                 {
                     source.AddVolatile(ConditionId.ChillyReception);
                 }),
@@ -1635,7 +1637,7 @@ public partial record Moves
                 SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Dragon,
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                OnTry = new OnTryEventInfo((_, source, _, _) =>
                 {
                     // Fails if HP is 33% or less, or if maxhp is 1 (Shedinja)
                     if (source.Hp <= source.MaxHp * 33 / 100 || source.MaxHp == 1)
@@ -1646,8 +1648,13 @@ public partial record Moves
                 }),
                 OnTryHit = new OnTryHitEventInfo((battle, _, source, move) =>
                 {
+                    if (move.Boosts is null)
+                    {
+                        battle.Debug("Clangorous Soul has no boosts to apply");
+                        return new VoidReturn();
+                    }
                     // Apply boosts first, fail if boosts couldn't be applied
-                    var boostResult = battle.Boost(move.SelfBoost, source, source, move);
+                    BoolZeroUnion? boostResult = battle.Boost(move.Boosts, source, source, move);
                     if (boostResult == null || !boostResult.IsTruthy()) return false;
                     return new VoidReturn();
                 }),
@@ -1768,9 +1775,9 @@ public partial record Moves
                 Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, FailMeFirst = true },
                 Target = MoveTarget.Scripted,
                 Type = MoveType.Dark,
-                DamageCallback = new DamageCallbackEventInfo((battle, pokemon, target, move) =>
+                DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
                 {
-                    var lastDamagedBy = pokemon.GetLastDamagedBy(true);
+                    Attacker? lastDamagedBy = pokemon.GetLastDamagedBy(true);
                     if (lastDamagedBy != null)
                     {
                         int damage = (int)(lastDamagedBy.Damage * 1.5);
@@ -1778,9 +1785,9 @@ public partial record Moves
                     }
                     return 0;
                 }),
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                OnTry = new OnTryEventInfo((_, source, _, _) =>
                 {
-                    var lastDamagedBy = source.GetLastDamagedBy(true);
+                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
                     if (lastDamagedBy == null || !lastDamagedBy.ThisTurn) return false;
                     return new VoidReturn();
                 }),
@@ -1882,12 +1889,12 @@ public partial record Moves
                 Type = MoveType.Normal,
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
-                    var lastMove = battle.LastMove;
+                    ActiveMove? lastMove = battle.LastMove;
                     if (lastMove == null) return false;
 
                     // Get the move to use - if it has a base move, use that
-                    var moveId = lastMove.BaseMove ?? lastMove.Id;
-                    var moveToUse = battle.Library.Moves[moveId];
+                    MoveId moveId = lastMove.BaseMove ?? lastMove.Id;
+                    Move moveToUse = battle.Library.Moves[moveId];
 
                     // Check if the move can be copied
                     if (moveToUse.Flags.FailCopycat == true) return false;
@@ -1981,26 +1988,26 @@ public partial record Moves
                     ConditionId[] sideConditions = [
                         ConditionId.Mist, ConditionId.LightScreen, ConditionId.Reflect, ConditionId.Spikes,
                         ConditionId.Safeguard, ConditionId.Tailwind, ConditionId.ToxicSpikes, ConditionId.StealthRock,
-                        ConditionId.StickyWeb, ConditionId.AuroraVeil
+                        ConditionId.StickyWeb, ConditionId.AuroraVeil,
                     ];
                     bool success = false;
 
-                    var sourceSide = source.Side;
-                    var targetSide = source.Side.Foe;
+                    Side sourceSide = source.Side;
+                    Side targetSide = source.Side.Foe;
 
                     // Store conditions from both sides
                     var sourceConditions = new Dictionary<ConditionId, EffectState>();
                     var targetConditions = new Dictionary<ConditionId, EffectState>();
 
-                    foreach (var id in sideConditions)
+                    foreach (ConditionId id in sideConditions)
                     {
-                        if (sourceSide.SideConditions.TryGetValue(id, out var sourceState))
+                        if (sourceSide.SideConditions.TryGetValue(id, out EffectState? sourceState))
                         {
                             sourceConditions[id] = sourceState;
                             sourceSide.SideConditions.Remove(id);
                             success = true;
                         }
-                        if (targetSide.SideConditions.TryGetValue(id, out var targetState))
+                        if (targetSide.SideConditions.TryGetValue(id, out EffectState? targetState))
                         {
                             targetConditions[id] = targetState;
                             targetSide.SideConditions.Remove(id);
@@ -2009,12 +2016,12 @@ public partial record Moves
                     }
 
                     // Swap conditions
-                    foreach (var (id, state) in sourceConditions)
+                    foreach ((ConditionId id, EffectState state) in sourceConditions)
                     {
                         state.Target = targetSide;
                         targetSide.SideConditions[id] = state;
                     }
-                    foreach (var (id, state) in targetConditions)
+                    foreach ((ConditionId id, EffectState state) in targetConditions)
                     {
                         state.Target = sourceSide;
                         sourceSide.SideConditions[id] = state;
@@ -2046,13 +2053,13 @@ public partial record Moves
                     {
                         return new VoidReturn();
                     }
-                    var yourItemResult = target.TakeItem(source);
+                    ItemFalseUnion yourItemResult = target.TakeItem(source);
                     if (yourItemResult is not ItemItemFalseUnion yourItemUnion)
                     {
                         return new VoidReturn();
                     }
-                    var yourItem = yourItemUnion.Item;
-                    var takeItemResult = battle.SingleEvent(EventId.TakeItem, yourItem, target.ItemState, source, target, move);
+                    Item yourItem = yourItemUnion.Item;
+                    RelayVar? takeItemResult = battle.SingleEvent(EventId.TakeItem, yourItem, target.ItemState, source, target, move);
                     if (takeItemResult is BoolRelayVar { Value: false } || !source.SetItem(yourItem.Id))
                     {
                         target.Item = yourItem.Id; // Bypass setItem so we don't break choice lock
@@ -2169,7 +2176,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 NonGhostTarget = MoveTarget.Self,
                 Type = MoveType.Ghost,
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, target) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, source, target) =>
                 {
                     if (!source.HasType(PokemonType.Ghost))
                     {
@@ -2182,7 +2189,7 @@ public partial record Moves
                         move.Target = MoveTarget.RandomNormal;
                     }
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = new OnTryHitEventInfo((_, target, source, move) =>
                 {
                     if (!source.HasType(PokemonType.Ghost))
                     {
@@ -2190,7 +2197,7 @@ public partial record Moves
                         // The volatile status will still try to apply but target is self
                         move.Self = new SecondaryEffect
                         {
-                            Boosts = new SparseBoostsTable { Spe = -1, Atk = 1, Def = 1 }
+                            Boosts = new SparseBoostsTable { Spe = -1, Atk = 1, Def = 1 },
                         };
                     }
                     else if (target.Volatiles.ContainsKey(ConditionId.Curse))
@@ -2200,7 +2207,7 @@ public partial record Moves
                     }
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
                     // Ghost variant: user loses 50% HP
                     if (source.HasType(PokemonType.Ghost))
@@ -2231,7 +2238,7 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 20,
-                    Boosts = new SparseBoostsTable { Def = -1, },
+                    Boosts = new SparseBoostsTable { Def = -1 },
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
