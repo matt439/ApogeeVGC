@@ -12,6 +12,8 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
@@ -34,21 +36,24 @@ public partial record Conditions
                     {
                         return BoolVoidUnion.FromBool(false);
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("-endability", pokemon);
                     }
+
                     // End the pokemon's current ability
-                    var ability = pokemon.GetAbility();
+                    Ability ability = pokemon.GetAbility();
                     battle.SingleEvent(EventId.End, ability, pokemon.AbilityState,
-                        new PokemonSingleEventTarget(pokemon), new PokemonSingleEventSource(pokemon),
+                        new PokemonSingleEventTarget(pokemon),
+                        new PokemonSingleEventSource(pokemon),
                         _library.Conditions[ConditionId.GastroAcid]);
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnCopy = new OnCopyEventInfo((battle, pokemon) =>
+                OnCopy = new OnCopyEventInfo((_, pokemon) =>
                 {
                     // Remove Gastro Acid if the pokemon has an ability with cantsuppress flag
-                    var ability = pokemon.GetAbility();
+                    Ability ability = pokemon.GetAbility();
                     if (ability.Flags.CantSuppress ?? false)
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.GastroAcid]);
@@ -96,15 +101,12 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 // Moves always hit the Glaive Rush user
-                OnAccuracy = new OnAccuracyEventInfo((_, _, _, _, _) =>
-                {
-                    return IntBoolVoidUnion.FromBool(true);
-                }),
+                OnAccuracy =
+                    new OnAccuracyEventInfo((_, _, _, _, _) => IntBoolVoidUnion.FromBool(true)),
                 // Damage is doubled against the Glaive Rush user
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, _, _, _, _) =>
-                {
-                    return battle.ChainModify(2);
-                }),
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, _, _, _, _) =>
+                        battle.ChainModify(2)),
                 // Remove the Glaive Rush drawback before the pokemon attacks
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
                 {
@@ -127,11 +129,7 @@ public partial record Conditions
                         battle.Add("-sidestart", side, "Grass Pledge");
                     }
                 }),
-                OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
-                {
-                    // Quarter speed (0.25x)
-                    return (int)Math.Floor(spe * 0.25);
-                }),
+                OnModifySpe = new OnModifySpeEventInfo((_, spe, _) => (int)Math.Floor(spe * 0.25)),
                 OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
                 {
                     // Duration handled automatically
@@ -157,10 +155,13 @@ public partial record Conditions
                     {
                         if (battle.DisplayUi)
                         {
-                            battle.Add("-activate", source, "ability: Persistent", "[move] Gravity");
+                            battle.Add("-activate", source, "ability: Persistent",
+                                "[move] Gravity");
                         }
+
                         return 7;
                     }
+
                     return 5;
                 }),
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
@@ -178,7 +179,7 @@ public partial record Conditions
                     }
 
                     // Remove airborne-related volatiles from all active Pokemon
-                    foreach (var pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.GetAllActive())
                     {
                         bool applies = false;
                         if (pokemon.RemoveVolatile(_library.Conditions[ConditionId.Bounce]) ||
@@ -188,33 +189,33 @@ public partial record Conditions
                             battle.Queue.CancelMove(pokemon);
                             pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
                         }
+
                         // TODO: Handle SkyDrop volatile when implemented
                         if (pokemon.Volatiles.ContainsKey(ConditionId.MagnetRise))
                         {
                             applies = true;
                             pokemon.DeleteVolatile(ConditionId.MagnetRise);
                         }
+
                         if (pokemon.Volatiles.ContainsKey(ConditionId.Telekinesis))
                         {
                             applies = true;
                             pokemon.DeleteVolatile(ConditionId.Telekinesis);
                         }
+
                         if (applies && battle.DisplayUi)
                         {
                             battle.Add("-activate", pokemon, "move: Gravity");
                         }
                     }
                 }),
-                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
+                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, _, _, _, _) =>
+                    battle.ChainModify([6840, 4096])),
+                OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
                 {
-                    // Accuracy boost: 6840/4096 ? 1.67x
-                    return battle.ChainModify([6840, 4096]);
-                }),
-                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
-                {
-                    foreach (var moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
                     {
-                        var move = _library.Moves[moveSlot.Id];
+                        Move move = _library.Moves[moveSlot.Id];
                         if (move.Flags.Gravity ?? false)
                         {
                             pokemon.DisableMove(moveSlot.Id);
@@ -231,8 +232,10 @@ public partial record Conditions
                         {
                             battle.Add("cant", pokemon, "move: Gravity", move.Name);
                         }
+
                         return BoolVoidUnion.FromBool(false);
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }, 6),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
@@ -278,28 +281,27 @@ public partial record Conditions
                     {
                         battle.Add("-singlemove", pokemon, "Grudge");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnFaint = new OnFaintEventInfo((battle, target, source, effect) =>
+                OnFaint = new OnFaintEventInfo((battle, _, source, effect) =>
                 {
                     if (source == null || source.Fainted || effect == null) return;
                     // Check if fainted by a move (not a future move)
                     if (effect.EffectType == EffectType.Move &&
-                        !(effect is Move { Flags.FutureMove: true }) &&
+                        effect is not Move { Flags.FutureMove: true } &&
                         source.LastMove != null)
                     {
-                        var move = source.LastMove;
+                        Move? move = source.LastMove;
                         // TODO: Handle Max moves - if (move.IsMax && move.BaseMove != null) get base move
 
-                        foreach (var moveSlot in source.MoveSlots)
+                        foreach (MoveSlot moveSlot in source.MoveSlots.Where(moveSlot =>
+                                     moveSlot.Id == move.Id))
                         {
-                            if (moveSlot.Id == move.Id)
+                            moveSlot.Pp = 0;
+                            if (battle.DisplayUi)
                             {
-                                moveSlot.Pp = 0;
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Add("-activate", source, "move: Grudge", move.Name);
-                                }
+                                battle.Add("-activate", source, "move: Grudge", move.Name);
                             }
                         }
                     }
@@ -331,30 +333,35 @@ public partial record Conditions
                     {
                         return 2;
                     }
+
                     if (source != null && source.HasAbility(AbilityId.Persistent))
                     {
                         if (battle.DisplayUi)
                         {
-                            battle.Add("-activate", source, "ability: Persistent", "[move] Heal Block");
+                            battle.Add("-activate", source, "ability: Persistent",
+                                "[move] Heal Block");
                         }
+
                         return 7;
                     }
+
                     return 5;
                 }),
-                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, "move: Heal Block");
                     }
+
                     // TODO: source.moveThisTurnResult = true;
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
                 {
-                    foreach (var moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
                     {
-                        var move = _library.Moves[moveSlot.Id];
+                        Move move = _library.Moves[moveSlot.Id];
                         if (move.Flags.Heal ?? false)
                         {
                             pokemon.DisableMove(moveSlot.Id);
@@ -370,8 +377,10 @@ public partial record Conditions
                         {
                             battle.Add("cant", pokemon, "move: Heal Block", move.Name);
                         }
+
                         return false;
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }, 6),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
@@ -389,37 +398,40 @@ public partial record Conditions
                 {
                     // Duration handled automatically
                 }, 20),
-                        OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "move: Heal Block");
+                    }
+                }),
+                OnTryHeal = new OnTryHealEventInfo(
+                    (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, _,
+                        target, source, effect) =>
+                    {
+                        // Z-power healing bypasses Heal Block
+                        // TODO: Check for effect.IsZ when implemented
+                        // if (effect != null && (effect.Id == "zpower" || effect is Move { IsZ: true })) return damage;
+
+                        // Pollen Puff healing is blocked with a special message
+                        if (source != null && target != source && target.Hp != target.MaxHp &&
+                            effect is Move { Id: MoveId.PollenPuff })
                         {
+                            battle.AttrLastMove("[still]");
                             if (battle.DisplayUi)
                             {
-                                battle.Add("-end", pokemon, "move: Heal Block");
+                                // FIXME: Wrong error message in TypeScript, but following the same pattern
+                                battle.Add("cant", source, "move: Heal Block", effect.Name);
                             }
-                        }),
-                        OnTryHeal = new OnTryHealEventInfo(
-                            (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage, target, source, effect) =>
-                            {
-                                // Z-power healing bypasses Heal Block
-                                // TODO: Check for effect.IsZ when implemented
-                                // if (effect != null && (effect.Id == "zpower" || effect is Move { IsZ: true })) return damage;
 
-                                // Pollen Puff healing is blocked with a special message
-                                if (source != null && target != source && target.Hp != target.MaxHp &&
-                                    effect is Move { Id: MoveId.PollenPuff })
-                                {
-                                    battle.AttrLastMove("[still]");
-                                    if (battle.DisplayUi)
-                                    {
-                                        // FIXME: Wrong error message in TypeScript, but following the same pattern
-                                        battle.Add("cant", source, "move: Heal Block", effect.Name);
-                                    }
-                                    return null;
-                                }
-                                // Block all other healing
-                                return IntBoolUnion.FromBool(false);
-                            })),
-                        // OnRestart is not needed - Psychic Noise duration is handled by DurationCallback
-                    },
+                            return null;
+                        }
+
+                        // Block all other healing
+                        return IntBoolUnion.FromBool(false);
+                    })),
+                // OnRestart is not needed - Psychic Noise duration is handled by DurationCallback
+            },
             [ConditionId.Hail] = new()
             {
                 Id = ConditionId.Hail,
@@ -510,9 +522,10 @@ public partial record Conditions
                     {
                         return 8;
                     }
+
                     return 5;
                 }),
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, defender, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, attacker, defender, move) =>
                 {
                     // Weaken Earthquake, Bulldoze, Magnitude if defender is grounded
                     MoveId[] weakenedMoves = [MoveId.Earthquake, MoveId.Bulldoze, MoveId.Magnitude];
@@ -524,12 +537,14 @@ public partial record Conditions
                         battle.Debug("move weakened by grassy terrain");
                         return battle.ChainModify(0.5);
                     }
+
                     // Boost Grass moves if attacker is grounded
                     if (move.Type == MoveType.Grass && (attacker.IsGrounded() ?? false))
                     {
                         battle.Debug("grassy terrain boost");
                         return battle.ChainModify([5325, 4096]);
                     }
+
                     return new VoidReturn();
                 }, 6),
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
@@ -557,7 +572,8 @@ public partial record Conditions
                     {
                         if (battle.DisplayUi)
                         {
-                            battle.Debug("Pokemon semi-invuln or not grounded; Grassy Terrain skipped");
+                            battle.Debug(
+                                "Pokemon semi-invuln or not grounded; Grassy Terrain skipped");
                         }
                     }
                 }, 5)
