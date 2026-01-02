@@ -8,6 +8,8 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
@@ -30,9 +32,10 @@ public partial record Conditions
                     {
                         battle.Add("-start", target, "move: Yawn", $"[of] {source}");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
                 {
                     // Yawn resolves at the end of the turn after it was applied
                 }, 23),
@@ -42,6 +45,7 @@ public partial record Conditions
                     {
                         battle.Add("-end", target, "move: Yawn", "[silent]");
                     }
+
                     // Try to set sleep status
                     target.TrySetStatus(ConditionId.Sleep, battle.EffectState.Source);
                 }),
@@ -61,27 +65,29 @@ public partial record Conditions
                         // In Gen 8+, Wish will never resolve when used on the 255th turn
                         // The hint is not displayed since this is a rare edge case
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
                 {
                     // Use GetOverflowedTurnCount for proper Gen 8+ turn overflow handling
                     if (battle.GetOverflowedTurnCount() <= battle.EffectState.StartingTurn) return;
-                    var slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
+                    Pokemon? slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
                     if (slotTarget != null)
                     {
-                        target.Side.RemoveSlotCondition(slotTarget, _library.Conditions[ConditionId.Wish]);
+                        target.Side.RemoveSlotCondition(slotTarget,
+                            _library.Conditions[ConditionId.Wish]);
                     }
                 }, 4),
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
-                    if (target != null && !target.Fainted)
+                    if (target is { Fainted: false })
                     {
-                        var healAmount = battle.EffectState.Hp ?? 0;
-                        var damage = battle.Heal(healAmount, target, target);
+                        int healAmount = battle.EffectState.Hp ?? 0;
+                        IntFalseUnion damage = battle.Heal(healAmount, target, target);
                         if (damage is IntIntFalseUnion { Value: > 0 } && battle.DisplayUi)
                         {
-                            var wisherName = battle.EffectState.Source?.Name ?? "unknown";
+                            string wisherName = battle.EffectState.Source?.Name ?? "unknown";
                             battle.Add("-heal", target, target.GetHealth,
                                 "[from] move: Wish", $"[wisher] {wisherName}");
                         }
@@ -94,32 +100,31 @@ public partial record Conditions
                 Name = "Zen Mode",
                 EffectType = EffectType.Condition,
                 AssociatedAbility = AbilityId.ZenMode,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                OnStart = new OnStartEventInfo((_, target, _, _) =>
                 {
-                    if (target is not Pokemon pokemon) return new VoidReturn();
+                    if (target is null) return new VoidReturn();
 
                     // Check if it's a Galar form
-                    bool isGalar = pokemon.Species.Forme == FormeId.Galar ||
-                                   pokemon.Species.Forme == FormeId.GalarZen;
+                    bool isGalar = target.Species.Forme is FormeId.Galar or FormeId.GalarZen;
 
                     if (!isGalar)
                     {
-                        if (pokemon.Species.Id != SpecieId.DarmanitanZen)
+                        if (target.Species.Id != SpecieId.DarmanitanZen)
                         {
-                            pokemon.FormeChange(SpecieId.DarmanitanZen);
+                            target.FormeChange(SpecieId.DarmanitanZen);
                         }
                     }
                     else
                     {
-                        if (pokemon.Species.Id != SpecieId.DarmanitanGalarZen)
+                        if (target.Species.Id != SpecieId.DarmanitanGalarZen)
                         {
-                            pokemon.FormeChange(SpecieId.DarmanitanGalarZen);
+                            target.FormeChange(SpecieId.DarmanitanGalarZen);
                         }
                     }
 
                     return new VoidReturn();
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = new OnEndEventInfo((_, pokemon) =>
                 {
                     // Check if in Zen forme
                     if (pokemon.Species.Forme is FormeId.Zen or FormeId.GalarZen)
