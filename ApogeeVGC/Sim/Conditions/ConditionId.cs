@@ -33,7 +33,6 @@ public enum ConditionId
     Yawn,
     GastroAcid,
     Commanding,
-    Embargo,
     MagicRoom,
     WonderRoom,
     Gravity,
