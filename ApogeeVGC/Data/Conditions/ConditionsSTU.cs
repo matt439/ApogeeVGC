@@ -714,7 +714,6 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
                 {
-                    // TODO: Check for Dynamax volatile
                     if (effect is Move { Id: MoveId.GMaxMeltdown })
                     {
                         battle.EffectState.Duration = 3;
@@ -832,13 +831,15 @@ public partial record Conditions
                     }
                     else if ((battle.EffectState.Layers ?? 0) >= 2)
                     {
-                        // TODO: Get opponent Pokemon for source parameter (pokemon.Side.Foe.Active[0])
-                        pokemon.TrySetStatus(ConditionId.Toxic, pokemon);
+                        // Get the first active opponent Pokemon as the source
+                        Pokemon? source = pokemon.Side.Foe.Active.FirstOrDefault(p => p != null);
+                        pokemon.TrySetStatus(ConditionId.Toxic, source ?? pokemon);
                     }
                     else
                     {
-                        // TODO: Get opponent Pokemon for source parameter (pokemon.Side.Foe.Active[0])
-                        pokemon.TrySetStatus(ConditionId.Poison, pokemon);
+                        // Get the first active opponent Pokemon as the source
+                        Pokemon? source = pokemon.Side.Foe.Active.FirstOrDefault(p => p != null);
+                        pokemon.TrySetStatus(ConditionId.Poison, source ?? pokemon);
                     }
                 }),
             },
