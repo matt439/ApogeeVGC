@@ -672,7 +672,25 @@ public partial record Moves
                     FailMimic = true,
                     FailInstruct = true,
                 },
-                // TODO: onHit - use a random move that has metronome flag
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Get all moves that have the Metronome flag
+                    var metronomeableMoves = battle.Library.Moves.Values
+                        .Where(move => move.Flags.Metronome == true)
+                        .ToList();
+
+                    if (metronomeableMoves.Count == 0)
+                    {
+                        return false;
+                    }
+
+                    // Randomly select a move
+                    Move randomMove = battle.Sample(metronomeableMoves);
+
+                    // Use the selected move
+                    battle.Actions.UseMove(randomMove, target);
+                    return new VoidReturn();
+                }),
                 CallsMove = true,
                 Secondary = null,
                 Target = MoveTarget.Self,
