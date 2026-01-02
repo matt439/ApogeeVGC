@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -1537,8 +1538,35 @@ public partial record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                // TODO: onHit - make target move last this turn (only in doubles/triples)
-                // Requires making Order settable on MoveAction
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Fails in singles
+                    if (battle.ActivePerHalf == 1)
+                    {
+                        return false;
+                    }
+
+                    // Get the target's queued move action
+                    MoveAction? action = battle.Queue.WillMove(target);
+                    if (action == null)
+                    {
+                        return false;
+                    }
+
+                    // Find the action in the queue and replace it with one that has order 201
+                    int index = battle.Queue.List.IndexOf(action);
+                    if (index == -1)
+                    {
+                        return false;
+                    }
+
+                    // Create a new action with order 201 (makes it move last)
+                    MoveAction newAction = action with { Order = 201 };
+                    battle.Queue.List[index] = newAction;
+
+                    battle.Add("-activate", target, "move: Quash");
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
