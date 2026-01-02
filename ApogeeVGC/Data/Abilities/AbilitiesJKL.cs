@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
@@ -70,13 +71,14 @@ public partial record Abilities
                 Num = 103,
                 Rating = -1.0,
                 // Item suppression is implemented in Pokemon.IgnoringItem()
-                // OnSwitchInPriority = 1
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                // Note: Klutz activates early enough via OnSwitchInPriority: 1 to beat most items
+                // In TypeScript this is onStart with onSwitchInPriority: 1
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     // End the item effect when switching in
                     Item item = pokemon.GetItem();
                     battle.SingleEvent(EventId.End, item, pokemon.ItemState, pokemon);
-                }, 1),
+                }, priority: 1),
             },
 
             // ==================== 'L' Abilities ====================
@@ -136,6 +138,10 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Libero == true) return new VoidReturn();
                     if (move.HasBounced == true || move.Flags.FutureMove == true ||
+                        move.SourceEffect is ConditionEffectStateId
+                        {
+                            ConditionId: ConditionId.Snatch
+                        } ||
                         move.CallsMove == true)
                         return new VoidReturn();
 
@@ -184,7 +190,7 @@ public partial record Abilities
                     {
                         BoolZeroUnion? boostResult =
                             battle.Boost(new SparseBoostsTable { SpA = 1 });
-                        if (boostResult is ZeroBoolZeroUnion)
+                        if (boostResult is not BoolBoolZeroUnion { Value: true })
                         {
                             battle.Add("-immune", target, "[from] ability: Lightning Rod");
                         }
