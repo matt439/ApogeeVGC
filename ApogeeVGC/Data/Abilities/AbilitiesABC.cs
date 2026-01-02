@@ -52,6 +52,7 @@ public partial record Abilities
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                     {
                         // List of moves that should not be affected by type-changing abilities
+                        // TODO: Add MoveId.MultiAttack, MoveId.NaturalGift, MoveId.Technoblast when available
                         MoveId[] noModifyType =
                         [
                             MoveId.Judgment,
@@ -166,7 +167,7 @@ public partial record Abilities
                 OnHit = new OnHitEventInfo((battle, target, _, move) =>
                 {
                     if (target.Hp == 0) return new VoidReturn();
-                    if (move is not { }) return new VoidReturn();
+                    if (move.EffectType != EffectType.Move) return new VoidReturn();
                     if (!target.GetMoveHitData(move).Crit) return new VoidReturn();
 
                     battle.Boost(new SparseBoostsTable { Atk = 12 }, target, target);
@@ -859,22 +860,22 @@ public partial record Abilities
                         showMsg = true;
                     }
 
-                    if (boost.Evasion is not null && boost.Evasion < 0)
-                    {
-                        boost.Evasion = null;
-                        showMsg = true;
-                    }
+                                    if (boost.Evasion is not null && boost.Evasion < 0)
+                                    {
+                                        boost.Evasion = null;
+                                        showMsg = true;
+                                    }
 
-                    if (showMsg && effect is not ActiveMove { Secondaries: not null })
+                                    if (showMsg && effect is not ActiveMove { Secondaries: not null })
+                                    {
+                                        battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
+                                            $"[of] {target}");
+                                    }
+                                }),
+                            },
+                    [AbilityId.CloudNine] = new()
                     {
-                        battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
-                            $"[of] {target}");
-                    }
-                }),
-            },
-            [AbilityId.CloudNine] = new()
-            {
-                Id = AbilityId.CloudNine,
+                        Id = AbilityId.CloudNine,
                 Name = "Cloud Nine",
                 Num = 13,
                 Rating = 1.5,
