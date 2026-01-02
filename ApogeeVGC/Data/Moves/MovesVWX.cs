@@ -1,7 +1,9 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -35,12 +37,13 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((battle, _, target, _) =>
                 {
                     // Check if target will move with a priority move that isn't Status
-                    var action = battle.Queue.WillMove(target);
-                    var move = action?.Move;
-                    if (move == null || move.Priority <= 0 || move.Category == MoveCategory.Status)
+                    MoveAction? action = battle.Queue.WillMove(target);
+                    Move? move = action?.Move;
+                    if (move is not { Priority: > 0 } || move.Category == MoveCategory.Status)
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
                 Secondary = new SecondaryEffect
@@ -79,20 +82,22 @@ public partial record Moves
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
                 {
                     // Wake up all sleeping Pokemon on both sides
-                    foreach (var pokemon in target.Side.Active)
+                    foreach (Pokemon? pokemon in target.Side.Active)
                     {
                         if (pokemon?.Status == ConditionId.Sleep)
                         {
                             pokemon.CureStatus();
                         }
                     }
-                    foreach (var pokemon in target.Side.Foe.Active)
+
+                    foreach (Pokemon? pokemon in target.Side.Foe.Active)
                     {
                         if (pokemon?.Status == ConditionId.Sleep)
                         {
                             pokemon.CureStatus();
                         }
                     }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -163,6 +168,7 @@ public partial record Moves
                         battle.ChainModify(2);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }),
                 Secondary = null,
@@ -226,7 +232,8 @@ public partial record Moves
                 Name = "Vise Grip",
                 BasePp = 30,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -395,9 +402,9 @@ public partial record Moves
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    var bp = move.BasePower * source.Hp / source.MaxHp;
+                    int bp = move.BasePower * source.Hp / source.MaxHp;
                     battle.Debug($"[Water Spout] BP: {bp}");
-                    return (int)bp;
+                    return bp;
                 }),
                 Secondary = null,
                 Target = MoveTarget.AllAdjacentFoes,
@@ -414,7 +421,7 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 1,
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                MultiHit = new int[] { 2, 5 },
+                MultiHit = new[] { 2, 5 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
@@ -458,9 +465,9 @@ public partial record Moves
                     Metronome = true,
                     Bullet = true,
                 },
-                OnModifyType = new OnModifyTypeEventInfo((battle, move, source, _) =>
+                OnModifyType = new OnModifyTypeEventInfo((battle, move, _, _) =>
                 {
-                    var weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = battle.Field.EffectiveWeather();
                     move.Type = weather switch
                     {
                         ConditionId.SunnyDay or ConditionId.DesolateLand => MoveType.Fire,
@@ -470,9 +477,9 @@ public partial record Moves
                         _ => move.Type,
                     };
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
                 {
-                    var weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = battle.Field.EffectiveWeather();
                     if (weather != ConditionId.None)
                     {
                         move.BasePower *= 2;
@@ -568,10 +575,7 @@ public partial record Moves
                 SideCondition = ConditionId.WideGuard,
                 Condition = _library.Conditions[ConditionId.WideGuard],
                 OnTry = new OnTryEventInfo((battle, _, _, _) =>
-                {
-                    // Wide Guard fails if there are no upcoming actions in the queue
-                    return battle.Queue.WillAct() != null ? new VoidReturn() : (BoolEmptyVoidUnion?)false;
-                }),
+                    battle.Queue.WillAct() != null ? new VoidReturn() : false),
                 Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Rock,
@@ -593,9 +597,9 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
                 {
-                    var weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = battle.Field.EffectiveWeather();
                     if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         move.Accuracy = IntTrueUnion.FromTrue();
@@ -812,22 +816,24 @@ public partial record Moves
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
                 {
                     // Fails if target's ability can't be suppressed
-                    var targetAbility = target.GetAbility();
+                    Ability targetAbility = target.GetAbility();
                     if (targetAbility.Flags.CantSuppress == true)
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
                     // Set target's ability to Insomnia
-                    var oldAbility = target.SetAbility(AbilityId.Insomnia, source);
+                    AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Insomnia, source);
                     if (oldAbility != null)
                     {
                         // Cure sleep if the target was asleep
@@ -835,8 +841,10 @@ public partial record Moves
                         {
                             target.CureStatus();
                         }
+
                         return new VoidReturn();
                     }
+
                     return false;
                 }),
                 Secondary = null,
