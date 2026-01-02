@@ -275,8 +275,14 @@ public partial record Conditions
                 NoCopy = true, // doesn't get copied by Baton Pass
                 OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
                 {
-                    // TODO: Check if target will move this turn or is active pokemon
-                    // If so, decrease duration by 1
+                    // The target hasn't taken its turn, or Cursed Body activated and the move
+                    // was not used through Dancer or Instruct
+                    if (battle.Queue.WillMove(pokemon) != null ||
+                        (pokemon == battle.ActivePokemon && battle.ActiveMove != null &&
+                         !(battle.ActiveMove.IsExternal ?? false)))
+                    {
+                        pokemon.Volatiles[ConditionId.Disable].Duration--;
+                    }
 
                     if (pokemon.LastMove == null)
                     {
@@ -321,7 +327,6 @@ public partial record Conditions
                 }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, attacker, _, move) =>
                 {
-                    // TODO: Check if move is Z-move
                     if (move.Id == battle.EffectState.Move)
                     {
                         if (battle.DisplayUi)
