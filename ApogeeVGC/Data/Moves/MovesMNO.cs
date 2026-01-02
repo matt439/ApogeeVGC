@@ -816,14 +816,41 @@ public partial record Moves
                     Protect = true,
                     FailMeFirst = true,
                     NoAssist = true,
+                    FailCopycat = true,
                 },
-                // TODO: damageCallback - return double the special damage received this turn
-                // TODO: beforeTurnCallback - add mirrorcoat volatile
-                // TODO: onTry - fail if no special damage was taken
-                // TODO: condition - track special damage and redirect target
-                Secondary = null,
                 Target = MoveTarget.Scripted,
                 Type = MoveType.Psychic,
+                Condition = _library.Conditions[ConditionId.MirrorCoat],
+                DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
+                {
+                    if (!pokemon.Volatiles.TryGetValue(ConditionId.MirrorCoat,
+                            out EffectState? effectState))
+                    {
+                        return IntFalseUnion.FromInt(0);
+                    }
+
+                    return IntFalseUnion.FromInt(effectState.TotalDamage ?? 1);
+                }),
+                BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _, _) =>
+                {
+                    pokemon.AddVolatile(ConditionId.MirrorCoat);
+                }),
+                OnTry = new OnTryEventInfo((_, source, _, _) =>
+                {
+                    if (!source.Volatiles.TryGetValue(ConditionId.MirrorCoat,
+                            out EffectState? effectState))
+                    {
+                        return BoolEmptyVoidUnion.FromBool(false);
+                    }
+
+                    if (effectState.Slot == null)
+                    {
+                        return BoolEmptyVoidUnion.FromBool(false);
+                    }
+
+                    return BoolEmptyVoidUnion.FromVoid();
+                }),
+                Secondary = null,
             },
             [MoveId.Mist] = new()
             {

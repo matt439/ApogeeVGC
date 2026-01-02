@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -189,10 +190,39 @@ public partial record Conditions
                 AssociatedMove = MoveId.MirrorCoat,
                 Duration = 1,
                 NoCopy = true,
-                // TODO: onStart - initialize slot and damage to track
-                // TODO: onRedirectTargetPriority = -1
-                // TODO: onRedirectTarget - redirect to pokemon that damaged source
-                // TODO: onDamagingHit - track special damage and attacker slot
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    battle.EffectState.Slot = null;
+                    battle.EffectState.TotalDamage = 0;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRedirectTarget = new OnRedirectTargetEventInfo((battle, target, source, _, move) =>
+                {
+                    if (move.Id != MoveId.MirrorCoat) return PokemonVoidUnion.FromVoid();
+
+                    var effectState = source.Volatiles.TryGetValue(ConditionId.MirrorCoat, out var state) ? state : null;
+                    if (source != target || effectState?.Slot == null)
+                    {
+                        return PokemonVoidUnion.FromVoid();
+                    }
+
+                    Pokemon? redirectTarget = battle.GetAtSlot(effectState.Slot);
+                    if (redirectTarget != null)
+                    {
+                        return redirectTarget;
+                    }
+                    return PokemonVoidUnion.FromVoid();
+                }, -1),
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                {
+                    if (source.IsAlly(target)) return;
+                    if (battle.GetCategory(move) != MoveCategory.Special) return;
+
+                    if (!target.Volatiles.TryGetValue(ConditionId.MirrorCoat, out var effectState)) return;
+
+                    effectState.Slot = source.GetSlot();
+                    effectState.TotalDamage = 2 * damage;
+                }),
             },
             [ConditionId.Mist] = new()
             {
