@@ -283,6 +283,7 @@ public partial record Items
                 {
                     pokemon.AddVolatile(ConditionId.Metronome);
                 }),
+                Condition = _library.Conditions[ConditionId.Metronome],
                 Num = 277,
                 Gen = 4,
             },
@@ -307,6 +308,7 @@ public partial record Items
                 {
                     pokemon.AddVolatile(ConditionId.MicleBerry);
                 })),
+                Condition = _library.Conditions[ConditionId.MicleBerry],
                 Num = 209,
                 Gen = 4,
             },

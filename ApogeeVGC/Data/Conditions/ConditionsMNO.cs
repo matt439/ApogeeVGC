@@ -82,6 +82,7 @@ public partial record Conditions
                 Id = ConditionId.Metronome,
                 Name = "Metronome",
                 EffectType = EffectType.Condition,
+                AssociatedItem = ItemId.Metronome,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
                     if (pokemon.Volatiles.TryGetValue(ConditionId.Metronome, out var state))
@@ -146,6 +147,7 @@ public partial record Conditions
                 Id = ConditionId.MicleBerry,
                 Name = "Micle Berry",
                 EffectType = EffectType.Condition,
+                AssociatedItem = ItemId.MicleBerry,
                 Duration = 2,
                 OnSourceAccuracy = new OnSourceAccuracyEventInfo((battle, accuracy, target, source, move) =>
                 {
