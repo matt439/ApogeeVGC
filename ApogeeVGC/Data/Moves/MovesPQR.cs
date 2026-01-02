@@ -360,8 +360,15 @@ public partial record Moves
                     Mirror = true,
                 },
                 IgnoreAbility = true,
-                // TODO: onModifyMove - use Atk instead of SpA if Atk > SpA
-                // Requires making Category settable on ActiveMove
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, source, _) =>
+                {
+                    // Use Physical category if Attack > Special Attack
+                    if (source.GetStat(StatIdExceptHp.Atk, false, true) >
+                        source.GetStat(StatIdExceptHp.SpA, false, true))
+                    {
+                        move.Category = MoveCategory.Physical;
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
