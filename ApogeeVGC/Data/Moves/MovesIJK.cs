@@ -103,7 +103,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                MultiHit = new int[] { 2, 5 },
+                MultiHit = new[] { 2, 5 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
@@ -154,20 +154,16 @@ public partial record Moves
                 },
                 VolatileStatus = ConditionId.Imprison,
                 Condition = _library.Conditions[ConditionId.Imprison],
-                OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>
+                OnTryHit = new OnTryHitEventInfo((_, _, source, _) =>
                 {
                     // Check if at least one foe has one of the user's moves
-                    foreach (var foe in source.Foes())
+                    if (source.Foes().Any(foe =>
+                            source.MoveSlots.Where(moveSlot => moveSlot.Id != MoveId.Struggle)
+                                .Any(moveSlot => foe.HasMove(moveSlot.Id))))
                     {
-                        foreach (var moveSlot in source.MoveSlots)
-                        {
-                            if (moveSlot.Id == MoveId.Struggle) continue;
-                            if (foe.HasMove(moveSlot.Id))
-                            {
-                                return new VoidReturn();
-                            }
-                        }
+                        return new VoidReturn();
                     }
+
                     // No foe shares a move - fail
                     return false;
                 }),
@@ -193,15 +189,17 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    var item = target.GetItem();
-                    if ((item.IsBerry || item.IsGem))
+                    Item item = target.GetItem();
+                    if (item.IsBerry || item.IsGem)
                     {
-                        var takeResult = target.TakeItem(source);
+                        ItemFalseUnion takeResult = target.TakeItem(source);
                         if (takeResult is ItemItemFalseUnion takenItem)
                         {
-                            battle.Add("-enditem", target, takenItem.Item.Name, "[from] move: Incinerate");
+                            battle.Add("-enditem", target, takenItem.Item.Name,
+                                "[from] move: Incinerate");
                         }
                     }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
