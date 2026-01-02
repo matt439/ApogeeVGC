@@ -572,6 +572,7 @@ public partial record Conditions
                 Name = "Flash Fire",
                 EffectType = EffectType.Condition,
                 NoCopy = true,
+                AssociatedAbility = AbilityId.FlashFire,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
                     if (battle.DisplayUi)
