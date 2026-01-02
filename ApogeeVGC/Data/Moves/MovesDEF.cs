@@ -556,7 +556,7 @@ public partial record Moves
                             battle.Add("-fail", source);
                         }
 
-                        // Return NOT_FAIL equivalent - the move still "worked" just didn't change anything
+                        return new Empty();
                     }
 
                     return new VoidReturn();
@@ -575,46 +575,20 @@ public partial record Moves
                 Flags = new MoveFlags { Metronome = true, FutureMove = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
-                // TODO: Implement Future Move mechanism
-                // This requires implementing slot conditions in the Side class:
-                //
-                // 1. Add SlotConditions property to Side class:
-                //    public Dictionary<int, Dictionary<ConditionId, EffectState>>? SlotConditions { get; set; }
-                //
-                // 2. Add AddSlotCondition method to Side class:
-                //    public bool AddSlotCondition(Pokemon target, ConditionId conditionId)
-                //
-                // 3. Implement OnTry event handler similar to TS implementation:
-                //    OnTry = new OnTryEventInfo((battle, source, target, move) =>
-                //    {
-                //        if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
-                //            return false;
-                //
-                //        // Store move data in slot condition state
-                //        var slotCondition = target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
-                //        slotCondition.Move = MoveId.DoomDesire;
-                //        slotCondition.Source = source;
-                //        slotCondition.MoveData = new Move
-                //        {
-                //            Id = MoveId.DoomDesire,
-                //            Name = "Doom Desire",
-                //            Accuracy = 100,
-                //            BasePower = 140,
-                //            Category = MoveCategory.Special,
-                //            Priority = 0,
-                //            Flags = new MoveFlags { Metronome = true, FutureMove = true },
-                //            Type = MoveType.Steel,
-                //        };
-                //
-                //        battle.Add("-start", source, "Doom Desire");
-                //        return false; // Return NOT_FAIL
-                //    }),
-                //
-                // 4. Create FutureMove condition in Conditions data that handles:
-                //    - OnSwitchIn: Execute the stored move when target switches in
-                //    - Duration tracking (executes after 2 turns)
-                //
-                // Reference: pokemon-showdown/data/moves.ts - doomdesire and futuresight
+                OnTry = new OnTryEventInfo((battle, source, target, _) =>
+                {
+                    if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
+                        return false;
+
+                    // Store move data in slot condition state
+                    EffectState slotCondition =
+                        target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
+                    slotCondition.Move = MoveId.DoomDesire;
+                    slotCondition.Source = source;
+
+                    battle.Add("-start", source, "Doom Desire");
+                    return new Empty();
+                }),
             },
             [MoveId.DoubleEdge] = new()
             {
@@ -2825,43 +2799,23 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Metronome = true, FutureMove = true },
+                IgnoreImmunity = true, // Future Sight ignores type immunity
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                // TODO: Implement Future Move mechanism (same as DoomDesire)
-                // This move works identically to Doom Desire, but with different typing:
-                //
-                // Key differences from Doom Desire:
-                // - Type is Psychic instead of Steel
-                // - Has IgnoreImmunity = true in the moveData
-                //
-                // OnTry implementation should be:
-                //    OnTry = new OnTryEventInfo((battle, source, target, move) =>
-                //    {
-                //        if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
-                //            return false;
-                //
-                //        var slotCondition = target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
-                //        slotCondition.Move = MoveId.FutureSight;
-                //        slotCondition.Source = source;
-                //        slotCondition.MoveData = new Move
-                //        {
-                //            Id = MoveId.FutureSight,
-                //            Name = "Future Sight",
-                //            Accuracy = 100,
-                //            BasePower = 120,
-                //            Category = MoveCategory.Special,
-                //            Priority = 0,
-                //            Flags = new MoveFlags { Metronome = true, FutureMove = true },
-                //            IgnoreImmunity = true,  // Key difference from Doom Desire
-                //            Type = MoveType.Psychic,
-                //        };
-                //
-                //        battle.Add("-start", source, "Future Sight");
-                //        return false; // Return NOT_FAIL
-                //    }),
-                //
-                // Reference: pokemon-showdown/data/moves.ts - futuresight
-                // See DoomDesire entry for slot condition infrastructure requirements
+                OnTry = new OnTryEventInfo((battle, source, target, _) =>
+                {
+                    if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
+                        return false;
+
+                    // Store move data in slot condition state
+                    EffectState slotCondition =
+                        target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
+                    slotCondition.Move = MoveId.FutureSight;
+                    slotCondition.Source = source;
+
+                    battle.Add("-start", source, "Future Sight");
+                    return new Empty();
+                }),
             },
         };
     }
