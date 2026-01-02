@@ -650,8 +650,8 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
-                    bool applies = false || (pokemon.HasType(PokemonType.Flying) ||
-                                             pokemon.HasAbility(AbilityId.Levitate));
+                    bool applies = (pokemon.HasType(PokemonType.Flying) ||
+                                    pokemon.HasAbility(AbilityId.Levitate));
 
                     if (pokemon.HasItem(ItemId.IronBall) ||
                         pokemon.Volatiles.ContainsKey(ConditionId.Ingrain) ||
@@ -664,7 +664,7 @@ public partial record Conditions
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Bounce]))
                     {
                         applies = true;
-                        // TODO: battle.queue.cancelMove(pokemon);
+                        battle.Queue.CancelMove(pokemon);
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
                     }
 
@@ -693,7 +693,7 @@ public partial record Conditions
                     if (pokemon.RemoveVolatile(_library.Conditions[ConditionId.Fly]) ||
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Bounce]))
                     {
-                        // TODO: battle.queue.cancelMove(pokemon);
+                        battle.Queue.CancelMove(pokemon);
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
                         if (battle.DisplayUi)
                         {
