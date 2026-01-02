@@ -868,7 +868,6 @@ public partial record Conditions
             {
                 Id = ConditionId.Sandstorm,
                 Name = "Sandstorm",
-                AssociatedMove = MoveId.Sandstorm,
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
@@ -931,7 +930,6 @@ public partial record Conditions
             {
                 Id = ConditionId.Snowscape,
                 Name = "Snowscape",
-                AssociatedMove = MoveId.Snowscape,
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
@@ -988,7 +986,6 @@ public partial record Conditions
             {
                 Id = ConditionId.SunnyDay,
                 Name = "SunnyDay",
-                AssociatedMove = MoveId.SunnyDay,
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>

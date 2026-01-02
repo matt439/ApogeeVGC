@@ -467,7 +467,6 @@ public partial record Conditions
                 Id = ConditionId.Arceus,
                 Name = "Arceus",
                 EffectType = EffectType.Condition,
-                AssociatedAbility = AbilityId.Multitype,
                 //OnTypePriority = 1,
                 OnType = new OnTypeEventInfo((battle, types, pokemon) =>
                     {
