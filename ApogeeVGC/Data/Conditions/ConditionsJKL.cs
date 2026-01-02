@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
@@ -156,8 +157,24 @@ public partial record Conditions
                 Name = "Lunar Dance",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.LunarDance,
-                // TODO: onSwitchIn - trigger Swap event
-                // TODO: onSwap - heal HP to max, cure status, restore PP if needed
+                OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
+                {
+                    battle.SingleEvent(EventId.Swap, battle.Library.Conditions[ConditionId.LunarDance],
+                        battle.EffectState, new PokemonSingleEventTarget(target));
+                }),
+                OnSwap = new OnSwapEventInfo((battle, target, _) =>
+                {
+                    if (!target.Fainted && (target.Hp < target.MaxHp || target.Status != ConditionId.None))
+                    {
+                        target.Heal(target.MaxHp);
+                        target.CureStatus();
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-heal", target, target.GetHealth, "[from] move: Lunar Dance");
+                        }
+                        target.Side.RemoveSlotCondition(target, _library.Conditions[ConditionId.LunarDance]);
+                    }
+                }),
             },
             [ConditionId.LockedMove] = new()
             {

@@ -653,8 +653,8 @@ public partial record Moves
                     return new VoidReturn();
                 }),
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
-                // TODO: slotCondition - lunardance that heals replacement pokemon
-                // This requires slot condition infrastructure to heal the incoming Pokemon
+                SlotCondition = ConditionId.LunarDance,
+                Condition = _library.Conditions[ConditionId.LunarDance],
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
