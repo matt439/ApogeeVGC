@@ -10,8 +10,13 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// Triggered before a Pokemon uses a move, can prevent the move.
 /// 
 /// Supports two handler patterns:
-/// 1. Legacy strongly-typed: (Battle, Pokemon, Pokemon, ActiveMove) => BoolVoidUnion
+/// 1. Legacy strongly-typed: (Battle, Pokemon, Pokemon, ActiveMove) => BoolVoidUnion?
 /// 2. Context-based: (EventContext) => RelayVar?
+/// 
+/// Return values:
+/// - false: Prevent the move from executing
+/// - null: Prevent the move from executing (same as false)
+/// - VoidReturn or void union: Allow the move to continue
 /// </summary>
 public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
 {
@@ -22,7 +27,7 @@ public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnBeforeMoveEventInfo(
-        VoidSourceMoveHandler handler,
+        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion?> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
@@ -38,11 +43,11 @@ public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
             typeof(ActiveMove),
         ];
         ExpectedReturnType = typeof(BoolVoidUnion);
-        
+
         // Nullability: Battle (non-null), target (non-null), source (non-null), move (non-null)
         ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false; // BoolVoidUnion is a struct, never null
-        
+        ReturnTypeNullable = true; // Handler can return null to prevent move
+
         // Validate configuration
         ValidateConfiguration();
     }
