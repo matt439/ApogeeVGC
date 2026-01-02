@@ -150,6 +150,7 @@ public enum ConditionId
                                                 LunarDance,
                                                 MagmaStorm,
                                                 Mist,
+                                                Counter,
                                                 MirrorCoat,
                                                 Mimic,
                                                 MeanLook,

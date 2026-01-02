@@ -75,6 +75,11 @@ public class EffectState
     public int? Hp { get; set; } // For Wish and similar healing effects
     public int? StartingTurn { get; set; } // For Wish timing
 
+    // Counter and Mirror Coat tracking
+    public PokemonSlot? Slot { get; set; } // For Counter/Mirror Coat damage source slot
+    public int? TotalDamage { get; set; } // For Counter/Mirror Coat damage tracking
+    public Pokemon? LastDamageSource { get; set; } // For Counter/Mirror Coat damage source
+
     public int? GetProperty(EffectStateKey? key)
     {
         return key switch

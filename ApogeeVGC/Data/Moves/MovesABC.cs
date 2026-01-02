@@ -1947,32 +1947,53 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
-                    Boosts = new SparseBoostsTable { Spe = -2 },
-                },
-                Target = MoveTarget.AllAdjacentFoes,
-                Type = MoveType.Grass,
-            },
-            [MoveId.Counter] = new()
-            {
-                Id = MoveId.Counter,
-                Num = 68,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Physical,
-                Name = "Counter",
-                BasePp = 20,
-                Priority = -5,
-                Flags = new MoveFlags { Contact = true, Protect = true, FailMeFirst = true, NoAssist = true, FailCopycat = true },
-                Target = MoveTarget.Scripted,
-                Type = MoveType.Fighting,
-                // TODO: damageCallback - returns 2x physical damage received
-                // TODO: beforeTurnCallback - sets up volatile for tracking
-                // TODO: onTry - checks if physical damage was taken
-                // TODO: condition - tracks damage taken
-            },
-            [MoveId.CourtChange] = new()
-            {
-                Id = MoveId.CourtChange,
+                            Boosts = new SparseBoostsTable { Spe = -2 },
+                        },
+                        Target = MoveTarget.AllAdjacentFoes,
+                        Type = MoveType.Grass,
+                    },
+                    [MoveId.Counter] = new()
+                    {
+                        Id = MoveId.Counter,
+                        Num = 68,
+                        Accuracy = 100,
+                        BasePower = 0,
+                        Category = MoveCategory.Physical,
+                        Name = "Counter",
+                        BasePp = 20,
+                        Priority = -5,
+                        Flags = new MoveFlags { Contact = true, Protect = true, FailMeFirst = true, NoAssist = true, FailCopycat = true },
+                        Target = MoveTarget.Scripted,
+                        Type = MoveType.Fighting,
+                        Condition = _library.Conditions[ConditionId.Counter],
+                        DamageCallback = new DamageCallbackEventInfo((battle, pokemon, _, _) =>
+                        {
+                            if (!pokemon.Volatiles.TryGetValue(ConditionId.Counter, out var effectState))
+                            {
+                                return IntFalseUnion.FromInt(0);
+                            }
+                            return IntFalseUnion.FromInt(effectState.TotalDamage ?? 1);
+                        }),
+                        BeforeTurnCallback = new BeforeTurnCallbackEventInfo((battle, pokemon, _, _) =>
+                        {
+                            pokemon.AddVolatile(ConditionId.Counter);
+                        }),
+                        OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                        {
+                            if (!source.Volatiles.TryGetValue(ConditionId.Counter, out var effectState))
+                            {
+                                return BoolEmptyVoidUnion.FromBool(false);
+                            }
+                            if (effectState.Slot == null)
+                            {
+                                return BoolEmptyVoidUnion.FromBool(false);
+                            }
+                            return BoolEmptyVoidUnion.FromVoid();
+                        }),
+                    },
+                    [MoveId.CourtChange] = new()
+                    {
+                        Id = MoveId.CourtChange,
                 Num = 756,
                 Accuracy = 100,
                 BasePower = 0,

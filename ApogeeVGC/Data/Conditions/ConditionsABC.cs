@@ -307,17 +307,57 @@ public partial record Conditions
                         $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Disabling all except {pokemon.Volatiles[ConditionId.ChoiceLock].Move}");
 
                     // Disable all moves except the locked move
-                    foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
-                                 moveSlot.Move != pokemon.Volatiles[ConditionId.ChoiceLock].Move))
+                            foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
+                                         moveSlot.Move != pokemon.Volatiles[ConditionId.ChoiceLock].Move))
+                            {
+                                pokemon.DisableMove(moveSlot.Id, false,
+                                    pokemon.Volatiles[ConditionId.ChoiceLock].SourceEffect);
+                            }
+                        }),
+                    },
+                    [ConditionId.Counter] = new()
                     {
-                        pokemon.DisableMove(moveSlot.Id, false,
-                            pokemon.Volatiles[ConditionId.ChoiceLock].SourceEffect);
-                    }
-                }),
-            },
-            [ConditionId.Confusion] = new()
-            {
-                Id = ConditionId.Confusion,
+                        Id = ConditionId.Counter,
+                        Name = "Counter",
+                        Duration = 1,
+                        NoCopy = true,
+                        OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                        {
+                            battle.EffectState.Slot = null;
+                            battle.EffectState.TotalDamage = 0;
+                            return BoolVoidUnion.FromVoid();
+                        }),
+                        OnRedirectTarget = new OnRedirectTargetEventInfo((battle, target, source, _, move) =>
+                        {
+                            if (move.Id != MoveId.Counter) return PokemonVoidUnion.FromVoid();
+
+                            var effectState = source.Volatiles.TryGetValue(ConditionId.Counter, out var state) ? state : null;
+                            if (source != target || effectState?.Slot == null)
+                            {
+                                return PokemonVoidUnion.FromVoid();
+                            }
+
+                                    Pokemon? redirectTarget = battle.GetAtSlot(effectState.Slot);
+                                    if (redirectTarget != null)
+                                    {
+                                        return redirectTarget;
+                                    }
+                                    return PokemonVoidUnion.FromVoid();
+                                }, -1),
+                                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                                {
+                                    if (source.IsAlly(target)) return;
+                                    if (battle.GetCategory(move) != MoveCategory.Physical) return;
+
+                                    if (!target.Volatiles.TryGetValue(ConditionId.Counter, out var effectState)) return;
+
+                                    effectState.Slot = source.GetSlot();
+                                    effectState.TotalDamage = 2 * damage;
+                                }),
+                            },
+                            [ConditionId.Confusion] = new()
+                            {
+                                Id = ConditionId.Confusion,
                 Name = "Confusion",
                 EffectType = EffectType.Condition,
                 OnStart = new OnStartEventInfo((battle, target, source, sourceEffect) =>
