@@ -600,7 +600,7 @@ public partial record Conditions
                     effectState.LastDamageSource = source;
                     return IntBoolVoidUnion.FromVoid();
                 }, -101),
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
                 {
                     if (!pokemon.Volatiles.TryGetValue(ConditionId.Bide, out EffectState? effectState))
                         return BoolVoidUnion.FromVoid();
