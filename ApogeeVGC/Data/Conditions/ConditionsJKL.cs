@@ -364,61 +364,6 @@ public partial record Conditions
                         return battle.FinalModify(accuracy);
                     }),
             },
-            [ConditionId.Obstruct] = new()
-            {
-                Id = ConditionId.Obstruct,
-                Name = "Obstruct",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.Obstruct,
-                Duration = 1,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-singleturn", target, "Protect");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                {
-                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
-                    {
-                        // G-Max moves not in Gen 9 VGC, omit check
-                        // Z/Max moves not in Gen 9 VGC, omit zBrokeProtect
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    if (move.SmartTarget ?? false)
-                    {
-                        move.SmartTarget = false;
-                    }
-                    else if (battle.DisplayUi)
-                    {
-                        battle.Add("-activate", target, "move: Protect");
-                    }
-
-                    // Check for lockedmove volatile and reset Outrage counter
-                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
-                            out EffectState? lockedMove))
-                    {
-                        if (lockedMove.Duration == 2)
-                        {
-                            source.DeleteVolatile(ConditionId.LockedMove);
-                        }
-                    }
-
-                    // If move makes contact, lower attacker's Defense by 2
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        battle.Boost(new SparseBoostsTable { Def = -2 }, source, target,
-                            _library.Conditions[ConditionId.Obstruct]);
-                    }
-
-                    return new Empty(); // NOT_FAIL equivalent
-                }, 3),
-                // Note: Z/Max move OnHit handler omitted as not applicable to Gen 9 VGC
-            },
         };
     }
 }
