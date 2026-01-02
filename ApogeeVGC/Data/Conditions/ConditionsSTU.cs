@@ -1444,12 +1444,21 @@ public partial record Conditions
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
                     if (pokemon.HasItem(ItemId.HeavyDutyBoots)) return;
-                    // TODO: Calculate type effectiveness for Stealth Rock
-                    // const typeMod = this.clampIntRange(pokemon.runEffectiveness(this.dex.getActiveMove('stealthrock')), -6, 6);
-                    // this.damage(pokemon.maxhp * (2 ** typeMod) / 8);
 
-                    // For now, just apply 1/8 damage (neutral effectiveness)
-                    battle.Damage(pokemon.MaxHp / 8, pokemon);
+                    // Calculate type effectiveness for Rock-type move (Stealth Rock)
+                    MoveEffectiveness effectiveness =
+                        battle.Dex.GetEffectiveness(MoveType.Rock, pokemon);
+                    int typeMod = effectiveness.ToModifier();
+
+                    // Clamp the type modifier to a reasonable range (-6 to 6)
+                    typeMod = battle.ClampIntRange(typeMod, -6, 6);
+
+                    // Calculate damage: maxhp * (2 ** typeMod) / 8
+                    // 2 ** typeMod represents the damage multiplier:
+                    // -2 = 1/4x, -1 = 1/2x, 0 = 1x, 1 = 2x, 2 = 4x
+                    int damage = (int)(pokemon.MaxHp * Math.Pow(2, typeMod) / 8);
+
+                    battle.Damage(damage, pokemon);
                 }),
             },
             [ConditionId.StickyWeb] = new()
