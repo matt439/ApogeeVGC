@@ -52,7 +52,6 @@ public partial record Abilities
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                     {
                         // List of moves that should not be affected by type-changing abilities
-                        // TODO: Add MoveId.MultiAttack, MoveId.NaturalGift, MoveId.Technoblast when available
                         MoveId[] noModifyType =
                         [
                             MoveId.Judgment,
@@ -860,22 +859,22 @@ public partial record Abilities
                         showMsg = true;
                     }
 
-                                    if (boost.Evasion is not null && boost.Evasion < 0)
-                                    {
-                                        boost.Evasion = null;
-                                        showMsg = true;
-                                    }
-
-                                    if (showMsg && effect is not ActiveMove { Secondaries: not null })
-                                    {
-                                        battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
-                                            $"[of] {target}");
-                                    }
-                                }),
-                            },
-                    [AbilityId.CloudNine] = new()
+                    if (boost.Evasion is not null && boost.Evasion < 0)
                     {
-                        Id = AbilityId.CloudNine,
+                        boost.Evasion = null;
+                        showMsg = true;
+                    }
+
+                    if (showMsg && effect is not ActiveMove { Secondaries: not null })
+                    {
+                        battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
+                            $"[of] {target}");
+                    }
+                }),
+            },
+            [AbilityId.CloudNine] = new()
+            {
+                Id = AbilityId.CloudNine,
                 Name = "Cloud Nine",
                 Num = 13,
                 Rating = 1.5,
