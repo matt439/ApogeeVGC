@@ -494,7 +494,21 @@ public partial record Conditions
                 }, 25),
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
-                    // TODO: Check if pokemon is terastallized - if so and has Flying type, show hint and return false
+                    // Check if pokemon is terastallized - if so and has Flying type, Roost's type suppression fails
+                    if (target.Terastallized is not null)
+                    {
+                        if (target.HasType(PokemonType.Flying))
+                        {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Hint(
+                                    "Roost's type suppression effect does not activate when a Terastallized Pokémon has the Flying type.");
+                            }
+
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                    }
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("-singleturn", target, "move: Roost");
