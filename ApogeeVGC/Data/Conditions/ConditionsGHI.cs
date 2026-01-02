@@ -85,8 +85,45 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: onFoeDisableMove - disable moves that the user also knows
-                // TODO: onFoeBeforeMove - prevent using imprisoned moves
+                OnFoeDisableMove = new OnFoeDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    // Get the source Pokemon from battle.EffectState
+                    Pokemon? source = battle.EffectState.Source;
+                    if (source == null) return;
+
+                    // Disable all moves that the source Pokemon also knows (except Struggle)
+                    foreach (MoveSlot moveSlot in source.MoveSlots)
+                    {
+                        if (moveSlot.Id == MoveId.Struggle) continue;
+                        pokemon.DisableMove(moveSlot.Id, true);
+                    }
+
+                    pokemon.MaybeDisabled = true;
+                }),
+                OnFoeBeforeMove = new OnFoeBeforeMoveEventInfo((battle, attacker, _, move) =>
+                {
+                    // Get the source Pokemon from battle.EffectState
+                    Pokemon? source = battle.EffectState.Source;
+                    if (source == null) return BoolVoidUnion.FromVoid();
+
+                    if (move.Id == MoveId.Struggle)
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+
+                    // Check if the source Pokemon also knows this move
+                    if (source.HasMove(move.Id))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", attacker, "move: Imprison", move.Name);
+                        }
+
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }, 4),
             },
             [ConditionId.Ingrain] = new()
             {
