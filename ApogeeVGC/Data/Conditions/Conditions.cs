@@ -49,15 +49,14 @@ public partial record Conditions
         return conditions;
     }
 
-        // Partial methods to be implemented in other files
-        private partial Dictionary<ConditionId, Condition> CreateConditionsAbc();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsDef();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsGhi();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsIjk();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsJkl();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsMno();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsPqr();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsStu();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsVwx();
-        private partial Dictionary<ConditionId, Condition> CreateConditionsYz();
-    }
+    // Partial methods to be implemented in other files
+    private partial Dictionary<ConditionId, Condition> CreateConditionsAbc();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsDef();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsGhi();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsJkl();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsMno();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsPqr();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsStu();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsVwx();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsYz();
+}
