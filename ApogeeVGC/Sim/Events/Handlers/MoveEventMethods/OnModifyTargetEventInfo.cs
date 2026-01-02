@@ -4,6 +4,11 @@ using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 
+public class TargetRelay
+{
+    public required Pokemon Target { get; set; }
+}
+
 /// <summary>
 /// Event handler info for OnModifyTarget event (move-specific).
 /// Triggered to modify move target.
@@ -12,7 +17,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 public sealed record OnModifyTargetEventInfo : EventHandlerInfo
 {
 public OnModifyTargetEventInfo(
-        Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove> handler,
+        Action<Battle, TargetRelay, Pokemon, Pokemon, ActiveMove> handler,
         int? priority = null,
    bool usesSpeed = true)
     {
@@ -21,7 +26,7 @@ public OnModifyTargetEventInfo(
         Handler = handler;
         Priority = priority;
       UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
+        ExpectedParameterTypes = [typeof(Battle), typeof(TargetRelay), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
         ExpectedReturnType = typeof(void);
         
     // Nullability: All parameters non-nullable by default (adjust as needed)

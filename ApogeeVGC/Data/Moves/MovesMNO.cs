@@ -474,9 +474,51 @@ public partial record Moves
                     Metronome = true,
                     FailMeFirst = true,
                 },
-                // TODO: damageCallback - return last damage taken * 1.5
-                // TODO: onTry - check if source was damaged this turn
-                // TODO: onModifyTarget - target the pokemon that damaged source
+                // Calculate damage as 1.5x the last damage taken this turn
+                DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
+                {
+                    // Find the most recent damage taken this turn
+                    Attacker? lastDamagedBy = pokemon.AttackedBy
+                        .Where(a => a is { ThisTurn: true, Damage: > 0 })
+                        .OrderByDescending(a => a.Damage)
+                        .FirstOrDefault();
+
+                    if (lastDamagedBy != null)
+                    {
+                        // Return 1.5x the damage taken, or 1 if calculation results in 0
+                        int damage = (int)(lastDamagedBy.Damage * 1.5);
+                        return IntFalseUnion.FromInt(damage > 0 ? damage : 1);
+                    }
+
+                    // No damage taken, return 0
+                    return IntFalseUnion.FromInt(0);
+                }),
+                // Check that the user was damaged this turn before allowing the move
+                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                {
+                    // Find if any damage was taken this turn
+                    Attacker? lastDamagedBy = source.AttackedBy
+                        .FirstOrDefault(a => a is { ThisTurn: true, Damage: > 0 });
+
+                    if (lastDamagedBy == null)
+                    {
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnModifyTarget = new OnModifyTargetEventInfo((battle, relayTarget, source, _, _) =>
+                {
+                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
+                    if (lastDamagedBy != null)
+                    {
+                        Pokemon? pok = battle.GetAtSlot(lastDamagedBy.PokemonSlot);
+                        if (pok != null)
+                        {
+                            relayTarget.Target = pok;
+                        }
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Scripted,
                 Type = MoveType.Steel,
