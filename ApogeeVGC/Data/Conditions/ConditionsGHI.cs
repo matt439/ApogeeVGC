@@ -69,6 +69,47 @@ public partial record Conditions
                 // Ice Ball uses LockedMove for the locking behavior and RolloutStorage for damage scaling
                 // This is just a marker condition
             },
+            [ConditionId.Imprison] = new()
+            {
+                Id = ConditionId.Imprison,
+                Name = "Imprison",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Imprison,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Imprison");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: onFoeDisableMove - disable moves that the user also knows
+                // TODO: onFoeBeforeMove - prevent using imprisoned moves
+            },
+            [ConditionId.Ingrain] = new()
+            {
+                Id = ConditionId.Ingrain,
+                Name = "Ingrain",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Ingrain,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Ingrain");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnTrapPokemon - set pokemon.TryTrap = true
+                OnResidual = new OnResidualEventInfo(
+                    (battle, pokemon, _, _) =>
+                    {
+                        battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
+                    }, 7),
+            },
             [ConditionId.Gem] = new()
             {
                 Id = ConditionId.Gem,

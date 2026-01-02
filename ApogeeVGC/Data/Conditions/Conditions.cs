@@ -28,9 +28,6 @@ public partial record Conditions
         foreach (var kvp in CreateConditionsGhi())
             conditions[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateConditionsIjk())
-            conditions[kvp.Key] = kvp.Value;
-
         foreach (var kvp in CreateConditionsJkl())
             conditions[kvp.Key] = kvp.Value;
 
