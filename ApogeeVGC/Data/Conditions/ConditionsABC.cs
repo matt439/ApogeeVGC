@@ -501,7 +501,50 @@ public partial record Conditions
                     battle.Add("-singleturn", target, "move: Protect");
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: Implement full BanefulBunker logic - needs OnTryHit handler with protect logic and contact poison
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false))
+                    {
+                        // Z-Moves and Max Moves can break through, but we don't track zBrokeProtect here
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+
+                    // Reset Outrage counter if locked
+                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                    if (lockedMove is not null &&
+                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+
+                    // Poison on contact
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Poison, target);
+                    }
+
+                    return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
+                }, 3),
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    // Handle Z-Moves/Max Moves that break through but still make contact
+                    // Note: IsZOrMaxPowered property would need to be checked if available
+                    // For now, this handles the case where the move hits through protect
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Poison, target);
+                    }
+                    return BoolEmptyVoidUnion.FromVoid();
+                }),
             },
             [ConditionId.BeakBlast] = new()
             {
@@ -513,7 +556,15 @@ public partial record Conditions
                     battle.Add("-singleturn", pokemon, "move: Beak Blast");
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: Implement contact checking to burn attackers
+                // Burn attackers that make contact while charging
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Burn, target);
+                    }
+                    return BoolEmptyVoidUnion.FromVoid();
+                }),
             },
             [ConditionId.Block] = new()
             {
@@ -585,7 +636,49 @@ public partial record Conditions
                     battle.Add("-singleturn", target, "move: Protect");
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: Implement full BurningBulwark logic - needs OnTryHit handler with protect logic and contact burn
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    // BurningBulwark only blocks damaging moves with protect flag (not Status)
+                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
+                    {
+                        // Z-Moves and Max Moves can break through, but we don't track zBrokeProtect here
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+
+                    // Reset Outrage counter if locked
+                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                    if (lockedMove is not null &&
+                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+
+                    // Burn on contact
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Burn, target);
+                    }
+
+                    return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
+                }, 3),
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    // Handle Z-Moves/Max Moves that break through but still make contact
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Burn, target);
+                    }
+                    return BoolEmptyVoidUnion.FromVoid();
+                }),
             },
             [ConditionId.Charge] = new()
             {
@@ -620,13 +713,34 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
-                {
-                    battle.Add("-end", pokemon, "Charge", "[silent]");
-                }),
-                // TODO: OnBasePower - doubles Electric move power
-                // TODO: OnMoveAborted/OnAfterMove - removes charge after Electric move use
-            },
+                    OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                    {
+                        battle.Add("-end", pokemon, "Charge", "[silent]");
+                    }),
+                    OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, defender, move) =>
+                    {
+                        if (move.Type == MoveType.Electric)
+                        {
+                            battle.Debug("charge boost");
+                            return battle.ChainModify(2);
+                        }
+                        return DoubleVoidUnion.FromVoid();
+                    }, 9),
+                    OnMoveAborted = new OnMoveAbortedEventInfo((battle, pokemon, target, move) =>
+                    {
+                        if (move.Type == MoveType.Electric && move.Id != MoveId.Charge)
+                        {
+                            pokemon.RemoveVolatile(_library.Conditions[ConditionId.Charge]);
+                        }
+                    }),
+                    OnAfterMove = new OnAfterMoveEventInfo((battle, pokemon, target, move) =>
+                    {
+                        if (move.Type == MoveType.Electric && move.Id != MoveId.Charge)
+                        {
+                            pokemon.RemoveVolatile(_library.Conditions[ConditionId.Charge]);
+                        }
+                    }),
+                },
             [ConditionId.ChillyReception] = new()
             {
                 Id = ConditionId.ChillyReception,
@@ -643,7 +757,11 @@ public partial record Conditions
                     battle.Add("-start", pokemon, "Curse", $"[of] {source}");
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnResidual - deals 1/4 max HP damage per turn
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Damage(pokemon.BaseMaxHp / 4, pokemon, pokemon,
+                        BattleDamageEffect.FromIEffect(_library.Conditions[ConditionId.Curse]));
+                }, 14),
             },
             [ConditionId.Commanded] = new()
             {
@@ -707,7 +825,7 @@ public partial record Conditions
                 OnBeforeTurn = new OnBeforeTurnEventInfo((battle, pokemon) =>
                 {
                     // Cancel Tatsugiri's action since it's hiding
-                    // TODO: Implement battle.queue.cancelAction(pokemon)
+                    battle.Queue.CancelAction(pokemon);
                 }),
             },
         };
