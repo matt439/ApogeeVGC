@@ -451,7 +451,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
                     // In sun, add an extra +1/+1 boost (SelfBoost already provides +1/+1)
-                    var weather = source.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
                     {
                         battle.Boost(new SparseBoostsTable { Atk = 1, SpA = 1 }, source, source);
@@ -649,7 +649,7 @@ public partial record Moves
                 Name = "Happy Hour",
                 BasePp = 30,
                 Priority = 0,
-                Flags = new MoveFlags { },
+                Flags = new MoveFlags(),
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Normal,
             },
@@ -730,7 +730,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Snatch = true, Distance = true, Sound = true, BypassSub = true, Metronome = true
+                    Snatch = true, Distance = true, Sound = true, BypassSub = true, Metronome = true,
                 },
                 Target = MoveTarget.AllyTeam,
                 Type = MoveType.Normal,
@@ -763,7 +763,7 @@ public partial record Moves
                 Flags = new MoveFlags
                 {
                     Protect = true, Mirror = true, BypassSub = true, AllyAnim = true,
-                    Metronome = true
+                    Metronome = true,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
@@ -813,7 +813,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Contact = true, Protect = true, Mirror = true, NonSky = true, Metronome = true
+                    Contact = true, Protect = true, Mirror = true, NonSky = true, Metronome = true,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
@@ -938,7 +938,7 @@ public partial record Moves
                 Num = 876,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
                 {
                     int power = Math.Max((int)Math.Floor(100.0 * target.Hp / target.MaxHp) + 1, 1);
                     if (battle.DisplayUi)
@@ -986,7 +986,6 @@ public partial record Moves
                 Type = MoveType.Psychic,
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    bool success;
                     int healAmount;
                     if (source.HasAbility(AbilityId.MegaLauncher))
                     {
@@ -997,8 +996,8 @@ public partial record Moves
                         healAmount = (int)Math.Ceiling(target.BaseMaxHp * 0.5);
                     }
 
-                    var healResult = battle.Heal(healAmount, target);
-                    success = healResult is not FalseIntFalseUnion;
+                    IntFalseUnion healResult = battle.Heal(healAmount, target);
+                    bool success = healResult is not FalseIntFalseUnion;
 
                     if (success && !target.IsAlly(source))
                     {
@@ -1079,7 +1078,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Contact = true, Protect = true, Mirror = true, Gravity = true, Metronome = true
+                    Contact = true, Protect = true, Mirror = true, Gravity = true, Metronome = true,
                 },
                 HasCrashDamage = true,
                 Target = MoveTarget.Normal,
@@ -1163,7 +1162,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Contact = true, Protect = true, Mirror = true, Heal = true, Metronome = true
+                    Contact = true, Protect = true, Mirror = true, Heal = true, Metronome = true,
                 },
                 Drain = (1, 2),
                 Target = MoveTarget.Normal,
@@ -1379,7 +1378,7 @@ public partial record Moves
                 Flags = new MoveFlags
                 {
                     Charge = true, Protect = true, Mirror = true, NoSleepTalk = true,
-                    FailInstruct = true
+                    FailInstruct = true,
                 },
                 Secondary = new SecondaryEffect
                 {
@@ -1401,13 +1400,13 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Contact = true, Protect = true, Mirror = true, Metronome = true, Bite = true
+                    Contact = true, Protect = true, Mirror = true, Metronome = true, Bite = true,
                 },
-                Secondaries = new[]
-                {
+                Secondaries =
+                [
                     new SecondaryEffect { Chance = 10, Status = ConditionId.Freeze },
                     new SecondaryEffect { Chance = 10, VolatileStatus = ConditionId.Flinch },
-                },
+                ],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
             },
@@ -1491,7 +1490,7 @@ public partial record Moves
                 Flags = new MoveFlags
                 {
                     Protect = true, BypassSub = true, AllyAnim = true, Metronome = true,
-                    FailInstruct = true
+                    FailInstruct = true,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
