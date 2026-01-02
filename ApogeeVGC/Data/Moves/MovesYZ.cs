@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -30,7 +31,16 @@ public partial record Moves
                         Metronome = true,
                     },
                     VolatileStatus = ConditionId.Yawn,
-                    // TODO: onTryHit - fail if target has status or is immune to sleep
+                    OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                    {
+                        // Fail if target already has a status or is immune to sleep
+                        if (target.Status != ConditionId.None || 
+                            !target.RunStatusImmunity(ConditionId.Sleep))
+                        {
+                            return false;
+                        }
+                        return new VoidReturn();
+                    }),
                     Secondary = null,
                     Target = MoveTarget.Normal,
                     Type = MoveType.Normal,
