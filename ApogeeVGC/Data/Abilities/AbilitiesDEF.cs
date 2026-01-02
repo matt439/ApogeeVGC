@@ -12,6 +12,7 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
@@ -331,11 +332,13 @@ public partial record Abilities
                             return new VoidReturn();
                         }
 
+                        bool infiltrates = move is ActiveMove { Infiltrates: true };
                         bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                      (move.Flags.BypassSub != true);
+                                      (move.Flags.BypassSub != true) &&
+                                      !infiltrates;
                         if (hitSub) return new VoidReturn();
 
-                        if (move is ActiveMove activeMove && !target.RunImmunity(activeMove))
+                        if (move is ActiveMove am && !target.RunImmunity(am))
                             return new VoidReturn();
                         return BoolVoidUnion.FromBool(false);
                     })),
@@ -998,10 +1001,11 @@ public partial record Abilities
                         }
                     }),
                 OnAllySetStatus =
-                    new OnAllySetStatusEventInfo((battle, _, target, source, effect) =>
+                    new OnAllySetStatusEventInfo((battle, status, target, source, effect) =>
                     {
-                        // Check if effect is Yawn by checking if it's a Condition with the Yawn ID
-                        bool isYawn = effect is Condition { Id: ConditionId.Yawn };
+                        // Check if effect is Yawn
+                        bool isYawn = effect?.EffectStateId == ConditionId.Yawn ||
+                                      status.Id == ConditionId.Yawn;
                         if (!target.HasType(PokemonType.Grass) || source == null ||
                             target == source ||
                             effect == null || isYawn)
@@ -1256,13 +1260,9 @@ public partial record Abilities
                         showMsg = true;
                     }
 
-                    var effectId = effect switch
-                    {
-                        ActiveMove am => am.VolatileStatus ?? am.Status,
-                        Condition c => c.Id,
-                        _ => null,
-                    };
-                    if (showMsg && effect is ActiveMove { Secondaries: null })
+                    // Show message if stats were lowered and effect doesn't have secondaries
+                    // Note: Octolock check removed as it's not in Gen 9 (isNonstandard: Past)
+                    if (showMsg && effect is not ActiveMove { Secondaries.Length: > 0 })
                     {
                         battle.Add("-fail", target, "unboost", "[from] ability: Full Metal Body",
                             $"[of] {target}");
