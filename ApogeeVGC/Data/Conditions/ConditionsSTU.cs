@@ -1483,8 +1483,10 @@ public partial record Conditions
                         battle.Add("-activate", pokemon, "move: Sticky Web");
                     }
 
-                    // TODO: Get opponent Pokemon for source parameter
-                    battle.Boost(new SparseBoostsTable { Spe = -1 }, pokemon, pokemon);
+                    // Get the first active opponent Pokemon as the source
+                    Pokemon? source = pokemon.Side.Foe.Active.FirstOrDefault(p => p != null);
+                    battle.Boost(new SparseBoostsTable { Spe = -1 }, pokemon, source,
+                        (IEffect?)_library.Moves[MoveId.StickyWeb]);
                 }),
             },
             [ConditionId.StockpileStorage] = new()
@@ -1509,7 +1511,7 @@ public partial record Conditions
                     battle.Boost(new SparseBoostsTable
                     {
                         Def = 1,
-                        SpD = 1
+                        SpD = 1,
                     }, target, target);
                     if (curDef != target.Boosts.GetBoost(BoostId.Def))
                         battle.EffectState.Def = (battle.EffectState.Def ?? 0) - 1;
