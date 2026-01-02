@@ -566,7 +566,13 @@ public partial record Conditions
                 Duration = 3,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
-                    // TODO: If target has already taken its turn and won't move again this turn, increase duration by 1
+                    // If target has already taken its turn and won't move again this turn, increase duration by 1
+                    // This matches PS implementation: if (!this.queue.willMove(target) && target.activeTurns) this.effectState.duration++;
+                    if (target.ActiveTurns > 0 && battle.Queue.WillMove(target) == null)
+                    {
+                        battle.EffectState.Duration = 4;
+                    }
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", target, "move: Taunt");
@@ -587,13 +593,12 @@ public partial record Conditions
                 }),
                 OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
                 {
-                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot moveSlot in from moveSlot in pokemon.MoveSlots
+                             let move = _library.Moves[moveSlot.Id]
+                             where move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst
+                             select moveSlot)
                     {
-                        Move move = _library.Moves[moveSlot.Id];
-                        if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
-                        {
-                            pokemon.DisableMove(moveSlot.Id);
-                        }
+                        pokemon.DisableMove(moveSlot.Id);
                     }
                 }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, attacker, _, move) =>
