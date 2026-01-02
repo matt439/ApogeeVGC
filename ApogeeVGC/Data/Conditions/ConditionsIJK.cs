@@ -3,7 +3,6 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -27,6 +26,7 @@ public partial record Conditions
                     {
                         battle.Add("-start", pokemon, "Imprison");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
                 // TODO: onFoeDisableMove - disable moves that the user also knows
@@ -44,13 +44,15 @@ public partial record Conditions
                     {
                         battle.Add("-start", pokemon, "Ingrain");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
                 // TODO: OnTrapPokemon - set pokemon.TryTrap = true
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
-                {
-                    battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
-                }, 7),
+                OnResidual = new OnResidualEventInfo(
+                    (battle, pokemon, _, _) =>
+                    {
+                        battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
+                    }, 7),
             },
         };
     }
