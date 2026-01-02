@@ -23,28 +23,29 @@ public partial record Moves
                 Name = "Yawn",
                 BasePp = 10,
                 Priority = 0,
-                    Flags = new MoveFlags
-                    {
-                        Protect = true,
-                        Reflectable = true,
-                        Mirror = true,
-                        Metronome = true,
-                    },
-                    VolatileStatus = ConditionId.Yawn,
-                    OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                    {
-                        // Fail if target already has a status or is immune to sleep
-                        if (target.Status != ConditionId.None || 
-                            !target.RunStatusImmunity(ConditionId.Sleep))
-                        {
-                            return false;
-                        }
-                        return new VoidReturn();
-                    }),
-                    Secondary = null,
-                    Target = MoveTarget.Normal,
-                    Type = MoveType.Normal,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
                 },
+                VolatileStatus = ConditionId.Yawn,
+                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                {
+                    // Fail if target already has a status or is immune to sleep
+                    if (target.Status != ConditionId.None ||
+                        !target.RunStatusImmunity(ConditionId.Sleep))
+                    {
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
 
             // ===== Z MOVES =====
 
