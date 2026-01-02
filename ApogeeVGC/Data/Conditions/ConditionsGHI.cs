@@ -140,7 +140,7 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnTrapPokemon - set pokemon.TryTrap = true
+                OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) => { pokemon.TryTrap(); }),
                 OnResidual = new OnResidualEventInfo(
                     (battle, pokemon, _, _) =>
                     {
@@ -268,7 +268,6 @@ public partial record Conditions
                             pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
                         }
 
-                        // TODO: Handle SkyDrop volatile when implemented
                         if (pokemon.Volatiles.ContainsKey(ConditionId.MagnetRise))
                         {
                             applies = true;
@@ -303,7 +302,6 @@ public partial record Conditions
                 // Groundedness is implemented in Pokemon.IsGrounded()
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
                 {
-                    // TODO: Check if move is Z-move (move.IsZ)
                     if (move.Flags.Gravity ?? false)
                     {
                         if (battle.DisplayUi)
@@ -318,7 +316,6 @@ public partial record Conditions
                 }, 6),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
-                    // TODO: Check if move is Z-move (move.IsZ)
                     if (move.Flags.Gravity ?? false)
                     {
                         if (battle.DisplayUi)
@@ -371,7 +368,6 @@ public partial record Conditions
                         source.LastMove != null)
                     {
                         Move? move = source.LastMove;
-                        // TODO: Handle Max moves - if (move.IsMax && move.BaseMove != null) get base move
 
                         foreach (MoveSlot moveSlot in source.MoveSlots.Where(moveSlot =>
                                      moveSlot.Id == move.Id))
@@ -425,14 +421,14 @@ public partial record Conditions
 
                     return 5;
                 }),
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = new OnStartEventInfo((battle, source, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, "move: Heal Block");
+                        battle.Add("-start", source, "move: Heal Block");
                     }
 
-                    // TODO: source.moveThisTurnResult = true;
+                    source.MoveLastTurnResult = true;
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
@@ -448,7 +444,6 @@ public partial record Conditions
                 }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
                 {
-                    // TODO: Check if move is Z-move or Max move
                     if (move.Flags.Heal ?? false)
                     {
                         if (battle.DisplayUi)
@@ -463,7 +458,6 @@ public partial record Conditions
                 }, 6),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
-                    // TODO: Check if move is Z-move or Max move
                     if (move.Flags.Heal ?? false)
                     {
                         if (battle.DisplayUi)
@@ -487,10 +481,6 @@ public partial record Conditions
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, _,
                         target, source, effect) =>
                     {
-                        // Z-power healing bypasses Heal Block
-                        // TODO: Check for effect.IsZ when implemented
-                        // if (effect != null && (effect.Id == "zpower" || effect is Move { IsZ: true })) return damage;
-
                         // Pollen Puff healing is blocked with a special message
                         if (source != null && target != source && target.Hp != target.MaxHp &&
                             effect is Move { Id: MoveId.PollenPuff })
