@@ -7,7 +7,7 @@ namespace ApogeeVGC.Data.SpeciesData;
 
 public partial record SpeciesData
 {
-    private static Dictionary<SpecieId, Species> GenerateSpeciesData751To800()
+    private static Dictionary<SpecieId, Species> GenerateSpeciesData0751to0800()
     {
         return new Dictionary<SpecieId, Species>
         {
