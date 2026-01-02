@@ -74,6 +74,7 @@ public class EffectState
     public int? BoundDivisor { get; set; } // For PartiallyTrapped damage calculation
     public int? Hp { get; set; } // For Wish and similar healing effects
     public int? StartingTurn { get; set; } // For Wish timing
+    public Move? MoveData { get; set; } // For Future Move attack data storage
 
     // Counter and Mirror Coat tracking
     public PokemonSlot? Slot { get; set; } // For Counter/Mirror Coat damage source slot

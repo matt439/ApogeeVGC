@@ -1144,17 +1144,89 @@ public partial record Conditions
                             _library.Conditions[ConditionId.FutureMove]);
                     }
                 }, 3),
-                OnEnd = new OnEndEventInfo((_, _) =>
+                OnEnd = new OnEndEventInfo((battle, target) =>
                 {
-                    // TODO: Implement full Future Move logic:
-                    // 1. Get move data from effectState
-                    // 2. Check if target is fainted or is the source
-                    // 3. Remove Protect/Endure volatiles
-                    // 4. Apply Infiltrator ability if source has it (Gen 6+)
-                    // 5. Apply Normalize ability if source has it (Gen 6+)
-                    // 6. Execute the move with trySpreadMoveHit
-                    // 7. Trigger Life Orb recoil if applicable (Gen 5+)
-                    // 8. Check for win condition
+                    // Get move data from effectState
+                    Move? moveData = battle.EffectState.MoveData;
+                    Pokemon? source = battle.EffectState.Source;
+
+                    if (moveData == null || source == null)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Hint(
+                                $"{moveData?.Name ?? "Future Move"} did not hit because move data or source is missing.");
+                        }
+
+                        return;
+                    }
+
+                    // Check if target is fainted or is the source
+                    if (target.Fainted || target == source)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Hint(
+                                $"{moveData.Name} did not hit because the target is {(target.Fainted ? "fainted" : "the user")}.");
+                        }
+
+                        return;
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, $"move: {moveData.Name}");
+                    }
+
+                    // Remove Protect/Endure volatiles
+                    target.RemoveVolatile(_library.Conditions[ConditionId.Protect]);
+                    target.RemoveVolatile(_library.Conditions[ConditionId.Endure]);
+
+                    // Convert to ActiveMove - need to create a dummy MoveSlot
+                    // Future moves don't actually use a slot since they're delayed
+                    MoveSlot dummySlot = new()
+                    {
+                        Id = moveData.Id,
+                        Pp = 1,
+                        MaxPp = 1,
+                        Target = moveData.Target,
+                        Disabled = false,
+                        DisabledSource = null,
+                        Used = false,
+                        Virtual = true,
+                    };
+
+                    ActiveMove hitMove = moveData.ToActiveMove() with
+                    {
+                        MoveSlot = dummySlot,
+                        Flags = moveData.Flags with { FutureMove = true },
+                    };
+
+                    // Apply Infiltrator ability if source has it (Gen 6+)
+                    if (source.HasAbility(AbilityId.Infiltrator))
+                    {
+                        hitMove.Infiltrates = true;
+                    }
+
+                    // Apply Normalize ability if source has it (Gen 6+)
+                    if (source.HasAbility(AbilityId.Normalize))
+                    {
+                        hitMove.Type = MoveType.Normal;
+                    }
+
+                    // Execute the move with TrySpreadMoveHit
+                    battle.Actions.TrySpreadMoveHit([target], source, hitMove, true);
+
+                    // Trigger Life Orb recoil if applicable (Gen 5+)
+                    if (source.IsActive && source.HasItem(ItemId.LifeOrb))
+                    {
+                        battle.RunEvent(EventId.AfterMoveSecondarySelf, source,
+                            RunEventSource.FromNullablePokemon(target), source.GetItem());
+                    }
+
+                    battle.ActiveMove = null;
+
+                    battle.CheckWin();
                 }),
             },
         };
