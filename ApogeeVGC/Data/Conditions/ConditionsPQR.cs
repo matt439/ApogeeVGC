@@ -544,7 +544,24 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 4,
                 AssociatedMove = MoveId.PerishSong,
-                // TODO: implement perish song countdown and faint
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "perish0");
+                    }
+                    target.Faint();
+                }),
+                // OnResidualOrder = 24
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (!pokemon.Volatiles.TryGetValue(ConditionId.PerishSong, out var state)) return;
+                    int duration = state.Duration ?? 0;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, $"perish{duration}");
+                    }
+                }, 24),
             },
             [ConditionId.Poltergeist] = new()
             {
@@ -552,7 +569,8 @@ public partial record Conditions
                 Name = "Poltergeist",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Poltergeist,
-                // TODO: implement item check
+                // Note: Poltergeist's item check is handled in the move's OnTry/OnTryHit handlers,
+                // not as a volatile condition. This is just a marker condition.
             },
             [ConditionId.Powder] = new()
             {
@@ -560,7 +578,33 @@ public partial record Conditions
                 Name = "Powder",
                 EffectType = EffectType.Condition,
                 Duration = 1,
-                // TODO: implement fire move prevention and damage
+                // Note: Powder is marked as isNonstandard: "Past" in TypeScript, meaning it's not in Gen 9.
+                // Implementing for completeness in case it's ever needed.
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Powder");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // OnTryMovePriority = -1
+                OnTryMove = new OnTryMoveEventInfo((battle, pokemon, _, move) =>
+                {
+                    if (move.Type == MoveType.Fire)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "move: Powder");
+                        }
+                        // Damage 1/4 of max HP, minimum 1
+                        int damage = Math.Max(1, (int)Math.Round(pokemon.MaxHp / 4.0));
+                        battle.Damage(damage);
+                        battle.AttrLastMove("[still]");
+                        return BoolEmptyVoidUnion.FromBool(false);
+                    }
+                    return BoolEmptyVoidUnion.FromVoid();
+                }, -1),
             },
             [ConditionId.PowerTrick] = new()
             {
@@ -568,7 +612,45 @@ public partial record Conditions
                 Name = "Power Trick",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.PowerTrick,
-                // TODO: implement Atk/Def stat swap
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Power Trick");
+                    }
+                    // Swap Attack and Defense stored stats
+                    int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
+                    int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
+                    pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
+                    pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnCopy = new OnCopyEventInfo((_, pokemon) =>
+                {
+                    // Re-swap when copying (e.g., Baton Pass) to maintain the swapped state
+                    int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
+                    int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
+                    pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
+                    pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Power Trick");
+                    }
+                    // Swap back Attack and Defense stored stats
+                    int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
+                    int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
+                    pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
+                    pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
+                }),
+                OnRestart = new OnRestartEventInfo((_, pokemon, _, _) =>
+                {
+                    // Using Power Trick again removes the volatile (toggles off)
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.PowerTrick]);
+                    return BoolVoidUnion.FromVoid();
+                }),
             },
             [ConditionId.PsychicNoise] = new()
             {
@@ -576,7 +658,10 @@ public partial record Conditions
                 Name = "Psychic Noise",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.PsychicNoise,
-                // TODO: same as HealBlock
+                // Note: Psychic Noise applies the HealBlock volatile as a secondary effect.
+                // The move's secondary { chance: 100, volatileStatus: 'healblock' } handles this.
+                // HealBlock.DurationCallback checks for Psychic Noise name to set duration to 2.
+                // This condition exists only as a marker for the move association.
             },
             [ConditionId.QuickGuard] = new()
             {
@@ -585,7 +670,57 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 1,
                 AssociatedMove = MoveId.QuickGuard,
-                // TODO: implement priority move blocking
+                OnSideStart = new OnSideStartEventInfo((battle, _, source, _) =>
+                {
+                    if (battle.DisplayUi && source != null)
+                    {
+                        battle.Add("-singleturn", source, "Quick Guard");
+                    }
+                }),
+                // OnTryHitPriority = 4
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    // Quick Guard blocks moves with positive priority (> 0.1 to account for fractional priority)
+                    // It blocks 0 priority moves boosted by Prankster or Gale Wings
+                    // Quick Claw/Custap Berry priority boosts do NOT count
+                    if (move.Priority <= 0.1) return BoolIntEmptyVoidUnion.FromVoid();
+
+                    // Check if move has protect flag
+                    if (!(move.Flags.Protect ?? false))
+                    {
+                        // G-Max One Blow and G-Max Rapid Flow bypass protection
+                        // (Not relevant for Gen 9 VGC but included for completeness)
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Quick Guard");
+                    }
+
+                    // Reset Outrage counter if source has lockedmove volatile
+                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove, out var lockedMoveState))
+                    {
+                        if (lockedMoveState.Duration == 2)
+                        {
+                            source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                        }
+                    }
+
+                    return new Empty(); // Equivalent to Battle.NOT_FAIL
+                }, 4),
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
+                {
+                    // Duration handled automatically
+                })
+                {
+                    Order = 26,
+                    SubOrder = 2,
+                },
+                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                {
+                    // Silent end - Quick Guard doesn't announce when it ends
+                }),
             },
             [ConditionId.PartiallyTrapped] = new()
             {
