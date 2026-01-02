@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -1001,6 +1002,19 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
+                OnLockMove = new OnLockMoveEventInfo(
+                    new OnLockMoveFunc((battle, _) =>
+                    {
+                        // Return the encored move ID to force the Pokemon to use it
+                        var encoredMove = battle.EffectState.Move;
+                        if (encoredMove.HasValue)
+                        {
+                            // Use implicit conversion from MoveId to MoveIdVoidUnion
+                            return encoredMove.Value;
+                        }
+
+                        return MoveIdVoidUnion.FromVoid();
+                    })),
                 OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
                 {
                     var encoredMove = battle.EffectState.Move;
@@ -1037,7 +1051,6 @@ public partial record Conditions
                         battle.Add("-end", target, "Encore");
                     }
                 }),
-                // TODO: OnOverrideAction - force encored move (requires battle action override system)
             },
             [ConditionId.EchoedVoice] = new()
             {
