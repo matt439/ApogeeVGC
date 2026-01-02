@@ -82,7 +82,7 @@ public partial record Moves
                 OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
                 {
                     if (pokemon.IgnoringItem()) return;
-                    var item = pokemon.GetItem();
+                    Item item = pokemon.GetItem();
                     if (item.Id != ItemId.None && item.OnPlate != null)
                     {
                         move.Type = (MoveType)item.OnPlate.Value;
@@ -111,7 +111,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
                     int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
-                    var healResult = battle.Heal(healAmount, target);
+                    IntFalseUnion healResult = battle.Heal(healAmount, target);
                     bool success = healResult is not FalseIntFalseUnion;
                     bool cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
@@ -137,29 +137,33 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, target, move) =>
                 {
-                    var item = target.GetItem();
+                    Item item = target.GetItem();
                     // Check if item can be taken (TakeItem event check)
-                    var takeResult = battle.SingleEvent(Sim.Events.EventId.TakeItem, item, target.ItemState, target, target, move, item);
+                    RelayVar? takeResult = battle.SingleEvent(Sim.Events.EventId.TakeItem, item,
+                        target.ItemState, target, target, move, item);
                     if (takeResult is BoolRelayVar { Value: false }) return basePower;
                     if (item.Id != ItemId.None)
                     {
                         battle.ChainModify(3, 2); // 1.5x
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }),
                 OnAfterHit = new OnAfterHitEventInfo((battle, target, source, _) =>
                 {
                     if (source.Hp > 0)
                     {
-                        var takeResult = target.TakeItem();
+                        ItemFalseUnion takeResult = target.TakeItem();
                         if (takeResult is ItemItemFalseUnion takenItem)
                         {
-                            battle.Add("-enditem", target, takenItem.Item.Name, "[from] move: Knock Off", $"[of] {source}");
+                            battle.Add("-enditem", target, takenItem.Item.Name,
+                                "[from] move: Knock Off", $"[of] {source}");
                         }
                     }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -297,16 +301,18 @@ public partial record Moves
                     // Last Resort fails unless the user knows at least 2 moves
                     if (source.MoveSlots.Count < 2) return false;
                     bool hasLastResort = false;
-                    foreach (var moveSlot in source.MoveSlots)
+                    foreach (MoveSlot moveSlot in source.MoveSlots)
                     {
                         if (moveSlot.Id == MoveId.LastResort)
                         {
                             hasLastResort = true;
                             continue;
                         }
+
                         // All other moves must have been used
                         if (!moveSlot.Used) return false;
                     }
+
                     return hasLastResort ? new VoidReturn() : false;
                 }),
                 Secondary = null,
@@ -434,7 +440,10 @@ public partial record Moves
                 Name = "Leech Life",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Heal = true, Metronome = true },
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, Heal = true, Metronome = true
+                },
                 Drain = (1, 2),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
@@ -449,7 +458,8 @@ public partial record Moves
                 Name = "Leer",
                 BasePp = 30,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
@@ -468,7 +478,8 @@ public partial record Moves
                 Name = "Lick",
                 BasePp = 30,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -487,7 +498,8 @@ public partial record Moves
                 Name = "Life Dew",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Heal = true, BypassSub = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Snatch = true, Heal = true, BypassSub = true, Metronome = true },
                 Target = MoveTarget.Allies,
                 Type = MoveType.Water,
             },
@@ -542,6 +554,7 @@ public partial record Moves
                     {
                         return false;
                     }
+
                     return new VoidReturn();
                 }),
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
@@ -601,7 +614,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
                     int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
-                    var healResult = battle.Heal(healAmount, target);
+                    IntFalseUnion healResult = battle.Heal(healAmount, target);
                     bool success = healResult is not FalseIntFalseUnion;
                     bool cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
@@ -633,8 +646,10 @@ public partial record Moves
                     if (battle.CanSwitch(source.Side) == 0)
                     {
                         battle.Add("-fail", source);
-                        return new VoidReturn(); // NOT_FAIL equivalent - move "worked" but did nothing
+                        return
+                            new VoidReturn(); // NOT_FAIL equivalent - move "worked" but did nothing
                     }
+
                     return new VoidReturn();
                 }),
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
@@ -654,7 +669,8 @@ public partial record Moves
                 Name = "Lash Out",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
@@ -668,7 +684,8 @@ public partial record Moves
                 Name = "Low Sweep",
                 BasePp = 20,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
@@ -687,7 +704,8 @@ public partial record Moves
                 Name = "Lunge",
                 BasePp = 15,
                 Priority = 0,
-                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
