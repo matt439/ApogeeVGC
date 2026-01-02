@@ -150,27 +150,45 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, _, move) =>
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                 {
                     if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
                     {
-                        // TODO: Check if move.isZ or move.isMax and set zBrokeProtect
                         return BoolIntEmptyVoidUnion.FromVoid();
                     }
 
-                    if (battle.DisplayUi)
+                    if (move.SmartTarget == true)
                     {
-                        battle.Add("-activate", target, "move: Protect");
+                        move.SmartTarget = false;
+                    }
+                    else
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Protect");
+                        }
                     }
 
-                    // TODO: Check for lockedmove volatile and reset Outrage counter
-                    // TODO: Check if move makes contact and lower Speed
-                    // if (this.checkMoveMakesContact(move, source, target)) {
-                    //     this.boost({ spe: -1 }, source, target, this.dex.getActiveMove("Silk Trap"));
-                    // }
+                    // Check for lockedmove volatile and reset Outrage counter
+                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
+                            out EffectState? lockedMove))
+                    {
+                        // Outrage counter is reset
+                        if (lockedMove.Duration == 2)
+                        {
+                            source.DeleteVolatile(ConditionId.LockedMove);
+                        }
+                    }
+
+                    // Check if move makes contact and lower Speed
+                    if (move.Flags.Contact == true)
+                    {
+                        battle.Boost(new SparseBoostsTable { Spe = -1 }, source, target,
+                            (IEffect?)_library.Moves[MoveId.SilkTrap]);
+                    }
+
                     return BoolIntEmptyVoidUnion.FromBool(false);
                 }, 3),
-                // TODO: OnHit - if move is Z or Max powered and makes contact, lower Speed
             },
             [ConditionId.SkyDrop] = new()
             {
