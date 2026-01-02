@@ -345,26 +345,103 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnTryPrimaryHit = new OnTryPrimaryHitEventInfo((_, target, source, move) =>
+                OnTryPrimaryHit = new OnTryPrimaryHitEventInfo((battle, target, source, move) =>
                 {
+                    // Bypass substitute if hitting self, move bypasses substitute, or move infiltrates
                     if (target == source || (move.Flags.BypassSub ?? false) ||
                         (move.Infiltrates ?? false))
                     {
                         return IntBoolVoidUnion.FromVoid();
                     }
 
-                    // TODO: Implement full Substitute damage blocking logic:
-                    // 1. Calculate damage with actions.getDamage
-                    // 2. If no damage, fail the move
-                    // 3. Cap damage at substitute HP
-                    // 4. Subtract from substitute HP
-                    // 5. If substitute breaks, remove it
-                    // 6. Otherwise show activate message
-                    // 7. Handle recoil and drain
-                    // 8. Trigger AfterSubDamage events
-                    // 9. Return HIT_SUBSTITUTE
+                    // Calculate damage using the battle's GetDamage method
+                    IntUndefinedFalseUnion damageResult =
+                        battle.Actions.GetDamage(source, target, move);
 
-                    return IntBoolVoidUnion.FromVoid();
+                    // If damage calculation failed or returned false, fail the move
+                    if (damageResult is FalseIntUndefinedFalseUnion)
+                    {
+                        return IntBoolVoidUnion.FromVoid();
+                    }
+
+                    // Get the actual damage value
+                    int damage = damageResult is IntIntUndefinedFalseUnion intDmg
+                        ? intDmg.Value
+                        : 0;
+
+                    // If no damage, let the move continue (might still have secondary effects)
+                    if (damage == 0)
+                    {
+                        return IntBoolVoidUnion.FromVoid();
+                    }
+
+                    // Cap damage at substitute's remaining HP
+                    int subHp = battle.EffectState.Hp ?? 0;
+                    damage = Math.Min(damage, subHp);
+
+                    // Subtract damage from substitute's HP
+                    battle.EffectState.Hp = subHp - damage;
+
+                    // Check if substitute broke
+                    if ((battle.EffectState.Hp ?? 0) <= 0)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", target, "Substitute");
+                        }
+
+                        target.RemoveVolatile(_library.Conditions[ConditionId.Substitute]);
+                    }
+                    else
+                    {
+                        // Substitute still active, show activate message
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Substitute",
+                                "[damage]");
+                        }
+                    }
+
+                    // Handle recoil damage if move has recoil
+                    if (move.Recoil != null)
+                    {
+                        int recoilDamage = battle.Actions.CalcRecoilDamage(damage, move, source);
+                        battle.Damage(recoilDamage, source, source,
+                            BattleDamageEffect.FromIEffect(
+                                _library.Conditions[ConditionId.Recoil]));
+                    }
+
+                    // Handle drain/heal if move has drain
+                    if (move.Drain != null)
+                    {
+                        (int numerator, int denominator) = move.Drain.Value;
+                        int drainAmount =
+                            battle.ClampIntRange(
+                                (int)Math.Ceiling(damage * numerator / (double)denominator), 1,
+                                null);
+                        battle.Heal(drainAmount, source, target,
+                            BattleHealEffect.FromDrain());
+                    }
+
+                    // Trigger OnAfterSubDamage event for the move
+                    if (move.OnAfterSubDamage != null)
+                    {
+                        var handler =
+                            (Action<Battle, int, Pokemon, Pokemon, ActiveMove>)move
+                                .OnAfterSubDamage.GetDelegateOrThrow();
+                        handler(battle, damage, target, source, move);
+                    }
+
+                    // Trigger AfterSubDamage events for target's ability, item, and volatiles
+                    battle.RunEvent(EventId.AfterSubDamage,
+                        target, // Implicitly converts to RunEventTarget via operator
+                        source, // Implicitly converts to RunEventSource via operator
+                        move,
+                        new IntRelayVar(damage));
+
+                    // Return HIT_SUBSTITUTE constant (represented as int value 0)
+                    // This tells the battle engine that the substitute took the hit
+                    return IntBoolVoidUnion.FromInt(0);
                 }, -1),
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
@@ -521,7 +598,6 @@ public partial record Conditions
                 }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, attacker, _, move) =>
                 {
-                    // TODO: Check if move is Z-move
                     if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
                     {
                         if (battle.DisplayUi)
