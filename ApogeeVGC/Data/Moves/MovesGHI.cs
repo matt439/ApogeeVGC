@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Items;
@@ -6,6 +7,8 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
+
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Moves;
 
@@ -274,6 +277,24 @@ public partial record Moves
                 Num = 520,
                 Accuracy = 100,
                 BasePower = 80,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                {
+                    // Check if this is being called as part of a pledge combo
+                    if (move.SourceEffect is MoveEffectStateId
+                        {
+                            MoveId: MoveId.WaterPledge or MoveId.FirePledge
+                        })
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-combine");
+                        }
+
+                        return 150;
+                    }
+
+                    return move.BasePower;
+                }),
                 Category = MoveCategory.Special,
                 Name = "Grass Pledge",
                 BasePp = 10,
@@ -288,9 +309,61 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                // TODO: basePowerCallback - 150 when combined with water/fire pledge
-                // TODO: onPrepareHit - pledge combination logic
-                // TODO: onModifyMove - pledge combination effects
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
+                {
+                    // Check the battle queue for ally Pokémon using Water Pledge or Fire Pledge
+                    if (battle.Queue.List != null)
+                    {
+                        foreach (var action in battle.Queue.List)
+                        {
+                            if (action is not MoveAction moveAction ||
+                                moveAction.Move == null ||
+                                moveAction.Pokemon?.IsActive != true ||
+                                moveAction.Pokemon.Fainted)
+                            {
+                                continue;
+                            }
+
+                            // Check if it's an ally using Water Pledge or Fire Pledge
+                            if (moveAction.Pokemon.IsAlly(source) &&
+                                (moveAction.Move.Id == MoveId.WaterPledge ||
+                                 moveAction.Move.Id == MoveId.FirePledge))
+                            {
+                                battle.Queue.PrioritizeAction(moveAction, move);
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-waiting", source, moveAction.Pokemon);
+                                }
+
+                                return null;
+                            }
+                        }
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                {
+                    // Check if this move is being modified by a pledge combo
+                    if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.WaterPledge })
+                    {
+                        // Water Pledge + Grass Pledge = Grass-type move with Grass Pledge side condition
+                        move.Type = MoveType.Grass;
+                        move.Self = new SecondaryEffect
+                        {
+                            SideCondition = ConditionId.GrassPledge,
+                        };
+                    }
+                    else if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.FirePledge })
+                    {
+                        // Fire Pledge + Grass Pledge = Fire-type move with Fire Pledge side condition
+                        move.Type = MoveType.Fire;
+                        move.Self = new SecondaryEffect
+                        {
+                            SideCondition = ConditionId.FirePledge,
+                        };
+                    }
+                }),
             },
             [MoveId.GrassyGlide] = new()
             {
@@ -730,7 +803,8 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Snatch = true, Distance = true, Sound = true, BypassSub = true, Metronome = true,
+                    Snatch = true, Distance = true, Sound = true, BypassSub = true,
+                    Metronome = true,
                 },
                 Target = MoveTarget.AllyTeam,
                 Type = MoveType.Normal,
