@@ -456,15 +456,34 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.FocusEnergy,
                 NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
                 {
+                    // Check for DragonCheer to prevent stacking
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.DragonCheer))
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    // Check if this is from copying abilities (Costar, Imposter, Psych Up, Transform)
+                    bool isCopied = effect is Ability ability &&
+                        (ability.Id == AbilityId.Costar || ability.Id == AbilityId.Imposter) ||
+                        effect is Move move && (move.Name == "Psych Up" || move.Name == "Transform");
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, "move: Focus Energy");
+                        if (isCopied)
+                        {
+                            battle.Add("-start", pokemon, "move: Focus Energy", "[silent]");
+                        }
+                        else
+                        {
+                            battle.Add("-start", pokemon, "move: Focus Energy");
+                        }
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnModifyCritRatio - increase crit ratio by 2 stages
+                OnModifyCritRatio = new OnModifyCritRatioEventInfo((battle, critRatio, _, _, _) =>
+                {
+                    return critRatio + 2;
+                }),
             },
             [ConditionId.FocusPunch] = new()
             {
@@ -560,13 +579,38 @@ public partial record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        // TODO: Check for Z-Power effect and add "[zeffect]" suffix
                         battle.Add("-singleturn", target, "move: Follow Me");
                     }
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnFoeRedirectTarget - redirect attacks to this Pokemon
-                // Priority 1, check if target is valid and not sky dropped
+                OnFoeRedirectTarget = new OnFoeRedirectTargetEventInfo((battle, target, source, effect, move) =>
+                {
+                    // Get the Pokemon that used Follow Me from the effect state
+                    var effectTarget = battle.EffectState.Target;
+                    Pokemon? followMeTarget = effectTarget is PokemonEffectStateTarget pokemonTarget 
+                        ? pokemonTarget.Pokemon 
+                        : null;
+
+                    if (followMeTarget == null) return PokemonVoidUnion.FromVoid();
+
+                    // Don't redirect if the Follow Me user is sky dropped
+                    if (followMeTarget.IsSkyDropped()) return PokemonVoidUnion.FromVoid();
+
+                    // Check if the Follow Me user is a valid target for this move
+                    if (battle.ValidTarget(followMeTarget, source, move.Target))
+                    {
+                        if (move.SmartTarget ?? false)
+                        {
+                            move.SmartTarget = false;
+                        }
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Follow Me redirected target of move");
+                        }
+                        return followMeTarget; // Uses implicit conversion
+                    }
+                    return PokemonVoidUnion.FromVoid();
+                }, 1),
             },
             [ConditionId.FlashFire] = new()
             {
@@ -663,19 +707,21 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
-                    battle.EffectState.HitCount = 1;
+                    battle.EffectState.Multiplier = 1;
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
                 {
-                    if ((battle.EffectState.HitCount ?? 0) < 4)
+                    if ((battle.EffectState.Multiplier ?? 1) < 4)
                     {
-                        battle.EffectState.HitCount = (battle.EffectState.HitCount ?? 0) + 1;
+                        // Double the multiplier (1 -> 2 -> 4)
+                        battle.EffectState.Multiplier = (battle.EffectState.Multiplier ?? 1) * 2;
                     }
                     battle.EffectState.Duration = 2;
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnBasePower - multiply base power by 2^(hitCount-1)
+                // Note: Base power scaling is handled in the move's BasePowerCallback
+                // The condition just tracks the multiplier (1, 2, 4)
             },
             [ConditionId.Flinch] = new()
             {
@@ -1023,16 +1069,68 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
-                    // TODO: Check if target's last move is valid for Encore
-                    // For now, just add the start message
+                    // Check if target has a valid last move for Encore
+                    if (target.LastMove == null)
+                    {
+                        battle.Debug("Encore failed: no last move");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    // Check if the last move has PP remaining
+                    MoveSlot? moveSlot = null;
+                    foreach (var slot in target.MoveSlots)
+                    {
+                        if (slot.Id == target.LastMove.Id)
+                        {
+                            moveSlot = slot;
+                            break;
+                        }
+                    }
+
+                    if (moveSlot == null || moveSlot.Pp <= 0)
+                    {
+                        battle.Debug("Encore failed: move not found or no PP");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    // Store the encored move
+                    battle.EffectState.Move = target.LastMove.Id;
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", target, "Encore");
                     }
-                    return new VoidReturn();
+                    return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnOverrideAction - force encored move
-                // TODO: OnResidual - check if PP is depleted
+                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    var encoredMove = battle.EffectState.Move;
+                    if (encoredMove == null) return;
+
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        if (moveSlot.Id != encoredMove)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    // Check if encored move has PP remaining
+                    var encoredMove = battle.EffectState.Move;
+                    if (encoredMove == null) return;
+
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        if (moveSlot.Id == encoredMove && moveSlot.Pp <= 0)
+                        {
+                            // End Encore if the encored move has no PP
+                            pokemon.RemoveVolatile(_library.Conditions[ConditionId.Encore]);
+                            return;
+                        }
+                    }
+                }, 14),
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
                     if (battle.DisplayUi)
@@ -1040,7 +1138,7 @@ public partial record Conditions
                         battle.Add("-end", target, "Encore");
                     }
                 }),
-                // TODO: OnDisableMove - disable all moves except encored move
+                // TODO: OnOverrideAction - force encored move (requires battle action override system)
             },
             [ConditionId.EchoedVoice] = new()
             {
@@ -1089,7 +1187,18 @@ public partial record Conditions
                     }
                     return new VoidReturn();
                 }),
-                // TODO: OnDamage (priority -10) - prevent fainting, leave at 1 HP
+                OnDamage = new OnDamageEventInfo((battle, damage, target, source, effect) =>
+                {
+                    if (effect?.EffectType == EffectType.Move && damage >= target.Hp)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Endure");
+                        }
+                        return IntBoolVoidUnion.FromInt(target.Hp - 1);
+                    }
+                    return IntBoolVoidUnion.FromVoid();
+                }, -10),
             },
             [ConditionId.FutureMove] = new()
             {
