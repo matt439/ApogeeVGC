@@ -870,17 +870,20 @@ public partial record Conditions
                 }),
                 OnSetStatus = new OnSetStatusEventInfo((battle, _, target, source, effect) =>
                 {
-                    if (effect == null || source == null) return BoolVoidUnion.FromVoid();
-                    if (effect is Condition { Id: ConditionId.Yawn })
+                    if (effect == null || source == null || effect is Condition { Id: ConditionId.Yawn }) return BoolVoidUnion.FromVoid();
+                    // Check if move has Infiltrates and target is not ally of source
+                    if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
                         return BoolVoidUnion.FromVoid();
-                    // TODO: Check if effect.infiltrates && !target.isAlly(source)
                     if (target != source)
                     {
                         if (battle.DisplayUi)
                         {
                             battle.Debug("interrupting setStatus");
-                            // TODO: Check for Synchronize ability or move without secondaries
-                            battle.Add("-activate", target, "move: Safeguard");
+                            // Show activation message for Synchronize ability or moves without secondaries
+                            if (effect is Ability { Name: "Synchronize" } or ActiveMove { Secondaries: null })
+                            {
+                                battle.Add("-activate", target, "move: Safeguard");
+                            }
                         }
 
                         return BoolVoidUnion.FromBool(false);
@@ -892,14 +895,19 @@ public partial record Conditions
                     new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
                     {
                         if (effect == null || source == null) return BoolVoidUnion.FromVoid();
-                        // TODO: Check if effect.infiltrates && !target.isAlly(source)
+                        // Check if move has Infiltrates and target is not ally of source
+                        if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
+                            return BoolVoidUnion.FromVoid();
                         if (status?.Id is ConditionId.Confusion or ConditionId.Yawn &&
                             target != source)
                         {
                             if (battle.DisplayUi)
                             {
-                                // TODO: Check if effect is Move without secondaries
-                                battle.Add("-activate", target, "move: Safeguard");
+                                // Show activation message only for moves without secondaries
+                                if (effect is ActiveMove { Secondaries: null })
+                                {
+                                    battle.Add("-activate", target, "move: Safeguard");
+                                }
                             }
 
                             return BoolVoidUnion.FromBool(false);
