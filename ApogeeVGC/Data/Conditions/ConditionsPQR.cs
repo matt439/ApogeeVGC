@@ -12,6 +12,9 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
@@ -134,7 +137,7 @@ public partial record Conditions
                             source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
                         }
 
-                        battle.Debug($"[Protect.OnTryHit] Returning Empty (block move)");
+                        battle.Debug("[Protect.OnTryHit] Returning Empty (block move)");
                         return new Empty(); // in place of Battle.NOT_FAIL ("")
                     },
                     3),
@@ -381,7 +384,7 @@ public partial record Conditions
                     },
                     1),
                 OnWeatherModifyDamage =
-                    new OnWeatherModifyDamageEventInfo((battle, _, attacker, defender, move) =>
+                    new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
                     {
                         if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
                         if (move.Type == MoveType.Water)
@@ -496,9 +499,10 @@ public partial record Conditions
                     {
                         battle.Add("-singleturn", target, "move: Roost");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnType = new OnTypeEventInfo((battle, types, pokemon) =>
+                OnType = new OnTypeEventInfo((battle, types, _) =>
                 {
                     battle.EffectState.TypeWas = types.FirstOrDefault();
                     // Filter out Flying type
@@ -520,10 +524,11 @@ public partial record Conditions
                 Name = "RolloutStorage",
                 EffectType = EffectType.Condition,
                 Duration = 2,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, move) =>
+                OnBasePower = new OnBasePowerEventInfo((_, _, source, _, move) =>
                 {
                     int bp = Math.Max(1, move.BasePower);
-                    source.Volatiles.TryGetValue(ConditionId.RolloutStorage, out EffectState? rolloutState);
+                    source.Volatiles.TryGetValue(ConditionId.RolloutStorage,
+                        out EffectState? rolloutState);
                     int hitCount = rolloutState?.ContactHitCount ?? 0;
                     bp *= (int)Math.Pow(2, hitCount);
                     if (source.Volatiles.ContainsKey(ConditionId.DefenseCurl))
@@ -550,12 +555,14 @@ public partial record Conditions
                     {
                         battle.Add("-start", target, "perish0");
                     }
+
                     target.Faint();
                 }),
                 // OnResidualOrder = 24
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    if (!pokemon.Volatiles.TryGetValue(ConditionId.PerishSong, out var state)) return;
+                    if (!pokemon.Volatiles.TryGetValue(ConditionId.PerishSong,
+                            out EffectState? state)) return;
                     int duration = state.Duration ?? 0;
                     if (battle.DisplayUi)
                     {
@@ -586,6 +593,7 @@ public partial record Conditions
                     {
                         battle.Add("-singleturn", target, "Powder");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
                 // OnTryMovePriority = -1
@@ -597,12 +605,14 @@ public partial record Conditions
                         {
                             battle.Add("-activate", pokemon, "move: Powder");
                         }
+
                         // Damage 1/4 of max HP, minimum 1
                         int damage = Math.Max(1, (int)Math.Round(pokemon.MaxHp / 4.0));
                         battle.Damage(damage);
                         battle.AttrLastMove("[still]");
                         return BoolEmptyVoidUnion.FromBool(false);
                     }
+
                     return BoolEmptyVoidUnion.FromVoid();
                 }, -1),
             },
@@ -618,6 +628,7 @@ public partial record Conditions
                     {
                         battle.Add("-start", pokemon, "Power Trick");
                     }
+
                     // Swap Attack and Defense stored stats
                     int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
                     int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
@@ -639,6 +650,7 @@ public partial record Conditions
                     {
                         battle.Add("-end", pokemon, "Power Trick");
                     }
+
                     // Swap back Attack and Defense stored stats
                     int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
                     int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
@@ -699,7 +711,8 @@ public partial record Conditions
                     }
 
                     // Reset Outrage counter if source has lockedmove volatile
-                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove, out var lockedMoveState))
+                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
+                            out EffectState? lockedMoveState))
                     {
                         if (lockedMoveState.Duration == 2)
                         {
@@ -717,7 +730,7 @@ public partial record Conditions
                     Order = 26,
                     SubOrder = 2,
                 },
-                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                OnSideEnd = new OnSideEndEventInfo((_, _) =>
                 {
                     // Silent end - Quick Guard doesn't announce when it ends
                 }),
@@ -728,12 +741,13 @@ public partial record Conditions
                 Name = "Partially Trapped",
                 EffectType = EffectType.Condition,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((battle, target, source, _) =>
+                DurationCallback = new DurationCallbackEventInfo((battle, _, source, _) =>
                 {
                     if (source != null && source.HasItem(ItemId.GripClaw))
                     {
                         return 8;
                     }
+
                     return battle.Random(5, 7);
                 }),
                 OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
@@ -744,19 +758,22 @@ public partial record Conditions
                             $"move: {battle.EffectState.SourceEffect?.Name ?? "unknown"}",
                             $"[of] {source}");
                     }
+
                     battle.EffectState.BoundDivisor =
                         (source != null && source.HasItem(ItemId.BindingBand)) ? 6 : 8;
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    var source = battle.EffectState.Source;
+                    Pokemon? source = battle.EffectState.Source;
                     // G-Max Centiferno and G-Max Sandblast continue even after the user leaves the field
-                    var sourceEffect = battle.EffectState.SourceEffect;
-                    var gmaxEffect = sourceEffect != null &&
-                        (sourceEffect.Name == "G-Max Centiferno" || sourceEffect.Name == "G-Max Sandblast");
+                    IEffect? sourceEffect = battle.EffectState.SourceEffect;
+                    bool gmaxEffect = sourceEffect is
+                        { Name: "G-Max Centiferno" or "G-Max Sandblast" };
 
-                    if (source != null && (!source.IsActive || source.Hp <= 0 || source.ActiveTurns <= 0) && !gmaxEffect)
+                    if (source != null &&
+                        (!source.IsActive || source.Hp <= 0 || source.ActiveTurns <= 0) &&
+                        !gmaxEffect)
                     {
                         pokemon.DeleteVolatile(ConditionId.PartiallyTrapped);
                         if (battle.DisplayUi)
@@ -764,8 +781,10 @@ public partial record Conditions
                             battle.Add("-end", pokemon, sourceEffect?.Name ?? "Partially Trapped",
                                 "[partiallytrapped]", "[silent]");
                         }
+
                         return;
                     }
+
                     battle.Damage(pokemon.BaseMaxHp / (battle.EffectState.BoundDivisor ?? 8));
                 }, 13),
                 OnEnd = new OnEndEventInfo((battle, pokemon) =>
@@ -779,11 +798,11 @@ public partial record Conditions
                 }),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {
-                    var sourceEffect = battle.EffectState.SourceEffect;
-                    var gmaxEffect = sourceEffect != null &&
-                        (sourceEffect.Name == "G-Max Centiferno" || sourceEffect.Name == "G-Max Sandblast");
-                    var source = battle.EffectState.Source;
-                    if ((source != null && source.IsActive) || gmaxEffect)
+                    IEffect? sourceEffect = battle.EffectState.SourceEffect;
+                    bool gmaxEffect = sourceEffect is
+                        { Name: "G-Max Centiferno" or "G-Max Sandblast" };
+                    Pokemon? source = battle.EffectState.Source;
+                    if (source is { IsActive: true } || gmaxEffect)
                     {
                         pokemon.TryTrap();
                     }
@@ -826,16 +845,20 @@ public partial record Conditions
                     {
                         if (battle.DisplayUi)
                         {
-                            battle.Add("-activate", source, "ability: Persistent", "[move] Safeguard");
+                            battle.Add("-activate", source, "ability: Persistent",
+                                "[move] Safeguard");
                         }
+
                         return 7;
                     }
+
                     return 5;
                 }),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, source, effect) =>
+                OnSetStatus = new OnSetStatusEventInfo((battle, _, target, source, effect) =>
                 {
                     if (effect == null || source == null) return BoolVoidUnion.FromVoid();
-                    if (effect is Condition { Id: ConditionId.Yawn }) return BoolVoidUnion.FromVoid();
+                    if (effect is Condition { Id: ConditionId.Yawn })
+                        return BoolVoidUnion.FromVoid();
                     // TODO: Check if effect.infiltrates && !target.isAlly(source)
                     if (target != source)
                     {
@@ -845,25 +868,31 @@ public partial record Conditions
                             // TODO: Check for Synchronize ability or move without secondaries
                             battle.Add("-activate", target, "move: Safeguard");
                         }
+
                         return BoolVoidUnion.FromBool(false);
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnTryAddVolatile = new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
-                {
-                    if (effect == null || source == null) return BoolVoidUnion.FromVoid();
-                    // TODO: Check if effect.infiltrates && !target.isAlly(source)
-                    if ((status?.Id == ConditionId.Confusion || status?.Id == ConditionId.Yawn) && target != source)
+                OnTryAddVolatile =
+                    new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
                     {
-                        if (battle.DisplayUi)
+                        if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                        // TODO: Check if effect.infiltrates && !target.isAlly(source)
+                        if (status?.Id is ConditionId.Confusion or ConditionId.Yawn &&
+                            target != source)
                         {
-                            // TODO: Check if effect is Move without secondaries
-                            battle.Add("-activate", target, "move: Safeguard");
+                            if (battle.DisplayUi)
+                            {
+                                // TODO: Check if effect is Move without secondaries
+                                battle.Add("-activate", target, "move: Safeguard");
+                            }
+
+                            return BoolVoidUnion.FromBool(false);
                         }
-                        return BoolVoidUnion.FromBool(false);
-                    }
-                    return BoolVoidUnion.FromVoid();
-                }),
+
+                        return BoolVoidUnion.FromVoid();
+                    }),
                 OnSideStart = new OnSideStartEventInfo((battle, side, source, _) =>
                 {
                     if (battle.DisplayUi)
@@ -904,9 +933,10 @@ public partial record Conditions
                     {
                         return 8;
                     }
+
                     return 5;
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, effect) =>
+                OnTryHit = new OnTryHitEventInfo((_, _, _, _) =>
                 {
                     // TODO: Check if effect priority <= 0.1 or effect.target === 'self'
                     // TODO: Check if target is semi-invulnerable or ally of source
@@ -957,7 +987,8 @@ public partial record Conditions
                         battle.EffectState.FromBooster = true;
                         if (battle.DisplayUi)
                         {
-                            battle.Add("-activate", pokemon, "ability: Protosynthesis", "[fromitem]");
+                            battle.Add("-activate", pokemon, "ability: Protosynthesis",
+                                "[fromitem]");
                         }
                     }
                     else if (battle.DisplayUi)
@@ -968,7 +999,8 @@ public partial record Conditions
                     battle.EffectState.BestStat = pokemon.GetBestStat(false, true);
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, "protosynthesis" + battle.EffectState.BestStat);
+                        battle.Add("-start", pokemon,
+                            "protosynthesis" + battle.EffectState.BestStat);
                     }
 
                     return new VoidReturn();
@@ -1082,6 +1114,7 @@ public partial record Conditions
                     {
                         battle.Add("-singleturn", pokemon, "move: Rage Powder");
                     }
+
                     return BoolVoidUnion.FromVoid();
                 }),
                 // TODO: OnFoeRedirectTarget - redirect attacks to this Pokemon (priority 1)
