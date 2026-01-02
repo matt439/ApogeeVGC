@@ -1180,9 +1180,55 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                // TODO: OnFoeRedirectTarget - redirect attacks to this Pokemon (priority 1)
-                // Check if source has powder immunity, check if ragePowderUser is sky dropped
-                // Check if ragePowderUser is valid target, then redirect
+                OnFoeRedirectTarget = new OnFoeRedirectTargetEventInfo(
+                    (battle, _, source, _, move) =>
+                    {
+                        // Get the Pokemon that used Rage Powder from the effect state
+                        EffectStateTarget? effectTarget = battle.EffectState.Target;
+                        Pokemon? ragePowderUser =
+                            effectTarget is PokemonEffectStateTarget pokemonTarget
+                                ? pokemonTarget.Pokemon
+                                : null;
+
+                        if (ragePowderUser == null) return PokemonVoidUnion.FromVoid();
+
+                        // Check if source has powder immunity
+                        // Grass-types, Overcoat ability, and Safety Goggles are immune to powder moves
+                        if (source.HasType(PokemonType.Grass) ||
+                            source.HasAbility(AbilityId.Overcoat) ||
+                            source.HasItem(ItemId.SafetyGoggles))
+                        {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Debug(
+                                    $"{source.Name} is immune to Rage Powder (Grass-type/Overcoat/Safety Goggles)");
+                            }
+
+                            return PokemonVoidUnion.FromVoid();
+                        }
+
+                        // Don't redirect if the Rage Powder user is sky dropped
+                        if (ragePowderUser.IsSkyDropped())
+                            return PokemonVoidUnion.FromVoid();
+
+                        // Check if the Rage Powder user is a valid target for this move
+                        if (battle.ValidTarget(ragePowderUser, source, move.Target))
+                        {
+                            if (move.SmartTarget ?? false)
+                            {
+                                move.SmartTarget = false;
+                            }
+
+                            if (battle.DisplayUi)
+                            {
+                                battle.Debug("Rage Powder redirected target of move");
+                            }
+
+                            return ragePowderUser; // Uses implicit conversion
+                        }
+
+                        return PokemonVoidUnion.FromVoid();
+                    }, 1),
             },
         };
     }
