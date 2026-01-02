@@ -97,10 +97,8 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.PhantomForce,
                 Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
                     BoolIntEmptyVoidUnion.FromBool(false)),
-                // TODO: OnTryHit - ignore Protect/Detect on the attack turn
             },
             [ConditionId.ShadowForce] = new()
             {
@@ -109,10 +107,8 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.ShadowForce,
                 Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
                     BoolIntEmptyVoidUnion.FromBool(false)),
-                // TODO: OnTryHit - ignore Protect/Detect on the attack turn
             },
             [ConditionId.Silvally] = new()
             {
