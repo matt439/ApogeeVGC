@@ -89,6 +89,7 @@ public partial record Conditions
                 Id = ConditionId.ZenMode,
                 Name = "Zen Mode",
                 EffectType = EffectType.Condition,
+                AssociatedAbility = AbilityId.ZenMode,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
                     if (target is not Pokemon pokemon) return new VoidReturn();
