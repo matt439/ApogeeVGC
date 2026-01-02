@@ -363,7 +363,7 @@ public partial record Abilities
 
                     if (!canHarvest) return;
                     if (pokemon.Hp == 0) return;
-                    if (pokemon.Item != null) return;
+                    if (pokemon.Item == ItemId.None) return;
 
                     Item? lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
                     if (lastItem is not { IsBerry: true }) return;
