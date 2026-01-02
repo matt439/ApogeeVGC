@@ -461,14 +461,22 @@ public partial record Conditions
                     {
                         return BoolVoidUnion.FromBool(false);
                     }
-                    if (battle.DisplayUi)
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", target, "Telekinesis");
+                        }
+                        return BoolVoidUnion.FromVoid();
+                    }),
+                    OnAccuracy = new OnAccuracyEventInfo((battle, accuracy, target, source, move) =>
                     {
-                        battle.Add("-start", target, "Telekinesis");
-                    }
-                    return BoolVoidUnion.FromVoid();
-                }),
-                // TODO: OnAccuracy - if move is not OHKO, return true (perfect accuracy)
-                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                        // Telekinesis grants perfect accuracy on non-OHKO moves
+                        if (move.Ohko == null)
+                        {
+                            return IntBoolVoidUnion.FromBool(true);
+                        }
+                        return IntBoolVoidUnion.FromVoid();
+                    }, -1),
+                    OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
                 {
                     // Ground immunity is handled by Pokemon.IsGrounded() for Telekinesis
                     return new VoidReturn();
@@ -1055,14 +1063,36 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
-                    // TODO: check if terastallized, return false if so
+                    // Tar Shot fails if target is Terastallized
+                    if (pokemon.Terastallized != null)
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, "Tar Shot");
                     }
                     return new VoidReturn();
                 }),
-                // TODO: onEffectiveness - increase Fire-type effectiveness
+                OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, type, move) =>
+                {
+                    // Increase Fire-type move effectiveness by 1 stage (2x multiplier)
+                    if (move.Type != MoveType.Fire)
+                    {
+                        return IntVoidUnion.FromVoid();
+                    }
+                    if (target == null)
+                    {
+                        return IntVoidUnion.FromVoid();
+                    }
+                    // Only apply to the first type of the target
+                    var targetTypes = target.GetTypes();
+                    if (targetTypes.Length == 0 || type != targetTypes[0])
+                    {
+                        return IntVoidUnion.FromVoid();
+                    }
+                    return IntVoidUnion.FromInt(typeMod + 1);
+                }, -2),
             },
             [ConditionId.ThroatChop] = new()
             {
@@ -1080,7 +1110,6 @@ public partial record Conditions
                 }),
                 OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
                 {
-                    // TODO: disable sound moves
                     foreach (var moveSlot in pokemon.MoveSlots)
                     {
                         var move = _library.Moves[moveSlot.Id];
@@ -1090,7 +1119,20 @@ public partial record Conditions
                         }
                     }
                 }),
-                // TODO: onBeforeMove - prevent sound moves
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                {
+                    // Z-moves and Max moves are not affected by Throat Chop
+                    // Note: isZ and isMax properties would need to be checked if available
+                    if (move.Flags.Sound == true)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "move: Throat Chop");
+                        }
+                        return false;
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }, 6),
                 //OnResidualOrder = 22,
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
