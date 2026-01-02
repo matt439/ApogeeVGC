@@ -11,6 +11,7 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -127,9 +128,7 @@ public partial record Conditions
                     if (pokemon.Ability == AbilityId.RksSystem)
                     {
                         Item item = pokemon.GetItem();
-                        // TODO: Get type from item.OnMemory property when implemented
-                        // For now, default to Normal type
-                        type = PokemonType.Normal;
+                        type = item.OnMemory?.ConvertToPokemonType() ?? PokemonType.Normal;
                     }
 
                     return new[] { type };
