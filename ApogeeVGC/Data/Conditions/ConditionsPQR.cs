@@ -870,7 +870,10 @@ public partial record Conditions
                 }),
                 OnSetStatus = new OnSetStatusEventInfo((battle, _, target, source, effect) =>
                 {
-                    if (effect == null || source == null || effect is Condition { Id: ConditionId.Yawn }) return BoolVoidUnion.FromVoid();
+                    if (effect == null || source == null || effect is Condition
+                        {
+                            Id: ConditionId.Yawn
+                        }) return BoolVoidUnion.FromVoid();
                     // Check if move has Infiltrates and target is not ally of source
                     if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
                         return BoolVoidUnion.FromVoid();
@@ -880,7 +883,10 @@ public partial record Conditions
                         {
                             battle.Debug("interrupting setStatus");
                             // Show activation message for Synchronize ability or moves without secondaries
-                            if (effect is Ability { Name: "Synchronize" } or ActiveMove { Secondaries: null })
+                            if (effect is Ability { Name: "Synchronize" } or ActiveMove
+                                {
+                                    Secondaries: null
+                                })
                             {
                                 battle.Add("-activate", target, "move: Safeguard");
                             }
@@ -958,15 +964,50 @@ public partial record Conditions
 
                     return 5;
                 }),
-                OnTryHit = new OnTryHitEventInfo((_, _, _, _) =>
+                // OnTryHitPriority = 4
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                 {
-                    // TODO: Check if effect priority <= 0.1 or effect.target === 'self'
-                    // TODO: Check if target is semi-invulnerable or ally of source
-                    // TODO: Check if target is not grounded
-                    // For now, this is a placeholder
-                    return BoolIntEmptyVoidUnion.FromVoid();
+                    // Psychic Terrain blocks priority moves targeting grounded Pokemon
+                    // Excludes moves targeting self or with priority <= 0.1
+                    if (move.Priority <= 0.1 || move.Target == MoveTarget.Self)
+                        return BoolIntEmptyVoidUnion.FromVoid();
+
+                    // Target must be grounded and not semi-invulnerable
+                    bool? isGrounded = target.IsGrounded();
+                    bool isSemiInvulnerable = target.IsSemiInvulnerable();
+                    if (!(isGrounded ?? false) || isSemiInvulnerable)
+                        return BoolIntEmptyVoidUnion.FromVoid();
+
+                    // Don't block if target is ally of source
+                    if (target.IsAlly(source))
+                        return BoolIntEmptyVoidUnion.FromVoid();
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Psychic Terrain");
+                    }
+
+                    return new Empty(); // Block the move
                 }, 4),
-                // TODO: OnBasePower - boost Psychic moves if attacker is grounded (1.3x boost: 5325/4096)
+                // OnBasePowerPriority = 6
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
+                {
+                    // Boost Psychic-type moves by 1.3x (5325/4096) when attacker is grounded
+                    bool? attackerGrounded = attacker.IsGrounded();
+                    bool attackerSemiInvuln = attacker.IsSemiInvulnerable();
+                    if (move.Type == MoveType.Psychic && (attackerGrounded ?? false) &&
+                        !attackerSemiInvuln)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("psychic terrain boost");
+                        }
+
+                        return battle.ChainModify([5325, 4096]);
+                    }
+
+                    return basePower;
+                }, 6),
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
                 {
                     if (battle.DisplayUi)
