@@ -3565,7 +3565,6 @@ public partial record Learnsets
                 [MoveId.AerialAce] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.AirCutter] = [MoveSource.Parse("9M")],
                 [MoveId.AirSlash] = [MoveSource.Parse("9M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L31"), MoveSource.Parse("6L31")],
                 [MoveId.Attract] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.BugBite] = [MoveSource.Parse("9M"), MoveSource.Parse("7T"), MoveSource.Parse("6T")],
                 [MoveId.BugBuzz] = [MoveSource.Parse("9M"), MoveSource.Parse("9L35"), MoveSource.Parse("7L35"), MoveSource.Parse("6L35")],
@@ -3626,7 +3625,6 @@ public partial record Learnsets
                 [MoveId.AerialAce] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.AirCutter] = [MoveSource.Parse("9M")],
                 [MoveId.AirSlash] = [MoveSource.Parse("9M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L31"), MoveSource.Parse("6L31")],
                 [MoveId.Attract] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.BugBite] = [MoveSource.Parse("7T"), MoveSource.Parse("6T")],
                 [MoveId.BugBuzz] = [MoveSource.Parse("9M"), MoveSource.Parse("9L35"), MoveSource.Parse("7L35"), MoveSource.Parse("6L35")],
@@ -3696,7 +3694,6 @@ public partial record Learnsets
                 [MoveId.AerialAce] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.AirCutter] = [MoveSource.Parse("9M")],
                 [MoveId.AirSlash] = [MoveSource.Parse("9M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L31"), MoveSource.Parse("6L31")],
                 [MoveId.Attract] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.BugBite] = [MoveSource.Parse("7T"), MoveSource.Parse("6T")],
                 [MoveId.BugBuzz] = [MoveSource.Parse("9M"), MoveSource.Parse("9L35"), MoveSource.Parse("7L35"), MoveSource.Parse("6L35")],
@@ -3906,7 +3903,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.AllySwitch] = [MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L33"), MoveSource.Parse("6L33")],
                 [MoveId.Attract] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M")],
                 [MoveId.CalmMind] = [MoveSource.Parse("9M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
@@ -3969,7 +3965,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.AllySwitch] = [MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L38"), MoveSource.Parse("6L38")],
                 [MoveId.Attract] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M")],
                 [MoveId.CalmMind] = [MoveSource.Parse("9M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
@@ -4024,7 +4019,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.AllySwitch] = [MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("9L38"), MoveSource.Parse("6L38")],
                 [MoveId.Attract] = [MoveSource.Parse("6M")],
                 [MoveId.CalmMind] = [MoveSource.Parse("9M"), MoveSource.Parse("6M")],
                 [MoveId.Confide] = [MoveSource.Parse("6M")],
@@ -4077,7 +4071,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.AllySwitch] = [MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L1"), MoveSource.Parse("6L1")],
                 [MoveId.Attract] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M")],
                 [MoveId.CalmMind] = [MoveSource.Parse("9M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
@@ -4857,7 +4850,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.AllySwitch] = [MoveSource.Parse("8M"), MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L12"), MoveSource.Parse("7L25"), MoveSource.Parse("6L25")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("8L18"), MoveSource.Parse("7M"), MoveSource.Parse("7L29"), MoveSource.Parse("6M"), MoveSource.Parse("6L29")],
                 [MoveId.CalmMind] = [MoveSource.Parse("8M"), MoveSource.Parse("8L33"), MoveSource.Parse("7M"), MoveSource.Parse("7L17"), MoveSource.Parse("6M"), MoveSource.Parse("6L17")],
                 [MoveId.ChargeBeam] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
@@ -4906,7 +4898,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.AllySwitch] = [MoveSource.Parse("8M"), MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L12"), MoveSource.Parse("7L25"), MoveSource.Parse("6L25")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("8L18"), MoveSource.Parse("7M"), MoveSource.Parse("7L29"), MoveSource.Parse("6M"), MoveSource.Parse("6L29")],
                 [MoveId.CalmMind] = [MoveSource.Parse("8M"), MoveSource.Parse("8L33"), MoveSource.Parse("7M"), MoveSource.Parse("7L17"), MoveSource.Parse("6M"), MoveSource.Parse("6L17")],
                 [MoveId.ChargeBeam] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
@@ -4974,7 +4965,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.Amnesia] = [MoveSource.Parse("8M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L9"), MoveSource.Parse("7L26"), MoveSource.Parse("6L26")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.BellyDrum] = [MoveSource.Parse("7E"), MoveSource.Parse("6E")],
                 [MoveId.CalmMind] = [MoveSource.Parse("8M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
@@ -5023,7 +5013,6 @@ public partial record Learnsets
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
                 [MoveId.Amnesia] = [MoveSource.Parse("8M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L9"), MoveSource.Parse("7L26"), MoveSource.Parse("6L26")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.CalmMind] = [MoveSource.Parse("8M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.Charm] = [MoveSource.Parse("8M")],
@@ -7135,7 +7124,6 @@ public partial record Learnsets
         {
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L25"), MoveSource.Parse("7L1"), MoveSource.Parse("6L1"), MoveSource.Parse("6S1")],
                 [MoveId.BodySlam] = [MoveSource.Parse("8M")],
                 [MoveId.CalmMind] = [MoveSource.Parse("8M"), MoveSource.Parse("7M"), MoveSource.Parse("6M")],
                 [MoveId.CloseCombat] = [MoveSource.Parse("8M"), MoveSource.Parse("8L75"), MoveSource.Parse("7L80"), MoveSource.Parse("6L80")],
@@ -9236,7 +9224,6 @@ public partial record Learnsets
                 [MoveId.Acrobatics] = [MoveSource.Parse("9M"), MoveSource.Parse("8M"), MoveSource.Parse("7M")],
                 [MoveId.AerialAce] = [MoveSource.Parse("7M")],
                 [MoveId.AllySwitch] = [MoveSource.Parse("8M"), MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L30"), MoveSource.Parse("7L36")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("7M")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M"), MoveSource.Parse("8M"), MoveSource.Parse("7E")],
                 [MoveId.BugBite] = [MoveSource.Parse("9M"), MoveSource.Parse("7T")],
@@ -9309,7 +9296,6 @@ public partial record Learnsets
                 [MoveId.AerialAce] = [MoveSource.Parse("7M")],
                 [MoveId.Agility] = [MoveSource.Parse("9M")],
                 [MoveId.AllySwitch] = [MoveSource.Parse("8M"), MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L32"), MoveSource.Parse("7L42")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("7M")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
                 [MoveId.BugBite] = [MoveSource.Parse("9M"), MoveSource.Parse("7T")],
@@ -9387,7 +9373,6 @@ public partial record Learnsets
                 [MoveId.Acrobatics] = [MoveSource.Parse("7M")],
                 [MoveId.AerialAce] = [MoveSource.Parse("7M")],
                 [MoveId.AllySwitch] = [MoveSource.Parse("7T")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L42"), MoveSource.Parse("7S0")],
                 [MoveId.Attract] = [MoveSource.Parse("7M")],
                 [MoveId.BugBite] = [MoveSource.Parse("7T")],
                 [MoveId.BugBuzz] = [MoveSource.Parse("7L28"), MoveSource.Parse("7S0")],

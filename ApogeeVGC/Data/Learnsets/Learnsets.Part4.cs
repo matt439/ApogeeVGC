@@ -5836,7 +5836,6 @@ public partial record Learnsets
                 [MoveId.Agility] = [MoveSource.Parse("9M")],
                 [MoveId.AirCutter] = [MoveSource.Parse("4T")],
                 [MoveId.AirSlash] = [MoveSource.Parse("9M"), MoveSource.Parse("9L28"), MoveSource.Parse("8M"), MoveSource.Parse("8L28"), MoveSource.Parse("7L37"), MoveSource.Parse("6L37"), MoveSource.Parse("5L37")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L24")],
                 [MoveId.Assurance] = [MoveSource.Parse("8M")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("7M"), MoveSource.Parse("6M"), MoveSource.Parse("5M"), MoveSource.Parse("4M")],
                 [MoveId.BugBite] = [MoveSource.Parse("9M"), MoveSource.Parse("9L1"), MoveSource.Parse("8L1"), MoveSource.Parse("7T"), MoveSource.Parse("6T"), MoveSource.Parse("5T"), MoveSource.Parse("4T")],
@@ -6103,7 +6102,6 @@ public partial record Learnsets
         {
             LearnsetData = new Dictionary<MoveId, List<MoveSource>>
             {
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8E"), MoveSource.Parse("7E"), MoveSource.Parse("6E"), MoveSource.Parse("5E"), MoveSource.Parse("4E")],
                 [MoveId.Attract] = [MoveSource.Parse("8M"), MoveSource.Parse("7M"), MoveSource.Parse("6M"), MoveSource.Parse("5M"), MoveSource.Parse("4M")],
                 [MoveId.BulletSeed] = [MoveSource.Parse("8M"), MoveSource.Parse("5D"), MoveSource.Parse("4M")],
                 [MoveId.Confide] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],
@@ -10201,7 +10199,6 @@ public partial record Learnsets
             {
                 [MoveId.AirCutter] = [MoveSource.Parse("9M"), MoveSource.Parse("4T")],
                 [MoveId.AirSlash] = [MoveSource.Parse("9M"), MoveSource.Parse("9L64"), MoveSource.Parse("7L64"), MoveSource.Parse("6L64"), MoveSource.Parse("6S3"), MoveSource.Parse("5L64"), MoveSource.Parse("4L64")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("7L64"), MoveSource.Parse("6L64"), MoveSource.Parse("6S4"), MoveSource.Parse("5L64"), MoveSource.Parse("4L64"), MoveSource.Parse("4S0")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M")],
                 [MoveId.BulletSeed] = [MoveSource.Parse("9M"), MoveSource.Parse("4M")],
                 [MoveId.Confide] = [MoveSource.Parse("7M"), MoveSource.Parse("6M")],

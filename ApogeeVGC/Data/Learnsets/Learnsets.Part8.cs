@@ -580,7 +580,6 @@ public partial record Learnsets
             {
                 [MoveId.Agility] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
                 [MoveId.AllySwitch] = [MoveSource.Parse("8M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L40")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
                 [MoveId.BodyPress] = [MoveSource.Parse("9M")],
                 [MoveId.BulletSeed] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
@@ -665,7 +664,6 @@ public partial record Learnsets
             {
                 [MoveId.Agility] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
                 [MoveId.AllySwitch] = [MoveSource.Parse("8M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L40")],
                 [MoveId.Assurance] = [MoveSource.Parse("8M")],
                 [MoveId.Avalanche] = [MoveSource.Parse("9M"), MoveSource.Parse("9L1"), MoveSource.Parse("8M"), MoveSource.Parse("8L1")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
@@ -789,7 +787,6 @@ public partial record Learnsets
             {
                 [MoveId.Agility] = [MoveSource.Parse("9M"), MoveSource.Parse("9L1"), MoveSource.Parse("8M"), MoveSource.Parse("8L1"), MoveSource.Parse("8S0")],
                 [MoveId.AllySwitch] = [MoveSource.Parse("8M")],
-                [MoveId.Aromatherapy] = [MoveSource.Parse("8L40")],
                 [MoveId.Assurance] = [MoveSource.Parse("8M")],
                 [MoveId.BatonPass] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
                 [MoveId.BodySlam] = [MoveSource.Parse("9M"), MoveSource.Parse("8M")],
