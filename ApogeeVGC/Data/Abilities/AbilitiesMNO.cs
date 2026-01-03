@@ -696,7 +696,7 @@ public partial record Abilities
                     if (pokemon.Status == ConditionId.None) return;
 
                     // If pokemon.ShowCure is undefined, it was skipped because its ability is known
-                    if (pokemon.ShowCure == null) pokemon.ShowCure = true;
+                    pokemon.ShowCure ??= true;
 
                     if (pokemon.ShowCure == true)
                     {
