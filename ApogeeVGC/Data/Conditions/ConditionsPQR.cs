@@ -846,6 +846,16 @@ public partial record Conditions
                 // Petal Dance uses the LockedMove condition mechanics
                 // This is a marker for the specific move
             },
+            [ConditionId.PhantomForce] = new()
+            {
+                Id = ConditionId.PhantomForce,
+                Name = "Phantom Force",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.PhantomForce,
+                Duration = 2,
+                OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
+                    BoolIntEmptyVoidUnion.FromBool(false)),
+            },
             [ConditionId.Safeguard] = new()
             {
                 Id = ConditionId.Safeguard,

@@ -18,38 +18,6 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
-            [ConditionId.Yawn] = new()
-            {
-                Id = ConditionId.Yawn,
-                Name = "Yawn",
-                AssociatedMove = MoveId.Yawn,
-                EffectType = EffectType.Condition,
-                NoCopy = true, // doesn't get copied by Baton Pass
-                Duration = 2,
-                OnStart = new OnStartEventInfo((battle, target, source, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", target, "move: Yawn", $"[of] {source}");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
-                {
-                    // Yawn resolves at the end of the turn after it was applied
-                }, 23),
-                OnEnd = new OnEndEventInfo((battle, target) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", target, "move: Yawn", "[silent]");
-                    }
-
-                    // Try to set sleep status
-                    target.TrySetStatus(ConditionId.Sleep, battle.EffectState.Source);
-                }),
-            },
             [ConditionId.Wish] = new()
             {
                 Id = ConditionId.Wish,
@@ -94,7 +62,39 @@ public partial record Conditions
                     }
                 }),
             },
-            [ConditionId.ZenMode] = new()
+            [ConditionId.Yawn] = new()
+            {
+                Id = ConditionId.Yawn,
+                Name = "Yawn",
+                AssociatedMove = MoveId.Yawn,
+                EffectType = EffectType.Condition,
+                NoCopy = true, // doesn't get copied by Baton Pass
+                Duration = 2,
+                OnStart = new OnStartEventInfo((battle, target, source, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "move: Yawn", $"[of] {source}");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                {
+                    // Yawn resolves at the end of the turn after it was applied
+                }, 23),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "move: Yawn", "[silent]");
+                    }
+
+                            // Try to set sleep status
+                            target.TrySetStatus(ConditionId.Sleep, battle.EffectState.Source);
+                        }),
+                    },
+                    [ConditionId.ZenMode] = new()
             {
                 Id = ConditionId.ZenMode,
                 Name = "Zen Mode",

@@ -23,6 +23,24 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
+            [ConditionId.DefenseCurl] = new()
+            {
+                Id = ConditionId.DefenseCurl,
+                Name = "Defense Curl",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.DefenseCurl,
+                NoCopy = true,
+                // This is a marker condition used by Rollout and Ice Ball to double their damage
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Defense Curl");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+            },
             [ConditionId.DragonCheer] = new()
             {
                 Id = ConditionId.DragonCheer,
@@ -157,27 +175,9 @@ public partial record Conditions
                     {
                         battle.Add("-fieldend", "move: Electric Terrain");
                     }
-                }),
-            },
-            [ConditionId.DefenseCurl] = new()
-            {
-                Id = ConditionId.DefenseCurl,
-                Name = "Defense Curl",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.DefenseCurl,
-                NoCopy = true,
-                // This is a marker condition used by Rollout and Ice Ball to double their damage
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", pokemon, "move: Defense Curl");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-            },
-            [ConditionId.Detect] = new()
+                    }),
+                },
+                [ConditionId.Detect] = new()
             {
                 Id = ConditionId.Detect,
                 Name = "Detect",

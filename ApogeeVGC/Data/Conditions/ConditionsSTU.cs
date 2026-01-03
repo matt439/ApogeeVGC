@@ -89,19 +89,9 @@ public partial record Conditions
 
                         return false;
                     },
-                    10),
-            },
-            [ConditionId.PhantomForce] = new()
-            {
-                Id = ConditionId.PhantomForce,
-                Name = "Phantom Force",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.PhantomForce,
-                Duration = 2,
-                OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
-                    BoolIntEmptyVoidUnion.FromBool(false)),
-            },
-            [ConditionId.ShadowForce] = new()
+                            10),
+                    },
+                    [ConditionId.ShadowForce] = new()
             {
                 Id = ConditionId.ShadowForce,
                 Name = "Shadow Force",
@@ -916,6 +906,77 @@ public partial record Conditions
                     }
 
                     return spe;
+                }),
+            },
+            [ConditionId.Uproar] = new()
+            {
+                Id = ConditionId.Uproar,
+                Name = "Uproar",
+                AssociatedMove = MoveId.Uproar,
+                EffectType = EffectType.Condition,
+                Duration = 3,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Uproar");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                {
+                    // Check if pokemon has ThroatChop volatile - if so, remove uproar
+                    if (target.Volatiles.ContainsKey(ConditionId.ThroatChop))
+                    {
+                        target.RemoveVolatile(_library.Conditions[ConditionId.Uproar]);
+                        return;
+                    }
+
+                    // Check if last move was Struggle - if so, don't lock (end the volatile)
+                    if (target.LastMove is { Id: MoveId.Struggle })
+                    {
+                        target.DeleteVolatile(ConditionId.Uproar);
+                        return;
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "Uproar", "[upkeep]");
+                    }
+                }, 28, 1),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Uproar");
+                    }
+                }),
+                // Lock the Pokemon into using Uproar
+                OnLockMove =
+                    new OnLockMoveEventInfo(
+                        (Func<Battle, Pokemon, MoveIdVoidUnion>)((_, _) => MoveId.Uproar)),
+                // Prevent sleep on all Pokemon while Uproar is active
+                OnAnySetStatus = new OnAnySetStatusEventInfo((battle, status, pokemon, _, _) =>
+                {
+                    if (status.Id == ConditionId.Sleep)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            if (pokemon == battle.EffectState.Target)
+                            {
+                                battle.Add("-fail", pokemon, "slp", "[from] Uproar", "[msg]");
+                            }
+                            else
+                            {
+                                battle.Add("-fail", pokemon, "slp", "[from] Uproar");
+                            }
+                        }
+
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    return BoolVoidUnion.FromVoid();
                 }),
             },
             [ConditionId.SaltCure] = new()

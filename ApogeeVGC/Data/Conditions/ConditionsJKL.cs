@@ -21,6 +21,69 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
+            [ConditionId.IceBall] = new()
+            {
+                Id = ConditionId.IceBall,
+                Name = "Ice Ball",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.IceBall,
+                // Ice Ball uses LockedMove for the locking behavior and RolloutStorage for damage scaling
+                // This is just a marker condition
+            },
+            [ConditionId.KingsShield] = new()
+            {
+                Id = ConditionId.KingsShield,
+                Name = "King's Shield",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.KingsShield,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Protect");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
+                    {
+                        // G-Max moves not in Gen 9 VGC, omit check
+                        // Z/Max moves not in Gen 9 VGC, omit zBrokeProtect
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+
+                    // Check for lockedmove volatile and reset Outrage counter
+                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
+                            out EffectState? lockedMove))
+                    {
+                        if (lockedMove.Duration == 2)
+                        {
+                            source.DeleteVolatile(ConditionId.LockedMove);
+                        }
+                    }
+
+                    // If move makes contact, lower attacker's Attack by 1
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        battle.Boost(new SparseBoostsTable { Atk = -1 }, source, target,
+                            _library.Conditions[ConditionId.KingsShield]);
+                    }
+
+                    return new Empty(); // NOT_FAIL equivalent
+                }, 3),
+            },
             [ConditionId.LaserFocus] = new()
             {
                 Id = ConditionId.LaserFocus,
@@ -270,100 +333,9 @@ public partial record Conditions
                             return state.Move.Value;
                         }
 
-                        return MoveIdVoidUnion.FromVoid();
-                    })),
-            },
-            [ConditionId.KingsShield] = new()
-            {
-                Id = ConditionId.KingsShield,
-                Name = "King's Shield",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.KingsShield,
-                Duration = 1,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-singleturn", target, "Protect");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                {
-                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
-                    {
-                        // G-Max moves not in Gen 9 VGC, omit check
-                        // Z/Max moves not in Gen 9 VGC, omit zBrokeProtect
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    if (move.SmartTarget ?? false)
-                    {
-                        move.SmartTarget = false;
-                    }
-                    else if (battle.DisplayUi)
-                    {
-                        battle.Add("-activate", target, "move: Protect");
-                    }
-
-                    // Check for lockedmove volatile and reset Outrage counter
-                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
-                            out EffectState? lockedMove))
-                    {
-                        if (lockedMove.Duration == 2)
-                        {
-                            source.DeleteVolatile(ConditionId.LockedMove);
+                                                return MoveIdVoidUnion.FromVoid();
+                                            })),
+                                    },
+                                };
+                            }
                         }
-                    }
-
-                    // If move makes contact, lower attacker's Attack by 1
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        battle.Boost(new SparseBoostsTable { Atk = -1 }, source, target,
-                            _library.Conditions[ConditionId.KingsShield]);
-                    }
-
-                    return new Empty(); // NOT_FAIL equivalent
-                }, 3),
-            },
-            [ConditionId.Metronome] = new()
-            {
-                Id = ConditionId.Metronome,
-                Name = "Metronome",
-                EffectType = EffectType.Condition,
-                // Marker condition for Metronome item boost tracking
-                // Actual logic is in the item handler
-            },
-            [ConditionId.MicleBerry] = new()
-            {
-                Id = ConditionId.MicleBerry,
-                Name = "Micle Berry",
-                EffectType = EffectType.Condition,
-                Duration = 2,
-                OnSourceAccuracy =
-                    new OnSourceAccuracyEventInfo((battle, accuracy, _, source, move) =>
-                    {
-                        // Don't modify accuracy for OHKO moves
-                        if (move.Ohko is not null)
-                        {
-                            return IntBoolVoidUnion.FromVoid();
-                        }
-
-                        // Announce the berry was consumed
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-enditem", source, "Micle Berry");
-                        }
-
-                        // Remove the volatile from the source (the attacker)
-                        source.RemoveVolatile(_library.Conditions[ConditionId.MicleBerry]);
-
-                        // Multiply accuracy by 1.2 (4915/4096)
-                        battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(accuracy);
-                    }),
-            },
-        };
-    }
-}

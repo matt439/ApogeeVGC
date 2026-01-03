@@ -57,19 +57,10 @@ public partial record Conditions
                     if (ability.Flags.CantSuppress ?? false)
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.GastroAcid]);
-                    }
-                }),
-            },
-            [ConditionId.IceBall] = new()
-            {
-                Id = ConditionId.IceBall,
-                Name = "Ice Ball",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.IceBall,
-                // Ice Ball uses LockedMove for the locking behavior and RolloutStorage for damage scaling
-                // This is just a marker condition
-            },
-            [ConditionId.Imprison] = new()
+                            }
+                        }),
+                    },
+                    [ConditionId.Imprison] = new()
             {
                 Id = ConditionId.Imprison,
                 Name = "Imprison",
