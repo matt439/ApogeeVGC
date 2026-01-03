@@ -129,7 +129,7 @@ public partial record Items
                     (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
-                            if (source.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
                                 return BoolVoidUnion.FromBool(false);
                             }
@@ -188,7 +188,7 @@ public partial record Items
                     (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
-                            if (source.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
                                 return BoolVoidUnion.FromBool(false);
                             }
@@ -257,7 +257,7 @@ public partial record Items
                     (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
-                            if (source.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
                                 return BoolVoidUnion.FromBool(false);
                             }
@@ -578,7 +578,7 @@ public partial record Items
                     (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
-                            if (source.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
+                            if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
                                 return BoolVoidUnion.FromBool(false);
                             }
