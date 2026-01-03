@@ -193,6 +193,7 @@ public partial record Items
                 Name = "Mental Herb",
                 SpriteNum = 285,
                 Fling = new FlingData { BasePower = 10 },
+                // TODO: Fling effect handler needs custom logic to cure conditions on target
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
                     var conditions = new[]
@@ -207,15 +208,12 @@ public partial record Items
                             if (!pokemon.UseItem()) return;
                             foreach (ConditionId secondCondition in conditions)
                             {
-                                if (pokemon.Volatiles.ContainsKey(secondCondition))
+                                pokemon.RemoveVolatile(_library.Conditions[secondCondition]);
+                                if (firstCondition == ConditionId.Attract &&
+                                    secondCondition == ConditionId.Attract)
                                 {
-                                    pokemon.RemoveVolatile(_library.Conditions[secondCondition]);
-                                    if (firstCondition == ConditionId.Attract &&
-                                        secondCondition == ConditionId.Attract)
-                                    {
-                                        battle.Add("-end", pokemon, "move: Attract",
-                                            "[from] item: Mental Herb");
-                                    }
+                                    battle.Add("-end", pokemon, "move: Attract",
+                                        "[from] item: Mental Herb");
                                 }
                             }
 
