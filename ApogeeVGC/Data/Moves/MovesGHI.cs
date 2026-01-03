@@ -740,6 +740,16 @@ public partial record Moves
                 Flags = new MoveFlags { BypassSub = true, Metronome = true },
                 Target = MoveTarget.All,
                 Type = MoveType.Ice,
+                OnHitField = new OnHitFieldEventInfo((battle, _, _, _) =>
+                {
+                    battle.Add("-clearallboost");
+                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    {
+                        pokemon.ClearBoosts();
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Headbutt] = new()
             {
@@ -794,6 +804,41 @@ public partial record Moves
                 },
                 Target = MoveTarget.AllyTeam,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    battle.Add("-activate", source, "move: Heal Bell");
+                    bool success = false;
+
+                    List<Pokemon> allies = [..target.Side.Pokemon];
+
+                    foreach (Pokemon ally in allies)
+                    {
+                        // Check if ally has ability immunity (except if source)
+                        if (ally != source && !battle.SuppressingAbility(ally))
+                        {
+                            if (ally.HasAbility(AbilityId.Soundproof))
+                            {
+                                battle.Add("-immune", ally, "[from] ability: Soundproof");
+                                continue;
+                            }
+
+                            if (ally.HasAbility(AbilityId.GoodAsGold))
+                            {
+                                battle.Add("-immune", ally, "[from] ability: Good as Gold");
+                                continue;
+                            }
+                        }
+
+                        if (ally.CureStatus()) success = true;
+                    }
+
+                    if (success)
+                    {
+                        return new VoidReturn();
+                    }
+
+                    return false;
+                }),
             },
             [MoveId.HealingWish] = new()
             {
@@ -806,9 +851,22 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Heal = true, Metronome = true },
-                SelfSwitch = true,
+                SelfDestruct = MoveSelfDestruct.FromIfHit(),
+                // TODO: Implement full HealingWish slot condition that heals and clears status on switch-in
+                // SlotCondition = ConditionId.HealingWish,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
+                OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>
+                {
+                    if (battle.CanSwitch(source.Side) == 0)
+                    {
+                        battle.AttrLastMove("[still]");
+                        battle.Add("-fail", source);
+                        return null; // NOT_FAIL equivalent
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.HeartSwap] = new()
             {
@@ -827,6 +885,36 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    // Store both Pokemon's boosts
+                    SparseBoostsTable targetBoosts = new()
+                    {
+                        Atk = target.Boosts.Atk,
+                        Def = target.Boosts.Def,
+                        SpA = target.Boosts.SpA,
+                        SpD = target.Boosts.SpD,
+                        Spe = target.Boosts.Spe,
+                        Accuracy = target.Boosts.Accuracy,
+                        Evasion = target.Boosts.Evasion,
+                    };
+                    SparseBoostsTable sourceBoosts = new()
+                    {
+                        Atk = source.Boosts.Atk,
+                        Def = source.Boosts.Def,
+                        SpA = source.Boosts.SpA,
+                        SpD = source.Boosts.SpD,
+                        Spe = source.Boosts.Spe,
+                        Accuracy = source.Boosts.Accuracy,
+                        Evasion = source.Boosts.Evasion,
+                    };
+
+                    target.SetBoost(sourceBoosts);
+                    source.SetBoost(targetBoosts);
+
+                    battle.Add("-swapboost", source, target, "[from] move: Heart Swap");
+                    return new VoidReturn();
+                }),
             },
             [MoveId.HeatCrash] = new()
             {
@@ -1067,7 +1155,7 @@ public partial record Moves
                     if (!success)
                     {
                         battle.Add("-fail", target, "heal");
-                        return false;
+                        return null; // NOT_FAIL equivalent
                     }
 
                     return new VoidReturn();
@@ -1118,6 +1206,20 @@ public partial record Moves
                 Num = 506,
                 Accuracy = 100,
                 BasePower = 65,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, move) =>
+                {
+                    if (target.Status != null || target.HasAbility(AbilityId.Comatose))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("BP doubled from status condition");
+                        }
+
+                        return move.BasePower * 2;
+                    }
+
+                    return move.BasePower;
+                }),
                 Category = MoveCategory.Special,
                 Name = "Hex",
                 BasePp = 10,
@@ -1239,7 +1341,8 @@ public partial record Moves
                 BasePp = 40,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Sound = true, Metronome = true },
-                Target = MoveTarget.AllySide,
+                Boosts = new SparseBoostsTable { Atk = 1 },
+                Target = MoveTarget.Allies,
                 Type = MoveType.Normal,
             },
             [MoveId.Hurricane] = new()
@@ -1260,6 +1363,24 @@ public partial record Moves
                     Wind = true,
                     Metronome = true,
                 },
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, target) =>
+                {
+                    if (target != null)
+                    {
+                        ConditionId effectiveWeather = target.EffectiveWeather();
+                        switch (effectiveWeather)
+                        {
+                            case ConditionId.RainDance:
+                            case ConditionId.PrimordialSea:
+                                move.Accuracy = IntTrueUnion.FromTrue();
+                                break;
+                            case ConditionId.SunnyDay:
+                            case ConditionId.DesolateLand:
+                                move.Accuracy = 50;
+                                break;
+                        }
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -1385,7 +1506,7 @@ public partial record Moves
                 Name = "Hyperspace Fury",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Mirror = true, BypassSub = true },
+                Flags = new MoveFlags { Mirror = true, BypassSub = true, NoSketch = true },
                 BreaksProtect = true,
                 Self = new SecondaryEffect
                 {
@@ -1393,6 +1514,30 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
+                OnTry = new OnTryEventInfo((battle, _, source, _) =>
+                {
+                    if (source.Species.Name == "Hoopa-Unbound")
+                    {
+                        return new VoidReturn();
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Hint(
+                            "Only a Pokemon whose form is Hoopa Unbound can use this move.");
+                        if (source.Species.Name == "Hoopa")
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.Add("-fail", source, "move: Hyperspace Fury", "[forme]");
+                            return null;
+                        }
+
+                        battle.AttrLastMove("[still]");
+                        battle.Add("-fail", source, "move: Hyperspace Fury");
+                    }
+
+                    return null;
+                }),
             },
             [MoveId.HyperspaceHole] = new()
             {
@@ -1517,6 +1662,22 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
+                OnAfterHit = new OnAfterHitEventInfo((battle, _, source, _) =>
+                {
+                    if (source.Hp > 0)
+                    {
+                        battle.Field.ClearTerrain();
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, _, source, _) =>
+                {
+                    if (source.Hp > 0)
+                    {
+                        battle.Field.ClearTerrain();
+                    }
+                }),
             },
             [MoveId.InfernalParade] = new()
             {
@@ -1524,6 +1685,15 @@ public partial record Moves
                 Num = 844,
                 Accuracy = 100,
                 BasePower = 60,
+                BasePowerCallback = new BasePowerCallbackEventInfo((_, _, target, move) =>
+                {
+                    if (target.Status != null || target.HasAbility(AbilityId.Comatose))
+                    {
+                        return move.BasePower * 2;
+                    }
+
+                    return move.BasePower;
+                }),
                 Category = MoveCategory.Special,
                 Name = "Infernal Parade",
                 BasePp = 15,
@@ -1554,6 +1724,49 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    // Check if target has a last move
+                    if (target.LastMove == null)
+                    {
+                        return false;
+                    }
+
+                    Move lastMove = target.LastMove;
+                    MoveSlot? moveSlot = target.GetMoveData(lastMove.Id);
+
+                    // Check various fail conditions
+                    if ((lastMove.Flags.FailInstruct ?? false) ||
+                        (lastMove.Flags.Charge ?? false) ||
+                        (lastMove.Flags.Recharge ?? false) ||
+                        target.Volatiles.ContainsKey(ConditionId.FocusPunch) ||
+                        moveSlot is { Pp: <= 0 })
+                    {
+                        return false;
+                    }
+
+                    battle.Add("-singleturn", target, "move: Instruct", $"[of] {source}");
+
+                    // Create a move action for the target to use their last move
+                    MoveAction instructedAction = new()
+                    {
+                        Choice = ActionId.Move,
+                        Pokemon = target,
+                        Move = lastMove,
+                        TargetLoc = target.LastMoveTargetLoc ?? 0,
+                        Order = 200,
+                        OriginalTarget = target,
+                    };
+
+                    var resolvedActions = battle.Queue.ResolveAction(instructedAction);
+                    if (resolvedActions.Count > 0 && resolvedActions[0] is MoveAction ma)
+                    {
+                        battle.Queue.PrioritizeAction(ma,
+                            _library.Moves[MoveId.Instruct].ToActiveMove());
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.IronTail] = new()
             {
@@ -1585,10 +1798,28 @@ public partial record Moves
                 Name = "Ivy Cudgel",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true },
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 CritRatio = 2,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
+                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
+                {
+                    switch (pokemon.Species.Name)
+                    {
+                        case "Ogerpon-Wellspring":
+                        case "Ogerpon-Wellspring-Tera":
+                            move.Type = MoveType.Water;
+                            break;
+                        case "Ogerpon-Hearthflame":
+                        case "Ogerpon-Hearthflame-Tera":
+                            move.Type = MoveType.Fire;
+                            break;
+                        case "Ogerpon-Cornerstone":
+                        case "Ogerpon-Cornerstone-Tera":
+                            move.Type = MoveType.Rock;
+                            break;
+                    }
+                }),
             },
         };
     }
