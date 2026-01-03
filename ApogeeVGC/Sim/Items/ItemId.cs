@@ -54,8 +54,6 @@ public enum ItemId
     // D items
     DampRock,
     DawnStone,
-    DeepSeaScale,
-    DeepSeaTooth,
     DestinyKnot,
     DiveBall,
     DracoPlate,
@@ -132,9 +130,7 @@ public enum ItemId
     // L items
     LaggingTail,
     LansatBerry,
-    LaxIncense,
     LeafStone,
-    Leek,
     Leftovers,
     LeppaBerry,
     LevelBall,
@@ -145,7 +141,6 @@ public enum ItemId
     LoadedDice,
     LoveBall,
     LoveSweet,
-    LuckyPunch,
     LumBerry,
     LuminousMoss,
     LureBall,

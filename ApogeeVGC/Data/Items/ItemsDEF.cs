@@ -42,46 +42,6 @@ public partial record Items
                 Num = 109,
                 Gen = 4,
             },
-            [ItemId.DeepSeaScale] = new()
-            {
-                Id = ItemId.DeepSeaScale,
-                Name = "Deep Sea Scale",
-                SpriteNum = 93,
-                Fling = new FlingData { BasePower = 30 },
-                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
-                {
-                    if (pokemon.BaseSpecies.Id == SpecieId.Clamperl)
-                    {
-                        battle.ChainModify(2);
-                        return battle.FinalModify(spd);
-                    }
-
-                    return spd;
-                }, 2),
-                Num = 227,
-                Gen = 3,
-                // IsNonstandard = "Past"
-            },
-            [ItemId.DeepSeaTooth] = new()
-            {
-                Id = ItemId.DeepSeaTooth,
-                Name = "Deep Sea Tooth",
-                SpriteNum = 94,
-                Fling = new FlingData { BasePower = 90 },
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
-                {
-                    if (pokemon.BaseSpecies.Id == SpecieId.Clamperl)
-                    {
-                        battle.ChainModify(2);
-                        return battle.FinalModify(spa);
-                    }
-
-                    return spa;
-                }, 1),
-                Num = 226,
-                Gen = 3,
-                // IsNonstandard = "Past"
-            },
             [ItemId.DestinyKnot] = new()
             {
                 Id = ItemId.DestinyKnot,

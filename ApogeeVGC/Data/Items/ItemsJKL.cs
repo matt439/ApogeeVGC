@@ -223,23 +223,6 @@ public partial record Items
                 Num = 206,
                 Gen = 3,
             },
-            [ItemId.LaxIncense] = new()
-            {
-                Id = ItemId.LaxIncense,
-                Name = "Lax Incense",
-                SpriteNum = 240,
-                Fling = new FlingData { BasePower = 10 },
-                OnModifyAccuracy = new OnModifyAccuracyEventInfo(
-                    (battle, accuracy, _, _, _) =>
-                    {
-                        battle.Debug("lax incense - decreasing accuracy");
-                        battle.ChainModify([3686, 4096]);
-                        return battle.FinalModify(accuracy);
-                    }, -2),
-                Num = 255,
-                Gen = 3,
-                // IsNonstandard = "Past", // Not supported in Item class
-            },
             [ItemId.LeafStone] = new()
             {
                 Id = ItemId.LeafStone,
@@ -248,28 +231,6 @@ public partial record Items
                 Fling = new FlingData { BasePower = 30 },
                 Num = 85,
                 Gen = 1,
-            },
-            [ItemId.Leek] = new()
-            {
-                Id = ItemId.Leek,
-                Name = "Leek",
-                SpriteNum = 475,
-                Fling = new FlingData { BasePower = 60 },
-                OnModifyCritRatio =
-                    new OnModifyCritRatioEventInfo((_, critRatio, user, _, _) =>
-                    {
-                        // Check for Farfetch'd and Sirfetch'd species (including Galarian forme)
-                        SpecieId baseSpecies = user.BaseSpecies.BaseSpecies;
-                        if (baseSpecies is SpecieId.Farfetchd or SpecieId.Sirfetchd)
-                        {
-                            return critRatio + 2;
-                        }
-
-                        return critRatio;
-                    }),
-                Num = 259,
-                Gen = 8,
-                // IsNonstandard = "Past", // Not supported in Item class
             },
             [ItemId.Leftovers] = new()
             {
@@ -467,26 +428,6 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 Num = 1110,
                 Gen = 8,
-            },
-            [ItemId.LuckyPunch] = new()
-            {
-                Id = ItemId.LuckyPunch,
-                Name = "Lucky Punch",
-                SpriteNum = 261,
-                Fling = new FlingData { BasePower = 40 },
-                OnModifyCritRatio =
-                    new OnModifyCritRatioEventInfo((_, critRatio, user, _, _) =>
-                    {
-                        if (user.BaseSpecies.Id == SpecieId.Chansey)
-                        {
-                            return critRatio + 2;
-                        }
-
-                        return critRatio;
-                    }),
-                Num = 256,
-                Gen = 2,
-                // IsNonstandard = "Past", // Not supported in Item class
             },
             [ItemId.LumBerry] = new()
             {
