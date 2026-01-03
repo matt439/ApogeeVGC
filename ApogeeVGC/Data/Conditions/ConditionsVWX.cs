@@ -1,7 +1,6 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
@@ -143,21 +142,6 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.WonderRoom,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((battle, _, source, _) =>
-                {
-                    if (source != null && source.HasAbility(AbilityId.Persistent))
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-activate", source, "ability: Persistent",
-                                "[move] Wonder Room");
-                        }
-
-                        return 7;
-                    }
-
-                    return 5;
-                }),
                 // Wonder Room's defensive stat swapping is implemented in Pokemon.CalculateStat():
                 // When Wonder Room is active, Defense and Special Defense stat VALUES are swapped
                 // BEFORE any calculations. This affects all damage calculations.
@@ -189,17 +173,9 @@ public partial record Conditions
                 }),
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
                 {
-                    if (battle.DisplayUi)
+                    if (battle.DisplayUi && source != null)
                     {
-                        if (source != null && source.HasAbility(AbilityId.Persistent))
-                        {
-                            battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}",
-                                "[persistent]");
-                        }
-                        else
-                        {
-                            battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}");
-                        }
+                        battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}");
                     }
                 }),
                 OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>

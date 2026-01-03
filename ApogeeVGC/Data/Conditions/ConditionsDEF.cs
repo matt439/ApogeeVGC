@@ -830,8 +830,7 @@ public partial record Conditions
                 }),
                 OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
                 {
-                    if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status &&
-                        move.Id != MoveId.PolarFlare)
+                    if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status)
                     {
                         target.CureStatus();
                     }

@@ -26,7 +26,6 @@ public enum MoveId
     HeavySlam,
     LowKick,
     WildCharge,
-    PolarFlare,
     AxeKick,
     Yawn,
     BellyDrum,

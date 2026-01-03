@@ -35,7 +35,6 @@ public enum ItemId
     Charcoal,
     ChartiBerry,
     CheriBerry,
-    CherishBall,
     ChestoBerry,
     ChilanBerry,
     ChippedPot,
@@ -188,7 +187,6 @@ public enum ItemId
 
     // P items
     PamtreBerry,
-    ParkBall,
     PasshoBerry,
     PayapaBerry,
     PechaBerry,
@@ -264,7 +262,6 @@ public enum ItemId
     StarSweet,
     Stick,
     StonePlate,
-    StrangeBall,
     StrawberrySweet,
     SunStone,
     SweetApple,

@@ -863,21 +863,6 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Safeguard,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((battle, _, source, _) =>
-                {
-                    if (source != null && source.HasAbility(AbilityId.Persistent))
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-activate", source, "ability: Persistent",
-                                "[move] Safeguard");
-                        }
-
-                        return 7;
-                    }
-
-                    return 5;
-                }),
                 OnSetStatus = new OnSetStatusEventInfo((battle, _, target, source, effect) =>
                 {
                     if (effect == null || source == null || effect is Condition
@@ -935,14 +920,7 @@ public partial record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        if (source != null && source.HasAbility(AbilityId.Persistent))
-                        {
-                            battle.Add("-sidestart", side, "Safeguard", "[persistent]");
-                        }
-                        else
-                        {
-                            battle.Add("-sidestart", side, "Safeguard");
-                        }
+                        battle.Add("-sidestart", side, "Safeguard");
                     }
                 }),
                 OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })

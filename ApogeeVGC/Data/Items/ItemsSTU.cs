@@ -640,16 +640,6 @@ public partial record Items
                 Num = 309,
                 Gen = 4,
             },
-            [ItemId.StrangeBall] = new()
-            {
-                Id = ItemId.StrangeBall,
-                Name = "Strange Ball",
-                SpriteNum = 308,
-                Num = 1785,
-                Gen = 8,
-                IsPokeball = true,
-                // IsNonstandard = "Unobtainable",
-            },
             [ItemId.StrawberrySweet] = new()
             {
                 Id = ItemId.StrawberrySweet,

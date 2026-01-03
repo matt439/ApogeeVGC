@@ -689,16 +689,6 @@ public partial record Items
                 Num = 149,
                 Gen = 3,
             },
-            [ItemId.CherishBall] = new()
-            {
-                Id = ItemId.CherishBall,
-                Name = "Cherish Ball",
-                SpriteNum = 64,
-                IsPokeball = true,
-                Num = 16,
-                Gen = 4,
-                // IsNonstandard = "Unobtainable", // Event-only but valid in Gen 9
-            },
             [ItemId.ChestoBerry] = new()
             {
                 Id = ItemId.ChestoBerry,

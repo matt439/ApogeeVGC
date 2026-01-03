@@ -171,7 +171,6 @@ public enum AbilityId
     ParentalBond,
     PastelVeil,
     PerishBody,
-    Persistent,
     Pickpocket,
     Pickup,
     Pixilate,

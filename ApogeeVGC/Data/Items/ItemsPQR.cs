@@ -35,16 +35,6 @@ public partial record Items
                 Gen = 3,
                 // IsNonstandard = "Past",
             },
-            [ItemId.ParkBall] = new()
-            {
-                Id = ItemId.ParkBall,
-                Name = "Park Ball",
-                SpriteNum = 325,
-                Num = 500,
-                Gen = 4,
-                IsPokeball = true,
-                // IsNonstandard = "Unobtainable",
-            },
             [ItemId.PasshoBerry] = new()
             {
                 Id = ItemId.PasshoBerry,

@@ -217,31 +217,9 @@ public partial record Conditions
                 AssociatedMove = MoveId.Gravity,
                 EffectType = EffectType.Condition,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((battle, source, _, _) =>
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, _, _) =>
                 {
-                    if (source != null && source.HasAbility(AbilityId.Persistent))
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-activate", source, "ability: Persistent",
-                                "[move] Gravity");
-                        }
-
-                        return 7;
-                    }
-
-                    return 5;
-                }),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
-                {
-                    if (source != null && source.HasAbility(AbilityId.Persistent))
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-fieldstart", "move: Gravity", "[persistent]");
-                        }
-                    }
-                    else if (battle.DisplayUi)
+                    if (battle.DisplayUi)
                     {
                         battle.Add("-fieldstart", "move: Gravity");
                     }
