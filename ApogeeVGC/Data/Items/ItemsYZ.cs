@@ -68,7 +68,7 @@ public partial record Items
                     return basePower;
                 }, 15),
                 OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
@@ -89,10 +89,12 @@ public partial record Items
                 SpriteNum = 574,
                 Fling = new FlingData { BasePower = 10 },
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
-                    (battle, accuracy, target, _, move) =>
+                    (battle, accuracy, target, _, _) =>
                     {
-                        // Only modify if move doesn't always hit and target hasn't moved yet
-                        if (move.AlwaysHit != true && battle.Queue.WillMove(target) == null)
+                        // TS checks: typeof accuracy === 'number' && !this.queue.willMove(target)
+                        // The handler receives int accuracy (not the int|true union), so we check
+                        // if target will NOT move. The accuracy type check is implicit since we receive int.
+                        if (battle.Queue.WillMove(target) == null)
                         {
                             battle.Debug("Zoom Lens boosting accuracy");
                             battle.ChainModify([4915, 4096]);
