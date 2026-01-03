@@ -1,7 +1,6 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
@@ -25,13 +24,15 @@ public partial class Pokemon
         {
             switch (source.IgnoreImmunity)
             {
-                case BoolMoveDataIgnoreImmunity boolImmunity when boolImmunity.Value:
+                case BoolMoveDataIgnoreImmunity { Value: true }:
                     return true;
                 case TypeMoveDataIgnoreImmunity typeImmunity:
-                    if (typeImmunity.TypeImmunities.TryGetValue(source.Type.ConvertToPokemonType(), out bool ignores) && ignores)
+                    if (typeImmunity.TypeImmunities.TryGetValue(source.Type.ConvertToPokemonType(),
+                            out bool ignores) && ignores)
                     {
                         return true;
                     }
+
                     break;
             }
         }
@@ -125,6 +126,7 @@ public partial class Pokemon
                     Battle.Add("-immune", this);
                 }
             }
+
             return false;
         }
 
@@ -143,6 +145,7 @@ public partial class Pokemon
                     Battle.Add("-immune", this);
                 }
             }
+
             return false;
         }
 
@@ -174,6 +177,7 @@ public partial class Pokemon
                     Battle.Add("-immune", this);
                 }
             }
+
             return false;
         }
 
@@ -193,6 +197,7 @@ public partial class Pokemon
                     Battle.Add("-immune", this);
                 }
             }
+
             return false;
         }
 
@@ -264,7 +269,8 @@ public partial class Pokemon
         if (!negateImmunity && HasType(PokemonType.Flying))
         {
             // Exception: ???-type + Roost active means it's still grounded
-            bool roosting = HasType(PokemonType.Unknown) && Volatiles.ContainsKey(ConditionId.Roost);
+            bool roosting = HasType(PokemonType.Unknown) &&
+                            Volatiles.ContainsKey(ConditionId.Roost);
             if (!roosting)
             {
                 return false;
@@ -279,12 +285,6 @@ public partial class Pokemon
 
         // Magnet Rise makes Pokemon airborne
         if (Volatiles.ContainsKey(ConditionId.MagnetRise))
-        {
-            return false;
-        }
-
-        // Telekinesis makes Pokemon airborne
-        if (Volatiles.ContainsKey(ConditionId.Telekinesis))
         {
             return false;
         }
@@ -321,10 +321,8 @@ public partial class Pokemon
     {
         return Volatiles.ContainsKey(ConditionId.Protect) ||
                Volatiles.ContainsKey(ConditionId.Detect) ||
-               Volatiles.ContainsKey(ConditionId.KingsShield) ||
                Volatiles.ContainsKey(ConditionId.SpikyShield) ||
                Volatiles.ContainsKey(ConditionId.BanefulBunker) ||
-               Volatiles.ContainsKey(ConditionId.Obstruct) ||
                Volatiles.ContainsKey(ConditionId.SilkTrap) ||
                Volatiles.ContainsKey(ConditionId.BurningBulwark);
     }

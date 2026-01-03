@@ -355,7 +355,6 @@ public partial record Abilities
                             ConditionId.Attract,
                             ConditionId.Disable,
                             ConditionId.Encore,
-                            ConditionId.HealBlock,
                             ConditionId.Taunt,
                             ConditionId.Torment,
                         ];
@@ -1079,7 +1078,7 @@ public partial record Abilities
                     // Copy crit-boosting volatiles
                     ConditionId[] volatilesToCopy =
                     [
-                        ConditionId.DragonCheer, ConditionId.FocusEnergy, ConditionId.LaserFocus,
+                        ConditionId.DragonCheer, ConditionId.FocusEnergy,
                     ];
 
                     // Remove existing volatiles first

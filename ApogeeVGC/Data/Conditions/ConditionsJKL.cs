@@ -8,7 +8,6 @@ using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -29,87 +28,6 @@ public partial record Conditions
                 AssociatedMove = MoveId.IceBall,
                 // Ice Ball uses LockedMove for the locking behavior and RolloutStorage for damage scaling
                 // This is just a marker condition
-            },
-            [ConditionId.KingsShield] = new()
-            {
-                Id = ConditionId.KingsShield,
-                Name = "King's Shield",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.KingsShield,
-                Duration = 1,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-singleturn", target, "Protect");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                {
-                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
-                    {
-                        // G-Max moves not in Gen 9 VGC, omit check
-                        // Z/Max moves not in Gen 9 VGC, omit zBrokeProtect
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    if (move.SmartTarget ?? false)
-                    {
-                        move.SmartTarget = false;
-                    }
-                    else if (battle.DisplayUi)
-                    {
-                        battle.Add("-activate", target, "move: Protect");
-                    }
-
-                    // Check for lockedmove volatile and reset Outrage counter
-                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
-                            out EffectState? lockedMove))
-                    {
-                        if (lockedMove.Duration == 2)
-                        {
-                            source.DeleteVolatile(ConditionId.LockedMove);
-                        }
-                    }
-
-                    // If move makes contact, lower attacker's Attack by 1
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        battle.Boost(new SparseBoostsTable { Atk = -1 }, source, target,
-                            _library.Conditions[ConditionId.KingsShield]);
-                    }
-
-                    return new Empty(); // NOT_FAIL equivalent
-                }, 3),
-            },
-            [ConditionId.LaserFocus] = new()
-            {
-                Id = ConditionId.LaserFocus,
-                Name = "Laser Focus",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.LaserFocus,
-                Duration = 2,
-                NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", pokemon, "move: Laser Focus");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                // Guarantees critical hit for next move by returning max crit ratio
-                OnModifyCritRatio = new OnModifyCritRatioEventInfo((_, _, _, _, _) => 5),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", pokemon, "move: Laser Focus", "[silent]");
-                    }
-                }),
             },
             [ConditionId.LeechSeed] = new()
             {
@@ -333,9 +251,9 @@ public partial record Conditions
                             return state.Move.Value;
                         }
 
-                                                return MoveIdVoidUnion.FromVoid();
-                                            })),
-                                    },
-                                };
-                            }
-                        }
+                        return MoveIdVoidUnion.FromVoid();
+                    })),
+            },
+        };
+    }
+}

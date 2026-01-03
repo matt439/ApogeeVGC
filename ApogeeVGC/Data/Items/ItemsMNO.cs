@@ -200,7 +200,7 @@ public partial record Items
                         var conditions = new[]
                         {
                             ConditionId.Attract, ConditionId.Taunt, ConditionId.Encore,
-                            ConditionId.Torment, ConditionId.Disable, ConditionId.HealBlock
+                            ConditionId.Torment, ConditionId.Disable
                         };
                         foreach (ConditionId firstCondition in conditions)
                         {
@@ -229,7 +229,7 @@ public partial record Items
                     var conditions = new[]
                     {
                         ConditionId.Attract, ConditionId.Taunt, ConditionId.Encore,
-                        ConditionId.Torment, ConditionId.Disable, ConditionId.HealBlock
+                        ConditionId.Torment, ConditionId.Disable
                     };
                     foreach (ConditionId firstCondition in conditions)
                     {

@@ -665,18 +665,6 @@ public partial record Moves
 
                     return null;
                 }),
-                OnTryMove = new OnTryMoveEventInfo((battle, source, target, move) =>
-                {
-                    // Fail if targeting ally while under Heal Block
-                    if (source.IsAlly(target) &&
-                        source.Volatiles.ContainsKey(ConditionId.HealBlock))
-                    {
-                        battle.Add("cant", source, "move: Heal Block", move);
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
                     if (source.IsAlly(target))
@@ -956,35 +944,6 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
-            },
-            [MoveId.PowerUpPunch] = new()
-            {
-                Id = MoveId.PowerUpPunch,
-                Num = 612,
-                Accuracy = 100,
-                BasePower = 40,
-                Category = MoveCategory.Physical,
-                Name = "Power-Up Punch",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Punch = true,
-                    Metronome = true,
-                },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Self = new SecondaryEffect
-                    {
-                        Boosts = new SparseBoostsTable { Atk = 1 },
-                    },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
             },
             [MoveId.PowerWhip] = new()
             {
@@ -1355,7 +1314,7 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
-                    VolatileStatus = ConditionId.HealBlock,
+                    VolatileStatus = ConditionId.PsychicNoise,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,

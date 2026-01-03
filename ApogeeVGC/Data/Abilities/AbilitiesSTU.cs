@@ -903,12 +903,10 @@ public partial record Abilities
                     if (attacker.BaseSpecies.BaseSpecies != SpecieId.Aegislash ||
                         attacker.Transformed)
                         return;
-                    if (move.Category == MoveCategory.Status && move.Id != MoveId.KingsShield)
+                    if (move.Category == MoveCategory.Status)
                         return;
 
-                    SpecieId targetForme = move.Id == MoveId.KingsShield
-                        ? SpecieId.Aegislash
-                        : SpecieId.AegislashBlade;
+                    SpecieId targetForme = SpecieId.AegislashBlade;
 
                     if (attacker.Species.Id != targetForme)
                     {

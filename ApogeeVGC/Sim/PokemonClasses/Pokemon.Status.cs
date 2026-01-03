@@ -6,11 +6,14 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Sim.PokemonClasses;
 
 public partial class Pokemon
 {
-    public bool SetStatus(ConditionId statusId, Pokemon? source = null, IEffect? sourceEffect = null,
+    public bool SetStatus(ConditionId statusId, Pokemon? source = null,
+        IEffect? sourceEffect = null,
         bool ignoreImmunities = false)
     {
         // Initial HP check
@@ -35,6 +38,7 @@ public partial class Pokemon
                 source = pses.Pokemon;
             }
         }
+
         source ??= this; // This ensures source is never null after this point
 
         // Check for duplicate status
@@ -52,6 +56,7 @@ public partial class Pokemon
                             $"Dictionary has {Battle.Library.Conditions.Count} entries: {string.Join(", ", Battle.Library.Conditions.Keys)}"
                         );
                     }
+
                     Battle.Add("-fail", this, Battle.Library.Conditions[Status]);
                 }
             }
@@ -63,6 +68,7 @@ public partial class Pokemon
                     Battle.AttrLastMove("[still]");
                 }
             }
+
             return false;
         }
 
@@ -87,6 +93,7 @@ public partial class Pokemon
                             Battle.Add("-immune", this);
                         }
                     }
+
                     return false;
                 }
             }
@@ -99,13 +106,15 @@ public partial class Pokemon
         // Run SetStatus event
         if (status.Id != ConditionId.None)
         {
-            RelayVar? result = Battle.RunEvent(EventId.SetStatus, this, source, sourceEffect, status);
+            RelayVar? result =
+                Battle.RunEvent(EventId.SetStatus, this, source, sourceEffect, status);
             if (result is BoolRelayVar { Value: false })
             {
                 if (Battle.DisplayUi)
                 {
                     Battle.Debug($"set status [{status.Id}] interrupted");
                 }
+
                 return false;
             }
         }
@@ -147,13 +156,15 @@ public partial class Pokemon
             };
 
             // Debug: Check status state after OnStart
-            Battle.Debug($"[SetStatus.AfterOnStart] {Name}: Status={status.Id}, Counter={StatusState.Counter}, Duration={StatusState.Duration}");
+            Battle.Debug(
+                $"[SetStatus.AfterOnStart] {Name}: Status={status.Id}, Counter={StatusState.Counter}, Duration={StatusState.Duration}");
 
             // BUGFIX: Ensure Counter is initialized for Stall condition
             // OnStart should set it to 3, but if it didn't, set it here as a failsafe
             if (status.Id == ConditionId.Stall && StatusState.Counter == null)
             {
-                Battle.Debug($"[AddVolatile.BUGFIX] {Name}: Stall Counter was null after OnStart, setting to 3");
+                Battle.Debug(
+                    $"[AddVolatile.BUGFIX] {Name}: Stall Counter was null after OnStart, setting to 3");
                 StatusState.Counter = 3;
             }
 
@@ -174,7 +185,8 @@ public partial class Pokemon
         // Run AfterSetStatus event
         if (status.Id != ConditionId.None)
         {
-            RelayVar? afterResult = Battle.RunEvent(EventId.AfterSetStatus, this, source, sourceEffect,
+            RelayVar? afterResult = Battle.RunEvent(EventId.AfterSetStatus, this, source,
+                sourceEffect,
                 status);
             if (afterResult is BoolRelayVar { Value: false })
             {
@@ -193,19 +205,6 @@ public partial class Pokemon
         // Early exit if Pokemon is fainted or has no status
         if (Hp <= 0 || Status == ConditionId.None) return false;
 
-        // Special case: If clearing sleep, also remove Nightmare volatile (silent)
-        if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
-        {
-            // Remove Nightmare volatile and add silent end message
-            if (RemoveVolatile(Battle.Library.Conditions[ConditionId.Nightmare]))
-            {
-                if (Battle.DisplayUi)
-                {
-                    Battle.Add("-end", this, Battle.Library.Conditions[ConditionId.Nightmare], "[silent]");
-                }
-            }
-        }
-
         // Clear the status directly (no events, no messages)
         Status = ConditionId.None;
         StatusState = Battle.InitEffectState();
@@ -218,7 +217,8 @@ public partial class Pokemon
         return Battle.Library.Conditions[Status];
     }
 
-    public bool TrySetStatus(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
+    public bool TrySetStatus(ConditionId status, Pokemon? source = null,
+        IEffect? sourceEffect = null)
     {
         return SetStatus(Status == ConditionId.None ? status : Status, source, sourceEffect);
     }
@@ -231,19 +231,8 @@ public partial class Pokemon
         // Add cure status message to battle log
         if (Battle.DisplayUi)
         {
-            Battle.Add("-curestatus", this, Battle.Library.Conditions[Status], silent ? "[silent]" : "[msg]");
-        }
-
-        // Special case: If curing sleep, also remove Nightmare volatile
-        if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
-        {
-            if (RemoveVolatile(Battle.Library.Conditions[ConditionId.Nightmare]))
-            {
-                if (Battle.DisplayUi)
-                {
-                    Battle.Add("-end", this, Battle.Library.Conditions[ConditionId.Nightmare], "[silent]");
-                }
-            }
+            Battle.Add("-curestatus", this, Battle.Library.Conditions[Status],
+                silent ? "[silent]" : "[msg]");
         }
 
         // Clear the status (equivalent to setStatus(''))
@@ -252,7 +241,8 @@ public partial class Pokemon
         return true;
     }
 
-    public RelayVar AddVolatile(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null,
+    public RelayVar AddVolatile(ConditionId status, Pokemon? source = null,
+        IEffect? sourceEffect = null,
         ConditionId? linkedStatus = null)
     {
         // Get the condition from the battle library
@@ -273,8 +263,10 @@ public partial class Pokemon
             {
                 source = pses.Pokemon;
             }
+
             sourceEffect ??= Battle.Event.Effect;
         }
+
         source ??= this; // Default source to this Pokemon
 
         // Check if volatile already exists
@@ -286,7 +278,7 @@ public partial class Pokemon
 
             // Try to restart the existing volatile
             return Battle.SingleEvent(EventId.Restart, condition, existingState, this, source,
-                       sourceEffect) ?? new BoolRelayVar(false);
+                sourceEffect) ?? new BoolRelayVar(false);
         }
 
         // Check status immunity
@@ -305,6 +297,7 @@ public partial class Pokemon
                     Battle.Add("-immune", this);
                 }
             }
+
             return new BoolRelayVar(false);
         }
 
@@ -318,6 +311,7 @@ public partial class Pokemon
             {
                 Battle.Debug($"add volatile [{status}] interrupted");
             }
+
             return tryResult ?? new BoolRelayVar(false);
         }
 
@@ -358,14 +352,17 @@ public partial class Pokemon
             this, source, sourceEffect);
 
         // Debug: Check volatile state after OnStart
-        Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: Status={status}, Counter={volatileState.Counter}, Duration={volatileState.Duration}");
-        Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: volatileState is same reference as Volatiles[{status}]? {ReferenceEquals(volatileState, Volatiles[status])}");
+        Battle.Debug(
+            $"[AddVolatile.AfterOnStart] {Name}: Status={status}, Counter={volatileState.Counter}, Duration={volatileState.Duration}");
+        Battle.Debug(
+            $"[AddVolatile.AfterOnStart] {Name}: volatileState is same reference as Volatiles[{status}]? {ReferenceEquals(volatileState, Volatiles[status])}");
 
         // BUGFIX: Ensure Counter is initialized for Stall condition
         // OnStart should set it to 3, but if it didn't, set it here as a failsafe
         if (status == ConditionId.Stall && volatileState.Counter == null)
         {
-            Battle.Debug($"[AddVolatile.BUGFIX] {Name}: Stall Counter was null after OnStart, setting to 3");
+            Battle.Debug(
+                $"[AddVolatile.BUGFIX] {Name}: Stall Counter was null after OnStart, setting to 3");
             volatileState.Counter = 3;
         }
 
@@ -452,6 +449,7 @@ public partial class Pokemon
             {
                 continue;
             }
+
             // Remove this Pokemon from the linked Pokemon list
             volatileData.LinkedPokemon.Remove(this);
 
@@ -533,7 +531,8 @@ public partial class Pokemon
             foreach (Pokemon linkedPoke in clonedState.LinkedPokemon)
             {
                 // Get the linked Pokémon's volatile state for this condition
-                if (!linkedPoke.Volatiles.TryGetValue(clonedState.LinkedStatus.Id, out EffectState? linkedState)
+                if (!linkedPoke.Volatiles.TryGetValue(clonedState.LinkedStatus.Id,
+                        out EffectState? linkedState)
                     || linkedState.LinkedPokemon is null) continue;
                 // Find and replace the source Pokémon with this Pokémon
                 int sourceIndex = linkedState.LinkedPokemon.IndexOf(pokemon);
@@ -551,7 +550,8 @@ public partial class Pokemon
         foreach ((ConditionId conditionId, EffectState volatileState) in Volatiles)
         {
             Condition condition = Battle.Library.Conditions[conditionId];
-            Battle.SingleEvent(EventId.Copy, condition, volatileState, new PokemonSingleEventTarget(this));
+            Battle.SingleEvent(EventId.Copy, condition, volatileState,
+                new PokemonSingleEventTarget(this));
         }
     }
 

@@ -19,26 +19,27 @@ public partial class Pokemon
             case MoveTarget.FoeSide:
             case MoveTarget.AllySide:
             case MoveTarget.AllyTeam:
+            {
+                // Add allies if not a foe-only move
+                if (move.Target != MoveTarget.FoeSide)
                 {
-                    // Add allies if not a foe-only move
-                    if (move.Target != MoveTarget.FoeSide)
-                    {
-                        targets.AddRange(AlliesAndSelf());
-                    }
-
-                    // Add foes if not an ally-only move
-                    if (move.Target != MoveTarget.AllySide && move.Target != MoveTarget.AllyTeam)
-                    {
-                        targets.AddRange(Foes(all: true));
-                    }
-
-                    // Retarget if the original target isn't in the list
-                    if (targets.Count > 0 && !targets.Contains(target))
-                    {
-                        Battle.RetargetLastMove(targets[^1]);
-                    }
-                    break;
+                    targets.AddRange(AlliesAndSelf());
                 }
+
+                // Add foes if not an ally-only move
+                if (move.Target != MoveTarget.AllySide && move.Target != MoveTarget.AllyTeam)
+                {
+                    targets.AddRange(Foes(all: true));
+                }
+
+                // Retarget if the original target isn't in the list
+                if (targets.Count > 0 && !targets.Contains(target))
+                {
+                    Battle.RetargetLastMove(targets[^1]);
+                }
+
+                break;
+            }
 
             case MoveTarget.AllAdjacent:
                 targets.AddRange(AdjacentAllies());
@@ -50,6 +51,7 @@ public partial class Pokemon
                 {
                     Battle.RetargetLastMove(targets[^1]);
                 }
+
                 break;
 
             case MoveTarget.Allies:
@@ -57,70 +59,14 @@ public partial class Pokemon
                 break;
 
             default:
+            {
+                Pokemon selectedTarget = target;
+
+                // If targeted foe faints, retarget (except in free-for-all)
+                if ((target.Fainted && !target.IsAlly(this)))
                 {
-                    Pokemon selectedTarget = target;
-
-                    // If targeted foe faints, retarget (except in free-for-all)
-                    if ((target.Fainted && !target.IsAlly(this)))
-                    {
-                        Pokemon? possibleTarget = Battle.GetRandomTarget(this, move);
-                        if (possibleTarget == null)
-                        {
-                            return new MoveTargets
-                            {
-                                Targets = [],
-                                PressureTargets = [],
-                            };
-                        }
-                        target = possibleTarget;
-                    }
-
-                    // Handle redirection for multi-Pokémon battles
-                    if (Battle.ActivePerHalf > 1 && move.TracksTarget != true)
-                    {
-                        // Check if this is a charging turn (first turn of two-turn moves)
-                        bool isCharging = move.Flags.Charge == true &&
-                                          !Volatiles.ContainsKey(ConditionId.TwoTurnMove) &&
-                                          // Solar Beam/Blade skip charging in sun
-                                          !(move.Id is MoveId.SolarBeam or MoveId.SolarBlade &&
-                                            EffectiveWeather() is ConditionId.SunnyDay or ConditionId.DesolateLand)
-                                          // Electro Shot skips charging in rain
-                                          && !(move.Id == MoveId.ElectroShot &&
-                                               EffectiveWeather() is ConditionId.RainDance or ConditionId.PrimordialSea) &&
-                                          // Power Herb allows skipping charge (except Sky Drop)
-                                          !(HasItem(ItemId.PowerHerb) && move.Id != MoveId.SkyDrop);
-
-                        // Apply redirection (Follow Me, Rage Powder, etc.)
-                        if (!isCharging && !(target.BeingCalledBack || target.SwitchFlag.IsTrue()))
-                        {
-                            RelayVar? redirectResult = Battle.PriorityEvent(
-                                EventId.RedirectTarget,
-                                this,
-                                this,
-                                move,
-                                target
-                            );
-
-                            if (redirectResult is PokemonRelayVar prv)
-                            {
-                                target = prv.Pokemon;
-                            }
-                        }
-                    }
-
-                    // Handle smart targeting (Dragon Darts)
-                    if (move.SmartTarget == true)
-                    {
-                        targets = GetSmartTargets(target, move);
-                        target = targets[0];
-                    }
-                    else
-                    {
-                        targets.Add(target);
-                    }
-
-                    // Fail if target fainted (unless it's a future move like Future Sight)
-                    if (target.Fainted && move.Flags.FutureMove != true)
+                    Pokemon? possibleTarget = Battle.GetRandomTarget(this, move);
+                    if (possibleTarget == null)
                     {
                         return new MoveTargets
                         {
@@ -129,13 +75,73 @@ public partial class Pokemon
                         };
                     }
 
-                    // Update battle log if target changed
-                    if (selectedTarget != target)
-                    {
-                        Battle.RetargetLastMove(target);
-                    }
-                    break;
+                    target = possibleTarget;
                 }
+
+                // Handle redirection for multi-Pokémon battles
+                if (Battle.ActivePerHalf > 1 && move.TracksTarget != true)
+                {
+                    // Check if this is a charging turn (first turn of two-turn moves)
+                    bool isCharging = move.Flags.Charge == true &&
+                                      !Volatiles.ContainsKey(ConditionId.TwoTurnMove) &&
+                                      // Solar Beam/Blade skip charging in sun
+                                      !(move.Id is MoveId.SolarBeam or MoveId.SolarBlade &&
+                                        EffectiveWeather() is ConditionId.SunnyDay
+                                            or ConditionId.DesolateLand)
+                                      // Electro Shot skips charging in rain
+                                      && !(move.Id == MoveId.ElectroShot &&
+                                           EffectiveWeather() is ConditionId.RainDance
+                                               or ConditionId.PrimordialSea) &&
+                                      // Power Herb allows skipping charge
+                                      !HasItem(ItemId.PowerHerb);
+
+                    // Apply redirection (Follow Me, Rage Powder, etc.)
+                    if (!isCharging && !(target.BeingCalledBack || target.SwitchFlag.IsTrue()))
+                    {
+                        RelayVar? redirectResult = Battle.PriorityEvent(
+                            EventId.RedirectTarget,
+                            this,
+                            this,
+                            move,
+                            target
+                        );
+
+                        if (redirectResult is PokemonRelayVar prv)
+                        {
+                            target = prv.Pokemon;
+                        }
+                    }
+                }
+
+                // Handle smart targeting (Dragon Darts)
+                if (move.SmartTarget == true)
+                {
+                    targets = GetSmartTargets(target, move);
+                    target = targets[0];
+                }
+                else
+                {
+                    targets.Add(target);
+                }
+
+                // Fail if target fainted (unless it's a future move like Future Sight)
+                if (target.Fainted && move.Flags.FutureMove != true)
+                {
+                    return new MoveTargets
+                    {
+                        Targets = [],
+                        PressureTargets = [],
+                    };
+                }
+
+                // Update battle log if target changed
+                if (selectedTarget != target)
+                {
+                    Battle.RetargetLastMove(target);
+                }
+
+                break;
+            }
         }
 
         // Resolve apparent targets for Pressure ability

@@ -50,15 +50,6 @@ public partial record Conditions
                     battle.EffectState.StartTime = battle.Random(2, 5);
                     battle.EffectState.Time = battle.EffectState.StartTime;
 
-                    Condition nightmare = _library.Conditions[ConditionId.Nightmare];
-
-                    if (!target.RemoveVolatile(nightmare)) return new VoidReturn();
-
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", target, "Nightmare", "[silent]");
-                    }
-
                     return new VoidReturn();
                 }),
                 //OnBeforeMovePriority = 10,
@@ -473,75 +464,6 @@ public partial record Conditions
                     }
                 }),
             },
-            [ConditionId.Telekinesis] = new()
-            {
-                Id = ConditionId.Telekinesis,
-                Name = "Telekinesis",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.Telekinesis,
-                Duration = 3,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
-                {
-                    // Check for immune species
-                    string[] immuneSpecies =
-                        ["Diglett", "Dugtrio", "Palossand", "Sandygast", "Gengar-Mega"];
-                    if (immuneSpecies.Contains(target.BaseSpecies.Name))
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-immune", target);
-                        }
-
-                        return BoolVoidUnion.FromBool(false);
-                    }
-
-                    if (target.Volatiles.ContainsKey(ConditionId.SmackDown) ||
-                        target.Volatiles.ContainsKey(ConditionId.Ingrain))
-                    {
-                        return BoolVoidUnion.FromBool(false);
-                    }
-
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", target, "Telekinesis");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnAccuracy = new OnAccuracyEventInfo((_, _, _, _, move) =>
-                {
-                    // Telekinesis grants perfect accuracy on non-OHKO moves
-                    if (move.Ohko == null)
-                    {
-                        return IntBoolVoidUnion.FromBool(true);
-                    }
-
-                    return IntBoolVoidUnion.FromVoid();
-                }, -1),
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
-                {
-                    if (pokemon.BaseSpecies.Name == "Gengar-Mega")
-                    {
-                        pokemon.DeleteVolatile(ConditionId.Telekinesis);
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-end", pokemon, "Telekinesis", "[silent]");
-                        }
-                    }
-                }),
-                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
-                {
-                    // Duration handled automatically
-                }, 19),
-                OnEnd = new OnEndEventInfo((battle, target) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", target, "Telekinesis");
-                    }
-                }),
-            },
             [ConditionId.Taunt] = new()
             {
                 Id = ConditionId.Taunt,
@@ -657,12 +579,6 @@ public partial record Conditions
                     {
                         applies = true;
                         pokemon.DeleteVolatile(ConditionId.MagnetRise);
-                    }
-
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.Telekinesis))
-                    {
-                        applies = true;
-                        pokemon.DeleteVolatile(ConditionId.Telekinesis);
                     }
 
                     if (!applies) return BoolVoidUnion.FromBool(false);

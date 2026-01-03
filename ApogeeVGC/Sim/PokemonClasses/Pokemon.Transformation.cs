@@ -7,6 +7,8 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -100,7 +102,6 @@ public partial class Pokemon
         [
             ConditionId.DragonCheer,
             ConditionId.FocusEnergy,
-            ConditionId.LaserFocus,
         ];
 
         // Remove overlapping volatiles first

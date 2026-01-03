@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -126,14 +127,6 @@ public partial class Pokemon
             // Special move target modifications
             switch (moveSlot.Id)
             {
-                case MoveId.PollenPuff:
-                    // Heal Block prevents Pollen Puff from targeting allies
-                    if (Volatiles.ContainsKey(ConditionId.HealBlock))
-                    {
-                    }
-
-                    break;
-
                 case MoveId.TeraStarStorm:
                     // Terapagos-Stellar gets spread targeting
                     if (Species.Id == SpecieId.TerapagosStellar)

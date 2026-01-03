@@ -572,9 +572,8 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
-                    if (move.Id is MoveId.Gust or MoveId.Twister or MoveId.SkyUppercut
-                        or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown
-                        or MoveId.ThousandArrows)
+                    if (move.Id is MoveId.Gust or MoveId.Twister
+                        or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown)
                     {
                         return BoolIntEmptyVoidUnion.FromVoid();
                     }

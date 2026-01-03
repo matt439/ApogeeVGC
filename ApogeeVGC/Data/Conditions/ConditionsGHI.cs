@@ -1,5 +1,4 @@
 using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -57,10 +56,10 @@ public partial record Conditions
                     if (ability.Flags.CantSuppress ?? false)
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.GastroAcid]);
-                            }
-                        }),
-                    },
-                    [ConditionId.Imprison] = new()
+                    }
+                }),
+            },
+            [ConditionId.Imprison] = new()
             {
                 Id = ConditionId.Imprison,
                 Name = "Imprison",
@@ -265,12 +264,6 @@ public partial record Conditions
                             pokemon.DeleteVolatile(ConditionId.MagnetRise);
                         }
 
-                        if (pokemon.Volatiles.ContainsKey(ConditionId.Telekinesis))
-                        {
-                            applies = true;
-                            pokemon.DeleteVolatile(ConditionId.Telekinesis);
-                        }
-
                         if (applies && battle.DisplayUi)
                         {
                             battle.Add("-activate", pokemon, "move: Gravity");
@@ -334,50 +327,6 @@ public partial record Conditions
                     }
                 }),
             },
-            [ConditionId.Grudge] = new()
-            {
-                Id = ConditionId.Grudge,
-                Name = "Grudge",
-                EffectType = EffectType.Condition,
-                // Note: Grudge move is marked as isNonstandard: "Past" in TypeScript
-                // AssociatedMove not set since MoveId.Grudge doesn't exist in gen 9 VGC
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-singlemove", pokemon, "Grudge");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnFaint = new OnFaintEventInfo((battle, _, source, effect) =>
-                {
-                    if (source == null || source.Fainted || effect == null) return;
-                    // Check if fainted by a move (not a future move)
-                    if (effect.EffectType == EffectType.Move &&
-                        effect is not Move { Flags.FutureMove: true } &&
-                        source.LastMove != null)
-                    {
-                        Move? move = source.LastMove;
-
-                        foreach (MoveSlot moveSlot in source.MoveSlots.Where(moveSlot =>
-                                     moveSlot.Id == move.Id))
-                        {
-                            moveSlot.Pp = 0;
-                            if (battle.DisplayUi)
-                            {
-                                battle.Add("-activate", source, "move: Grudge", move.Name);
-                            }
-                        }
-                    }
-                }),
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
-                {
-                    battle.Debug("removing Grudge before attack");
-                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.Grudge]);
-                    return BoolVoidUnion.FromVoid();
-                }, 100),
-            },
             [ConditionId.GuardSplit] = new()
             {
                 Id = ConditionId.GuardSplit,
@@ -385,113 +334,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 // This is handled in the move's onHit, not as a persistent condition
             },
-            [ConditionId.HealBlock] = new()
-            {
-                Id = ConditionId.HealBlock,
-                Name = "Heal Block",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.HealBlock,
-                Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((battle, _, source, effect) =>
-                {
-                    if (effect?.Name == "Psychic Noise")
-                    {
-                        return 2;
-                    }
-
-                    if (source != null && source.HasAbility(AbilityId.Persistent))
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-activate", source, "ability: Persistent",
-                                "[move] Heal Block");
-                        }
-
-                        return 7;
-                    }
-
-                    return 5;
-                }),
-                OnStart = new OnStartEventInfo((battle, source, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", source, "move: Heal Block");
-                    }
-
-                    source.MoveLastTurnResult = true;
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
-                {
-                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
-                    {
-                        Move move = _library.Moves[moveSlot.Id];
-                        if (move.Flags.Heal ?? false)
-                        {
-                            pokemon.DisableMove(moveSlot.Id);
-                        }
-                    }
-                }),
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
-                {
-                    if (move.Flags.Heal ?? false)
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("cant", pokemon, "move: Heal Block", move.Name);
-                        }
-
-                        return false;
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }, 6),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
-                {
-                    if (move.Flags.Heal ?? false)
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("cant", pokemon, "move: Heal Block", move.Name);
-                        }
-                    }
-                }),
-                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
-                {
-                    // Duration handled automatically
-                }, 20),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", pokemon, "move: Heal Block");
-                    }
-                }),
-                OnTryHeal = new OnTryHealEventInfo(
-                    (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, _,
-                        target, source, effect) =>
-                    {
-                        // Pollen Puff healing is blocked with a special message
-                        if (source != null && target != source && target.Hp != target.MaxHp &&
-                            effect is Move { Id: MoveId.PollenPuff })
-                        {
-                            battle.AttrLastMove("[still]");
-                            if (battle.DisplayUi)
-                            {
-                                // FIXME: Wrong error message in TypeScript, but following the same pattern
-                                battle.Add("cant", source, "move: Heal Block", effect.Name);
-                            }
-
-                            return null;
-                        }
-
-                                    // Block all other healing
-                                    return IntBoolUnion.FromBool(false);
-                                })),
-                            // OnRestart is not needed - Psychic Noise duration is handled by DurationCallback
-                        },
-                        [ConditionId.HealReplacement] = new()
+            [ConditionId.HealReplacement] = new()
             {
                 // This is a slot condition
                 Id = ConditionId.HealReplacement,
@@ -537,8 +380,8 @@ public partial record Conditions
                 }),
                 OnBasePower = new OnBasePowerEventInfo((battle, _, attacker, defender, move) =>
                 {
-                    // Weaken Earthquake, Bulldoze, Magnitude if defender is grounded
-                    MoveId[] weakenedMoves = [MoveId.Earthquake, MoveId.Bulldoze, MoveId.Magnitude];
+                    // Weaken Earthquake, Bulldoze if defender is grounded
+                    MoveId[] weakenedMoves = [MoveId.Earthquake, MoveId.Bulldoze];
                     if (weakenedMoves.Contains(move.Id) &&
                         defender != null &&
                         (defender.IsGrounded() ?? false) &&

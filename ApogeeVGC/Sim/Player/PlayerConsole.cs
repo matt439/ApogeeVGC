@@ -102,16 +102,16 @@ public class PlayerConsole : IPlayer
         {
             // Update perspective
             _currentPerspective = evt.Perspective;
-            
+
             // Add message
             _recentMessages.Add(evt.Message);
-            
+
             // Keep only recent messages
             while (_recentMessages.Count > MaxMessages)
             {
                 _recentMessages.RemoveAt(0);
             }
-            
+
             // Display message
             string text = evt.Message.ToDisplayText();
             if (!string.IsNullOrEmpty(text))
@@ -132,13 +132,17 @@ public class PlayerConsole : IPlayer
         }
 
         // Display side conditions for both sides
-        string opponentSideState = GetSideConditionsDisplay(perspective.OpponentSide.SideConditionsWithDuration, "Opponent");
+        string opponentSideState =
+            GetSideConditionsDisplay(perspective.OpponentSide.SideConditionsWithDuration,
+                "Opponent");
         if (!string.IsNullOrEmpty(opponentSideState))
         {
             AnsiConsole.MarkupLine($"[bold]{opponentSideState}[/]");
         }
 
-        string playerSideState = GetSideConditionsDisplay(perspective.PlayerSide.SideConditionsWithDuration, "Your Team");
+        string playerSideState =
+            GetSideConditionsDisplay(perspective.PlayerSide.SideConditionsWithDuration,
+                "Your Team");
         if (!string.IsNullOrEmpty(playerSideState))
         {
             AnsiConsole.MarkupLine($"[bold]{playerSideState}[/]");
@@ -241,7 +245,8 @@ public class PlayerConsole : IPlayer
     /// <param name="request">The move request containing active Pokemon data</param>
     /// <param name="currentPokemonIndex">The index of the Pokemon making the move (0 or 1 in doubles)</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    private async Task<int> GetTargetLocationAsync(PokemonMoveData selectedMove, MoveRequest request,
+    private async Task<int> GetTargetLocationAsync(PokemonMoveData selectedMove,
+        MoveRequest request,
         int currentPokemonIndex, CancellationToken cancellationToken)
     {
         MoveTarget targetType = selectedMove.Move.Target;
@@ -277,7 +282,7 @@ public class PlayerConsole : IPlayer
         // AdjacentAllyOrSelf can target allies AND self
         bool canTargetAllies = targetType is MoveTarget.Normal or MoveTarget.AdjacentAlly
             or MoveTarget.AdjacentAllyOrSelf or MoveTarget.Any;
-        
+
         // Check if move can target self specifically
         bool canTargetSelf = targetType is MoveTarget.AdjacentAllyOrSelf or MoveTarget.Any;
 
@@ -293,7 +298,7 @@ public class PlayerConsole : IPlayer
             for (int i = 0; i < opponents.Count; i++)
             {
                 PokemonPerspective? opp = opponents[i];
-                if (opp != null && !opp.Fainted)
+                if (opp is { Fainted: false })
                 {
                     targetChoices.Add($"Opponent {i + 1}: {opp.Name} ({opp.Hp}/{opp.MaxHp} HP)");
                     targetLocs.Add(i + 1); // Positive for opponents
@@ -308,7 +313,7 @@ public class PlayerConsole : IPlayer
             for (int i = 0; i < allies.Count; i++)
             {
                 PokemonPerspective? ally = allies[i];
-                if (ally != null && !ally.Fainted)
+                if (ally is { Fainted: false })
                 {
                     // Skip current Pokemon unless move can target self
                     if (i == currentPokemonIndex && !canTargetSelf)
@@ -316,10 +321,10 @@ public class PlayerConsole : IPlayer
                         continue;
                     }
 
-                    string label = i == currentPokemonIndex 
+                    string label = i == currentPokemonIndex
                         ? $"Your Pokemon {i + 1}: {ally.Name} (Self) ({ally.Hp}/{ally.MaxHp} HP)"
                         : $"Your Pokemon {i + 1}: {ally.Name} ({ally.Hp}/{ally.MaxHp} HP)";
-                    
+
                     targetChoices.Add(label);
                     targetLocs.Add(-(i + 1)); // Negative for allies
                 }
@@ -540,7 +545,8 @@ public class PlayerConsole : IPlayer
         }
 
         var actions = new List<ChosenAction>();
-        var alreadySelectedSwitchIndices = new HashSet<int>(); // Track Pokemon already selected for switching
+        var alreadySelectedSwitchIndices =
+            new HashSet<int>(); // Track Pokemon already selected for switching
         bool teraAlreadySelected = false; // Track if terastallization has been selected this turn
 
         // Handle each active Pokemon
@@ -620,11 +626,11 @@ public class PlayerConsole : IPlayer
                     },
                     alreadySelectedSwitchIndices,
                     cancellationToken);
-                
+
                 // Track this Pokemon as selected so it can't be chosen again
                 int selectedPokemonIndex = switchChoice.Actions[0].Index!.Value;
                 alreadySelectedSwitchIndices.Add(selectedPokemonIndex);
-                
+
                 // Add the switch action to our actions list
                 actions.Add(switchChoice.Actions[0]);
             }
@@ -651,7 +657,8 @@ public class PlayerConsole : IPlayer
                 AnsiConsole.WriteLine();
 
                 // Determine target location based on move target type
-                int targetLoc = await GetTargetLocationAsync(selectedMove, request, pokemonIndex, cancellationToken);
+                int targetLoc = await GetTargetLocationAsync(selectedMove, request, pokemonIndex,
+                    cancellationToken);
 
                 actions.Add(new ChosenAction
                 {
@@ -682,7 +689,7 @@ public class PlayerConsole : IPlayer
         // Build list of available Pokemon with their original indices, excluding fainted ones and already selected ones
         var availablePokemonWithIndex = request.Side.Pokemon
             .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
-            .Where(x => !x.PokemonData.Active && 
+            .Where(x => !x.PokemonData.Active &&
                         !IsPokemonFainted(x.OriginalIndex) &&
                         !excludedPokemonIndices.Contains(x.OriginalIndex))
             .ToList();
@@ -829,13 +836,10 @@ public class PlayerConsole : IPlayer
             ConditionId.Substitute => "Sub",
             ConditionId.LeechSeed => "Seeded",
             ConditionId.ChoiceLock => "ChoiceLock",
-            ConditionId.HealBlock => "HealBlock",
             ConditionId.Ingrain => "Ingrain",
             ConditionId.MagnetRise => "MagRise",
-            ConditionId.Telekinesis => "Telekns",
             ConditionId.PartiallyTrapped => "Trapped",
             ConditionId.FocusEnergy => "FocusEng",
-            ConditionId.Nightmare => "Nightmare",
             ConditionId.GastroAcid => "GastroAcd",
             ConditionId.Yawn => "Yawn",
             ConditionId.Tailwind => "Tailwind",
@@ -851,15 +855,12 @@ public class PlayerConsole : IPlayer
             ConditionId.Commanding => "Commanding",
             ConditionId.Commanded => "Commanded",
             ConditionId.Detect => "Detect",
-            ConditionId.KingsShield => "KingsShield",
             ConditionId.SpikyShield => "SpikyShield",
             ConditionId.BanefulBunker => "BanefulBunker",
-            ConditionId.Obstruct => "Obstruct",
             ConditionId.SilkTrap => "SilkTrap",
             ConditionId.BurningBulwark => "BurningBulwark",
             ConditionId.QuickGuard => "QuickGuard",
             ConditionId.WideGuard => "WideGuard",
-            ConditionId.LaserFocus => "LaserFocus",
             ConditionId.ShedTail => "ShedTail",
             ConditionId.DragonCheer => "DragonCheer",
             ConditionId.Rest => "Rest",
@@ -884,17 +885,16 @@ public class PlayerConsole : IPlayer
         return condition switch
         {
             ConditionId.Stall or ConditionId.Protect or ConditionId.Detect or
-                ConditionId.KingsShield or ConditionId.SpikyShield or
-                ConditionId.BanefulBunker or ConditionId.Obstruct or ConditionId.SilkTrap or
+                ConditionId.SpikyShield or
+                ConditionId.BanefulBunker or ConditionId.SilkTrap or
                 ConditionId.BurningBulwark or ConditionId.QuickGuard
                 or ConditionId.WideGuard => "blue",
             ConditionId.Confusion => "yellow",
             ConditionId.Substitute or ConditionId.ShedTail => "green",
             ConditionId.LeechSeed => "darkgreen",
             ConditionId.ChoiceLock => "red",
-            ConditionId.HealBlock => "darkred",
             ConditionId.Ingrain or ConditionId.Wish => "cyan",
-            ConditionId.FocusEnergy or ConditionId.LaserFocus or ConditionId.DragonCheer =>
+            ConditionId.FocusEnergy or ConditionId.DragonCheer =>
                 "orange",
             ConditionId.Tailwind or ConditionId.QuarkDrive => "yellow",
             ConditionId.Reflect or ConditionId.LightScreen => "lightblue",
@@ -991,7 +991,8 @@ public class PlayerConsole : IPlayer
     /// <summary>
     /// Get side conditions display showing screen moves and other side conditions with durations
     /// </summary>
-    private string GetSideConditionsDisplay(IReadOnlyDictionary<ConditionId, int?> sideConditions, string sideName)
+    private string GetSideConditionsDisplay(IReadOnlyDictionary<ConditionId, int?> sideConditions,
+        string sideName)
     {
         if (sideConditions.Count == 0)
         {

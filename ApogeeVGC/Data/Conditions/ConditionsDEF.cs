@@ -360,7 +360,7 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
-                    if (move.Id is MoveId.Earthquake or MoveId.Magnitude)
+                    if (move.Id is MoveId.Earthquake)
                     {
                         return BoolIntEmptyVoidUnion.FromVoid();
                     }
@@ -370,7 +370,7 @@ public partial record Conditions
                 OnSourceModifyDamage =
                     new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
                     {
-                        if (move.Id is MoveId.Earthquake or MoveId.Magnitude)
+                        if (move.Id is MoveId.Earthquake)
                         {
                             return battle.ChainModify(2);
                         }
@@ -435,9 +435,8 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
-                    if (move.Id is MoveId.Gust or MoveId.Twister or MoveId.SkyUppercut
-                        or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown
-                        or MoveId.ThousandArrows)
+                    if (move.Id is MoveId.Gust or MoveId.Twister
+                        or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown)
                     {
                         return BoolIntEmptyVoidUnion.FromVoid();
                     }

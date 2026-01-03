@@ -501,8 +501,6 @@ public partial class BattleActions
             {
                 ConditionId.BanefulBunker,
                 ConditionId.BurningBulwark,
-                ConditionId.KingsShield,
-                ConditionId.Obstruct,
                 ConditionId.Protect,
                 ConditionId.SilkTrap,
                 ConditionId.SpikyShield,
