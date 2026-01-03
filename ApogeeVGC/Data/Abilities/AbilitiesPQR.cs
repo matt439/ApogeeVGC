@@ -56,7 +56,9 @@ public partial record Abilities
                                 Hit: < 2
                             })
                         {
-                            secondaries.RemoveAll(effect => effect.Self == null);
+                            // Keep only flinch effects (filter returns matching items)
+                            secondaries.RemoveAll(effect =>
+                                effect.VolatileStatus != ConditionId.Flinch);
                         }
                     }),
             },
@@ -223,7 +225,14 @@ public partial record Abilities
                 // OnModifyTypePriority = -1
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                 {
-                    if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
+                    // Non-Gen9 moves excluded: MultiAttack, NaturalGift, Technoblast
+                    MoveId[] noModifyType =
+                    [
+                        MoveId.Judgment, MoveId.RevelationDance, MoveId.TerrainPulse,
+                        MoveId.WeatherBall,
+                    ];
+                    if (move.Type == MoveType.Normal &&
+                        !noModifyType.Contains(move.Id) &&
                         !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                     {
                         move.Type = MoveType.Fairy;
@@ -409,9 +418,14 @@ public partial record Abilities
                 Rating = 0.0,
                 // OnAllyBasePowerPriority = 22
                 OnAllyBasePower = new OnAllyBasePowerEventInfo(
-                    (battle, basePower, attacker, pokemon, _) =>
+                    (battle, basePower, attacker, _, _) =>
                     {
-                        if (attacker != pokemon)
+                        // Boost if attacker is not the PowerSpot holder (effectState.target)
+                        if (battle.EffectState.Target is PokemonEffectStateTarget
+                            {
+                                Pokemon: var effectHolder,
+                            } &&
+                            attacker != effectHolder)
                         {
                             battle.Debug("Power Spot boost");
                             battle.ChainModify([5325, 4096]);
@@ -542,8 +556,10 @@ public partial record Abilities
                     if (type != MoveType.Unknown)
                     {
                         PokemonType pokemonType = type.ConvertToPokemonType();
-                        string currentTypes = string.Join("", source.GetTypes());
-                        if (currentTypes != pokemonType.ToString())
+                        // TS: source.getTypes().join() !== type - compares joined type string to move type
+                        PokemonType[] currentTypes = source.GetTypes();
+                        // Only change type if pokemon doesn't already have exactly this single type
+                        if (currentTypes.Length != 1 || currentTypes[0] != pokemonType)
                         {
                             if (!source.SetType([pokemonType])) return new VoidReturn();
                             battle.EffectState.Protean = true;
@@ -862,7 +878,8 @@ public partial record Abilities
                 }),
                 OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, _, _, effect) =>
                 {
-                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
+                    // TS checks effect?.name === 'Intimidate' - using Id enum instead
+                    if (effect is Ability { Id: AbilityId.Intimidate } && boost.Atk != null)
                     {
                         battle.Boost(new SparseBoostsTable { Spe = 1 });
                     }
@@ -917,7 +934,14 @@ public partial record Abilities
                 // OnModifyTypePriority = -1
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                 {
-                    if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
+                    // Non-Gen9 moves excluded: MultiAttack, NaturalGift, Technoblast
+                    MoveId[] noModifyType =
+                    [
+                        MoveId.Judgment, MoveId.RevelationDance, MoveId.TerrainPulse,
+                        MoveId.WeatherBall,
+                    ];
+                    if (move.Type == MoveType.Normal &&
+                        !noModifyType.Contains(move.Id) &&
                         !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                     {
                         move.Type = MoveType.Ice;
