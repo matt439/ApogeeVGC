@@ -84,7 +84,6 @@ public enum ConditionId
         WideGuard,
         Commanded,
         BeakBlast,
-        Bide,
         Block,
 
         // Weather conditions

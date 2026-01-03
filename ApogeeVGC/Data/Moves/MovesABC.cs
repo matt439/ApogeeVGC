@@ -264,6 +264,15 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
+                    OnHit = (_, target, source, move) =>
+                    {
+                        if (target.StatsRaisedThisTurn)
+                        {
+                            target.AddVolatile(ConditionId.Confusion, source, move);
+                        }
+
+                        return new VoidReturn();
+                    },
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
@@ -459,20 +468,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
-            [MoveId.Aromatherapy] = new()
-            {
-                Id = MoveId.Aromatherapy,
-                Num = 312,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Aromatherapy",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Distance = true, Metronome = true },
-                Target = MoveTarget.AllyTeam,
-                Type = MoveType.Grass,
-            },
             [MoveId.AromaticMist] = new()
             {
                 Id = MoveId.AromaticMist,
@@ -484,11 +479,7 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 0,
                 Flags = new MoveFlags { BypassSub = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { SpD = 1 },
-                },
+                Boosts = new SparseBoostsTable { SpD = 1 },
                 Target = MoveTarget.AdjacentAlly,
                 Type = MoveType.Fairy,
             },
@@ -504,6 +495,16 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, move) =>
+                {
+                    if (target.HurtThisTurn is > 0)
+                    {
+                        battle.Debug("BP doubled on damaged target");
+                        return move.BasePower * 2;
+                    }
+
+                    return move.BasePower;
+                }),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
@@ -661,6 +662,20 @@ public partial record Moves
                 Priority = -4,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                BasePowerCallback =
+                    new BasePowerCallbackEventInfo((battle, pokemon, target, move) =>
+                    {
+                        bool damagedByTarget = pokemon.AttackedBy.Any(p =>
+                            p.Source == target && p is { Damage: > 0, ThisTurn: true }
+                        );
+                        if (damagedByTarget)
+                        {
+                            battle.Debug($"BP doubled for getting hit by {target}");
+                            return move.BasePower * 2;
+                        }
+
+                        return move.BasePower;
+                    }),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
             },
@@ -700,11 +715,7 @@ public partial record Moves
                     Protect = true, Reflectable = true, Mirror = true, AllyAnim = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -1 },
-                },
+                Boosts = new SparseBoostsTable { Atk = -1 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
             },
@@ -735,6 +746,15 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, _) =>
+                {
+                    if (target.Status is ConditionId.Poison or ConditionId.Toxic)
+                    {
+                        return battle.ChainModify(2);
+                    }
+
+                    return DoubleVoidUnion.FromVoid();
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 50,
@@ -820,43 +840,6 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                Target = MoveTarget.Self,
-                Type = MoveType.Normal,
-            },
-            [MoveId.Bestow] = new()
-            {
-                Id = MoveId.Bestow,
-                Num = 516,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Bestow",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Mirror = true, BypassSub = true, AllyAnim = true, NoAssist = true,
-                    FailCopycat = true,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
-            [MoveId.Bide] = new()
-            {
-                Id = MoveId.Bide,
-                Num = 117,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Physical,
-                Name = "Bide",
-                BasePp = 10,
-                Priority = 1,
-                Flags = new MoveFlags
-                {
-                    Contact = true, Protect = true, Metronome = true, NoSleepTalk = true,
-                    FailInstruct = true,
-                },
-                VolatileStatus = ConditionId.Bide,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -988,6 +971,17 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Protect = true, Mirror = true, Metronome = true, Wind = true },
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, target) =>
+                {
+                    if (target != null)
+                    {
+                        ConditionId effectiveWeather = target.EffectiveWeather();
+                        if (effectiveWeather is ConditionId.RainDance or ConditionId.PrimordialSea)
+                        {
+                            move.Accuracy = IntTrueUnion.FromTrue();
+                        }
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -1008,6 +1002,13 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Protect = true, Mirror = true, Metronome = true, Wind = true },
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                {
+                    if (battle.Field.IsWeather([ConditionId.Hail, ConditionId.Snowscape]))
+                    {
+                        move.Accuracy = IntTrueUnion.FromTrue();
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 10,
@@ -1101,21 +1102,6 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-            },
-            [MoveId.BoltBeak] = new()
-            {
-                Id = MoveId.BoltBeak,
-                Num = 754,
-                Accuracy = 100,
-                BasePower = 85,
-                Category = MoveCategory.Physical,
-                Name = "Bolt Beak",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Electric,
             },
             [MoveId.BoltStrike] = new()
             {
@@ -1305,6 +1291,15 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, _) =>
+                {
+                    if (target.Hp * 2 <= target.MaxHp)
+                    {
+                        return battle.ChainModify(2);
+                    }
+
+                    return DoubleVoidUnion.FromVoid();
+                }),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
             },
@@ -1322,25 +1317,6 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.AllAdjacent,
                 Type = MoveType.Dark,
-            },
-            [MoveId.Bubble] = new()
-            {
-                Id = MoveId.Bubble,
-                Num = 145,
-                Accuracy = 100,
-                BasePower = 40,
-                Category = MoveCategory.Special,
-                Name = "Bubble",
-                BasePp = 30,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 10,
-                    Boosts = new SparseBoostsTable { Spe = -1 },
-                },
-                Target = MoveTarget.AllAdjacentFoes,
-                Type = MoveType.Water,
             },
             [MoveId.BubbleBeam] = new()
             {
@@ -1496,23 +1472,17 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
+                    OnHit = (_, target, source, move) =>
+                    {
+                        if (target.StatsRaisedThisTurn)
+                        {
+                            target.TrySetStatus(ConditionId.Burn, source, move);
+                        }
+
+                        return new VoidReturn();
+                    },
                 },
                 Target = MoveTarget.AllAdjacentFoes,
-                Type = MoveType.Fire,
-            },
-            [MoveId.BurnUp] = new()
-            {
-                Id = MoveId.BurnUp,
-                Num = 682,
-                Accuracy = 100,
-                BasePower = 130,
-                Category = MoveCategory.Special,
-                Name = "Burn Up",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Protect = true, Mirror = true, Defrost = true, Metronome = true },
-                Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
             [MoveId.CalmMind] = new()
@@ -1645,11 +1615,7 @@ public partial record Moves
                     Protect = true, Reflectable = true, Mirror = true, AllyAnim = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -2 },
-                },
+                Boosts = new SparseBoostsTable { Atk = -2 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
             },
@@ -1845,11 +1811,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { BypassSub = true, AllyAnim = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = 1, Def = 1 },
-                },
+                Boosts = new SparseBoostsTable { Atk = 1, Def = 1 },
                 Target = MoveTarget.AdjacentAlly,
                 Type = MoveType.Fighting,
             },
@@ -1940,11 +1902,7 @@ public partial record Moves
                     Reflectable = true, Mirror = true, Sound = true, BypassSub = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { SpA = -1 },
-                },
+                Boosts = new SparseBoostsTable { SpA = -1 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -2090,11 +2048,7 @@ public partial record Moves
                     Protect = true, Reflectable = true, Mirror = true, Metronome = true,
                     Powder = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Spe = -2 },
-                },
+                Boosts = new SparseBoostsTable { Spe = -2 },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Grass,
             },
