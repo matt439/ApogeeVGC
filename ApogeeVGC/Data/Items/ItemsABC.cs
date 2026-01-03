@@ -511,11 +511,10 @@ public partial record Items
                 }, -1),
                 OnTakeItem = new OnTakeItemEventInfo(
                     (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                        (_, _, pokemon, source, _) =>
+                        (_, _, pokemon, _, _) =>
                         {
-                            // Kyogre can't have this item removed
-                            if (source.BaseSpecies.Id == SpecieId.Kyogre ||
-                                pokemon.BaseSpecies.Id == SpecieId.Kyogre)
+                            // Kyogre can't have this item removed (TS only checks holder)
+                            if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Kyogre)
                             {
                                 return BoolVoidUnion.FromBool(false); // Prevent removal
                             }
@@ -1069,6 +1068,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 60 },
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
                 {
+                    // TS checks: user.baseSpecies.name.startsWith('Ogerpon-Cornerstone')
                     if (user.BaseSpecies.Id == SpecieId.OgerponCornerstone ||
                         user.BaseSpecies.Id == SpecieId.OgerponCornerstoneTera)
                     {
@@ -1080,11 +1080,10 @@ public partial record Items
                 }, 15),
                 OnTakeItem = new OnTakeItemEventInfo(
                     (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                        (_, _, pokemon, source, _) =>
+                        (_, _, pokemon, _, _) =>
                         {
-                            // Ogerpon cannot have its mask removed
-                            if (source.BaseSpecies.BaseSpecies == SpecieId.Ogerpon ||
-                                pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
+                            // TS uses (item, source) where source=holder, only checks holder
+                            if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
                                 return BoolVoidUnion.FromBool(false);
                             }
