@@ -28,9 +28,6 @@ public partial record Moves
         foreach (var kvp in CreateMovesGhi())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesIjk())
-            moves[kvp.Key] = kvp.Value;
-
         foreach (var kvp in CreateMovesJkl())
             moves[kvp.Key] = kvp.Value;
 
