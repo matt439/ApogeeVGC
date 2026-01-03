@@ -115,7 +115,8 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Contact = true, Protect = true, Mirror = true, Distance = true, Metronome = true,
+                    Contact = true, Protect = true, Mirror = true, Distance = true,
+                    Metronome = true,
                 },
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
@@ -235,7 +236,8 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Protect = true, Mirror = true, Distance = true, Metronome = true, Slicing = true,
+                    Protect = true, Mirror = true, Distance = true, Metronome = true,
+                    Slicing = true,
                 },
                 Secondary = new SecondaryEffect
                 {
@@ -1074,6 +1076,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OverrideOffensiveStat = StatIdExceptHp.Def, // Uses Def instead of Atk
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
@@ -1250,7 +1253,8 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Contact = true, Protect = true, Mirror = true, Distance = true, Metronome = true,
+                    Contact = true, Protect = true, Mirror = true, Distance = true,
+                    Metronome = true,
                 },
                 Recoil = (33, 100),
                 Target = MoveTarget.Any,

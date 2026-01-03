@@ -9,10 +9,11 @@ namespace ApogeeVGC.Sim.Moves;
 
 public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
 {
-   public MoveId Id { get; init; }
+    public MoveId Id { get; init; }
     public EffectStateId EffectStateId => Id;
     public required string Name { get; init; }
     public string FullName => $"move: {Name}";
+
     public int Num
     {
         get;
@@ -20,12 +21,16 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
         {
             if (Num < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(Num), "Move number must be non-negative.");
+                throw new ArgumentOutOfRangeException(nameof(Num),
+                    "Move number must be non-negative.");
             }
+
             field = value;
         }
     }
+
     public Condition? Condition { get; init; }
+
     public int BasePower
     {
         get;
@@ -33,11 +38,14 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
         {
             if (value < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(BasePower), "Base power must be non-negative.");
+                throw new ArgumentOutOfRangeException(nameof(BasePower),
+                    "Base power must be non-negative.");
             }
+
             field = value;
         }
     }
+
     public required IntTrueUnion Accuracy
     {
         get;
@@ -45,11 +53,14 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
         {
             if (value is IntIntTrueUnion { Value: < 1 or > 100 })
             {
-                throw new ArgumentOutOfRangeException(nameof(Accuracy), "Accuracy must be between 1 and 100.");
+                throw new ArgumentOutOfRangeException(nameof(Accuracy),
+                    "Accuracy must be between 1 and 100.");
             }
+
             field = value;
         }
     }
+
     public int BasePp
     {
         get;
@@ -57,18 +68,23 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
         {
             if (!(value == 1 || value % 5 == 0))
             {
-                throw new ArgumentOutOfRangeException(nameof(BasePp), "PP must be 1 or a multiple of 5.");
+                throw new ArgumentOutOfRangeException(nameof(BasePp),
+                    "PP must be 1 or a multiple of 5.");
             }
+
             if (value > 40)
             {
                 throw new ArgumentOutOfRangeException(nameof(BasePp), "PP cannot exceed 40.");
             }
+
             field = value;
         }
     }
+
     public bool NoPpBoosts { get; init; }
     public MoveCategory Category { get; set; }
     public MoveType Type { get; set; }
+
     public int Priority
     {
         get;
@@ -76,20 +92,23 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
         {
             if (value is > 5 or < -7)
             {
-                throw new ArgumentOutOfRangeException(nameof(Priority), "Priority must be between -7 and 5.");
+                throw new ArgumentOutOfRangeException(nameof(Priority),
+                    "Priority must be between -7 and 5.");
             }
+
             field = value;
         }
     }
+
     public MoveTarget Target { get; set; }
     public MoveFlags Flags { get; set; } = new();
-    
+
     public MoveDamage? Damage { get; init; }
 
 
     // Hit effects
     public MoveOhko? Ohko { get; init; }
-    public bool? ThawsTarget { get;init; }
+    public bool? ThawsTarget { get; init; }
     public int[]? Heal { get; init; }
     public bool? ForceSwitch { get; init; }
     public MoveSelfSwitch? SelfSwitch { get; init; }
@@ -112,12 +131,12 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
 
     // Hit effect modifiers
     public bool? AlwaysHit { get; init; }
-    public MoveType? BaseMoveType { get;init; }
+    public MoveType? BaseMoveType { get; init; }
     public int? BasePowerModifier { get; init; }
     public int? CritModifier { get; init; }
     public int? CritRatio { get; init; }
     public MoveOverridePokemon? OverrideOffensivePokemon { get; init; }
-    public StatIdExceptHp? OverrideOffensiveStat { get; init; }
+    public StatIdExceptHp? OverrideOffensiveStat { get; set; } // Settable for Wonder Room swap
     public MoveOverridePokemon? OverrideDefensivePokemon { get; init; }
     public StatIdExceptHp? OverrideDefensiveStat { get; init; }
     public bool? ForceStab { get; init; }
@@ -144,6 +163,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     public bool? HasCrashDamage { get; init; }
     public bool? IsConfusionSelfHit { get; init; }
     public bool? StallingMove { get; init; }
+
     public MoveId? BaseMove { get; init; }
     //public ConditionId? PseudoWeather { get; init; }
     //public ConditionId? VolatileStatus { get; init; }
@@ -157,7 +177,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
         // Match TypeScript behavior: if secondaries is null but secondary exists,
         // wrap secondary in an array to populate secondaries
         SecondaryEffect[]? secondaries = Secondaries ?? (Secondary != null ? [Secondary] : null);
-        
+
         return new ActiveMove
         {
             // Copy all base Move properties
@@ -232,7 +252,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
             SideCondition = SideCondition,
             Status = Status,
             AffectsFainted = AffectsFainted,
-            
+
             // Copy event handlers
             BasePowerCallback = BasePowerCallback,
             BeforeMoveCallback = BeforeMoveCallback,
@@ -278,7 +298,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
                 Used = false,
             },
         };
-    }//public EffectDelegate? GetDelegate(EventId id)
+    } //public EffectDelegate? GetDelegate(EventId id)
     //{
     //    return id switch
     //    {
@@ -324,7 +344,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
 
     //// Moves do not define event sub-orders
     //public int? GetSubOrder(EventId id) => null;
-    
+
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.
@@ -333,8 +353,8 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     /// <returns>A new Move instance with copied state</returns>
     public Move Copy()
     {
-        return this with 
-        { 
+        return this with
+        {
             // Records have built-in copy semantics with 'with' expression
             // This creates a shallow copy which is appropriate since most properties
             // are either value types, immutable references, or function delegates

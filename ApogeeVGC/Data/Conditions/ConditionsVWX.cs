@@ -1,5 +1,4 @@
 using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
@@ -7,7 +6,7 @@ using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -99,14 +98,9 @@ public partial record Conditions
                 OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                 {
                     // Wide Guard blocks all spread moves (allAdjacent, allAdjacentFoes)
+                    // Note: Does NOT check for protect flag - blocks ALL spread moves
                     if (move.Target != MoveTarget.AllAdjacent &&
                         move.Target != MoveTarget.AllAdjacentFoes)
-                    {
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    // Check if move has protect flag
-                    if (!(move.Flags.Protect ?? false))
                     {
                         return BoolIntEmptyVoidUnion.FromVoid();
                     }
@@ -117,12 +111,13 @@ public partial record Conditions
                     }
 
                     // Reset Outrage counter if source has lockedmove volatile
+                    // TypeScript: if (source.volatiles['lockedmove'].duration === 2) delete source.volatiles['lockedmove']
                     if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
                             out var lockedMoveState))
                     {
                         if (lockedMoveState.Duration == 2)
                         {
-                            source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                            source.Volatiles.Remove(ConditionId.LockedMove);
                         }
                     }
 
@@ -166,12 +161,32 @@ public partial record Conditions
                 // Wonder Room's defensive stat swapping is implemented in Pokemon.CalculateStat():
                 // When Wonder Room is active, Defense and Special Defense stat VALUES are swapped
                 // BEFORE any calculations. This affects all damage calculations.
-                // 
-                // Note: The TypeScript version also has an OnModifyMove handler that swaps
-                // move.overrideOffensiveStat for moves like Body Press. In C#, since Move properties
-                // are init-only, this swap would need to be handled in the damage calculation code
-                // where OverrideOffensiveStat is used. The stat swapping in CalculateStat handles
-                // most cases correctly.
+                //
+                // OnModifyMove swaps overrideOffensiveStat for moves like Body Press.
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                {
+                    // This code is for moves that use defensive stats as the attacking stat
+                    // (e.g. Body Press uses Def instead of Atk)
+                    if (move.OverrideOffensiveStat == null) return;
+
+                    StatIdExceptHp statAndBoosts = move.OverrideOffensiveStat.Value;
+                    if (statAndBoosts != StatIdExceptHp.Def && statAndBoosts != StatIdExceptHp.SpD)
+                    {
+                        return;
+                    }
+
+                    // Swap Def <-> SpD
+                    move.OverrideOffensiveStat = statAndBoosts == StatIdExceptHp.Def
+                        ? StatIdExceptHp.SpD
+                        : StatIdExceptHp.Def;
+
+                    if (battle.DisplayUi)
+                    {
+                        string statName = statAndBoosts == StatIdExceptHp.Def ? "" : "Sp. ";
+                        battle.Hint(
+                            $"{move.Name} uses {statName}Def boosts when Wonder Room is active.");
+                    }
+                }),
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
                 {
                     if (battle.DisplayUi)
