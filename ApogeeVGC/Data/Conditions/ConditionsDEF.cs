@@ -175,9 +175,9 @@ public partial record Conditions
                     {
                         battle.Add("-fieldend", "move: Electric Terrain");
                     }
-                    }),
-                },
-                [ConditionId.Detect] = new()
+                }),
+            },
+            [ConditionId.Detect] = new()
             {
                 Id = ConditionId.Detect,
                 Name = "Detect",
@@ -793,8 +793,7 @@ public partial record Conditions
                 //OnBeforeMovePriority = 10,
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
                     {
-                        if ((move.Flags.Defrost ?? false) &&
-                            !(move.Id == MoveId.BurnUp && !pokemon.HasType(PokemonType.Fire)))
+                        if (move.Flags.Defrost ?? false)
                         {
                             return new VoidReturn();
                         }
