@@ -420,7 +420,7 @@ public partial record Items
                 {
                     if (pokemon.ItemState.Ready != true) return;
                     pokemon.UseItem();
-                }, -4),
+                }, -3),
                 OnAnyAfterMega = new OnAnyAfterMegaEventInfo((_, pokemon) =>
                 {
                     if (pokemon.ItemState.Ready != true) return;
