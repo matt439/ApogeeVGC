@@ -920,7 +920,8 @@ public partial record Items
                 // Weather immunity partially implemented in Pokemon.EffectiveWeather()
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.IgnoringItem()) return;
+                    // TS: if (!pokemon.ignoringItem()) return; - return early if NOT ignoring item
+                    if (!pokemon.IgnoringItem()) return;
                     ConditionId weather = battle.Field.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.RainDance
                         or ConditionId.DesolateLand or ConditionId.PrimordialSea)
