@@ -1820,7 +1820,7 @@ public partial record Abilities
                     EffectState? toxicSpikesData =
                         side.GetSideConditionData(ConditionId.ToxicSpikes);
                     if (move.Category == MoveCategory.Physical && (toxicSpikesData == null ||
-                            (toxicSpikesData.Counter ?? 0) < 2))
+                            (toxicSpikesData.Layers ?? 0) < 2))
                     {
                         battle.Add("-activate", target, "ability: Toxic Debris");
                         side.AddSideCondition(_library.Conditions[ConditionId.ToxicSpikes], target);
