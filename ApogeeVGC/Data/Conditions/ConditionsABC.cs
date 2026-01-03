@@ -552,27 +552,6 @@ public partial record Conditions
                     return BoolEmptyVoidUnion.FromVoid();
                 }),
             },
-            [ConditionId.BeakBlast] = new()
-            {
-                Id = ConditionId.BeakBlast,
-                Name = "Beak Blast",
-                Duration = 1,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    battle.Add("-singleturn", pokemon, "move: Beak Blast");
-                    return BoolVoidUnion.FromVoid();
-                }),
-                // Burn attackers that make contact while charging
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                {
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        source.TrySetStatus(ConditionId.Burn, target);
-                    }
-
-                    return BoolEmptyVoidUnion.FromVoid();
-                }),
-            },
             [ConditionId.Block] = new()
             {
                 Id = ConditionId.Block,

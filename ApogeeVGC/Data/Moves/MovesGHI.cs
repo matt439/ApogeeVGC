@@ -698,20 +698,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
             },
-            [MoveId.Hail] = new()
-            {
-                Id = MoveId.Hail,
-                Num = 258,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Hail",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags { Metronome = true },
-                Target = MoveTarget.All,
-                Type = MoveType.Ice,
-            },
             [MoveId.HappyHour] = new()
             {
                 Id = MoveId.HappyHour,

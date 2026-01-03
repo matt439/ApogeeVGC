@@ -138,10 +138,6 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Libero == true) return new VoidReturn();
                     if (move.HasBounced == true || move.Flags.FutureMove == true ||
-                        move.SourceEffect is ConditionEffectStateId
-                        {
-                            ConditionId: ConditionId.Snatch
-                        } ||
                         move.CallsMove == true)
                         return new VoidReturn();
 

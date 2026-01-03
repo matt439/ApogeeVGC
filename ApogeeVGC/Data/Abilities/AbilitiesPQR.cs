@@ -45,22 +45,6 @@ public partial record Abilities
                     return new VoidReturn();
                 }),
                 // Note: Damage modifier for second hit implemented in BattleActions.ModifyDamage()
-                OnSourceModifySecondaries =
-                    new OnSourceModifySecondariesEventInfo((_, secondaries, _, _,
-                        move) =>
-                    {
-                        // Hack to prevent accidentally suppressing King's Rock/Razor Fang
-                        if (move is
-                            {
-                                MultiHitType: MoveMultiHitType.ParentBond, Id: MoveId.SecretPower,
-                                Hit: < 2
-                            })
-                        {
-                            // Keep only flinch effects (filter returns matching items)
-                            secondaries.RemoveAll(effect =>
-                                effect.VolatileStatus != ConditionId.Flinch);
-                        }
-                    }),
             },
             [AbilityId.PastelVeil] = new()
             {

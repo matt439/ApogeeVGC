@@ -68,21 +68,6 @@ public partial record Moves
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Poison,
             },
-            [MoveId.AcidArmor] = new()
-            {
-                Id = MoveId.AcidArmor,
-                Num = 151,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Acid Armor",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def = 2 },
-                Target = MoveTarget.Self,
-                Type = MoveType.Poison,
-            },
             [MoveId.AcidSpray] = new()
             {
                 Id = MoveId.AcidSpray,
@@ -778,24 +763,6 @@ public partial record Moves
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
-            [MoveId.BeakBlast] = new()
-            {
-                Id = MoveId.BeakBlast,
-                Num = 690,
-                Accuracy = 100,
-                BasePower = 100,
-                Category = MoveCategory.Physical,
-                Name = "Beak Blast",
-                BasePp = 15,
-                Priority = -3,
-                Flags = new MoveFlags
-                {
-                    Protect = true, FailMeFirst = true, NoSleepTalk = true, NoAssist = true,
-                    FailCopycat = true, FailInstruct = true, Bullet = true,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Flying,
-            },
             [MoveId.BeatUp] = new()
             {
                 Id = MoveId.BeatUp,
@@ -1004,7 +971,7 @@ public partial record Moves
                     { Protect = true, Mirror = true, Metronome = true, Wind = true },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
                 {
-                    if (battle.Field.IsWeather([ConditionId.Hail, ConditionId.Snowscape]))
+                    if (battle.Field.IsWeather([ConditionId.Snowscape]))
                     {
                         move.Accuracy = IntTrueUnion.FromTrue();
                     }
@@ -1122,40 +1089,6 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-            },
-            [MoveId.BoneClub] = new()
-            {
-                Id = MoveId.BoneClub,
-                Num = 125,
-                Accuracy = 85,
-                BasePower = 65,
-                Category = MoveCategory.Physical,
-                Name = "Bone Club",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 10,
-                    VolatileStatus = ConditionId.Flinch,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ground,
-            },
-            [MoveId.Bonemerang] = new()
-            {
-                Id = MoveId.Bonemerang,
-                Num = 155,
-                Accuracy = 90,
-                BasePower = 50,
-                Category = MoveCategory.Physical,
-                Name = "Bonemerang",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                MultiHit = 2,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ground,
             },
             [MoveId.BoneRush] = new()
             {

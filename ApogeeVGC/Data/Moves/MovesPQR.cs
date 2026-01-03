@@ -1884,21 +1884,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
-            [MoveId.Return] = new()
-            {
-                Id = MoveId.Return,
-                Num = 216,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Physical,
-                Name = "Return",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
             [MoveId.Revenge] = new()
             {
                 Id = MoveId.Revenge,

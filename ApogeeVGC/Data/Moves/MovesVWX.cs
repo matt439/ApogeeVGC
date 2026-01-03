@@ -473,7 +473,7 @@ public partial record Moves
                         ConditionId.SunnyDay or ConditionId.DesolateLand => MoveType.Fire,
                         ConditionId.RainDance or ConditionId.PrimordialSea => MoveType.Water,
                         ConditionId.Sandstorm => MoveType.Rock,
-                        ConditionId.Snowscape or ConditionId.Hail => MoveType.Ice,
+                        ConditionId.Snowscape => MoveType.Ice,
                         _ => move.Type,
                     };
                 }),

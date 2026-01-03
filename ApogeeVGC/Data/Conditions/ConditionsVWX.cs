@@ -50,11 +50,11 @@ public partial record Conditions
                         battle.Add("-sideend", targetSide, "Water Pledge");
                     }
                 }),
-                // Double secondary effect chances for moves (except Secret Power)
+                // Double secondary effect chances for moves
                 // Skip Serene Grace + Flinch interaction
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
-                    if (move.Secondaries != null && move.Id != MoveId.SecretPower)
+                    if (move.Secondaries != null)
                     {
                         battle.Debug("doubling secondary chance");
                         foreach (var secondary in move.Secondaries)

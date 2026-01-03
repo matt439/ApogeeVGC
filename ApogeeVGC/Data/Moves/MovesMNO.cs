@@ -39,24 +39,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
-            [MoveId.MeFirst] = new()
-            {
-                Id = MoveId.MeFirst,
-                Num = 382,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Me First",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true, BypassSub = true, FailMeFirst = true, NoSleepTalk = true,
-                    NoAssist = true, FailCopycat = true, FailInstruct = true, FailMimic = true
-                },
-                Target = MoveTarget.AdjacentFoe,
-                Type = MoveType.Normal,
-            },
             [MoveId.MagicalLeaf] = new()
             {
                 Id = MoveId.MagicalLeaf,
@@ -764,21 +746,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
-            [MoveId.MindBlown] = new()
-            {
-                Id = MoveId.MindBlown,
-                Num = 720,
-                Accuracy = 100,
-                BasePower = 150,
-                Category = MoveCategory.Special,
-                Name = "Mind Blown",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                MindBlownRecoil = true,
-                Target = MoveTarget.AllAdjacent,
-                Type = MoveType.Fire,
-            },
             [MoveId.Minimize] = new()
             {
                 Id = MoveId.Minimize,
@@ -1025,7 +992,7 @@ public partial record Moves
                         denominator = 3;
                     }
                     else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
-                             or ConditionId.Sandstorm or ConditionId.Hail or ConditionId.Snowscape)
+                             or ConditionId.Sandstorm or ConditionId.Snowscape)
                     {
                         // 25% = 1/4
                         numerator = 1;
@@ -1075,7 +1042,7 @@ public partial record Moves
                         denominator = 3;
                     }
                     else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
-                             or ConditionId.Sandstorm or ConditionId.Hail or ConditionId.Snowscape)
+                             or ConditionId.Sandstorm or ConditionId.Snowscape)
                     {
                         // 25% = 1/4
                         numerator = 1;

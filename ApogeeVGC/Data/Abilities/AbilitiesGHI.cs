@@ -578,14 +578,14 @@ public partial record Abilities
                 Rating = 1.0,
                 OnWeather = new OnWeatherEventInfo((battle, target, _, effect) =>
                 {
-                    if (effect.Id is ConditionId.Hail or ConditionId.Snowscape)
+                    if (effect.Id is ConditionId.Snowscape)
                     {
                         battle.Heal(target.BaseMaxHp / 16);
                     }
                 }),
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Snowscape })
                     {
                         return false;
                     }
@@ -614,7 +614,7 @@ public partial record Abilities
                 OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (battle.Field.IsWeather([ConditionId.Hail, ConditionId.Snowscape]) &&
+                    if (battle.Field.IsWeather([ConditionId.Snowscape]) &&
                         pokemon.Species.Id == SpecieId.EiscueNoice)
                     {
                         battle.Add("-activate", pokemon, "ability: Ice Face");
@@ -670,7 +670,7 @@ public partial record Abilities
                     // Snow/hail resuming because Cloud Nine/Air Lock ended does not trigger Ice Face
                     if (sourceEffect is Ability { SuppressWeather: true }) return;
                     if (pokemon.Hp == 0) return;
-                    if (battle.Field.IsWeather([ConditionId.Hail, ConditionId.Snowscape]) &&
+                    if (battle.Field.IsWeather([ConditionId.Snowscape]) &&
                         pokemon.Species.Id == SpecieId.EiscueNoice)
                     {
                         battle.Add("-activate", pokemon, "ability: Ice Face");

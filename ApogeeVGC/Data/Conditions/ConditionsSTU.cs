@@ -89,9 +89,9 @@ public partial record Conditions
 
                         return false;
                     },
-                            10),
-                    },
-                    [ConditionId.ShadowForce] = new()
+                    10),
+            },
+            [ConditionId.ShadowForce] = new()
             {
                 Id = ConditionId.ShadowForce,
                 Name = "Shadow Force",
@@ -179,11 +179,6 @@ public partial record Conditions
 
                     return BoolIntEmptyVoidUnion.FromBool(false);
                 }, 3),
-            },
-            [ConditionId.Snatch] = new()
-            {
-                Id = ConditionId.Snatch,
-                AssociatedMove = MoveId.Snatch,
             },
             [ConditionId.SupercellSlam] = new()
             {
@@ -585,7 +580,7 @@ public partial record Conditions
                 {
                     foreach (MoveSlot moveSlot in from moveSlot in pokemon.MoveSlots
                              let move = _library.Moves[moveSlot.Id]
-                             where move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst
+                             where move.Category == MoveCategory.Status
                              select moveSlot)
                     {
                         pokemon.DisableMove(moveSlot.Id);
@@ -593,7 +588,7 @@ public partial record Conditions
                 }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, attacker, _, move) =>
                 {
-                    if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
+                    if (move.Category == MoveCategory.Status)
                     {
                         if (battle.DisplayUi)
                         {

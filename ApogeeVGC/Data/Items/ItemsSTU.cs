@@ -40,7 +40,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 80 },
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type == ConditionId.Sandstorm || type == ConditionId.Hail ||
+                    if (type == ConditionId.Sandstorm ||
                         type == ConditionId.Powder)
                     {
                         return BoolVoidUnion.FromBool(false);

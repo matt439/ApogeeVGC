@@ -486,61 +486,12 @@ public partial record Conditions
                             return null;
                         }
 
-                        // Block all other healing
-                        return IntBoolUnion.FromBool(false);
-                    })),
-                // OnRestart is not needed - Psychic Noise duration is handled by DurationCallback
-            },
-            [ConditionId.Hail] = new()
-            {
-                Id = ConditionId.Hail,
-                Name = "Hail",
-                EffectType = EffectType.Weather,
-                Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
-                    source.HasItem(ItemId.IcyRock) ? 8 : 5),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
-                {
-                    if (!battle.DisplayUi) return;
-
-                    if (effect is Ability)
-                    {
-                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
-                        battle.Add("-weather", "Hail", "[from] ability: " + effect.Name,
-                            $"[of] {source}");
-                    }
-                    else
-                    {
-                        battle.Add("-weather", "Hail");
-                    }
-                }),
-                //OnFieldResidualOrder = 1,
-                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-weather", "Hail", "[upkeep]");
-                        }
-
-                        if (battle.Field.IsWeather(ConditionId.Hail))
-                        {
-                            battle.EachEvent(EventId.Weather);
-                        }
-                    },
-                    1),
-                OnWeather = new OnWeatherEventInfo((battle, target, _, _) =>
-                {
-                    battle.Damage(target.BaseMaxHp / 16);
-                }),
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-weather", "none");
-                    }
-                }),
-            },
-            [ConditionId.HealReplacement] = new()
+                                    // Block all other healing
+                                    return IntBoolUnion.FromBool(false);
+                                })),
+                            // OnRestart is not needed - Psychic Noise duration is handled by DurationCallback
+                        },
+                        [ConditionId.HealReplacement] = new()
             {
                 // This is a slot condition
                 Id = ConditionId.HealReplacement,

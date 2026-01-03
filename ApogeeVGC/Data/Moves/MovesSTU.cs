@@ -355,25 +355,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
-            [MoveId.SecretPower] = new()
-            {
-                Id = MoveId.SecretPower,
-                Num = 290,
-                Accuracy = 100,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Secret Power",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 30,
-                    Status = ConditionId.Paralysis,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
             [MoveId.SecretSword] = new()
             {
                 Id = MoveId.SecretSword,
@@ -873,25 +854,6 @@ public partial record Moves
                 Target = MoveTarget.Self,
                 Type = MoveType.Ground,
             },
-            [MoveId.SignalBeam] = new()
-            {
-                Id = MoveId.SignalBeam,
-                Num = 324,
-                Accuracy = 100,
-                BasePower = 75,
-                Category = MoveCategory.Special,
-                Name = "Signal Beam",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 10,
-                    VolatileStatus = ConditionId.Confusion,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Bug,
-            },
             [MoveId.SilkTrap] = new()
             {
                 Id = MoveId.SilkTrap,
@@ -907,29 +869,6 @@ public partial record Moves
                 VolatileStatus = ConditionId.SilkTrap,
                 Secondary = null,
                 Target = MoveTarget.Self,
-                Type = MoveType.Bug,
-            },
-            [MoveId.SilverWind] = new()
-            {
-                Id = MoveId.SilverWind,
-                Num = 318,
-                Accuracy = 100,
-                BasePower = 60,
-                Category = MoveCategory.Special,
-                Name = "Silver Wind",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 10,
-                    Self = new SecondaryEffect
-                    {
-                        Boosts = new SparseBoostsTable
-                            { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
-                    },
-                },
-                Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
             },
             [MoveId.SimpleBeam] = new()
@@ -1460,22 +1399,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
-            [MoveId.Snatch] = new()
-            {
-                Id = MoveId.Snatch,
-                Num = 289,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Snatch",
-                BasePp = 10,
-                Priority = 4,
-                Flags = new MoveFlags { BypassSub = true, NoAssist = true, FailCopycat = true },
-                VolatileStatus = ConditionId.Snatch,
-                Secondary = null,
-                Target = MoveTarget.Self,
-                Type = MoveType.Dark,
-            },
             [MoveId.Snarl] = new()
             {
                 Id = MoveId.Snarl,
@@ -1675,7 +1598,7 @@ public partial record Moves
                     var weakWeathers = new[]
                     {
                         ConditionId.RainDance, ConditionId.PrimordialSea, ConditionId.Sandstorm,
-                        ConditionId.Hail, ConditionId.Snowscape,
+                        ConditionId.Snowscape,
                     };
                     ConditionId weather = battle.Field.EffectiveWeather();
                     if (weakWeathers.Contains(weather))
@@ -1747,7 +1670,7 @@ public partial record Moves
                     var weakWeathers = new[]
                     {
                         ConditionId.RainDance, ConditionId.PrimordialSea, ConditionId.Sandstorm,
-                        ConditionId.Hail, ConditionId.Snowscape,
+                        ConditionId.Snowscape,
                     };
                     ConditionId weather = battle.Field.EffectiveWeather();
                     if (weakWeathers.Contains(weather))
@@ -1946,23 +1869,6 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Grass,
-            },
-            [MoveId.SpectralThief] = new()
-            {
-                Id = MoveId.SpectralThief,
-                Num = 712,
-                Accuracy = 100,
-                BasePower = 90,
-                Category = MoveCategory.Physical,
-                Name = "Spectral Thief",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, BypassSub = true },
-                StealsBoosts = true,
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ghost,
             },
             [MoveId.SpinOut] = new()
             {
@@ -2822,7 +2728,7 @@ public partial record Moves
                     MoveAction? action = battle.Queue.WillMove(target);
                     Move? move = action?.Choice == ActionId.Move ? action.Move : null;
                     if (move == null ||
-                        (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst) ||
+                        move.Category == MoveCategory.Status ||
                         target.Volatiles.ContainsKey(ConditionId.MustRecharge))
                     {
                         return false;
@@ -3058,9 +2964,8 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((_, source, _, move) =>
+                OnTry = new OnTryEventInfo((_, source, _, _) =>
                 {
-                    if (move.SourceEffect == MoveId.Snatch) return true;
                     return source.Volatiles.ContainsKey(ConditionId.StockpileStorage);
                 }),
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
@@ -3247,7 +3152,7 @@ public partial record Moves
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                         factor = 0.667;
                     else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
-                             or ConditionId.Sandstorm or ConditionId.Hail or ConditionId.Snowscape)
+                             or ConditionId.Sandstorm or ConditionId.Snowscape)
                         factor = 0.25;
 
                     bool success =
@@ -4027,8 +3932,7 @@ public partial record Moves
                     MoveAction? action = battle.Queue.WillMove(target);
                     Move? targetMove = action?.Choice == ActionId.Move ? action.Move : null;
                     if (targetMove == null ||
-                        (targetMove.Category == MoveCategory.Status &&
-                         targetMove.Id != MoveId.MeFirst) ||
+                        targetMove.Category == MoveCategory.Status ||
                         target.Volatiles.ContainsKey(ConditionId.MustRecharge))
                     {
                         battle.Add("-fail", source);

@@ -2684,21 +2684,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
             },
-            [MoveId.Frustration] = new()
-            {
-                Id = MoveId.Frustration,
-                Num = 218,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Physical,
-                Name = "Frustration",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
             [MoveId.FuryAttack] = new()
             {
                 Id = MoveId.FuryAttack,

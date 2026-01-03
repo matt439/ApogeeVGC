@@ -638,8 +638,7 @@ public partial record Abilities
                 Rating = 3.0,
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
                 {
-                    if (battle.Field.IsWeather(ConditionId.Hail) ||
-                        battle.Field.IsWeather(ConditionId.Snowscape))
+                    if (battle.Field.IsWeather(ConditionId.Snowscape))
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(spe);
@@ -675,7 +674,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Snowscape })
                     {
                         return false;
                     }
@@ -685,8 +684,7 @@ public partial record Abilities
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
                 {
-                    if (battle.Field.IsWeather(ConditionId.Hail) ||
-                        battle.Field.IsWeather(ConditionId.Snowscape))
+                    if (battle.Field.IsWeather(ConditionId.Snowscape))
                     {
                         battle.Debug("Snow Cloak - decreasing accuracy");
                         battle.ChainModify([3277, 4096]);

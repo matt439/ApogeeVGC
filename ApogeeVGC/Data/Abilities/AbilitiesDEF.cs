@@ -34,7 +34,7 @@ public partial record Abilities
                 {
                     MoveId[] blockedMoves =
                     [
-                        MoveId.Explosion, MoveId.MindBlown, MoveId.MistyExplosion,
+                        MoveId.Explosion, MoveId.MistyExplosion,
                         MoveId.SelfDestruct,
                     ];
                     if (blockedMoves.Contains(move.Id))
@@ -1098,27 +1098,7 @@ public partial record Abilities
                         ConditionId.SunnyDay or ConditionId.DesolateLand => SpecieId.CastformSunny,
                         ConditionId.RainDance or ConditionId.PrimordialSea =>
                             SpecieId.CastformRainy,
-                        ConditionId.Hail or ConditionId.Snowscape => SpecieId.CastformSnowy,
-                        _ => SpecieId.Castform,
-                    };
-
-                    if (pokemon.IsActive && pokemon.Species.Id != targetForme)
-                    {
-                        pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
-                    }
-                }),
-                OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
-                        pokemon.Transformed) return;
-
-                    ConditionId? weather = pokemon.EffectiveWeather();
-                    SpecieId targetForme = weather switch
-                    {
-                        ConditionId.SunnyDay or ConditionId.DesolateLand => SpecieId.CastformSunny,
-                        ConditionId.RainDance or ConditionId.PrimordialSea =>
-                            SpecieId.CastformRainy,
-                        ConditionId.Hail or ConditionId.Snowscape => SpecieId.CastformSnowy,
+                        ConditionId.Snowscape => SpecieId.CastformSnowy,
                         _ => SpecieId.Castform,
                     };
 

@@ -16,13 +16,15 @@ public partial class BattleActions
     /// Hit step 0: Check for semi-invulnerability (Fly, Dig, Dive, etc.).
     /// Returns a list of hit results (true = can hit, false = miss due to invulnerability).
     /// </summary>
-    public List<BoolIntEmptyUndefinedUnion> HitStepInvulnerabilityEvent(List<Pokemon> targets, Pokemon pokemon,
+    public List<BoolIntEmptyUndefinedUnion> HitStepInvulnerabilityEvent(List<Pokemon> targets,
+        Pokemon pokemon,
         ActiveMove move)
     {
         // Helping Hand always hits all targets
         if (move.Id == MoveId.HelpingHand)
         {
-            return Enumerable.Repeat(BoolIntEmptyUndefinedUnion.FromBool(true), targets.Count).ToList();
+            return Enumerable.Repeat(BoolIntEmptyUndefinedUnion.FromBool(true), targets.Count)
+                .ToList();
         }
 
         var hitResults = new List<BoolIntEmptyUndefinedUnion>();
@@ -44,7 +46,8 @@ public partial class BattleActions
             else
             {
                 // Run Invulnerability event to check if target can be hit
-                RelayVar? invulnResult = Battle.RunEvent(EventId.Invulnerability, target, pokemon, move);
+                RelayVar? invulnResult =
+                    Battle.RunEvent(EventId.Invulnerability, target, pokemon, move);
 
                 // Convert RelayVar to boolean (false means invulnerable/miss, true/null means can hit)
                 canHit = invulnResult is not BoolRelayVar { Value: false };
@@ -84,7 +87,8 @@ public partial class BattleActions
     /// Hit step 1: Run TryHit event (handles Protect, Magic Bounce, Volt Absorb, etc.).
     /// Returns a list of hit results (true = can hit, false = blocked, undefined = NOT_FAIL).
     /// </summary>
-    public List<BoolIntEmptyUndefinedUnion> HitStepTryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion> HitStepTryEvent(List<Pokemon> targets, Pokemon pokemon,
+        ActiveMove move)
     {
         // Run TryHit event for all targets
         RelayVar? hitResult = Battle.RunEvent(EventId.TryHit, targets.ToArray(), pokemon, move);
@@ -134,6 +138,7 @@ public partial class BattleActions
                     Battle.Add("-fail", pokemon);
                 }
             }
+
             Battle.AttrLastMove("[still]");
         }
 
@@ -162,7 +167,7 @@ public partial class BattleActions
             else
             {
                 // Any other RelayVar type defaults to false
-                Battle.Debug($"[HitStepTryEvent] Unknown type, defaulting to false");
+                Battle.Debug("[HitStepTryEvent] Unknown type, defaulting to false");
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
             }
         }
@@ -175,14 +180,15 @@ public partial class BattleActions
     /// Hit step 2: Check for type immunity (e.g., Ground-type moves against Flying-types).
     /// Returns a list of hit results (true = not immune, false = immune).
     /// </summary>
-    public static List<BoolIntEmptyUndefinedUnion> HitStepTypeImmunity(List<Pokemon> targets, Pokemon pokemon,
+    public static List<BoolIntEmptyUndefinedUnion> HitStepTypeImmunity(List<Pokemon> targets,
+        Pokemon pokemon,
         ActiveMove move)
     {
         // Default ignoreImmunity for Status moves if not already set
         move.IgnoreImmunity ??= move.Category == MoveCategory.Status;
 
         return targets.Select(target =>
-            target.RunImmunity(move, !(move.SmartTarget ?? false)))
+                target.RunImmunity(move, !(move.SmartTarget ?? false)))
             .Select(BoolIntEmptyUndefinedUnion.FromBool).ToList();
     }
 
@@ -190,7 +196,8 @@ public partial class BattleActions
     /// Hit step 3: Check for move-specific immunities (Powder moves, TryImmunity event, Prankster).
     /// Returns a list of hit results (true = can hit, false = immune).
     /// </summary>
-    public List<BoolIntEmptyUndefinedUnion> HitStepTryImmunity(List<Pokemon> targets, Pokemon pokemon,
+    public List<BoolIntEmptyUndefinedUnion> HitStepTryImmunity(List<Pokemon> targets,
+        Pokemon pokemon,
         ActiveMove move)
     {
         var hitResults = new List<BoolIntEmptyUndefinedUnion>();
@@ -236,7 +243,8 @@ public partial class BattleActions
 
                 // Show hint message unless target has Illusion or move would fail anyway due to status immunity
                 if (target.Illusion != null ||
-                    !(move.Status != null && !Battle.Dex.GetImmunity(move.Status.Value, target.Types)))
+                    !(move.Status != null &&
+                      !Battle.Dex.GetImmunity(move.Status.Value, target.Types)))
                 {
                     if (Battle.DisplayUi)
                     {
@@ -262,7 +270,8 @@ public partial class BattleActions
     /// Hit step 4: Check accuracy.
     /// Returns a list of hit results (true = hit, false = miss).
     /// </summary>
-    public List<BoolIntEmptyUndefinedUnion> HitStepAccuracy(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion> HitStepAccuracy(List<Pokemon> targets, Pokemon pokemon,
+        ActiveMove move)
     {
         var hitResults = new List<BoolIntEmptyUndefinedUnion>();
 
@@ -291,7 +300,8 @@ public partial class BattleActions
                     // OHKO moves gain accuracy based on level difference
                     // Only works if: target level <= user level AND (move hits all types OR target doesn't have OHKO immunity type)
                     bool hasTypeImmunity = move.Ohko is BoolMoveOhko { Value: true } ||
-                                           move.Ohko is IceMoveOhko && target.HasType(PokemonType.Ice);
+                                           move.Ohko is IceMoveOhko &&
+                                           target.HasType(PokemonType.Ice);
 
                     if (pokemon.Level >= target.Level && !hasTypeImmunity)
                     {
@@ -304,6 +314,7 @@ public partial class BattleActions
                         {
                             Battle.Add("-immune", target, "[ohko]");
                         }
+
                         hitResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
                         continue;
                     }
@@ -372,7 +383,8 @@ public partial class BattleActions
                             Evasion = target.Boosts.Evasion,
                         };
 
-                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
+                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target,
+                            null,
                             null, targetBoostsTable);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
@@ -472,7 +484,8 @@ public partial class BattleActions
     /// Hit step 5: Break protection effects (Protect, King's Shield, etc.).
     /// Returns null to indicate this step doesn't filter targets.
     /// </summary>
-    public List<BoolIntEmptyUndefinedUnion>? HitStepBreakProtect(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion>? HitStepBreakProtect(List<Pokemon> targets,
+        Pokemon pokemon, ActiveMove move)
     {
         if (move.BreaksProtect != true)
         {
@@ -486,14 +499,14 @@ public partial class BattleActions
             // Remove individual protection volatiles
             var protectionVolatiles = new[]
             {
-            ConditionId.BanefulBunker,
-            ConditionId.BurningBulwark,
-            ConditionId.KingsShield,
-            ConditionId.Obstruct,
-            ConditionId.Protect,
-            ConditionId.SilkTrap,
-            ConditionId.SpikyShield,
-        };
+                ConditionId.BanefulBunker,
+                ConditionId.BurningBulwark,
+                ConditionId.KingsShield,
+                ConditionId.Obstruct,
+                ConditionId.Protect,
+                ConditionId.SilkTrap,
+                ConditionId.SpikyShield,
+            };
 
             foreach (ConditionId effectId in protectionVolatiles)
             {
@@ -508,9 +521,9 @@ public partial class BattleActions
             {
                 var sideProtections = new[]
                 {
-                ConditionId.QuickGuard,
-                ConditionId.WideGuard,
-            };
+                    ConditionId.QuickGuard,
+                    ConditionId.WideGuard,
+                };
 
                 foreach (ConditionId effectId in sideProtections)
                 {
@@ -548,7 +561,8 @@ public partial class BattleActions
     /// Hit step 6: Steal positive boosts (Spectral Thief).
     /// Returns null to indicate this step doesn't filter targets.
     /// </summary>
-    public List<BoolIntEmptyUndefinedUnion>? HitStepStealBoosts(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion>? HitStepStealBoosts(List<Pokemon> targets,
+        Pokemon pokemon, ActiveMove move)
     {
         if (move.StealsBoosts != true)
         {
@@ -565,6 +579,7 @@ public partial class BattleActions
             {
                 continue;
             }
+
             boosts.SetBoost(boost.BoostId, boost.Value);
             stolen = true;
         }
@@ -593,19 +608,21 @@ public partial class BattleActions
         };
         target.SetBoost(resetBoosts);
 
-        // Add animation for Spectral Thief specifically
-        if (move.Id == MoveId.SpectralThief && Battle.DisplayUi)
+        // Add animation for moves that steal boosts
+        if (move.StealsBoosts == true && Battle.DisplayUi)
         {
-            Battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(pokemon), "Spectral Thief", 
+            Battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(pokemon), move.Name,
                 StringNumberDelegateObjectUnion.FromObject(target));
         }
 
         return null;
     }
 
-    private readonly int[] _multiHitSample = [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5];
+    private readonly int[] _multiHitSample =
+        [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5];
 
-    public List<BoolIntEmptyUndefinedUnion> HitStepMoveHitLoop(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion> HitStepMoveHitLoop(List<Pokemon> targets,
+        Pokemon pokemon, ActiveMove move)
     {
         // Initialize damage array with 0s for each target
         var damage = new List<BoolIntEmptyUndefinedUnion>();
@@ -621,7 +638,8 @@ public partial class BattleActions
         IntIntArrayUnion targetHits = move.MultiHit ?? 1;
         int targetHitResult;
 
-        Battle.Debug($"[HitStepMoveHitLoop] Move: {move.Name}, MultiHit: {move.MultiHit?.GetType().Name ?? "null"}");
+        Battle.Debug(
+            $"[HitStepMoveHitLoop] Move: {move.Name}, MultiHit: {move.MultiHit?.GetType().Name ?? "null"}");
 
         if (targetHits is IntArrayIntIntArrayUnion range)
         {
@@ -663,9 +681,9 @@ public partial class BattleActions
 
         // There is no need to recursively check the 'sleepUsable' flag as Sleep Talk can only be used while asleep.
         bool isSleepUsable = move.SleepUsable == true ||
-                            (move.SourceEffect is MoveEffectStateId mesi &&
-                             Library.Moves.TryGetValue(mesi.MoveId, out Move? sourceMove) &&
-                             sourceMove.SleepUsable == true);
+                             (move.SourceEffect is MoveEffectStateId mesi &&
+                              Library.Moves.TryGetValue(mesi.MoveId, out Move? sourceMove) &&
+                              sourceMove.SleepUsable == true);
 
         var targetsCopy = new List<Pokemon>(targets);
         int hit;
@@ -772,7 +790,8 @@ public partial class BattleActions
                             Evasion = target.Boosts.Evasion,
                         };
 
-                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
+                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target,
+                            null,
                             null, targetBoosts);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
@@ -850,7 +869,10 @@ public partial class BattleActions
                 moveDamage = moveDamageThisHit;
             }
 
-            if (!moveDamage.Any(val => val is not BoolBoolIntUndefinedUnion { Value: false })) break;
+            if (!moveDamage.Any(val => val is not BoolBoolIntUndefinedUnion
+                {
+                    Value: false
+                })) break;
             nullDamage = false;
 
             for (int i = 0; i < moveDamage.Count; i++)
@@ -862,8 +884,10 @@ public partial class BattleActions
                 BoolIntUndefinedUnion md = moveDamage[i];
                 damage[i] = md switch
                 {
-                    BoolBoolIntUndefinedUnion { Value: true } => BoolIntEmptyUndefinedUnion.FromInt(0),
-                    IntBoolIntUndefinedUnion intDmg => BoolIntEmptyUndefinedUnion.FromInt(intDmg.Value),
+                    BoolBoolIntUndefinedUnion { Value: true } => BoolIntEmptyUndefinedUnion.FromInt(
+                        0),
+                    IntBoolIntUndefinedUnion intDmg => BoolIntEmptyUndefinedUnion.FromInt(
+                        intDmg.Value),
                     _ => BoolIntEmptyUndefinedUnion.FromInt(0),
                 };
 
@@ -884,7 +908,8 @@ public partial class BattleActions
                 int hpBeforeRecoil = pokemon.Hp;
 
                 Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
-                    BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()]), true);
+                    BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()]),
+                    true);
 
                 move.MindBlownRecoil = false;
                 if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
@@ -909,6 +934,7 @@ public partial class BattleActions
             {
                 damage[i] = BoolIntEmptyUndefinedUnion.FromBool(false);
             }
+
             return damage;
         }
 
@@ -931,25 +957,26 @@ public partial class BattleActions
         }
 
         // Recoil damage
-        if ((move.Recoil != null || move.Id == MoveId.Chloroblast) && 
- move.TotalDamage is IntIntFalseUnion totalDamageInt && totalDamageInt.Value > 0)
+        if ((move.Recoil != null || move.Id == MoveId.Chloroblast) &&
+            move.TotalDamage is IntIntFalseUnion { Value: > 0 } totalDamageInt)
         {
-  int hpBeforeRecoil = pokemon.Hp;
+            int hpBeforeRecoil = pokemon.Hp;
 
             Battle.Damage(CalcRecoilDamage(totalDamageInt.Value, move, pokemon), pokemon, pokemon,
-        BattleDamageEffect.FromIEffect(Library.Conditions[ConditionId.Recoil]));
+                BattleDamageEffect.FromIEffect(Library.Conditions[ConditionId.Recoil]));
 
-   if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
-{
-  Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
-      }
+            if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
+            {
+                Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+            }
         }
 
         // Struggle recoil
         if (move.StruggleRecoil == true)
         {
             int hpBeforeRecoil = pokemon.Hp;
-            int recoilDamage = Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0), 1, null);
+            int recoilDamage =
+                Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0), 1, null);
 
             Battle.DirectDamage(recoilDamage, pokemon, pokemon,
                 Library.Conditions[ConditionId.StruggleRecoil]);
@@ -996,7 +1023,10 @@ public partial class BattleActions
         }
 
         if (!damage.Any(val => (val is IntBoolIntEmptyUndefinedUnion intVal &&
-                                intVal.Value != 0) || val is IntBoolIntEmptyUndefinedUnion { Value: 0 }))
+                                intVal.Value != 0) || val is IntBoolIntEmptyUndefinedUnion
+            {
+                Value: 0
+            }))
         {
             return damage;
         }
@@ -1009,33 +1039,34 @@ public partial class BattleActions
         {
             for (int i = 0; i < damage.Count; i++)
             {
-      // There are no multihit spread moves, so it's safe to use move.totalDamage for multihit moves
-    // The previous check was for `move.multihit`, but that fails for Dragon Darts
-      int curDamage;
-       if (targets.Count == 1)
-     {
-         // For single target moves, use TotalDamage if it's an integer
-        curDamage = move.TotalDamage is IntIntFalseUnion totalDmgInt 
-               ? totalDmgInt.Value 
-        : 0;
-     }
-       else
-      {
-     // For multi-target moves, use individual damage value
-          curDamage = damage[i] is IntBoolIntEmptyUndefinedUnion dmgInt 
-    ? dmgInt.Value 
-     : 0;
-          }
+                // There are no multihit spread moves, so it's safe to use move.totalDamage for multihit moves
+                // The previous check was for `move.multihit`, but that fails for Dragon Darts
+                int curDamage;
+                if (targets.Count == 1)
+                {
+                    // For single target moves, use TotalDamage if it's an integer
+                    curDamage = move.TotalDamage is IntIntFalseUnion totalDmgInt
+                        ? totalDmgInt.Value
+                        : 0;
+                }
+                else
+                {
+                    // For multi-target moves, use individual damage value
+                    curDamage = damage[i] is IntBoolIntEmptyUndefinedUnion dmgInt
+                        ? dmgInt.Value
+                        : 0;
+                }
 
-    if (curDamage > 0 && targets[i].Hp > 0)
-       {
-            int targetHpBeforeDamage = (targets[i].HurtThisTurn ?? 0) + curDamage;
-     if (targets[i].Hp <= targets[i].MaxHp / 2 && targetHpBeforeDamage > targets[i].MaxHp / 2)
-          {
-         Battle.RunEvent(EventId.EmergencyExit, targets[i], pokemon);
-      }
- }
-          }
+                if (curDamage > 0 && targets[i].Hp > 0)
+                {
+                    int targetHpBeforeDamage = (targets[i].HurtThisTurn ?? 0) + curDamage;
+                    if (targets[i].Hp <= targets[i].MaxHp / 2 &&
+                        targetHpBeforeDamage > targets[i].MaxHp / 2)
+                    {
+                        Battle.RunEvent(EventId.EmergencyExit, targets[i], pokemon);
+                    }
+                }
+            }
         }
 
         return damage;
