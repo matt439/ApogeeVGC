@@ -6,6 +6,8 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Abilities;
 
 public partial record Abilities
@@ -64,7 +66,9 @@ public partial record Abilities
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
                     Pokemon pokemon = psfp.Pokemon;
 
-                    if (!pokemon.Volatiles.ContainsKey(ConditionId.ZenMode) ||
+                    // Add null check for Volatiles dictionary
+                    if (pokemon.Volatiles == null ||
+                        !pokemon.Volatiles.ContainsKey(ConditionId.ZenMode) ||
                         pokemon.Hp == 0) return;
 
                     pokemon.Transformed = false;

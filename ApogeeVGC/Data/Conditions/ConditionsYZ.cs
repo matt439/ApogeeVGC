@@ -126,6 +126,8 @@ public partial record Conditions
                 }),
                 OnEnd = new OnEndEventInfo((_, pokemon) =>
                 {
+                    if (pokemon == null) return;
+
                     // Check if in Zen forme
                     if (pokemon.Species.Forme is FormeId.Zen or FormeId.GalarZen)
                     {
