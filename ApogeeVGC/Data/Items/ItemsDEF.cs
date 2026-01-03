@@ -8,7 +8,6 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
