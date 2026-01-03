@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Moves;
 
@@ -100,10 +101,11 @@ public partial record Moves
 
                     if (battle.DisplayUi)
                     {
+                        battle.Add("-fail", source, "move: Dark Void");
                         battle.Hint("Only a Pokemon whose form is Darkrai can use this move.");
                     }
 
-                    return false;
+                    return null;
                 }),
             },
             [MoveId.Decorate] = new()
@@ -117,11 +119,7 @@ public partial record Moves
                 BasePp = 15,
                 Priority = 0,
                 Flags = new MoveFlags { AllyAnim = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = 2, SpA = 2 },
-                },
+                Boosts = new SparseBoostsTable { Atk = 2, SpA = 2 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
             },
@@ -556,7 +554,8 @@ public partial record Moves
                             battle.Add("-fail", source);
                         }
 
-                        return new Empty();
+                        battle.AttrLastMove("[still]");
+                        return new Empty(); // NOT_FAIL equivalent
                     }
 
                     return new VoidReturn();
@@ -685,9 +684,10 @@ public partial record Moves
                     if (battle.DisplayUi)
                     {
                         battle.Add("-fail", source, "move: Double Shock");
+                        battle.AttrLastMove("[still]");
                     }
 
-                    return false;
+                    return null;
                 }),
             },
             [MoveId.Doubleteam] = new()
@@ -813,7 +813,10 @@ public partial record Moves
                 Name = "Dragon Darts",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Flags = new MoveFlags
+                {
+                    Protect = true, Mirror = true, Metronome = true, NoParentalBond = true,
+                },
                 MultiHit = 2,
                 SmartTarget = true,
                 Target = MoveTarget.Normal,
@@ -1094,14 +1097,10 @@ public partial record Moves
                 },
                 OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
                 {
-                    if (target.RunEffectiveness(move) <= 0.0) return new VoidReturn();
-                    if (battle.DisplayUi)
-                    {
-                        battle.Debug("electro drift super effective buff");
-                    }
-
-                    battle.ChainModify([5461, 4096]);
-                    return new VoidReturn();
+                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
+                    // Only apply buff when super effective (> 0)
+                    battle.Debug("electro drift super effective buff");
+                    return battle.ChainModify([5461, 4096]);
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1158,13 +1157,17 @@ public partial record Moves
                 },
                 OnTry = new OnTryEventInfo((battle, source, _, _) =>
                 {
-                    if (source.ActiveMoveActions <= 1) return new VoidReturn();
-                    if (battle.DisplayUi)
+                    if (source.ActiveMoveActions > 1)
                     {
-                        battle.Hint("Fake out only works on your first turn out.");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Hint("Fake Out only works on your first turn out.");
+                        }
+
+                        return false;
                     }
 
-                    return false;
+                    return new VoidReturn();
                 }),
                 Secondary = new SecondaryEffect
                 {
@@ -1259,11 +1262,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { SpA = -2 },
-                },
+                Boosts = new SparseBoostsTable { SpA = -2 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -1771,11 +1770,7 @@ public partial record Moves
                     Protect = true, Reflectable = true, Mirror = true, AllyAnim = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { SpD = -2 },
-                },
+                Boosts = new SparseBoostsTable { SpD = -2 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
@@ -1823,11 +1818,7 @@ public partial record Moves
                     Protect = true, Reflectable = true, Mirror = true, Dance = true,
                     AllyAnim = true, Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -2 },
-                },
+                Boosts = new SparseBoostsTable { Atk = -2 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Flying,
             },
@@ -1861,6 +1852,16 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
+                OnAfterMoveSecondarySelf =
+                    new OnAfterMoveSecondarySelfEventInfo((battle, source, target, move) =>
+                    {
+                        if (target == null || target.Fainted || target.Hp <= 0)
+                        {
+                            battle.Boost(new SparseBoostsTable { Atk = 3 }, source, source, move);
+                        }
+
+                        return BoolVoidUnion.FromVoid();
+                    }),
             },
             [MoveId.FickleBeam] = new()
             {
@@ -2113,13 +2114,17 @@ public partial record Moves
                 Type = MoveType.Bug,
                 OnTry = new OnTryEventInfo((battle, source, _, _) =>
                 {
-                    if (source.ActiveMoveActions <= 1) return new VoidReturn();
-                    if (battle.DisplayUi)
+                    if (source.ActiveMoveActions > 1)
                     {
-                        battle.Hint("First Impression only works on your first turn out.");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Hint("First Impression only works on your first turn out.");
+                        }
+
+                        return false;
                     }
 
-                    return false;
+                    return new VoidReturn();
                 }),
             },
             [MoveId.Fissure] = new()
@@ -2152,6 +2157,38 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                {
+                    int ratio = Math.Max(source.Hp * 48 / source.MaxHp, 1);
+                    int bp;
+                    if (ratio < 2)
+                    {
+                        bp = 200;
+                    }
+                    else if (ratio < 5)
+                    {
+                        bp = 150;
+                    }
+                    else if (ratio < 10)
+                    {
+                        bp = 100;
+                    }
+                    else if (ratio < 17)
+                    {
+                        bp = 80;
+                    }
+                    else if (ratio < 33)
+                    {
+                        bp = 40;
+                    }
+                    else
+                    {
+                        bp = 20;
+                    }
+
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
             },
             [MoveId.FlameCharge] = new()
             {
@@ -2275,11 +2312,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 VolatileStatus = ConditionId.Confusion,
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { SpA = 1 },
-                },
+                Boosts = new SparseBoostsTable { SpA = 1 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },

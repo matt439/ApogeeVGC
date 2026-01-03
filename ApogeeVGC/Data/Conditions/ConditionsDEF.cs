@@ -357,7 +357,16 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Dig,
                 Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
+                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
+                {
+                    // Immune to sandstorm and snow damage while underground
+                    if (type.AsConditionId is ConditionId.Sandstorm or ConditionId.Snowscape)
+                    {
+                        return false;
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
                     if (move.Id is MoveId.Earthquake)
@@ -385,7 +394,16 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Dive,
                 Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
+                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
+                {
+                    // Immune to sandstorm and snow damage while underwater
+                    if (type.AsConditionId is ConditionId.Sandstorm or ConditionId.Snowscape)
+                    {
+                        return false;
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
                     if (move.Id is MoveId.Surf or MoveId.Whirlpool)
@@ -432,9 +450,10 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Fly,
                 Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
+                // No OnImmunity - Fly doesn't protect from weather
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
+                    // Moves that can hit Pokemon in the air
                     if (move.Id is MoveId.Gust or MoveId.Twister
                         or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown)
                     {
