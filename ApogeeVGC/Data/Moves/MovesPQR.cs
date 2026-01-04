@@ -412,11 +412,8 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -1 },
-                },
+                Boosts = new SparseBoostsTable { Atk = -1 },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -654,6 +651,21 @@ public partial record Moves
                     Metronome = true,
                     Bullet = true,
                 },
+                OnTryMove = new OnTryMoveEventInfo((battle, source, target, move) =>
+                {
+                    // Fail if targeting ally while under a heal-blocking effect
+                    // Note: TypeScript checks for 'healblock' volatile. HealBlock is not in Gen 9 VGC.
+                    // We use PsychicNoise as a simplified placeholder for heal-blocking effects.
+                    if (source.IsAlly(target) &&
+                        source.Volatiles.ContainsKey(ConditionId.PsychicNoise))
+                    {
+                        battle.AttrLastMove("[still]");
+                        battle.Add("cant", source, "move: Heal Block", move);
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
                 OnTryHit = new OnTryHitEventInfo((_, target, source, move) =>
                 {
                     if (source.IsAlly(target))
@@ -1165,16 +1177,16 @@ public partial record Moves
                     Metronome = true,
                     Slicing = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
                 {
-                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, source))
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         battle.Debug("psyblade electric terrain boost");
                         battle.ChainModify(3, 2); // 1.5x
                         return battle.FinalModify(basePower);
                     }
 
-                    return new VoidReturn();
+                    return basePower;
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1311,6 +1323,9 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
+                // Note: TypeScript applies 'healblock' volatile, but HealBlock is not in Gen 9 VGC.
+                // This implementation uses PsychicNoise as a simplified placeholder for the heal-blocking effect.
+                // In Gen 9, Psychic Noise prevents the target from healing for 2 turns.
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
@@ -1334,7 +1349,9 @@ public partial record Moves
                     NonSky = true,
                     Metronome = true,
                 },
+                Terrain = ConditionId.PsychicTerrain,
                 Condition = _library.Conditions[ConditionId.PsychicTerrain],
+                Secondary = null,
                 Target = MoveTarget.All,
                 Type = MoveType.Psychic,
             },
@@ -1840,6 +1857,17 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                {
+                    if (source.Side.FaintedLastTurn != null)
+                    {
+                        battle.Debug("Boosted for a faint last turn");
+                        return battle.ChainModify(2);
+                    }
+
+                    return basePower;
+                }),
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -2410,6 +2438,11 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Heal = true, Metronome = true },
                 Heal = [1, 2],
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.Roost,
+                },
+                Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Flying,
             },
