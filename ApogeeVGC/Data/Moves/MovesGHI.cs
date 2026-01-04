@@ -326,8 +326,7 @@ public partial record Moves
 
                             // Check if it's an ally using Water Pledge or Fire Pledge
                             if (moveAction.Pokemon.IsAlly(source) &&
-                                (moveAction.Move.Id == MoveId.WaterPledge ||
-                                 moveAction.Move.Id == MoveId.FirePledge))
+                                moveAction.Move.Id is MoveId.WaterPledge or MoveId.FirePledge)
                             {
                                 battle.Queue.PrioritizeAction(moveAction, move);
                                 if (battle.DisplayUi)
@@ -514,23 +513,21 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SelfBoost = new SparseBoostsTable
+                Boosts = new SparseBoostsTable
                 {
                     Atk = 1,
                     SpA = 1,
                 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
                 {
-                    // In sun, add an extra +1/+1 boost (SelfBoost already provides +1/+1)
-                    ConditionId weather = source.EffectiveWeather();
-                    if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                    // In sun, boost to +2/+2 instead of +1/+1
+                    ConditionId weather = pokemon.EffectiveWeather();
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
-                        battle.Boost(new SparseBoostsTable { Atk = 1, SpA = 1 }, source, source);
+                        move.Boosts = new SparseBoostsTable { Atk = 2, SpA = 2 };
                     }
-
-                    return new VoidReturn();
                 }),
             },
             [MoveId.GuardSplit] = new()

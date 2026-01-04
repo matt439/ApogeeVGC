@@ -7,7 +7,7 @@ namespace ApogeeVGC.Sim.Moves;
 public record HitEffect
 {
     public ResultMoveHandler? OnHit { get; init; }
-    public SparseBoostsTable? Boosts { get; init; }
+    public SparseBoostsTable? Boosts { get; set; }
     public ConditionId? Status { get; init; }
     public ConditionId? VolatileStatus { get; init; }
     public ConditionId? SideCondition { get; init; }
