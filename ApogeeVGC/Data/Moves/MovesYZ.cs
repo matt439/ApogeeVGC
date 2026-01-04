@@ -42,6 +42,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
+                Condition = _library.Conditions[ConditionId.Yawn],
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
