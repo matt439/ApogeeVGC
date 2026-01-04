@@ -41,4 +41,9 @@
     <None Remove="Sim\Ui\**" />
   </ItemGroup>
 
+  <!-- Learnsets JSON data file - copied to output directory when present -->
+  <ItemGroup>
+    <Content Include="Data\Learnsets\learnsets.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('Data\Learnsets\learnsets.json')" />
+  </ItemGroup>
+
 </Project>
