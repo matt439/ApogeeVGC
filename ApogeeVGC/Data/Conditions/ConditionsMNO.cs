@@ -411,15 +411,36 @@ public partial record Conditions
                     // Block the status
                     return false;
                 }),
-                // TODO: Add OnTryAddVolatile to block confusion for grounded Pokemon
-                // TS: onTryAddVolatile(status, target, source, effect) {
-                //     if (!target.isGrounded() || target.isSemiInvulnerable()) return;
-                //     if (status.id === 'confusion') {
-                //         if (effect.effectType === 'Move' && !effect.secondaries) 
-                //             this.add('-activate', target, 'move: Misty Terrain');
-                //         return null;
-                //     }
-                // }
+                // Block confusion for grounded Pokemon
+                OnTryAddVolatile =
+                    new OnTryAddVolatileEventInfo((battle, status, target, _, effect) =>
+                    {
+                        // Allow volatile if target is NOT grounded OR IS semi-invulnerable
+                        if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable())
+                        {
+                            return new VoidReturn();
+                        }
+
+                        // Block confusion
+                        if (status.Id == ConditionId.Confusion)
+                        {
+                            // Show message if from a move without secondaries
+                            if (effect is ActiveMove { Secondaries: null })
+                            {
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-activate", target, "move: Misty Terrain");
+                                }
+                            }
+
+                            // Return null to block the volatile
+                            return null;
+                        }
+
+                        // Allow other volatiles
+                        return new VoidReturn();
+                    }),
+
                 //OnBasePowerPriority = 6,
                 OnBasePower = new OnBasePowerEventInfo((battle, _, _, defender, move) =>
                     {
