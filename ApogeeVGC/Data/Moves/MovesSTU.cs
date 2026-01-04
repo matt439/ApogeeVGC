@@ -2577,7 +2577,8 @@ public partial record Moves
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
-                    move.Type = MoveType.Fighting;
+                    // In Gen 9, Struggle is typeless (uses '???' type in PS which we represent as Unknown)
+                    move.Type = MoveType.Unknown;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-activate", pokemon, "move: Struggle");
@@ -2965,9 +2966,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 OnTry = new OnTryEventInfo((_, source, _, _) =>
-                {
-                    return source.Volatiles.ContainsKey(ConditionId.StockpileStorage);
-                }),
+                    source.Volatiles.ContainsKey(ConditionId.StockpileStorage)),
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
                     int layers =
@@ -3435,7 +3434,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 VolatileStatus = ConditionId.TarShot,
-                Boosts = new SparseBoostsTable { SpA = -1 },
+                Boosts = new SparseBoostsTable { Spe = -1 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Rock,
@@ -3662,8 +3661,12 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Protect = true, Mirror = true, NoSleepTalk = true, NoAssist = true,
-                    FailCopycat = true, FailMimic = true, FailInstruct = true,
+                    Protect = true,
+                    Mirror = true,
+                    NoAssist = true,
+                    FailCopycat = true,
+                    FailMimic = true,
+                    NoSketch = true,
                 },
                 OnModifyType = new OnModifyTypeEventInfo((_, move, source, _) =>
                 {
