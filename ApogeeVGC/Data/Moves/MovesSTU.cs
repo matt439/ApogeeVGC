@@ -619,19 +619,19 @@ public partial record Moves
                         source.Volatiles.ContainsKey(ConditionId.Commanded))
                     {
                         battle.Add("-fail", source);
-                        return false;
+                        return new Empty();
                     }
 
                     if (source.Volatiles.ContainsKey(ConditionId.Substitute))
                     {
                         battle.Add("-fail", source, "move: Shed Tail");
-                        return false;
+                        return new Empty();
                     }
 
                     if (source.Hp <= Math.Ceiling(source.MaxHp / 2.0))
                     {
                         battle.Add("-fail", source, "move: Shed Tail", "[weak]");
-                        return false;
+                        return new Empty();
                     }
 
                     return new VoidReturn();
@@ -2440,7 +2440,8 @@ public partial record Moves
                         if (value > 0) positiveBoosts += value;
                     }
 
-                    int bp = 20 + 20 * positiveBoosts;
+                    Move storedPower = _library.Moves[MoveId.StoredPower];
+                    int bp = storedPower.BasePower + 20 * positiveBoosts;
                     battle.Debug($"[Stored Power] BP: {bp}");
                     return bp;
                 }),
