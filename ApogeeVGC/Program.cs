@@ -7,6 +7,12 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        LearnsetJsonConverter.ConvertToJson(
+            "pokemon-showdown/data/learnsets.ts",
+            "Data/Learnsets/learnsets.json");
+
+        return;
+
         // Validate species data conversion
         if (args.Length > 0 && args[0] == "--validate-species")
         {

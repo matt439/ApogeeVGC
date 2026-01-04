@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using ApogeeVGC.Data.Json;
@@ -17,12 +16,14 @@ public static partial class LearnsetJsonConverter
     // Lookup dictionaries built from actual enum values (case-insensitive)
     private static readonly Dictionary<string, string> MoveIdLookup = BuildEnumLookup<MoveId>();
     private static readonly Dictionary<string, string> SpecieIdLookup = BuildEnumLookup<SpecieId>();
-    private static readonly Dictionary<string, string> AbilityIdLookup = BuildEnumLookup<AbilityId>();
+
+    private static readonly Dictionary<string, string> AbilityIdLookup =
+        BuildEnumLookup<AbilityId>();
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = false,
-        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
     };
 
     /// <summary>
@@ -32,10 +33,11 @@ public static partial class LearnsetJsonConverter
     private static Dictionary<string, string> BuildEnumLookup<T>() where T : struct, Enum
     {
         var lookup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var name in Enum.GetNames<T>())
+        foreach (string name in Enum.GetNames<T>())
         {
             lookup[name.ToLowerInvariant()] = name;
         }
+
         return lookup;
     }
 
@@ -56,10 +58,10 @@ public static partial class LearnsetJsonConverter
             return;
         }
 
-        var content = File.ReadAllText(inputPath);
+        string content = File.ReadAllText(inputPath);
         Console.WriteLine($"Read {content.Length:N0} characters from input file");
 
-        var speciesMatches = SpeciesEntryRegex().Matches(content);
+        MatchCollection speciesMatches = SpeciesEntryRegex().Matches(content);
         Console.WriteLine($"Found {speciesMatches.Count} species entries");
 
         var root = new LearnsetsJsonRoot();
@@ -68,17 +70,17 @@ public static partial class LearnsetJsonConverter
 
         foreach (Match match in speciesMatches)
         {
-            var speciesId = match.Groups["species"].Value;
-            var entryContent = match.Groups["content"].Value;
+            string speciesId = match.Groups["species"].Value;
+            string entryContent = match.Groups["content"].Value;
 
-            var specieIdEnum = ConvertToSpecieIdEnum(speciesId);
+            string? specieIdEnum = ConvertToSpecieIdEnum(speciesId);
             if (specieIdEnum == null)
             {
                 skippedCount++;
                 continue;
             }
 
-            var learnsetModel = ParseLearnsetEntry(entryContent);
+            LearnsetJsonModel? learnsetModel = ParseLearnsetEntry(entryContent);
             if (learnsetModel != null)
             {
                 root.Learnsets[specieIdEnum] = learnsetModel;
@@ -90,13 +92,13 @@ public static partial class LearnsetJsonConverter
         Console.WriteLine($"Skipped species entries: {skippedCount}");
 
         // Ensure output directory exists
-        var outputDir = Path.GetDirectoryName(outputPath);
+        string? outputDir = Path.GetDirectoryName(outputPath);
         if (!string.IsNullOrEmpty(outputDir))
         {
             Directory.CreateDirectory(outputDir);
         }
 
-        var json = JsonSerializer.Serialize(root, JsonOptions);
+        string json = JsonSerializer.Serialize(root, JsonOptions);
         File.WriteAllText(outputPath, json);
 
         var fileInfo = new FileInfo(outputPath);
@@ -110,7 +112,7 @@ public static partial class LearnsetJsonConverter
         bool hasData = false;
 
         // Parse learnset moves
-        var learnsetMatch = LearnsetRegex().Match(entryContent);
+        Match learnsetMatch = LearnsetRegex().Match(entryContent);
         if (learnsetMatch.Success)
         {
             var learnset = ParseMoves(learnsetMatch.Groups["moves"].Value);
@@ -122,7 +124,7 @@ public static partial class LearnsetJsonConverter
         }
 
         // Parse eventData
-        var eventDataMatch = EventDataRegex().Match(entryContent);
+        Match eventDataMatch = EventDataRegex().Match(entryContent);
         if (eventDataMatch.Success)
         {
             var events = ParseEvents(eventDataMatch.Groups["events"].Value);
@@ -141,7 +143,7 @@ public static partial class LearnsetJsonConverter
         }
 
         // Parse encounters
-        var encountersMatch = EncountersRegex().Match(entryContent);
+        Match encountersMatch = EncountersRegex().Match(entryContent);
         if (encountersMatch.Success)
         {
             var encounters = ParseEvents(encountersMatch.Groups["encounters"].Value);
@@ -159,16 +161,16 @@ public static partial class LearnsetJsonConverter
     {
         var result = new Dictionary<string, string[]>();
 
-        var moveMatches = MoveEntryRegex().Matches(movesContent);
+        MatchCollection moveMatches = MoveEntryRegex().Matches(movesContent);
         foreach (Match moveMatch in moveMatches)
         {
-            var moveId = moveMatch.Groups["move"].Value;
-            var sources = moveMatch.Groups["sources"].Value;
+            string moveId = moveMatch.Groups["move"].Value;
+            string sources = moveMatch.Groups["sources"].Value;
 
-            var moveIdEnum = ConvertToMoveIdEnum(moveId);
+            string? moveIdEnum = ConvertToMoveIdEnum(moveId);
             if (moveIdEnum == null) continue; // Skip unknown moves
 
-            var sourcesList = ParseMoveSources(sources);
+            string[] sourcesList = ParseMoveSources(sources);
             if (sourcesList.Length > 0)
             {
                 result[moveIdEnum] = sourcesList;
@@ -180,12 +182,13 @@ public static partial class LearnsetJsonConverter
 
     private static string[] ParseMoveSources(string sourcesContent)
     {
-        var matches = SourceCodeRegex().Matches(sourcesContent);
-        var result = new string[matches.Count];
+        MatchCollection matches = SourceCodeRegex().Matches(sourcesContent);
+        string[] result = new string[matches.Count];
         for (int i = 0; i < matches.Count; i++)
         {
             result[i] = matches[i].Groups["code"].Value;
         }
+
         return result;
     }
 
@@ -193,15 +196,15 @@ public static partial class LearnsetJsonConverter
     {
         var result = new List<EventInfoJsonModel>();
 
-        var eventMatches = SingleEventRegex().Matches(eventsContent);
+        MatchCollection eventMatches = SingleEventRegex().Matches(eventsContent);
         foreach (Match eventMatch in eventMatches)
         {
-            var eventContent = eventMatch.Groups["event"].Value;
+            string eventContent = eventMatch.Groups["event"].Value;
             var eventInfo = new EventInfoJsonModel();
             bool hasData = false;
 
             // Parse generation
-            var genMatch = GenerationRegex().Match(eventContent);
+            Match genMatch = GenerationRegex().Match(eventContent);
             if (genMatch.Success)
             {
                 eventInfo.Generation = int.Parse(genMatch.Groups["gen"].Value);
@@ -209,21 +212,21 @@ public static partial class LearnsetJsonConverter
             }
 
             // Parse level
-            var levelMatch = LevelRegex().Match(eventContent);
+            Match levelMatch = LevelRegex().Match(eventContent);
             if (levelMatch.Success)
             {
                 eventInfo.Level = int.Parse(levelMatch.Groups["level"].Value);
             }
 
             // Parse gender
-            var genderMatch = GenderRegex().Match(eventContent);
+            Match genderMatch = GenderRegex().Match(eventContent);
             if (genderMatch.Success)
             {
                 eventInfo.Gender = genderMatch.Groups["gender"].Value;
             }
 
             // Parse nature
-            var natureMatch = NatureRegex().Match(eventContent);
+            Match natureMatch = NatureRegex().Match(eventContent);
             if (natureMatch.Success)
             {
                 eventInfo.Nature = natureMatch.Groups["nature"].Value;
@@ -246,21 +249,21 @@ public static partial class LearnsetJsonConverter
             }
 
             // Parse perfectIvs
-            var perfectIvsMatch = PerfectIvsRegex().Match(eventContent);
+            Match perfectIvsMatch = PerfectIvsRegex().Match(eventContent);
             if (perfectIvsMatch.Success)
             {
                 eventInfo.PerfectIvs = int.Parse(perfectIvsMatch.Groups["count"].Value);
             }
 
             // Parse IVs
-            var ivsMatch = IvsRegex().Match(eventContent);
+            Match ivsMatch = IvsRegex().Match(eventContent);
             if (ivsMatch.Success)
             {
                 eventInfo.Ivs = ParseIvs(ivsMatch.Groups["ivs"].Value);
             }
 
             // Parse abilities
-            var abilitiesMatch = AbilitiesRegex().Match(eventContent);
+            Match abilitiesMatch = AbilitiesRegex().Match(eventContent);
             if (abilitiesMatch.Success)
             {
                 var abilities = ParseAbilities(abilitiesMatch.Groups["abilities"].Value);
@@ -271,14 +274,14 @@ public static partial class LearnsetJsonConverter
             }
 
             // Parse moves
-            var movesMatch = EventMovesRegex().Match(eventContent);
+            Match movesMatch = EventMovesRegex().Match(eventContent);
             if (movesMatch.Success)
             {
                 eventInfo.Moves = ParseEventMoves(movesMatch.Groups["moves"].Value);
             }
 
             // Parse pokeball
-            var pokeballMatch = PokeballRegex().Match(eventContent);
+            Match pokeballMatch = PokeballRegex().Match(eventContent);
             if (pokeballMatch.Success)
             {
                 eventInfo.Pokeball = pokeballMatch.Groups["ball"].Value;
@@ -297,22 +300,22 @@ public static partial class LearnsetJsonConverter
     {
         var result = new Dictionary<string, int>();
 
-        var hpMatch = Regex.Match(ivsContent, @"hp:\s*(\d+)");
+        Match hpMatch = Regex.Match(ivsContent, @"hp:\s*(\d+)");
         if (hpMatch.Success) result["hp"] = int.Parse(hpMatch.Groups[1].Value);
 
-        var atkMatch = Regex.Match(ivsContent, @"atk:\s*(\d+)");
+        Match atkMatch = Regex.Match(ivsContent, @"atk:\s*(\d+)");
         if (atkMatch.Success) result["atk"] = int.Parse(atkMatch.Groups[1].Value);
 
-        var defMatch = Regex.Match(ivsContent, @"def:\s*(\d+)");
+        Match defMatch = Regex.Match(ivsContent, @"def:\s*(\d+)");
         if (defMatch.Success) result["def"] = int.Parse(defMatch.Groups[1].Value);
 
-        var spaMatch = Regex.Match(ivsContent, @"spa:\s*(\d+)");
+        Match spaMatch = Regex.Match(ivsContent, @"spa:\s*(\d+)");
         if (spaMatch.Success) result["spa"] = int.Parse(spaMatch.Groups[1].Value);
 
-        var spdMatch = Regex.Match(ivsContent, @"spd:\s*(\d+)");
+        Match spdMatch = Regex.Match(ivsContent, @"spd:\s*(\d+)");
         if (spdMatch.Success) result["spd"] = int.Parse(spdMatch.Groups[1].Value);
 
-        var speMatch = Regex.Match(ivsContent, @"spe:\s*(\d+)");
+        Match speMatch = Regex.Match(ivsContent, @"spe:\s*(\d+)");
         if (speMatch.Success) result["spe"] = int.Parse(speMatch.Groups[1].Value);
 
         return result;
@@ -321,26 +324,32 @@ public static partial class LearnsetJsonConverter
     private static List<string> ParseAbilities(string abilitiesContent)
     {
         var result = new List<string>();
-        var matches = Regex.Matches(abilitiesContent, @"""([^""]+)""");
+        MatchCollection matches = Regex.Matches(abilitiesContent, """
+            "([^"]+)"
+            """);
         foreach (Match match in matches)
         {
-            var ability = ConvertToAbilityIdEnum(match.Groups[1].Value);
+            string? ability = ConvertToAbilityIdEnum(match.Groups[1].Value);
             if (ability != null)
             {
                 result.Add(ability);
             }
         }
+
         return result;
     }
 
     private static List<string> ParseEventMoves(string movesContent)
     {
         var result = new List<string>();
-        var matches = Regex.Matches(movesContent, @"""([^""]+)""");
+        MatchCollection matches = Regex.Matches(movesContent, """
+                                                              "([^"]+)"
+                                                              """);
         foreach (Match match in matches)
         {
             result.Add(match.Groups[1].Value);
         }
+
         return result;
     }
 
@@ -348,29 +357,17 @@ public static partial class LearnsetJsonConverter
     {
         if (tsId == "missingno") return null; // Skip MissingNo
 
-        if (SpecieIdLookup.TryGetValue(tsId, out var enumName))
-        {
-            return enumName;
-        }
-        return null;
+        return SpecieIdLookup.GetValueOrDefault(tsId);
     }
 
     private static string? ConvertToMoveIdEnum(string tsId)
     {
-        if (MoveIdLookup.TryGetValue(tsId, out var enumName))
-        {
-            return enumName;
-        }
-        return null;
+        return MoveIdLookup.GetValueOrDefault(tsId);
     }
 
     private static string? ConvertToAbilityIdEnum(string tsId)
     {
-        if (AbilityIdLookup.TryGetValue(tsId, out var enumName))
-        {
-            return enumName;
-        }
-        return null;
+        return AbilityIdLookup.GetValueOrDefault(tsId);
     }
 
     // Regex patterns using GeneratedRegex for performance
@@ -383,7 +380,9 @@ public static partial class LearnsetJsonConverter
     [GeneratedRegex(@"(?<move>[a-z0-9]+):\s*\[(?<sources>[^\]]+)\]")]
     private static partial Regex MoveEntryRegex();
 
-    [GeneratedRegex(@"""(?<code>[0-9][A-Z][^""]*?)""")]
+    [GeneratedRegex("""
+                    "(?<code>[0-9][A-Z][^"]*?)"
+                    """)]
     private static partial Regex SourceCodeRegex();
 
     [GeneratedRegex(@"eventData:\s*\[(?<events>[\s\S]*?)\n\t\t\]")]
@@ -401,10 +400,14 @@ public static partial class LearnsetJsonConverter
     [GeneratedRegex(@"level:\s*(?<level>\d+)")]
     private static partial Regex LevelRegex();
 
-    [GeneratedRegex(@"gender:\s*""(?<gender>[MFN])""")]
+    [GeneratedRegex("""
+                    gender:\s*"(?<gender>[MFN])"
+                    """)]
     private static partial Regex GenderRegex();
 
-    [GeneratedRegex(@"nature:\s*""(?<nature>[^""]+)""")]
+    [GeneratedRegex("""
+                    nature:\s*"(?<nature>[^"]+)"
+                    """)]
     private static partial Regex NatureRegex();
 
     [GeneratedRegex(@"perfectIvs:\s*(?<count>\d+)")]
@@ -419,6 +422,8 @@ public static partial class LearnsetJsonConverter
     [GeneratedRegex(@"moves:\s*\[(?<moves>[^\]]+)\]")]
     private static partial Regex EventMovesRegex();
 
-    [GeneratedRegex(@"pokeball:\s*""(?<ball>[^""]+)""")]
+    [GeneratedRegex("""
+                    pokeball:\s*"(?<ball>[^"]+)"
+                    """)]
     private static partial Regex PokeballRegex();
 }
