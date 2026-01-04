@@ -849,8 +849,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Heal = true, Metronome = true },
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
-                // TODO: Implement full HealingWish slot condition that heals and clears status on switch-in
-                // SlotCondition = ConditionId.HealingWish,
+                SlotCondition = ConditionId.HealingWish,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
                 OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>

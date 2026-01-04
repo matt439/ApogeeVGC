@@ -340,6 +340,43 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.HealingWish] = new()
+            {
+                // This is a slot condition for Healing Wish
+                Id = ConditionId.HealingWish,
+                Name = "Healing Wish",
+                AssociatedMove = MoveId.HealingWish,
+                EffectType = EffectType.Condition,
+                OnStart = new OnStartEventInfo((battle, _, source, _) =>
+                {
+                    battle.Add("-activate", source, "move: Healing Wish");
+                    return new VoidReturn();
+                }),
+                OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
+                {
+                    // Trigger the onSwap event
+                    battle.SingleEvent(EventId.Swap, _library.Conditions[ConditionId.HealingWish],
+                        battle.EffectState, target, target);
+                }),
+                OnSwap = new OnSwapEventInfo((battle, target, _) =>
+                {
+                    // Only heal if the Pokemon needs healing (HP not full or has status)
+                    if (!target.Fainted &&
+                        (target.Hp < target.MaxHp || target.Status != ConditionId.None))
+                    {
+                        target.Heal(target.MaxHp);
+                        target.CureStatus(silent: true);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-heal", target, target.GetHealth,
+                                "[from] move: Healing Wish");
+                        }
+
+                        target.Side.RemoveSlotCondition(target,
+                            _library.Conditions[ConditionId.HealingWish]);
+                    }
+                }),
+            },
             [ConditionId.GrassyTerrain] = new()
             {
                 Id = ConditionId.GrassyTerrain,

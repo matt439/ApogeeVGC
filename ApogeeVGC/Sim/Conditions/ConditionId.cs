@@ -89,6 +89,7 @@ public enum ConditionId
     MustRecharge,
     FutureMove,
     HealReplacement,
+    HealingWish,
     Gem,
 
     //Dynamax,
