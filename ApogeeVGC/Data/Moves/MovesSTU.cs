@@ -3499,11 +3499,59 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                OnHitField = new OnHitFieldEventInfo((battle, _, _, _) =>
+                OnHitField = new OnHitFieldEventInfo((battle, _, source, move) =>
                 {
+                    var targets = new List<Pokemon>();
+
+                    // Check each active Pokemon for invulnerability, TryHit events, and if they have a berry
                     foreach (Pokemon pokemon in battle.GetAllActive())
                     {
-                        pokemon.EatItem();
+                        // Check invulnerability
+                        RelayVar? invulnResult = battle.RunEvent(EventId.Invulnerability, pokemon,
+                            source, move);
+                        if (invulnResult is BoolRelayVar { Value: false })
+                        {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-miss", source, pokemon);
+                            }
+
+                            continue;
+                        }
+
+                        // Check TryHit event and if Pokemon has a berry
+                        RelayVar? tryHitResult =
+                            battle.RunEvent(EventId.TryHit, pokemon, source, move);
+                        Item item = pokemon.GetItem();
+                        if (tryHitResult is not null && item.IsBerry)
+                        {
+                            targets.Add(pokemon);
+                        }
+                    }
+
+                    // Always show field activate message
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldactivate", "move: Teatime");
+                    }
+
+                    // If no valid targets, fail the move
+                    if (targets.Count == 0)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source, "move: Teatime");
+                            battle.AttrLastMove("[still]");
+                        }
+
+                        // Return NOT_FAIL equivalent - move worked but had no effect
+                        return new VoidReturn();
+                    }
+
+                    // Eat the berry for all valid targets
+                    foreach (Pokemon pokemon in targets)
+                    {
+                        pokemon.EatItem(true);
                     }
 
                     return new VoidReturn();
