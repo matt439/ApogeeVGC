@@ -2578,8 +2578,7 @@ public partial record Moves
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
-                    // In Gen 9, Struggle is typeless (uses '???' type in PS which we represent as Unknown)
-                    move.Type = MoveType.Unknown;
+                    move.Type = MoveType.Rock;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-activate", pokemon, "move: Struggle");
