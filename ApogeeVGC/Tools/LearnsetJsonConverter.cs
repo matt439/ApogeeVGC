@@ -46,7 +46,8 @@ public static partial class LearnsetJsonConverter
     /// </summary>
     /// <param name="inputPath">Path to the learnsets.ts file</param>
     /// <param name="outputPath">Path where the JSON file will be written</param>
-    public static void ConvertToJson(string inputPath, string outputPath)
+    /// <param name="writeIndented">Whether to format JSON with indentation (default: false for smaller file size)</param>
+    public static void ConvertToJson(string inputPath, string outputPath, bool writeIndented = false)
     {
         Console.WriteLine("LearnsetJsonConverter - Converting TypeScript learnsets to JSON");
         Console.WriteLine($"Input:  {Path.GetFullPath(inputPath)}");
@@ -98,7 +99,13 @@ public static partial class LearnsetJsonConverter
             Directory.CreateDirectory(outputDir);
         }
 
-        string json = JsonSerializer.Serialize(root, JsonOptions);
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = writeIndented,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
+        string json = JsonSerializer.Serialize(root, options);
         File.WriteAllText(outputPath, json);
 
         var fileInfo = new FileInfo(outputPath);

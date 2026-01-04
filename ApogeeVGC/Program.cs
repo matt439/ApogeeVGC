@@ -7,8 +7,11 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // GenerateLearnsetJson();
-
+        if (args.Length > 0 && args[0] == "--generate-learnsets-json")
+        {
+            GenerateLearnsetJson();
+            return;
+        }
 
         // Validate species data conversion
         if (args.Length > 0 && args[0] == "--validate-species")
@@ -64,7 +67,9 @@ public class Program
             Console.WriteLine($"Input exists: {File.Exists(inputPath)}");
             Console.WriteLine();
 
-            LearnsetJsonConverter.ConvertToJson(inputPath, outputPath);
+            // Pass true for writeIndented to generate human-readable JSON with line breaks
+            // Use false (default) for production to minimize file size
+            LearnsetJsonConverter.ConvertToJson(inputPath, outputPath, writeIndented: true);
 
             Console.WriteLine();
             Console.WriteLine($"Output exists: {File.Exists(outputPath)}");
