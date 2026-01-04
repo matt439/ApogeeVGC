@@ -380,20 +380,46 @@ public partial record Conditions
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
                     source.HasItem(ItemId.TerrainExtender) ? 8 : 5),
-                OnSetStatus = new OnSetStatusEventInfo((battle, _, target, _, _) =>
+                // Block status conditions for grounded Pokemon
+                // TS: if (!target.isGrounded() || target.isSemiInvulnerable()) return; (allows status)
+                //     return false; (blocks status)
+                OnSetStatus = new OnSetStatusEventInfo((battle, _, target, _, effect) =>
                 {
-                    if ((target.IsGrounded() ?? false) && !target.IsSemiInvulnerable())
+                    // Allow status if target is NOT grounded OR IS semi-invulnerable
+                    if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable())
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Show message if this is from a move's status effect or Yawn
+                    if (effect is ActiveMove move &&
+                        (move.Status != null || move.Id == MoveId.Yawn))
                     {
                         if (battle.DisplayUi)
                         {
                             battle.Add("-activate", target, "move: Misty Terrain");
                         }
-
-                        return false;
+                    }
+                    else if (effect is Condition { Id: ConditionId.Yawn })
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Misty Terrain");
+                        }
                     }
 
-                    return new VoidReturn();
+                    // Block the status
+                    return false;
                 }),
+                // TODO: Add OnTryAddVolatile to block confusion for grounded Pokemon
+                // TS: onTryAddVolatile(status, target, source, effect) {
+                //     if (!target.isGrounded() || target.isSemiInvulnerable()) return;
+                //     if (status.id === 'confusion') {
+                //         if (effect.effectType === 'Move' && !effect.secondaries) 
+                //             this.add('-activate', target, 'move: Misty Terrain');
+                //         return null;
+                //     }
+                // }
                 //OnBasePowerPriority = 6,
                 OnBasePower = new OnBasePowerEventInfo((battle, _, _, defender, move) =>
                     {

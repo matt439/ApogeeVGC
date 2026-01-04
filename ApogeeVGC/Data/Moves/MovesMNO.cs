@@ -430,12 +430,9 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
+                Boosts = new SparseBoostsTable { Atk = -2, SpA = -2 },
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -2, SpA = -2 },
-                },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
@@ -459,11 +456,8 @@ public partial record Moves
                 // Calculate damage as 1.5x the last damage taken this turn
                 DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
                 {
-                    // Find the most recent damage taken this turn
-                    Attacker? lastDamagedBy = pokemon.AttackedBy
-                        .Where(a => a is { ThisTurn: true, Damage: > 0 })
-                        .OrderByDescending(a => a.Damage)
-                        .FirstOrDefault();
+                    // Get the last attacker who damaged the user this turn
+                    Attacker? lastDamagedBy = pokemon.GetLastDamagedBy(true);
 
                     if (lastDamagedBy != null)
                     {
@@ -479,10 +473,9 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((_, _, source, _) =>
                 {
                     // Find if any damage was taken this turn
-                    Attacker? lastDamagedBy = source.AttackedBy
-                        .FirstOrDefault(a => a is { ThisTurn: true, Damage: > 0 });
+                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
 
-                    if (lastDamagedBy == null)
+                    if (lastDamagedBy is not { ThisTurn: true })
                     {
                         return false;
                     }
@@ -553,11 +546,8 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { SpD = -2 },
-                },
+                Boosts = new SparseBoostsTable { SpD = -2 },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
             },
@@ -1399,11 +1389,8 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -1, SpA = -1 },
-                },
+                Boosts = new SparseBoostsTable { Atk = -1, SpA = -1 },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
