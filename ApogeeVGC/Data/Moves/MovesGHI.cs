@@ -1204,7 +1204,7 @@ public partial record Moves
                 BasePower = 65,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, move) =>
                 {
-                    if (target.Status != null || target.HasAbility(AbilityId.Comatose))
+                    if (target.Status != ConditionId.None || target.HasAbility(AbilityId.Comatose))
                     {
                         if (battle.DisplayUi)
                         {
@@ -1683,7 +1683,7 @@ public partial record Moves
                 BasePower = 60,
                 BasePowerCallback = new BasePowerCallbackEventInfo((_, _, target, move) =>
                 {
-                    if (target.Status != null || target.HasAbility(AbilityId.Comatose))
+                    if (target.Status != ConditionId.None || target.HasAbility(AbilityId.Comatose))
                     {
                         return move.BasePower * 2;
                     }
