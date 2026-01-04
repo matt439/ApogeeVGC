@@ -576,6 +576,11 @@ public partial record Moves
                 Condition = _library.Conditions[ConditionId.WideGuard],
                 OnTry = new OnTryEventInfo((battle, _, _, _) =>
                     battle.Queue.WillAct() != null ? new VoidReturn() : false),
+                OnHitSide = new OnHitSideEventInfo((_, _, source, _) =>
+                {
+                    source.AddVolatile(ConditionId.Stall);
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Rock,
@@ -834,7 +839,9 @@ public partial record Moves
                 {
                     // Set target's ability to Insomnia
                     AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Insomnia, source);
-                    if (oldAbility != null)
+
+                    // Check for success - SetAbility returns the old AbilityId on success
+                    if (oldAbility is AbilityIdAbilityIdFalseUnion)
                     {
                         // Cure sleep if the target was asleep
                         if (target.Status == ConditionId.Sleep)
@@ -845,7 +852,9 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    return false;
+                    // Return false if SetAbility failed with false, or null if it returned null
+                    // This matches the TS: if (!oldAbility) return oldAbility as false | null;
+                    return oldAbility is FalseAbilityIdFalseUnion ? false : null;
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
