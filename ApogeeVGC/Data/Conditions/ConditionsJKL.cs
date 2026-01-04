@@ -177,11 +177,20 @@ public partial record Conditions
                 }),
                 OnSwap = new OnSwapEventInfo((battle, target, _) =>
                 {
+                    // Check if target needs healing, status cure, or PP restoration
+                    bool needsPpRestore = target.MoveSlots.Any(ms => ms.Pp < ms.MaxPp);
                     if (!target.Fainted &&
-                        (target.Hp < target.MaxHp || target.Status != ConditionId.None))
+                        (target.Hp < target.MaxHp || target.Status != ConditionId.None ||
+                         needsPpRestore))
                     {
                         target.Heal(target.MaxHp);
-                        target.CureStatus();
+                        target.ClearStatus();
+                        // Restore PP for all moves
+                        foreach (MoveSlot moveSlot in target.MoveSlots)
+                        {
+                            moveSlot.Pp = moveSlot.MaxPp;
+                        }
+
                         if (battle.DisplayUi)
                         {
                             battle.Add("-heal", target, target.GetHealth,

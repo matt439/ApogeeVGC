@@ -460,11 +460,8 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Def = -1 },
-                },
+                Boosts = new SparseBoostsTable { Def = -1 },
+                Secondary = null,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Normal,
             },
@@ -499,7 +496,9 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Snatch = true, Heal = true, BypassSub = true, Metronome = true },
+                    { Snatch = true, Heal = true, BypassSub = true },
+                Heal = [1, 4],
+                Secondary = null,
                 Target = MoveTarget.Allies,
                 Type = MoveType.Water,
             },
@@ -671,6 +670,18 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                {
+                    if (source.StatsLoweredThisTurn)
+                    {
+                        battle.Debug("lashout buff");
+                        battle.ChainModify(2);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }),
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
