@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -1931,7 +1932,8 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Protect = true, Mirror = true, Dance = true, Metronome = true },
+                {
+                    Protect = true, Mirror = true, Dance = true, Metronome = true },
                 Secondary = new SecondaryEffect
                 {
                     Chance = 50,
@@ -2458,6 +2460,13 @@ public partial record Moves
                 },
                 Target = MoveTarget.Any,
                 Type = MoveType.Fighting,
+                OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, _, type, _) =>
+                {
+                    // Flying Press is both Fighting and Flying type for effectiveness
+                    // Add Flying effectiveness to the base Fighting effectiveness
+                    MoveEffectiveness flyingEffectiveness = battle.Dex.GetEffectiveness(MoveType.Flying, type);
+                    return typeMod + flyingEffectiveness.ToModifier();
+                }),
             },
             [MoveId.FocusBlast] = new()
             {
@@ -2526,6 +2535,11 @@ public partial record Moves
                 VolatileStatus = ConditionId.FollowMe,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
+                OnTry = new OnTryEventInfo((battle, _, _, _) =>
+                {
+                    // Follow Me fails in singles (when there's only 1 active Pokemon per side)
+                    return battle.ActivePerHalf > 1 ? new VoidReturn() : false;
+                }),
             },
             [MoveId.ForcePalm] = new()
             {

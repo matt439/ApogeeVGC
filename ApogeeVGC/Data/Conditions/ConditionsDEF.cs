@@ -549,6 +549,15 @@ public partial record Conditions
                         @volatile.LostFocus = true;
                     }
                 }),
+                OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
+                {
+                    // Pokemon focusing for Focus Punch cannot flinch
+                    if (status.Id == ConditionId.Flinch)
+                    {
+                        return null; // Silently block flinch
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
             },
             [ConditionId.Fling] = new()
             {
