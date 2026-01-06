@@ -1342,7 +1342,8 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Protect = true, Mirror = true, Metronome = true, Bullet = true },
+                {
+                    Protect = true, Mirror = true, Metronome = true, Bullet = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, _) =>
@@ -1972,7 +1973,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true },
-                SelfBoost = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
+                Boosts = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
                 OnTry = new OnTryEventInfo((_, _, source, _) =>
@@ -1985,10 +1986,25 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnTryHit = new OnTryHitEventInfo((battle, pokemon, _, move) =>
+                {
+                    // Apply boosts first - if boosts fail (already at max), return null for silent failure
+                    if (move.Boosts == null) return new VoidReturn();
+                    
+                    BoolZeroUnion? boostResult = battle.Boost(move.Boosts, pokemon, pokemon, move);
+                    if (boostResult is null or ZeroBoolZeroUnion)
+                    {
+                        return null; // Silent failure - don't show "But it failed!"
+                    }
+                    
+                    // Remove boosts from move to prevent double application
+                    move.Boosts = null;
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((battle, pokemon, _, _) =>
                 {
                     // Deal direct damage equal to half of max HP
-                    battle.DirectDamage(target.MaxHp / 2, target);
+                    battle.DirectDamage(pokemon.MaxHp / 2, pokemon);
                     return new VoidReturn();
                 }),
             },
@@ -2377,7 +2393,7 @@ public partial record Moves
                         target.Staleness = StalenessId.External;
                     }
 
-                    // Show fail message if healing failed
+                    // Show fail message if healing failed, return NOT_FAIL (Empty)
                     if (result is FalseIntFalseUnion)
                     {
                         if (battle.DisplayUi)
@@ -2385,7 +2401,7 @@ public partial record Moves
                             battle.Add("-fail", target, "heal");
                         }
 
-                        return false;
+                        return new Empty(); // NOT_FAIL equivalent - don't trigger additional failure handling
                     }
 
                     return new VoidReturn();
@@ -2699,7 +2715,7 @@ public partial record Moves
                 Name = "Fusion Bolt",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true },
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
@@ -2725,9 +2741,21 @@ public partial record Moves
                 Name = "Fusion Flare",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true },
+                Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                {
+                    // Double base power if Fusion Bolt was used successfully this turn
+                    if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionBolt)
+                    {
+                        battle.Debug("double power");
+                        battle.ChainModify(2);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }),
             },
             [MoveId.FutureSight] = new()
             {
