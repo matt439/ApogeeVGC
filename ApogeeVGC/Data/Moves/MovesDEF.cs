@@ -1075,7 +1075,7 @@ public partial record Moves
                 Flags = new MoveFlags
                 {
                     Protect = true, FailEncore = true, NoSleepTalk = true, FailCopycat = true,
-                    FailMimic = true, FailInstruct = true,
+                    FailMimic = true, FailInstruct = true, NoParentalBond = true,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
@@ -1418,6 +1418,8 @@ public partial record Moves
                     if (weather == ConditionId.RainDance || weather == ConditionId.PrimordialSea)
                     {
                         // Skip charge turn in rain - execute immediately
+                        battle.AttrLastMove("[still]");
+                        battle.AddMove("-anim", attacker.ToString(), move.Name, defender.ToString());
                         return new VoidReturn();
                     }
 

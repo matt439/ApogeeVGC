@@ -981,7 +981,8 @@ public partial record Conditions
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
                     // Check if target has a valid last move for Encore
-                    if (target.LastMove == null)
+                    Move? move = target.LastMove;
+                    if (move == null)
                     {
                         battle.Debug("Encore failed: no last move");
                         return BoolVoidUnion.FromBool(false);
@@ -991,25 +992,32 @@ public partial record Conditions
                     MoveSlot? moveSlot = null;
                     foreach (MoveSlot slot in target.MoveSlots)
                     {
-                        if (slot.Id == target.LastMove.Id)
+                        if (slot.Id == move.Id)
                         {
                             moveSlot = slot;
                             break;
                         }
                     }
 
-                    if (moveSlot == null || moveSlot.Pp <= 0)
+                    // Check if move has failencore flag or no PP
+                    if ((move.Flags.FailEncore ?? false) || moveSlot == null || moveSlot.Pp <= 0)
                     {
-                        battle.Debug("Encore failed: move not found or no PP");
+                        battle.Debug("Encore failed: move has failencore flag, not found, or no PP");
                         return BoolVoidUnion.FromBool(false);
                     }
 
                     // Store the encored move
-                    battle.EffectState.Move = target.LastMove.Id;
+                    battle.EffectState.Move = move.Id;
 
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", target, "Encore");
+                    }
+
+                    // If target won't move this turn, add an extra duration turn
+                    if (battle.Queue.WillMove(target) == null)
+                    {
+                        target.Volatiles[ConditionId.Encore].Duration++;
                     }
 
                     return BoolVoidUnion.FromVoid();
@@ -1055,7 +1063,7 @@ public partial record Conditions
                             return;
                         }
                     }
-                }, 14),
+                }, 16),
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
                     if (battle.DisplayUi)
