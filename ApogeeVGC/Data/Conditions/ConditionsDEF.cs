@@ -59,7 +59,7 @@ public partial record Conditions
                     // These are moves/abilities that copy stat changes, so we show silently
                     bool isCopied =
                         effect is Ability { Id: AbilityId.Costar or AbilityId.Imposter } ||
-                        effect is Move { Name: "Psych Up" or "Transform" };
+                        effect is Move { Id: MoveId.PsychUp or MoveId.Transform };
                     if (isCopied)
                     {
                         if (battle.DisplayUi)
@@ -491,7 +491,7 @@ public partial record Conditions
                     // Check if this is from copying abilities (Costar, Imposter, Psych Up, Transform)
                     bool isCopied =
                         effect is Ability { Id: AbilityId.Costar or AbilityId.Imposter } ||
-                        effect is Move { Name: "Psych Up" or "Transform" };
+                        effect is Move { Id: MoveId.PsychUp or MoveId.Transform };
                     if (battle.DisplayUi)
                     {
                         if (isCopied)
