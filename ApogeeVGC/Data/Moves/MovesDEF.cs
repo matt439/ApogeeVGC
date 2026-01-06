@@ -2578,6 +2578,21 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Fail if target already has Grass type
+                    if (target.HasType(PokemonType.Grass)) return false;
+                    
+                    // Try to add Grass type
+                    if (!target.AddType(PokemonType.Grass)) return false;
+                    
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "typeadd", "Grass", "[from] move: Forest's Curse");
+                    }
+                    
+                    return new VoidReturn();
+                }),
             },
             [MoveId.FoulPlay] = new()
             {
@@ -2614,6 +2629,12 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
+                OnEffectiveness = new OnEffectivenessEventInfo((_, _, _, type, _) =>
+                {
+                    // Freeze-Dry is super effective against Water types
+                    if (type == PokemonType.Water) return 1;
+                    return IntVoidUnion.FromVoid();
+                }),
             },
             [MoveId.FreezingGlare] = new()
             {
@@ -2702,6 +2723,26 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
+                Condition = _library.Conditions[ConditionId.FuryCutter],
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                {
+                    // Add the volatile on first hit
+                    if (!source.Volatiles.ContainsKey(ConditionId.FuryCutter) || 
+                        (battle.ActiveMove?.Hit ?? 0) == 1)
+                    {
+                        source.AddVolatile(ConditionId.FuryCutter);
+                    }
+                    
+                    // Get the multiplier from the volatile
+                    int multiplier = source.Volatiles.TryGetValue(ConditionId.FuryCutter, out var state) 
+                        ? state.Multiplier ?? 1 
+                        : 1;
+                    
+                    // Calculate and clamp base power (1 to 160)
+                    int bp = Math.Clamp(move.BasePower * multiplier, 1, 160);
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
             },
             [MoveId.FurySwipes] = new()
             {
@@ -2732,7 +2773,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
                 {
                     // Double base power if Fusion Flare was used successfully this turn
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionFlare)
@@ -2758,7 +2799,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
                 {
                     // Double base power if Fusion Bolt was used successfully this turn
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionBolt)
@@ -2781,7 +2822,7 @@ public partial record Moves
                 Name = "Future Sight",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Metronome = true, FutureMove = true },
+                Flags = new MoveFlags { AllyAnim = true, Metronome = true, FutureMove = true },
                 IgnoreImmunity = true, // Future Sight ignores type immunity
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
@@ -2796,7 +2837,6 @@ public partial record Moves
                     slotCondition.Move = MoveId.FutureSight;
                     slotCondition.Source = source;
                     // Store the move data for when the attack executes
-                    // Note: ignoreImmunity is false in the stored moveData (different from the move itself)
                     slotCondition.MoveData = new Move
                     {
                         Id = MoveId.FutureSight,
