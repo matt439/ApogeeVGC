@@ -1148,6 +1148,17 @@ public partial record Moves
                 Flags = new MoveFlags { Reflectable = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((_, target, source, move) =>
+                {
+                    RelayVar result = target.AddVolatile(ConditionId.Trapped, source, move, ConditionId.Trapper);
+                    // Convert RelayVar to appropriate return type
+                    // If AddVolatile returns false, the move fails
+                    if (result is BoolRelayVar { Value: false })
+                    {
+                        return false;
+                    }
+                    return new VoidReturn();
+                }),
             },
             [MoveId.BloodMoon] = new()
             {
@@ -1194,7 +1205,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                    { Contact = true, Protect = true, Mirror = true },
                 OverrideOffensiveStat = StatIdExceptHp.Def, // Uses Def instead of Atk
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
@@ -1289,6 +1300,7 @@ public partial record Moves
                     Distance = true, Metronome = true, NoSleepTalk = true, NoAssist = true,
                     FailInstruct = true,
                 },
+                Condition = _library.Conditions[ConditionId.Bounce],
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
@@ -1296,6 +1308,23 @@ public partial record Moves
                 },
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // On second turn, remove the volatile and execute the move
+                    if (attacker.DeleteVolatile(ConditionId.Bounce))
+                    {
+                        return new VoidReturn();
+                    }
+                    // First turn: prepare and add two-turn volatile
+                    battle.Add("-prepare", attacker, move.Name);
+                    RelayVar? chargeResult = battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    return BoolEmptyVoidUnion.FromBool(false);
+                }),
             },
             [MoveId.BranchPoke] = new()
             {
@@ -1363,6 +1392,14 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
+                OnTryHit = new OnTryHitEventInfo((_, pokemon, _, _) =>
+                {
+                    // will shatter screens through sub, before you hit
+                    pokemon.Side.RemoveSideCondition(ConditionId.Reflect);
+                    pokemon.Side.RemoveSideCondition(ConditionId.LightScreen);
+                    pokemon.Side.RemoveSideCondition(ConditionId.AuroraVeil);
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Brine] = new()
             {
@@ -2113,7 +2150,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def = 3 },
+                SelfBoost = new SparseBoostsTable { Def =  3 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Grass,
             },
@@ -2469,11 +2506,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                    Bite = true,
+                    Contact = true, Protect = true, Mirror = true, Metronome = true, Bite = true,
                 },
                 Secondary = new SecondaryEffect
                 {
