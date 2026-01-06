@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -2031,6 +2032,18 @@ public partial record Moves
                     if (lastDamagedBy == null || !lastDamagedBy.ThisTurn) return false;
                     return new VoidReturn();
                 }),
+                OnModifyTarget = new OnModifyTargetEventInfo((battle, targetRelayVar, source, _, _) =>
+                {
+                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
+                    if (lastDamagedBy != null)
+                    {
+                        Pokemon? newTarget = battle.GetAtSlot(lastDamagedBy.PokemonSlot);
+                        if (newTarget != null)
+                        {
+                            targetRelayVar.Target = newTarget;
+                        }
+                    }
+                }),
             },
             [MoveId.Confide] = new()
             {
@@ -2099,6 +2112,23 @@ public partial record Moves
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Get the type of the user's first move
+                    if (target.MoveSlots.Count == 0) return false;
+                    
+                    Move firstMove = battle.Library.Moves[target.MoveSlots[0].Id];
+                    PokemonType type = firstMove.Type.ConvertToPokemonType();
+                    
+                    // Fail if user already has this type or can't set type
+                    if (target.HasType(type) || !target.SetType(type))
+                    {
+                        return false;
+                    }
+                    
+                    battle.Add("-start", target, "typechange", type.ToString());
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Conversion2] = new()
             {
@@ -2110,435 +2140,41 @@ public partial record Moves
                 Name = "Conversion 2",
                 BasePp = 30,
                 Priority = 0,
-                Flags = new MoveFlags { Metronome = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
-            [MoveId.Copycat] = new()
-            {
-                Id = MoveId.Copycat,
-                Num = 383,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Copycat",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    FailEncore = true, NoSleepTalk = true, NoAssist = true, FailCopycat = true,
-                    FailMimic = true, FailInstruct = true,
-                },
-                CallsMove = true,
-                Target = MoveTarget.Self,
-                Type = MoveType.Normal,
-                OnHit = new OnHitEventInfo((battle, _, source, _) =>
-                {
-                    ActiveMove? lastMove = battle.LastMove;
-                    if (lastMove == null) return false;
-
-                    // Get the move to use - if it has a base move, use that
-                    MoveId moveId = lastMove.BaseMove ?? lastMove.Id;
-                    Move moveToUse = battle.Library.Moves[moveId];
-
-                    // Check if the move can be copied
-                    if (moveToUse.Flags.FailCopycat == true) return false;
-
-                    battle.Actions.UseMove(moveToUse.Id, source);
-                    return new VoidReturn();
-                }),
-            },
-            [MoveId.CosmicPower] = new()
-            {
-                Id = MoveId.CosmicPower,
-                Num = 322,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Cosmic Power",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def = 1, SpD = 1 },
-                Target = MoveTarget.Self,
-                Type = MoveType.Psychic,
-            },
-            [MoveId.CottonGuard] = new()
-            {
-                Id = MoveId.CottonGuard,
-                Num = 538,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Cotton Guard",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def =  3 },
-                Target = MoveTarget.Self,
-                Type = MoveType.Grass,
-            },
-            [MoveId.CottonSpore] = new()
-            {
-                Id = MoveId.CottonSpore,
-                Num = 178,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Cotton Spore",
-                BasePp = 40,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true, Reflectable = true, Mirror = true, Metronome = true,
-                    Powder = true,
-                },
-                Boosts = new SparseBoostsTable { Spe = -2 },
-                Target = MoveTarget.AllAdjacentFoes,
-                Type = MoveType.Grass,
-            },
-            [MoveId.Counter] = new()
-            {
-                Id = MoveId.Counter,
-                Num = 68,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Physical,
-                Name = "Counter",
-                BasePp = 20,
-                Priority = -5,
-                Flags = new MoveFlags
-                {
-                    Contact = true, Protect = true, FailMeFirst = true, NoAssist = true,
-                    FailCopycat = true,
-                },
-                Target = MoveTarget.Scripted,
-                Type = MoveType.Fighting,
-                Condition = _library.Conditions[ConditionId.Counter],
-                DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
-                {
-                    if (!pokemon.Volatiles.TryGetValue(ConditionId.Counter,
-                            out EffectState? effectState))
-                    {
-                        return IntFalseUnion.FromInt(0);
-                    }
-
-                    return IntFalseUnion.FromInt(effectState.TotalDamage ?? 1);
-                }),
-                BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _, _) =>
-                {
-                    pokemon.AddVolatile(ConditionId.Counter);
-                }),
-                OnTry = new OnTryEventInfo((_, source, _, _) =>
-                {
-                    if (!source.Volatiles.TryGetValue(ConditionId.Counter,
-                            out EffectState? effectState))
-                    {
-                        return BoolEmptyVoidUnion.FromBool(false);
-                    }
-
-                    if (effectState.Slot == null)
-                    {
-                        return BoolEmptyVoidUnion.FromBool(false);
-                    }
-
-                    return BoolEmptyVoidUnion.FromVoid();
-                }),
-            },
-            [MoveId.CourtChange] = new()
-            {
-                Id = MoveId.CourtChange,
-                Num = 756,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Court Change",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags { Mirror = true, Metronome = true },
-                Target = MoveTarget.All,
-                Type = MoveType.Normal,
-                OnHitField = new OnHitFieldEventInfo((battle, _, source, _) =>
-                {
-                    ConditionId[] sideConditions =
-                    [
-                        ConditionId.Mist, ConditionId.LightScreen, ConditionId.Reflect,
-                        ConditionId.Spikes,
-                        ConditionId.Safeguard, ConditionId.Tailwind, ConditionId.ToxicSpikes,
-                        ConditionId.StealthRock,
-                        ConditionId.StickyWeb, ConditionId.AuroraVeil,
-                    ];
-                    bool success = false;
-
-                    Side sourceSide = source.Side;
-                    Side targetSide = source.Side.Foe;
-
-                    // Store conditions from both sides
-                    var sourceConditions = new Dictionary<ConditionId, EffectState>();
-                    var targetConditions = new Dictionary<ConditionId, EffectState>();
-
-                    foreach (ConditionId id in sideConditions)
-                    {
-                        if (sourceSide.SideConditions.TryGetValue(id, out EffectState? sourceState))
-                        {
-                            sourceConditions[id] = sourceState;
-                            sourceSide.SideConditions.Remove(id);
-                            success = true;
-                        }
-
-                        if (targetSide.SideConditions.TryGetValue(id, out EffectState? targetState))
-                        {
-                            targetConditions[id] = targetState;
-                            targetSide.SideConditions.Remove(id);
-                            success = true;
-                        }
-                    }
-
-                    // Swap conditions
-                    foreach ((ConditionId id, EffectState state) in sourceConditions)
-                    {
-                        state.Target = targetSide;
-                        targetSide.SideConditions[id] = state;
-                    }
-
-                    foreach ((ConditionId id, EffectState state) in targetConditions)
-                    {
-                        state.Target = sourceSide;
-                        sourceSide.SideConditions[id] = state;
-                    }
-
-                    if (!success) return false;
-                    battle.Add("-swapsideconditions");
-                    battle.Add("-activate", source, "move: Court Change");
-                    return new VoidReturn();
-                }),
-            },
-            [MoveId.Covet] = new()
-            {
-                Id = MoveId.Covet,
-                Num = 343,
-                Accuracy = 100,
-                BasePower = 60,
-                Category = MoveCategory.Physical,
-                Name = "Covet",
-                BasePp = 25,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true, Protect = true, Mirror = true, FailMeFirst = true,
-                    NoAssist = true, FailCopycat = true,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, move) =>
-                {
-                    // Can't steal if source already has an item or used a gem
-                    if (source.Item != ItemId.None || source.Volatiles.ContainsKey(ConditionId.Gem))
-                    {
-                        return new VoidReturn();
-                    }
-
-                    ItemFalseUnion yourItemResult = target.TakeItem(source);
-                    if (yourItemResult is not ItemItemFalseUnion yourItemUnion)
-                    {
-                        return new VoidReturn();
-                    }
-
-                    Item yourItem = yourItemUnion.Item;
-                    RelayVar? takeItemResult = battle.SingleEvent(EventId.TakeItem, yourItem,
-                        target.ItemState, source, target, move);
-                    if (takeItemResult is BoolRelayVar { Value: false } ||
-                        !source.SetItem(yourItem.Id))
-                    {
-                        target.Item = yourItem.Id; // Bypass setItem so we don't break choice lock
-                        return new VoidReturn();
-                    }
-
-                    battle.Add("-item", source, yourItem.Name, "[from] move: Covet",
-                        $"[of] {target}");
-                    return new VoidReturn();
-                }),
-            },
-            [MoveId.Crabhammer] = new()
-            {
-                Id = MoveId.Crabhammer,
-                Num = 152,
-                Accuracy = 90,
-                BasePower = 100,
-                Category = MoveCategory.Physical,
-                Name = "Crabhammer",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                CritRatio = 2,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Water,
-            },
-            [MoveId.CrossChop] = new()
-            {
-                Id = MoveId.CrossChop,
-                Num = 238,
-                Accuracy = 80,
-                BasePower = 100,
-                Category = MoveCategory.Physical,
-                Name = "Cross Chop",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                CritRatio = 2,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-            },
-            [MoveId.CrossPoison] = new()
-            {
-                Id = MoveId.CrossPoison,
-                Num = 440,
-                Accuracy = 100,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Cross Poison",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true, Protect = true, Mirror = true, Metronome = true, Slicing = true,
-                },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 10,
-                    Status = ConditionId. Poison,
-                },
-                CritRatio = 2,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Poison,
-            },
-            [MoveId.CrushClaw] = new()
-            {
-                Id = MoveId.CrushClaw,
-                Num = 306,
-                Accuracy = 95,
-                BasePower = 75,
-                Category = MoveCategory.Physical,
-                Name = "Crush Claw",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 50,
-                    Boosts = new SparseBoostsTable { Def = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
-            [MoveId.CrushGrip] = new()
-            {
-                Id = MoveId.CrushGrip,
-                Num = 462,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Physical,
-                Name = "Crush Grip",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
-                {
-                    int hp = target.Hp;
-                    int maxHp = target.MaxHp;
-                    int bp = (int)Math.Floor((int)Math.Floor(
-                        (120 * (100 * (int)Math.Floor((double)hp * 4096 / maxHp)) + 2048 - 1) /
-                        4096.0) / 100.0);
-                    bp = bp == 0 ? 1 : bp;
-                    battle.Debug($"BP for {hp}/{maxHp} HP: {bp}");
-                    return bp;
-                }),
-            },
-            [MoveId.Curse] = new()
-            {
-                Id = MoveId.Curse,
-                Num = 174,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Curse",
-                BasePp = 10,
-                Priority = 0,
                 Flags = new MoveFlags { BypassSub = true, Metronome = true },
-                VolatileStatus = ConditionId.Curse,
                 Target = MoveTarget.Normal,
-                NonGhostTarget = MoveTarget.Self,
-                Type = MoveType.Ghost,
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, source, target) =>
+                Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    if (!source.HasType(PokemonType.Ghost))
+                    // Fail if target hasn't used a move
+                    if (target.LastMoveUsed == null) return false;
+                    
+                    MoveType attackType = target.LastMoveUsed.Type;
+                    List<PokemonType> possibleTypes = [];
+                    
+                    // Find types that resist the attack type
+                    foreach (PokemonType typeName in Enum.GetValues<PokemonType>())
                     {
-                        // Non-Ghost: change target to self
-                        move.Target = move.NonGhostTarget ?? MoveTarget.Self;
-                    }
-                    else if (source.IsAlly(target))
-                    {
-                        // Ghost targeting ally: pick random foe instead
-                        move.Target = MoveTarget.RandomNormal;
-                    }
-                }),
-                OnTryHit = new OnTryHitEventInfo((_, target, source, move) =>
-                {
-                    if (!source.HasType(PokemonType.Ghost))
-                    {
-                        // Non-Ghost variant: add stat boosts instead of curse
-                        // The volatile status will still try to apply but target is self
-                        move.Self = new SecondaryEffect
+                        if (typeName == PokemonType.Unknown) continue;
+                        
+                        // Check if source already has this type
+                        if (source.HasType(typeName)) continue;
+                        
+                        // Check if this type resists the attack type
+                        MoveEffectiveness effectiveness = battle.Dex.GetEffectiveness(attackType, typeName);
+                        if (effectiveness.ToModifier() < 0)
                         {
-                            Boosts = new SparseBoostsTable { Spe = -1, Atk = 1, Def = 1 },
-                        };
+                            possibleTypes.Add(typeName);
+                        }
                     }
-                    else if (target.Volatiles.ContainsKey(ConditionId.Curse))
-                    {
-                        // Ghost variant: fail if target already cursed
-                        return false;
-                    }
-
+                    
+                    if (possibleTypes.Count == 0) return false;
+                    
+                    PokemonType randomType = battle.Sample(possibleTypes);
+                    if (!source.SetType(randomType)) return false;
+                    
+                    battle.Add("-start", source, "typechange", randomType.ToString());
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, _, source, _) =>
-                {
-                    // Ghost variant: user loses 50% HP
-                    if (source.HasType(PokemonType.Ghost))
-                    {
-                        battle.DirectDamage(source.MaxHp / 2, source, source);
-                    }
-
-                    return new VoidReturn();
-                }),
-            },
-            [MoveId.Crunch] = new()
-            {
-                Id = MoveId.Crunch,
-                Num = 242,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Physical,
-                Name = "Crunch",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true, Protect = true, Mirror = true, Metronome = true, Bite = true,
-                },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 20,
-                    Boosts = new SparseBoostsTable { Def = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Dark,
             },
         };
 
