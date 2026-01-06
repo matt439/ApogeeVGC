@@ -1,0 +1,49 @@
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
+
+namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
+
+/// <summary>
+/// Event handler info for OnFoeRedirectTarget event.
+/// Redirects move target to a different Pokemon when targeting foes.
+/// Signature: (Battle battle, Pokemon target, Pokemon source, IEffect effect, ActiveMove move) => PokemonVoidUnion
+/// </summary>
+public sealed record OnFoeRedirectTargetEventInfo : EventHandlerInfo
+{
+    /// <summary>
+    /// Creates a new OnFoeRedirectTarget event handler.
+    /// </summary>
+    /// <param name="handler">The event handler delegate</param>
+    /// <param name="priority">Execution priority (higher executes first)</param>
+    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    public OnFoeRedirectTargetEventInfo(
+        Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion> handler,
+   int? priority = null,
+        bool usesSpeed = true)
+    {
+  Id = EventId.RedirectTarget;
+        Prefix = EventPrefix.Foe;
+  Handler = handler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+     ExpectedParameterTypes =
+   [
+        typeof(Battle),
+   typeof(Pokemon),
+typeof(Pokemon),
+        typeof(IEffect),
+    typeof(ActiveMove),
+        ];
+        ExpectedReturnType = typeof(PokemonVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
+    }
+}

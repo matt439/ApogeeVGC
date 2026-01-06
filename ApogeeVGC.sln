@@ -1,17 +1,59 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApogeeVGC_CPP", "ApogeeVGC_CPP\ApogeeVGC_CPP.vcxproj", "{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEnvironment_CPP", "TestEnvironment_CPP\TestEnvironment_CPP.vcxproj", "{176B85FF-843B-4902-BE1E-DF91366B347A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC_CS", "ApogeeVGC_CS\ApogeeVGC_CS.csproj", "{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestEnvironment_CS", "TestEnvironment_CS\TestEnvironment_CS.csproj", "{779C0840-EE6B-47EC-806A-16C13501DED5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC", "ApogeeVGC\ApogeeVGC.csproj", "{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pokemon-showdown", "pokemon-showdown", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\CONTRIBUTING.md = pokemon-showdown\CONTRIBUTING.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sim", "sim", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\sim\battle-actions.ts = pokemon-showdown\sim\battle-actions.ts
+		pokemon-showdown\sim\battle-queue.ts = pokemon-showdown\sim\battle-queue.ts
+		pokemon-showdown\sim\battle-stream.ts = pokemon-showdown\sim\battle-stream.ts
+		pokemon-showdown\sim\battle.ts = pokemon-showdown\sim\battle.ts
+		pokemon-showdown\sim\dex-abilities.ts = pokemon-showdown\sim\dex-abilities.ts
+		pokemon-showdown\sim\dex-conditions.ts = pokemon-showdown\sim\dex-conditions.ts
+		pokemon-showdown\sim\dex-data.ts = pokemon-showdown\sim\dex-data.ts
+		pokemon-showdown\sim\dex-formats.ts = pokemon-showdown\sim\dex-formats.ts
+		pokemon-showdown\sim\dex-items.ts = pokemon-showdown\sim\dex-items.ts
+		pokemon-showdown\sim\dex-moves.ts = pokemon-showdown\sim\dex-moves.ts
+		pokemon-showdown\sim\dex-species.ts = pokemon-showdown\sim\dex-species.ts
+		pokemon-showdown\sim\DEX.md = pokemon-showdown\sim\DEX.md
+		pokemon-showdown\sim\dex.ts = pokemon-showdown\sim\dex.ts
+		pokemon-showdown\sim\field.ts = pokemon-showdown\sim\field.ts
+		pokemon-showdown\sim\global-types.ts = pokemon-showdown\sim\global-types.ts
+		pokemon-showdown\sim\index.ts = pokemon-showdown\sim\index.ts
+		pokemon-showdown\sim\NONSTANDARD.md = pokemon-showdown\sim\NONSTANDARD.md
+		pokemon-showdown\sim\pokemon.ts = pokemon-showdown\sim\pokemon.ts
+		pokemon-showdown\sim\prng.ts = pokemon-showdown\sim\prng.ts
+		pokemon-showdown\sim\README.md = pokemon-showdown\sim\README.md
+		pokemon-showdown\sim\side.ts = pokemon-showdown\sim\side.ts
+		pokemon-showdown\sim\team-validator.ts = pokemon-showdown\sim\team-validator.ts
+		pokemon-showdown\sim\TEAMS.md = pokemon-showdown\sim\TEAMS.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{C3D4E5F6-A7B8-9012-CDEF-123456789012}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\data\abilities.ts = pokemon-showdown\data\abilities.ts
+		pokemon-showdown\data\aliases.ts = pokemon-showdown\data\aliases.ts
+		pokemon-showdown\data\conditions.ts = pokemon-showdown\data\conditions.ts
+		pokemon-showdown\data\formats-data.ts = pokemon-showdown\data\formats-data.ts
+		pokemon-showdown\data\FORMES.md = pokemon-showdown\data\FORMES.md
+		pokemon-showdown\data\items.ts = pokemon-showdown\data\items.ts
+		pokemon-showdown\data\learnsets.ts = pokemon-showdown\data\learnsets.ts
+		pokemon-showdown\data\moves.ts = pokemon-showdown\data\moves.ts
+		pokemon-showdown\data\natures.ts = pokemon-showdown\data\natures.ts
+		pokemon-showdown\data\pokedex.ts = pokemon-showdown\data\pokedex.ts
+		pokemon-showdown\data\pokemongo.ts = pokemon-showdown\data\pokemongo.ts
+		pokemon-showdown\data\rulesets.ts = pokemon-showdown\data\rulesets.ts
+		pokemon-showdown\data\scripts.ts = pokemon-showdown\data\scripts.ts
+		pokemon-showdown\data\tags.ts = pokemon-showdown\data\tags.ts
+		pokemon-showdown\data\typechart.ts = pokemon-showdown\data\typechart.ts
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,54 +65,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Debug|Any CPU.Build.0 = Debug|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Debug|x64.ActiveCfg = Debug|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Debug|x64.Build.0 = Debug|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Debug|x86.ActiveCfg = Debug|Win32
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Debug|x86.Build.0 = Debug|Win32
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|Any CPU.ActiveCfg = Release|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|Any CPU.Build.0 = Release|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|x64.ActiveCfg = Release|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|x64.Build.0 = Release|x64
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|x86.ActiveCfg = Release|Win32
-		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|x86.Build.0 = Release|Win32
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|Any CPU.Build.0 = Debug|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x64.ActiveCfg = Debug|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x64.Build.0 = Debug|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x86.ActiveCfg = Debug|Win32
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x86.Build.0 = Debug|Win32
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|Any CPU.ActiveCfg = Release|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|Any CPU.Build.0 = Release|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x64.ActiveCfg = Release|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x64.Build.0 = Release|x64
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x86.ActiveCfg = Release|Win32
-		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x86.Build.0 = Release|Win32
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Debug|x64.Build.0 = Debug|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Debug|x86.Build.0 = Debug|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Release|x64.ActiveCfg = Release|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Release|x64.Build.0 = Release|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Release|x86.ActiveCfg = Release|Any CPU
-		{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}.Release|x86.Build.0 = Release|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Debug|x64.Build.0 = Debug|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Debug|x86.Build.0 = Debug|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Release|x64.ActiveCfg = Release|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Release|x64.Build.0 = Release|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Release|x86.ActiveCfg = Release|Any CPU
-		{779C0840-EE6B-47EC-806A-16C13501DED5}.Release|x86.Build.0 = Release|Any CPU
 		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -87,7 +81,11 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D4980C97-4378-47AD-B4AE-F4C7E358EFAA}
+		SolutionGuid = {971DA40E-4821-4480-A51A-9661F9670CE0}
 	EndGlobalSection
 EndGlobal

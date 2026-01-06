@@ -1,0 +1,38 @@
+﻿using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.Utils;
+
+namespace ApogeeVGC.Sim.FormatClasses;
+
+public record Learnset : ICopyable<Learnset>
+{
+    public IReadOnlyDictionary<MoveId, List<MoveSource>>? LearnsetData { get; init; }
+    public IReadOnlyList<EventInfo>? EventData { get; init; }
+    public bool? EventOnly { get; init; }
+    public IReadOnlyList<EventInfo>? Encounters { get; init; }
+    public bool? Exists { get; init; }
+
+    public Learnset Copy()
+    {
+        return this with
+        {
+            LearnsetData = LearnsetData == null
+                ? null
+                : new Dictionary<MoveId, List<MoveSource>>(
+                    LearnsetData.Select(kvp =>
+                        new KeyValuePair<MoveId, List<MoveSource>>(
+                            kvp.Key,
+                            [..kvp.Value]
+                        )
+                    )
+                ),
+            EventData = EventData == null
+                ? null
+                : new List<EventInfo>(EventData),
+            Encounters = Encounters == null
+                ? null
+                : new List<EventInfo>(Encounters),
+            // EventOnly and Exists are value types, copied automatically by 'with'
+        };
+    }
+}

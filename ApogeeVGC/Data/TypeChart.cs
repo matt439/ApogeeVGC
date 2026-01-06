@@ -1,34 +1,20 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Types;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Data;
 
 public enum MoveEffectiveness
 {
-    Normal,
-    SuperEffective2X,
-    SuperEffective4X,
-    NotVeryEffective05X,
-    NotVeryEffective025X,
-    Immune,
-}
-
-public static class MoveEffectivenessTools
-{
-    public static double GetMultiplier(this MoveEffectiveness moveEffectiveness)
-    {
-        return moveEffectiveness switch
-        {
-            MoveEffectiveness.Normal => 1.0,
-            MoveEffectiveness.SuperEffective2X => 2.0,
-            MoveEffectiveness.SuperEffective4X => 4.0,
-            MoveEffectiveness.NotVeryEffective05X => 0.5,
-            MoveEffectiveness.NotVeryEffective025X => 0.25,
-            MoveEffectiveness.Immune => 0.0,
-            _ => throw new ArgumentOutOfRangeException(nameof(moveEffectiveness),
-                "Invalid move effectiveness value.")
-        };
-    }
+    Normal = 0,
+    SuperEffective2X = 1,
+    NotVeryEffective05X = 2,
+    Immune = 3,
+    SuperEffective4X = 4,
+    NotVeryEffective025X = 5,
 }
 
 public record TypeChart
@@ -46,7 +32,7 @@ public record TypeChart
         return typeEffectiveness.ConvertToMoveEffectiveness();
     }
 
-    public MoveEffectiveness GetMoveEffectiveness(List<PokemonType> pokemon, MoveType moveType)
+    public MoveEffectiveness GetMoveEffectiveness(IReadOnlyList<PokemonType> pokemon, MoveType moveType)
     {
         return pokemon.Count switch
         {
@@ -63,6 +49,12 @@ public record TypeChart
     {
         return GetMoveEffectiveness(pokemon.ToList(), moveType);
     }
+
+    //public MoveEffectiveness GetSpecialEffectiveness(PokemonType pokemon, SpecialImmunityId immunity)
+    //{
+    //    TypeEffectiveness typeEffectiveness = _typeData[pokemon].SpecialDamageTaken[immunity];
+    //    return typeEffectiveness.ConvertToMoveEffectiveness();
+    //}
 
     private static MoveEffectiveness CombineTypeEffectivenesses(TypeEffectiveness effectiveness1,
         TypeEffectiveness effectiveness2)
@@ -147,6 +139,19 @@ public record TypeChart
                 [StatId.Atk] = 13,
                 [StatId.Def] = 13,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn ] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Fire] = new TypeData
         {
@@ -183,6 +188,19 @@ public record TypeChart
                 [StatId.Atk] = 14,
                 [StatId.Def] = 12,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Water] = new TypeData
         {
@@ -219,6 +237,19 @@ public record TypeChart
                 [StatId.Atk] = 14,
                 [StatId.Def] = 13,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Electric] = new TypeData
         {
@@ -252,6 +283,19 @@ public record TypeChart
             {
                 [StatId.Atk] = 14,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Grass] = new TypeData
         {
@@ -287,6 +331,19 @@ public record TypeChart
                 [StatId.Atk] = 14,
                 [StatId.Def] = 14,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Ice] = new TypeData
         {
@@ -321,6 +378,19 @@ public record TypeChart
             {
                 [StatId.Def] = 13,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Fighting] = new TypeData
         {
@@ -358,6 +428,19 @@ public record TypeChart
                 [StatId.Atk] = 12,
                 [StatId.Def] = 12,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Poison] = new TypeData
         {
@@ -394,6 +477,19 @@ public record TypeChart
                 [StatId.Atk] = 12,
                 [StatId.Def] = 14,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Immune,
+            //},
         },
         [PokemonType.Ground] = new TypeData
         {
@@ -428,6 +524,19 @@ public record TypeChart
             {
                 [StatId.Atk] = 12,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Flying] = new TypeData
         {
@@ -466,6 +575,19 @@ public record TypeChart
                 [StatId.Atk] = 12,
                 [StatId.Def] = 13,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Psychic] = new TypeData
         {
@@ -500,6 +622,19 @@ public record TypeChart
             {
                 [StatId.Def] = 12,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Rock] = new TypeData
         {
@@ -536,6 +671,19 @@ public record TypeChart
                 [StatId.Atk] = 13,
                 [StatId.Def] = 12,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Ghost] = new TypeData
         {
@@ -571,6 +719,19 @@ public record TypeChart
                 [StatId.Atk] = 13,
                 [StatId.Def] = 14,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Dragon] = new TypeData
         {
@@ -604,6 +765,19 @@ public record TypeChart
             {
                 [StatId.Def] = 14,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Dark] = new TypeData
         {
@@ -630,6 +804,19 @@ public record TypeChart
                 [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>(),
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Steel] = new TypeData
         {
@@ -663,6 +850,19 @@ public record TypeChart
             {
                 [StatId.Atk] = 13,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Immune,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Immune,
+            //},
         },
         [PokemonType.Fairy] = new TypeData
         {
@@ -688,6 +888,19 @@ public record TypeChart
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Normal] = new TypeData
         {
@@ -713,6 +926,19 @@ public record TypeChart
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
             },
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
         [PokemonType.Unknown] = new TypeData
         {
@@ -739,6 +965,19 @@ public record TypeChart
                 [MoveType.Water] = TypeEffectiveness.Normal,
             },
             IsNonstandard = Nonstandard.Past,
+            //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
+            //{
+            //    [SpecialImmunityId.Prankster] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Paralysis] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Burn] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Trapped] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Powder] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Sandstorm] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Hail] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Freeze] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Poison] = TypeEffectiveness.Normal,
+            //    [SpecialImmunityId.Toxic] = TypeEffectiveness.Normal,
+            //},
         },
     };
 }

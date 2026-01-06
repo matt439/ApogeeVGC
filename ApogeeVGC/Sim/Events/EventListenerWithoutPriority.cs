@@ -1,0 +1,23 @@
+﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
+
+namespace ApogeeVGC.Sim.Events;
+
+public record EventListenerWithoutPriority
+{
+    public required IEffect Effect { get; init; }
+    public Pokemon? Target { get; set; }
+    public int? Index { get; set; }
+    public EventHandlerInfo? HandlerInfo { get; init; }
+    public EffectState? State { get; init; }
+    public EffectDelegate? End { get; init; }
+    public List<object>? EndCallArgs { get; init; }
+    public required EffectHolder EffectHolder { get; init; }
+    
+    // Backward compatibility: extract callback from HandlerInfo
+    [Obsolete("Use HandlerInfo instead")]
+    public EffectDelegate? Callback => HandlerInfo?.Handler != null 
+     ? EffectDelegate.FromNullableDelegate(HandlerInfo.Handler) 
+        : null;
+}

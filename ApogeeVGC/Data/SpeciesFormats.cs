@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Data;
 
