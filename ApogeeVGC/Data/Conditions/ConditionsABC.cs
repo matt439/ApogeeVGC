@@ -572,6 +572,7 @@ public partial record Conditions
                 OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
+                    // SkyUppercut and ThousandArrows are isNonstandard: "Past" in Gen 9
                     if (move.Id is MoveId.Gust or MoveId.Twister
                         or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown)
                     {

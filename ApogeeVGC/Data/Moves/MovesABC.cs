@@ -8,6 +8,9 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.Actions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Moves;
@@ -125,6 +128,30 @@ public partial record Moves
                 Flags = new MoveFlags { Metronome = true },
                 Target = MoveTarget.AdjacentAllyOrSelf,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Only check stats that can be boosted (not Accuracy/Evasion for Acupressure)
+                    List<BoostId> stats = [];
+                    BoostId[] boostableStats = [BoostId.Atk, BoostId.Def, BoostId.SpA, BoostId.SpD, BoostId.Spe];
+                    foreach (BoostId stat in boostableStats)
+                    {
+                        if (target.Boosts.GetBoost(stat) < 6)
+                        {
+                            stats.Add(stat);
+                        }
+                    }
+
+                    if (stats.Count > 0)
+                    {
+                        BoostId randomStat = battle.Sample(stats);
+                        SparseBoostsTable boost = new();
+                        boost.SetBoost(randomStat, 2);
+                        battle.Boost(boost, target);
+                        return new VoidReturn();
+                    }
+
+                    return false;
+                }),
             },
             [MoveId.AerialAce] = new()
             {
@@ -175,6 +202,21 @@ public partial record Moves
                 Flags = new MoveFlags { BypassSub = true, AllyAnim = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Fails in singles
+                    if (battle.ActivePerHalf == 1) return false;
+                    
+                    MoveAction? action = battle.Queue.WillMove(target);
+                    if (action is not null)
+                    {
+                        battle.Queue.PrioritizeAction(action);
+                        battle.Add("-activate", target, "move: After You");
+                        return new VoidReturn();
+                    }
+                    
+                    return false;
+                }),
             },
             [MoveId.Agility] = new()
             {
@@ -273,8 +315,48 @@ public partial record Moves
                 BasePp = 15,
                 Priority = 2,
                 Flags = new MoveFlags { Metronome = true },
+                Condition = _library.Conditions[ConditionId.AllySwitch],
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
+                OnPrepareHit = new OnPrepareHitEventInfo((_, pokemon, _, _) =>
+                {
+                    // AddVolatile returns RelayVar, convert to bool for BoolEmptyVoidUnion
+                    RelayVar result = pokemon.AddVolatile(ConditionId.AllySwitch);
+                    return result is not BoolRelayVar { Value: false };
+                }),
+                OnHit = new OnHitEventInfo((battle, _, pokemon, _) =>
+                {
+                    bool success = true;
+                    
+                    // Fail in singles (Triples not supported in this implementation)
+                    if (battle.Format.GameType != GameType.Doubles)
+                    {
+                        success = false;
+                    }
+                    
+                    int newPosition = pokemon.Position == 0 
+                        ? pokemon.Side.Active.Count - 1 
+                        : 0;
+                    
+                    if (pokemon.Side.Active[newPosition] == null)
+                    {
+                        success = false;
+                    }
+                    else if (pokemon.Side.Active[newPosition]!.Fainted)
+                    {
+                        success = false;
+                    }
+                    
+                    if (!success)
+                    {
+                        battle.Add("-fail", pokemon, "move: Ally Switch");
+                        battle.AttrLastMove("[still]");
+                        return new Empty(); // NOT_FAIL
+                    }
+                    
+                    battle.SwapPosition(pokemon, newPosition, "[from] move: Ally Switch");
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Amnesia] = new()
             {
@@ -560,6 +642,12 @@ public partial record Moves
                 VolatileStatus = ConditionId.Attract,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+                OnTryImmunity = new OnTryImmunityEventInfo((_, target, source, _) =>
+                {
+                    // Attract only works between opposite genders
+                    return (target.Gender == GenderId.M && source.Gender == GenderId.F) ||
+                           (target.Gender == GenderId.F && source.Gender == GenderId.M);
+                }),
             },
             [MoveId.AuraSphere] = new()
             {
@@ -600,6 +688,28 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    if (source.Species.BaseSpecies == SpecieId.Morpeko)
+                    {
+                        return new VoidReturn();
+                    }
+                    battle.AttrLastMove("[still]");
+                    battle.Add("-fail", source, "move: Aura Wheel");
+                    battle.Hint("Only a Pokemon whose form is Morpeko or Morpeko-Hangry can use this move.");
+                    return BoolEmptyVoidUnion.FromBool(false);
+                }),
+                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
+                {
+                    if (pokemon.Species.Id == SpecieId.MorpekoHangry)
+                    {
+                        move.Type = MoveType.Dark;
+                    }
+                    else
+                    {
+                        move.Type = MoveType.Electric;
+                    }
+                }),
             },
             [MoveId.AuroraBeam] = new()
             {
@@ -634,6 +744,11 @@ public partial record Moves
                 SideCondition = ConditionId.AuroraVeil,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Ice,
+                OnTry = new OnTryEventInfo((battle, _, _, _) =>
+                {
+                    // Aurora Veil only works in hail or snow
+                    return battle.Field.IsWeather([ConditionId.Snowscape]);
+                }),
             },
             [MoveId.Avalanche] = new()
             {
@@ -684,6 +799,11 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
+                OnMoveFail = new OnMoveFailEventInfo((battle, _, source, move) =>
+                {
+                    battle.Damage(source.BaseMaxHp / 2, source, source,
+                        BattleDamageEffect.FromIEffect(move));
+                }),
             },
             [MoveId.BabyDollEyes] = new()
             {
@@ -717,8 +837,19 @@ public partial record Moves
                 Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
                 StallingMove = true,
                 VolatileStatus = ConditionId.BanefulBunker,
+                Condition = _library.Conditions[ConditionId.BanefulBunker],
                 Target = MoveTarget.Self,
                 Type = MoveType.Poison,
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, pokemon, _, _) =>
+                {
+                    return battle.Queue.WillAct() != null && 
+                           battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false };
+                }),
+                OnHit = new OnHitEventInfo((_, _, pokemon, _) =>
+                {
+                    pokemon.AddVolatile(ConditionId.Stall);
+                    return new VoidReturn();
+                }),
             },
             [MoveId.BarbBarrage] = new()
             {
@@ -762,6 +893,25 @@ public partial record Moves
                 SelfSwitch = MoveSelfSwitch.FromCopyVolatile(),
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.CanSwitch(target.Side) == 0 || 
+                        target.Volatiles.ContainsKey(ConditionId.Commanded))
+                    {
+                        battle.AttrLastMove("[still]");
+                        battle.Add("-fail", target);
+                        return new Empty(); // NOT_FAIL
+                    }
+                    return new VoidReturn();
+                }),
+                Self = new SecondaryEffect
+                {
+                    OnHit = (_, _, source, _) =>
+                    {
+                        source.SkipBeforeSwitchOutEventFlag = true;
+                        return new VoidReturn();
+                    },
+                },
             },
             [MoveId.BeatUp] = new()
             {
@@ -937,7 +1087,8 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Protect = true, Mirror = true, Metronome = true, Wind = true },
+                {
+                    Protect = true, Mirror = true, Metronome = true, Wind = true },
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, _, target) =>
                 {
                     if (target != null)
@@ -2196,7 +2347,7 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 10,
-                    Status = ConditionId.Poison,
+                    Status = ConditionId. Poison,
                 },
                 CritRatio = 2,
                 Target = MoveTarget.Normal,
@@ -2333,5 +2484,6 @@ public partial record Moves
                 Type = MoveType.Dark,
             },
         };
+
     }
 }
