@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
@@ -87,7 +88,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
+                    { Protect = true, Reflectable = true, Mirror = true, Metronome = true, NoSketch = true },
                 Status = ConditionId.Sleep,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dark,
@@ -489,7 +490,17 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    // Note: Cramorant Gulp Missile forme change is handled by the ability, not the move
+                    // Handle Cramorant Gulp Missile forme change
+                    if (attacker.HasAbility(AbilityId.GulpMissile) && 
+                        attacker.Species.Name == "Cramorant" && 
+                        !attacker.Transformed)
+                    {
+                        SpecieId forme = attacker.Hp <= attacker.MaxHp / 2 
+                            ? SpecieId.CramorantGorging 
+                            : SpecieId.CramorantGulping;
+                        attacker.FormeChange(forme, move);
+                    }
+
                     // Starting the charge turn - show prepare message
                     battle.Add("-prepare", attacker, move.Name);
                     // Run ChargeMove event (for Power Herb, etc.)
@@ -584,6 +595,18 @@ public partial record Moves
                         target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.DoomDesire;
                     slotCondition.Source = source;
+                    // Store the move data for when the attack executes
+                    slotCondition.MoveData = new Move
+                    {
+                        Id = MoveId.DoomDesire,
+                        Name = "Doom Desire",
+                        Accuracy = 100,
+                        BasePower = 140,
+                        Category = MoveCategory.Special,
+                        Priority = 0,
+                        Flags = new MoveFlags { Metronome = true, FutureMove = true },
+                        Type = MoveType.Steel,
+                    };
 
                     battle.Add("-start", source, "Doom Desire");
                     return new Empty();
@@ -1373,7 +1396,8 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Charge = true, Protect = true, Mirror = true, Metronome = true },
+                {
+                    Charge = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
                 HasSheerForce = true,
@@ -2277,63 +2301,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
-            [MoveId.FlashCannon] = new()
-            {
-                Id = MoveId.FlashCannon,
-                Num = 430,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Special,
-                Name = "Flash Cannon",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 10,
-                    Boosts = new SparseBoostsTable { SpD = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Steel,
-            },
-            [MoveId.Flatter] = new()
-            {
-                Id = MoveId.Flatter,
-                Num = 260,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Flatter",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true, Reflectable = true, Mirror = true, AllyAnim = true,
-                    Metronome = true,
-                },
-                VolatileStatus = ConditionId.Confusion,
-                Boosts = new SparseBoostsTable { SpA = 1 },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Dark,
-            },
-            [MoveId.FleurCannon] = new()
-            {
-                Id = MoveId.FleurCannon,
-                Num = 705,
-                Accuracy = 90,
-                BasePower = 130,
-                Category = MoveCategory.Special,
-                Name = "Fleur Cannon",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true },
-                Self = new SecondaryEffect
-                {
-                    Boosts = new SparseBoostsTable { SpA = -2 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fairy,
-            },
             [MoveId.Fling] = new()
             {
                 Id = MoveId.Fling,
@@ -2616,52 +2583,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
             },
-            [MoveId.FreezeShock] = new()
-            {
-                Id = MoveId.FreezeShock,
-                Num = 553,
-                Accuracy = 90,
-                BasePower = 140,
-                Category = MoveCategory.Physical,
-                Name = "Freeze Shock",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Charge = true, Protect = true, Mirror = true, NoSleepTalk = true,
-                    FailInstruct = true,
-                },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 30,
-                    Status = ConditionId.Paralysis,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ice,
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
-                {
-                    // If already charged (volatile exists), remove it and execute the attack
-                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.FreezeShock]))
-                    {
-                        return new VoidReturn();
-                    }
-
-                    // Starting the charge turn - show prepare message
-                    battle.Add("-prepare", attacker, move.Name);
-                    // Run ChargeMove event (for Power Herb, etc.)
-                    RelayVar? chargeResult =
-                        battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
-                    if (chargeResult is BoolRelayVar { Value: false })
-                    {
-                        return new VoidReturn();
-                    }
-
-                    // Add the volatile for charging state
-                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
-                    attacker.AddVolatile(ConditionId.FreezeShock);
-                    return null; // Return null to skip the attack this turn
-                }),
-            },
             [MoveId.FreezingGlare] = new()
             {
                 Id = MoveId.FreezingGlare,
@@ -2830,6 +2751,20 @@ public partial record Moves
                         target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.FutureSight;
                     slotCondition.Source = source;
+                    // Store the move data for when the attack executes
+                    // Note: ignoreImmunity is false in the stored moveData (different from the move itself)
+                    slotCondition.MoveData = new Move
+                    {
+                        Id = MoveId.FutureSight,
+                        Name = "Future Sight",
+                        Accuracy = 100,
+                        BasePower = 120,
+                        Category = MoveCategory.Special,
+                        Priority = 0,
+                        Flags = new MoveFlags { AllyAnim = true, Metronome = true, FutureMove = true },
+                        IgnoreImmunity = false, // Note: Different from the main move's ignoreImmunity
+                        Type = MoveType.Psychic,
+                    };
 
                     battle.Add("-start", source, "Future Sight");
                     return new Empty();
