@@ -1472,6 +1472,37 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    Item item = target.GetItem();
+                    if (source.Hp > 0 && item.IsBerry)
+                    {
+                        ItemFalseUnion takeResult = target.TakeItem(source);
+                        if (takeResult is ItemItemFalseUnion takenItemUnion)
+                        {
+                            Item takenItem = takenItemUnion.Item;
+                            battle.Add("-enditem", target, takenItem.Name, "[from] stealeat", 
+                                "[move] Bug Bite", $"[of] {source}");
+                            RelayVar? eatResult = battle.SingleEvent(EventId.Eat, takenItem, 
+                                target.ItemState, source, 
+                                SingleEventSource.FromNullablePokemon(source), move);
+                            if (eatResult is not BoolRelayVar { Value: false })
+                            {
+                                battle.RunEvent(EventId.EatItem, source, 
+                                    RunEventSource.FromNullablePokemon(source), move, takenItem);
+                                if (takenItem.Id == ItemId.LeppaBerry)
+                                {
+                                    target.Staleness = StalenessId.External;
+                                }
+                            }
+                            if (takenItem.OnEat != null)
+                            {
+                                source.AteBerry = true;
+                            }
+                        }
+                    }
+                    return new VoidReturn();
+                }),
             },
             [MoveId.BugBuzz] = new()
             {
@@ -1849,7 +1880,8 @@ public partial record Moves
                 BasePp = 5,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Sound = true, Dance = true },
-                SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
+                // Note: Do NOT use SelfBoost here - boosts are applied manually in OnHit
+                // to allow the move to fail properly if boosts can't be applied
                 Target = MoveTarget.Self,
                 Type = MoveType.Dragon,
                 OnTry = new OnTryEventInfo((_, source, _, _) =>
@@ -1862,21 +1894,13 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, _, source, move) =>
-                {
-                    if (move.Boosts is null)
-                    {
-                        battle.Debug("Clangorous Soul has no boosts to apply");
-                        return new VoidReturn();
-                    }
-
-                    // Apply boosts first, fail if boosts couldn't be applied
-                    BoolZeroUnion? boostResult = battle.Boost(move.Boosts, source, source, move);
-                    if (boostResult == null || !boostResult.IsTruthy()) return false;
-                    return new VoidReturn();
-                }),
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
+                    // Apply boosts - fail if boosts couldn't be applied
+                    SparseBoostsTable boosts = new() { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 };
+                    BoolZeroUnion? boostResult = battle.Boost(boosts, source, source);
+                    if (boostResult == null || !boostResult.IsTruthy()) return false;
+                    
                     // Deal 33% recoil damage
                     battle.DirectDamage(source.MaxHp * 33 / 100, source);
                     return new VoidReturn();
