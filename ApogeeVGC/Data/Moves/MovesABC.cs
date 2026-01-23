@@ -1576,8 +1576,16 @@ public partial record Moves
                 Flags = new MoveFlags { Metronome = true, NoAssist = true, FailCopycat = true },
                 StallingMove = true,
                 VolatileStatus = ConditionId.BurningBulwark,
+                Condition = _library.Conditions[ConditionId.BurningBulwark],
                 Target = MoveTarget.Self,
                 Type = MoveType.Fire,
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, pokemon, _, _) => battle.Queue.WillAct() != null &&
+                    battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }),
+                OnHit = new OnHitEventInfo((_, _, pokemon, _) =>
+                {
+                    pokemon.AddVolatile(ConditionId.Stall);
+                    return new VoidReturn();
+                }),
             },
             [MoveId.BurningJealousy] = new()
             {
@@ -1849,7 +1857,7 @@ public partial record Moves
                 BasePp = 5,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Sound = true, Dance = true },
-                SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
+                Boosts = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Dragon,
                 OnTry = new OnTryEventInfo((_, source, _, _) =>
@@ -1870,9 +1878,11 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    // Apply boosts first, fail if boosts couldn't be applied
+                    // Apply boosts first, fail silently if boosts couldn't be applied
                     var boostResult = battle.Boost(move.Boosts, source, source, move);
-                    if (boostResult == null || !boostResult.IsTruthy()) return false;
+                    if (boostResult == null || !boostResult.IsTruthy()) return null;
+                    // Clear boosts so they don't get applied again
+                    move.Boosts = null;
                     return new VoidReturn();
                 }),
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
@@ -1897,9 +1907,9 @@ public partial record Moves
                 Type = MoveType.Poison,
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
-                    target.Boosts = new BoostsTable();
+                    target.ClearBoosts();
                     battle.Add("-clearboost", target);
-                    return null;
+                    return new VoidReturn();
                 }),
             },
             [MoveId.CloseCombat] = new()
@@ -1966,14 +1976,10 @@ public partial record Moves
                 Type = MoveType.Fighting,
                 OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
                 {
-                    if (target.RunEffectiveness(move) <= 0.0) return new VoidReturn();
-                    if (battle.DisplayUi)
-                    {
-                        battle.Debug("collision course super effective buff");
-                    }
-
-                    battle.ChainModify([5461, 4096]);
-                    return new VoidReturn();
+                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
+                    // Only apply buff when super effective (> 0)
+                    battle.Debug("collision course super effective buff");
+                    return battle.ChainModify([5461, 4096]);
                 }),
             },
             [MoveId.Comeuppance] = new()
