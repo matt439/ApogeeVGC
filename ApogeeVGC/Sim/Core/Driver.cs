@@ -25,7 +25,7 @@ public class Driver
     private const int BattleEvalSeed = 9876;
 
     private const int RandomEvaluationNumTest = 1000;
-    private const int NumThreads = 10;
+    private const int NumThreads = 16;
     private const int BattleTimeoutMilliseconds = 3000; // 3 seconds timeout per battle
 
     public void Start(DriverMode mode)
