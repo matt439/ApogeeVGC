@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.PokemonClasses;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Moves;
@@ -1065,13 +1066,10 @@ public partial record Moves
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, _, target) =>
                 {
-                    if (target != null)
+                    var effectiveWeather = target?.EffectiveWeather();
+                    if (effectiveWeather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
-                        var effectiveWeather = target.EffectiveWeather();
-                        if (effectiveWeather is ConditionId.RainDance or ConditionId.PrimordialSea)
-                        {
-                            move.Accuracy = IntTrueUnion.FromTrue();
-                        }
+                        move.Accuracy = IntTrueUnion.FromTrue();
                     }
                 }),
                 Secondary = new SecondaryEffect
@@ -1120,6 +1118,11 @@ public partial record Moves
                 BasePp = 5,
                 Priority = 0,
                 Flags = new MoveFlags { Reflectable = true, Mirror = true, Metronome = true },
+                OnHit = new OnHitEventInfo((_, target, source, move) =>
+                {
+                    target.AddVolatile(ConditionId.Trapped, source, move);
+                    return new VoidReturn();
+                }),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -1168,7 +1171,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                    { Contact = true, Protect = true, Mirror = true },
                 OverrideOffensiveStat = StatIdExceptHp.Def, // Uses Def instead of Atk
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
@@ -1270,6 +1273,30 @@ public partial record Moves
                 },
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
+                Condition = _library.Conditions[ConditionId.Bounce],
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // If already in the air (volatile exists), remove it and execute the attack
+                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Bounce]))
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Starting the charge turn - show prepare message
+                    battle.Add("-prepare", attacker, move.Name);
+                    // Run ChargeMove event (for Power Herb, etc.)
+                    RelayVar? chargeResult =
+                        battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Add the volatile for airborne state
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    attacker.AddVolatile(ConditionId.Bounce);
+                    return null; // Return null to skip the attack this turn
+                }),
             },
             [MoveId.BranchPoke] = new()
             {
@@ -1335,6 +1362,14 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                {
+                    // Will shatter screens through sub, before you hit
+                    target.Side.RemoveSideCondition(ConditionId.Reflect);
+                    target.Side.RemoveSideCondition(ConditionId.LightScreen);
+                    target.Side.RemoveSideCondition(ConditionId.AuroraVeil);
+                    return new VoidReturn();
+                }),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
@@ -1407,6 +1442,34 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    Item item = target.GetItem();
+                    if (source.Hp > 0 && item.IsBerry)
+                    {
+                        ItemFalseUnion takeResult = target.TakeItem(source);
+                        if (takeResult is ItemItemFalseUnion takenItem)
+                        {
+                            battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
+                                "[move] Bug Bite", $"[of] {source}");
+                            // Trigger the Eat event on the item for the source
+                            battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
+                                source, source, move);
+                            battle.RunEvent(EventId.EatItem, source, source, move, takenItem.Item);
+                            if (takenItem.Item.Id == ItemId.LeppaBerry)
+                            {
+                                target.Staleness = StalenessId.External;
+                            }
+
+                            if (takenItem.Item.OnEat != null)
+                            {
+                                source.AteBerry = true;
+                            }
+                        }
+                    }
+
+                    return new VoidReturn();
+                }),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
             },
