@@ -454,6 +454,7 @@ public partial record Conditions
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
                     // Moves that can hit Pokemon in the air
+                    // Note: SkyUppercut and ThousandArrows are not in Gen 9
                     if (move.Id is MoveId.Gust or MoveId.Twister
                         or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown)
                     {
@@ -525,29 +526,23 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                OnHit = new OnHitEventInfo((_, target, _, move) =>
                 {
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.FocusPunch,
-                            out EffectState? state) &&
-                        state.LostFocus == true)
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("cant", pokemon, "Focus Punch", "Focus Punch");
-                        }
-
-                        return false;
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }, 8),
-                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, _) =>
-                {
-                    if (target.Volatiles.TryGetValue(ConditionId.FocusPunch,
+                    // Lose focus if hit by a non-Status move
+                    if (move.Category != MoveCategory.Status &&
+                        target.Volatiles.TryGetValue(ConditionId.FocusPunch,
                             out EffectState? @volatile))
                     {
                         @volatile.LostFocus = true;
                     }
+
+                    return null;
+                }),
+                OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
+                {
+                    // Block flinch while charging Focus Punch
+                    if (status.Id == ConditionId.Flinch) return null;
+                    return new VoidReturn();
                 }),
             },
             [ConditionId.Fling] = new()
@@ -1229,6 +1224,7 @@ public partial record Conditions
                     {
                         MoveSlot = dummySlot,
                         Flags = moveData.Flags with { FutureMove = true },
+                        IgnoreImmunity = false, // Future move hits respect type immunity
                     };
 
                     // Apply Infiltrator ability if source has it (Gen 6+)

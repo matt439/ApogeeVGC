@@ -2480,6 +2480,30 @@ public partial record Moves
                 },
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
+                Condition = _library.Conditions[ConditionId.Fly],
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                {
+                    // If already in the air (volatile exists), remove it and execute the attack
+                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Fly]))
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Starting the charge turn - show prepare message
+                    battle.Add("-prepare", attacker, move.Name);
+                    // Run ChargeMove event (for Power Herb, etc.)
+                    RelayVar? chargeResult =
+                        battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn();
+                    }
+
+                    // Add the volatile for flying state
+                    attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
+                    attacker.AddVolatile(ConditionId.Fly);
+                    return null; // Return null to skip the attack this turn
+                }),
             },
             [MoveId.FlyingPress] = new()
             {
@@ -2498,6 +2522,12 @@ public partial record Moves
                 },
                 Target = MoveTarget.Any,
                 Type = MoveType.Fighting,
+                OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, _, type, _) =>
+                {
+                    // Flying Press deals Fighting + Flying type damage
+                    // GetEffectiveness returns MoveEffectiveness enum which converts to int
+                    return typeMod + (int)battle.Dex.GetEffectiveness(MoveType.Flying, type);
+                }),
             },
             [MoveId.FocusBlast] = new()
             {
@@ -2547,10 +2577,30 @@ public partial record Moves
                 Flags = new MoveFlags
                 {
                     Contact = true, Protect = true, Punch = true, FailMeFirst = true,
-                    NoSleepTalk = true, FailInstruct = true,
+                    NoSleepTalk = true, NoAssist = true, FailCopycat = true, FailInstruct = true,
                 },
+                Condition = _library.Conditions[ConditionId.FocusPunch],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
+                PriorityChargeCallback = new PriorityChargeCallbackEventInfo((_, pokemon) =>
+                {
+                    pokemon.AddVolatile(ConditionId.FocusPunch);
+                }),
+                BeforeMoveCallback = new BeforeMoveCallbackEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.FocusPunch, out EffectState? state) &&
+                        state.LostFocus == true)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "Focus Punch", "Focus Punch");
+                        }
+
+                        return true;
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
             },
             [MoveId.FollowMe] = new()
             {
@@ -2566,6 +2616,11 @@ public partial record Moves
                 VolatileStatus = ConditionId.FollowMe,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    // Follow Me fails in singles (only works in doubles/triples)
+                    return battle.ActivePerHalf > 1 ? new VoidReturn() : false;
+                }),
             },
             [MoveId.ForcePalm] = new()
             {
@@ -2604,6 +2659,20 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Fail if target already has Grass type
+                    if (target.HasType(PokemonType.Grass)) return false;
+                    // Try to add Grass type
+                    if (!target.AddType(PokemonType.Grass)) return false;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "typeadd", "Grass",
+                            "[from] move: Forest's Curse");
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.FoulPlay] = new()
             {
@@ -2640,6 +2709,12 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
+                OnEffectiveness = new OnEffectivenessEventInfo((_, _, _, type, _) =>
+                {
+                    // Freeze-Dry is super effective against Water types
+                    if (type == PokemonType.Water) return 1;
+                    return new VoidReturn();
+                }),
             },
             [MoveId.FreezeShock] = new()
             {
@@ -2772,8 +2847,29 @@ public partial record Moves
                 {
                     Contact = true, Protect = true, Mirror = true, Metronome = true, Slicing = true,
                 },
+                Condition = _library.Conditions[ConditionId.FuryCutter],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
+                {
+                    // Add volatile on first hit or if volatile doesn't exist
+                    if (!pokemon.Volatiles.ContainsKey(ConditionId.FuryCutter) || move.Hit == 1)
+                    {
+                        pokemon.AddVolatile(ConditionId.FuryCutter);
+                    }
+
+                    // Get multiplier from volatile state (defaults to 1)
+                    int multiplier = 1;
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.FuryCutter, out EffectState? state))
+                    {
+                        multiplier = state.Multiplier ?? 1;
+                    }
+
+                    // Calculate BP, clamped between 1 and 160
+                    int bp = Math.Clamp(move.BasePower * multiplier, 1, 160);
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
             },
             [MoveId.FurySwipes] = new()
             {
@@ -2851,8 +2947,8 @@ public partial record Moves
                 Name = "Future Sight",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags { Metronome = true, FutureMove = true },
-                IgnoreImmunity = true, // Future Sight ignores type immunity
+                Flags = new MoveFlags { AllyAnim = true, Metronome = true, FutureMove = true },
+                IgnoreImmunity = true, // For setup phase - actual hit respects immunity
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
                 OnTry = new OnTryEventInfo((battle, source, target, _) =>
