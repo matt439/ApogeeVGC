@@ -344,10 +344,17 @@ public partial record Moves
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
                 {
                     // Check if this move is being modified by a pledge combo
+                    // TODO: ForceStab and SideCondition are init-only properties, so they cannot be
+                    // set at runtime. The current implementation using move.Self.SideCondition is a
+                    // workaround but applies to wrong side. The proper fix requires making these
+                    // properties settable or restructuring how pledge combos work.
+                    // For VGC, pledge combos are rarely used, so this is low priority.
                     if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.WaterPledge })
                     {
-                        // Water Pledge + Grass Pledge = Grass-type move with Grass Pledge side condition
+                        // Water Pledge + Grass Pledge = Grass-type move with Grass Pledge side condition (swamp)
                         move.Type = MoveType.Grass;
+                        // TypeScript: move.sideCondition = 'grasspledge' (applies to target side)
+                        // Using Self.SideCondition is incorrect but works around init-only limitation
                         move.Self = new SecondaryEffect
                         {
                             SideCondition = ConditionId.GrassPledge,
@@ -355,8 +362,9 @@ public partial record Moves
                     }
                     else if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.FirePledge })
                     {
-                        // Fire Pledge + Grass Pledge = Fire-type move with Fire Pledge side condition
+                        // Fire Pledge + Grass Pledge = Fire-type move with Fire Pledge side condition (sea of fire)
                         move.Type = MoveType.Fire;
+                        // TypeScript: move.sideCondition = 'firepledge' (applies to target side)
                         move.Self = new SecondaryEffect
                         {
                             SideCondition = ConditionId.FirePledge,
@@ -487,13 +495,9 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                Secondary = new SecondaryEffect
+                Boosts = new SparseBoostsTable
                 {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable
-                    {
-                        Atk = -1,
-                    },
+                    Atk = -1,
                 },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Normal,
@@ -671,7 +675,7 @@ public partial record Moves
                 {
                     int targetSpeed = target.GetStat(StatIdExceptHp.Spe);
                     int userSpeed = pokemon.GetStat(StatIdExceptHp.Spe);
-                    int power = 25 * targetSpeed / userSpeed + 1;
+                    int power = userSpeed > 0 ? 25 * targetSpeed / userSpeed + 1 : 1;
                     if (power > 150) power = 150;
                     if (battle.DisplayUi)
                     {
@@ -705,7 +709,12 @@ public partial record Moves
                 Name = "Happy Hour",
                 BasePp = 30,
                 Priority = 0,
-                Flags = new MoveFlags(),
+                Flags = new MoveFlags { Metronome = true },
+                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                {
+                    battle.Add("-activate", target, "move: Happy Hour");
+                    return new VoidReturn();
+                }),
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Normal,
             },
@@ -720,7 +729,7 @@ public partial record Moves
                 BasePp = 30,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def = 1 },
+                Boosts = new SparseBoostsTable { Def = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -1084,13 +1093,17 @@ public partial record Moves
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
                 {
-                    int power = Math.Max((int)Math.Floor(100.0 * target.Hp / target.MaxHp) + 1, 1);
+                    int hp = target.Hp;
+                    int maxHp = target.MaxHp;
+                    // Use 4096-based rounding to match game mechanics
+                    int bp = (int)Math.Floor((double)((int)Math.Floor(100.0 * ((int)Math.Floor(100.0 * (int)Math.Floor((double)hp * 4096 / maxHp)) + 2048 - 1) / 4096)) / 100);
+                    if (bp == 0) bp = 1;
                     if (battle.DisplayUi)
                     {
-                        battle.Debug($"BP: {power}");
+                        battle.Debug($"BP for {hp}/{maxHp} HP: {bp}");
                     }
 
-                    return power;
+                    return bp;
                 }),
                 Category = MoveCategory.Physical,
                 Name = "Hard Press",
