@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
@@ -87,14 +88,14 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags
-                    { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
+                    { Protect = true, Reflectable = true, Mirror = true, Metronome = true, NoSketch = true },
                 Status = ConditionId.Sleep,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dark,
                 OnTry = new OnTryEventInfo((battle, _, source, move) =>
                 {
                     // Only Darkrai can use Dark Void (or if the move has bounced)
-                    if (source.Species.Name == "Darkrai" || (move.HasBounced ?? false))
+                    if (source.Species.BaseSpecies == SpecieId.Darkrai || (move.HasBounced ?? false))
                     {
                         return new VoidReturn();
                     }
@@ -134,7 +135,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def = 1, SpD = 1 },
+                Boosts = new SparseBoostsTable { Def = 1, SpD = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Bug,
             },
@@ -149,7 +150,7 @@ public partial record Moves
                 BasePp = 40,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def = 1 },
+                Boosts = new SparseBoostsTable { Def = 1 },
                 VolatileStatus = ConditionId.DefenseCurl,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
@@ -584,6 +585,7 @@ public partial record Moves
                         target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.DoomDesire;
                     slotCondition.Source = source;
+                    slotCondition.MoveData = battle.Library.Moves[MoveId.DoomDesire];
 
                     battle.Add("-start", source, "Doom Desire");
                     return new Empty();
@@ -701,7 +703,7 @@ public partial record Moves
                 BasePp = 15,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Evasion = 1 },
+                Boosts = new SparseBoostsTable { Evasion = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -799,7 +801,7 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Dance = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Atk = 1, Spe = 1 },
+                Boosts = new SparseBoostsTable { Atk = 1, Spe = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Dragon,
             },
@@ -2830,6 +2832,7 @@ public partial record Moves
                         target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.FutureSight;
                     slotCondition.Source = source;
+                    slotCondition.MoveData = battle.Library.Moves[MoveId.FutureSight];
 
                     battle.Add("-start", source, "Future Sight");
                     return new Empty();
