@@ -987,6 +987,13 @@ public partial record Conditions
                         return BoolVoidUnion.FromBool(false);
                     }
 
+                    // Check if the last move has failencore flag
+                    if (target.LastMove.Flags.FailEncore ?? false)
+                    {
+                        battle.Debug("Encore failed: move has failencore flag");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
                     // Check if the last move has PP remaining
                     MoveSlot? moveSlot = null;
                     foreach (MoveSlot slot in target.MoveSlots)
@@ -1010,6 +1017,12 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", target, "Encore");
+                    }
+
+                    // Extend duration if the target hasn't moved yet this turn
+                    if (battle.Queue.WillMove(target) == null)
+                    {
+                        battle.EffectState.Duration++;
                     }
 
                     return BoolVoidUnion.FromVoid();
@@ -1055,7 +1068,7 @@ public partial record Conditions
                             return;
                         }
                     }
-                }, 14),
+                }, 16),
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {
                     if (battle.DisplayUi)

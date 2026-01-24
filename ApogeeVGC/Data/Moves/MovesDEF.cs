@@ -664,8 +664,7 @@ public partial record Moves
                         if (battle.DisplayUi)
                         {
                             string typeString = string.Join("/",
-                                source.GetTypes().Where(t => t != PokemonType.Unknown)
-                                    .Select(t => t.ToString()));
+                                source.GetTypes().Select(t => t.ToString()));
                             battle.Add("-start", source, "typechange", typeString,
                                 "[from] move: Double Shock");
                         }
@@ -1396,6 +1395,8 @@ public partial record Moves
                     if (weather == ConditionId.RainDance || weather == ConditionId.PrimordialSea)
                     {
                         // Skip charge turn in rain - execute immediately
+                        battle.AttrLastMove("[still]");
+                        battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(attacker), move.Name, StringNumberDelegateObjectUnion.FromObject(defender));
                         return new VoidReturn();
                     }
 
