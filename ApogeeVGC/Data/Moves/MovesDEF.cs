@@ -1804,6 +1804,16 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+                OnDamage = new OnDamageEventInfo((_, damage, target, _, _) =>
+                {
+                    // Prevent KO - always leave target with at least 1 HP
+                    if (damage >= target.Hp)
+                    {
+                        return target.Hp - 1;
+                    }
+
+                    return IntBoolVoidUnion.FromVoid();
+                }, -20),
             },
             [MoveId.FeatherDance] = new()
             {
@@ -1835,7 +1845,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 2,
                 Flags = new MoveFlags
-                    { Mirror = true, Metronome = true, NoAssist = true, FailCopycat = true },
+                    { Mirror = true, NoAssist = true, FailCopycat = true },
                 BreaksProtect = true,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -1948,7 +1958,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true },
-                SelfBoost = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
+                Boosts = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
                 OnTry = new OnTryEventInfo((_, _, source, _) =>
@@ -1959,6 +1969,19 @@ public partial record Moves
                         return false;
                     }
 
+                    return new VoidReturn();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, _, _, move) =>
+                {
+                    // Try to apply boosts; if boost fails, return null (silent fail)
+                    BoolZeroUnion? result = battle.Boost(move.Boosts);
+                    if (result?.IsTruthy() != true)
+                    {
+                        return null;
+                    }
+
+                    // Clear the boosts so they aren't applied again
+                    move.Boosts = null;
                     return new VoidReturn();
                 }),
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
