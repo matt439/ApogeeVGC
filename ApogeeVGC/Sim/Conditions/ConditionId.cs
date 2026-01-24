@@ -158,4 +158,5 @@ public enum ConditionId
     ThroatChop,
     Uproar,
     SupercellSlam,
+    HelpingHand,
 }

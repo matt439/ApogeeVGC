@@ -461,6 +461,39 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.HelpingHand] = new()
+            {
+                Id = ConditionId.HelpingHand,
+                Name = "Helping Hand",
+                AssociatedMove = MoveId.HelpingHand,
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, source, _) =>
+                {
+                    battle.EffectState.DoubleMultiplier = 1.5;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Helping Hand", $"[of] {source}");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRestart = new OnRestartEventInfo((battle, target, source, _) =>
+                {
+                    battle.EffectState.DoubleMultiplier = (battle.EffectState.DoubleMultiplier ?? 1.0) * 1.5;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "Helping Hand", $"[of] {source}");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                {
+                    battle.Debug($"Boosting from Helping Hand: {battle.EffectState.DoubleMultiplier}");
+                    return battle.ChainModify(battle.EffectState.DoubleMultiplier ?? 1.0);
+                }, 10),
+            },
         };
     }
 }

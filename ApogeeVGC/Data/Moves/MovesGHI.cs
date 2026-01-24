@@ -815,6 +815,8 @@ public partial record Moves
                     battle.Add("-activate", source, "move: Heal Bell");
                     bool success = false;
 
+                    // Note: In standard 2v2 VGC, all team Pokemon are on the same Side.Pokemon list
+                    // AllySide is only relevant for multi battles (4 player) which are not supported
                     List<Pokemon> allies = [..target.Side.Pokemon];
 
                     foreach (Pokemon ally in allies)
@@ -1206,8 +1208,19 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 5,
                 Flags = new MoveFlags { BypassSub = true, NoAssist = true, FailCopycat = true },
+                VolatileStatus = ConditionId.HelpingHand,
                 Target = MoveTarget.AdjacentAlly,
                 Type = MoveType.Normal,
+                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                {
+                    // Fails if target already moved or won't move this turn
+                    if (!target.NewlySwitched && battle.Queue.WillMove(target) == null)
+                    {
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Hex] = new()
             {
