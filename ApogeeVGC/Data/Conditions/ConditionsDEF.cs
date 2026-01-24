@@ -1038,12 +1038,16 @@ public partial record Conditions
                             return encoredMove.Value;
                         }
 
+
                         return MoveIdVoidUnion.FromVoid();
                     })),
                 OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
                 {
                     var encoredMove = battle.EffectState.Move;
                     if (encoredMove == null) return;
+
+                    // Check if Pokemon has the encored move
+                    if (!pokemon.HasMove(encoredMove.Value)) return;
 
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots)
                     {

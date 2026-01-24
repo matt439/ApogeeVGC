@@ -1655,18 +1655,17 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     // 1.5x base power in Psychic Terrain if user is grounded
                     if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, source) &&
                         (source.IsGrounded() ?? false))
                     {
                         battle.Debug("terrain buff");
-                        battle.ChainModify(3, 2); // 1.5x = 3/2
-                        return battle.FinalModify(basePower);
+                        return battle.ChainModify(3, 2); // 1.5x = 3/2
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
                 {
@@ -1879,21 +1878,21 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, pokemon, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
                 {
                     // 30% chance to double base power
                     if (battle.RandomChance(3, 10))
                     {
+                        battle.AttrLastMove("[anim] Fickle Beam All Out");
                         if (battle.DisplayUi)
                         {
                             battle.Add("-activate", pokemon, "move: Fickle Beam");
                         }
 
-                        battle.ChainModify(2);
-                        return battle.FinalModify(basePower);
+                        return battle.ChainModify(2);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
             },
             [MoveId.FieryDance] = new()
@@ -2779,20 +2778,19 @@ public partial record Moves
                 Name = "Fusion Bolt",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true },
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
                 {
                     // Double base power if Fusion Flare was used successfully this turn
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionFlare)
                     {
                         battle.Debug("double power");
-                        battle.ChainModify(2);
-                        return battle.FinalModify(basePower);
+                        return battle.ChainModify(2);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
             },
             [MoveId.FusionFlare] = new()
@@ -2805,9 +2803,20 @@ public partial record Moves
                 Name = "Fusion Flare",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true },
+                Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                {
+                    // Double base power if Fusion Bolt was used successfully this turn
+                    if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionBolt)
+                    {
+                        battle.Debug("double power");
+                        return battle.ChainModify(2);
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.FutureSight] = new()
             {
