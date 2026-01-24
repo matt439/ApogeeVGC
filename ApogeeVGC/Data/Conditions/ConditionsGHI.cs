@@ -136,6 +136,16 @@ public partial record Conditions
                     {
                         battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
                     }, 7),
+                // groundedness implemented in Pokemon.IsGrounded()
+                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "move: Ingrain");
+                    }
+
+                    return null; // Prevent drag-out silently
+                }),
             },
             [ConditionId.Gem] = new()
             {

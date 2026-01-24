@@ -1100,7 +1100,11 @@ public partial record Moves
                     int hp = target.Hp;
                     int maxHp = target.MaxHp;
                     // Use 4096-based rounding to match game mechanics
-                    int bp = (int)Math.Floor((double)((int)Math.Floor(100.0 * ((int)Math.Floor(100.0 * (int)Math.Floor((double)hp * 4096 / maxHp)) + 2048 - 1) / 4096)) / 100);
+                    // TypeScript: Math.floor(Math.floor((100 * (100 * Math.floor(hp * 4096 / maxHP)) + 2048 - 1) / 4096) / 100) || 1
+                    int step1 = (int)Math.Floor((double)hp * 4096 / maxHp);
+                    int step2 = 100 * (100 * step1) + 2048 - 1; // 10000 * step1 + 2047
+                    int step3 = (int)Math.Floor((double)step2 / 4096);
+                    int bp = (int)Math.Floor((double)step3 / 100);
                     if (bp == 0) bp = 1;
                     if (battle.DisplayUi)
                     {
@@ -1822,6 +1826,31 @@ public partial record Moves
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Ice,
             },
+            [MoveId.Incinerate] = new()
+            {
+                Id = MoveId.Incinerate,
+                Num = 510,
+                Accuracy = 100,
+                BasePower = 60,
+                Category = MoveCategory.Special,
+                Name = "Incinerate",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Fire,
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    Item item = target.GetItem();
+                    if ((item.IsBerry || item.IsGem) &&
+                        target.TakeItem(source) is ItemItemFalseUnion)
+                    {
+                        battle.Add("-enditem", target, item.Name, "[from] move: Incinerate");
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
             [MoveId.InfernalParade] = new()
             {
                 Id = MoveId.InfernalParade,
@@ -1849,6 +1878,28 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ghost,
+            },
+            [MoveId.Imprison] = new()
+            {
+                Id = MoveId.Imprison,
+                Num = 286,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Imprison",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    BypassSub = true,
+                    Metronome = true,
+                    MustPressure = true,
+                },
+                VolatileStatus = ConditionId.Imprison,
+                Condition = _library.Conditions[ConditionId.Imprison],
+                Target = MoveTarget.Self,
+                Type = MoveType.Psychic,
             },
             [MoveId.Inferno] = new()
             {
