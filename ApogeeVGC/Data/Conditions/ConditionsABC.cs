@@ -60,10 +60,7 @@ public partial record Conditions
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnResidual = new OnResidualEventInfo(
-                    (battle, pokemon, _, _) =>
-                    {
-                        battle.Heal(pokemon.BaseMaxHp / 16, pokemon);
-                    }, 6),
+                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon); }, 6),
             },
             [ConditionId.Attract] = new()
             {
@@ -219,7 +216,7 @@ public partial record Conditions
                             if (sourceEffect is Ability)
                             {
                                 battle.Add("-status", target, "brn", "[from] ability: " +
-                                    sourceEffect.Name, $"[of] {source}");
+                                                                     sourceEffect.Name, $"[of] {source}");
                             }
 
                             break;
@@ -407,7 +404,7 @@ public partial record Conditions
                                 break;
                             case Ability:
                                 battle.Add("-start", target, "confusion", "[from] ability: " +
-                                    sourceEffect.Name, $"[of] {source}");
+                                                                          sourceEffect.Name, $"[of] {source}");
                                 break;
                             default:
                                 battle.Add("-start", target, "confusion");
@@ -679,10 +676,7 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
-                {
-                    battle.Add("-end", pokemon, "Charge", "[silent]");
-                }),
+                OnEnd = new OnEndEventInfo((battle, pokemon) => { battle.Add("-end", pokemon, "Charge", "[silent]"); }),
                 OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, move) =>
                 {
                     if (move.Type == MoveType.Electric)
@@ -737,7 +731,7 @@ public partial record Conditions
                 {
                     battle.Damage(pokemon.BaseMaxHp / 4, pokemon, pokemon,
                         BattleDamageEffect.FromIEffect(_library.Conditions[ConditionId.Curse]));
-                }, 14),
+                }, 12),
             },
             [ConditionId.Commanded] = new()
             {

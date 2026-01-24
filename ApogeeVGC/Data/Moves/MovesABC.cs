@@ -9,6 +9,9 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Types;
+using ApogeeVGC.Sim.Utils.Extensions;
+using MoveEventMethods = ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Moves;
@@ -2010,8 +2013,20 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((_, source, _, _) =>
                 {
                     var lastDamagedBy = source.GetLastDamagedBy(true);
-                    if (lastDamagedBy == null || !lastDamagedBy.ThisTurn) return false;
+                    if (lastDamagedBy is not { ThisTurn: true }) return false;
                     return new VoidReturn();
+                }),
+                OnModifyTarget = new MoveEventMethods.OnModifyTargetEventInfo((battle, targetRelayVar, source, _, _) =>
+                {
+                    var lastDamagedBy = source.GetLastDamagedBy(true);
+                    if (lastDamagedBy != null)
+                    {
+                        var redirectTarget = battle.GetAtSlot(lastDamagedBy.PokemonSlot);
+                        if (redirectTarget != null)
+                        {
+                            targetRelayVar.Target = redirectTarget;
+                        }
+                    }
                 }),
             },
             [MoveId.Confide] = new()
@@ -2081,6 +2096,23 @@ public partial record Moves
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Get the type of the first move
+                    if (target.MoveSlots.Count == 0) return false;
+                    var firstMoveId = target.MoveSlots[0].Id;
+                    var firstMove = battle.Library.Moves[firstMoveId];
+                    var moveType = firstMove.Type.ConvertToPokemonType();
+
+                    // Fail if target already has this type or can't change to it
+                    if (target.HasType(moveType) || !target.SetType(moveType))
+                    {
+                        return false;
+                    }
+
+                    battle.Add("-start", target, "typechange", firstMove.Type.ConvertToString());
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Conversion2] = new()
             {
@@ -2092,9 +2124,54 @@ public partial record Moves
                 Name = "Conversion 2",
                 BasePp = 30,
                 Priority = 0,
-                Flags = new MoveFlags { Metronome = true },
+                Flags = new MoveFlags { BypassSub = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    if (target.LastMoveUsed == null)
+                    {
+                        return false;
+                    }
+
+                    var attackType = target.LastMoveUsed.Type;
+                    var possibleTypes = new List<PokemonType>();
+
+                    // Find types that resist or are immune to the attack type
+                    foreach (var pokemonType in Enum.GetValues<PokemonType>())
+                    {
+                        // Skip Unknown type
+                        if (pokemonType == PokemonType.Unknown) continue;
+
+                        // Skip if source already has this type
+                        if (source.HasType(pokemonType)) continue;
+
+                        // Check if this type resists or is immune to the attack type
+                        var typeChart = battle.Library.TypeChart;
+                        if (typeChart.TypeData.TryGetValue(pokemonType, out var typeData) &&
+                            typeData.DamageTaken.TryGetValue(attackType, out var effectiveness))
+                        {
+                            if (effectiveness is TypeEffectiveness.NotVeryEffective or TypeEffectiveness.Immune)
+                            {
+                                possibleTypes.Add(pokemonType);
+                            }
+                        }
+                    }
+
+                    if (possibleTypes.Count == 0)
+                    {
+                        return false;
+                    }
+
+                    var randomType = battle.Sample(possibleTypes);
+                    if (!source.SetType(randomType))
+                    {
+                        return false;
+                    }
+
+                    battle.Add("-start", source, "typechange", randomType.ConvertToMoveType().ConvertToString());
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Copycat] = new()
             {
@@ -2117,13 +2194,14 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
                     var lastMove = battle.LastMove;
-                    if (lastMove == null) return false;
+                    // No last move = silently do nothing (undefined in TS)
+                    if (lastMove == null) return new VoidReturn();
 
                     // Get the move to use - if it has a base move, use that
                     var moveId = lastMove.BaseMove ?? lastMove.Id;
                     var moveToUse = battle.Library.Moves[moveId];
 
-                    // Check if the move can be copied
+                    // Check if the move can be copied - return false to fail
                     if (moveToUse.Flags.FailCopycat == true) return false;
 
                     battle.Actions.UseMove(moveToUse.Id, source);
@@ -2248,6 +2326,7 @@ public partial record Moves
                         ConditionId.Spikes,
                         ConditionId.Safeguard, ConditionId.Tailwind, ConditionId.ToxicSpikes,
                         ConditionId.StealthRock,
+                        ConditionId.WaterPledge, ConditionId.FirePledge, ConditionId.GrassPledge,
                         ConditionId.StickyWeb, ConditionId.AuroraVeil,
                     ];
                     var success = false;
@@ -2474,14 +2553,15 @@ public partial record Moves
                 {
                     if (!source.HasType(PokemonType.Ghost))
                     {
-                        // Non-Ghost variant: add stat boosts instead of curse
-                        // The volatile status will still try to apply but target is self
+                        // Non-Ghost variant: remove volatile status and onHit, add stat boosts
+                        move.VolatileStatus = null;
+                        move.OnHit = null;
                         move.Self = new SecondaryEffect
                         {
                             Boosts = new SparseBoostsTable { Spe = -1, Atk = 1, Def = 1 },
                         };
                     }
-                    else if (target.Volatiles.ContainsKey(ConditionId.Curse))
+                    else if (move.VolatileStatus != null && target.Volatiles.ContainsKey(ConditionId.Curse))
                     {
                         // Ghost variant: fail if target already cursed
                         return false;
@@ -2492,11 +2572,8 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
                     // Ghost variant: user loses 50% HP
-                    if (source.HasType(PokemonType.Ghost))
-                    {
-                        battle.DirectDamage(source.MaxHp / 2, source, source);
-                    }
-
+                    // This handler is removed for non-Ghost in OnTryHit
+                    battle.DirectDamage(source.MaxHp / 2, source, source);
                     return new VoidReturn();
                 }),
             },

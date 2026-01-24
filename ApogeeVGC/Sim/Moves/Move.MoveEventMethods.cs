@@ -19,7 +19,7 @@ public partial record Move : IMoveEventMethods
     public OnDamageEventInfo? OnDamage { get; init; }
     public OnBasePowerEventInfo? OnBasePower { get; init; }
     public OnEffectivenessEventInfo? OnEffectiveness { get; init; }
-    public OnHitEventInfo? OnHit { get; init; }
+    public OnHitEventInfo? OnHit { get; set; }
     public OnHitFieldEventInfo? OnHitField { get; init; }
     public OnHitSideEventInfo? OnHitSide { get; init; }
     public OnModifyMoveEventInfo? OnModifyMove { get; init; }
