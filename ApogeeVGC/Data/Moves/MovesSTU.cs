@@ -2118,7 +2118,7 @@ public partial record Moves
                     if (battle.Field.GetPseudoWeather(ConditionId.Gravity) is not null)
                     {
                         battle.Add("cant", source, "move: Gravity", move);
-                        return false;
+                        return null; // Silent failure - message already shown
                     }
 
                     return true;
@@ -2249,7 +2249,7 @@ public partial record Moves
                     {
                         int hpBeforeRecoil = source.Hp;
                         battle.Damage(source.MaxHp / 2, source, source,
-                            BattleDamageEffect.FromIEffect(_library.Conditions[ConditionId.Recoil]),
+                            BattleDamageEffect.FromIEffect(move),
                             true);
                         if (source.Hp <= source.MaxHp / 2 && hpBeforeRecoil > source.MaxHp / 2)
                         {

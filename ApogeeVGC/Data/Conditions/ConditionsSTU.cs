@@ -168,7 +168,7 @@ public partial record Conditions
                             (IEffect?)_library.Moves[MoveId.SilkTrap]);
                     }
 
-                    return BoolIntEmptyVoidUnion.FromBool(false);
+                    return new Empty(); // NOT_FAIL - move was blocked but don't show failure message
                 }, 3),
             },
             [ConditionId.SupercellSlam] = new()
@@ -1397,7 +1397,7 @@ public partial record Conditions
                         battle.Damage(source.BaseMaxHp / 8, source, target);
                     }
 
-                    return BoolIntEmptyVoidUnion.FromBool(false);
+                    return new Empty(); // NOT_FAIL - move was blocked but don't show failure message
                 }, 3),
             },
             [ConditionId.StealthRock] = new()
