@@ -1180,16 +1180,22 @@ public partial record Conditions
 
                         if (ragePowderUser == null) return PokemonVoidUnion.FromVoid();
 
+                        // Note: TypeScript checks isSkyDropped() here, but Sky Drop is isNonstandard: "Past"
+                        // and not available in Gen 9 VGC, so we skip this check.
+
                         // Check if source has powder immunity
                         // Grass-types, Overcoat ability, and Safety Goggles are immune to powder moves
-                        if (source.HasType(PokemonType.Grass) ||
-                            source.HasAbility(AbilityId.Overcoat) ||
-                            source.HasItem(ItemId.SafetyGoggles))
+                        // TypeScript uses source.runStatusImmunity('powder') which returns true if NOT immune
+                        bool hasPowderImmunity = source.HasType(PokemonType.Grass) ||
+                                                 source.HasAbility(AbilityId.Overcoat) ||
+                                                 source.HasItem(ItemId.SafetyGoggles);
+
+                        if (hasPowderImmunity)
                         {
                             if (battle.DisplayUi)
                             {
                                 battle.Debug(
-                                    $"{source.Name} is immune to Rage Powder (Grass-type/Overcoat/Safety Goggles)");
+                                    $"{source.Name} is immune to Rage Powder (powder immunity)");
                             }
 
                             return PokemonVoidUnion.FromVoid();

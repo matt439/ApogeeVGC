@@ -1176,16 +1176,15 @@ public partial record Moves
                     Metronome = true,
                     Slicing = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         battle.Debug("psyblade electric terrain boost");
-                        battle.ChainModify(3, 2); // 1.5x
-                        return battle.FinalModify(basePower);
+                        return battle.ChainModify(1.5);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1612,7 +1611,7 @@ public partial record Moves
                     Dance = true,
                     Metronome = true,
                 },
-                SelfBoost = new SparseBoostsTable { SpA = 1, SpD = 1, Spe = 1 },
+                Boosts = new SparseBoostsTable { SpA = 1, SpD = 1, Spe = 1 },
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Bug,
@@ -1792,6 +1791,78 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
+                OnAfterHit = new OnAfterHitEventInfo((battle, _, pokemon, move) =>
+                {
+                    // Skip if move has Sheer Force boost (suppresses secondary effects)
+                    if (move.HasSheerForce ?? false) return BoolVoidUnion.FromVoid();
+
+                    // Remove Leech Seed from user
+                    if (pokemon.Hp > 0 &&
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.LeechSeed]))
+                    {
+                        battle.Add("-end", pokemon, "Leech Seed", "[from] move: Rapid Spin",
+                            $"[of] {pokemon}");
+                    }
+
+                    // Remove hazards from user's side
+                    // Note: G-Max Steelsurge is not in Gen 9 VGC
+                    var sideConditions = new[]
+                    {
+                        ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
+                        ConditionId.StickyWeb
+                    };
+                    foreach (ConditionId condition in sideConditions)
+                    {
+                        if (pokemon.Hp > 0 && pokemon.Side.RemoveSideCondition(condition))
+                        {
+                            battle.Add("-sideend", pokemon.Side,
+                                battle.Library.Conditions[condition].Name,
+                                "[from] move: Rapid Spin", $"[of] {pokemon}");
+                        }
+                    }
+
+                    // Remove partial trapping from user
+                    if (pokemon.Hp > 0 &&
+                        pokemon.Volatiles.ContainsKey(ConditionId.PartiallyTrapped))
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.PartiallyTrapped]);
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, _, pokemon, move) =>
+                {
+                    // Same logic as OnAfterHit - applies even when hitting a substitute
+                    if (move.HasSheerForce ?? false) return;
+
+                    if (pokemon.Hp > 0 &&
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.LeechSeed]))
+                    {
+                        battle.Add("-end", pokemon, "Leech Seed", "[from] move: Rapid Spin",
+                            $"[of] {pokemon}");
+                    }
+
+                    var sideConditions = new[]
+                    {
+                        ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
+                        ConditionId.StickyWeb
+                    };
+                    foreach (ConditionId condition in sideConditions)
+                    {
+                        if (pokemon.Hp > 0 && pokemon.Side.RemoveSideCondition(condition))
+                        {
+                            battle.Add("-sideend", pokemon.Side,
+                                battle.Library.Conditions[condition].Name,
+                                "[from] move: Rapid Spin", $"[of] {pokemon}");
+                        }
+                    }
+
+                    if (pokemon.Hp > 0 &&
+                        pokemon.Volatiles.ContainsKey(ConditionId.PartiallyTrapped))
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.PartiallyTrapped]);
+                    }
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
