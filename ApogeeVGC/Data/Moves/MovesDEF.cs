@@ -1359,6 +1359,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { NonSky = true, Metronome = true },
+                Terrain = ConditionId.ElectricTerrain,
                 Condition = _library.Conditions[ConditionId.ElectricTerrain],
                 Target = MoveTarget.All,
                 Type = MoveType.Electric,

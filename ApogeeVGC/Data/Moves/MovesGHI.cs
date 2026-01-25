@@ -419,6 +419,7 @@ public partial record Moves
                     NonSky = true,
                     Metronome = true,
                 },
+                Terrain = ConditionId.GrassyTerrain,
                 Condition = _library.Conditions[ConditionId.GrassyTerrain],
                 Target = MoveTarget.All,
                 Type = MoveType.Grass,

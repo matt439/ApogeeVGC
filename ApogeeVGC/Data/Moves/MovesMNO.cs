@@ -941,6 +941,7 @@ public partial record Moves
                     NonSky = true,
                     Metronome = true,
                 },
+                Terrain = ConditionId.MistyTerrain,
                 Condition = _library.Conditions[ConditionId.MistyTerrain],
                 Secondary = null,
                 Target = MoveTarget.All,
@@ -1007,85 +1008,87 @@ public partial record Moves
                     Metronome = true,
                 },
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
-                {
-                    // Determine heal factor based on weather
-                    int numerator = 1;
-                    int denominator = 2; // Default 50%
-
-                    ConditionId weather = source.EffectiveWeather();
-                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
-                        // 66.7% = 2/3
-                        numerator = 2;
-                        denominator = 3;
-                    }
-                    else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
-                             or ConditionId.Sandstorm or ConditionId.Snowscape)
-                    {
-                        // 25% = 1/4
-                        numerator = 1;
-                        denominator = 4;
-                    }
+                        // Determine heal factor based on weather
+                        int numerator = 1;
+                        int denominator = 2; // Default 50%
 
-                    int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
-                    IntFalseUnion healResult = battle.Heal(healAmount, source);
-                    if (healResult is FalseIntFalseUnion)
-                    {
-                        battle.Add("-fail", source, "heal");
-                    }
+                        ConditionId weather = source.EffectiveWeather();
+                        if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
+                        {
+                            // 66.7% = 2/3
+                            numerator = 2;
+                            denominator = 3;
+                        }
+                        else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
+                                 or ConditionId.Sandstorm or ConditionId.Snowscape)
+                        {
+                            // 25% = 1/4
+                            numerator = 1;
+                            denominator = 4;
+                        }
 
-                    return new VoidReturn();
-                }),
-                Secondary = null,
-                Target = MoveTarget.Self,
-                Type = MoveType.Fairy,
-            },
-            [MoveId.MorningSun] = new()
-            {
-                Id = MoveId.MorningSun,
-                Num = 234,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Morning Sun",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Snatch = true,
-                    Heal = true,
-                    Metronome = true,
+                        int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                        IntFalseUnion healResult = battle.Heal(healAmount, source);
+                        if (healResult is FalseIntFalseUnion)
+                        {
+                            battle.Add("-fail", source, "heal");
+                            return new Empty(); // NOT_FAIL - move worked but heal failed
+                        }
+
+                        return true; // Heal succeeded
+                    }),
+                    Secondary = null,
+                    Target = MoveTarget.Self,
+                    Type = MoveType.Fairy,
                 },
-                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                [MoveId.MorningSun] = new()
                 {
-                    // Determine heal factor based on weather
-                    int numerator = 1;
-                    int denominator = 2; // Default 50%
-
-                    ConditionId weather = source.EffectiveWeather();
-                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
+                    Id = MoveId.MorningSun,
+                    Num = 234,
+                    Accuracy = IntTrueUnion.FromTrue(),
+                    BasePower = 0,
+                    Category = MoveCategory.Status,
+                    Name = "Morning Sun",
+                    BasePp = 5,
+                    Priority = 0,
+                    Flags = new MoveFlags
                     {
-                        // 66.7% = 2/3
-                        numerator = 2;
-                        denominator = 3;
-                    }
-                    else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
-                             or ConditionId.Sandstorm or ConditionId.Snowscape)
+                        Snatch = true,
+                        Heal = true,
+                        Metronome = true,
+                    },
+                    OnHit = new OnHitEventInfo((battle, _, source, _) =>
                     {
-                        // 25% = 1/4
-                        numerator = 1;
-                        denominator = 4;
-                    }
+                        // Determine heal factor based on weather
+                        int numerator = 1;
+                        int denominator = 2; // Default 50%
 
-                    int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
-                    IntFalseUnion healResult = battle.Heal(healAmount, source);
-                    if (healResult is FalseIntFalseUnion)
-                    {
-                        battle.Add("-fail", source, "heal");
-                    }
+                        ConditionId weather = source.EffectiveWeather();
+                        if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
+                        {
+                            // 66.7% = 2/3
+                            numerator = 2;
+                            denominator = 3;
+                        }
+                        else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
+                                 or ConditionId.Sandstorm or ConditionId.Snowscape)
+                        {
+                            // 25% = 1/4
+                            numerator = 1;
+                            denominator = 4;
+                        }
 
-                    return new VoidReturn();
-                }),
+                        int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                        IntFalseUnion healResult = battle.Heal(healAmount, source);
+                        if (healResult is FalseIntFalseUnion)
+                        {
+                            battle.Add("-fail", source, "heal");
+                            return new Empty(); // NOT_FAIL - move worked but heal failed
+                        }
+
+                        return true; // Heal succeeded
+                    }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
