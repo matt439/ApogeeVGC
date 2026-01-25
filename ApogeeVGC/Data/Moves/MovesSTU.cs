@@ -2599,13 +2599,18 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    // Heal by target's attack stat (with boosts)
-                    int targetAtk = target.GetStat(StatIdExceptHp.Atk);
-                    IntFalseUnion healResult = battle.Heal(targetAtk, source, source);
+                    // Fail if target's attack is already at minimum
+                    if (target.Boosts.GetBoost(BoostId.Atk) == -6) return false;
+
+                    // Get target's attack stat (with boosts applied) BEFORE lowering
+                    int targetAtk = target.GetStat(StatIdExceptHp.Atk, false, true);
 
                     // Lower target's attack by 1
                     BoolZeroUnion? boostResult = battle.Boost(new SparseBoostsTable { Atk = -1 },
-                        target, source, move);
+                        target, source, null, false, true);
+
+                    // Heal source by target's (pre-boost) attack stat
+                    IntFalseUnion healResult = battle.Heal(targetAtk, source, target);
 
                     // Move succeeds if either heal or boost worked
                     bool success = healResult is not FalseIntFalseUnion ||
@@ -2664,7 +2669,7 @@ public partial record Moves
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
-                    move.Type = MoveType.Rock;
+                    move.Type = MoveType.Unknown; // Typeless damage (???)
                     if (battle.DisplayUi)
                     {
                         battle.Add("-activate", pokemon, "move: Struggle");
@@ -2714,14 +2719,23 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
+                OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
+                {
+                    Item item = pokemon.GetItem();
+                    if (!item.IsBerry) pokemon.DisableMove(MoveId.StuffCheeks);
+                }),
                 OnTry = new OnTryEventInfo((_, source, _, _) =>
                 {
-                    if (!source.EatItem(true)) return false;
-                    return true;
+                    Item item = source.GetItem();
+                    return item.IsBerry;
                 }),
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
-                    battle.Boost(new SparseBoostsTable { Def = 2 }, source);
+                    // Boost first, then eat item
+                    BoolZeroUnion? boostResult =
+                        battle.Boost(new SparseBoostsTable { Def = 2 }, source);
+                    if (boostResult?.IsTruthy() != true) return null;
+                    source.EatItem(true);
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -2773,13 +2787,13 @@ public partial record Moves
                     if (source.Volatiles.ContainsKey(ConditionId.Substitute))
                     {
                         battle.Add("-fail", source, "move: Substitute");
-                        return false;
+                        return new Empty(); // NOT_FAIL - message already shown
                     }
 
                     if (source.Hp <= source.MaxHp / 4 || source.MaxHp == 1)
                     {
                         battle.Add("-fail", source, "move: Substitute", "[weak]");
-                        return false;
+                        return new Empty(); // NOT_FAIL - message already shown
                     }
 
                     return new VoidReturn();
@@ -3066,9 +3080,8 @@ public partial record Moves
                             FalseIntFalseUnion;
                     if (!success) battle.Add("-fail", target, "heal");
                     target.RemoveVolatile(_library.Conditions[ConditionId.StockpileStorage]);
-                    return success
-                        ? new VoidReturn()
-                        : false; // NOT_FAIL equivalent
+                    // Always return success or NOT_FAIL (Empty) - stockpile is consumed regardless
+                    return success ? new VoidReturn() : new Empty();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Self,
@@ -3158,7 +3171,7 @@ public partial record Moves
                 },
                 OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
                     !target.HasAbility(AbilityId.StickyHold)),
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
                     ItemFalseUnion? yourItem = target.TakeItem(source);
                     ItemFalseUnion? myItem = source.TakeItem();
@@ -3171,7 +3184,6 @@ public partial record Moves
                         return false;
                     }
 
-                    // SingleEvent TakeItem checks...
                     battle.Add("-activate", source, "move: Trick", $"[of] {target}");
                     if (myItem is ItemItemFalseUnion myItemUnion)
                     {
@@ -3179,11 +3191,21 @@ public partial record Moves
                         battle.Add("-item", target, myItemUnion.Item.Name,
                             "[from] move: Switcheroo");
                     }
+                    else if (yourItem is ItemItemFalseUnion yourItemForEnditem)
+                    {
+                        battle.Add("-enditem", target, yourItemForEnditem.Item.Name, "[silent]",
+                            "[from] move: Switcheroo");
+                    }
 
                     if (yourItem is ItemItemFalseUnion yourItemUnion)
                     {
                         source.SetItem(yourItemUnion.Item.Id);
                         battle.Add("-item", source, yourItemUnion.Item.Name,
+                            "[from] move: Switcheroo");
+                    }
+                    else if (myItem is ItemItemFalseUnion myItemForEnditem)
+                    {
+                        battle.Add("-enditem", source, myItemForEnditem.Item.Name, "[silent]",
                             "[from] move: Switcheroo");
                     }
 
