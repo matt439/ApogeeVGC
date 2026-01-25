@@ -472,9 +472,7 @@ public partial record Conditions
                         battle.Add("-fieldstart", "move: Misty Terrain");
                     }
                 }),
-                //OnFieldResidualOrder = 27,
-                //OnFieldResidualSubOrder = 7,
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
                 {
                     Order = 27,
                     SubOrder = 7,

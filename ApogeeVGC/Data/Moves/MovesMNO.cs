@@ -732,6 +732,45 @@ public partial record Moves
                     FailMimic = true,
                     FailInstruct = true,
                 },
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    Move? lastMove = target.LastMove;
+                    if (source.Transformed || lastMove == null ||
+                        lastMove.Flags.FailMimic == true ||
+                        source.Moves.Contains(lastMove.Id))
+                    {
+                        return false;
+                    }
+
+                    // Find the index of Mimic in source's move slots
+                    int mimicIndex = -1;
+                    for (int i = 0; i < source.MoveSlots.Count; i++)
+                    {
+                        if (source.MoveSlots[i].Id == MoveId.Mimic)
+                        {
+                            mimicIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (mimicIndex < 0) return false;
+
+                    // Replace the Mimic move slot with the mimicked move
+                    source.MoveSlots[mimicIndex] = new MoveSlot
+                    {
+                        Id = lastMove.Id,
+                        Move = lastMove.Id,
+                        Pp = lastMove.BasePp,
+                        MaxPp = lastMove.BasePp,
+                        Target = lastMove.Target,
+                        Disabled = false,
+                        Used = false,
+                        Virtual = true,
+                    };
+
+                    battle.Add("-start", source, "Mimic", lastMove.Name);
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -773,7 +812,6 @@ public partial record Moves
                     Protect = true,
                     FailMeFirst = true,
                     NoAssist = true,
-                    FailCopycat = true,
                 },
                 Target = MoveTarget.Scripted,
                 Type = MoveType.Psychic,
