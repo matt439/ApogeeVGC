@@ -1560,11 +1560,26 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((_, target, _, _) =>
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
-                    if (!target.SetType(PokemonType.Water))
+                    // Check if already pure Water type or if SetType fails
+                    PokemonType[] types = target.GetTypes();
+                    bool isAlreadyPureWater = types.Length == 1 && types[0] == PokemonType.Water;
+                    if (isAlreadyPureWater || !target.SetType(PokemonType.Water))
                     {
-                        return false;
+                        // Soak should animate even when it fails.
+                        // Returning false would suppress the animation.
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target);
+                        }
+
+                        return new Empty(); // null equivalent - move worked but failed silently
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "typechange", "Water");
                     }
 
                     return new VoidReturn();
@@ -1805,11 +1820,31 @@ public partial record Moves
                     Chance = 100,
                     VolatileStatus = ConditionId.SparklingAria,
                 },
-                OnHit = new OnHitEventInfo((_, target, _, _) =>
+                OnAfterMove = new OnAfterMoveEventInfo((battle, source, _, move) =>
                 {
-                    if (target.Status == ConditionId.Burn)
+                    if (source.Fainted || move.HitTargets == null || move.HasSheerForce == true)
                     {
-                        target.CureStatus();
+                        // Make sure the volatiles are cleared
+                        foreach (Pokemon pokemon in battle.GetAllActive())
+                        {
+                            pokemon.DeleteVolatile(ConditionId.SparklingAria);
+                        }
+
+                        return new VoidReturn();
+                    }
+
+                    int numberTargets = move.HitTargets.Count;
+                    foreach (Pokemon pokemon in move.HitTargets)
+                    {
+                        // Bypasses Shield Dust when hitting multiple targets
+                        if (pokemon != source && pokemon.IsActive &&
+                            (pokemon.RemoveVolatile(
+                                 _library.Conditions[ConditionId.SparklingAria]) ||
+                             numberTargets > 1) &&
+                            pokemon.Status == ConditionId.Burn)
+                        {
+                            pokemon.CureStatus();
+                        }
                     }
 
                     return new VoidReturn();
