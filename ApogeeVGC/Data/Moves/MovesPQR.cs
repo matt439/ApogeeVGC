@@ -1298,7 +1298,8 @@ public partial record Moves
                     target.Side.RemoveSideCondition(ConditionId.Reflect);
                     target.Side.RemoveSideCondition(ConditionId.LightScreen);
                     target.Side.RemoveSideCondition(ConditionId.AuroraVeil);
-                    return null; // Continue with the move
+                    // TS has no return (undefined) - continue with the move
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
