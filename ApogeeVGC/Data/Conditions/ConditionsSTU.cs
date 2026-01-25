@@ -162,7 +162,7 @@ public partial record Conditions
                     }
 
                     // Check if move makes contact and lower Speed
-                    if (move.Flags.Contact == true)
+                    if (battle.CheckMoveMakesContact(move, source, target))
                     {
                         battle.Boost(new SparseBoostsTable { Spe = -1 }, source, target,
                             (IEffect?)_library.Moves[MoveId.SilkTrap]);

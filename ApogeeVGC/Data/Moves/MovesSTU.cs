@@ -833,17 +833,14 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
-                    int healAmount;
+                    double factor = 0.5;
                     // Heal 2/3 in Sandstorm, 1/2 otherwise
                     if (battle.Field.IsWeather(ConditionId.Sandstorm))
                     {
-                        healAmount = battle.Modify(target.MaxHp, 2, 3);
-                    }
-                    else
-                    {
-                        healAmount = target.MaxHp / 2;
+                        factor = 0.667;
                     }
 
+                    int healAmount = battle.Modify(target.MaxHp, factor);
                     IntFalseUnion result = battle.Heal(healAmount, target);
 
                     if (result is FalseIntFalseUnion)
@@ -853,7 +850,7 @@ public partial record Moves
                             battle.Add("-fail", target, "heal");
                         }
 
-                        // Return NOT_FAIL equivalent - move worked but heal failed
+                        return new Empty(); // NOT_FAIL - move worked but heal failed
                     }
 
                     return new VoidReturn();
@@ -875,6 +872,16 @@ public partial record Moves
                 Flags = new MoveFlags(),
                 StallingMove = true,
                 VolatileStatus = ConditionId.SilkTrap,
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, pokemon, _, _) =>
+                    battle.Queue.WillAct() is not null &&
+                    battle.RunEvent(EventId.StallMove, pokemon) is not null
+                        ? new VoidReturn()
+                        : false),
+                OnHit = new OnHitEventInfo((_, pokemon, _, _) =>
+                {
+                    pokemon.AddVolatile(ConditionId.Stall);
+                    return new VoidReturn();
+                }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Bug,
@@ -1017,12 +1024,28 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((_, target, source, _) =>
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                 {
                     Ability targetAbility = target.GetAbility();
                     Ability sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.FailSkillSwap == true ||
                         targetAbility.Flags.FailSkillSwap == true)
+                    {
+                        return false;
+                    }
+
+                    // Check if source can receive target's ability
+                    RelayVar? sourceCanBeSet = battle.RunEvent(EventId.SetAbility, source, source, move,
+                        targetAbility);
+                    if (sourceCanBeSet is BoolRelayVar { Value: false })
+                    {
+                        return false;
+                    }
+
+                    // Check if target can receive source's ability
+                    RelayVar? targetCanBeSet = battle.RunEvent(EventId.SetAbility, target, source, move,
+                        sourceAbility);
+                    if (targetCanBeSet is BoolRelayVar { Value: false })
                     {
                         return false;
                     }
@@ -1099,6 +1122,26 @@ public partial record Moves
                     FailInstruct = true,
                 },
                 CritRatio = 2,
+                OnTryMove = new OnTryMoveEventInfo((battle, source, target, move) =>
+                {
+                    // If we have the volatile from turn 1, remove it and continue with the attack
+                    if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    {
+                        return new VoidReturn(); // Continue with the attack
+                    }
+
+                    // Turn 1: Prepare the move
+                    battle.Add("-prepare", source, move.Name);
+                    RelayVar? chargeResult =
+                        battle.RunEvent(EventId.ChargeMove, source, target, move);
+                    if (chargeResult is BoolRelayVar { Value: false })
+                    {
+                        return new VoidReturn(); // ChargeMove failed - continue but don't set up
+                    }
+
+                    source.AddVolatile(ConditionId.TwoTurnMove, target);
+                    return null; // Stop the move on turn 1
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
