@@ -175,7 +175,7 @@ public partial record Moves
                     foreach (BoolZeroUnion? unused in targets
                                  .Select(target =>
                                      battle.Boost(new SparseBoostsTable { Def = 1, SpD = 1 },
-                                         target, source, move))
+                                         target, source, move, isSecondary: false, isSelf: true))
                                  .Where(result => result?.IsTruthy() == true))
                     {
                         didSomething = true;
