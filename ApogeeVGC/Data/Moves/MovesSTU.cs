@@ -548,7 +548,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return false;
+                        return new VoidReturn(); // ChargeMove failed - continue but don't set up
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
@@ -641,6 +641,14 @@ public partial record Moves
                     battle.DirectDamage((int)Math.Ceiling(target.MaxHp / 2.0));
                     return new VoidReturn();
                 }),
+                Self = new SecondaryEffect
+                {
+                    OnHit = (_, _, source, _) =>
+                    {
+                        source.SkipBeforeSwitchOutEventFlag = true;
+                        return new VoidReturn();
+                    },
+                },
                 SelfSwitch = MoveSelfSwitch.FromShedTail(),
                 Secondary = null,
                 Target = MoveTarget.Self,

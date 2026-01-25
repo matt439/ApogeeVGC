@@ -885,10 +885,10 @@ public partial record Conditions
                     if (effect == null || source == null || effect is Condition
                         {
                             Id: ConditionId.Yawn
-                        }) return BoolVoidUnion.FromVoid();
+                        }) return null;
                     // Check if move has Infiltrates and target is not ally of source
                     if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
-                        return BoolVoidUnion.FromVoid();
+                        return null;
                     if (target != source)
                     {
                         if (battle.DisplayUi)
@@ -904,18 +904,18 @@ public partial record Conditions
                             }
                         }
 
-                        return BoolVoidUnion.FromBool(false);
+                        return null; // Silent failure - TS returns null
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
                 OnTryAddVolatile =
                     new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
                     {
-                        if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                        if (effect == null || source == null) return null;
                         // Check if move has Infiltrates and target is not ally of source
                         if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
-                            return BoolVoidUnion.FromVoid();
+                            return null;
                         if (status?.Id is ConditionId.Confusion or ConditionId.Yawn &&
                             target != source)
                         {
@@ -928,10 +928,10 @@ public partial record Conditions
                                 }
                             }
 
-                            return BoolVoidUnion.FromBool(false);
+                            return null; // Silent failure - TS returns null
                         }
 
-                        return BoolVoidUnion.FromVoid();
+                        return null;
                     }),
                 OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
                 {
