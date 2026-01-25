@@ -644,9 +644,9 @@ public partial record Moves
                     // Fails if user cannot switch
                     if (battle.CanSwitch(source.Side) == 0)
                     {
+                        battle.AttrLastMove("[still]");
                         battle.Add("-fail", source);
-                        return
-                            new VoidReturn(); // NOT_FAIL equivalent - move "worked" but did nothing
+                        return new Empty(); // NOT_FAIL equivalent - move "worked" but did nothing
                     }
 
                     return new VoidReturn();
