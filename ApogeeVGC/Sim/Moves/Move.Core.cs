@@ -111,7 +111,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     public bool? ThawsTarget { get; init; }
     public int[]? Heal { get; init; }
     public bool? ForceSwitch { get; init; }
-    public MoveSelfSwitch? SelfSwitch { get; init; }
+    public MoveSelfSwitch? SelfSwitch { get; set; }
     public bool? SpreadHit { get; set; }
     public SparseBoostsTable? SelfBoost { get; init; }
     public MoveSelfDestruct? SelfDestruct { get; init; }

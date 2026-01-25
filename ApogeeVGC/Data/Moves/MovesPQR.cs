@@ -104,10 +104,9 @@ public partial record Moves
                         battle.Boost(new SparseBoostsTable { Atk = -1, SpA = -1 }, target, source,
                             move);
                     // If the boost fails completely and target doesn't have Mirror Armor, prevent the switch
-                    // Note: SelfSwitch is init-only, so we return false to signal move failure
                     if (success?.IsTruthy() != true && !target.HasAbility(AbilityId.MirrorArmor))
                     {
-                        return false;
+                        move.SelfSwitch = null;
                     }
 
                     return new VoidReturn();
@@ -675,7 +674,7 @@ public partial record Moves
                         move.Infiltrates = true;
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {

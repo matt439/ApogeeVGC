@@ -1450,7 +1450,8 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                VolatileStatus = ConditionId.NoRetreat,
+                OnTry = new OnTryEventInfo((_, _, source, move) =>
                 {
                     // Fail if source already has No Retreat
                     if (source.Volatiles.ContainsKey(ConditionId.NoRetreat))
@@ -1458,19 +1459,17 @@ public partial record Moves
                         return false;
                     }
 
-                    return new VoidReturn();
-                }),
-                OnHit = new OnHitEventInfo((_, _, source, _) =>
-                {
-                    // Only apply volatile status if not already trapped
-                    if (!source.Volatiles.ContainsKey(ConditionId.Trapped))
+                    // If already trapped, don't apply the NoRetreat volatile
+                    // (but still allow the stat boosts)
+                    if (source.Volatiles.ContainsKey(ConditionId.Trapped))
                     {
-                        source.AddVolatile(ConditionId.NoRetreat);
+                        move.VolatileStatus = null;
                     }
 
                     return new VoidReturn();
                 }),
-                SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
+                Condition = _library.Conditions[ConditionId.NoRetreat],
+                Boosts = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Fighting,
