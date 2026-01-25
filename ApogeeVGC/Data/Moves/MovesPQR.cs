@@ -1969,6 +1969,39 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                {
+                    int ratio = Math.Max((int)Math.Floor(source.Hp * 48.0 / source.MaxHp), 1);
+                    int bp;
+                    if (ratio < 2)
+                    {
+                        bp = 200;
+                    }
+                    else if (ratio < 5)
+                    {
+                        bp = 150;
+                    }
+                    else if (ratio < 10)
+                    {
+                        bp = 100;
+                    }
+                    else if (ratio < 17)
+                    {
+                        bp = 80;
+                    }
+                    else if (ratio < 33)
+                    {
+                        bp = 40;
+                    }
+                    else
+                    {
+                        bp = 20;
+                    }
+
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
@@ -2305,7 +2338,7 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SelfBoost = new SparseBoostsTable { Spe = 2 },
+                Boosts = new SparseBoostsTable { Spe = 2 },
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Rock,
@@ -2531,6 +2564,34 @@ public partial record Moves
                 {
                     Protect = true, Mirror = true, Sound = true, BypassSub = true, Metronome = true
                 },
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                {
+                    // Double power if triggered by ally's Round
+                    if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.Round })
+                    {
+                        battle.Debug("BP doubled");
+                        return 120; // move.basePower * 2
+                    }
+
+                    return 60;
+                }),
+                OnTry = new OnTryEventInfo((battle, _, _, move) =>
+                {
+                    // Prioritize ally's Round actions so they go immediately after this one
+                    foreach (IAction action in battle.Queue.List)
+                    {
+                        if (action is not MoveAction moveAction) continue;
+                        if (moveAction.Pokemon == null || moveAction.Move == null) continue;
+                        if (moveAction.Move.Id == MoveId.Round)
+                        {
+                            battle.Queue.PrioritizeAction(moveAction, move);
+                            return new VoidReturn();
+                        }
+                    }
+
+                    return new VoidReturn();
+                }),
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },

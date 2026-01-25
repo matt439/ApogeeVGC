@@ -683,11 +683,28 @@ public partial record Conditions
                 Id = ConditionId.PsychicNoise,
                 Name = "Psychic Noise",
                 EffectType = EffectType.Condition,
+                Duration = 2, // Psychic Noise blocks healing for 2 turns
                 AssociatedMove = MoveId.PsychicNoise,
                 // Note: In Gen 9, Psychic Noise prevents the target from healing for 2 turns.
-                // TypeScript uses a separate 'healblock' volatile, but HealBlock is not in Gen 9 VGC.
-                // This simplified implementation uses PsychicNoise as a placeholder volatile for the effect.
+                // TypeScript uses the 'healblock' volatile with duration 2 when applied via Psychic Noise.
                 // The move's secondary applies this condition, and related code checks for it when blocking heals.
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Heal Block");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "move: Heal Block");
+                    }
+                }),
+                OnTryHeal = new OnTryHealEventInfo(false),
             },
             [ConditionId.QuickGuard] = new()
             {
