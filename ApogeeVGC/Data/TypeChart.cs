@@ -28,7 +28,7 @@ public record TypeChart
 
     public MoveEffectiveness GetMoveEffectiveness(PokemonType pokemon, MoveType moveType)
     {
-        TypeEffectiveness typeEffectiveness =  _typeData[pokemon].DamageTaken[moveType];
+        var typeEffectiveness =  _typeData[pokemon].DamageTaken[moveType];
         return typeEffectiveness.ConvertToMoveEffectiveness();
     }
 
@@ -127,6 +127,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -176,6 +178,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.SuperEffective,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -225,6 +229,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.NotVeryEffective,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -274,6 +280,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -320,6 +328,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.NotVeryEffective,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -368,6 +378,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.SuperEffective,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -415,6 +427,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -465,6 +479,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -514,6 +530,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.SuperEffective,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -561,6 +579,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -612,6 +632,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -659,6 +681,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.SuperEffective,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.SuperEffective,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -708,6 +732,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -756,6 +782,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.NotVeryEffective,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -802,6 +830,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>(),
             //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
@@ -841,6 +871,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -887,6 +919,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.SuperEffective,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
             //{
@@ -925,6 +959,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
             //{
@@ -963,6 +999,8 @@ public record TypeChart
                 [MoveType.Steel] = TypeEffectiveness.Normal,
                 [MoveType.Stellar] = TypeEffectiveness.Normal,
                 [MoveType.Water] = TypeEffectiveness.Normal,
+
+                [MoveType.Unknown] = TypeEffectiveness.Normal,
             },
             IsNonstandard = Nonstandard.Past,
             //SpecialDamageTaken = new Dictionary<SpecialImmunityId, TypeEffectiveness>
