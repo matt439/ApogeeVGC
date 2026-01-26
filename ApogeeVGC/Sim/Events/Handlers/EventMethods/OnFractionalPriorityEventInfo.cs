@@ -36,7 +36,7 @@ public sealed record OnFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFra
             typeof(Pokemon),
             typeof(ActiveMove),
         ];
-        ExpectedReturnType = typeof(double);
+        ExpectedReturnType = typeof(DoubleVoidUnion);
         
         // Nullability: target (4th param) is nullable since it's passed as null
         ParameterNullability = [false, false, false, true, false];

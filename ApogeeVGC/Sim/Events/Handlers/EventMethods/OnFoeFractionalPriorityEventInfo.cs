@@ -23,7 +23,7 @@ public sealed record OnFoeFractionalPriorityEventInfo : UnionEventHandlerInfo<On
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(double);
+        ExpectedReturnType = typeof(DoubleVoidUnion);
         
         // Nullability: target (4th param) is nullable since it's passed as null
         ParameterNullability = [false, false, false, true, false];
