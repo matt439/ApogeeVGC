@@ -177,7 +177,9 @@ public class BattleQueue(Battle battle)
         // Process pre-turn actions (not during midTurn)
         if (!midTurn)
         {
-            if (currentAction is MoveAction ma)
+            // Only process pre-turn callbacks for actual Move actions (not BeforeTurnMove, PriorityChargeMove, etc.)
+            // This matches TypeScript: if (action.choice === 'move')
+            if (currentAction is MoveAction { Choice: ActionId.Move } ma)
             {
                 // Add BeforeTurnMove action if the move has a beforeTurnCallback (e.g., Focus Punch)
                 if (ma.Move.BeforeTurnCallback != null)
