@@ -408,6 +408,10 @@ internal static class EventHandlerAdapter
             DoubleDoubleVoidUnion doubleVoid => new DecimalRelayVar((decimal)doubleVoid.Value),
             VoidDoubleVoidUnion => new VoidReturnRelayVar(),
 
+            // IntBoolUnion -> int or bool
+            IntIntBoolUnion intBool => new IntRelayVar(intBool.Value),
+            BoolIntBoolUnion boolInt => new BoolRelayVar(boolInt.Value),
+
             // IntVoidUnion -> int or VoidReturn
             IntIntVoidUnion intVoid => new IntRelayVar(intVoid.Value),
             VoidIntVoidUnion => new VoidReturnRelayVar(),
