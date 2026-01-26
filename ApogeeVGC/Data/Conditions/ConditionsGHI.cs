@@ -204,7 +204,12 @@ public partial record Conditions
                         battle.Add("-sidestart", side, "Grass Pledge");
                     }
                 }),
-                OnModifySpe = new OnModifySpeEventInfo((_, spe, _) => (int)Math.Floor(spe * 0.25)),
+                // TS: return this.chainModify(0.25) - reduces Speed to 25%
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
+                {
+                    battle.ChainModify(0.25);
+                    return battle.FinalModify(spe);
+                }),
                 OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
                 {
                     // Duration handled automatically
