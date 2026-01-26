@@ -12,10 +12,24 @@ namespace ApogeeVGC.Sim.FormatClasses;
 
 public enum FormatId
 {
+    // Smogon formats
     Gen9Ou,
+
+    // Custom formats
     CustomSingles,
     CustomSinglesBlind,
     CustomDoubles,
+
+    // VGC Gen 9 Regulations (2023-2025)
+    Gen9VgcRegulationA,    // Paldea dex only, no restricted
+    Gen9VgcRegulationB,    // Paldea dex only, no restricted
+    Gen9VgcRegulationC,    // Paldea + Teal Mask, no restricted
+    Gen9VgcRegulationD,    // All obtainable, 1 restricted
+    Gen9VgcRegulationE,    // All obtainable + Indigo Disk, 1 restricted
+    Gen9VgcRegulationF,    // All obtainable, 2 restricted
+    Gen9VgcRegulationG,    // All obtainable, 2 restricted (2025)
+    Gen9VgcRegulationH,    // All obtainable, 1 restricted
+    Gen9VgcRegulationI,    // All obtainable, no restricted
 }
 
 public enum FormatEffectType
@@ -26,11 +40,47 @@ public enum FormatEffectType
     ValidatorRule,
 }
 
+/// <summary>
+/// Rule identifiers for format validation and battle rules.
+/// Based on Pokemon Showdown's rulesets.ts.
+/// </summary>
 public enum RuleId
 {
+    // Base rulesets
     Standard,
-    OverflowStatMod,
+    StandardDoubles,
+    FlatRules,
+    Obtainable,
+
+    // Team validation rules
+    TeamPreview,
+    SpeciesClause,
+    NicknameClause,
+    ItemClause,
+
+    // Battle rules
     EndlessBattleClause,
+    CancelMod,
+    HpPercentageMod,
+    OverflowStatMod,
+
+    // Level adjustment rules
+    AdjustLevelDown,
+
+    // VGC-specific rules
+    VGCTimer,
+    LimitOneRestricted,
+    LimitTwoRestricted,
+
+    // Obtainability rules
+    ObtainableMoves,
+    ObtainableAbilities,
+    ObtainableFormes,
+    ObtainableMisc,
+
+    // Ban categories (used with banlists)
+    Mythical,
+    RestrictedLegendary,
 }
 
 public partial record Format : IEffect, IBasicEffect, ICopyable<Format>

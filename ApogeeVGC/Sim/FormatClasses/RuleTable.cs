@@ -3,9 +3,31 @@ using System.Data;
 
 namespace ApogeeVGC.Sim.FormatClasses;
 
+/// <summary>
+/// Tracks rules, bans, and numeric settings for a format.
+/// Mirrors the RuleTable from Pokemon Showdown's dex-formats.ts.
+/// </summary>
 public class RuleTable : Dictionary<RuleId, Rule>
 {
+    // Team composition settings
+    public int MinTeamSize { get; set; } = 1;
+    public int MaxTeamSize { get; set; } = 6;
     public int? PickedTeamSize { get; set; }
+    public int? MaxTotalLevel { get; set; }
+
+    // Level settings
+    public int MinLevel { get; set; } = 1;
+    public int MaxLevel { get; set; } = 100;
+    public int DefaultLevel { get; set; } = 100;
+    public int? AdjustLevel { get; set; }
+    public int? AdjustLevelDown { get; set; }
+
+    // Move and EV settings
+    public int MaxMoveCount { get; set; } = 4;
+    public int? EvLimit { get; set; }
+
+    // Source gen (for legality checking)
+    public int MinSourceGen { get; set; } = 1;
 
     public bool Has(RuleId rule)
     {
