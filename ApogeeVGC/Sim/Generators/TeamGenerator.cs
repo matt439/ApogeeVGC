@@ -25,6 +25,7 @@ public static class TeamGenerator
                 Gender = GenderId.M,
                 Evs = new StatsTable { Hp = 236, Atk = 36, SpD = 236 },
                 TeraType = MoveType.Water,
+                Level = 64,
             },
             new PokemonSet
             {
