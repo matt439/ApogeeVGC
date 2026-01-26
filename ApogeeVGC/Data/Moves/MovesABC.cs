@@ -2284,7 +2284,7 @@ public partial record Moves
 
                     return IntFalseUnion.FromInt(effectState.TotalDamage ?? 1);
                 }),
-                BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _, _) =>
+                BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.Counter);
                 }),

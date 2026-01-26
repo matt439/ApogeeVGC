@@ -568,8 +568,7 @@ public partial class Battle
                     btmAction.Move.BeforeTurnCallback,
                     this,
                     btmAction.Pokemon,
-                    target,
-                    btmAction.Move);
+                    target);
                 break;
             }
 
