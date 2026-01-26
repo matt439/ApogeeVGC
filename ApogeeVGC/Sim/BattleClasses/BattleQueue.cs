@@ -175,9 +175,10 @@ public class BattleQueue(Battle battle)
         }
 
         // Process pre-turn actions (not during midTurn)
+        // Only process for regular Move actions, not BeforeTurnMove/PriorityChargeMove to avoid infinite recursion
         if (!midTurn)
         {
-            if (currentAction is MoveAction ma)
+            if (currentAction is MoveAction { Choice: ActionId.Move } ma)
             {
                 // Add BeforeTurnMove action if the move has a beforeTurnCallback (e.g., Focus Punch)
                 if (ma.Move.BeforeTurnCallback != null)
