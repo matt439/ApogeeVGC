@@ -1116,17 +1116,17 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (100, "Ghost"),
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((battle, priority, source, _, _) =>
+                    (ModifierSourceMoveHandler)((battle, priority, target, _, _) =>
                     {
                         if (priority <= 0 &&
-                            (source.Hp <= source.MaxHp / 4 ||
-                             (source.Hp <= source.MaxHp / 2 &&
-                              source.HasAbility(AbilityId.Gluttony) &&
-                              source.AbilityState.Gluttony == true)))
+                            (target.Hp <= target.MaxHp / 4 ||
+                             (target.Hp <= target.MaxHp / 2 &&
+                              target.HasAbility(AbilityId.Gluttony) &&
+                              target.AbilityState.Gluttony == true)))
                         {
-                            if (source.EatItem())
+                            if (target.EatItem())
                             {
-                                battle.Add("-activate", source, "item: Custap Berry", "[consumed]");
+                                battle.Add("-activate", target, "item: Custap Berry", "[consumed]");
                                 return DoubleVoidUnion.FromDouble(0.1);
                             }
                         }
