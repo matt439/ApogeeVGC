@@ -569,7 +569,7 @@ public partial class Battle
                     this,
                     btmAction.Pokemon,
                     target,
-                    btmAction.Move);
+                    btmAction.Move.ToActiveMove());
                 break;
             }
 
