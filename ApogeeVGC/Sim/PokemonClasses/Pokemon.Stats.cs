@@ -196,7 +196,7 @@ public partial class Pokemon
 
     public void UpdateMaxHp()
     {
-        int newBaseMaxHp = Battle.StatModify(Species.BaseStats, Set, StatId.Hp);
+        int newBaseMaxHp = Battle.StatModify(Species.BaseStats, Set, StatId.Hp, BattleLevel);
         if (newBaseMaxHp == BaseMaxHp) return;
         BaseMaxHp = newBaseMaxHp;
         int newMaxHp = BaseMaxHp;

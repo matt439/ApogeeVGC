@@ -50,7 +50,8 @@ public partial class BattleActions
         // Fixed damage moves
         if (move.Damage is LevelMoveDamage)
         {
-            return source.Level;
+            // Use BattleLevel for level-based damage (respects AdjustLevelDown for VGC)
+            return source.BattleLevel;
         }
         else if (move.Damage is IntMoveDamage intDmg)
         {
@@ -145,10 +146,11 @@ public partial class BattleActions
             // Exclude moves like Dragon Energy with variable BP
             !(move.BasePower is 0 or 150 && move.BasePowerCallback != null))
         {
-            basePower = 60;
+        basePower = 60;
         }
 
-        int level = source.Level;
+        // Use BattleLevel for damage formula (respects AdjustLevelDown for VGC)
+        int level = source.BattleLevel;
 
         // Determine attacker and defender (some moves swap offensive/defensive Pokemon)
         Pokemon attacker = move.OverrideOffensivePokemon == MoveOverridePokemon.Target

@@ -146,14 +146,24 @@ public partial class Battle
         return Trunc((Trunc(value * fixedPointFraction) + 2048 - 1) / 4096);
     }
 
+
     public StatsTable SpreadModify(StatsTable baseStats, PokemonSet set)
+    {
+        return SpreadModify(baseStats, set, set.Level);
+    }
+
+    /// <summary>
+    /// Calculate all stats using the specified level.
+    /// Used for applying AdjustLevelDown in VGC formats.
+    /// </summary>
+    public StatsTable SpreadModify(StatsTable baseStats, PokemonSet set, int level)
     {
         StatsTable modStats = new();
 
         // iterate through all stats in baseStats
         foreach (StatId statName in baseStats.Keys)
         {
-            modStats[statName] = StatModify(baseStats, set, statName);
+            modStats[statName] = StatModify(baseStats, set, statName, level);
         }
         return modStats;
     }
@@ -166,6 +176,19 @@ public partial class Battle
     /// </summary>
     public int StatModify(StatsTable baseStats, PokemonSet set, StatId statName)
     {
+        // Use set level - for initial calculations before Pokemon object exists
+        return StatModify(baseStats, set, statName, set.Level);
+    }
+
+    /// <summary>
+    /// Calculate a single stat value using Pokemon's official stat calculation formula.
+    /// Uses the specified level for calculation (supports AdjustLevelDown for VGC).
+    /// HP uses: floor(floor(2 * base + IV + floor(EV/4) + 100) * level / 100 + 10)
+    /// Other stats use: floor(floor(2 * base + IV + floor(EV/4)) * level / 100 + 5)
+    /// Then nature modifiers are applied with 16-bit truncation.
+    /// </summary>
+    public int StatModify(StatsTable baseStats, PokemonSet set, StatId statName, int level)
+    {
         int stat = baseStats.GetStat(statName);
         int iv = set.Ivs.GetStat(statName);
         int ev = set.Evs.GetStat(statName);
@@ -174,11 +197,11 @@ public partial class Battle
         if (statName == StatId.Hp)
         {
             // HP = floor(floor(2 * base + IV + floor(EV/4) + 100) * level / 100 + 10)
-            return Trunc(Trunc(2 * stat + iv + Trunc(ev / 4) + 100) * set.Level / 100 + 10);
+            return Trunc(Trunc(2 * stat + iv + Trunc(ev / 4) + 100) * level / 100 + 10);
         }
 
         // Other stats: floor(floor(2 * base + IV + floor(EV/4)) * level / 100 + 5)
-        stat = Trunc(Trunc(2 * stat + iv + Trunc(ev / 4)) * set.Level / 100 + 5);
+        stat = Trunc(Trunc(2 * stat + iv + Trunc(ev / 4)) * level / 100 + 5);
 
         // Apply nature modifiers
         Nature nature = set.Nature;

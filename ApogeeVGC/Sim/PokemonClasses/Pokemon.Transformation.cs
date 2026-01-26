@@ -182,7 +182,8 @@ public partial class Pokemon
         KnownType = true;
         WeightHg = species.WeightHg;
 
-        StatsTable stats = Battle.SpreadModify(Species.BaseStats, Set);
+        // Use BattleLevel for stat calculations (respects AdjustLevelDown for VGC)
+        StatsTable stats = Battle.SpreadModify(Species.BaseStats, Set, BattleLevel);
         if (Species.MaxHp is not null)
         {
             stats.Hp = Species.MaxHp.Value;

@@ -21,7 +21,18 @@ public partial class Pokemon : IPriorityComparison
     public string FullName => $"{Side.Id.ToString()}: {Name}";
 
     public string Fullname => $"{Side.Id.GetSideIdName()}: {Name}";
+    
+    /// <summary>
+    /// The Pokemon's original level from the team set (1-100).
+    /// </summary>
     public int Level => Set.Level;
+    
+    /// <summary>
+    /// The Pokemon's effective level for battle, adjusted by format rules.
+    /// For VGC formats with AdjustLevelDown = 50, Pokemon above level 50 are scaled down.
+    /// </summary>
+    public int BattleLevel { get; }
+    
     public GenderId Gender => Set.Gender;
     public int Happiness => Set.Happiness;
     public PokeballId Pokeball => Set.Pokeball;
@@ -32,6 +43,7 @@ public partial class Pokemon : IPriorityComparison
     public List<MoveSlot> MoveSlots { get; set; }
 
     public int Position { get; set; }
+
 
     public Species BaseSpecies { get; set; }
     public Species Species { get; set; }
@@ -169,12 +181,33 @@ public partial class Pokemon : IPriorityComparison
         BaseSpecies = battle.Library.Species[set.Species];
         Species = BaseSpecies;
 
+        // Calculate battle level based on format rules
+        // AdjustLevelDown scales Pokemon above the threshold down to that level
+        // AdjustLevel forces all Pokemon to a specific level
+        var ruleTable = battle.RuleTable;
+        if (ruleTable.AdjustLevel.HasValue)
+        {
+            // Force all Pokemon to specific level
+            BattleLevel = ruleTable.AdjustLevel.Value;
+        }
+        else if (ruleTable.AdjustLevelDown.HasValue && set.Level > ruleTable.AdjustLevelDown.Value)
+        {
+            // Scale down Pokemon above the threshold
+            BattleLevel = ruleTable.AdjustLevelDown.Value;
+        }
+        else
+        {
+            // Use original level
+            BattleLevel = set.Level;
+        }
+
         SpeciesState = battle.InitEffectState(Species.Id);
 
         if (set.Moves.Count == 0)
         {
             throw new InvalidOperationException($"Set {Name} has no moves");
         }
+
 
         MoveSlots = [];
         BaseMoveSlots = [];
@@ -289,8 +322,8 @@ public partial class Pokemon : IPriorityComparison
             id = Species.BaseSpecies;
         }
 
-        // Use provided level or fall back to Pokemon's level
-        int displayLevel = level ?? Level;
+        // Use provided level or fall back to Pokemon's battle level (adjusted for format rules)
+        int displayLevel = level ?? BattleLevel;
 
         var details = new PokemonDetails
         {
