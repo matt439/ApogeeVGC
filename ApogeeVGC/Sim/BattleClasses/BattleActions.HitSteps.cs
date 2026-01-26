@@ -906,7 +906,7 @@ public partial class BattleActions
                 int hpBeforeRecoil = pokemon.Hp;
 
                 Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
-                    BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()]),
+                    BattleDamageEffect.FromIEffect(move),
                     true);
 
                 move.MindBlownRecoil = false;

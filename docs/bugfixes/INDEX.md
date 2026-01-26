@@ -35,6 +35,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple interconnected issues with self-targeting moves
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Infinite loop in damage calculation for self-stat changes
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Secondary property not converted to Secondaries array
+- [Steel Beam & Mind Blown Recoil Fix](#steel-beam--mind-blown-recoil-fix) - MoveId does not have corresponding ConditionId for recoil damage effect
 
 ### Status Conditions
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
@@ -1179,6 +1180,30 @@ Accuracy and Evasion are **boost-only values**—they can be modified by stat boos
 
 ---
 
+### Steel Beam & Mind Blown Recoil Fix
+**File**: `SteelBeamMindBlownRecoilFix.md`  
+**Severity**: High  
+**Systems Affected**: Move recoil mechanics (MindBlownRecoil property)
+
+**Problem**: Moves with the `MindBlownRecoil` property (Steel Beam and Mind Blown) crashed with `ArgumentException: MoveId 'SteelBeam' does not have a corresponding ConditionId` when attempting to apply recoil damage after hitting.
+
+**Root Cause**: The code tried to look up a `ConditionId` for these moves using `Library.Conditions[move.Id.ToConditionId()]` to use as the damage effect. However, Steel Beam and Mind Blown don't have corresponding `ConditionId` entries because they don't create persistent conditions. In TypeScript, `conditions.get(move.id)` can dynamically handle any move as a condition reference for damage tracking.
+
+**Solution**: Pass the move directly as the damage effect since `ActiveMove` implements `IEffect`:
+
+```csharp
+// Changed from:
+BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()])
+// To:
+BattleDamageEffect.FromIEffect(move)
+```
+
+**Pattern**: The `ToConditionId()` method should only be used for moves that have explicit `ConditionId` mappings (e.g., Protect, Trick Room, Leech Seed). For damage tracking purposes, moves can serve as `IEffect` instances directly without needing a separate condition.
+
+**Keywords**: `MindBlownRecoil`, `Steel Beam`, `Mind Blown`, `recoil`, `damage effect`, `ConditionId`, `IEffect`, `move mechanics`, `ArgumentException`, `ToConditionId`
+
+---
+
 *Last Updated*: 2025-01-19  
-*Total Bug Fixes Documented*: 25  
+*Total Bug Fixes Documented*: 26  
 *Reference Guides*: 1
