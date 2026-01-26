@@ -1,6 +1,7 @@
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Player;
 using ApogeeVGC.Sim.SideClasses;
 
@@ -38,6 +39,10 @@ public class SyncSimulator : IBattleController
         Player1 = CreatePlayer(SideId.P1, battleOptions.Player1Options);
         Player2 = CreatePlayer(SideId.P2, battleOptions.Player2Options);
         PrintDebug = printDebug;
+
+        // Validate teams against format rules
+        var validator = new TeamValidator(library, Battle.Format);
+        ValidateTeams(validator, battleOptions, printDebug);
 
         // Subscribe to Battle events
         Battle.ChoiceRequested += OnChoiceRequested;
@@ -238,6 +243,51 @@ public class SyncSimulator : IBattleController
 
         // If tiebreak didn't determine a winner, it's a true tie
         return SimulatorResult.Tie;
+    }
+
+    /// <summary>
+    /// Validates both player teams against the format rules.
+    /// Throws InvalidOperationException if either team is invalid.
+    /// </summary>
+    private static void ValidateTeams(TeamValidator validator, BattleOptions battleOptions, bool printDebug)
+    {
+        var player1Result = validator.ValidateTeam(battleOptions.Player1Options.Team);
+        var player2Result = validator.ValidateTeam(battleOptions.Player2Options.Team);
+
+        var allProblems = new List<string>();
+
+        if (!player1Result.IsValid)
+        {
+            allProblems.Add($"Player 1 ({battleOptions.Player1Options.Name}) team validation failed:");
+            foreach (var problem in player1Result.Problems)
+            {
+                allProblems.Add($"  - {problem}");
+            }
+        }
+
+        if (!player2Result.IsValid)
+        {
+            allProblems.Add($"Player 2 ({battleOptions.Player2Options.Name}) team validation failed:");
+            foreach (var problem in player2Result.Problems)
+            {
+                allProblems.Add($"  - {problem}");
+            }
+        }
+
+        if (allProblems.Count > 0)
+        {
+            var errorMessage = string.Join(Environment.NewLine, allProblems);
+            if (printDebug)
+            {
+                Console.WriteLine($"[SyncSimulator] Team validation failed:{Environment.NewLine}{errorMessage}");
+            }
+            throw new InvalidOperationException($"Team validation failed:{Environment.NewLine}{errorMessage}");
+        }
+
+        if (printDebug)
+        {
+            Console.WriteLine("[SyncSimulator] Team validation passed for both players");
+        }
     }
 
     private IPlayer CreatePlayer(SideId sideId, PlayerOptions options)

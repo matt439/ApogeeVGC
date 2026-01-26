@@ -22,25 +22,36 @@ public record ValidationResult(bool IsValid, IReadOnlyList<string> Problems)
 }
 
 /// <summary>
-/// Validates Pokemon teams for Gen 9 VGC format.
-/// Checks move legality, ability validity, and format-specific rules like Item Clause.
+/// Validates Pokemon teams against format rules.
+/// Uses RuleTable properties for dynamic rule enforcement based on format.
 /// </summary>
 public class TeamValidator
 {
-    private const int MinTeamSize = 1;
-    private const int MaxTeamSize = 6;
     private const int Gen9 = 9;
 
     private readonly Library _library;
+    private readonly Format _format;
+    private readonly RuleTable _ruleTable;
 
-    public TeamValidator(Library library)
+    /// <summary>
+    /// Creates a TeamValidator for the specified format.
+    /// </summary>
+    /// <param name="library">The game data library.</param>
+    /// <param name="format">The format to validate against.</param>
+    public TeamValidator(Library library, Format format)
     {
         ArgumentNullException.ThrowIfNull(library);
+        ArgumentNullException.ThrowIfNull(format);
+
         _library = library;
+        _format = format;
+
+        // Use format's RuleTable or create default
+        _ruleTable = format.RuleTable ?? new RuleTable();
     }
 
     /// <summary>
-    /// Validates a complete team of Pokemon.
+    /// Validates a complete team of Pokemon against format rules.
     /// </summary>
     /// <param name="team">The team to validate.</param>
     /// <returns>Validation result with any problems found.</returns>
@@ -50,20 +61,49 @@ public class TeamValidator
 
         var problems = new List<string>();
 
-        // Team size validation
-        if (team.Count < MinTeamSize)
+        // Team size validation using RuleTable
+        if (team.Count < _ruleTable.MinTeamSize)
         {
-            problems.Add($"Team must have at least {MinTeamSize} Pokemon (your team has {team.Count}).");
+            problems.Add($"Team must have at least {_ruleTable.MinTeamSize} Pokemon (your team has {team.Count}).");
             return ValidationResult.Failure(problems);
         }
 
-        if (team.Count > MaxTeamSize)
+        if (team.Count > _ruleTable.MaxTeamSize)
         {
-            problems.Add($"Team cannot have more than {MaxTeamSize} Pokemon (your team has {team.Count}).");
+            problems.Add($"Team cannot have more than {_ruleTable.MaxTeamSize} Pokemon (your team has {team.Count}).");
             return ValidationResult.Failure(problems);
         }
 
-        // Item Clause: Each item must be unique (except no item)
+        // Item Clause: Each item must be unique (if rule is active)
+        if (_ruleTable.Has(RuleId.ItemClause))
+        {
+            ValidateItemClause(team, problems);
+        }
+
+        // Species Clause: Each species must be unique (if rule is active)
+        if (_ruleTable.Has(RuleId.SpeciesClause))
+        {
+            ValidateSpeciesClause(team, problems);
+        }
+
+        // Validate each individual Pokemon set
+        foreach (var set in team)
+        {
+            var setResult = ValidateSet(set);
+            if (!setResult.IsValid)
+            {
+                problems.AddRange(setResult.Problems);
+            }
+        }
+
+        return problems.Count == 0 ? ValidationResult.Success : ValidationResult.Failure(problems);
+    }
+
+    /// <summary>
+    /// Validates Item Clause: each item must be unique (except no item).
+    /// </summary>
+    private void ValidateItemClause(IReadOnlyList<PokemonSet> team, List<string> problems)
+    {
         var itemCounts = new Dictionary<ItemId, int>();
         foreach (var set in team)
         {
@@ -82,8 +122,13 @@ public class TeamValidator
                 problems.Add($"Item Clause: You are limited to one of each item. {itemName} appears {count} times.");
             }
         }
+    }
 
-        // Species Clause: Each species must be unique
+    /// <summary>
+    /// Validates Species Clause: each species must be unique.
+    /// </summary>
+    private void ValidateSpeciesClause(IReadOnlyList<PokemonSet> team, List<string> problems)
+    {
         var speciesCounts = new Dictionary<SpecieId, int>();
         foreach (var set in team)
         {
@@ -103,18 +148,6 @@ public class TeamValidator
                     $"Species Clause: You are limited to one of each Pokemon species. {speciesName} appears {count} times.");
             }
         }
-
-        // Validate each individual Pokemon set
-        foreach (var set in team)
-        {
-            var setResult = ValidateSet(set);
-            if (!setResult.IsValid)
-            {
-                problems.AddRange(setResult.Problems);
-            }
-        }
-
-        return problems.Count == 0 ? ValidationResult.Success : ValidationResult.Failure(problems);
     }
 
     /// <summary>
@@ -136,6 +169,17 @@ public class TeamValidator
             return ValidationResult.Failure(problems);
         }
 
+        // Level validation using RuleTable
+        if (set.Level < _ruleTable.MinLevel)
+        {
+            problems.Add($"{name} is level {set.Level}, but minimum level is {_ruleTable.MinLevel}.");
+        }
+
+        if (set.Level > _ruleTable.MaxLevel)
+        {
+            problems.Add($"{name} is level {set.Level}, but maximum level is {_ruleTable.MaxLevel}.");
+        }
+
         // Ability validation
         var abilityProblem = ValidateAbility(set.Ability, species, name);
         if (abilityProblem != null)
@@ -151,6 +195,12 @@ public class TeamValidator
             {
                 problems.Add(moveProblem);
             }
+        }
+
+        // Move count validation
+        if (set.Moves.Count > _ruleTable.MaxMoveCount)
+        {
+            problems.Add($"{name} has {set.Moves.Count} moves, but maximum is {_ruleTable.MaxMoveCount}.");
         }
 
         // Item existence check (if item is specified)
