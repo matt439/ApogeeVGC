@@ -3184,6 +3184,25 @@ public partial record Moves
                         return false;
                     }
 
+                    // Check if receiving Pokemon can take the item (TakeItem event)
+                    bool myItemFailed = myItem is ItemItemFalseUnion myItemCheck &&
+                        battle.SingleEvent(EventId.TakeItem, myItemCheck.Item, source.ItemState,
+                            new PokemonSingleEventTarget(target), source, move, myItemCheck.Item)
+                            is BoolRelayVar { Value: false };
+                    bool yourItemFailed = yourItem is ItemItemFalseUnion yourItemCheck &&
+                        battle.SingleEvent(EventId.TakeItem, yourItemCheck.Item, target.ItemState,
+                            new PokemonSingleEventTarget(source), target, move, yourItemCheck.Item)
+                            is BoolRelayVar { Value: false };
+
+                    if (myItemFailed || yourItemFailed)
+                    {
+                        if (yourItem is ItemItemFalseUnion yourItemVal2)
+                            target.Item = yourItemVal2.Item.Id;
+                        if (myItem is ItemItemFalseUnion myItemVal2)
+                            source.Item = myItemVal2.Item.Id;
+                        return false;
+                    }
+
                     battle.Add("-activate", source, "move: Trick", $"[of] {target}");
                     if (myItem is ItemItemFalseUnion myItemUnion)
                     {
@@ -4581,7 +4600,7 @@ public partial record Moves
                 },
                 OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
                     !target.HasAbility(AbilityId.StickyHold)),
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
                     ItemFalseUnion? yourItem = target.TakeItem(source);
                     ItemFalseUnion? myItem = source.TakeItem();
@@ -4591,6 +4610,25 @@ public partial record Moves
                         if (yourItem is ItemItemFalseUnion yourItemVal)
                             target.Item = yourItemVal.Item.Id;
                         if (myItem is ItemItemFalseUnion myItemVal) source.Item = myItemVal.Item.Id;
+                        return false;
+                    }
+
+                    // Check if receiving Pokemon can take the item (TakeItem event)
+                    bool myItemFailed = myItem is ItemItemFalseUnion myItemCheck &&
+                        battle.SingleEvent(EventId.TakeItem, myItemCheck.Item, source.ItemState,
+                            new PokemonSingleEventTarget(target), source, move, myItemCheck.Item)
+                            is BoolRelayVar { Value: false };
+                    bool yourItemFailed = yourItem is ItemItemFalseUnion yourItemCheck &&
+                        battle.SingleEvent(EventId.TakeItem, yourItemCheck.Item, target.ItemState,
+                            new PokemonSingleEventTarget(source), target, move, yourItemCheck.Item)
+                            is BoolRelayVar { Value: false };
+
+                    if (myItemFailed || yourItemFailed)
+                    {
+                        if (yourItem is ItemItemFalseUnion yourItemVal2)
+                            target.Item = yourItemVal2.Item.Id;
+                        if (myItem is ItemItemFalseUnion myItemVal2)
+                            source.Item = myItemVal2.Item.Id;
                         return false;
                     }
 

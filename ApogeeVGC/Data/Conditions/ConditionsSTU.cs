@@ -868,6 +868,10 @@ public partial record Conditions
                     new OnLockMoveEventInfo(
                         (Func<Battle, Pokemon, MoveIdVoidUnion>)((_, _) => MoveId.Uproar)),
                 // Prevent sleep on all Pokemon while Uproar is active
+                // TODO: TypeScript returns null here for silent failure, but OnAnySetStatusEventInfo
+                // doesn't support nullable return. BoolVoidUnion.FromBool(false) will still prevent
+                // the status but may have different message handling. Consider updating event info
+                // to support nullable returns like OnSetStatusEventInfo does.
                 OnAnySetStatus = new OnAnySetStatusEventInfo((battle, status, pokemon, _, _) =>
                 {
                     if (status.Id == ConditionId.Sleep)
