@@ -4020,9 +4020,10 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, target) =>
                 {
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    if (target == null) return;
+                    ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         move.Accuracy = IntTrueUnion.FromTrue();
@@ -4263,20 +4264,39 @@ public partial record Moves
                             success = true;
                     }
 
+                    // Remove hazards from both user's side and foe sides
                     var sideConditions = new[]
                     {
                         ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
                         ConditionId.StickyWeb,
                     };
-                    foreach (ConditionId condition in sideConditions)
+                    var sides = new List<Side> { source.Side };
+                    sides.AddRange(source.Side.FoeSidesWithConditions());
+
+                    foreach (Side side in sides)
                     {
-                        if (source.Side.RemoveSideCondition(condition)) success = true;
+                        foreach (ConditionId condition in sideConditions)
+                        {
+                            if (side.RemoveSideCondition(condition))
+                            {
+                                if (battle.DisplayUi)
+                                {
+                                    Condition cond = _library.Conditions[condition];
+                                    battle.Add("-sideend", side, cond.Name);
+                                }
+
+                                success = true;
+                            }
+                        }
                     }
 
-                    if (source.Side.Foe.RemoveSideCondition(ConditionId.StickyWeb)) success = true;
+                    if (success && battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Tidy Up");
+                    }
 
                     BoolZeroUnion? boosted =
-                        battle.Boost(new SparseBoostsTable { Atk = 1, Spe = 1 }, source);
+                        battle.Boost(new SparseBoostsTable { Atk = 1, Spe = 1 }, source, source, null, false, true);
                     return (boosted?.IsTruthy() ?? false) || success
                         ? new VoidReturn()
                         : false;
