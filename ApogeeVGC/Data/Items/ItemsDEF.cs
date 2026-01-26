@@ -310,10 +310,7 @@ public partial record Items
                     if (pokemon.ItemState.Eject != true) return;
                     TryUseEjectPack(battle, pokemon);
                 }, order: 29),
-                OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((_, pokemon) =>
-                {
-                    pokemon.SwitchFlag = true;
-                })),
+                OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((_, pokemon) => { pokemon.SwitchFlag = true; })),
                 OnEnd = new OnEndEventInfo((_, pokemon) => { pokemon.ItemState.Eject = null; }),
                 Num = 1119,
                 Gen = 8,

@@ -125,7 +125,6 @@ public partial record Items
                 Name = "Grip Claw",
                 SpriteNum = 179,
                 Fling = new FlingData { BasePower = 90 },
-                // TODO: Implemented in statuses - extends binding move duration
                 Num = 286,
                 Gen = 4,
             },

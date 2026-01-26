@@ -307,10 +307,7 @@ public partial record Items
                 Name = "Metronome",
                 SpriteNum = 289,
                 Fling = new FlingData { BasePower = 30 },
-                OnStart = new OnStartEventInfo((_, pokemon) =>
-                {
-                    pokemon.AddVolatile(ConditionId.Metronome);
-                }),
+                OnStart = new OnStartEventInfo((_, pokemon) => { pokemon.AddVolatile(ConditionId.Metronome); }),
                 Condition = _library.Conditions[ConditionId.Metronome],
                 Num = 277,
                 Gen = 4,
@@ -704,10 +701,7 @@ public partial record Items
 
                         return BoolVoidUnion.FromVoid();
                     })),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, _) =>
-                {
-                    battle.Heal(10);
-                })),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, _) => { battle.Heal(10); })),
                 Num = 155,
                 Gen = 3,
             },
