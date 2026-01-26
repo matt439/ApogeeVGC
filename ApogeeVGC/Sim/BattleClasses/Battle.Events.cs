@@ -348,9 +348,9 @@ public partial class Battle
 
             // Check for Mold Breaker suppression
             if (effect.EffectType == EffectType.Ability &&
-                effectHolder is PokemonEffectHolder pokemonHolder2)
+                effectHolder is PokemonEffectHolder pokemonHolder2 &&
+                effect is Ability ability)
             {
-                var ability = (Ability)effect;
                 if ((ability.Flags.Breakable ?? false) &&
                     SuppressingAbility(pokemonHolder2.Pokemon))
                 {

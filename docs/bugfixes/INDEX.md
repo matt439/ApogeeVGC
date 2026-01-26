@@ -12,6 +12,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue) - Move event handlers not mapped
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Int passed to RunEvent instead of IntRelayVar
 - [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix) - ConditionIdRelayVar not converted to PokemonTypeConditionIdUnion
+- [Condition to Ability Cast Fix](#condition-to-ability-cast-fix) - InvalidCastException when trying to cast Condition to Ability
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -834,6 +835,36 @@ if (paramType == typeof(PokemonTypeConditionIdUnion))
 **Pattern**: Similar parameter conversion issues may exist for other union types. If you see "Parameter X is non-nullable but no matching value found in context" errors, check if the RelayVar type needs explicit conversion logic in `EventHandlerAdapter.ResolveParameter`.
 
 **Keywords**: `immunity`, `weather`, `SunnyDay`, `OnImmunity`, `PokemonTypeConditionIdUnion`, `ConditionIdRelayVar`, `EventHandlerAdapter`, `parameter conversion`, `union type`, `status immunity`, `RelayVar unwrapping`
+
+---
+
+### Condition to Ability Cast Fix
+**File**: `ConditionToAbilityCastFix.md`  
+**Severity**: High  
+**Systems Affected**: Event system, Mold Breaker ability suppression, all effect types
+
+**Problem**: Random battle simulations would crash with `InvalidCastException: Unable to cast object of type 'ApogeeVGC.Sim.Conditions.Condition' to type 'ApogeeVGC.Sim.Abilities.Ability'` during event processing in `Battle.RunEvent` at line 353.
+
+**Root Cause**: The code checked if `effect.EffectType == EffectType.Ability` but then unconditionally cast the effect to `Ability` without verifying the concrete type. A `Condition` can have multiple `EffectType` values (Condition, Weather, Status, Terrain), so relying solely on `EffectType` is insufficient to determine the concrete type. This created a potential crash when an effect had an `EffectType` that didn't match its concrete class.
+
+**Solution**: Added explicit type check using pattern matching before casting:
+```csharp
+if (effect.EffectType == EffectType.Ability &&
+    effectHolder is PokemonEffectHolder pokemonHolder2 &&
+    effect is Ability ability)  // ? Added type check
+{
+    // Safe to use ability here
+}
+```
+
+**Pattern**: This follows the same defensive pattern used for status condition checking. Always use `is ConcreteType variable` pattern matching when casting interface types to concrete types, even if the `EffectType` check suggests it should be safe.
+
+**Prevention**:
+- Never rely solely on `EffectType` to determine concrete type
+- Always use pattern matching (`is`) before casting
+- Apply defensive checks consistently across all similar code
+
+**Keywords**: `InvalidCastException`, `Condition`, `Ability`, `type safety`, `pattern matching`, `EffectType`, `Mold Breaker`, `event system`, `defensive programming`
 
 ---
 
