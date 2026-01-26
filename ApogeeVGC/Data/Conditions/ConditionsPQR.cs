@@ -134,7 +134,7 @@ public partial record Conditions
                             battle.Add("-activate", target, "move: Protect");
                         }
 
-                        EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                        var lockedMove = source.GetVolatile(ConditionId.LockedMove);
                         if (lockedMove is not null &&
                             source.Volatiles[ConditionId.LockedMove].Duration == 2)
                         {
@@ -544,10 +544,10 @@ public partial record Conditions
                 Duration = 2,
                 OnBasePower = new OnBasePowerEventInfo((_, _, source, _, move) =>
                 {
-                    int bp = Math.Max(1, move.BasePower);
+                    var bp = Math.Max(1, move.BasePower);
                     source.Volatiles.TryGetValue(ConditionId.RolloutStorage,
-                        out EffectState? rolloutState);
-                    int hitCount = rolloutState?.ContactHitCount ?? 0;
+                        out var rolloutState);
+                    var hitCount = rolloutState?.ContactHitCount ?? 0;
                     bp *= (int)Math.Pow(2, hitCount);
                     if (source.Volatiles.ContainsKey(ConditionId.DefenseCurl))
                     {
@@ -580,8 +580,8 @@ public partial record Conditions
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     if (!pokemon.Volatiles.TryGetValue(ConditionId.PerishSong,
-                            out EffectState? state)) return;
-                    int duration = state.Duration ?? 0;
+                            out var state)) return;
+                    var duration = state.Duration ?? 0;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, $"perish{duration}");
@@ -625,7 +625,7 @@ public partial record Conditions
                         }
 
                         // Damage 1/4 of max HP, minimum 1
-                        int damage = Math.Max(1, (int)Math.Round(pokemon.MaxHp / 4.0));
+                        var damage = Math.Max(1, (int)Math.Round(pokemon.MaxHp / 4.0));
                         battle.Damage(damage);
                         battle.AttrLastMove("[still]");
                         return BoolEmptyVoidUnion.FromBool(false);
@@ -648,8 +648,8 @@ public partial record Conditions
                     }
 
                     // Swap Attack and Defense stored stats
-                    int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
-                    int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
+                    var newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
+                    var newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
                     pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
                     pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
                     return BoolVoidUnion.FromVoid();
@@ -657,8 +657,8 @@ public partial record Conditions
                 OnCopy = new OnCopyEventInfo((_, pokemon) =>
                 {
                     // Re-swap when copying (e.g., Baton Pass) to maintain the swapped state
-                    int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
-                    int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
+                    var newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
+                    var newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
                     pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
                     pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
                 }),
@@ -670,8 +670,8 @@ public partial record Conditions
                     }
 
                     // Swap back Attack and Defense stored stats
-                    int newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
-                    int newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
+                    var newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
+                    var newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
                     pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
                     pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
                 }),
@@ -747,7 +747,7 @@ public partial record Conditions
 
                     // Reset Outrage counter if source has lockedmove volatile
                     if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
-                            out EffectState? lockedMoveState))
+                            out var lockedMoveState))
                     {
                         if (lockedMoveState.Duration == 2)
                         {
@@ -800,10 +800,10 @@ public partial record Conditions
                 }),
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    Pokemon? source = battle.EffectState.Source;
+                    var source = battle.EffectState.Source;
                     // G-Max Centiferno and G-Max Sandblast continue even after the user leaves the field
-                    IEffect? sourceEffect = battle.EffectState.SourceEffect;
-                    bool gmaxEffect = sourceEffect is
+                    var sourceEffect = battle.EffectState.SourceEffect;
+                    var gmaxEffect = sourceEffect is
                         { Name: "G-Max Centiferno" or "G-Max Sandblast" };
 
                     if (source != null &&
@@ -833,10 +833,10 @@ public partial record Conditions
                 }),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {
-                    IEffect? sourceEffect = battle.EffectState.SourceEffect;
-                    bool gmaxEffect = sourceEffect is
+                    var sourceEffect = battle.EffectState.SourceEffect;
+                    var gmaxEffect = sourceEffect is
                         { Name: "G-Max Centiferno" or "G-Max Sandblast" };
-                    Pokemon? source = battle.EffectState.Source;
+                    var source = battle.EffectState.Source;
                     if (source is { IsActive: true } || gmaxEffect)
                     {
                         pokemon.TryTrap();
@@ -982,8 +982,8 @@ public partial record Conditions
                         return BoolIntEmptyVoidUnion.FromVoid();
 
                     // Target must be grounded and not semi-invulnerable
-                    bool? isGrounded = target.IsGrounded();
-                    bool isSemiInvulnerable = target.IsSemiInvulnerable();
+                    var isGrounded = target.IsGrounded();
+                    var isSemiInvulnerable = target.IsSemiInvulnerable();
                     if (!(isGrounded ?? false) || isSemiInvulnerable)
                         return BoolIntEmptyVoidUnion.FromVoid();
 
@@ -1002,8 +1002,8 @@ public partial record Conditions
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
                 {
                     // Boost Psychic-type moves by 1.3x (5325/4096) when attacker is grounded
-                    bool? attackerGrounded = attacker.IsGrounded();
-                    bool attackerSemiInvuln = attacker.IsSemiInvulnerable();
+                    var attackerGrounded = attacker.IsGrounded();
+                    var attackerSemiInvuln = attacker.IsSemiInvulnerable();
                     if (move.Type == MoveType.Psychic && (attackerGrounded ?? false) &&
                         !attackerSemiInvuln)
                     {
@@ -1193,8 +1193,8 @@ public partial record Conditions
                     (battle, _, source, _, move) =>
                     {
                         // Get the Pokemon that used Rage Powder from the effect state
-                        EffectStateTarget? effectTarget = battle.EffectState.Target;
-                        Pokemon? ragePowderUser =
+                        var effectTarget = battle.EffectState.Target;
+                        var ragePowderUser =
                             effectTarget is PokemonEffectStateTarget pokemonTarget
                                 ? pokemonTarget.Pokemon
                                 : null;
@@ -1207,9 +1207,9 @@ public partial record Conditions
                         // Check if source has powder immunity
                         // Grass-types, Overcoat ability, and Safety Goggles are immune to powder moves
                         // TypeScript uses source.runStatusImmunity('powder') which returns true if NOT immune
-                        bool hasPowderImmunity = source.HasType(PokemonType.Grass) ||
-                                                 source.HasAbility(AbilityId.Overcoat) ||
-                                                 source.HasItem(ItemId.SafetyGoggles);
+                        var hasPowderImmunity = source.HasType(PokemonType.Grass) ||
+                                                source.HasAbility(AbilityId.Overcoat) ||
+                                                source.HasItem(ItemId.SafetyGoggles);
 
                         if (hasPowderImmunity)
                         {

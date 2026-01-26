@@ -35,7 +35,7 @@ public partial record Conditions
                         {
                             case Ability:
                                 battle.Add("-status", target, "slp", "[from] ability: " +
-                                    sourceEffect.Name, $"[of] {source}");
+                                                                     sourceEffect.Name, $"[of] {source}");
                                 break;
                             case ActiveMove:
                                 battle.Add("-status", target, "slp",
@@ -670,10 +670,7 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
-                OnSwitchIn = new OnSwitchInEventInfo((battle, _) =>
-                {
-                    battle.EffectState.Stage = 0;
-                }),
+                OnSwitchIn = new OnSwitchInEventInfo((battle, _) => { battle.EffectState.Stage = 0; }),
                 //OnResidualOrder = 9,
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                     {
@@ -976,10 +973,7 @@ public partial record Conditions
                         }
                     },
                     1),
-                OnWeather = new OnWeatherEventInfo((battle, target, _, _) =>
-                {
-                    battle.Damage(target.BaseMaxHp / 16);
-                }),
+                OnWeather = new OnWeatherEventInfo((battle, target, _, _) => { battle.Damage(target.BaseMaxHp / 16); }),
                 OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
                 {
                     if (battle.DisplayUi)

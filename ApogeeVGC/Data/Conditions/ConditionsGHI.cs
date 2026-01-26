@@ -132,10 +132,7 @@ public partial record Conditions
                 }),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) => { pokemon.TryTrap(); }),
                 OnResidual = new OnResidualEventInfo(
-                    (battle, pokemon, _, _) =>
-                    {
-                        battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
-                    }, 7),
+                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon); }, 7),
                 // groundedness implemented in Pokemon.IsGrounded()
                 OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
                 {

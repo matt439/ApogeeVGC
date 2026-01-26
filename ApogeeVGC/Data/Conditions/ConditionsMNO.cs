@@ -465,7 +465,7 @@ public partial record Conditions
                     if (effect is Ability)
                     {
                         battle.Add("-fieldstart", "move: Misty Terrain", "[from] ability: " +
-                            effect.Name, $"[of] {source}");
+                                                                         effect.Name, $"[of] {source}");
                     }
                     else
                     {

@@ -4,7 +4,6 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -40,7 +39,7 @@ public partial record Conditions
                 {
                     // Use GetOverflowedTurnCount for proper Gen 8+ turn overflow handling
                     if (battle.GetOverflowedTurnCount() <= battle.EffectState.StartingTurn) return;
-                    Pokemon? slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
+                    var slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
                     if (slotTarget != null)
                     {
                         target.Side.RemoveSlotCondition(slotTarget,
@@ -51,11 +50,11 @@ public partial record Conditions
                 {
                     if (target is { Fainted: false })
                     {
-                        int healAmount = battle.EffectState.Hp ?? 0;
-                        IntFalseUnion damage = battle.Heal(healAmount, target, target);
+                        var healAmount = battle.EffectState.Hp ?? 0;
+                        var damage = battle.Heal(healAmount, target, target);
                         if (damage is IntIntFalseUnion { Value: > 0 })
                         {
-                            string wisherName = battle.EffectState.Source?.Name ?? "unknown";
+                            var wisherName = battle.EffectState.Source?.Name ?? "unknown";
                             battle.Add("-heal", target, target.GetHealth,
                                 "[from] move: Wish", $"[wisher] {wisherName}");
                         }
@@ -99,7 +98,7 @@ public partial record Conditions
                     if (target is null) return new VoidReturn();
 
                     // Check if it's a Galar form
-                    bool isGalar = target.Species.Forme is FormeId.Galar or FormeId.GalarZen;
+                    var isGalar = target.Species.Forme is FormeId.Galar or FormeId.GalarZen;
 
                     if (!isGalar)
                     {
@@ -126,7 +125,7 @@ public partial record Conditions
                     if (pokemon.Species.Forme is FormeId.Zen or FormeId.GalarZen)
                     {
                         // Revert to base forme - Darmanitan or Darmanitan-Galar
-                        SpecieId baseForme = pokemon.Species.Forme == FormeId.GalarZen
+                        var baseForme = pokemon.Species.Forme == FormeId.GalarZen
                             ? SpecieId.DarmanitanGalar
                             : SpecieId.Darmanitan;
                         pokemon.FormeChange(baseForme);

@@ -155,7 +155,7 @@ public partial record Conditions
                     if (effect is Ability)
                     {
                         battle.Add("-fieldstart", "move: Electric Terrain", "[from] ability: " +
-                            effect.Name, $"[of] {source}");
+                                                                            effect.Name, $"[of] {source}");
                     }
                     else
                     {
@@ -787,7 +787,7 @@ public partial record Conditions
                         {
                             case Ability:
                                 battle.Add("-status", target, "frz", "[from] ability: " +
-                                    sourceEffect.Name, $"[of] {source}");
+                                                                     sourceEffect.Name, $"[of] {source}");
                                 break;
                             default:
                                 battle.Add("-status", target, "frz");
@@ -1088,10 +1088,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.EchoedVoice,
                 Duration = 2,
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, _, _) =>
-                {
-                    battle.EffectState.Multiplier = 1;
-                }),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, _, _) => { battle.EffectState.Multiplier = 1; }),
                 OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>
                 {
                     if (battle.EffectState.Duration != 2)
