@@ -1,5 +1,4 @@
 using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -21,25 +20,25 @@ public sealed record OnLockMoveEventInfo : UnionEventHandlerInfo<OnLockMove>
     public OnLockMoveEventInfo(
         OnLockMove unionValue,
         int? priority = null,
-bool usesSpeed = true)
+        bool usesSpeed = true)
     {
         Id = EventId.LockMove;
-   UnionValue = unionValue;
-     Handler = ExtractDelegate();
-  Priority = priority;
-   UsesSpeed = usesSpeed;
- ExpectedParameterTypes =
-   [
-    typeof(Battle),
-        typeof(Pokemon),
-  ];
-    ExpectedReturnType = typeof(MoveIdVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
+        UnionValue = unionValue;
+        Handler = ExtractDelegate();
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+        ExpectedParameterTypes =
+        [
+            typeof(Battle),
+            typeof(Pokemon),
+        ];
+        ExpectedReturnType = typeof(MoveIdVoidUnion);
+
+        // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false];
         ReturnTypeNullable = false;
-    
-    // Validate configuration
+
+        // Validate configuration
         ValidateConfiguration();
     }
 }

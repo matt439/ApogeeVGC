@@ -13,23 +13,23 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnAnySetStatusEventInfo : EventHandlerInfo
 {
     public OnAnySetStatusEventInfo(
-        Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion> handler,
-int? priority = null,
-bool usesSpeed = true)
+        Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.SetStatus;
-Prefix = EventPrefix.Any;
+        Prefix = EventPrefix.Any;
         Handler = handler;
-Priority = priority;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(Condition), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
+        ExpectedParameterTypes = [typeof(Battle), typeof(Condition), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
         ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
+
+        // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
+        ReturnTypeNullable = true;
+
+        // Validate configuration
         ValidateConfiguration();
     }
 }
