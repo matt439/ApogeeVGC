@@ -18,6 +18,7 @@ public class RandomTeamGenerator
 {
     private const int MoveCount = 4;
     private const int MaxEvPerStat = 252;
+    private const int Gen9 = 9;
 
     private readonly Library _library;
     private readonly Format _format;
@@ -349,6 +350,7 @@ public class RandomTeamGenerator
 
     /// <summary>
     /// Picks 4 random moves from the Pokemon's learnset.
+    /// Only considers moves learnable in Gen 9 to match validator requirements.
     /// </summary>
     private IReadOnlyList<MoveId> PickRandomMoves(SpecieId speciesId)
     {
@@ -358,7 +360,16 @@ public class RandomTeamGenerator
             throw new InvalidOperationException($"No learnset found for {speciesId}.");
         }
 
-        var availableMoves = learnset.LearnsetData.Keys.ToList();
+        // Filter to only moves that have a Gen 9 source
+        var availableMoves = learnset.LearnsetData
+            .Where(kvp => kvp.Value.Any(source => source.Generation == Gen9))
+            .Select(kvp => kvp.Key)
+            .ToList();
+
+        if (availableMoves.Count == 0)
+        {
+            throw new InvalidOperationException($"No Gen 9 moves available for {speciesId}.");
+        }
 
         // Shuffle and take first 4
         var selectedMoves = new List<MoveId>();
@@ -370,12 +381,6 @@ public class RandomTeamGenerator
             var moveIndex = indices[indexPos];
             indices.RemoveAt(indexPos);
             selectedMoves.Add(availableMoves[moveIndex]);
-        }
-
-        // If we have less than 4 moves, fill with what we have
-        if (selectedMoves.Count == 0)
-        {
-            throw new InvalidOperationException($"No moves available for {speciesId}.");
         }
 
         return selectedMoves;
