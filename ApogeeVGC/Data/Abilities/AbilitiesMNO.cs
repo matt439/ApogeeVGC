@@ -84,9 +84,9 @@ public partial record Abilities
                 Rating = 4.0,
                 OnDamage = new OnDamageEventInfo((battle, _, _, source, effect) =>
                 {
-                    if (effect.EffectType != EffectType.Move)
+                    if (effect?.EffectType != EffectType.Move)
                     {
-                        if (effect.EffectType == EffectType.Ability)
+                        if (effect?.EffectType == EffectType.Ability)
                         {
                             battle.Add("-activate", source, $"ability: {effect.Name}");
                         }
