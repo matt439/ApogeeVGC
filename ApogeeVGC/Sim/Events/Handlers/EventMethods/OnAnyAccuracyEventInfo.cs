@@ -12,7 +12,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnAnyAccuracyEventInfo : EventHandlerInfo
 {
     public OnAnyAccuracyEventInfo(
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
+        Func<Battle, int?, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
 int? priority = null,
 bool usesSpeed = true)
     {
@@ -21,11 +21,11 @@ Prefix = EventPrefix.Any;
         Handler = handler;
 Priority = priority;
         UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
+      ExpectedParameterTypes = [typeof(Battle), typeof(int?), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
         ExpectedReturnType = typeof(IntBoolVoidUnion);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
+    // Nullability: accuracy can be null for always-hit moves (TypeScript: number | true)
+        ParameterNullability = [false, true, false, false, false];
         ReturnTypeNullable = false;
     
     // Validate configuration

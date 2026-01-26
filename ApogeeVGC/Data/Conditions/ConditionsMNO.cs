@@ -201,6 +201,10 @@ public partial record Conditions
                         // OHKO moves bypass Micle Berry boost
                         if (move.Ohko != null) return null;
 
+                        // Only modify numeric accuracy (TypeScript: typeof accuracy === 'number')
+                        // Always-hit moves (accuracy == null) pass through unchanged
+                        if (!accuracy.HasValue) return null;
+
                         if (battle.DisplayUi)
                         {
                             battle.Add("-enditem", source, "Micle Berry");
@@ -209,7 +213,7 @@ public partial record Conditions
                         source.RemoveVolatile(_library.Conditions[ConditionId.MicleBerry]);
 
                         // Boost accuracy by 1.2x (4915/4096 ≈ 1.2)
-                        int modifiedAccuracy = (int)Math.Floor(accuracy * 4915.0 / 4096.0);
+                        int modifiedAccuracy = (int)Math.Floor(accuracy.Value * 4915.0 / 4096.0);
                         return IntBoolVoidUnion.FromInt(modifiedAccuracy);
                     }),
             },
@@ -261,7 +265,10 @@ public partial record Conditions
                         return IntBoolVoidUnion.FromBool(true); // Always hit
                     }
 
-                    return IntBoolVoidUnion.FromInt(accuracy);
+                    // Pass through accuracy unchanged (null for always-hit, value for numeric)
+                    return accuracy.HasValue 
+                        ? IntBoolVoidUnion.FromInt(accuracy.Value) 
+                        : null;
                 }),
             },
             [ConditionId.MirrorCoat] = new()

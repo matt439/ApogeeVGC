@@ -19,7 +19,7 @@ public sealed record OnFoeAccuracyEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnFoeAccuracyEventInfo(
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
+        Func<Battle, int?, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
   int? priority = null,
         bool usesSpeed = true)
     {
@@ -31,15 +31,15 @@ Handler = handler;
   ExpectedParameterTypes =
   [
      typeof(Battle),
-typeof(int),
+typeof(int?),
    typeof(Pokemon),
        typeof(Pokemon),
             typeof(ActiveMove),
         ];
         ExpectedReturnType = typeof(IntBoolVoidUnion);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
+    // Nullability: accuracy can be null for always-hit moves (TypeScript: number | true)
+        ParameterNullability = [false, true, false, false, false];
         ReturnTypeNullable = false;
     
     // Validate configuration

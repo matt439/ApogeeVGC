@@ -14,6 +14,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix) - ConditionIdRelayVar not converted to PokemonTypeConditionIdUnion
 - [Condition to Ability Cast Fix](#condition-to-ability-cast-fix) - InvalidCastException when trying to cast Condition to Ability
 - [ModifyAccuracy Event Parameter Nullability Fix](#modifyaccuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves
+- [Accuracy Event Parameter Nullability Fix](#accuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves (Lock-On)
 - [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
 - [Ripen Ability Null Effect Fix](#ripen-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
 - [Disguise Ability Null Effect Fix](#disguise-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
@@ -745,12 +746,36 @@ When documenting a new bug fix:
 
 ---
 
+### Accuracy Event Parameter Nullability Fix
+**File**: `AccuracyEventParameterNullabilityFix.md`  
+**Severity**: High  
+**Systems Affected**: Accuracy event handlers (all prefixes: Base, Source, Foe, Ally, Any)
+
+**Problem**: The `Accuracy` event handler signatures declared the `accuracy` parameter as `int` (non-nullable), but moves with true accuracy (always-hit moves) pass `BoolRelayVar(true)` instead of `IntRelayVar`. This caused the Lock-On condition's `OnSourceAccuracy` handler to crash when triggered for always-hit moves.
+
+**Root Cause**: Identical to ModifyAccuracy issue - TypeScript allows `accuracy: number | true`, but C# signatures used `int` (non-nullable). The `BattleActions.HitStepAccuracy` method passes `RelayVar.FromIntTrueUnion(accuracy)` which can be either `IntRelayVar` or `BoolRelayVar(true)`.
+
+**Solution**:
+- Changed all `Accuracy` event handler signatures (OnAccuracy, OnSourceAccuracy, OnFoeAccuracy, OnAllyAccuracy, OnAnyAccuracy) to use `int?` (nullable int)
+- EventHandlerAdapter already supported `BoolRelayVar(true)` ? `null` conversion from ModifyAccuracy fix
+- Updated handler implementations (Micle Berry, Minimize) to check `accuracy.HasValue` before using `.Value`
+- Lock-On handler unchanged (uses discard parameter `_`)
+
+**Semantic Mapping**:
+- TypeScript `typeof accuracy === 'number'` ? C# `accuracy.HasValue`
+- TypeScript `true` (always hit) ? C# `null`
+
+**Keywords**: `Accuracy`, `accuracy`, `nullable`, `int?`, `Lock-On`, `event parameter`, `type mismatch`, `BoolRelayVar`, `always-hit moves`, `Micle Berry`, `Minimize`
+
+---
+
 ### Effectiveness Event PokemonType Parameter Fix
 **File**: `EffectivenessEventPokemonTypeParameterFix.md`  
 **Severity**: High  
 **Systems Affected**: Effectiveness event handlers (items like Iron Ball, abilities that modify type matchups)
 
 **Problem**: When Iron Ball item's Effectiveness event handler was invoked during type effectiveness calculation, the event system crashed with `InvalidOperationException: Event Effectiveness: Parameter 3 (PokemonType _) is non-nullable but no matching value found in context`.
+
 
 **Root Cause**: The Effectiveness event is called from `Pokemon.RunEffectiveness` with a `PokemonType` as the event source to represent the type being checked for effectiveness. While `RunEventSource` and `SingleEventSource` both supported `PokemonType` through their respective type source records (`TypeRunEventSource` and `PokemonTypeSingleEventSource`), the event context system wasn't properly handling it:
 1. `Battle.RunEvent` wasn't converting `TypeRunEventSource` to `PokemonTypeSingleEventSource`
