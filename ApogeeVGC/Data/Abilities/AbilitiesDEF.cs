@@ -305,7 +305,8 @@ public partial record Abilities
                 // OnDamagePriority = 1
                 OnDamage = new OnDamageEventInfo((battle, damage, target, _, effect) =>
                 {
-                    if (effect.EffectType == EffectType.Move &&
+                    if (effect != null &&
+                        effect.EffectType == EffectType.Move &&
                         target.Species.Id is SpecieId.Mimikyu or SpecieId.MimikyuTotem)
                     {
                         battle.Add("-activate", target, "ability: Disguise");

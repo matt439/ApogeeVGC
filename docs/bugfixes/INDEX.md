@@ -16,6 +16,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [ModifyAccuracy Event Parameter Nullability Fix](#modifyaccuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves
 - [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
 - [Ripen Ability Null Effect Fix](#ripen-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
+- [Disguise Ability Null Effect Fix](#disguise-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -47,6 +48,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [GUI Team Preview Fix](#gui-team-preview-fix) - No Pokémon displayed during GUI team preview
 
 ### Battle Lifecycle
+- [Collection Modified During Enumeration Fix](#collection-modified-during-enumeration-fix) - InvalidOperationException when side.Active is modified during foreach iteration
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Infinite loop when active Pokemon fainted without proper switch handling
 - [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended during request generation
@@ -797,6 +799,64 @@ if (effect == null)
 **Impact**: When `effect` is null, the healing proceeds unchanged without activating Ripen's berry-doubling logic, matching the correct TypeScript behavior.
 
 **Keywords**: `ripen`, `ability`, `OnTryHeal`, `null reference`, `effect parameter`, `berry`, `healing`, `item`, `null check`
+
+---
+
+### Disguise Ability Null Effect Fix
+**File**: `DisguiseNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Disguise ability `OnDamage` event handler
+
+**Problem**: The Disguise ability crashed with a `NullReferenceException` when trying to access `effect.EffectType` in its `OnDamage` handler. The error occurred when Mimikyu took damage from sources that don't have an associated `IEffect` (e.g., confusion self-damage, recoil, weather damage, status conditions).
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its properties. The TypeScript reference implementation uses optional chaining (`effect?.effectType`) that was missing from the C# port.
+
+**Solution**: Added a null guard at the beginning of the handler:
+```csharp
+if (effect != null &&
+    effect.EffectType == EffectType.Move &&
+    target.Species.Id is SpecieId.Mimikyu or SpecieId.MimikyuTotem)
+{
+    // Activate Disguise
+}
+```
+
+**Impact**: When `effect` is null, the damage proceeds unchanged without activating Disguise's protection, matching the correct TypeScript behavior where Disguise only protects against direct move attacks.
+
+**Keywords**: `disguise`, `ability`, `OnDamage`, `null reference`, `effect parameter`, `Mimikyu`, `damage`, `null check`, `optional chaining`
+
+---
+
+### Collection Modified During Enumeration Fix
+**File**: `CollectionModifiedDuringEnumerationFix.md`  
+**Severity**: High  
+**Systems Affected**: Battle lifecycle, switching mechanics, phazing
+
+**Problem**: During random battle testing, the simulator threw `System.InvalidOperationException: Collection was modified; enumeration operation may not execute.` in the `RunAction` method at line 719. The error occurred when phazing moves (Roar, Dragon Tail, etc.) triggered forced switches.
+
+**Root Cause**: The `RunAction` method had four `foreach` loops that iterated directly over `side.Active`:
+1. Phazing loop (lines 716-729) 
+2. Cancel fainted actions loop (lines 737-747)
+3. Revival Blessing check loop (lines 788-804)
+4. BeforeSwitchOut event loop (lines 821-843)
+
+When `Actions.DragIn()` was called during the phazing loop, it called `BattleActions.SwitchIn()`, which modifies `side.Active[pos]` while the `foreach` loop was still iterating over the collection.
+
+**Solution**: Created snapshot copies of `side.Active` before each foreach loop using C# 12 collection expression syntax `[.. side.Active]`. This ensures that even if the original collection is modified during iteration, the loop continues safely over the snapshot.
+
+**Example Change**:
+```csharp
+// Before (unsafe):
+foreach (Pokemon? pokemon in side.Active) { ... }
+
+// After (safe):
+Pokemon?[] activeSnapshot = [.. side.Active];
+foreach (Pokemon? pokemon in activeSnapshot) { ... }
+```
+
+**Impact**: Prevents concurrent modification exceptions during forced switches, ensuring battle stability during phazing scenarios.
+
+**Keywords**: `collection modified`, `enumeration`, `concurrent modification`, `InvalidOperationException`, `foreach`, `side.Active`, `phazing`, `DragIn`, `SwitchIn`, `Roar`, `Dragon Tail`, `snapshot`, `collection expression`
 
 ---
 
