@@ -6,6 +6,8 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+
 namespace ApogeeVGC.Data.Moves;
 
 public partial record Moves
@@ -673,17 +675,14 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, target) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, target) =>
                 {
                     // TS: if (target && ['raindance', 'primordialsea'].includes(target.effectiveWeather()))
                     // Use target's effective weather (accounts for Utility Umbrella)
-                    if (target != null)
+                    var weather = target?.EffectiveWeather();
+                    if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
-                        var weather = target.EffectiveWeather();
-                        if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
-                        {
-                            move.Accuracy = IntTrueUnion.FromTrue();
-                        }
+                        move.Accuracy = IntTrueUnion.FromTrue();
                     }
                 }),
                 Secondary = new SecondaryEffect
