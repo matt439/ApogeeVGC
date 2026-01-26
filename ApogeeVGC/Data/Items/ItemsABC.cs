@@ -136,7 +136,7 @@ public partial record Items
                         return;
                     }
 
-                    if (effect.EffectStateId == AbilityId.Intimidate)
+                    if (effect != null && effect.EffectStateId == AbilityId.Intimidate)
                     {
                         target.UseItem();
                     }

@@ -18,6 +18,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
 - [Ripen Ability Null Effect Fix](#ripen-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
 - [Disguise Ability Null Effect Fix](#disguise-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
+- [Adrenaline Orb Null Effect Fix](#adrenaline-orb-null-effect-fix) - NullReferenceException when effect parameter is null in OnAfterBoost handler
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -850,6 +851,29 @@ if (effect != null &&
 **Impact**: When `effect` is null, the damage proceeds unchanged without activating Disguise's protection, matching the correct TypeScript behavior where Disguise only protects against direct move attacks.
 
 **Keywords**: `disguise`, `ability`, `OnDamage`, `null reference`, `effect parameter`, `Mimikyu`, `damage`, `null check`, `optional chaining`
+
+---
+
+### Adrenaline Orb Null Effect Fix
+**File**: `AdrenalineOrbNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Adrenaline Orb item `OnAfterBoost` event handler
+
+**Problem**: The Adrenaline Orb item crashed with a `NullReferenceException` when trying to access `effect.EffectStateId` in its `OnAfterBoost` handler. The error occurred when boost events were triggered without an associated effect (e.g., weather effects, terrain effects, field conditions).
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its `EffectStateId` property. Stat boosts can come from various sources that don't have an associated effect. The TypeScript reference directly accesses `effect.name` without a null check, but C# requires explicit null handling.
+
+**Solution**: Added a null guard before checking the effect's identity:
+```csharp
+if (effect != null && effect.EffectStateId == AbilityId.Intimidate)
+{
+    target.UseItem();
+}
+```
+
+**Impact**: When `effect` is null, the Adrenaline Orb doesn't activate, which is correct because the item is designed to only respond to the Intimidate ability. This prevents crashes while maintaining correct game mechanics.
+
+**Keywords**: `adrenaline orb`, `item`, `OnAfterBoost`, `null reference`, `effect parameter`, `intimidate`, `stat boost`, `null check`
 
 ---
 
