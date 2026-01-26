@@ -62,7 +62,7 @@ public class SyncSimulator : IBattleController
             // 4. When all choices are submitted, Choose() calls CommitChoices() which calls TurnLoop()
             // 5. TurnLoop() processes actions and may set a new RequestState or end the battle
             // 6. Control returns to us, and we loop to check for new requests
-            
+
             while (!Battle.Ended)
             {
                 // Check if there are pending requests
@@ -124,7 +124,7 @@ public class SyncSimulator : IBattleController
                         $"Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
                 }
 
-                Console.WriteLine($"Stack trace (last 10 frames):");
+                Console.WriteLine("Stack trace (last 10 frames):");
                 var frames = ex.StackTrace?.Split('\n').Take(10);
                 if (frames != null)
                 {
@@ -198,7 +198,7 @@ public class SyncSimulator : IBattleController
             // Compare against both P1 and P2 side names to determine the winner
             string p1Name = Battle.P1.Name;
             string p2Name = Battle.P2.Name;
-            
+
             if (Battle.Winner.Equals(p1Name, StringComparison.OrdinalIgnoreCase))
             {
                 return SimulatorResult.Player1Win;
@@ -207,7 +207,7 @@ public class SyncSimulator : IBattleController
             {
                 return SimulatorResult.Player2Win;
             }
-            
+
             // Fallback: also check for side ID strings ("p1", "p2") for backwards compatibility
             if (Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase))
             {
@@ -217,7 +217,7 @@ public class SyncSimulator : IBattleController
             {
                 return SimulatorResult.Player2Win;
             }
-            
+
             // Unknown winner format - log error and treat as tie
             Console.WriteLine($"WARNING: Unknown winner format: '{Battle.Winner}'");
             return SimulatorResult.Tie;
@@ -281,6 +281,7 @@ public class SyncSimulator : IBattleController
             {
                 Console.WriteLine($"[SyncSimulator] Team validation failed:{Environment.NewLine}{errorMessage}");
             }
+
             throw new InvalidOperationException($"Team validation failed:{Environment.NewLine}{errorMessage}");
         }
 

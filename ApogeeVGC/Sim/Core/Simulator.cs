@@ -3,7 +3,6 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Player;
-using ApogeeVGC.Sim.SideClasses;
 using System.Threading.Channels;
 
 namespace ApogeeVGC.Sim.Core;
@@ -109,10 +108,10 @@ public class Simulator : IBattleController
                 TimeSpan.FromSeconds(300)); // Shorter timeout for testing
 
             // Start the battle loop task
-            Task battleLoopTask = Task.Run(() => RunBattleLoop(), _cancellationTokenSource.Token);
+            var battleLoopTask = Task.Run(RunBattleLoop, _cancellationTokenSource.Token);
 
             // Start processing choice responses
-            Task choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
+            var choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
 
             // Wait for either the battle to end or a timeout
             var timeoutTask = Task.Delay(TimeSpan.FromSeconds(300), _cancellationTokenSource.Token);
@@ -122,7 +121,7 @@ public class Simulator : IBattleController
                 timeoutTask
             );
 
-            string taskName = completedTask == battleLoopTask ? "battleLoop" :
+            var taskName = completedTask == battleLoopTask ? "battleLoop" :
                 completedTask == choiceProcessingTask ? "choiceProcessing" : "timeout";
             if (PrintDebug)
             {
@@ -205,11 +204,11 @@ public class Simulator : IBattleController
                         $"Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
                 }
 
-                Console.WriteLine($"Stack trace (last 10 frames):");
+                Console.WriteLine("Stack trace (last 10 frames):");
                 var frames = ex.StackTrace?.Split('\n').Take(10);
                 if (frames != null)
                 {
-                    foreach (string frame in frames)
+                    foreach (var frame in frames)
                     {
                         Console.WriteLine($"  {frame.Trim()}");
                     }
@@ -320,15 +319,15 @@ public class Simulator : IBattleController
         }
 
         // Start an async task to get the choice
-        Task choiceTask = Task.Run(async () =>
+        var choiceTask = Task.Run(async () =>
         {
             try
             {
-                IPlayer player = GetPlayer(e.SideId);
+                var player = GetPlayer(e.SideId);
 
                 // Request choice from the player
                 using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-                Choice choice = await player.GetNextChoiceAsync(
+                var choice = await player.GetNextChoiceAsync(
                     e.Request,
                     e.RequestType,
                     e.Perspective,
@@ -355,7 +354,7 @@ public class Simulator : IBattleController
                             $"[Simulator.OnChoiceRequested] Empty choice received for {e.SideId}, using AutoChoose");
                     }
 
-                    Side side = Battle!.Sides.First(s => s.Id == e.SideId);
+                    var side = Battle!.Sides.First(s => s.Id == e.SideId);
                     if (PrintDebug)
                     {
                         Console.WriteLine(
@@ -384,7 +383,7 @@ public class Simulator : IBattleController
                     SideId = e.SideId,
                     Choice = choice,
                     Success = true
-                });
+                }, cts.Token);
 
                 // Log the choice for replay
                 LogChoice(e.SideId, choice);
@@ -398,7 +397,7 @@ public class Simulator : IBattleController
                 }
 
                 // Auto-choose on timeout
-                Side side = Battle!.Sides.First(s => s.Id == e.SideId);
+                var side = Battle!.Sides.First(s => s.Id == e.SideId);
                 side.AutoChoose();
 
                 await _choiceResponseChannel!.Writer.WriteAsync(new ChoiceResponse
@@ -453,7 +452,7 @@ public class Simulator : IBattleController
     /// </summary>
     private void OnUpdateRequested(object? sender, BattleUpdateEventArgs e)
     {
-        IPlayer player = GetPlayer(e.SideId);
+        var player = GetPlayer(e.SideId);
         player.UpdateEvents(e.Events);
     }
 
@@ -503,7 +502,7 @@ public class Simulator : IBattleController
                 Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Starting");
             }
 
-            await foreach (ChoiceResponse response in _choiceResponseChannel!.Reader.ReadAllAsync(
+            await foreach (var response in _choiceResponseChannel!.Reader.ReadAllAsync(
                                cancellationToken))
             {
                 if (PrintDebug)
@@ -572,7 +571,8 @@ public class Simulator : IBattleController
             if (PrintDebug)
             {
                 Console.WriteLine(
-                    $"[Simulator.ProcessChoiceResponsesAsync] ReadAllAsync completed, Battle.Ended={Battle.Ended}");
+                    $"[Simulator.ProcessChoiceResponsesAsync] ReadAllAsync completed, Battle.Ended={Battle?.Ended ??
+                        throw new InvalidOperationException(nameof(Battle.Ended))}");
             }
         }
         catch (OperationCanceledException)
@@ -590,23 +590,25 @@ public class Simulator : IBattleController
             {
                 Console.WriteLine(
                     $"[Simulator.ProcessChoiceResponsesAsync] ERROR: {ex.GetType().Name}: {ex.Message}");
-                
+
                 // Print inner exception details if present
                 if (ex.InnerException != null)
                 {
-                    Console.WriteLine($"  Inner Exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
-                    
+                    Console.WriteLine(
+                        $"  Inner Exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+
                     if (ex.InnerException.InnerException != null)
                     {
-                        Console.WriteLine($"    Inner Inner Exception: {ex.InnerException.InnerException.GetType().Name}: {ex.InnerException.InnerException.Message}");
+                        Console.WriteLine(
+                            $"    Inner Inner Exception: {ex.InnerException.InnerException.GetType().Name}: {ex.InnerException.InnerException.Message}");
                     }
                 }
-                
+
                 // Print first 15 lines of stack trace
                 if (ex.StackTrace != null)
                 {
                     var stackLines = ex.StackTrace.Split('\n').Take(15);
-                    Console.WriteLine($"  Stack Trace:");
+                    Console.WriteLine("  Stack Trace:");
                     foreach (var line in stackLines)
                     {
                         Console.WriteLine($"    {line.Trim()}");
@@ -630,7 +632,7 @@ public class Simulator : IBattleController
             if (PrintDebug)
             {
                 Console.WriteLine(
-                    $"[Simulator.ProcessChoiceResponsesAsync] Exiting, Battle.Ended={Battle.Ended}");
+                    $"[Simulator.ProcessChoiceResponsesAsync] Exiting, Battle.Ended={Battle?.Ended ?? throw new InvalidOperationException(nameof(Battle.Ended))}");
             }
         }
     }
@@ -669,12 +671,12 @@ public class Simulator : IBattleController
         if (!string.IsNullOrEmpty(Battle.Winner))
         {
             // Winner is stored as side ID string ("p1" or "p2")
-            bool isP1Winner = Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase) ||
-                              Battle.Winner.Equals("Random 1", StringComparison.OrdinalIgnoreCase);
+            var isP1Winner = Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase) ||
+                             Battle.Winner.Equals("Random 1", StringComparison.OrdinalIgnoreCase);
 
             if (PrintDebug)
             {
-                string winnerName = isP1Winner ? "Player 1" : "Player 2";
+                var winnerName = isP1Winner ? "Player 1" : "Player 2";
                 Console.WriteLine($"Winner: {winnerName}");
             }
 
@@ -744,6 +746,7 @@ public class Simulator : IBattleController
             {
                 Console.WriteLine($"[Simulator] Team validation failed:{Environment.NewLine}{errorMessage}");
             }
+
             throw new InvalidOperationException($"Team validation failed:{Environment.NewLine}{errorMessage}");
         }
 
@@ -797,7 +800,7 @@ public class Simulator : IBattleController
             throw new InvalidOperationException("Battle is not initialized");
         }
 
-        Side side = Battle.Sides.First(s => s.Id == sideId);
+        var side = Battle.Sides.First(s => s.Id == sideId);
         Battle.Win(side);
         InputLog.Add($">forcewin {sideId.ToString().ToLower()}");
     }
@@ -828,7 +831,7 @@ public class Simulator : IBattleController
             throw new InvalidOperationException("Battle is not initialized");
         }
 
-        Side side = Battle.Sides.First(s => s.Id == sideId);
+        var side = Battle.Sides.First(s => s.Id == sideId);
         Battle.Lose(side);
         InputLog.Add($">forcelose {sideId.ToString().ToLower()}");
     }
@@ -854,7 +857,7 @@ public class Simulator : IBattleController
         sb.AppendLine($">reseed {Battle.PrngSeed}");
 
         // Add all logged choices and commands
-        foreach (string log in InputLog)
+        foreach (var log in InputLog)
         {
             sb.AppendLine(log);
         }
@@ -868,7 +871,7 @@ public class Simulator : IBattleController
     private void LogChoice(SideId sideId, Choice choice)
     {
         // Format choice as battle-stream protocol
-        string choiceStr = FormatChoiceForLog(choice);
+        var choiceStr = FormatChoiceForLog(choice);
         InputLog.Add($">{sideId.ToString().ToLower()} {choiceStr}");
     }
 
@@ -884,7 +887,7 @@ public class Simulator : IBattleController
         }
 
         var parts = new List<string>();
-        foreach (ChosenAction action in choice.Actions)
+        foreach (var action in choice.Actions)
         {
             // Format each action - this is a simplified version
             parts.Add(action.ToString() ?? "default");

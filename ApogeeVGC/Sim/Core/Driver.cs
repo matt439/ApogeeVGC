@@ -102,7 +102,7 @@ public class Driver
         Console.WriteLine("[Driver] Simulator created");
 
         // Run the battle synchronously on the main thread
-        SimulatorResult result =
+        var result =
             simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
@@ -143,7 +143,7 @@ public class Driver
         Console.WriteLine("[Driver] Simulator created");
 
         // Run the battle asynchronously on the main thread
-        SimulatorResult result =
+        var result =
             simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
@@ -156,7 +156,7 @@ public class Driver
 
         // Create the MonoGame window
         using var game = new BattleGame();
-        
+
         PlayerOptions player1Options = new()
         {
             Type = Player.PlayerType.Gui,
@@ -188,14 +188,14 @@ public class Driver
 
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Simulator created");
-        
+
         // Start the battle (will defer until LoadContent completes)
         game.StartBattle(Library, battleOptions, simulator);
         Console.WriteLine("[Driver] Battle start queued");
-        
+
         // Run MonoGame on main thread (blocking call)
         game.Run();
-        
+
         Console.WriteLine("[Driver] Battle completed");
     }
 
@@ -206,7 +206,7 @@ public class Driver
 
         // Create the MonoGame window
         using var game = new BattleGame();
-        
+
         PlayerOptions player1Options = new()
         {
             Type = Player.PlayerType.Gui,
@@ -238,21 +238,22 @@ public class Driver
 
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Simulator created");
-        
+
         // Start the battle (will defer until LoadContent completes)
         game.StartBattle(Library, battleOptions, simulator);
         Console.WriteLine("[Driver] Battle start queued");
-        
+
         // Run MonoGame on main thread (blocking call)
         game.Run();
-        
+
         Console.WriteLine("[Driver] Battle completed");
     }
 
     private void RunRandomVsRandomSinglesTest()
     {
         Console.WriteLine("[Driver] Starting Random vs Random Singles test (SYNCHRONOUS)");
-        Console.WriteLine($"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
+        Console.WriteLine(
+            $"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
 
         const bool debug = true;
 
@@ -288,7 +289,7 @@ public class Driver
         Console.WriteLine("[Driver] SyncSimulator created");
 
         // Run the battle completely synchronously - no async/await needed!
-        SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+        var result = simulator.Run(Library, battleOptions, printDebug: debug);
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
 
@@ -300,7 +301,8 @@ public class Driver
     private void RunRandomVsRandomDoublesTest()
     {
         Console.WriteLine("[Driver] Starting Random vs Random Doubles test (SYNCHRONOUS)");
-        Console.WriteLine($"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
+        Console.WriteLine(
+            $"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
 
         const bool debug = true;
 
@@ -336,7 +338,7 @@ public class Driver
         Console.WriteLine("[Driver] SyncSimulator created");
 
         // Run the battle completely synchronously - no async/await needed!
-        SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+        var result = simulator.Run(Library, battleOptions, printDebug: debug);
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
 
@@ -388,7 +390,7 @@ public class Driver
             };
 
             var simulator = new SyncSimulator();
-            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+            var result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }, cts.Token);
 
@@ -418,7 +420,7 @@ public class Driver
     {
         Console.WriteLine();
         Console.WriteLine("-----------------------------------------------------------");
-        
+
         if (ex is BattleTimeoutException timeoutEx)
         {
             Console.WriteLine("ERROR: Battle exceeded timeout (likely infinite loop!)");
@@ -438,7 +440,7 @@ public class Driver
             Console.WriteLine($"Exception Type: {ex.GetType().Name}");
             Console.WriteLine($"Exception Message: {ex.Message}");
         }
-        
+
         Console.WriteLine($"Player 1 Seed: {player1Seed}");
         Console.WriteLine($"Player 2 Seed: {player2Seed}");
         Console.WriteLine($"Battle Seed:   {battleSeed}");
@@ -449,12 +451,12 @@ public class Driver
         Console.WriteLine($"  private const int BattleSeed = {battleSeed};");
         Console.WriteLine();
         Console.WriteLine($"Then run with DriverMode.{debugMode} to debug.");
-        
+
         if (ex is not BattleTimeoutException and not BattleTurnLimitException)
         {
             Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
         }
-        
+
         Console.WriteLine("-----------------------------------------------------------");
         Console.WriteLine();
     }
@@ -469,8 +471,8 @@ public class Driver
         var simResults = new ConcurrentBag<SimulatorResult>();
         var stopwatch = Stopwatch.StartNew();
 
-        int seedCounter = 0;
-        int completedBattles = 0;
+        var seedCounter = 0;
+        var completedBattles = 0;
         var turnOnBattleEnd = new ConcurrentBag<int>();
         var exceptions = new ConcurrentBag<(int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>();
 
@@ -483,13 +485,13 @@ public class Driver
         Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
         {
             // Calculate unique seeds for this battle using atomic operations
-            int offset1 = Interlocked.Increment(ref seedCounter);
-            int offset2 = Interlocked.Increment(ref seedCounter);
-            int offset3 = Interlocked.Increment(ref seedCounter);
-            
-            int localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
-            int localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
-            int localBattleSeed = BattleEvalSeed + offset3;
+            var offset1 = Interlocked.Increment(ref seedCounter);
+            var offset2 = Interlocked.Increment(ref seedCounter);
+            var offset3 = Interlocked.Increment(ref seedCounter);
+
+            var localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
+            var localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
+            var localBattleSeed = BattleEvalSeed + offset3;
 
             try
             {
@@ -499,11 +501,11 @@ public class Driver
                     localBattleSeed,
                     FormatId.CustomSingles,
                     debug);
-                
+
                 simResults.Add(result);
                 turnOnBattleEnd.Add(turn);
-                
-                int completed = Interlocked.Increment(ref completedBattles);
+
+                var completed = Interlocked.Increment(ref completedBattles);
                 if (completed % 100 == 0)
                 {
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
@@ -513,7 +515,7 @@ public class Driver
             {
                 // Store exception with seed information for debugging
                 exceptions.Add((localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
-                
+
                 // Log immediately to console
                 LogExceptionWithSeeds(
                     localPlayer1Seed,
@@ -530,25 +532,25 @@ public class Driver
         var resultsList = simResults.ToList();
         var turnsList = turnOnBattleEnd.ToList();
         var exceptionsList = exceptions.ToList();
-        
-        int successfulBattles = resultsList.Count;
-        int failedBattles = exceptionsList.Count;
-        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
-        int ties = resultsList.Count(result => result == SimulatorResult.Tie);
+
+        var successfulBattles = resultsList.Count;
+        var failedBattles = exceptionsList.Count;
+        var player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        var player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+        var ties = resultsList.Count(result => result == SimulatorResult.Tie);
 
         // Calculate timing metrics
-        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
-        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+        var totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        var timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        var simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
 
         // Calculate turn statistics (only if there are successful battles)
         double meanTurns = 0;
         double stdDevTurns = 0;
         double medianTurns = 0;
-        int minTurns = 0;
-        int maxTurns = 0;
-        
+        var minTurns = 0;
+        var maxTurns = 0;
+
         if (turnsList.Count > 0)
         {
             meanTurns = turnsList.Mean();
@@ -569,12 +571,12 @@ public class Driver
         sb.AppendLine($"Failed Battles (Exceptions): {failedBattles}");
         sb.AppendLine($"Total Battles Attempted: {RandomEvaluationNumTest}");
         sb.AppendLine();
-        
+
         if (failedBattles > 0)
         {
             sb.AppendLine("??  EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (int i = 0; i < exceptionsList.Count; i++)
+            for (var i = 0; i < exceptionsList.Count; i++)
             {
                 var (p1Seed, p2Seed, bSeed, ex) = exceptionsList[i];
                 sb.AppendLine($"Exception #{i + 1}:");
@@ -584,10 +586,11 @@ public class Driver
                 sb.AppendLine($"  Exception:     {ex.GetType().Name}: {ex.Message}");
                 sb.AppendLine();
             }
+
             sb.AppendLine("-----------------------------------------------------------");
             sb.AppendLine();
         }
-        
+
         sb.AppendLine("Battle Results (Successful Battles Only):");
         sb.AppendLine($"Player 1 Wins: {player1Wins}");
         sb.AppendLine($"Player 2 Wins: {player2Wins}");
@@ -598,6 +601,7 @@ public class Driver
             sb.AppendLine($"Win Rate for Player 2: {(double)player2Wins / successfulBattles:P2}");
             sb.AppendLine($"Tie Rate: {(double)ties / successfulBattles:P2}");
         }
+
         sb.AppendLine();
         sb.AppendLine("Performance Metrics:");
         sb.AppendLine($"Number of threads: {NumThreads}");
@@ -628,8 +632,8 @@ public class Driver
         var simResults = new ConcurrentBag<SimulatorResult>();
         var stopwatch = Stopwatch.StartNew();
 
-        int seedCounter = 0;
-        int completedBattles = 0;
+        var seedCounter = 0;
+        var completedBattles = 0;
         var turnOnBattleEnd = new ConcurrentBag<int>();
         var exceptions = new ConcurrentBag<(int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>();
 
@@ -642,13 +646,13 @@ public class Driver
         Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
         {
             // Calculate unique seeds for this battle using atomic operations
-            int offset1 = Interlocked.Increment(ref seedCounter);
-            int offset2 = Interlocked.Increment(ref seedCounter);
-            int offset3 = Interlocked.Increment(ref seedCounter);
-            
-            int localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
-            int localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
-            int localBattleSeed = BattleEvalSeed + offset3;
+            var offset1 = Interlocked.Increment(ref seedCounter);
+            var offset2 = Interlocked.Increment(ref seedCounter);
+            var offset3 = Interlocked.Increment(ref seedCounter);
+
+            var localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
+            var localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
+            var localBattleSeed = BattleEvalSeed + offset3;
 
             try
             {
@@ -658,11 +662,11 @@ public class Driver
                     localBattleSeed,
                     FormatId.CustomDoubles,
                     debug);
-                
+
                 simResults.Add(result);
                 turnOnBattleEnd.Add(turn);
-                
-                int completed = Interlocked.Increment(ref completedBattles);
+
+                var completed = Interlocked.Increment(ref completedBattles);
                 if (completed % 100 == 0)
                 {
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
@@ -672,7 +676,7 @@ public class Driver
             {
                 // Store exception with seed information for debugging
                 exceptions.Add((localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
-                
+
                 // Log immediately to console
                 LogExceptionWithSeeds(
                     localPlayer1Seed,
@@ -689,25 +693,25 @@ public class Driver
         var resultsList = simResults.ToList();
         var turnsList = turnOnBattleEnd.ToList();
         var exceptionsList = exceptions.ToList();
-        
-        int successfulBattles = resultsList.Count;
-        int failedBattles = exceptionsList.Count;
-        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
-        int ties = resultsList.Count(result => result == SimulatorResult.Tie);
+
+        var successfulBattles = resultsList.Count;
+        var failedBattles = exceptionsList.Count;
+        var player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        var player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+        var ties = resultsList.Count(result => result == SimulatorResult.Tie);
 
         // Calculate timing metrics
-        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
-        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+        var totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        var timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        var simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
 
         // Calculate turn statistics (only if there are successful battles)
         double meanTurns = 0;
         double stdDevTurns = 0;
         double medianTurns = 0;
-        int minTurns = 0;
-        int maxTurns = 0;
-        
+        var minTurns = 0;
+        var maxTurns = 0;
+
         if (turnsList.Count > 0)
         {
             meanTurns = turnsList.Mean();
@@ -728,12 +732,12 @@ public class Driver
         sb.AppendLine($"Failed Battles (Exceptions): {failedBattles}");
         sb.AppendLine($"Total Battles Attempted: {RandomEvaluationNumTest}");
         sb.AppendLine();
-        
+
         if (failedBattles > 0)
         {
             sb.AppendLine("??  EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (int i = 0; i < exceptionsList.Count; i++)
+            for (var i = 0; i < exceptionsList.Count; i++)
             {
                 var (p1Seed, p2Seed, bSeed, ex) = exceptionsList[i];
                 sb.AppendLine($"Exception #{i + 1}:");
@@ -743,10 +747,11 @@ public class Driver
                 sb.AppendLine($"  Exception:     {ex.GetType().Name}: {ex.Message}");
                 sb.AppendLine();
             }
+
             sb.AppendLine("-----------------------------------------------------------");
             sb.AppendLine();
         }
-        
+
         sb.AppendLine("Battle Results (Successful Battles Only):");
         sb.AppendLine($"Player 1 Wins: {player1Wins}");
         sb.AppendLine($"Player 2 Wins: {player2Wins}");
@@ -757,6 +762,7 @@ public class Driver
             sb.AppendLine($"Win Rate for Player 2: {(double)player2Wins / successfulBattles:P2}");
             sb.AppendLine($"Tie Rate: {(double)ties / successfulBattles:P2}");
         }
+
         sb.AppendLine();
         sb.AppendLine("Performance Metrics:");
         sb.AppendLine($"Number of threads: {NumThreads}");
