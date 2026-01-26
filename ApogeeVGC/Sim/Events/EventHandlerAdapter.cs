@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events;
@@ -292,6 +293,20 @@ internal static class EventHandlerAdapter
         if (relayVar is BoolRelayVar boolVar && (targetType == typeof(bool) || targetType == typeof(Boolean)))
         {
             value = boolVar.Value;
+            return true;
+        }
+
+        // Handle SparseBoostsTable
+        if (relayVar is SparseBoostsTableRelayVar sparseBoostsVar && targetType == typeof(SparseBoostsTable))
+        {
+            value = sparseBoostsVar.Table;
+            return true;
+        }
+
+        // Handle BoostsTable
+        if (relayVar is BoostsTableRelayVar boostsVar && targetType == typeof(BoostsTable))
+        {
+            value = boostsVar.Table;
             return true;
         }
 
