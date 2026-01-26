@@ -425,6 +425,10 @@ internal static class EventHandlerAdapter
             PokemonPokemonVoidUnion pokemonVoid => new PokemonRelayVar(pokemonVoid.Pokemon),
             VoidPokemonVoidUnion => new VoidReturnRelayVar(),
 
+            // MoveIdVoidUnion -> MoveId or VoidReturn
+            MoveIdMoveIdVoidUnion moveIdVoid => new MoveIdRelayVar(moveIdVoid.MoveId),
+            VoidMoveIdVoidUnion => new VoidReturnRelayVar(),
+
             // Primitive types
             bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),

@@ -20,6 +20,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix) - VoidReturn causing IntRelayVar type mismatch
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - Multiple stat handlers returning VoidReturn instead of int
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Incorrect nullability constraints on stat modification parameters
+- [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
 - [Union Type Handling Guide](#union-type-handling-guide) - Comprehensive guide for preventing union type issues
 
 ### Move Mechanics
@@ -289,7 +290,53 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
-### Spirit Break Secondary Effect Fix
+### MoveIdVoidUnion Return Conversion Fix
+**File**: `MoveIdVoidUnionReturnConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: Two-turn moves, LockMove event handlers
+
+**Problem**: When a Pokemon used a two-turn move (Fly, Dig, Dive, Skull Bash, Solar Beam, Sky Drop), the battle crashed with `InvalidOperationException: Event LockMove: Unable to convert return value of type 'VoidMoveIdVoidUnion' to RelayVar`.
+
+**Root Cause**: The `TwoTurnMove` condition's `OnLockMove` handler returns `MoveIdVoidUnion`, which can be either `MoveIdMoveIdVoidUnion` (containing a MoveId) or `VoidMoveIdVoidUnion` (containing VoidReturn). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `MoveIdVoidUnion`.
+
+**Solution**: Added conversion cases for both variants of `MoveIdVoidUnion`:
+- `MoveIdMoveIdVoidUnion` ? `MoveIdRelayVar`
+- `VoidMoveIdVoidUnion` ? `VoidReturnRelayVar`
+
+**Pattern**: Event handlers that return union types need explicit conversion cases in `EventHandlerAdapter.ConvertReturnValue` to unwrap the variant and convert it to the appropriate `RelayVar` type.
+
+**Keywords**: `two-turn move`, `LockMove event`, `MoveIdVoidUnion`, `event handler return`, `union type conversion`, `Fly`, `Dig`, `Dive`, `Skull Bash`, `Solar Beam`, `Sky Drop`
+
+---
+
+### Union Type Handling Guide
+**File**: `UnionTypeHandlingGuide.md`  
+**Type**: Reference Guide  
+**Purpose**: Comprehensive guide for preventing recurring union type issues
+
+**Contents**:
+- 6 major issue categories with detection patterns
+- Complete audit checklist for codebase review
+- Code search queries for finding potential issues
+- Prevention guidelines for new code
+- Testing scenarios for verification
+- Quick reference for Union ? RelayVar mapping
+
+**Key Topics**:
+- Missing union type conversions in EventHandlerAdapter
+- Undefined/Empty handling in success checks
+- Event handler return type mismatches
+- Missing null checks before union access
+- Inconsistent NOT_FAIL representation
+
+**Use Cases**:
+- Adding new event handlers
+- Adding new union types
+- Processing event results
+- Determining move/action success
+- Code reviews and audits
+
+**Keywords**: `union types`, `Undefined`, `Empty`, `NOT_FAIL`, `EventHandlerAdapter`, `reference guide`
 **File**: `SpiritBreakSecondaryEffectFix.md`  
 **Severity**: High  
 **Systems Affected**: Moves with secondary effects using `Secondary` property
@@ -391,6 +438,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - VoidReturn instead of int in stat handlers
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Null parameter when non-nullable expected
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Primitive int instead of IntRelayVar
+- [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
