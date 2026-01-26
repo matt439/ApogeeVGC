@@ -55,7 +55,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (Pokemon ally in pokemon.AlliesAndSelf())
+                    foreach (var ally in pokemon.AlliesAndSelf())
                     {
                         if (ally.Status is ConditionId.Poison or ConditionId.Toxic)
                         {
@@ -79,7 +79,7 @@ public partial record Abilities
                             Pokemon: var target,
                         })
                         return;
-                    foreach (Pokemon ally in target.AlliesAndSelf())
+                    foreach (var ally in target.AlliesAndSelf())
                     {
                         if (ally.Status is ConditionId.Poison or ConditionId.Toxic)
                         {
@@ -154,7 +154,7 @@ public partial record Abilities
                             source.SwitchFlag == true)
                             return;
 
-                        ItemFalseUnion yourItemResult = source.TakeItem(target);
+                        var yourItemResult = source.TakeItem(target);
                         if (yourItemResult is not ItemItemFalseUnion { Item: var yourItem })
                             return;
                         if (!target.SetItem(yourItem.Id))
@@ -188,11 +188,11 @@ public partial record Abilities
 
                     if (pickupTargets.Count == 0) return;
 
-                    Pokemon randomTarget = battle.Sample(pickupTargets);
-                    ItemId item = randomTarget.LastItem;
+                    var randomTarget = battle.Sample(pickupTargets);
+                    var item = randomTarget.LastItem;
                     randomTarget.LastItem = ItemId.None;
 
-                    if (battle.Library.Items.TryGetValue(item, out Item? itemData))
+                    if (battle.Library.Items.TryGetValue(item, out var itemData))
                     {
                         battle.Add("-item", pokemon, itemData.Name, "[from] ability: Pickup");
                     }
@@ -244,7 +244,7 @@ public partial record Abilities
                 // OnModifySpAPriority = 5
                 OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
                 {
-                    foreach (Pokemon allyActive in pokemon.Allies())
+                    foreach (var allyActive in pokemon.Allies())
                     {
                         if (allyActive.HasAbility(AbilityId.Minus) ||
                             allyActive.HasAbility(AbilityId.Plus))
@@ -389,7 +389,7 @@ public partial record Abilities
                 OnAllyFaint = new OnAllyFaintEventInfo((_, target, pokemon, _) =>
                 {
                     if (pokemon.Hp == 0) return;
-                    Ability ability = target.GetAbility();
+                    var ability = target.GetAbility();
                     if (ability.Flags.NoReceiver == true || ability.Id == AbilityId.None) return;
                     pokemon.SetAbility(ability.Id, target);
                 }),
@@ -438,10 +438,7 @@ public partial record Abilities
                 Name = "Pressure",
                 Num = 46,
                 Rating = 2.5,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    battle.Add("-ability", pokemon, "Pressure");
-                }),
+                OnStart = new OnStartEventInfo((battle, pokemon) => { battle.Add("-ability", pokemon, "Pressure"); }),
                 OnDeductPp = new OnDeductPpEventInfo((_, target, source) =>
                 {
                     if (target.IsAlly(source)) return 0;
@@ -476,9 +473,9 @@ public partial record Abilities
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    Pokemon pokemon = psfp.Pokemon;
+                    var pokemon = psfp.Pokemon;
                     if (battle.Field.WeatherState.Source != pokemon) return;
-                    foreach (Pokemon target in battle.GetAllActive())
+                    foreach (var target in battle.GetAllActive())
                     {
                         if (target == pokemon) continue;
                         if (target.HasAbility(AbilityId.PrimordialSea))
@@ -536,12 +533,12 @@ public partial record Abilities
                         move.CallsMove == true)
                         return new VoidReturn();
 
-                    MoveType type = move.Type;
+                    var type = move.Type;
                     if (type != MoveType.Unknown)
                     {
-                        PokemonType pokemonType = type.ConvertToPokemonType();
+                        var pokemonType = type.ConvertToPokemonType();
                         // TS: source.getTypes().join() !== type - compares joined type string to move type
-                        PokemonType[] currentTypes = source.GetTypes();
+                        var currentTypes = source.GetTypes();
                         // Only change type if pokemon doesn't already have exactly this single type
                         if (currentTypes.Length != 1 || currentTypes[0] != pokemonType)
                         {
@@ -724,7 +721,7 @@ public partial record Abilities
                 }),
                 OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
                 {
-                    Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
+                    var quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
 
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
@@ -885,7 +882,7 @@ public partial record Abilities
                 OnAllyFaint = new OnAllyFaintEventInfo((_, target, pokemon, _) =>
                 {
                     if (pokemon.Hp == 0) return;
-                    Ability ability = target.GetAbility();
+                    var ability = target.GetAbility();
                     if (ability.Flags.NoReceiver == true || ability.Id == AbilityId.None) return;
                     pokemon.SetAbility(ability.Id, target);
                 }),
@@ -950,10 +947,7 @@ public partial record Abilities
                 Name = "Regenerator",
                 Num = 144,
                 Rating = 4.5,
-                OnSwitchOut = new OnSwitchOutEventInfo((_, pokemon) =>
-                {
-                    pokemon.Heal(pokemon.BaseMaxHp / 3);
-                }),
+                OnSwitchOut = new OnSwitchOutEventInfo((_, pokemon) => { pokemon.Heal(pokemon.BaseMaxHp / 3); }),
             },
             [AbilityId.Ripen] = new()
             {

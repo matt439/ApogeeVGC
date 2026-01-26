@@ -137,20 +137,20 @@ public partial record Abilities
                 Rating = 2.5,
                 OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
                 {
-                    Ability sourceAbility = source.GetAbility();
+                    var sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.FailSkillSwap == true) return;
 
                     if (battle.CheckMoveMakesContact(move, source, target, !source.IsAlly(target)))
                     {
-                        RelayVar? targetCanBeSet =
+                        var targetCanBeSet =
                             battle.RunEvent(EventId.SetAbility, target, source, battle.Effect,
                                 sourceAbility);
                         if (targetCanBeSet is BoolRelayVar { Value: false }) return;
 
-                        AbilityIdFalseUnion? oldAbilityResult =
+                        var oldAbilityResult =
                             source.SetAbility(AbilityId.WanderingSpirit, target);
                         if (oldAbilityResult is null or FalseAbilityIdFalseUnion) return;
-                        AbilityId oldAbility =
+                        var oldAbility =
                             ((AbilityIdAbilityIdFalseUnion)oldAbilityResult).AbilityId;
 
                         if (target.IsAlly(source))
@@ -159,7 +159,7 @@ public partial record Abilities
                         }
                         else
                         {
-                            Ability? oldAbilityData =
+                            var oldAbilityData =
                                 battle.Library.Abilities.GetValueOrDefault(oldAbility);
                             battle.Add("-activate", target, "ability: Wandering Spirit",
                                 oldAbilityData?.Name ?? oldAbility.ToString(),
@@ -346,7 +346,7 @@ public partial record Abilities
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
                 {
                     if (source != null && target == source) return;
-                    bool showMsg = false;
+                    var showMsg = false;
                     if (boost.Atk is < 0)
                     {
                         boost.Atk = null;
@@ -407,7 +407,7 @@ public partial record Abilities
                     if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag ||
                         target.SwitchFlag == true)
                         return;
-                    foreach (Pokemon active in battle.Sides.SelectMany(side =>
+                    foreach (var active in battle.Sides.SelectMany(side =>
                                  side.Active.OfType<Pokemon>()))
                     {
                         active.SwitchFlag = false;
@@ -510,7 +510,7 @@ public partial record Abilities
                     // SkyDrop check would go here if we implemented that move
 
                     battle.Debug("Wonder Guard immunity: " + move.Id);
-                    MoveEffectiveness effectiveness = target.RunEffectiveness(move);
+                    var effectiveness = target.RunEffectiveness(move);
                     if (effectiveness.ToModifier() <= 0 || target.RunImmunity(move) != true)
                     {
                         if (move.SmartTarget == true)

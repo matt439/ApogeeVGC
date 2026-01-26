@@ -10,6 +10,7 @@ public partial record Abilities
 
     public Abilities(Library library)
     {
+
         _library = library;
         AbilitiesData = new ReadOnlyDictionary<AbilityId, Ability>(CreateAbilities());
     }

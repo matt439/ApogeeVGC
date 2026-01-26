@@ -1625,14 +1625,8 @@ public partial record Abilities
                 Name = "Teravolt",
                 Num = 164,
                 Rating = 3.0,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    battle.Add("-ability", pokemon, "Teravolt");
-                }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
-                {
-                    move.IgnoreAbility = true;
-                }),
+                OnStart = new OnStartEventInfo((battle, pokemon) => { battle.Add("-ability", pokemon, "Teravolt"); }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) => { move.IgnoreAbility = true; }),
             },
             [AbilityId.ThermalExchange] = new()
             {
@@ -1816,7 +1810,7 @@ public partial record Abilities
                     EffectState? toxicSpikesData =
                         side.GetSideConditionData(ConditionId.ToxicSpikes);
                     if (move.Category == MoveCategory.Physical && (toxicSpikesData == null ||
-                            (toxicSpikesData.Layers ?? 0) < 2))
+                                                                   (toxicSpikesData.Layers ?? 0) < 2))
                     {
                         battle.Add("-activate", target, "ability: Toxic Debris");
                         side.AddSideCondition(_library.Conditions[ConditionId.ToxicSpikes], target);
@@ -1958,14 +1952,8 @@ public partial record Abilities
                 Name = "Turboblaze",
                 Num = 163,
                 Rating = 3.0,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    battle.Add("-ability", pokemon, "Turboblaze");
-                }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
-                {
-                    move.IgnoreAbility = true;
-                }),
+                OnStart = new OnStartEventInfo((battle, pokemon) => { battle.Add("-ability", pokemon, "Turboblaze"); }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) => { move.IgnoreAbility = true; }),
             },
 
             // ==================== 'U' Abilities ====================

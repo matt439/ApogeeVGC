@@ -8,7 +8,6 @@ using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using static ApogeeVGC.Sim.BattleClasses.BattleActions;
@@ -41,7 +40,7 @@ public partial record Abilities
                     }
 
                     // Get the base move from library and convert to active move
-                    Move baseMove = battle.Library.Moves[move.Id];
+                    var baseMove = battle.Library.Moves[move.Id];
                     var newMove = baseMove.ToActiveMove();
                     newMove.HasBounced = true;
                     newMove.PranksterBoosted = false;
@@ -65,7 +64,7 @@ public partial record Abilities
                     }
 
                     // Get the base move from library and convert to active move
-                    Move baseMove = battle.Library.Moves[move.Id];
+                    var baseMove = battle.Library.Moves[move.Id];
                     var newMove = baseMove.ToActiveMove();
                     newMove.HasBounced = true;
                     newMove.PranksterBoosted = false;
@@ -115,11 +114,11 @@ public partial record Abilities
 
                         var hitTargets = move.HitTargets.ToList();
                         battle.SpeedSort(hitTargets);
-                        foreach (Pokemon pokemon in hitTargets)
+                        foreach (var pokemon in hitTargets)
                         {
                             if (pokemon != source)
                             {
-                                ItemFalseUnion yourItem = pokemon.TakeItem(source);
+                                var yourItem = pokemon.TakeItem(source);
                                 if (yourItem is not ItemItemFalseUnion { Item: var item }) continue;
                                 if (!source.SetItem(item.Id))
                                 {
@@ -254,7 +253,7 @@ public partial record Abilities
                 }, -1),
                 OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
                 {
-                    ConditionId terrain = battle.Field.Terrain;
+                    var terrain = battle.Field.Terrain;
                     var types = terrain switch
                     {
                         ConditionId.ElectricTerrain => [PokemonType.Electric],
@@ -340,7 +339,7 @@ public partial record Abilities
                 // OnModifySpAPriority = 5
                 OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
                 {
-                    foreach (Pokemon allyActive in pokemon.Allies())
+                    foreach (var allyActive in pokemon.Allies())
                     {
                         if (allyActive.HasAbility(AbilityId.Minus) ||
                             allyActive.HasAbility(AbilityId.Plus))
@@ -366,12 +365,12 @@ public partial record Abilities
                     if (source == null || target == source ||
                         effect.EffectStateId == AbilityId.MirrorArmor) return;
 
-                    foreach (BoostId b in Enum.GetValues<BoostId>())
+                    foreach (var b in Enum.GetValues<BoostId>())
                     {
-                        int? boostValue = boost.GetBoost(b);
+                        var boostValue = boost.GetBoost(b);
                         if (boostValue is < 0)
                         {
-                            int targetBoost = target.Boosts.GetBoost(b);
+                            var targetBoost = target.Boosts.GetBoost(b);
                             if (targetBoost == -6) continue;
 
                             var negativeBoost = new SparseBoostsTable();
@@ -407,10 +406,7 @@ public partial record Abilities
                 {
                     battle.Add("-ability", pokemon, "Mold Breaker");
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
-                {
-                    move.IgnoreAbility = true;
-                }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) => { move.IgnoreAbility = true; }),
             },
             [AbilityId.Moody] = new()
             {
@@ -425,7 +421,7 @@ public partial record Abilities
                     var boost = new SparseBoostsTable();
 
                     // Find stats that can be raised (not at +6)
-                    foreach (BoostId stat in Enum.GetValues<BoostId>())
+                    foreach (var stat in Enum.GetValues<BoostId>())
                     {
                         if (stat is BoostId.Accuracy or BoostId.Evasion) continue;
                         if (pokemon.Boosts.GetBoost(stat) < 6)
@@ -444,7 +440,7 @@ public partial record Abilities
 
                     // Find stats that can be lowered (not at -6, and not the one we just raised)
                     List<BoostId> statsToLower = [];
-                    foreach (BoostId stat in Enum.GetValues<BoostId>())
+                    foreach (var stat in Enum.GetValues<BoostId>())
                     {
                         if (stat is BoostId.Accuracy or BoostId.Evasion) continue;
                         if (pokemon.Boosts.GetBoost(stat) > -6 && stat != randomStatPlus)
@@ -475,7 +471,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Electric)
                     {
-                        BoolZeroUnion? boostResult =
+                        var boostResult =
                             battle.Boost(new SparseBoostsTable { Spe = 1 });
                         if (boostResult is ZeroBoolZeroUnion)
                         {
@@ -548,7 +544,7 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
                 {
-                    Ability sourceAbility = source.GetAbility();
+                    var sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.CantSuppress == true ||
                         sourceAbility.Id == AbilityId.Mummy)
                     {
@@ -557,16 +553,16 @@ public partial record Abilities
 
                     if (battle.CheckMoveMakesContact(move, source, target, !source.IsAlly(target)))
                     {
-                        AbilityIdFalseUnion? oldAbilityResult =
+                        var oldAbilityResult =
                             source.SetAbility(AbilityId.Mummy, target);
                         if (oldAbilityResult is AbilityIdAbilityIdFalseUnion
                             {
                                 AbilityId: var oldAbilityId,
                             })
                         {
-                            string oldAbilityName =
+                            var oldAbilityName =
                                 battle.Library.Abilities.TryGetValue(oldAbilityId,
-                                    out Ability? oldAbilityData)
+                                    out var oldAbilityData)
                                     ? oldAbilityData.Name
                                     : oldAbilityId.ToString();
                             battle.Add("-activate", target, "ability: Mummy", oldAbilityName,
@@ -620,9 +616,9 @@ public partial record Abilities
                     if (pokemon.ShowCure is true or false) return;
 
                     List<Pokemon> cureList = [];
-                    int noCureCount = 0;
+                    var noCureCount = 0;
 
-                    foreach (Pokemon? curPoke in pokemon.Side.Active)
+                    foreach (var curPoke in pokemon.Side.Active)
                     {
                         // pokemon not statused
                         if (curPoke?.Status == ConditionId.None || curPoke == null)
@@ -635,9 +631,9 @@ public partial record Abilities
                             continue;
                         }
 
-                        Species species = curPoke.Species;
+                        var species = curPoke.Species;
                         // pokemon can't get Natural Cure
-                        bool canHaveNaturalCure =
+                        var canHaveNaturalCure =
                             species.Abilities.Slot0 == AbilityId.NaturalCure ||
                             species.Abilities.Slot1 == AbilityId.NaturalCure ||
                             species.Abilities.Hidden == AbilityId.NaturalCure;
@@ -672,7 +668,7 @@ public partial record Abilities
                     if (cureList.Count == 0 || noCureCount == 0)
                     {
                         // It's possible to know what pokemon were cured
-                        foreach (Pokemon pkmn in cureList)
+                        foreach (var pkmn in cureList)
                         {
                             pkmn.ShowCure = true;
                         }
@@ -681,11 +677,11 @@ public partial record Abilities
                     {
                         // It's not possible to know what pokemon were cured
                         // Unlike a -hint, this is real information that battlers need, so we use a -message
-                        string plural = cureList.Count == 1 ? "was" : "were";
+                        var plural = cureList.Count == 1 ? "was" : "were";
                         battle.Add("-message",
                             $"({cureList.Count} of {pokemon.Side.Name}'s pokemon {plural} cured by Natural Cure.)");
 
-                        foreach (Pokemon pkmn in cureList)
+                        foreach (var pkmn in cureList)
                         {
                             pkmn.ShowCure = false;
                         }
@@ -757,7 +753,7 @@ public partial record Abilities
                         AbilityId.DeltaStream,
                     ];
 
-                    foreach (Pokemon target in battle.GetAllActive())
+                    foreach (var target in battle.GetAllActive())
                     {
                         if (target.HasItem(ItemId.AbilityShield))
                         {
@@ -773,7 +769,7 @@ public partial record Abilities
 
                         if (target.Illusion != null)
                         {
-                            Ability illusionAbility = battle.Library.Abilities[AbilityId.Illusion];
+                            var illusionAbility = battle.Library.Abilities[AbilityId.Illusion];
                             battle.SingleEvent(EventId.End, illusionAbility, target.AbilityState,
                                 target, pokemon);
                         }
@@ -783,7 +779,7 @@ public partial record Abilities
 
                         if (Array.Exists(strongWeathers, w => w == target.GetAbility().Id))
                         {
-                            Ability targetAbility = target.GetAbility();
+                            var targetAbility = target.GetAbility();
                             battle.SingleEvent(EventId.End, targetAbility, target.AbilityState,
                                 target, pokemon);
                         }
@@ -792,10 +788,10 @@ public partial record Abilities
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    Pokemon source = psfp.Pokemon;
+                    var source = psfp.Pokemon;
                     if (source.Transformed) return;
 
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (var pokemon in battle.GetAllActive())
                     {
                         if (pokemon != source && pokemon.HasAbility(AbilityId.NeutralizingGas))
                         {
@@ -811,11 +807,11 @@ public partial record Abilities
 
                     var sortedActive = battle.GetAllActive().ToList();
                     battle.SpeedSort(sortedActive);
-                    foreach (Pokemon pokemon in sortedActive)
+                    foreach (var pokemon in sortedActive)
                     {
                         if (pokemon != source)
                         {
-                            Ability ability = pokemon.GetAbility();
+                            var ability = pokemon.GetAbility();
                             if (ability.Flags.CantSuppress == true) continue;
                             if (pokemon.HasItem(ItemId.AbilityShield)) continue;
                             // Will be suppressed by Pokemon.IgnoringAbility if needed
@@ -962,13 +958,13 @@ public partial record Abilities
                         effect.EffectStateId == ItemId.MirrorHerb) return;
                     battle.EffectState.Boosts ??= new SparseBoostsTable();
 
-                    SparseBoostsTable boostPlus = battle.EffectState.Boosts;
-                    foreach (BoostId stat in Enum.GetValues<BoostId>())
+                    var boostPlus = battle.EffectState.Boosts;
+                    foreach (var stat in Enum.GetValues<BoostId>())
                     {
-                        int? boostValue = boost.GetBoost(stat);
+                        var boostValue = boost.GetBoost(stat);
                         if (boostValue is > 0)
                         {
-                            int existing = boostPlus.GetBoost(stat) ?? 0;
+                            var existing = boostPlus.GetBoost(stat) ?? 0;
                             boostPlus.SetBoost(stat, existing + boostValue.Value);
                         }
                     }
@@ -1051,7 +1047,7 @@ public partial record Abilities
                 // OnModifyAtkPriority = 5
                 OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
                 {
-                    ConditionId weather = pokemon.EffectiveWeather();
+                    var weather = pokemon.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.Debug("Orichalcum boost");

@@ -135,8 +135,8 @@ public partial record Abilities
                 //OnBasePowerPriority = 21,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, pokemon, _, _) =>
                     {
-                        bool boosted = true;
-                        foreach (Pokemon target in battle.GetAllActive())
+                        var boosted = true;
+                        foreach (var target in battle.GetAllActive())
                         {
                             if (target == pokemon) continue;
                             if (battle.Queue.WillMove(target) != null)
@@ -219,10 +219,10 @@ public partial record Abilities
                         if (source is null || source == target || target.Hp == 0) return;
                         if (move.TotalDamage is not IntIntFalseUnion totalDamage) return;
 
-                        Attacker? lastAttackedBy = target.GetLastAttackedBy();
+                        var lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;
 
-                        int damage = move.MultiHit != null && move.SmartTarget != true
+                        var damage = move.MultiHit != null && move.SmartTarget != true
                             ? totalDamage.Value
                             : lastAttackedBy.Damage;
 
@@ -481,10 +481,7 @@ public partial record Abilities
                 Num = 188,
                 Rating = 1.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    battle.Add("-ability", pokemon, "Aura Break");
-                }),
+                OnStart = new OnStartEventInfo((battle, pokemon) => { battle.Add("-ability", pokemon, "Aura Break"); }),
                 OnAnyTryPrimaryHit = new OnAnyTryPrimaryHitEventInfo((_, target, source, move) =>
                 {
                     if (target == source || move.Category == MoveCategory.Status)
@@ -503,7 +500,7 @@ public partial record Abilities
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     if (pokemon.Hp == 0) return;
-                    foreach (Pokemon target in pokemon.Foes())
+                    foreach (var target in pokemon.Foes())
                     {
                         if (target.Status == ConditionId.Sleep ||
                             target.HasAbility(AbilityId.Comatose))
@@ -633,7 +630,7 @@ public partial record Abilities
                     new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
                     {
                         if (effect is null || effect.EffectType != EffectType.Move) return;
-                        StatIdExceptHp bestStat = source.GetBestStat(true, true);
+                        var bestStat = source.GetBestStat(true, true);
                         var boostTable = new SparseBoostsTable();
                         boostTable.SetBoost(bestStat.ConvertToBoostId(), length);
                         battle.Boost(boostTable, source);
@@ -686,7 +683,7 @@ public partial record Abilities
                         var lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;
 
-                        int damage =
+                        var damage =
                             move.MultiHit != null && !(move.SmartTarget ?? false) &&
                             move.TotalDamage is IntIntFalseUnion totalDmg
                                 ? totalDmg.Value
@@ -819,7 +816,7 @@ public partial record Abilities
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
                 {
                     if (source != null && target == source) return;
-                    bool showMsg = false;
+                    var showMsg = false;
 
                     // Check and remove all negative boosts
                     if (boost.Atk is not null && boost.Atk < 0)
@@ -907,7 +904,7 @@ public partial record Abilities
                     new OnAfterMoveSecondaryEventInfo((battle, target, _, move) =>
                     {
                         if (target.Hp == 0) return;
-                        MoveType type = move.Type;
+                        var type = move.Type;
                         if (target.IsActive &&
                             move.EffectType == EffectType.Move &&
                             move.Category != MoveCategory.Status &&
@@ -921,7 +918,7 @@ public partial record Abilities
                             // Curse Glitch for doubles (when in position 1)
                             if (target.Side.Active.Count == 2 && target.Position == 1)
                             {
-                                MoveAction? action = battle.Queue.WillMove(target);
+                                var action = battle.Queue.WillMove(target);
                                 if (action is { Move.Id: MoveId.Curse })
                                 {
                                     action.TargetLoc = -1;
@@ -945,10 +942,7 @@ public partial record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    battle.Add("-ability", pokemon, "Comatose");
-                }),
+                OnStart = new OnStartEventInfo((battle, pokemon) => { battle.Add("-ability", pokemon, "Comatose"); }),
                 OnSetStatus = new OnSetStatusEventInfo((battle, _, target, _, effect) =>
                 {
                     if (effect is ActiveMove { Status: not null })
@@ -1000,10 +994,10 @@ public partial record Abilities
                     {
                         if (source == null || target.IsAlly(source)) return;
 
-                        bool statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
-                                            || boost.SpD is < 0 || boost.Spe is < 0 ||
-                                            boost.Accuracy is < 0
-                                            || boost.Evasion is < 0;
+                        var statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
+                                           || boost.SpD is < 0 || boost.Spe is < 0 ||
+                                           boost.Accuracy is < 0
+                                           || boost.Evasion is < 0;
 
                         if (statsLowered)
                         {
@@ -1063,7 +1057,7 @@ public partial record Abilities
                 // OnSwitchInPriority = -2
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    Pokemon? ally = pokemon.Allies().FirstOrDefault();
+                    var ally = pokemon.Allies().FirstOrDefault();
                     if (ally == null) return;
 
                     // Copy all boosts from ally
@@ -1082,24 +1076,24 @@ public partial record Abilities
                     ];
 
                     // Remove existing volatiles first
-                    foreach (ConditionId volatileId in volatilesToCopy)
+                    foreach (var volatileId in volatilesToCopy)
                     {
-                        if (pokemon.Volatiles.TryGetValue(volatileId, out EffectState? _))
+                        if (pokemon.Volatiles.TryGetValue(volatileId, out _))
                         {
                             pokemon.RemoveVolatile(battle.Library.Conditions[volatileId]);
                         }
                     }
 
                     // Copy volatiles from ally
-                    foreach (ConditionId volatileId in volatilesToCopy)
+                    foreach (var volatileId in volatilesToCopy)
                     {
-                        if (ally.Volatiles.TryGetValue(volatileId, out EffectState? @volatile))
+                        if (ally.Volatiles.TryGetValue(volatileId, out var @volatile))
                         {
                             pokemon.AddVolatile(volatileId);
                             // Copy layers/special data if needed
                             if (volatileId == ConditionId.DragonCheer &&
                                 pokemon.Volatiles.TryGetValue(volatileId,
-                                    out EffectState? arg2Volatile))
+                                    out var arg2Volatile))
                             {
                                 arg2Volatile.HasDragonType =
                                     @volatile.HasDragonType;
@@ -1118,8 +1112,8 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, _, _) =>
                 {
-                    bool activated = false;
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    var activated = false;
+                    foreach (var pokemon in battle.GetAllActive())
                     {
                         if (pokemon == target || pokemon.Fainted) continue;
                         if (!activated)
@@ -1142,8 +1136,8 @@ public partial record Abilities
                 OnEatItem = new OnEatItemEventInfo((battle, item, _, _, effect) =>
                 {
                     // Only trigger for berries that weren't stolen by Bug Bite or Pluck
-                    bool isStolenBerry = effect is ActiveMove move &&
-                                         (move.Id == MoveId.BugBite || move.Id == MoveId.Pluck);
+                    var isStolenBerry = effect is ActiveMove move &&
+                                        (move.Id == MoveId.BugBite || move.Id == MoveId.Pluck);
 
                     if (item.IsBerry && !isStolenBerry)
                     {
@@ -1163,7 +1157,7 @@ public partial record Abilities
                     battle.EffectState.Counter--;
                     if (battle.EffectState.Counter <= 0)
                     {
-                        Item? item = battle.EffectState.Berry;
+                        var item = battle.EffectState.Berry;
                         battle.Add("-activate", pokemon, "ability: Cud Chew");
                         battle.Add("-enditem", pokemon, item.Name, "[eat]");
 
@@ -1192,7 +1186,7 @@ public partial record Abilities
                 Rating = 0.0, // Only useful in Doubles
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (Pokemon ally in pokemon.AdjacentAllies())
+                    foreach (var ally in pokemon.AdjacentAllies())
                     {
                         ally.ClearBoosts();
                         battle.Add("-clearboost", ally, "[from] ability: Curious Medicine",
@@ -1256,11 +1250,11 @@ public partial record Abilities
         if (battle.GameType != GameType.Doubles) return;
 
         // Don't run between when a Pokemon switches in and the resulting onSwitchIn event
-        IAction? peek = battle.Queue.Peek();
+        var peek = battle.Queue.Peek();
         if (peek?.Choice == ActionId.RunSwitch) return;
 
         var allies = pokemon.Allies().ToList();
-        Pokemon? ally = allies.FirstOrDefault();
+        var ally = allies.FirstOrDefault();
         if (pokemon.SwitchFlag.IsTrue() || ally?.SwitchFlag.IsTrue() == true) return;
 
         if (ally == null ||
