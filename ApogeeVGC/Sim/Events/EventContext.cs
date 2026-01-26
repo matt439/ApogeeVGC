@@ -51,6 +51,11 @@ public sealed class EventContext
     public Pokemon? SourcePokemon { get; init; }
   
     /// <summary>
+    /// Source type (for type-specific events like Effectiveness).
+    /// </summary>
+    public PokemonType? SourceType { get; init; }
+  
+    /// <summary>
     /// Source effect (ability, item, move, condition, etc. that triggered this event).
     /// </summary>
     public IEffect? SourceEffect { get; init; }

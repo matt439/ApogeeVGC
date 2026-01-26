@@ -48,6 +48,11 @@ internal sealed class EventInvocationContext
            PokemonSingleEventSource p => p.Pokemon,
        _ => null
       },
+  SourceType = Source switch
+      {
+          PokemonTypeSingleEventSource t => t.Type,
+          _ => null
+      },
   SourceEffect = SourceEffect,
     Move = SourceEffect as Moves.ActiveMove,
  RelayVar = RelayVar

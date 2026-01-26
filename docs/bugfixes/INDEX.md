@@ -14,6 +14,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix) - ConditionIdRelayVar not converted to PokemonTypeConditionIdUnion
 - [Condition to Ability Cast Fix](#condition-to-ability-cast-fix) - InvalidCastException when trying to cast Condition to Ability
 - [ModifyAccuracy Event Parameter Nullability Fix](#modifyaccuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves
+- [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -716,6 +717,41 @@ When documenting a new bug fix:
 - TypeScript `true` (always hit) ? C# `null`
 
 **Keywords**: `ModifyAccuracy`, `accuracy`, `nullable`, `int?`, `Hustle`, `event parameter`, `type mismatch`, `BoolRelayVar`, `always-hit moves`
+
+---
+
+### Effectiveness Event PokemonType Parameter Fix
+**File**: `EffectivenessEventPokemonTypeParameterFix.md`  
+**Severity**: High  
+**Systems Affected**: Effectiveness event handlers (items like Iron Ball, abilities that modify type matchups)
+
+**Problem**: When Iron Ball item's Effectiveness event handler was invoked during type effectiveness calculation, the event system crashed with `InvalidOperationException: Event Effectiveness: Parameter 3 (PokemonType _) is non-nullable but no matching value found in context`.
+
+**Root Cause**: The Effectiveness event is called from `Pokemon.RunEffectiveness` with a `PokemonType` as the event source to represent the type being checked for effectiveness. While `RunEventSource` and `SingleEventSource` both supported `PokemonType` through their respective type source records (`TypeRunEventSource` and `PokemonTypeSingleEventSource`), the event context system wasn't properly handling it:
+1. `Battle.RunEvent` wasn't converting `TypeRunEventSource` to `PokemonTypeSingleEventSource`
+2. `EventContext` had no field for `SourceType`
+3. `EventInvocationContext.ToEventContext` wasn't extracting `PokemonType` from the source
+4. `EventHandlerAdapter.ResolveParameter` had no logic to resolve `PokemonType` parameters
+
+**Solution**:
+- Added `SourceType` property to `EventContext` to hold `PokemonType` sources
+- Updated `Battle.RunEvent` to convert `TypeRunEventSource` ? `PokemonTypeSingleEventSource`
+- Updated `EventInvocationContext.ToEventContext` to extract `PokemonType` from `PokemonTypeSingleEventSource`
+- Added `PokemonType` resolution logic to `EventHandlerAdapter.ResolveParameter`
+
+**Handler Example** (Iron Ball):
+```csharp
+OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, type, move) =>
+{
+    if (move.Type == MoveType.Ground && target.HasType(PokemonType.Flying))
+        return 0; // Ground moves hit Flying-types holding Iron Ball
+    return typeMod;
+}),
+```
+
+**Impact**: Effectiveness event handlers can now properly receive and use the `PokemonType` parameter to modify type matchup calculations.
+
+**Keywords**: `Effectiveness`, `type effectiveness`, `PokemonType`, `Iron Ball`, `event parameter`, `event source`, `TypeRunEventSource`, `parameter resolution`, `type matchup`
 
 ---
 

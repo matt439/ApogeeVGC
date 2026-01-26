@@ -279,6 +279,7 @@ public partial class Battle
             {
                 PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource
                     .Pokemon),
+                TypeRunEventSource typeSource => new PokemonTypeSingleEventSource(typeSource.Type),
                 _ => null,
             },
             Effect = sourceEffect,

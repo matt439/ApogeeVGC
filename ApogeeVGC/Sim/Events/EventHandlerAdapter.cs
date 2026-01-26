@@ -182,6 +182,12 @@ internal static class EventHandlerAdapter
             return context.Move;
         }
 
+        // Add support for PokemonType
+        if (paramType == typeof(PokemonType) || typeof(PokemonType).IsAssignableFrom(paramType))
+        {
+            return context.SourceType;
+        }
+
         // Check for PokemonSideFieldUnion types
         if (paramType == typeof(PokemonSideFieldUnion) || typeof(PokemonSideFieldUnion).IsAssignableFrom(paramType))
         {
