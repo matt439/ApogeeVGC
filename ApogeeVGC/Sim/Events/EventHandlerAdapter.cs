@@ -444,6 +444,10 @@ internal static class EventHandlerAdapter
             MoveIdMoveIdVoidUnion moveIdVoid => new MoveIdRelayVar(moveIdVoid.MoveId),
             VoidMoveIdVoidUnion => new VoidReturnRelayVar(),
 
+            // VoidFalseUnion -> VoidReturn or false
+            VoidVoidFalseUnion => new VoidReturnRelayVar(),
+            FalseVoidFalseUnion => new BoolRelayVar(false),
+
             // Primitive types
             bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),

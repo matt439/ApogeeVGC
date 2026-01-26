@@ -22,6 +22,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - Multiple stat handlers returning VoidReturn instead of int
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Incorrect nullability constraints on stat modification parameters
 - [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
+- [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix) - VoidVoidFalseUnion cannot be converted to RelayVar
 - [Union Type Handling Guide](#union-type-handling-guide) - Comprehensive guide for preventing union type issues
 
 ### Move Mechanics
@@ -313,6 +314,25 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### VoidFalseUnion Return Conversion Fix
+**File**: `VoidFalseUnionReturnConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: Move-blocking conditions (Throat Chop, Taunt, etc.), ModifyMove event handlers
+
+**Problem**: When a Pokemon with the Throat Chop condition tried to use a sound-based move, the battle crashed with `InvalidOperationException: Event ModifyMove: Unable to convert return value of type 'VoidVoidFalseUnion' to RelayVar`.
+
+**Root Cause**: The `ThroatChop` condition's `OnModifyMove` handler returns `VoidFalseUnion`, which can be either `VoidVoidFalseUnion` (VoidReturn, allow move) or `FalseVoidFalseUnion` (false, block move). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `VoidFalseUnion`.
+
+**Solution**: Added conversion cases for both variants of `VoidFalseUnion`:
+- `VoidVoidFalseUnion` ? `VoidReturnRelayVar` (no effect, allow move)
+- `FalseVoidFalseUnion` ? `BoolRelayVar(false)` (block move)
+
+**Semantic Meaning**: Following copilot instructions - `VoidReturn` = "no effect" (move proceeds), `false` = explicit block signal.
+
+**Keywords**: `Throat Chop`, `sound move`, `move blocking`, `VoidFalseUnion`, `ModifyMove event`, `event handler return`, `union type conversion`, `Taunt`, `Torment`, `Disable`
+
+---
+
 ### Union Type Handling Guide
 **File**: `UnionTypeHandlingGuide.md`  
 **Type**: Reference Guide  
@@ -443,6 +463,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Null parameter when non-nullable expected
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Primitive int instead of IntRelayVar
 - [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
+- [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix) - VoidVoidFalseUnion cannot be converted to RelayVar
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
