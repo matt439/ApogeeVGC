@@ -1116,23 +1116,23 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (100, "Ghost"),
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (FractionalPriorityHandler)((battle, priority, source, _) =>
+                (FractionalPriorityHandler)((battle, priority, pokemon, _) =>
+                {
+                    if (priority <= 0 &&
+                        (pokemon.Hp <= pokemon.MaxHp / 4 ||
+                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
+                          pokemon.HasAbility(AbilityId.Gluttony) &&
+                          pokemon.AbilityState.Gluttony == true)))
                     {
-                        if (priority <= 0 &&
-                            (source.Hp <= source.MaxHp / 4 ||
-                             (source.Hp <= source.MaxHp / 2 &&
-                              source.HasAbility(AbilityId.Gluttony) &&
-                              source.AbilityState.Gluttony == true)))
+                        if (pokemon.EatItem())
                         {
-                            if (source.EatItem())
-                            {
-                                battle.Add("-activate", source, "item: Custap Berry", "[consumed]");
-                                return DoubleVoidUnion.FromDouble(0.1);
-                            }
+                            battle.Add("-activate", pokemon, "item: Custap Berry", "[consumed]");
+                            return DoubleVoidUnion.FromDouble(0.1);
                         }
+                    }
 
-                        return DoubleVoidUnion.FromVoid();
-                    }), -2),
+                    return DoubleVoidUnion.FromVoid();
+                }), -2),
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
                 Num = 210,
                 Gen = 4,
