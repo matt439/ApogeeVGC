@@ -32,7 +32,7 @@ public record MoveAction : IAction
             {
                 case IntIntFalseUnion iifu:
                     int i = iifu.Value;
-                    if (i is 3 or 5 or 200 or 201 or 199 or 106)
+                    if (i is 3 or 5 or 200 or 201 or 199 or 106 or 107)
                     {
                         field = i;
                     }
