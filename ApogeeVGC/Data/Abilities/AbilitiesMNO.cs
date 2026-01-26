@@ -938,7 +938,7 @@ public partial record Abilities
                 }),
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
+                    if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
                         battle.Add("-fail", target, "unboost", "Attack",
@@ -1147,7 +1147,7 @@ public partial record Abilities
                 }),
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
+                    if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
                         battle.Add("-fail", target, "unboost", "Attack",
