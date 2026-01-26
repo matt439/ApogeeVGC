@@ -386,6 +386,10 @@ internal static class EventHandlerAdapter
             BoolBoolUndefinedUnion boolUndef => new BoolRelayVar(boolUndef.Value),
             UndefinedBoolUndefinedUnion => new UndefinedRelayVar(),
 
+            // PokemonVoidUnion -> Pokemon or VoidReturn
+            PokemonPokemonVoidUnion pokemonVoid => new PokemonRelayVar(pokemonVoid.Pokemon),
+            VoidPokemonVoidUnion => new VoidReturnRelayVar(),
+
             // Primitive types
             bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),
