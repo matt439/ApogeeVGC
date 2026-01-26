@@ -644,7 +644,8 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamage = new OnDamageEventInfo((battle, damage, _, source, effect) =>
                 {
-                    if (effect.EffectType == EffectType.Move &&
+                    if (effect != null &&
+                        effect.EffectType == EffectType.Move &&
                         effect is Move { MultiHit: null } move &&
                         !(move.HasSheerForce == true && source != null &&
                           source.HasAbility(AbilityId.SheerForce)))
