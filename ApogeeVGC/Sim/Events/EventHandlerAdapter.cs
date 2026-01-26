@@ -202,6 +202,25 @@ internal static class EventHandlerAdapter
             }
         }
 
+        // Check for PokemonTypeConditionIdUnion
+        if (paramType == typeof(PokemonTypeConditionIdUnion))
+        {
+            if (context.HasRelayVar)
+            {
+                // Handle ConditionIdRelayVar -> PokemonTypeConditionIdUnion
+                if (context.RelayVar is ConditionIdRelayVar conditionIdVar && conditionIdVar.Id.HasValue)
+                {
+                    return new PokemonTypeConditionIdUnion(conditionIdVar.Id.Value);
+                }
+                
+                // Handle PokemonTypeRelayVar -> PokemonTypeConditionIdUnion
+                if (context.RelayVar is PokemonTypeRelayVar pokemonTypeVar)
+                {
+                    return new PokemonTypeConditionIdUnion(pokemonTypeVar.Type);
+                }
+            }
+        }
+
         if (typeof(IEffect).IsAssignableFrom(paramType))
         {
             return context.SourceEffect;

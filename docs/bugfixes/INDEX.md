@@ -11,6 +11,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Trick Room Bug Fix](#trick-room-bug-fix) - Field event handlers not mapped/invoked
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue) - Move event handlers not mapped
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Int passed to RunEvent instead of IntRelayVar
+- [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix) - ConditionIdRelayVar not converted to PokemonTypeConditionIdUnion
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -446,6 +447,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Protect Bug Fix](#protect-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
 - [Trick Room Bug Fix](#trick-room-bug-fix)
+- [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix)
 
 **EventHandlerInfoMapper.cs**:
 - [Trick Room Bug Fix](#trick-room-bug-fix)
@@ -794,6 +796,44 @@ When documenting a new bug fix:
 **Impact**: Enables all moves with `OnBasePower` handlers to execute correctly and allows multiple handlers to chain properly for any event using the ChainModify() + VoidReturn pattern.
 
 **Keywords**: `Facade`, `BasePower`, `event parameter`, `RelayVar`, `IntRelayVar`, `VoidReturn`, `VoidReturnRelayVar`, `EventHandlerAdapter`, `parameter resolution`, `non-nullable`, `type mismatch`, `GetDamage`, `RunEvent`, `damage calculation`, `handler chaining`, `ChainModify`
+
+---
+
+### Immunity Event Parameter Conversion Fix
+**File**: `ImmunityEventParameterConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: Weather effects with immunity handlers, condition immunity checks, event parameter resolution
+
+**Problem**: When weather (e.g., Sunny Day) with immunity handlers was active and a move tried to apply a volatile status, the battle crashed with `Event Immunity adapted handler failed on effect SunnyDay (Weather)` and inner exception `Parameter 1 (PokemonTypeConditionIdUnion type) is non-nullable but no matching value found in context`.
+
+**Root Cause**: The `EventHandlerAdapter.ResolveParameter` method didn't know how to convert a `ConditionIdRelayVar` (or `PokemonTypeRelayVar`) into a `PokemonTypeConditionIdUnion` parameter type. When `Pokemon.RunStatusImmunity` called `RunEvent` with a `ConditionId?`, it was implicitly converted to `ConditionIdRelayVar` but the adapter couldn't extract it for the handler's `PokemonTypeConditionIdUnion` parameter.
+
+**Solution**: Added logic to `EventHandlerAdapter.ResolveParameter` to handle the conversion:
+```csharp
+if (paramType == typeof(PokemonTypeConditionIdUnion))
+{
+    if (context.HasRelayVar)
+    {
+        // Handle ConditionIdRelayVar -> PokemonTypeConditionIdUnion
+        if (context.RelayVar is ConditionIdRelayVar conditionIdVar && conditionIdVar.Id.HasValue)
+        {
+            return new PokemonTypeConditionIdUnion(conditionIdVar.Id.Value);
+        }
+        
+        // Handle PokemonTypeRelayVar -> PokemonTypeConditionIdUnion
+        if (context.RelayVar is PokemonTypeRelayVar pokemonTypeVar)
+        {
+            return new PokemonTypeConditionIdUnion(pokemonTypeVar.Type);
+        }
+    }
+}
+```
+
+**Union Type Context**: `PokemonTypeConditionIdUnion` is used for immunity checks because immunity can apply to either type immunity (e.g., Ground moves vs Flying) or condition immunity (e.g., Freeze immunity in Sunny Day). The union allows a single `OnImmunity` handler signature to check both.
+
+**Pattern**: Similar parameter conversion issues may exist for other union types. If you see "Parameter X is non-nullable but no matching value found in context" errors, check if the RelayVar type needs explicit conversion logic in `EventHandlerAdapter.ResolveParameter`.
+
+**Keywords**: `immunity`, `weather`, `SunnyDay`, `OnImmunity`, `PokemonTypeConditionIdUnion`, `ConditionIdRelayVar`, `EventHandlerAdapter`, `parameter conversion`, `union type`, `status immunity`, `RelayVar unwrapping`
 
 ---
 
