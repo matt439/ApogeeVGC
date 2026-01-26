@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
@@ -189,7 +190,8 @@ public partial record Moves
                     Dance = true,
                     Metronome = true,
                 },
-                SelfBoost = new SparseBoostsTable
+                // TS uses boosts with target: "self", so Boosts is correct here (not SelfBoost)
+                Boosts = new SparseBoostsTable
                 {
                     Atk = 1,
                     Def = 1,
@@ -349,8 +351,85 @@ public partial record Moves
                     Metronome = true,
                     PledgeCombo = true,
                 },
-                // Note: Pledge combo mechanics (combining with Fire/Grass Pledge) are not implemented
-                // as they require complex queue manipulation and are rarely used in VGC
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                {
+                    // Check if this is being called as part of a pledge combo
+                    if (move.SourceEffect is MoveEffectStateId
+                        {
+                            MoveId: MoveId.FirePledge or MoveId.GrassPledge
+                        })
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-combine");
+                        }
+
+                        return 150;
+                    }
+
+                    return move.BasePower;
+                }),
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
+                {
+                    // Check the battle queue for ally Pokémon using Fire Pledge or Grass Pledge
+                    if (battle.Queue.List != null)
+                    {
+                        foreach (var action in battle.Queue.List)
+                        {
+                            if (action is not MoveAction moveAction ||
+                                moveAction.Move == null ||
+                                moveAction.Pokemon?.IsActive != true ||
+                                moveAction.Pokemon.Fainted)
+                            {
+                                continue;
+                            }
+
+                            // Check if it's an ally using Fire Pledge or Grass Pledge
+                            if (moveAction.Pokemon.IsAlly(source) &&
+                                moveAction.Move.Id is MoveId.FirePledge or MoveId.GrassPledge)
+                            {
+                                battle.Queue.PrioritizeAction(moveAction, move);
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-waiting", source, moveAction.Pokemon);
+                                }
+
+                                return null;
+                            }
+                        }
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                {
+                    // Check if this move is being modified by a pledge combo
+                    // TODO: ForceStab and SideCondition are init-only properties, so they cannot be
+                    // set at runtime. The current implementation using move.Self.SideCondition is a
+                    // workaround but applies to wrong side. The proper fix requires making these
+                    // properties settable or restructuring how pledge combos work.
+                    // For VGC, pledge combos are rarely used, so this is low priority.
+                    if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.GrassPledge })
+                    {
+                        // Grass Pledge + Water Pledge = Grass-type move with Grass Pledge side condition (swamp)
+                        move.Type = MoveType.Grass;
+                        // TypeScript: move.sideCondition = 'grasspledge' (applies to target side)
+                        move.Self = new SecondaryEffect
+                        {
+                            SideCondition = ConditionId.GrassPledge,
+                        };
+                    }
+                    else if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.FirePledge })
+                    {
+                        // Fire Pledge + Water Pledge = Water-type move with Water Pledge side condition (rainbow)
+                        move.Type = MoveType.Water;
+                        // TypeScript: move.self = { sideCondition: 'waterpledge' } (applies to user's side)
+                        move.Self = new SecondaryEffect
+                        {
+                            SideCondition = ConditionId.WaterPledge,
+                        };
+                    }
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
@@ -600,12 +679,17 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, target) =>
                 {
-                    var weather = battle.Field.EffectiveWeather();
-                    if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
+                    // TS: if (target && ['raindance', 'primordialsea'].includes(target.effectiveWeather()))
+                    // Use target's effective weather (accounts for Utility Umbrella)
+                    if (target != null)
                     {
-                        move.Accuracy = IntTrueUnion.FromTrue();
+                        var weather = target.EffectiveWeather();
+                        if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
+                        {
+                            move.Accuracy = IntTrueUnion.FromTrue();
+                        }
                     }
                 }),
                 Secondary = new SecondaryEffect

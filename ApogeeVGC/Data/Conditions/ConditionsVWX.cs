@@ -50,6 +50,7 @@ public partial record Conditions
                     }
                 }),
                 // Double secondary effect chances for moves
+                // Note: Secret Power exception is omitted since it's not a Gen 9 move (isNonstandard: "Past")
                 // Skip Serene Grace + Flinch interaction
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
