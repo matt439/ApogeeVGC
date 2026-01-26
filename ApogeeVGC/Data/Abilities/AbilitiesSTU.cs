@@ -856,7 +856,7 @@ public partial record Abilities
                 Num = 100,
                 Rating = -1.0,
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((_, _, _, _, _) => -0.1), -1),
+                    (FractionalPriorityHandler)((_, _, _, _) => -0.1), -1),
             },
             [AbilityId.Stalwart] = new()
             {

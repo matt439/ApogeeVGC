@@ -516,7 +516,7 @@ public partial record Items
                 SpriteNum = 373,
                 Fling = new FlingData { BasePower = 80 },
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((battle, priority, pokemon, _, move) =>
+                    (FractionalPriorityHandler)((battle, priority, pokemon, move) =>
                     {
                         if (move.Category == MoveCategory.Status &&
                             pokemon.HasAbility(AbilityId.MyceliumMight))

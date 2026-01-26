@@ -194,7 +194,7 @@ public partial record Items
                 SpriteNum = 237,
                 Fling = new FlingData { BasePower = 10 },
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((_, _, _, _, _) =>
+                    (FractionalPriorityHandler)((_, _, _, _) =>
                         DoubleVoidUnion.FromDouble(-0.1))),
                 Num = 279,
                 Gen = 4,

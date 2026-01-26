@@ -580,7 +580,7 @@ public partial record Abilities
                 // OnFractionalPriorityPriority = -1
                 OnFractionalPriority =
                     new OnFractionalPriorityEventInfo(
-                        (ModifierSourceMoveHandler)((_, _, _, _, move) =>
+                        (FractionalPriorityHandler)((_, _, _, move) =>
                         {
                             if (move.Category == MoveCategory.Status)
                             {

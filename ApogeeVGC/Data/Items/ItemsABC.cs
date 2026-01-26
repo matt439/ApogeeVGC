@@ -1116,7 +1116,7 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (100, "Ghost"),
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((battle, priority, source, _, _) =>
+                    (FractionalPriorityHandler)((battle, priority, source, _) =>
                     {
                         if (priority <= 0 &&
                             (source.Hp <= source.MaxHp / 4 ||

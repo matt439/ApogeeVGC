@@ -799,7 +799,7 @@ public partial record Abilities
                 Rating = 2.5,
                 // OnFractionalPriorityPriority = -1
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((battle, _, pokemon, _, move) =>
+                    (FractionalPriorityHandler)((battle, _, pokemon, move) =>
                     {
                         if (move.Category != MoveCategory.Status && battle.RandomChance(3, 10))
                         {
