@@ -82,7 +82,7 @@ public partial record Moves
                 OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
                 {
                     if (pokemon.IgnoringItem()) return;
-                    Item item = pokemon.GetItem();
+                    var item = pokemon.GetItem();
                     if (item.Id != ItemId.None && item.OnPlate != null)
                     {
                         move.Type = (MoveType)item.OnPlate.Value;
@@ -110,10 +110,10 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
-                    int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
-                    IntFalseUnion healResult = battle.Heal(healAmount, target);
-                    bool success = healResult is not FalseIntFalseUnion;
-                    bool cured = target.CureStatus();
+                    var healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
+                    var healResult = battle.Heal(healAmount, target);
+                    var success = healResult is not FalseIntFalseUnion;
+                    var cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
                 }),
                 Secondary = null,
@@ -139,9 +139,9 @@ public partial record Moves
                 },
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, target, move) =>
                 {
-                    Item item = target.GetItem();
+                    var item = target.GetItem();
                     // Check if item can be taken (TakeItem event check)
-                    RelayVar? takeResult = battle.SingleEvent(Sim.Events.EventId.TakeItem, item,
+                    var takeResult = battle.SingleEvent(Sim.Events.EventId.TakeItem, item,
                         target.ItemState, target, target, move, item);
                     if (takeResult is BoolRelayVar { Value: false }) return basePower;
                     if (item.Id != ItemId.None)
@@ -156,7 +156,7 @@ public partial record Moves
                 {
                     if (source.Hp > 0)
                     {
-                        ItemFalseUnion takeResult = target.TakeItem();
+                        var takeResult = target.TakeItem();
                         if (takeResult is ItemItemFalseUnion takenItem)
                         {
                             battle.Add("-enditem", target, takenItem.Item.Name,
@@ -246,8 +246,8 @@ public partial record Moves
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
                 {
-                    int targetWeight = target.GetWeight();
-                    int bp = targetWeight switch
+                    var targetWeight = target.GetWeight();
+                    var bp = targetWeight switch
                     {
                         >= 2000 => 120,
                         >= 1000 => 100,
@@ -300,8 +300,8 @@ public partial record Moves
                 {
                     // Last Resort fails unless the user knows at least 2 moves
                     if (source.MoveSlots.Count < 2) return false;
-                    bool hasLastResort = false;
-                    foreach (MoveSlot moveSlot in source.MoveSlots)
+                    var hasLastResort = false;
+                    foreach (var moveSlot in source.MoveSlots)
                     {
                         if (moveSlot.Id == MoveId.LastResort)
                         {
@@ -337,7 +337,7 @@ public partial record Moves
                 },
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
                 {
-                    int bp = 50 + 50 * source.Side.TotalFainted;
+                    var bp = 50 + 50 * source.Side.TotalFainted;
                     battle.Debug($"BP: {bp}");
                     return bp;
                 }),
@@ -612,10 +612,10 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
-                    int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
-                    IntFalseUnion healResult = battle.Heal(healAmount, target);
-                    bool success = healResult is not FalseIntFalseUnion;
-                    bool cured = target.CureStatus();
+                    var healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
+                    var healResult = battle.Heal(healAmount, target);
+                    var success = healResult is not FalseIntFalseUnion;
+                    var cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
                 }),
                 Secondary = null,

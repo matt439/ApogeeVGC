@@ -11,7 +11,6 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils.Extensions;
-using MoveEventMethods = ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Moves;
@@ -2016,7 +2015,7 @@ public partial record Moves
                     if (lastDamagedBy is not { ThisTurn: true }) return false;
                     return new VoidReturn();
                 }),
-                OnModifyTarget = new MoveEventMethods.OnModifyTargetEventInfo((battle, targetRelayVar, source, _, _) =>
+                OnModifyTarget = new OnModifyTargetEventInfo((battle, targetRelayVar, source, _, _) =>
                 {
                     var lastDamagedBy = source.GetLastDamagedBy(true);
                     if (lastDamagedBy != null)

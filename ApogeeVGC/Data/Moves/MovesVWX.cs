@@ -1,9 +1,7 @@
 using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -37,8 +35,8 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((battle, _, target, _) =>
                 {
                     // Check if target will move with a priority move that isn't Status
-                    MoveAction? action = battle.Queue.WillMove(target);
-                    Move? move = action?.Move;
+                    var action = battle.Queue.WillMove(target);
+                    var move = action?.Move;
                     if (move is not { Priority: > 0 } || move.Category == MoveCategory.Status)
                     {
                         return false;
@@ -82,7 +80,7 @@ public partial record Moves
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
                 {
                     // Wake up all sleeping Pokemon on both sides
-                    foreach (Pokemon? pokemon in target.Side.Active)
+                    foreach (var pokemon in target.Side.Active)
                     {
                         if (pokemon?.Status == ConditionId.Sleep)
                         {
@@ -90,7 +88,7 @@ public partial record Moves
                         }
                     }
 
-                    foreach (Pokemon? pokemon in target.Side.Foe.Active)
+                    foreach (var pokemon in target.Side.Foe.Active)
                     {
                         if (pokemon?.Status == ConditionId.Sleep)
                         {
@@ -402,7 +400,7 @@ public partial record Moves
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    int bp = move.BasePower * source.Hp / source.MaxHp;
+                    var bp = move.BasePower * source.Hp / source.MaxHp;
                     battle.Debug($"[Water Spout] BP: {bp}");
                     return bp;
                 }),
@@ -467,7 +465,7 @@ public partial record Moves
                 },
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, _, _) =>
                 {
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    var weather = battle.Field.EffectiveWeather();
                     move.Type = weather switch
                     {
                         ConditionId.SunnyDay or ConditionId.DesolateLand => MoveType.Fire,
@@ -479,7 +477,7 @@ public partial record Moves
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
                 {
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    var weather = battle.Field.EffectiveWeather();
                     if (weather != ConditionId.None)
                     {
                         move.BasePower *= 2;
@@ -604,7 +602,7 @@ public partial record Moves
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
                 {
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    var weather = battle.Field.EffectiveWeather();
                     if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         move.Accuracy = IntTrueUnion.FromTrue();
@@ -827,7 +825,7 @@ public partial record Moves
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
                 {
                     // Fails if target's ability can't be suppressed
-                    Ability targetAbility = target.GetAbility();
+                    var targetAbility = target.GetAbility();
                     if (targetAbility.Flags.CantSuppress == true)
                     {
                         return false;
@@ -838,7 +836,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
                     // Set target's ability to Insomnia
-                    AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Insomnia, source);
+                    var oldAbility = target.SetAbility(AbilityId.Insomnia, source);
 
                     // Check for success - SetAbility returns the old AbilityId on success
                     if (oldAbility is AbilityIdAbilityIdFalseUnion)

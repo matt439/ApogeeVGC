@@ -1,6 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
@@ -171,8 +170,8 @@ public partial record Moves
                         return false;
                     }
 
-                    bool didSomething = false;
-                    foreach (BoolZeroUnion? unused in targets
+                    var didSomething = false;
+                    foreach (var unused in targets
                                  .Select(target =>
                                      battle.Boost(new SparseBoostsTable { Def = 1, SpD = 1 },
                                          target, source, move, isSecondary: false, isSelf: true))
@@ -320,7 +319,7 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((_, target, source, move) =>
                 {
-                    RelayVar result = target.AddVolatile(ConditionId.Trapped, source, move,
+                    var result = target.AddVolatile(ConditionId.Trapped, source, move,
                         ConditionId.Trapper);
                     return result is BoolRelayVar { Value: true } ? new VoidReturn() : false;
                 }),
@@ -457,12 +456,12 @@ public partial record Moves
                 DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
                 {
                     // Get the last attacker who damaged the user this turn
-                    Attacker? lastDamagedBy = pokemon.GetLastDamagedBy(true);
+                    var lastDamagedBy = pokemon.GetLastDamagedBy(true);
 
                     if (lastDamagedBy != null)
                     {
                         // Return 1.5x the damage taken, or 1 if calculation results in 0
-                        int damage = (int)(lastDamagedBy.Damage * 1.5);
+                        var damage = (int)(lastDamagedBy.Damage * 1.5);
                         return IntFalseUnion.FromInt(damage > 0 ? damage : 1);
                     }
 
@@ -473,7 +472,7 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((_, _, source, _) =>
                 {
                     // Find if any damage was taken this turn
-                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
+                    var lastDamagedBy = source.GetLastDamagedBy(true);
 
                     if (lastDamagedBy is not { ThisTurn: true })
                     {
@@ -484,10 +483,10 @@ public partial record Moves
                 }),
                 OnModifyTarget = new OnModifyTargetEventInfo((battle, relayTarget, source, _, _) =>
                 {
-                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
+                    var lastDamagedBy = source.GetLastDamagedBy(true);
                     if (lastDamagedBy != null)
                     {
-                        Pokemon? pok = battle.GetAtSlot(lastDamagedBy.PokemonSlot);
+                        var pok = battle.GetAtSlot(lastDamagedBy.PokemonSlot);
                         if (pok != null)
                         {
                             relayTarget.Target = pok;
@@ -581,7 +580,7 @@ public partial record Moves
                     // Boost SpA by 1 on charge turn
                     battle.Boost(new SparseBoostsTable { SpA = 1 }, attacker, attacker, move);
                     // Run ChargeMove event (for Power Herb, etc.)
-                    RelayVar? chargeResult =
+                    var chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -657,7 +656,7 @@ public partial record Moves
                     }
 
                     // Randomly select a move
-                    Move randomMove = battle.Sample(metronomeableMoves);
+                    var randomMove = battle.Sample(metronomeableMoves);
 
                     // Use the selected move
                     battle.Actions.UseMove(randomMove, target);
@@ -734,7 +733,7 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    Move? lastMove = target.LastMove;
+                    var lastMove = target.LastMove;
                     if (source.Transformed || lastMove == null ||
                         lastMove.Flags.FailMimic == true ||
                         source.Moves.Contains(lastMove.Id))
@@ -743,8 +742,8 @@ public partial record Moves
                     }
 
                     // Find the index of Mimic in source's move slots
-                    int mimicIndex = -1;
-                    for (int i = 0; i < source.MoveSlots.Count; i++)
+                    var mimicIndex = -1;
+                    for (var i = 0; i < source.MoveSlots.Count; i++)
                     {
                         if (source.MoveSlots[i].Id == MoveId.Mimic)
                         {
@@ -819,7 +818,7 @@ public partial record Moves
                 DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
                 {
                     if (!pokemon.Volatiles.TryGetValue(ConditionId.MirrorCoat,
-                            out EffectState? effectState))
+                            out var effectState))
                     {
                         return IntFalseUnion.FromInt(0);
                     }
@@ -833,7 +832,7 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((_, source, _, _) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.MirrorCoat,
-                            out EffectState? effectState))
+                            out var effectState))
                     {
                         return BoolEmptyVoidUnion.FromBool(false);
                     }
@@ -1008,87 +1007,87 @@ public partial record Moves
                     Metronome = true,
                 },
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
-                    {
-                        // Determine heal factor based on weather
-                        int numerator = 1;
-                        int denominator = 2; // Default 50%
-
-                        ConditionId weather = source.EffectiveWeather();
-                        if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
-                        {
-                            // 66.7% = 2/3
-                            numerator = 2;
-                            denominator = 3;
-                        }
-                        else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
-                                 or ConditionId.Sandstorm or ConditionId.Snowscape)
-                        {
-                            // 25% = 1/4
-                            numerator = 1;
-                            denominator = 4;
-                        }
-
-                        int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
-                        IntFalseUnion healResult = battle.Heal(healAmount, source);
-                        if (healResult is FalseIntFalseUnion)
-                        {
-                            battle.Add("-fail", source, "heal");
-                            return new Empty(); // NOT_FAIL - move worked but heal failed
-                        }
-
-                        return true; // Heal succeeded
-                    }),
-                    Secondary = null,
-                    Target = MoveTarget.Self,
-                    Type = MoveType.Fairy,
-                },
-                [MoveId.MorningSun] = new()
                 {
-                    Id = MoveId.MorningSun,
-                    Num = 234,
-                    Accuracy = IntTrueUnion.FromTrue(),
-                    BasePower = 0,
-                    Category = MoveCategory.Status,
-                    Name = "Morning Sun",
-                    BasePp = 5,
-                    Priority = 0,
-                    Flags = new MoveFlags
+                    // Determine heal factor based on weather
+                    var numerator = 1;
+                    var denominator = 2; // Default 50%
+
+                    var weather = source.EffectiveWeather();
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
-                        Snatch = true,
-                        Heal = true,
-                        Metronome = true,
-                    },
-                    OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                        // 66.7% = 2/3
+                        numerator = 2;
+                        denominator = 3;
+                    }
+                    else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
+                             or ConditionId.Sandstorm or ConditionId.Snowscape)
                     {
-                        // Determine heal factor based on weather
-                        int numerator = 1;
-                        int denominator = 2; // Default 50%
+                        // 25% = 1/4
+                        numerator = 1;
+                        denominator = 4;
+                    }
 
-                        ConditionId weather = source.EffectiveWeather();
-                        if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
-                        {
-                            // 66.7% = 2/3
-                            numerator = 2;
-                            denominator = 3;
-                        }
-                        else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
-                                 or ConditionId.Sandstorm or ConditionId.Snowscape)
-                        {
-                            // 25% = 1/4
-                            numerator = 1;
-                            denominator = 4;
-                        }
+                    var healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                    var healResult = battle.Heal(healAmount, source);
+                    if (healResult is FalseIntFalseUnion)
+                    {
+                        battle.Add("-fail", source, "heal");
+                        return new Empty(); // NOT_FAIL - move worked but heal failed
+                    }
 
-                        int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
-                        IntFalseUnion healResult = battle.Heal(healAmount, source);
-                        if (healResult is FalseIntFalseUnion)
-                        {
-                            battle.Add("-fail", source, "heal");
-                            return new Empty(); // NOT_FAIL - move worked but heal failed
-                        }
+                    return true; // Heal succeeded
+                }),
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Fairy,
+            },
+            [MoveId.MorningSun] = new()
+            {
+                Id = MoveId.MorningSun,
+                Num = 234,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Morning Sun",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Heal = true,
+                    Metronome = true,
+                },
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                {
+                    // Determine heal factor based on weather
+                    var numerator = 1;
+                    var denominator = 2; // Default 50%
 
-                        return true; // Heal succeeded
-                    }),
+                    var weather = source.EffectiveWeather();
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
+                    {
+                        // 66.7% = 2/3
+                        numerator = 2;
+                        denominator = 3;
+                    }
+                    else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
+                             or ConditionId.Sandstorm or ConditionId.Snowscape)
+                    {
+                        // 25% = 1/4
+                        numerator = 1;
+                        denominator = 4;
+                    }
+
+                    var healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                    var healResult = battle.Heal(healAmount, source);
+                    if (healResult is FalseIntFalseUnion)
+                    {
+                        battle.Add("-fail", source, "heal");
+                        return new Empty(); // NOT_FAIL - move worked but heal failed
+                    }
+
+                    return true; // Heal succeeded
+                }),
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
@@ -1128,11 +1127,11 @@ public partial record Moves
                         ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
                         ConditionId.StickyWeb
                     ];
-                    foreach (ConditionId hazard in hazards)
+                    foreach (var hazard in hazards)
                     {
                         if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
                         {
-                            Condition conditionData = battle.Library.Conditions[hazard];
+                            var conditionData = battle.Library.Conditions[hazard];
                             battle.Add("-sideend", source.Side, conditionData.Name,
                                 "[from] move: Mortal Spin", $"[of] {source}");
                         }
@@ -1165,11 +1164,11 @@ public partial record Moves
                         ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
                         ConditionId.StickyWeb
                     ];
-                    foreach (ConditionId hazard in hazards)
+                    foreach (var hazard in hazards)
                     {
                         if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
                         {
-                            Condition conditionData = battle.Library.Conditions[hazard];
+                            var conditionData = battle.Library.Conditions[hazard];
                             battle.Add("-sideend", source.Side, conditionData.Name,
                                 "[from] move: Mortal Spin", $"[of] {source}");
                         }
@@ -1518,12 +1517,12 @@ public partial record Moves
                     {
                         // Check if Dondozo is commanded by Tatsugiri
                         if (!source.Volatiles.TryGetValue(ConditionId.Commanded,
-                                out EffectState? commandedState))
+                                out var commandedState))
                         {
                             return new VoidReturn();
                         }
 
-                        Pokemon? tatsugiri = commandedState.Source;
+                        var tatsugiri = commandedState.Source;
                         if (tatsugiri == null ||
                             tatsugiri.Species.BaseSpecies != SpecieId.Tatsugiri)
                         {
@@ -1531,7 +1530,7 @@ public partial record Moves
                         }
 
                         // Boost based on Tatsugiri's forme
-                        FormeId forme = tatsugiri.Species.Forme;
+                        var forme = tatsugiri.Species.Forme;
                         switch (forme)
                         {
                             case FormeId.Droopy:
