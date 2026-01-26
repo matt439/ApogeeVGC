@@ -1204,9 +1204,11 @@ public partial record Conditions
                         {
                             battle.Add("cant", pokemon, "move: Throat Chop");
                         }
-                        // TODO: TypeScript returns false here, but OnModifyMove typically returns void
-                        // This may need to be handled differently in the battle engine
+
+                        return VoidFalseUnion.FromFalse();
                     }
+
+                    return VoidFalseUnion.FromVoid();
                 }),
                 //OnResidualOrder = 22,
                 OnEnd = new OnEndEventInfo((battle, target) =>
