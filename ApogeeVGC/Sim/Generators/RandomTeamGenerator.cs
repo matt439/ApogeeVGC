@@ -141,8 +141,8 @@ public class RandomTeamGenerator
         // Pick a random ability from the species' available abilities
         var ability = PickRandomAbility(species);
 
-        // Pick 4 random moves from the learnset
-        var moves = PickRandomMoves(speciesId);
+        // Pick 4 random moves from the learnset and get the required level
+        var (moves, requiredLevel) = PickRandomMoves(speciesId);
 
         // Pick a random item that hasn't been used yet
         var item = PickRandomUnused(_usableItems, usedItems);
@@ -160,6 +160,10 @@ public class RandomTeamGenerator
         // Determine gender based on species
         var gender = DetermineGender(species);
 
+        // Set level to the maximum of required level for moves and the format's minimum (usually 50 for VGC)
+        // The level will be adjusted down to 50 for battle by AdjustLevelDown rule
+        var level = Math.Max(requiredLevel, 50);
+
         return new PokemonSet
         {
             Name = species.Name,
@@ -171,13 +175,14 @@ public class RandomTeamGenerator
             Gender = gender,
             Evs = evs,
             TeraType = teraType,
-            Level = 50,
+            Level = level,
         };
     }
 
     /// <summary>
     /// Builds the list of species legal in the format.
     /// Excludes species based on format banlist (Mythical always, Restricted if banned).
+    /// Only includes species that have at least 4 moves learnable in Gen 9.
     /// </summary>
     private List<SpecieId> BuildLegalSpeciesList()
     {
@@ -200,9 +205,18 @@ public class RandomTeamGenerator
                 continue;
             }
 
-            // Skip if the species has no learnset (can't have valid moves)
+            // Skip if the species has no learnset or not enough Gen 9 moves
             if (!_library.Learnsets.TryGetValue(speciesId, out var learnset) ||
-                learnset.LearnsetData is not { Count: >= MoveCount })
+                learnset.LearnsetData == null)
+            {
+                continue;
+            }
+
+            // Count moves that have a Gen 9 source
+            var gen9MoveCount = learnset.LearnsetData
+                .Count(kvp => kvp.Value.Any(source => source.Generation == Gen9));
+
+            if (gen9MoveCount < MoveCount)
             {
                 continue;
             }
@@ -221,6 +235,7 @@ public class RandomTeamGenerator
 
     /// <summary>
     /// Builds the list of restricted legendary species for formats that allow them.
+    /// Only includes species that have at least 4 moves learnable in Gen 9.
     /// </summary>
     private List<SpecieId> BuildRestrictedSpeciesList()
     {
@@ -238,9 +253,18 @@ public class RandomTeamGenerator
                 continue;
             }
 
-            // Skip if the species has no learnset
+            // Skip if the species has no learnset or not enough Gen 9 moves
             if (!_library.Learnsets.TryGetValue(speciesId, out var learnset) ||
-                learnset.LearnsetData is not { Count: >= MoveCount })
+                learnset.LearnsetData == null)
+            {
+                continue;
+            }
+
+            // Count moves that have a Gen 9 source
+            var gen9MoveCount = learnset.LearnsetData
+                .Count(kvp => kvp.Value.Any(source => source.Generation == Gen9));
+
+            if (gen9MoveCount < MoveCount)
             {
                 continue;
             }
@@ -351,8 +375,9 @@ public class RandomTeamGenerator
     /// <summary>
     /// Picks 4 random moves from the Pokemon's learnset.
     /// Only considers moves learnable in Gen 9 to match validator requirements.
+    /// Returns the moves and the minimum level required to learn all of them.
     /// </summary>
-    private IReadOnlyList<MoveId> PickRandomMoves(SpecieId speciesId)
+    private (IReadOnlyList<MoveId> Moves, int RequiredLevel) PickRandomMoves(SpecieId speciesId)
     {
         if (!_library.Learnsets.TryGetValue(speciesId, out var learnset) ||
             learnset.LearnsetData == null)
@@ -383,7 +408,26 @@ public class RandomTeamGenerator
             selectedMoves.Add(availableMoves[moveIndex]);
         }
 
-        return selectedMoves;
+        // Calculate the minimum level required to learn all selected moves
+        var requiredLevel = 1;
+        foreach (var moveId in selectedMoves)
+        {
+            if (learnset.LearnsetData.TryGetValue(moveId, out var sources))
+            {
+                // Find the Gen 9 level-up source with the highest level requirement
+                foreach (var source in sources)
+                {
+                    if (source.Generation == Gen9 &&
+                        source.SourceType == MoveSourceType.LevelUp &&
+                        source.LevelOrIndex.HasValue)
+                    {
+                        requiredLevel = Math.Max(requiredLevel, source.LevelOrIndex.Value);
+                    }
+                }
+            }
+        }
+
+        return (selectedMoves, requiredLevel);
     }
 
     /// <summary>
