@@ -252,104 +252,6 @@ public class Driver
         Console.WriteLine("[Driver] Battle completed");
     }
 
-    //private void RunRandomVsRandomSinglesTest()
-    //{
-    //    Console.WriteLine("[Driver] Starting Random vs Random Singles test (SYNCHRONOUS)");
-    //    Console.WriteLine(
-    //        $"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
-
-    //    const bool debug = true;
-
-    //    PlayerOptions player1Options = new()
-    //    {
-    //        Type = Player.PlayerType.Random,
-    //        Name = "Random 1",
-    //        Team = TeamGenerator.GenerateTestTeam(Library),
-    //        Seed = new PrngSeed(PlayerRandom1Seed),
-    //        PrintDebug = debug,
-    //    };
-
-    //    PlayerOptions player2Options = new()
-    //    {
-    //        Type = Player.PlayerType.Random,
-    //        Name = "Random 2",
-    //        Team = TeamGenerator.GenerateTestTeam(Library),
-    //        Seed = new PrngSeed(PlayerRandom2Seed),
-    //        PrintDebug = debug,
-    //    };
-
-    //    BattleOptions battleOptions = new()
-    //    {
-    //        Id = FormatId.CustomSingles,
-    //        Player1Options = player1Options,
-    //        Player2Options = player2Options,
-    //        Debug = debug,
-    //        Sync = true, // Enable synchronous mode
-    //        Seed = new PrngSeed(BattleSeed),
-    //    };
-
-    //    var simulator = new SyncSimulator();
-    //    Console.WriteLine("[Driver] SyncSimulator created");
-
-    //    // Run the battle completely synchronously - no async/await needed!
-    //    var result = simulator.Run(Library, battleOptions, printDebug: debug);
-
-    //    Console.WriteLine($"[Driver] Battle completed with result: {result}");
-
-    //    // Show final statistics
-    //    Console.WriteLine("\n=== Battle Complete ===");
-    //    Console.WriteLine($"Winner: {result}");
-    //}
-
-    //private void RunRandomVsRandomDoublesTest()
-    //{
-    //    Console.WriteLine("[Driver] Starting Random vs Random Doubles test (SYNCHRONOUS)");
-    //    Console.WriteLine(
-    //        $"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
-
-    //    const bool debug = true;
-
-    //    PlayerOptions player1Options = new()
-    //    {
-    //        Type = Player.PlayerType.Random,
-    //        Name = "Random 1",
-    //        Team = TeamGenerator.GenerateTestTeam(Library),
-    //        Seed = new PrngSeed(PlayerRandom1Seed),
-    //        PrintDebug = debug,
-    //    };
-
-    //    PlayerOptions player2Options = new()
-    //    {
-    //        Type = Player.PlayerType.Random,
-    //        Name = "Random 2",
-    //        Team = TeamGenerator.GenerateTestTeam(Library),
-    //        Seed = new PrngSeed(PlayerRandom2Seed),
-    //        PrintDebug = debug,
-    //    };
-
-    //    BattleOptions battleOptions = new()
-    //    {
-    //        Id = FormatId.CustomDoubles,
-    //        Player1Options = player1Options,
-    //        Player2Options = player2Options,
-    //        Debug = debug,
-    //        Sync = true, // Enable synchronous mode
-    //        Seed = new PrngSeed(BattleSeed),
-    //    };
-
-    //    var simulator = new SyncSimulator();
-    //    Console.WriteLine("[Driver] SyncSimulator created");
-
-    //    // Run the battle completely synchronously - no async/await needed!
-    //    var result = simulator.Run(Library, battleOptions, printDebug: debug);
-
-    //    Console.WriteLine($"[Driver] Battle completed with result: {result}");
-
-    //    // Show final statistics
-    //    Console.WriteLine("\n=== Battle Complete ===");
-    //    Console.WriteLine($"Winner: {result}");
-    //}
-
     /// <summary>
     /// Helper method to run a single battle simulation with timeout protection.
     /// </summary>
@@ -786,8 +688,106 @@ public class Driver
         Console.ReadLine();
     }
 
-    void RunRndVsRndVgcRegIEvaluation()
+    private void RunRndVsRndVgcRegIEvaluation()
     {
 
     }
+
+    //private void RunRandomVsRandomSinglesTest()
+    //{
+    //    Console.WriteLine("[Driver] Starting Random vs Random Singles test (SYNCHRONOUS)");
+    //    Console.WriteLine(
+    //        $"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
+
+    //    const bool debug = true;
+
+    //    PlayerOptions player1Options = new()
+    //    {
+    //        Type = Player.PlayerType.Random,
+    //        Name = "Random 1",
+    //        Team = TeamGenerator.GenerateTestTeam(Library),
+    //        Seed = new PrngSeed(PlayerRandom1Seed),
+    //        PrintDebug = debug,
+    //    };
+
+    //    PlayerOptions player2Options = new()
+    //    {
+    //        Type = Player.PlayerType.Random,
+    //        Name = "Random 2",
+    //        Team = TeamGenerator.GenerateTestTeam(Library),
+    //        Seed = new PrngSeed(PlayerRandom2Seed),
+    //        PrintDebug = debug,
+    //    };
+
+    //    BattleOptions battleOptions = new()
+    //    {
+    //        Id = FormatId.CustomSingles,
+    //        Player1Options = player1Options,
+    //        Player2Options = player2Options,
+    //        Debug = debug,
+    //        Sync = true, // Enable synchronous mode
+    //        Seed = new PrngSeed(BattleSeed),
+    //    };
+
+    //    var simulator = new SyncSimulator();
+    //    Console.WriteLine("[Driver] SyncSimulator created");
+
+    //    // Run the battle completely synchronously - no async/await needed!
+    //    var result = simulator.Run(Library, battleOptions, printDebug: debug);
+
+    //    Console.WriteLine($"[Driver] Battle completed with result: {result}");
+
+    //    // Show final statistics
+    //    Console.WriteLine("\n=== Battle Complete ===");
+    //    Console.WriteLine($"Winner: {result}");
+    //}
+
+    //private void RunRandomVsRandomDoublesTest()
+    //{
+    //    Console.WriteLine("[Driver] Starting Random vs Random Doubles test (SYNCHRONOUS)");
+    //    Console.WriteLine(
+    //        $"[Driver] Using seeds - Player1: {PlayerRandom1Seed}, Player2: {PlayerRandom2Seed}, Battle: {BattleSeed}");
+
+    //    const bool debug = true;
+
+    //    PlayerOptions player1Options = new()
+    //    {
+    //        Type = Player.PlayerType.Random,
+    //        Name = "Random 1",
+    //        Team = TeamGenerator.GenerateTestTeam(Library),
+    //        Seed = new PrngSeed(PlayerRandom1Seed),
+    //        PrintDebug = debug,
+    //    };
+
+    //    PlayerOptions player2Options = new()
+    //    {
+    //        Type = Player.PlayerType.Random,
+    //        Name = "Random 2",
+    //        Team = TeamGenerator.GenerateTestTeam(Library),
+    //        Seed = new PrngSeed(PlayerRandom2Seed),
+    //        PrintDebug = debug,
+    //    };
+
+    //    BattleOptions battleOptions = new()
+    //    {
+    //        Id = FormatId.CustomDoubles,
+    //        Player1Options = player1Options,
+    //        Player2Options = player2Options,
+    //        Debug = debug,
+    //        Sync = true, // Enable synchronous mode
+    //        Seed = new PrngSeed(BattleSeed),
+    //    };
+
+    //    var simulator = new SyncSimulator();
+    //    Console.WriteLine("[Driver] SyncSimulator created");
+
+    //    // Run the battle completely synchronously - no async/await needed!
+    //    var result = simulator.Run(Library, battleOptions, printDebug: debug);
+
+    //    Console.WriteLine($"[Driver] Battle completed with result: {result}");
+
+    //    // Show final statistics
+    //    Console.WriteLine("\n=== Battle Complete ===");
+    //    Console.WriteLine($"Winner: {result}");
+    //}
 }
