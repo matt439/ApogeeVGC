@@ -8,7 +8,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnFractionalPriority event.
 /// Modifies fractional priority for move ordering.
-/// Signature: (Battle battle, int priority, Pokemon pokemon, ActiveMove move) => double | decimal constant (-0.1)
+/// Signature: (Battle battle, int priority, Pokemon source, Pokemon? target, ActiveMove move) => double | decimal constant (-0.1)
 /// </summary>
 public sealed record OnFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFractionalPriority>
 {
@@ -33,15 +33,16 @@ public sealed record OnFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFra
             typeof(Battle),
             typeof(int),
             typeof(Pokemon),
+            typeof(Pokemon),
             typeof(ActiveMove),
         ];
         ExpectedReturnType = typeof(double);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
+        // Nullability: target (4th param) is nullable since it's passed as null
+        ParameterNullability = [false, false, false, true, false];
         ReturnTypeNullable = false;
     
-    // Validate configuration
+        // Validate configuration
         ValidateConfiguration();
     }
 }

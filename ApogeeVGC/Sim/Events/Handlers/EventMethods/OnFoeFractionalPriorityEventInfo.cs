@@ -7,29 +7,29 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnFoeFractionalPriority event.
-/// Signature: Func<Battle, int, Pokemon, ActiveMove, double> | decimal constant
+/// Signature: (Battle, int, Pokemon, Pokemon?, ActiveMove) => double | decimal constant
 /// </summary>
 public sealed record OnFoeFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFractionalPriority>
 {
     public OnFoeFractionalPriorityEventInfo(
-       OnFractionalPriority unionValue,
+        OnFractionalPriority unionValue,
         int? priority = null,
-bool usesSpeed = true)
+        bool usesSpeed = true)
     {
         Id = EventId.FractionalPriority;
-  Prefix = EventPrefix.Foe;
-     UnionValue = unionValue;
-   Handler = ExtractDelegate();
- Priority = priority;
-UsesSpeed = usesSpeed;
- ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(ActiveMove)];
-  ExpectedReturnType = typeof(double);
+        Prefix = EventPrefix.Foe;
+        UnionValue = unionValue;
+        Handler = ExtractDelegate();
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
+        ExpectedReturnType = typeof(double);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
+        // Nullability: target (4th param) is nullable since it's passed as null
+        ParameterNullability = [false, false, false, true, false];
         ReturnTypeNullable = false;
     
-    // Validate configuration
+        // Validate configuration
         ValidateConfiguration();
     }
 }
