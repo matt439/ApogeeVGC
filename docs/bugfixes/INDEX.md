@@ -29,6 +29,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
 - [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix) - VoidVoidFalseUnion cannot be converted to RelayVar
 - [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix) - IntIntBoolUnion cannot be converted to RelayVar
+- [SparseBoostsTableVoidUnion Return Conversion Fix](#sparsebooststablevoidunion-return-conversion-fix) - VoidSparseBoostsTableVoidUnion cannot be converted to RelayVar
 - [Union Type Handling Guide](#union-type-handling-guide) - Comprehensive guide for preventing union type issues
 
 ### Move Mechanics
@@ -360,6 +361,25 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### SparseBoostsTableVoidUnion Return Conversion Fix
+**File**: `SparseBoostsTableVoidUnionReturnConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: ModifyBoost events, stat boost modifications, Unaware ability
+
+**Problem**: When a Pokémon with the Unaware ability was switching in, the battle crashed with `InvalidOperationException: Event ModifyBoost adapted handler failed on effect Unaware (Ability)` with inner exception `Unable to convert return value of type 'VoidSparseBoostsTableVoidUnion' to RelayVar`.
+
+**Root Cause**: The Unaware ability's `OnAnyModifyBoost` handler returns `SparseBoostsTableVoidUnion`, which can be either `SparseBoostsTableSparseBoostsTableVoidUnion` (containing a `SparseBoostsTable` with modified boosts) or `VoidSparseBoostsTableVoidUnion` (indicating no modification). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `SparseBoostsTableVoidUnion`.
+
+**Solution**: Added conversion cases for both variants of `SparseBoostsTableVoidUnion`:
+- `SparseBoostsTableSparseBoostsTableVoidUnion` ? `SparseBoostsTableRelayVar` (preserves the modified boost table)
+- `VoidSparseBoostsTableVoidUnion` ? `VoidReturnRelayVar` (indicates no modification)
+
+**Pattern**: Event handlers that return union types need explicit conversion cases in `EventHandlerAdapter.ConvertReturnValue` to unwrap the variant and convert it to the appropriate `RelayVar` type. The `SparseBoostsTableRelayVar` type already existed in the codebase.
+
+**Keywords**: `Unaware`, `SparseBoostsTableVoidUnion`, `SparseBoostsTableSparseBoostsTableVoidUnion`, `VoidSparseBoostsTableVoidUnion`, `ModifyBoost event`, `OnAnyModifyBoost`, `event handler return`, `union type conversion`, `stat boosts`, `EventHandlerAdapter`, `SparseBoostsTableRelayVar`, `switch-in`
+
+---
+
 ### Union Type Handling Guide
 **File**: `UnionTypeHandlingGuide.md`  
 **Type**: Reference Guide  
@@ -550,6 +570,10 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
 - [Trick Room Bug Fix](#trick-room-bug-fix)
 - [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix)
+- [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix)
+- [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix)
+- [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix)
+- [SparseBoostsTableVoidUnion Return Conversion Fix](#sparsebooststablevoidunion-return-conversion-fix)
 
 **EventHandlerInfoMapper.cs**:
 - [Trick Room Bug Fix](#trick-room-bug-fix)

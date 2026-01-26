@@ -465,6 +465,10 @@ internal static class EventHandlerAdapter
             VoidVoidFalseUnion => new VoidReturnRelayVar(),
             FalseVoidFalseUnion => new BoolRelayVar(false),
 
+            // SparseBoostsTableVoidUnion -> SparseBoostsTable or VoidReturn
+            SparseBoostsTableSparseBoostsTableVoidUnion sparseBoostsVoid => new SparseBoostsTableRelayVar(sparseBoostsVoid.Table),
+            VoidSparseBoostsTableVoidUnion => new VoidReturnRelayVar(),
+
             // Primitive types
             bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),
