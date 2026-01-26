@@ -29,7 +29,6 @@ public class TeamValidator
 {
     private const int MinTeamSize = 1;
     private const int MaxTeamSize = 6;
-    private const int MaxMoveCount = 4;
     private const int Gen9 = 9;
 
     private readonly Library _library;
@@ -70,7 +69,7 @@ public class TeamValidator
         {
             if (set.Item != ItemId.None)
             {
-                itemCounts.TryGetValue(set.Item, out int count);
+                itemCounts.TryGetValue(set.Item, out var count);
                 itemCounts[set.Item] = count + 1;
             }
         }
@@ -88,10 +87,10 @@ public class TeamValidator
         var speciesCounts = new Dictionary<SpecieId, int>();
         foreach (var set in team)
         {
-            var species = _library.Species.TryGetValue(set.Species, out var s) ? s : null;
+            var species = _library.Species.GetValueOrDefault(set.Species);
             var baseSpeciesId = species?.BaseSpecies ?? set.Species;
-            
-            speciesCounts.TryGetValue(baseSpeciesId, out int count);
+
+            speciesCounts.TryGetValue(baseSpeciesId, out var count);
             speciesCounts[baseSpeciesId] = count + 1;
         }
 
@@ -100,7 +99,8 @@ public class TeamValidator
             if (count > 1)
             {
                 var speciesName = _library.Species.TryGetValue(speciesId, out var s) ? s.Name : speciesId.ToString();
-                problems.Add($"Species Clause: You are limited to one of each Pokemon species. {speciesName} appears {count} times.");
+                problems.Add(
+                    $"Species Clause: You are limited to one of each Pokemon species. {speciesName} appears {count} times.");
             }
         }
 
@@ -206,7 +206,7 @@ public class TeamValidator
         if (!_library.Learnsets.TryGetValue(speciesId, out var learnset))
         {
             // Try base species if this is a forme
-            if (species.BaseSpecies != speciesId && 
+            if (species.BaseSpecies != speciesId &&
                 _library.Learnsets.TryGetValue(species.BaseSpecies, out learnset))
             {
                 // Use base species learnset
@@ -223,7 +223,7 @@ public class TeamValidator
         }
 
         // Check if any source is valid for Gen 9
-        bool canLearn = false;
+        var canLearn = false;
         string? levelProblem = null;
 
         foreach (var source in sources)
@@ -235,7 +235,7 @@ public class TeamValidator
             }
 
             // For level-up moves, check if Pokemon is high enough level
-            if (source.SourceType == MoveSourceType.LevelUp && source.LevelOrIndex.HasValue)
+            if (source is { SourceType: MoveSourceType.LevelUp, LevelOrIndex: not null })
             {
                 if (level >= source.LevelOrIndex.Value)
                 {
@@ -262,6 +262,7 @@ public class TeamValidator
             {
                 return levelProblem;
             }
+
             return $"{pokemonName} can't learn {move.Name}.";
         }
 
@@ -269,7 +270,4 @@ public class TeamValidator
     }
 }
 
-public class PokemonSources
-{
-
-}
+public class PokemonSources;
