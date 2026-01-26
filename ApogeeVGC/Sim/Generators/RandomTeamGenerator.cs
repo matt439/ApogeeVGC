@@ -1,6 +1,5 @@
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -165,7 +164,7 @@ public class RandomTeamGenerator
     {
         var usable = new List<ItemId>();
 
-        foreach (var (itemId, item) in _library.Items)
+        foreach (var (itemId, _) in _library.Items)
         {
             if (itemId == ItemId.None)
             {

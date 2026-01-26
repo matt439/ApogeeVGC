@@ -15,7 +15,7 @@ public class Driver
     private Library Library { get; } = new();
 
     // Seeds for standard test runs - can be changed freely
-    private const int PlayerRandom1Seed = 12352;
+    //private const int PlayerRandom1Seed = 12352;
     private const int PlayerRandom2Seed = 1826;
     private const int BattleSeed = 9885;
 
@@ -34,9 +34,9 @@ public class Driver
 
     // Format configuration - change this to use different VGC regulations
     // Available: Gen9VgcRegulationA through Gen9VgcRegulationI, CustomSingles, CustomDoubles
-    private const FormatId DefaultVgcFormat = FormatId.Gen9VgcRegulationG;
-    private const FormatId DefaultSinglesFormat = FormatId.CustomSingles;
-    private const FormatId DefaultDoublesFormat = FormatId.CustomDoubles;
+    //private const FormatId DefaultVgcFormat = FormatId.Gen9VgcRegulationG;
+    //private const FormatId DefaultSinglesFormat = FormatId.CustomSingles;
+    //private const FormatId DefaultDoublesFormat = FormatId.CustomDoubles;
 
     public void Start(DriverMode mode)
     {
