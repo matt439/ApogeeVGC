@@ -2525,6 +2525,49 @@ public partial record Moves
                     FailInstruct = true,
                     NoParentalBond = true,
                 },
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
+                {
+                    var bp = move.BasePower;
+                    pokemon.Volatiles.TryGetValue(ConditionId.Rollout, out var rolloutData);
+                    if (rolloutData?.HitCount > 0)
+                    {
+                        bp *= (int)Math.Pow(2, rolloutData.ContactHitCount ?? 0);
+                    }
+
+                    if (rolloutData is not null && pokemon.Status != ConditionId.Sleep)
+                    {
+                        rolloutData.HitCount = (rolloutData.HitCount ?? 0) + 1;
+                        rolloutData.ContactHitCount = (rolloutData.ContactHitCount ?? 0) + 1;
+                        if (rolloutData.HitCount < 5)
+                        {
+                            rolloutData.Duration = 2;
+                        }
+                    }
+
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.DefenseCurl))
+                    {
+                        bp *= 2;
+                    }
+
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, target) =>
+                {
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.Rollout) ||
+                        pokemon.Status == ConditionId.Sleep ||
+                        target is null)
+                    {
+                        return;
+                    }
+
+                    pokemon.AddVolatile(ConditionId.Rollout);
+                    if (move.SourceEffect is not null)
+                    {
+                        pokemon.LastMoveTargetLoc = pokemon.GetLocOf(target);
+                    }
+                }),
+                Condition = _library.Conditions[ConditionId.Rollout],
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Rock,

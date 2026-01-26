@@ -533,8 +533,22 @@ public partial record Conditions
                 Name = "Rollout",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Rollout,
-                // Rollout uses LockedMove for the locking behavior and RolloutStorage for damage scaling
-                // This is just a marker condition
+                Duration = 1,
+                OnLockMove = new OnLockMoveEventInfo(MoveId.Rollout),
+                OnStart = new OnStartEventInfo((battle, _, _, _) =>
+                {
+                    battle.EffectState.HitCount = 0;
+                    battle.EffectState.ContactHitCount = 0;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((_, target, _, _) =>
+                {
+                    // If the pokemon used Struggle, don't lock
+                    if (target.LastMove?.Id == MoveId.Struggle)
+                    {
+                        target.DeleteVolatile(ConditionId.Rollout);
+                    }
+                }),
             },
             [ConditionId.RolloutStorage] = new()
             {
