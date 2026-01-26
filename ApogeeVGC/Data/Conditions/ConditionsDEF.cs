@@ -894,7 +894,12 @@ public partial record Conditions
                             $"[of] {source}");
                     }
                 }),
-                // Note: Freeze immunity handled elsewhere
+                OnImmunity = new OnImmunityEventInfo((_, type, pokemon) =>
+                {
+                    if (pokemon.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
+                    if (type.AsConditionId == ConditionId.Freeze) return false;
+                    return new VoidReturn();
+                }),
                 //OnFieldResidualOrder = 1,
                 OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
                     {

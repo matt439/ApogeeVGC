@@ -932,7 +932,7 @@ public partial record Conditions
                 Name = "Sandstorm",
                 EffectType = EffectType.Weather,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
                     source.HasItem(ItemId.SmoothRock) ? 8 : 5),
                 // This should be applied directly to the stat before any of the other modifiers are chained
                 // So we give it increased priority.
@@ -994,7 +994,7 @@ public partial record Conditions
                 Name = "Snowscape",
                 EffectType = EffectType.Weather,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
                     source.HasItem(ItemId.IcyRock) ? 8 : 5),
                 //OnModifyDefPriority = 10,
                 OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
@@ -1050,7 +1050,7 @@ public partial record Conditions
                 Name = "SunnyDay",
                 EffectType = EffectType.Weather,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
                     source.HasItem(ItemId.HeatRock) ? 8 : 5),
                 OnWeatherModifyDamage =
                     new OnWeatherModifyDamageEventInfo((battle, _, attacker, defender, move) =>
@@ -1090,6 +1090,12 @@ public partial record Conditions
                     {
                         battle.Add("-weather", "SunnyDay");
                     }
+                }),
+                OnImmunity = new OnImmunityEventInfo((_, type, pokemon) =>
+                {
+                    if (pokemon.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
+                    if (type.AsConditionId == ConditionId.Freeze) return false;
+                    return new VoidReturn();
                 }),
                 //OnFieldResidualOrder = 1,
                 OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>

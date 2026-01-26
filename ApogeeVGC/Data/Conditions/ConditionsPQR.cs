@@ -432,7 +432,7 @@ public partial record Conditions
                 Name = "RainDance",
                 EffectType = EffectType.Weather,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
                     source.HasItem(ItemId.DampRock) ? 8 : 5),
                 OnWeatherModifyDamage =
                     new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
