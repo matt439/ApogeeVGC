@@ -69,7 +69,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2023 Regulation A",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer],
             Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
             RuleTable = new RuleTable
             {
@@ -87,7 +87,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2023 Regulation B",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer],
             Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
             RuleTable = new RuleTable
             {
@@ -105,7 +105,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2023 Regulation C",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer],
             Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
             RuleTable = new RuleTable
             {
@@ -123,7 +123,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2023 Regulation D",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer, RuleId.LimitOneRestricted],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.LimitOneRestricted],
             Banlist = [RuleId.Mythical],
             RuleTable = new RuleTable
             {
@@ -141,7 +141,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2024 Regulation E",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer, RuleId.LimitOneRestricted],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.LimitOneRestricted],
             Banlist = [RuleId.Mythical],
             RuleTable = new RuleTable
             {
@@ -159,7 +159,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2024 Regulation F",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer, RuleId.LimitTwoRestricted],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.LimitTwoRestricted],
             Banlist = [RuleId.Mythical],
             RuleTable = new RuleTable
             {
@@ -177,7 +177,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2025 Regulation G",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer, RuleId.LimitTwoRestricted],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.LimitTwoRestricted],
             Banlist = [RuleId.Mythical],
             RuleTable = new RuleTable
             {
@@ -195,7 +195,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2025 Regulation H",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer, RuleId.LimitOneRestricted],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.LimitOneRestricted],
             Banlist = [RuleId.Mythical],
             RuleTable = new RuleTable
             {
@@ -213,7 +213,7 @@ public record Formats
         {
             Name = "[Gen 9] VGC 2025 Regulation I",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VGCTimer],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer],
             Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
             RuleTable = new RuleTable
             {

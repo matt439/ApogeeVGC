@@ -31,16 +31,24 @@ public record Rulesets
             FormatEffectType = FormatEffectType.ValidatorRule,
             Name = "Standard Doubles",
             Desc = "The standard ruleset for all official Smogon doubles tiers",
-            Ruleset = [RuleId.Obtainable, RuleId.TeamPreview, RuleId.HpPercentageMod, RuleId.CancelMod,
-                       RuleId.EndlessBattleClause, RuleId.SpeciesClause, RuleId.NicknameClause],
+            Ruleset =
+            [
+                RuleId.Obtainable, RuleId.TeamPreview, RuleId.HpPercentageMod, RuleId.CancelMod,
+                RuleId.EndlessBattleClause, RuleId.SpeciesClause, RuleId.NicknameClause
+            ],
         },
 
         [RuleId.FlatRules] = new Format
         {
             FormatEffectType = FormatEffectType.ValidatorRule,
             Name = "Flat Rules",
-            Desc = "The in-game Flat Rules: Adjust Level Down 50, Species Clause, Item Clause = 1, -Mythical, -Restricted Legendary, Bring 6 Pick 4.",
-            Ruleset = [RuleId.Obtainable, RuleId.TeamPreview, RuleId.SpeciesClause, RuleId.NicknameClause, RuleId.ItemClause, RuleId.AdjustLevelDown, RuleId.CancelMod],
+            Desc =
+                "The in-game Flat Rules: Adjust Level Down 50, Species Clause, Item Clause = 1, -Mythical, -Restricted Legendary, Bring 6 Pick 4.",
+            Ruleset =
+            [
+                RuleId.Obtainable, RuleId.TeamPreview, RuleId.SpeciesClause, RuleId.NicknameClause, RuleId.ItemClause,
+                RuleId.AdjustLevelDown, RuleId.CancelMod
+            ],
             Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
         },
 
@@ -49,7 +57,10 @@ public record Rulesets
             FormatEffectType = FormatEffectType.ValidatorRule,
             Name = "Obtainable",
             Desc = "Makes sure the team is possible to obtain in-game.",
-            Ruleset = [RuleId.ObtainableMoves, RuleId.ObtainableAbilities, RuleId.ObtainableFormes, RuleId.ObtainableMisc],
+            Ruleset =
+            [
+                RuleId.ObtainableMoves, RuleId.ObtainableAbilities, RuleId.ObtainableFormes, RuleId.ObtainableMisc
+            ],
         },
 
         [RuleId.TeamPreview] = new Format
@@ -80,7 +91,7 @@ public record Rulesets
             Desc = "Prevents teams from having more than one Pokémon holding the same item.",
         },
 
-        [RuleId.VGCTimer] = new Format
+        [RuleId.VgcTimer] = new Format
         {
             FormatEffectType = FormatEffectType.Rule,
             Name = "VGC Timer",

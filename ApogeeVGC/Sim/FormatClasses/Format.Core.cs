@@ -9,7 +9,6 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.FormatClasses;
 
-
 public enum FormatId
 {
     // Smogon formats
@@ -21,16 +20,17 @@ public enum FormatId
     CustomDoubles,
 
     // VGC Gen 9 Regulations (2023-2025)
-    Gen9VgcRegulationA,    // Paldea dex only, no restricted
-    Gen9VgcRegulationB,    // Paldea dex only, no restricted
-    Gen9VgcRegulationC,    // Paldea + Teal Mask, no restricted
-    Gen9VgcRegulationD,    // All obtainable, 1 restricted
-    Gen9VgcRegulationE,    // All obtainable + Indigo Disk, 1 restricted
-    Gen9VgcRegulationF,    // All obtainable, 2 restricted
-    Gen9VgcRegulationG,    // All obtainable, 2 restricted (2025)
-    Gen9VgcRegulationH,    // All obtainable, 1 restricted
-    Gen9VgcRegulationI,    // All obtainable, no restricted
+    Gen9VgcRegulationA, // Paldea dex only, no restricted
+    Gen9VgcRegulationB, // Paldea dex only, no restricted
+    Gen9VgcRegulationC, // Paldea + Teal Mask, no restricted
+    Gen9VgcRegulationD, // All obtainable, 1 restricted
+    Gen9VgcRegulationE, // All obtainable + Indigo Disk, 1 restricted
+    Gen9VgcRegulationF, // All obtainable, 2 restricted
+    Gen9VgcRegulationG, // All obtainable, 2 restricted (2025)
+    Gen9VgcRegulationH, // All obtainable, 1 restricted
+    Gen9VgcRegulationI, // All obtainable, no restricted
 }
+
 
 public enum FormatEffectType
 {
@@ -68,7 +68,7 @@ public enum RuleId
     AdjustLevelDown,
 
     // VGC-specific rules
-    VGCTimer,
+    VgcTimer,
     LimitOneRestricted,
     LimitTwoRestricted,
 
@@ -107,13 +107,17 @@ public partial record Format : IEffect, IBasicEffect, ICopyable<Format>
     public bool NoLog { get; init; }
 
     public FormatHasValue? HasValue { get; init; }
+
     // OnValidateRule TODO: Implement this event method
     public RuleId? MutuallyExclusiveWith { get; init; }
+
     // ModdedDex fields here. Possible unnecessary in this context.
     public bool? ChallengeShow { get; init; }
     public bool? SearchShow { get; init; }
     public bool? BestOfDefault { get; init; }
+
     public bool? TeraPreviewDefault { get; init; }
+
     // Threads // TODO: Implement thread handling
     public bool? TournamentShow { get; init; }
 
@@ -137,6 +141,7 @@ public partial record Format : IEffect, IBasicEffect, ICopyable<Format>
         public bool RemoveNicknames { get; init; }
         public Dictionary<string, Dictionary<string, bool>>? SkipSets { get; init; }
     }
+
     public string? Section { get; init; }
     public int? Column { get; init; }
 
