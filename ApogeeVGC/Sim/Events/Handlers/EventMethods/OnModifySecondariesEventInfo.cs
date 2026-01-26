@@ -7,7 +7,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnModifySecondaries event.
 /// Modifies secondary effects of a move.
-/// Signature: (Battle battle, List<SecondaryEffect> secondaries, Pokemon target, Pokemon source, ActiveMove move) => void
+/// Signature: (Battle battle, SecondaryEffect[] secondaries, Pokemon target, Pokemon source, ActiveMove move) => SecondaryEffect[]
 /// </summary>
 public sealed record OnModifySecondariesEventInfo : EventHandlerInfo
 {
@@ -18,7 +18,7 @@ public sealed record OnModifySecondariesEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnModifySecondariesEventInfo(
-        Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove> handler,
+        Func<Battle, SecondaryEffect[], Pokemon, Pokemon, ActiveMove, SecondaryEffect[]> handler,
         int? priority = null,
  bool usesSpeed = true)
     {
@@ -29,12 +29,12 @@ public sealed record OnModifySecondariesEventInfo : EventHandlerInfo
         ExpectedParameterTypes =
       [
             typeof(Battle),
-     typeof(List<SecondaryEffect>),
+     typeof(SecondaryEffect[]),
     typeof(Pokemon),
    typeof(Pokemon),
-       typeof(ActiveMove),
+        typeof(ActiveMove),
         ];
-    ExpectedReturnType = typeof(void);
+    ExpectedReturnType = typeof(SecondaryEffect[]);
         
     // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false, false, false, false];

@@ -329,6 +329,22 @@ internal static class EventHandlerAdapter
             return true;
         }
 
+        // Handle SecondaryEffect[] unwrapping (direct array type)
+        if (relayVar is SecondaryEffectArrayRelayVar secondaryEffectsVar &&
+            targetType == typeof(SecondaryEffect[]))
+        {
+            value = secondaryEffectsVar.Effects;
+            return true;
+        }
+
+        // Handle SecondaryEffect[] -> List<SecondaryEffect> conversion
+        if (relayVar is SecondaryEffectArrayRelayVar secondaryEffectsListVar &&
+            (targetType == typeof(List<SecondaryEffect>) || targetType.IsAssignableFrom(typeof(List<SecondaryEffect>))))
+        {
+            value = new List<SecondaryEffect>(secondaryEffectsListVar.Effects);
+            return true;
+        }
+
         return false;
     }
 
@@ -414,6 +430,9 @@ internal static class EventHandlerAdapter
             int intValue => new IntRelayVar(intValue),
             decimal decValue => new DecimalRelayVar(decValue),
             double doubleValue => new DecimalRelayVar((decimal)doubleValue),
+
+            // SecondaryEffect[] -> SecondaryEffectArrayRelayVar
+            SecondaryEffect[] secondaryEffects => new SecondaryEffectArrayRelayVar(secondaryEffects),
 
             // VoidReturn - preserve as VoidReturnRelayVar
             VoidReturn => new VoidReturnRelayVar(),

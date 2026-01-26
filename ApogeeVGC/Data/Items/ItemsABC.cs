@@ -1094,7 +1094,7 @@ public partial record Items
                     new OnModifySecondariesEventInfo((battle, secondaries, _, _, _) =>
                     {
                         battle.Debug("Covert Cloak prevent secondary");
-                        secondaries.RemoveAll(effect => effect.Self == null);
+                        return secondaries.Where(effect => effect.Self != null).ToArray();
                     }),
                 Num = 1885,
                 Gen = 9,

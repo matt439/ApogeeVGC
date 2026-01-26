@@ -460,9 +460,8 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnModifySecondaries = new OnModifySecondariesEventInfo((_, secondaries, _, _, _) =>
                 {
-                    // Filter out secondaries that don't target self
-                    // Note: This modifies the list in place by removing non-self secondaries
-                    secondaries.RemoveAll(effect => effect.Self == null);
+                    // Filter out secondaries that don't target self (return only self-targeting effects)
+                    return secondaries.Where(effect => effect.Self != null).ToArray();
                 }),
             },
             [AbilityId.ShieldsDown] = new()
