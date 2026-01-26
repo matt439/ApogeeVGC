@@ -344,6 +344,13 @@ internal static class EventHandlerAdapter
             return true;
         }
 
+        // Handle BoostsTableRelayVar -> SparseBoostsTable conversion
+        if (relayVar is BoostsTableRelayVar boostsVarToSparse && targetType == typeof(SparseBoostsTable))
+        {
+            value = SparseBoostsTable.FromBoostsTable(boostsVarToSparse.Table);
+            return true;
+        }
+
         // Handle SecondaryEffect[] unwrapping (direct array type)
         if (relayVar is SecondaryEffectArrayRelayVar secondaryEffectsVar &&
             targetType == typeof(SecondaryEffect[]))
