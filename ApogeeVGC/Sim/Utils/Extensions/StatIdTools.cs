@@ -121,6 +121,23 @@ public static class StatIdTools
 
     public static string ConvertToString(this BoostId boost, bool leadingCapital = false)
     {
-        return boost.ConvertToStatId().ConvertToString();
+        return (boost, leadingCapital) switch
+        {
+            (BoostId.Atk, true) => "Attack",
+            (BoostId.Atk, false) => "attack",
+            (BoostId.Def, true) => "Defense",
+            (BoostId.Def, false) => "defense",
+            (BoostId.SpA, true) => "Special Attack",
+            (BoostId.SpA, false) => "special attack",
+            (BoostId.SpD, true) => "Special Defense",
+            (BoostId.SpD, false) => "special defense",
+            (BoostId.Spe, true) => "Speed",
+            (BoostId.Spe, false) => "speed",
+            (BoostId.Accuracy, true) => "Accuracy",
+            (BoostId.Accuracy, false) => "accuracy",
+            (BoostId.Evasion, true) => "Evasion",
+            (BoostId.Evasion, false) => "evasion",
+            _ => throw new ArgumentOutOfRangeException(nameof(boost), "Invalid boost ID."),
+        };
     }
 }

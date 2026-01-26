@@ -35,6 +35,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Missing Recoil condition dictionary entry
 
+### Type Conversion & Stat System
+- [BoostId To String Evasion/Accuracy Conversion Fix](#boostid-to-string-evasionaccuracy-conversion-fix) - ArgumentOutOfRangeException when converting Evasion/Accuracy BoostId to string
+
 ### UI and Display
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
 - [GUI Team Preview Fix](#gui-team-preview-fix) - No Pokémon displayed during GUI team preview
@@ -973,6 +976,47 @@ if (effect.EffectType == EffectType.Ability &&
 
 ---
 
+### BoostId To String Evasion/Accuracy Conversion Fix
+**File**: `BoostIdToStringEvasionAccuracyFix.md`  
+**Severity**: High  
+**Systems Affected**: Stat boost display system, all moves/abilities/items that modify accuracy or evasion
+
+**Problem**: When attempting to display stat boost changes for Evasion or Accuracy, the application threw an `ArgumentOutOfRangeException`:
+```
+System.ArgumentOutOfRangeException: Cannot convert Evasion to StatId. (Parameter 'stat')
+  at StatIdTools.ConvertToStatId(BoostId stat)
+  at StatIdTools.ConvertToString(BoostId boost, Boolean leadingCapital)
+```
+
+This occurred when any move attempted to modify evasion (e.g., Defog lowering evasion, Double Team raising evasion) or accuracy.
+
+**Root Cause**: The `ConvertToString(BoostId)` extension method incorrectly attempted to convert the `BoostId` to a `StatId` first:
+```csharp
+return boost.ConvertToStatId().ConvertToString();  // ? Wrong!
+```
+
+However:
+- **`BoostId`** includes: Atk, Def, SpA, SpD, Spe, **Accuracy**, **Evasion**
+- **`StatId`** includes: HP, Atk, Def, SpA, SpD, Spe
+
+Accuracy and Evasion are **boost-only values**—they can be modified by stat boosts but are not actual stats that Pokemon possess. They don't appear in `StatId`, so conversion correctly threw an exception.
+
+**Solution**: Rewrote `ConvertToString(BoostId)` to handle all `BoostId` values directly, including Accuracy and Evasion, using a comprehensive switch expression that mirrors the stat conversion logic but includes the two additional boost-only values.
+
+**Affected Moves/Abilities**:
+- Defog (lowers evasion)
+- Double Team (raises evasion)
+- Minimize (raises evasion)
+- Sand Attack, Flash, etc. (lower accuracy)
+- Coil, Hone Claws (raise accuracy)
+- Hustle, Snow Cloak (abilities affecting accuracy)
+
+**Pattern**: When working with Pokemon mechanics, remember that `BoostId` is a superset of `StatId` (minus HP, plus Accuracy/Evasion). Direct conversions between these types are unsafe for the two boost-only values.
+
+**Keywords**: `BoostId`, `StatId`, `Evasion`, `Accuracy`, `ArgumentOutOfRangeException`, `type conversion`, `stat boost display`, `ConvertToString`, `boost-only values`, `Defog`, `Double Team`, `stat modification`
+
+---
+
 *Last Updated*: 2025-01-19  
-*Total Bug Fixes Documented*: 24  
+*Total Bug Fixes Documented*: 25  
 *Reference Guides*: 1
