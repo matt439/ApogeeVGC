@@ -62,6 +62,9 @@ public class Driver
             case DriverMode.RandomVsRandomDoublesEvaluation:
                 RunRandomVsRandomDoublesEvaluationTest();
                 break;
+            case DriverMode.RndVsRndVgcRegIEvaluation:
+                RunRndVsRndVgcRegIEvaluation();
+                break;
             default:
                 throw new NotImplementedException($"Driver mode {mode} is not implemented.");
         }
@@ -781,5 +784,10 @@ public class Driver
 
         Console.WriteLine("Press Enter key to exit...");
         Console.ReadLine();
+    }
+
+    void RunRndVsRndVgcRegIEvaluation()
+    {
+
     }
 }
