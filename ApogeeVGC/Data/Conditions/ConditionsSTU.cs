@@ -834,18 +834,18 @@ public partial record Conditions
                 }),
                 OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
                 {
-                    // Check if pokemon has ThroatChop volatile - if so, remove uproar
+                    // Check if pokemon has ThroatChop volatile - if so, remove uproar and return
                     if (target.Volatiles.ContainsKey(ConditionId.ThroatChop))
                     {
                         target.RemoveVolatile(_library.Conditions[ConditionId.Uproar]);
                         return;
                     }
 
-                    // Check if last move was Struggle - if so, don't lock (end the volatile)
+                    // Check if last move was Struggle - if so, don't lock (delete the volatile)
+                    // Note: Unlike ThroatChop, this does NOT return early - the upkeep message still shows
                     if (target.LastMove is { Id: MoveId.Struggle })
                     {
                         target.DeleteVolatile(ConditionId.Uproar);
-                        return;
                     }
 
                     if (battle.DisplayUi)
