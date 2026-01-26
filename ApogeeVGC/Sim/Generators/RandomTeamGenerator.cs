@@ -127,15 +127,11 @@ public class RandomTeamGenerator
                 .Where(x => !usedSpecies.Contains(x) && !_restrictedSpecies.Contains(x))
                 .ToList();
 
-            if (nonRestrictedLegal.Count > 0)
-            {
-                speciesId = nonRestrictedLegal[_random.Next(nonRestrictedLegal.Count)];
-            }
-            else
-            {
+            speciesId = nonRestrictedLegal.Count > 0
+                ? nonRestrictedLegal[_random.Next(nonRestrictedLegal.Count)]
+                :
                 // Fallback to any unused legal species
-                speciesId = PickRandomUnused(_legalSpecies, usedSpecies);
-            }
+                PickRandomUnused(_legalSpecies, usedSpecies);
         }
 
         usedSpecies.Add(speciesId);

@@ -70,7 +70,7 @@ public class Driver
                 RunRndVsRndVgcRegIEvaluation();
                 break;
             default:
-                throw new NotImplementedException($"Driver mode {mode} is not implemented.");
+                throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
     }
 
@@ -705,7 +705,9 @@ public class Driver
         var seedCounter = 0;
         var completedBattles = 0;
         var turnOnBattleEnd = new ConcurrentBag<int>();
-        var exceptions = new ConcurrentBag<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>();
+        var exceptions =
+            new ConcurrentBag<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
+                Exception)>();
 
         // Run simulations in parallel with specified number of threads
         var parallelOptions = new ParallelOptions
@@ -750,7 +752,8 @@ public class Driver
             catch (Exception ex)
             {
                 // Store exception with all seed information for debugging
-                exceptions.Add((localTeam1Seed, localTeam2Seed, localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
+                exceptions.Add(
+                    (localTeam1Seed, localTeam2Seed, localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
 
                 // Log immediately to console
                 LogExceptionWithAllSeeds(
