@@ -2179,30 +2179,24 @@ public partial record Moves
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
                 {
                     // Check if this move is being modified by a pledge combo
-                    // TODO: ForceStab and SideCondition are init-only properties, so they cannot be
-                    // set at runtime. The current implementation using move.Self.SideCondition is a
-                    // workaround but applies to wrong side. The proper fix requires making these
-                    // properties settable or restructuring how pledge combos work.
-                    // For VGC, pledge combos are rarely used, so this is low priority.
                     if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.WaterPledge })
                     {
                         // Water Pledge + Fire Pledge = Water-type move with Water Pledge side condition (rainbow)
+                        // Rainbow applies to USER's side (doubles secondary effect chances)
                         move.Type = MoveType.Water;
-                        // TypeScript: move.self = { sideCondition: 'waterpledge' } (applies to user's side)
+                        move.ForceStab = true;
                         move.Self = new SecondaryEffect
                         {
-                            SideCondition = ConditionId.WaterPledge,
+                            SideCondition = ConditionId.WaterPledge, // Applies to user side via Self
                         };
                     }
                     else if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.GrassPledge })
                     {
                         // Grass Pledge + Fire Pledge = Fire-type move with Fire Pledge side condition (sea of fire)
+                        // Sea of fire applies to target's side (damages non-Fire types)
                         move.Type = MoveType.Fire;
-                        // TypeScript: move.sideCondition = 'firepledge' (applies to target side)
-                        move.Self = new SecondaryEffect
-                        {
-                            SideCondition = ConditionId.FirePledge,
-                        };
+                        move.ForceStab = true;
+                        move.SideCondition = ConditionId.FirePledge; // Applies to target side
                     }
                 }),
                 Target = MoveTarget.Normal,

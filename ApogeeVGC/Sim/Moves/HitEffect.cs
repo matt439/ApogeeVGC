@@ -10,7 +10,7 @@ public record HitEffect
     public SparseBoostsTable? Boosts { get; set; }
     public ConditionId? Status { get; init; }
     public ConditionId? VolatileStatus { get; set; }
-    public ConditionId? SideCondition { get; init; }
+    public ConditionId? SideCondition { get; set; } // Settable for pledge combo side conditions
     public ConditionId? SlotCondition { get; init; }
     public ConditionId? PseudoWeather { get; init; }
     public ConditionId? Terrain { get; init; }

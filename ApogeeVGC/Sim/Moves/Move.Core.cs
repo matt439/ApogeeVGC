@@ -139,7 +139,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     public StatIdExceptHp? OverrideOffensiveStat { get; set; } // Settable for Wonder Room swap
     public MoveOverridePokemon? OverrideDefensivePokemon { get; init; }
     public StatIdExceptHp? OverrideDefensiveStat { get; init; }
-    public bool? ForceStab { get; init; }
+    public bool? ForceStab { get; set; } // Settable for pledge combos
     public bool? IgnoreAbility { get; set; }
     public bool? IgnoreAccuracy { get; init; }
     public bool? IgnoreDefensive { get; init; }
