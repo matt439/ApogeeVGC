@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalse
 
@@ -16,7 +17,7 @@ public partial class Pokemon
 {
     public bool TransformInto(Pokemon pokemon, IEffect? effect = null)
     {
-        Species species = pokemon.Species;
+        var species = pokemon.Species;
 
         // Validation checks
         if (pokemon.Fainted || Illusion != null || pokemon.Illusion != null ||
@@ -40,7 +41,7 @@ public partial class Pokemon
 
         // Copy types
         var types = pokemon.GetTypes(excludeAdded: true, preterastallized: true);
-        if (pokemon.Volatiles.TryGetValue(ConditionId.Roost, out EffectState? roostState))
+        if (pokemon.Volatiles.TryGetValue(ConditionId.Roost, out var roostState))
         {
             // Use the type stored in Roost volatile
             if (roostState.TypeWas is not null)
@@ -62,7 +63,7 @@ public partial class Pokemon
         ApparentType = pokemon.ApparentType.ToList();
 
         // Copy stats (except HP)
-        foreach (StatIdExceptHp stat in Enum.GetValues<StatIdExceptHp>())
+        foreach (var stat in Enum.GetValues<StatIdExceptHp>())
         {
             StoredStats[stat] = pokemon.StoredStats[stat];
         }
@@ -72,10 +73,10 @@ public partial class Pokemon
 
         // Copy moves
         MoveSlots.Clear();
-        foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+        foreach (var moveSlot in pokemon.MoveSlots)
         {
-            int pp = moveSlot.MaxPp == 1 ? 1 : 5;
-            int maxPp = moveSlot.MaxPp == 1 ? 1 : 5;
+            var pp = moveSlot.MaxPp == 1 ? 1 : 5;
+            var maxPp = moveSlot.MaxPp == 1 ? 1 : 5;
 
             MoveSlots.Add(new MoveSlot
             {
@@ -92,7 +93,7 @@ public partial class Pokemon
         }
 
         // Copy boosts
-        foreach (BoostId boost in Enum.GetValues<BoostId>())
+        foreach (var boost in Enum.GetValues<BoostId>())
         {
             Boosts.SetBoost(boost, pokemon.Boosts.GetBoost(boost));
         }
@@ -105,15 +106,15 @@ public partial class Pokemon
         ];
 
         // Remove overlapping volatiles first
-        foreach (ConditionId volatileId in critVolatiles)
+        foreach (var volatileId in critVolatiles)
         {
             RemoveVolatile(Battle.Library.Conditions[volatileId]);
         }
 
         // Add them from target
-        foreach (ConditionId volatileId in critVolatiles)
+        foreach (var volatileId in critVolatiles)
         {
-            if (!pokemon.Volatiles.TryGetValue(volatileId, out EffectState? volatileState))
+            if (!pokemon.Volatiles.TryGetValue(volatileId, out var volatileState))
                 continue;
             AddVolatile(volatileId);
 
@@ -162,7 +163,7 @@ public partial class Pokemon
     /// </summary>
     public Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
     {
-        RelayVar? rv = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
+        var rv = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
         if (rv is null) return null;
 
         if (rv is SpecieRelayVar srv)
@@ -174,7 +175,7 @@ public partial class Pokemon
             throw new InvalidOperationException("species must be a SpecieRelayVar");
         }
 
-        Species species = srv.Species;
+        var species = srv.Species;
 
         SetType(species.Types.ToArray(), true);
         ApparentType = rawSpecies.Types.ToList();
@@ -183,7 +184,7 @@ public partial class Pokemon
         WeightHg = species.WeightHg;
 
         // Use BattleLevel for stat calculations (respects AdjustLevelDown for VGC)
-        StatsTable stats = Battle.SpreadModify(Species.BaseStats, Set, BattleLevel);
+        var stats = Battle.SpreadModify(Species.BaseStats, Set, BattleLevel);
         if (Species.MaxHp is not null)
         {
             stats.Hp = Species.MaxHp.Value;
@@ -229,14 +230,14 @@ public partial class Pokemon
         source ??= Battle.Effect;
 
         // Get the raw species from the battle library
-        Species rawSpecies = Battle.Library.Species[specieId];
+        var rawSpecies = Battle.Library.Species[specieId];
 
         // Attempt to set the species
-        Species? species = SetSpecie(rawSpecies, source);
+        var species = SetSpecie(rawSpecies, source);
         if (species == null) return false;
 
         // Determine the species the opponent sees (accounting for Illusion)
-        string apparentSpecies = Illusion?.Species.Name ?? species.BaseSpecies.ToString();
+        var apparentSpecies = Illusion?.Species.Name ?? species.BaseSpecies.ToString();
 
         if (isPermanent == true)
         {
@@ -245,7 +246,7 @@ public partial class Pokemon
 
             // Update details and send to client
             Details = GetUpdatedDetails();
-            string details = (Illusion ?? this).GetUpdatedDetails().ToString();
+            var details = (Illusion ?? this).GetUpdatedDetails().ToString();
 
             // Add Tera type to details if Terastallized
             if (Terastallized != null)
@@ -329,7 +330,7 @@ public partial class Pokemon
             }
 
             // Get the new ability from the species
-            AbilityId newAbility =
+            var newAbility =
                 species.Abilities.GetAbility(abilitySlot) ?? species.Abilities.Slot0;
 
             // Ogerpon's forme change doesn't override permanent abilities

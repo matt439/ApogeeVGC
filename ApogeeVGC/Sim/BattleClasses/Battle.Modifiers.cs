@@ -18,8 +18,8 @@ public partial class Battle
     public double Chain(double previousMod, double nextMod)
     {
         // Convert to fixed-point (4096-based)
-        int prevFixed = Trunc((int)(previousMod * 4096));
-        int nextFixed = Trunc((int)(nextMod * 4096));
+        var prevFixed = Trunc((int)(previousMod * 4096));
+        var nextFixed = Trunc((int)(nextMod * 4096));
 
         // Apply chaining formula: M'' = ((M * M') + 0x800) >> 12
         // The 0x800 (2048) is added for proper rounding
@@ -35,8 +35,8 @@ public partial class Battle
         }
 
         // Convert fraction to fixed-point
-        int prevFixed = Trunc(previousMod[0] * 4096 / previousMod[1]);
-        int nextFixed = Trunc((int)(nextMod * 4096));
+        var prevFixed = Trunc(previousMod[0] * 4096 / previousMod[1]);
+        var nextFixed = Trunc((int)(nextMod * 4096));
 
         return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
@@ -49,8 +49,8 @@ public partial class Battle
                 nameof(nextMod));
         }
 
-        int prevFixed = Trunc((int)(previousMod * 4096));
-        int nextFixed = Trunc(nextMod[0] * 4096 / nextMod[1]);
+        var prevFixed = Trunc((int)(previousMod * 4096));
+        var nextFixed = Trunc(nextMod[0] * 4096 / nextMod[1]);
 
         return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
@@ -62,14 +62,15 @@ public partial class Battle
             throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]",
                 nameof(previousMod));
         }
+
         if (nextMod.Length != 2)
         {
             throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]",
                 nameof(nextMod));
         }
 
-        int prevFixed = Trunc(previousMod[0] * 4096 / previousMod[1]);
-        int nextFixed = Trunc(nextMod[0] * 4096 / nextMod[1]);
+        var prevFixed = Trunc(previousMod[0] * 4096 / previousMod[1]);
+        var nextFixed = Trunc(nextMod[0] * 4096 / nextMod[1]);
 
         return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
@@ -78,10 +79,10 @@ public partial class Battle
     {
         // Get the current modifier from the event state as fixed-point
         // Default to 1.0 (4096 in fixed-point) if null
-        int previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
+        var previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
 
         // Convert the new modifier to fixed-point format
-        int nextMod = Trunc(numerator * 4096 / denominator);
+        var nextMod = Trunc(numerator * 4096 / denominator);
 
         // Chain the modifiers together and store back in the event
         // The >> 12 is a right shift by 12 bits (equivalent to dividing by 4096)
@@ -94,7 +95,8 @@ public partial class Battle
     {
         if (fraction.Length != 2)
         {
-            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]", nameof(fraction));
+            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]",
+                nameof(fraction));
         }
 
         return ChainModify(fraction[0], fraction[1]);
@@ -106,10 +108,11 @@ public partial class Battle
         {
             throw new ArgumentOutOfRangeException(nameof(fraction), "Fraction must be greater than 0.");
         }
+
         // Convert the double fraction to a fixed-point representation
-        int fixedPointFraction = Trunc((int)(fraction * 4096));
+        var fixedPointFraction = Trunc((int)(fraction * 4096));
         // Chain the fixed-point modification
-        int previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
+        var previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
         Event.Modifier = ((previousMod * fixedPointFraction + 2048) >> 12) / 4096.0;
         return fixedPointFraction;
     }
@@ -117,7 +120,7 @@ public partial class Battle
     public int Modify(int value, int numerator, int denominator = 1)
     {
         // Calculate the 4096-based fixed-point modifier
-        int modifier = Trunc(numerator * 4096 / denominator);
+        var modifier = Trunc(numerator * 4096 / denominator);
 
         // Apply the modifier with proper rounding
         return Trunc((Trunc(value * modifier) + 2048 - 1) / 4096);
@@ -140,8 +143,9 @@ public partial class Battle
         {
             throw new ArgumentOutOfRangeException(nameof(fraction), "Fraction must be greater than 0.");
         }
+
         // Convert the double fraction to a fixed-point representation
-        int fixedPointFraction = Trunc((int)(fraction * 4096));
+        var fixedPointFraction = Trunc((int)(fraction * 4096));
         // Apply the fixed-point modification
         return Trunc((Trunc(value * fixedPointFraction) + 2048 - 1) / 4096);
     }
@@ -161,10 +165,11 @@ public partial class Battle
         StatsTable modStats = new();
 
         // iterate through all stats in baseStats
-        foreach (StatId statName in baseStats.Keys)
+        foreach (var statName in baseStats.Keys)
         {
             modStats[statName] = StatModify(baseStats, set, statName, level);
         }
+
         return modStats;
     }
 
@@ -189,9 +194,9 @@ public partial class Battle
     /// </summary>
     public int StatModify(StatsTable baseStats, PokemonSet set, StatId statName, int level)
     {
-        int stat = baseStats.GetStat(statName);
-        int iv = set.Ivs.GetStat(statName);
-        int ev = set.Evs.GetStat(statName);
+        var stat = baseStats.GetStat(statName);
+        var iv = set.Ivs.GetStat(statName);
+        var ev = set.Evs.GetStat(statName);
 
         // HP calculation uses a different formula
         if (statName == StatId.Hp)
@@ -204,7 +209,7 @@ public partial class Battle
         stat = Trunc(Trunc(2 * stat + iv + Trunc(ev / 4)) * level / 100 + 5);
 
         // Apply nature modifiers
-        Nature nature = set.Nature;
+        var nature = set.Nature;
 
         // Natures are calculated with 16-bit truncation
         // This only affects Eternatus-Eternamax in Pure Hackmons
@@ -222,6 +227,7 @@ public partial class Battle
             stat = RuleTable.Has(RuleId.OverflowStatMod) ? Math.Min(stat, 728) : stat;
             stat = Trunc(Trunc(stat * 90, 16) / 100);
         }
+
         return stat;
     }
 
@@ -255,7 +261,7 @@ public partial class Battle
 
         // For other bit counts, scale up by 2^bits, truncate, then scale back down
         // This effectively performs: Math.Floor(num / (2^bits)) * (2^bits)
-        int divisor = 1 << bits; // 2^bits
+        var divisor = 1 << bits; // 2^bits
         return (num / divisor) * divisor;
     }
 
@@ -270,6 +276,7 @@ public partial class Battle
         {
             return min.Value;
         }
+
         return num > max ? max.Value : num;
     }
 }

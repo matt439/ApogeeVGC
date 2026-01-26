@@ -21,18 +21,18 @@ public partial class Pokemon : IPriorityComparison
     public string FullName => $"{Side.Id.ToString()}: {Name}";
 
     public string Fullname => $"{Side.Id.GetSideIdName()}: {Name}";
-    
+
     /// <summary>
     /// The Pokemon's original level from the team set (1-100).
     /// </summary>
     public int Level => Set.Level;
-    
+
     /// <summary>
     /// The Pokemon's effective level for battle, adjusted by format rules.
     /// For VGC formats with AdjustLevelDown = 50, Pokemon above level 50 are scaled down.
     /// </summary>
     public int BattleLevel { get; }
-    
+
     public GenderId Gender => Set.Gender;
     public int Happiness => Set.Happiness;
     public PokeballId Pokeball => Set.Pokeball;
@@ -130,7 +130,7 @@ public partial class Pokemon : IPriorityComparison
 
     public double WeightKg { get; set; }
     public int WeightHg { get; set; }
-    public IntFalseUnion Order =>int.MaxValue;
+    public IntFalseUnion Order => int.MaxValue;
     public int Priority => 0;
     public int Speed { get; set; }
     public int SubOrder => 0;
@@ -226,9 +226,9 @@ public partial class Pokemon : IPriorityComparison
                 Target = move.Target,
                 Disabled = false,
                 DisabledSource = null,
-                Used = false, 
-                }
-            );
+                Used = false,
+            }
+        );
         BaseMoveSlots = baseMoveSlots;
 
         // Position = 0;
@@ -249,7 +249,7 @@ public partial class Pokemon : IPriorityComparison
         };
 
         BaseAbility = set.Ability;
-     Ability = BaseAbility;
+        Ability = BaseAbility;
         AbilityState = battle.InitEffectState(Ability, null, this);
 
         Item = set.Item;
@@ -291,8 +291,8 @@ public partial class Pokemon : IPriorityComparison
     /// </summary>
     public PokemonSlot GetSlot()
     {
-        int positionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
-        int slotPosition = Position + positionOffset;
+        var positionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
+        var slotPosition = Position + positionOffset;
         return new PokemonSlot(Side.Id, slotPosition);
     }
 
@@ -305,7 +305,7 @@ public partial class Pokemon : IPriorityComparison
     public override string ToString()
     {
         // Determine the full name to display (real or illusion)
-        string fullname = Illusion != null ? Illusion.Fullname : FullName;
+        var fullname = Illusion != null ? Illusion.Fullname : FullName;
 
         // If active, combine slot identifier with name (skip first 2 chars of fullname)
         // Otherwise just return the full name
@@ -314,7 +314,7 @@ public partial class Pokemon : IPriorityComparison
 
     public PokemonDetails GetUpdatedDetails(int? level = null)
     {
-        SpecieId id = Species.Id;
+        var id = Species.Id;
 
         // Handle special forms that should use base species name
         if (id is SpecieId.GreninjaBond or SpecieId.RockruffDusk)
@@ -323,7 +323,7 @@ public partial class Pokemon : IPriorityComparison
         }
 
         // Use provided level or fall back to Pokemon's battle level (adjusted for format rules)
-        int displayLevel = level ?? BattleLevel;
+        var displayLevel = level ?? BattleLevel;
 
         var details = new PokemonDetails
         {
@@ -340,8 +340,8 @@ public partial class Pokemon : IPriorityComparison
 
     private SideSecretSharedResult GetFullDetailsData()
     {
-        SideSecretSharedResult health = GetHealth();
-        PokemonDetails details = Details;
+        var health = GetHealth();
+        var details = Details;
         if (Illusion is not null)
         {
             details = Illusion.GetUpdatedDetails(Level);
@@ -353,7 +353,7 @@ public partial class Pokemon : IPriorityComparison
         }
 
         // Combine details string with health string
-        string detailsStr = details.ToString();
+        var detailsStr = details.ToString();
         Secret secretFullDetails = $"{detailsStr}|{health.Secret}";
         Shared sharedFullDetails = $"{detailsStr}|{health.Shared}";
 
@@ -362,7 +362,7 @@ public partial class Pokemon : IPriorityComparison
 
     public int GetUndynamaxedHp(int? amount = null)
     {
-        int hp = amount ?? Hp;
+        var hp = amount ?? Hp;
         return hp;
     }
 
@@ -384,7 +384,7 @@ public partial class Pokemon : IPriorityComparison
         }
 
         // Build secret HP string (always exact)
-        string secretStr = $"{Hp}/{MaxHp}";
+        var secretStr = $"{Hp}/{MaxHp}";
         string sharedStr;
         HpColor? hpColor = null;
 
@@ -396,11 +396,12 @@ public partial class Pokemon : IPriorityComparison
         else if (Battle.ReportPercentages || Battle.Gen >= 7)
         {
             // HP Percentage Mod mechanics
-            int percentage = (int)Math.Ceiling(100.0 * Hp / MaxHp);
+            var percentage = (int)Math.Ceiling(100.0 * Hp / MaxHp);
             if (percentage == 100 && Hp < MaxHp)
             {
                 percentage = 99;
             }
+
             sharedStr = $"{percentage}/100";
 
             // Calculate HP color based on percentage
@@ -417,7 +418,7 @@ public partial class Pokemon : IPriorityComparison
             // PS doesn't use pixels after Gen 6, but for reference:
             // - [Gen 7] SM uses 99 pixels
             // - [Gen 7] USUM uses 86 pixels
-            int pixels = (int)Math.Floor(48.0 * Hp / MaxHp);
+            var pixels = (int)Math.Floor(48.0 * Hp / MaxHp);
             if (pixels == 0) pixels = 1; // Equivalent to: || 1
 
             sharedStr = $"{pixels}/48";
@@ -426,13 +427,13 @@ public partial class Pokemon : IPriorityComparison
             {
                 if (pixels == 9)
                 {
-                    string colorSuffix = Hp * 5 > MaxHp ? "y" : "r";
+                    var colorSuffix = Hp * 5 > MaxHp ? "y" : "r";
                     sharedStr += colorSuffix;
                     hpColor = colorSuffix == "y" ? HpColor.Yellow : HpColor.Red;
                 }
                 else if (pixels == 24)
                 {
-                    string colorSuffix = Hp * 2 > MaxHp ? "g" : "y";
+                    var colorSuffix = Hp * 2 > MaxHp ? "g" : "y";
                     sharedStr += colorSuffix;
                     hpColor = colorSuffix == "g" ? HpColor.Green : HpColor.Yellow;
                 }
@@ -441,7 +442,7 @@ public partial class Pokemon : IPriorityComparison
             // For other pixel values, calculate color based on pixel ratio
             if (!hpColor.HasValue)
             {
-                double hpRatio = (double)Hp / MaxHp;
+                var hpRatio = (double)Hp / MaxHp;
                 hpColor = hpRatio switch
                 {
                     > 0.5 => HpColor.Green,
@@ -465,4 +466,5 @@ public partial class Pokemon : IPriorityComparison
         {
             HpColor = hpColor,
         };
-    }}
+    }
+}

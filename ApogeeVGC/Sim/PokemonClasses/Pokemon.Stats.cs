@@ -25,7 +25,7 @@ public partial class Pokemon
     public int CalculateStat(StatIdExceptHp statName, int boost, int? modifier = null, Pokemon? statUser = null)
     {
         // Get base stat from stored stats
-        int stat = StoredStats[statName];
+        var stat = StoredStats[statName];
 
         // Wonder Room swaps Defense and Special Defense BEFORE any other calculations
         if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
@@ -40,12 +40,12 @@ public partial class Pokemon
 
         // Create sparse boosts table with only the stat we're calculating
         var boosts = new SparseBoostsTable();
-        BoostId boostName = statName.ConvertToBoostId();
+        var boostName = statName.ConvertToBoostId();
         boosts.SetBoost(boostName, boost);
 
         // Run ModifyBoost event to allow abilities/items/conditions to modify boosts
         // Example: Simple ability doubles boost stages
-        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, statUser ?? this, null,
+        var boostEvent = Battle.RunEvent(EventId.ModifyBoost, statUser ?? this, null,
             null, boosts);
 
         if (boostEvent is SparseBoostsTableRelayVar brv)
@@ -76,7 +76,7 @@ public partial class Pokemon
     public int GetStat(StatIdExceptHp statName, bool unboosted = false, bool unmodified = false)
     {
         // Get base stat from stored stats
-        int stat = StoredStats[statName];
+        var stat = StoredStats[statName];
 
         // Download ignores Wonder Room's effect, but this results in
         // stat stages being calculated on the opposite defensive stat
@@ -94,10 +94,10 @@ public partial class Pokemon
         // Stat boosts
         if (!unboosted)
         {
-            BoostsTable boosts = Boosts;
+            var boosts = Boosts;
             if (!unmodified)
             {
-                RelayVar? relayVar = Battle.RunEvent(EventId.ModifyBoost, this, null,
+                var relayVar = Battle.RunEvent(EventId.ModifyBoost, this, null,
                     null, boosts);
 
                 if (relayVar is BoostsTableRelayVar brv)
@@ -109,13 +109,14 @@ public partial class Pokemon
                     throw new InvalidOperationException("boosts must be a BoostsTableRelayVar");
                 }
             }
-                    stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
-                }
 
-                // Stat modifier effects
-                if (!unmodified)
-                {
-                    EventId eventId = statName switch
+            stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
+        }
+
+        // Stat modifier effects
+        if (!unmodified)
+        {
+            var eventId = statName switch
             {
                 StatIdExceptHp.Atk => EventId.ModifyAtk,
                 StatIdExceptHp.Def => EventId.ModifyDef,
@@ -124,46 +125,48 @@ public partial class Pokemon
                 StatIdExceptHp.Spe => EventId.ModifySpe,
                 _ => throw new ArgumentOutOfRangeException(nameof(statName), "Invalid stat name."),
             };
-            RelayVar? relayVar = Battle.RunEvent(eventId, this, null, null, new IntRelayVar(stat));
+            var relayVar = Battle.RunEvent(eventId, this, null, null, new IntRelayVar(stat));
             if (relayVar is IntRelayVar irv)
             {
                 stat = irv.Value;
             }
             else
             {
-                                string relayVarType = relayVar?.GetType().Name ?? "null";
-                                throw new InvalidOperationException(
-                                    $"stat must be an IntRelayVar, but got {relayVarType} for {Name}'s {statName} (Event: {eventId})");
-                            }
-                        }
+                var relayVarType = relayVar?.GetType().Name ?? "null";
+                throw new InvalidOperationException(
+                    $"stat must be an IntRelayVar, but got {relayVarType} for {Name}'s {statName} (Event: {eventId})");
+            }
+        }
 
-                        if (statName == StatIdExceptHp.Spe && stat > 10000) stat = 10000;
+        if (statName == StatIdExceptHp.Spe && stat > 10000) stat = 10000;
         return stat;
     }
 
     public int GetActionSpeed()
     {
-        int speed = GetStat(StatIdExceptHp.Spe);
+        var speed = GetStat(StatIdExceptHp.Spe);
         if (Battle.Field.GetPseudoWeather(ConditionId.TrickRoom) is not null)
         {
             speed = TrickRoomSpeedOffset - speed;
         }
+
         return speed;
     }
 
     public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
     {
-        int bestStatValue = 0;
+        var bestStatValue = 0;
         var bestStatName = StatIdExceptHp.Atk;
 
         // Iterate through all stat types except HP
-        foreach (StatIdExceptHp statId in Enum.GetValues<StatIdExceptHp>())
+        foreach (var statId in Enum.GetValues<StatIdExceptHp>())
         {
-            int currentStatValue = GetStat(statId, unboosted, unmodified);
+            var currentStatValue = GetStat(statId, unboosted, unmodified);
             if (currentStatValue <= bestStatValue) continue;
             bestStatValue = currentStatValue;
             bestStatName = statId;
         }
+
         return bestStatName;
     }
 
@@ -176,7 +179,7 @@ public partial class Pokemon
     public int GetWeight()
     {
         // Run ModifyWeight event to allow abilities/items/conditions to modify weight
-        RelayVar? weightEvent = Battle.RunEvent(EventId.ModifyWeight, this, null, null,
+        var weightEvent = Battle.RunEvent(EventId.ModifyWeight, this, null, null,
             WeightHg);
 
         int modifiedWeight;
@@ -196,10 +199,10 @@ public partial class Pokemon
 
     public void UpdateMaxHp()
     {
-        int newBaseMaxHp = Battle.StatModify(Species.BaseStats, Set, StatId.Hp, BattleLevel);
+        var newBaseMaxHp = Battle.StatModify(Species.BaseStats, Set, StatId.Hp, BattleLevel);
         if (newBaseMaxHp == BaseMaxHp) return;
         BaseMaxHp = newBaseMaxHp;
-        int newMaxHp = BaseMaxHp;
+        var newMaxHp = BaseMaxHp;
         Hp = Hp <= 0 ? 0 : Math.Max(1, newMaxHp - (MaxHp - Hp));
         MaxHp = newMaxHp;
         if (Hp > 0)
@@ -216,23 +219,24 @@ public partial class Pokemon
     public int PositiveBoosts()
     {
         // Iterate through all boost types
-        return Enum.GetValues<BoostId>().Select(boostId => Boosts.GetBoost(boostId)).
-            Where(boostValue => boostValue > 0).Sum();
+        return Enum.GetValues<BoostId>().Select(boostId => Boosts.GetBoost(boostId)).Where(boostValue => boostValue > 0)
+            .Sum();
     }
 
     public SparseBoostsTable GetCappedBoost(SparseBoostsTable boosts)
     {
         SparseBoostsTable cappedBoost = new();
-        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
+        foreach (var (boostId, value) in boosts.GetNonNullBoosts())
         {
             // Get current boost value for this stat
-            int currentBoost = Boosts.GetBoost(boostId);
+            var currentBoost = Boosts.GetBoost(boostId);
 
             // Calculate capped boost: clamp(current + incoming) - current
             // This gives us the actual amount we can boost (respecting -6 to +6 limits)
-            int cappedValue = Battle.ClampIntRange(currentBoost + value, -6, 6) - currentBoost;
+            var cappedValue = Battle.ClampIntRange(currentBoost + value, -6, 6) - currentBoost;
             cappedBoost.SetBoost(boostId, cappedValue);
         }
+
         return cappedBoost;
     }
 
@@ -247,10 +251,10 @@ public partial class Pokemon
         // Cap all boosts to respect -6 to +6 limits
         boosts = GetCappedBoost(boosts);
 
-        int delta = 0;
+        var delta = 0;
 
         // Apply each boost to the Pokemon's current boosts
-        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
+        foreach (var (boostId, value) in boosts.GetNonNullBoosts())
         {
             delta = value;
             Boosts.SetBoost(boostId, Boosts.GetBoost(boostId) + delta);
@@ -277,7 +281,7 @@ public partial class Pokemon
     public void SetBoost(SparseBoostsTable boosts)
     {
         // Iterate through all non-null boosts in the sparse table and set them
-        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
+        foreach (var (boostId, value) in boosts.GetNonNullBoosts())
         {
             Boosts.SetBoost(boostId, value);
         }
