@@ -150,6 +150,12 @@ public partial class Battle
         {
             Pokemon pokemon = pokemonTarget.Pokemon;
 
+            // Guard against null pokemon (can occur despite non-nullable declaration)
+            if (pokemon is null)
+            {
+                return handlers;
+            }
+
             if (pokemon.IsActive || (source?.IsActive ?? false))
             {
                 handlers = FindPokemonEventHandlers(pokemon, eventName);
@@ -159,6 +165,9 @@ public partial class Battle
                     // Check allies (including self) for Ally and Any prefixed events
                     foreach (Pokemon allyActive in pokemon.AlliesAndSelf())
                     {
+                        // Guard against null allies (defensive)
+                        if (allyActive is null) continue;
+
                         handlers.AddRange(FindPokemonEventHandlers(allyActive, eventName,
                             EventPrefix.Ally));
                         handlers.AddRange(FindPokemonEventHandlers(allyActive, eventName,
@@ -168,6 +177,9 @@ public partial class Battle
                     // Check foes for Foe and Any prefixed events
                     foreach (Pokemon foeActive in pokemon.Foes())
                     {
+                        // Guard against null foes (defensive)
+                        if (foeActive is null) continue;
+
                         handlers.AddRange(FindPokemonEventHandlers(foeActive, eventName,
                             EventPrefix.Foe));
                         handlers.AddRange(FindPokemonEventHandlers(foeActive, eventName,
