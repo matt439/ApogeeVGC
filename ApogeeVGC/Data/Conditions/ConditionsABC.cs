@@ -194,35 +194,20 @@ public partial record Conditions
                 ImmuneTypes = [PokemonType.Fire],
                 OnStart = new OnStartEventInfo((battle, target, source, sourceEffect) =>
                 {
-                    if (sourceEffect is null)
-                    {
-                        throw new ArgumentNullException(
-                            $"Source effect is null when trying to apply" +
-                            $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
-                    }
-
                     if (!battle.DisplayUi) return new VoidReturn();
 
-                    switch (sourceEffect.EffectType)
+                    if (sourceEffect is Item { Id: ItemId.FlameOrb })
                     {
-                        case EffectType.Item:
-                            if (sourceEffect is Item { Id: ItemId.FlameOrb })
-                            {
-                                battle.Add("-status", target, "brn", "[from] item: Flame Orb");
-                            }
-
-                            break;
-                        case EffectType.Ability:
-                            if (sourceEffect is Ability)
-                            {
-                                battle.Add("-status", target, "brn", "[from] ability: " +
-                                                                     sourceEffect.Name, $"[of] {source}");
-                            }
-
-                            break;
-                        case EffectType.Move:
-                            battle.Add("-status", target, "brn");
-                            break;
+                        battle.Add("-status", target, "brn", "[from] item: Flame Orb");
+                    }
+                    else if (sourceEffect?.EffectType == EffectType.Ability)
+                    {
+                        battle.Add("-status", target, "brn", "[from] ability: " +
+                                                             sourceEffect.Name, $"[of] {source}");
+                    }
+                    else
+                    {
+                        battle.Add("-status", target, "brn");
                     }
 
                     return new VoidReturn();

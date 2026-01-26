@@ -80,7 +80,7 @@ public partial record Conditions
                 {
                     if (!battle.DisplayUi) return new VoidReturn();
 
-                    if (sourceEffect.EffectType == EffectType.Ability)
+                    if (sourceEffect?.EffectType == EffectType.Ability)
                     {
                         battle.Add("-status", target, "psn", "[from] ability: " +
                                                              sourceEffect.Name, $"[of] {source}");
@@ -92,6 +92,10 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
+                // OnResidualOrder = 9
+                OnResidual = new OnResidualEventInfo(
+                    (battle, pokemon, _, _) => { battle.Damage(pokemon.BaseMaxHp / 8); },
+                    9),
             },
             [ConditionId.Protect] = new()
             {
