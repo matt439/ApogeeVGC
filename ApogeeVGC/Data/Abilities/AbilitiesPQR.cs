@@ -959,6 +959,11 @@ public partial record Abilities
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
                         target, _, effect) =>
                     {
+                        if (effect == null)
+                        {
+                            return IntBoolUnion.FromInt(damage);
+                        }
+
                         if (effect.EffectStateId == ItemId.BerryJuice ||
                             effect.EffectStateId == ItemId.Leftovers)
                         {

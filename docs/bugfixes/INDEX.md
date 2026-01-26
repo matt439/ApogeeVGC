@@ -15,6 +15,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Condition to Ability Cast Fix](#condition-to-ability-cast-fix) - InvalidCastException when trying to cast Condition to Ability
 - [ModifyAccuracy Event Parameter Nullability Fix](#modifyaccuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves
 - [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
+- [Ripen Ability Null Effect Fix](#ripen-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -773,6 +774,29 @@ OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, type, m
 **Impact**: Effectiveness event handlers can now properly receive and use the `PokemonType` parameter to modify type matchup calculations.
 
 **Keywords**: `Effectiveness`, `type effectiveness`, `PokemonType`, `Iron Ball`, `event parameter`, `event source`, `TypeRunEventSource`, `parameter resolution`, `type matchup`
+
+---
+
+### Ripen Ability Null Effect Fix
+**File**: `RipenNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Ripen ability `OnTryHeal` event handler
+
+**Problem**: The Ripen ability crashed with a `NullReferenceException` when trying to access `effect.EffectStateId` in its `OnTryHeal` handler. The error occurred when a Pokémon with Ripen was healed from sources that don't have an associated `IEffect` (e.g., natural regeneration, certain abilities).
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its properties. The TypeScript reference implementation includes an explicit null check (`if (!effect) return;`) that was missing from the C# port.
+
+**Solution**: Added a null guard at the beginning of the `OnTryHeal` handler:
+```csharp
+if (effect == null)
+{
+    return IntBoolUnion.FromInt(damage);
+}
+```
+
+**Impact**: When `effect` is null, the healing proceeds unchanged without activating Ripen's berry-doubling logic, matching the correct TypeScript behavior.
+
+**Keywords**: `ripen`, `ability`, `OnTryHeal`, `null reference`, `effect parameter`, `berry`, `healing`, `item`, `null check`
 
 ---
 
