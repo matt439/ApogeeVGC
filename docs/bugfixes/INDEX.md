@@ -13,6 +13,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Int passed to RunEvent instead of IntRelayVar
 - [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix) - ConditionIdRelayVar not converted to PokemonTypeConditionIdUnion
 - [Condition to Ability Cast Fix](#condition-to-ability-cast-fix) - InvalidCastException when trying to cast Condition to Ability
+- [ModifyAccuracy Event Parameter Nullability Fix](#modifyaccuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -669,6 +670,31 @@ When documenting a new bug fix:
 
 ## Testing
 [How to verify the fix]
+
+---
+
+### ModifyAccuracy Event Parameter Nullability Fix
+**File**: `ModifyAccuracyEventParameterNullabilityFix.md`  
+**Severity**: High  
+**Systems Affected**: ModifyAccuracy event handlers (abilities like Hustle, Compound Eyes; items like Wide Lens, Zoom Lens)
+
+**Problem**: The `ModifyAccuracy` event handler signature declared the `accuracy` parameter as `int` (non-nullable), but moves with true accuracy (always-hit moves) pass `BoolRelayVar(true)` instead of `IntRelayVar`. This caused parameter resolution to fail when abilities tried to process always-hit moves.
+
+**Root Cause**: TypeScript allows `accuracy: number | true`, but C# signature used `int` (non-nullable). TypeScript handlers check `typeof accuracy === 'number'` before modifying, but C# handlers had no way to distinguish between numeric accuracy and always-hit moves.
+
+**Solution**:
+- Changed all `ModifyAccuracy` event handler signatures to use `int?` (nullable int)
+- Updated `EventHandlerAdapter.TryUnwrapRelayVar` to convert `BoolRelayVar(true)` ? `null` for `int?` parameters
+- Updated all handler implementations (Hustle, Compound Eyes, Sand Veil, Snow Cloak, Tangled Feet, Victory Star, Wide Lens, Zoom Lens, Bright Powder) to check `accuracy.HasValue` before modifying
+
+**Semantic Mapping**:
+- TypeScript `typeof accuracy === 'number'` ? C# `accuracy.HasValue`
+- TypeScript `true` (always hit) ? C# `null`
+
+**Keywords**: `ModifyAccuracy`, `accuracy`, `nullable`, `int?`, `Hustle`, `event parameter`, `type mismatch`, `BoolRelayVar`, `always-hit moves`
+
+---
+
 
 ## Keywords
 [Searchable terms]

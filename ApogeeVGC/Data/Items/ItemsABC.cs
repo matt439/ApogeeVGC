@@ -588,9 +588,14 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
                 {
-                    battle.Debug("brightpowder - decreasing accuracy");
-                    battle.ChainModify([3686, 4096]);
-                    return battle.FinalModify(accuracy);
+                    // Only modify numeric accuracy
+                    if (accuracy.HasValue)
+                    {
+                        battle.Debug("brightpowder - decreasing accuracy");
+                        battle.ChainModify([3686, 4096]);
+                        return battle.FinalModify(accuracy.Value);
+                    }
+                    return accuracy;
                 }, -2),
                 Num = 213,
                 Gen = 2,

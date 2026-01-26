@@ -168,11 +168,12 @@ public partial record Items
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
                     (battle, accuracy, _, _, move) =>
                     {
-                        // Only modify if move doesn't always hit
-                        if (move.AlwaysHit != true)
+                        // Only modify numeric accuracy (TypeScript: typeof accuracy === 'number')
+                        // Moves with true accuracy (always hit) have accuracy == null
+                        if (accuracy.HasValue)
                         {
                             battle.ChainModify([4505, 4096]);
-                            int result = battle.FinalModify(accuracy);
+                            int result = battle.FinalModify(accuracy.Value);
                             return DoubleVoidUnion.FromDouble(result);
                         }
 

@@ -514,10 +514,12 @@ public partial record Abilities
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
                     (battle, accuracy, _, _, move) =>
                     {
-                        if (move.Category == MoveCategory.Physical)
+                        // Only modify accuracy for physical moves with numeric accuracy
+                        // (TypeScript checks: move.category === 'Physical' && typeof accuracy === 'number')
+                        if (move.Category == MoveCategory.Physical && accuracy.HasValue)
                         {
                             battle.ChainModify([3277, 4096]);
-                            return battle.FinalModify(accuracy);
+                            return battle.FinalModify(accuracy.Value);
                         }
 
                         return accuracy;

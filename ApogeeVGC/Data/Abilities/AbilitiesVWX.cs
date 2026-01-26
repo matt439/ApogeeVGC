@@ -60,10 +60,11 @@ public partial record Abilities
                                 Pokemon: var abilityHolder,
                             })
                             return accuracy;
-                        if (source.IsAlly(abilityHolder))
+                        // Only modify numeric accuracy
+                        if (accuracy.HasValue && source.IsAlly(abilityHolder))
                         {
                             battle.ChainModify([4506, 4096]);
-                            return battle.FinalModify(accuracy);
+                            return battle.FinalModify(accuracy.Value);
                         }
 
                         return accuracy;

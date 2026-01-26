@@ -8,7 +8,8 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnAnyModifyAccuracy event.
 /// Modifies accuracy for any move in battle.
-/// Signature: (Battle battle, int relayVar, Pokemon target, Pokemon source, ActiveMove move) => DoubleVoidUnion
+/// Signature: (Battle battle, int? relayVar, Pokemon target, Pokemon source, ActiveMove move) => DoubleVoidUnion
+/// Note: accuracy is nullable because moves with true accuracy (always hit) pass null/true instead of a number
 /// </summary>
 public sealed record OnAnyModifyAccuracyEventInfo : EventHandlerInfo
 {
@@ -19,7 +20,7 @@ public sealed record OnAnyModifyAccuracyEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnAnyModifyAccuracyEventInfo(
-Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+Func<Battle, int?, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
         int? priority = null,
    bool usesSpeed = true)
     {
@@ -31,15 +32,15 @@ Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
   ExpectedParameterTypes =
         [
    typeof(Battle),
-typeof(int),
+typeof(int?),
    typeof(Pokemon),
             typeof(Pokemon),
   typeof(ActiveMove),
         ];
      ExpectedReturnType = typeof(DoubleVoidUnion);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
+    // Nullability: accuracy parameter is nullable (position 1)
+        ParameterNullability = [false, true, false, false, false];
         ReturnTypeNullable = false;
     
     // Validate configuration

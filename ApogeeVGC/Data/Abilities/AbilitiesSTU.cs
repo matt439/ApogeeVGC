@@ -123,11 +123,12 @@ public partial record Abilities
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
                 {
-                    if (battle.Field.IsWeather(ConditionId.Sandstorm))
+                    // Only modify numeric accuracy
+                    if (accuracy.HasValue && battle.Field.IsWeather(ConditionId.Sandstorm))
                     {
                         battle.Debug("Sand Veil - decreasing accuracy");
                         battle.ChainModify([3277, 4096]);
-                        return battle.FinalModify(accuracy);
+                        return battle.FinalModify(accuracy.Value);
                     }
 
                     return accuracy;
@@ -683,11 +684,12 @@ public partial record Abilities
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
                 {
-                    if (battle.Field.IsWeather(ConditionId.Snowscape))
+                    // Only modify numeric accuracy
+                    if (accuracy.HasValue && battle.Field.IsWeather(ConditionId.Snowscape))
                     {
                         battle.Debug("Snow Cloak - decreasing accuracy");
                         battle.ChainModify([3277, 4096]);
-                        return battle.FinalModify(accuracy);
+                        return battle.FinalModify(accuracy.Value);
                     }
 
                     return accuracy;
@@ -1468,11 +1470,12 @@ public partial record Abilities
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, target, _, _) =>
                 {
-                    if (target.Volatiles.ContainsKey(ConditionId.Confusion))
+                    // Only modify numeric accuracy
+                    if (accuracy.HasValue && target.Volatiles.ContainsKey(ConditionId.Confusion))
                     {
                         battle.Debug("Tangled Feet - decreasing accuracy");
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(accuracy);
+                        return battle.FinalModify(accuracy.Value);
                     }
 
                     return accuracy;

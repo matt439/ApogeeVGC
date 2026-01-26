@@ -1016,9 +1016,14 @@ public partial record Abilities
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
                     (battle, accuracy, _, _, _) =>
                     {
-                        battle.Debug("compoundeyes - enhancing accuracy");
-                        battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(accuracy);
+                        // Only modify numeric accuracy (TypeScript: typeof accuracy === 'number')
+                        if (accuracy.HasValue)
+                        {
+                            battle.Debug("compoundeyes - enhancing accuracy");
+                            battle.ChainModify([5325, 4096]);
+                            return battle.FinalModify(accuracy.Value);
+                        }
+                        return accuracy;
                     }, -1),
             },
             [AbilityId.Contrary] = new()

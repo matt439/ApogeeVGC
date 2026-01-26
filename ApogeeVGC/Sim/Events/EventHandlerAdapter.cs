@@ -287,6 +287,21 @@ internal static class EventHandlerAdapter
             return true;
         }
 
+        // Handle nullable int (int?)
+        if (relayVar is IntRelayVar intVarNullable && targetType == typeof(int?))
+        {
+            value = intVarNullable.Value;
+            return true;
+        }
+
+        // Handle BoolRelayVar(true) -> null for nullable int (for accuracy events)
+        // In TypeScript, moves with true accuracy pass `true`, which maps to null in C#
+        if (relayVar is BoolRelayVar { Value: true } && targetType == typeof(int?))
+        {
+            value = null;
+            return true;
+        }
+
         // Handle decimal -> int conversion (for stat modifications that return decimal but parameter expects int)
         if (relayVar is DecimalRelayVar decVarToInt && (targetType == typeof(int) || targetType == typeof(Int32)))
         {
