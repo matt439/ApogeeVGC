@@ -801,14 +801,10 @@ public partial record Conditions
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     var source = battle.EffectState.Source;
-                    // G-Max Centiferno and G-Max Sandblast continue even after the user leaves the field
                     var sourceEffect = battle.EffectState.SourceEffect;
-                    var gmaxEffect = sourceEffect is
-                        { Name: "G-Max Centiferno" or "G-Max Sandblast" };
 
                     if (source != null &&
-                        (!source.IsActive || source.Hp <= 0 || source.ActiveTurns <= 0) &&
-                        !gmaxEffect)
+                        (!source.IsActive || source.Hp <= 0 || source.ActiveTurns <= 0))
                     {
                         pokemon.DeleteVolatile(ConditionId.PartiallyTrapped);
                         if (battle.DisplayUi)
@@ -833,11 +829,8 @@ public partial record Conditions
                 }),
                 OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
                 {
-                    var sourceEffect = battle.EffectState.SourceEffect;
-                    var gmaxEffect = sourceEffect is
-                        { Name: "G-Max Centiferno" or "G-Max Sandblast" };
                     var source = battle.EffectState.Source;
-                    if (source is { IsActive: true } || gmaxEffect)
+                    if (source is { IsActive: true })
                     {
                         pokemon.TryTrap();
                     }
