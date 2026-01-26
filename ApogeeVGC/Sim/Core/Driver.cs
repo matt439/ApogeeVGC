@@ -876,9 +876,9 @@ public class Driver
         using var cts = new CancellationTokenSource();
         var simulationTask = Task.Run(() =>
         {
-            // Generate random teams using the team seeds
-            var team1Generator = new RandomTeamGenerator(Library, team1Seed);
-            var team2Generator = new RandomTeamGenerator(Library, team2Seed);
+            // Generate random teams using the team seeds for VGC Regulation I
+            var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, team1Seed);
+            var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, team2Seed);
 
             var team1 = team1Generator.GenerateTeam();
             var team2 = team2Generator.GenerateTeam();

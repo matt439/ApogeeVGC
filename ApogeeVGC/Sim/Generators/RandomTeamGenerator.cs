@@ -1,5 +1,6 @@
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -10,20 +11,28 @@ namespace ApogeeVGC.Sim.Generators;
 
 /// <summary>
 /// Generates random Pokemon teams for VGC formats.
+/// Supports different VGC regulations (A-I) with proper handling of restricted Pokemon limits.
 /// Uses a seed for reproducibility when debugging exceptions.
 /// </summary>
 public class RandomTeamGenerator
 {
-    private const int TeamSize = 6;
     private const int MoveCount = 4;
-    private const int EvLimit = 510;
     private const int MaxEvPerStat = 252;
 
     private readonly Library _library;
+    private readonly Format _format;
     private readonly Random _random;
 
-    // Cache of legal species for VGC Regulation I (no Mythical, no Restricted Legendary)
+    // Settings extracted from format RuleTable
+    private readonly int _teamSize;
+    private readonly int _evLimit;
+    private readonly int _maxRestrictedCount;
+
+    // Cache of legal species for the format (excluding banned categories)
     private readonly List<SpecieId> _legalSpecies;
+
+    // Cache of restricted legendary species (for formats that allow them)
+    private readonly List<SpecieId> _restrictedSpecies;
 
     // Cache of usable items (exclude balls, fossils, evolution items, etc.)
     private readonly List<ItemId> _usableItems;
@@ -39,33 +48,45 @@ public class RandomTeamGenerator
     ];
 
     /// <summary>
-    /// Creates a new random team generator with the specified seed.
+    /// Creates a new random team generator for the specified format.
     /// </summary>
     /// <param name="library">The game data library.</param>
+    /// <param name="formatId">The VGC format to generate teams for.</param>
     /// <param name="seed">Random seed for reproducibility.</param>
-    public RandomTeamGenerator(Library library, int seed)
+    public RandomTeamGenerator(Library library, FormatId formatId, int seed)
     {
         ArgumentNullException.ThrowIfNull(library);
         _library = library;
+        _format = library.Formats.TryGetValue(formatId, out var format)
+            ? format
+            : throw new ArgumentException($"Format {formatId} not found in library.", nameof(formatId));
         _random = new Random(seed);
 
+        // Extract settings from format RuleTable
+        _teamSize = _format.RuleTable?.MaxTeamSize ?? 6;
+        _evLimit = _format.RuleTable?.EvLimit ?? 510;
+        _maxRestrictedCount = GetMaxRestrictedCount();
+
         _legalSpecies = BuildLegalSpeciesList();
+        _restrictedSpecies = BuildRestrictedSpeciesList();
         _usableItems = BuildUsableItemsList();
     }
 
     /// <summary>
-    /// Generates a random team valid for VGC Regulation I.
+    /// Generates a random team valid for the specified format.
+    /// Respects format rules including restricted Pokemon limits.
     /// </summary>
-    /// <returns>A list of 6 Pokemon sets.</returns>
+    /// <returns>A list of Pokemon sets matching the format's team size.</returns>
     public List<PokemonSet> GenerateTeam()
     {
-        var team = new List<PokemonSet>(TeamSize);
+        var team = new List<PokemonSet>(_teamSize);
         var usedSpecies = new HashSet<SpecieId>();
         var usedItems = new HashSet<ItemId>();
+        var restrictedCount = 0;
 
-        for (var i = 0; i < TeamSize; i++)
+        for (var i = 0; i < _teamSize; i++)
         {
-            var pokemon = GenerateRandomPokemon(usedSpecies, usedItems);
+            var pokemon = GenerateRandomPokemon(usedSpecies, usedItems, ref restrictedCount);
             team.Add(pokemon);
         }
 
@@ -74,13 +95,50 @@ public class RandomTeamGenerator
 
     /// <summary>
     /// Generates a single random Pokemon that doesn't conflict with already selected species/items.
+    /// Respects the restricted Pokemon limit for the format.
     /// </summary>
-    private PokemonSet GenerateRandomPokemon(HashSet<SpecieId> usedSpecies, HashSet<ItemId> usedItems)
+    private PokemonSet GenerateRandomPokemon(
+        HashSet<SpecieId> usedSpecies,
+        HashSet<ItemId> usedItems,
+        ref int restrictedCount)
     {
-        // Pick a random species that hasn't been used yet
-        var speciesId = PickRandomUnused(_legalSpecies, usedSpecies);
-        usedSpecies.Add(speciesId);
+        // Determine if we can still add restricted Pokemon
+        var canAddRestricted = restrictedCount < _maxRestrictedCount && _restrictedSpecies.Count > 0;
 
+        SpecieId speciesId;
+        if (canAddRestricted && _random.Next(3) == 0)
+        {
+            // Occasionally try to pick a restricted Pokemon (1 in 3 chance when allowed)
+            var unusedRestricted = _restrictedSpecies.Where(x => !usedSpecies.Contains(x)).ToList();
+            if (unusedRestricted.Count > 0)
+            {
+                speciesId = unusedRestricted[_random.Next(unusedRestricted.Count)];
+                restrictedCount++;
+            }
+            else
+            {
+                speciesId = PickRandomUnused(_legalSpecies, usedSpecies);
+            }
+        }
+        else
+        {
+            // Pick from legal non-restricted species
+            var nonRestrictedLegal = _legalSpecies
+                .Where(x => !usedSpecies.Contains(x) && !_restrictedSpecies.Contains(x))
+                .ToList();
+
+            if (nonRestrictedLegal.Count > 0)
+            {
+                speciesId = nonRestrictedLegal[_random.Next(nonRestrictedLegal.Count)];
+            }
+            else
+            {
+                // Fallback to any unused legal species
+                speciesId = PickRandomUnused(_legalSpecies, usedSpecies);
+            }
+        }
+
+        usedSpecies.Add(speciesId);
         var species = _library.Species[speciesId];
 
         // Pick a random ability from the species' available abilities
@@ -121,18 +179,26 @@ public class RandomTeamGenerator
     }
 
     /// <summary>
-    /// Builds the list of species legal in VGC Regulation I.
-    /// Excludes Mythical and Restricted Legendary Pokemon.
+    /// Builds the list of species legal in the format.
+    /// Excludes species based on format banlist (Mythical always, Restricted if banned).
     /// </summary>
     private List<SpecieId> BuildLegalSpeciesList()
     {
         var legal = new List<SpecieId>();
+        var bansMythical = _format.Banlist.Contains(RuleId.Mythical);
+        var bansRestricted = _format.Banlist.Contains(RuleId.RestrictedLegendary);
 
         foreach (var (speciesId, species) in _library.Species)
         {
-            // Skip if Mythical or Restricted Legendary
-            if (species.Tags.Contains(SpeciesTag.Mythical) ||
-                species.Tags.Contains(SpeciesTag.RestrictedLegendary))
+            // Skip if Mythical and format bans them
+            if (bansMythical && species.Tags.Contains(SpeciesTag.Mythical))
+            {
+                continue;
+            }
+
+            // Skip if Restricted Legendary and format bans them entirely
+            // (formats with LimitOneRestricted/LimitTwoRestricted don't ban them, they limit count)
+            if (bansRestricted && species.Tags.Contains(SpeciesTag.RestrictedLegendary))
             {
                 continue;
             }
@@ -154,6 +220,63 @@ public class RandomTeamGenerator
         }
 
         return legal;
+    }
+
+    /// <summary>
+    /// Builds the list of restricted legendary species for formats that allow them.
+    /// </summary>
+    private List<SpecieId> BuildRestrictedSpeciesList()
+    {
+        if (_maxRestrictedCount == 0)
+        {
+            return [];
+        }
+
+        var restricted = new List<SpecieId>();
+
+        foreach (var (speciesId, species) in _library.Species)
+        {
+            if (!species.Tags.Contains(SpeciesTag.RestrictedLegendary))
+            {
+                continue;
+            }
+
+            // Skip if the species has no learnset
+            if (!_library.Learnsets.TryGetValue(speciesId, out var learnset) ||
+                learnset.LearnsetData is not { Count: >= MoveCount })
+            {
+                continue;
+            }
+
+            // Skip battle-only formes
+            if (species.BattleOnly.HasValue)
+            {
+                continue;
+            }
+
+            restricted.Add(speciesId);
+        }
+
+        return restricted;
+    }
+
+    /// <summary>
+    /// Determines the maximum number of restricted Pokemon allowed based on format rules.
+    /// </summary>
+    private int GetMaxRestrictedCount()
+    {
+        if (_format.Ruleset.Contains(RuleId.LimitTwoRestricted))
+        {
+            return 2;
+        }
+
+        if (_format.Ruleset.Contains(RuleId.LimitOneRestricted))
+        {
+            return 1;
+        }
+
+        // If restricted legendaries are banned entirely or no limit rule, return 0
+        return 0;
     }
 
     /// <summary>
@@ -272,12 +395,12 @@ public class RandomTeamGenerator
     }
 
     /// <summary>
-    /// Generates random EVs respecting the 510 total limit and 252 per-stat limit.
+    /// Generates random EVs respecting the format's EV limit and 252 per-stat limit.
     /// </summary>
     private StatsTable GenerateRandomEvs()
     {
         var stats = new int[6]; // HP, Atk, Def, SpA, SpD, Spe
-        var remaining = EvLimit;
+        var remaining = _evLimit;
 
         // Distribute EVs randomly across stats
         for (var i = 0; i < 6 && remaining > 0; i++)
