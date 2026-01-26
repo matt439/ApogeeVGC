@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -492,6 +493,18 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 1,
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                BasePowerCallback = new BasePowerCallbackEventInfo((_, source, _, move) =>
+                {
+                    // Greninja-Ash with Battle Bond (not transformed) gets +5 BP
+                    if (source.Species.Id == SpecieId.GreninjaAsh &&
+                        source.HasAbility(AbilityId.BattleBond) &&
+                        !source.Transformed)
+                    {
+                        return move.BasePower + 5;
+                    }
+
+                    return move.BasePower;
+                }),
                 MultiHit = new[] { 2, 5 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -536,9 +549,10 @@ public partial record Moves
                     Metronome = true,
                     Bullet = true,
                 },
-                OnModifyType = new OnModifyTypeEventInfo((battle, move, _, _) =>
+                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
                 {
-                    var weather = battle.Field.EffectiveWeather();
+                    // Use pokemon.EffectiveWeather() to account for Utility Umbrella
+                    var weather = pokemon.EffectiveWeather();
                     move.Type = weather switch
                     {
                         ConditionId.SunnyDay or ConditionId.DesolateLand => MoveType.Fire,
@@ -548,9 +562,10 @@ public partial record Moves
                         _ => move.Type,
                     };
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
                 {
-                    var weather = battle.Field.EffectiveWeather();
+                    // Use pokemon.EffectiveWeather() to account for Utility Umbrella
+                    var weather = pokemon.EffectiveWeather();
                     if (weather != ConditionId.None)
                     {
                         move.BasePower *= 2;
