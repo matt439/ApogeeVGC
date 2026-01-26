@@ -10,14 +10,14 @@ public abstract record VoidFalseUnion
 {
     public static VoidFalseUnion FromVoid() => new VoidVoidFalseUnion(new VoidReturn());
     public static VoidFalseUnion FromFalse() => new FalseVoidFalseUnion();
-    
+
     public static implicit operator VoidFalseUnion(VoidReturn value) => new VoidVoidFalseUnion(value);
-    
+
     /// <summary>
     /// Returns true if this union represents false (failure/stop signal).
     /// </summary>
     public bool IsFalse => this is FalseVoidFalseUnion;
-    
+
     /// <summary>
     /// Returns true if this union represents void (no effect).
     /// </summary>
@@ -25,4 +25,5 @@ public abstract record VoidFalseUnion
 }
 
 public record VoidVoidFalseUnion(VoidReturn Value) : VoidFalseUnion;
+
 public record FalseVoidFalseUnion : VoidFalseUnion;

@@ -32,13 +32,15 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
         bool usesSpeed = true)
     {
         Id = EventId.ModifyMove;
+
         // Wrap Action in Func that returns null
-        Func<Battle, ActiveMove, Pokemon, Pokemon?, VoidFalseUnion?> wrappedHandler = (b, m, p, t) =>
+        VoidFalseUnion? WrappedHandler(Battle b, ActiveMove m, Pokemon p, Pokemon? t)
         {
             handler(b, m, p, t);
             return null;
-        };
-        Handler = wrappedHandler;
+        }
+
+        Handler = (Func<Battle, ActiveMove, Pokemon, Pokemon?, VoidFalseUnion?>)WrappedHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes =
@@ -49,11 +51,11 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
             typeof(Pokemon),
         ];
         ExpectedReturnType = typeof(VoidFalseUnion);
-        
+
         // Nullability: All parameters non-nullable by default, target can be null
         ParameterNullability = [false, false, false, true];
         ReturnTypeNullable = true;
-    
+
         // Validate configuration
         ValidateConfiguration();
     }
@@ -81,15 +83,15 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
             typeof(Pokemon),
         ];
         ExpectedReturnType = typeof(VoidFalseUnion);
-        
+
         // Nullability: All parameters non-nullable by default, target can be null
         ParameterNullability = [false, false, false, true];
         ReturnTypeNullable = true;
-    
+
         // Validate configuration
         ValidateConfiguration();
     }
-    
+
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, Move, SourcePokemon, TargetPokemon
@@ -104,7 +106,7 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
         Priority = priority;
         UsesSpeed = usesSpeed;
     }
-  
+
     /// <summary>
     /// Creates strongly-typed context-based handler.
     /// Best of both worlds: strongly-typed parameters + context performance.
@@ -121,14 +123,15 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                     context.Battle,
                     context.GetMove(),
                     context.GetSourcePokemon(),
-                    context.TargetPokemon  // Direct access, can be null
+                    context.TargetPokemon // Direct access, can be null
                 );
-                
+
                 // Convert VoidFalseUnion to RelayVar using implicit operator
                 if (result is FalseVoidFalseUnion)
                 {
                     return false; // Uses implicit operator RelayVar(bool)
                 }
+
                 return null;
             },
             priority,
