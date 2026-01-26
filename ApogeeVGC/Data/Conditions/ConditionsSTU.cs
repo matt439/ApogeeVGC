@@ -1178,8 +1178,7 @@ public partial record Conditions
                 }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
                 {
-                    // Z-moves and Max moves are not affected by Throat Chop
-                    // Note: isZ and isMax properties would need to be checked if available
+                    // Gen 9 has no Z-moves or Max moves, so we just check sound flag
                     if (move.Flags.Sound == true)
                     {
                         if (battle.DisplayUi)
@@ -1192,6 +1191,19 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }, 6),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    // Gen 9 has no Z-moves or Max moves, so we just check sound flag
+                    if (move.Flags.Sound == true)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "move: Throat Chop");
+                        }
+                        // TODO: TypeScript returns false here, but OnModifyMove typically returns void
+                        // This may need to be handled differently in the battle engine
+                    }
+                }),
                 //OnResidualOrder = 22,
                 OnEnd = new OnEndEventInfo((battle, target) =>
                 {

@@ -3514,11 +3514,17 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                Boosts = new SparseBoostsTable { SpA = 1, SpD = 1 },
-                OnHit = new OnHitEventInfo((_, _, source, _) =>
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
-                    source.CureStatus();
-                    return new VoidReturn();
+                    // TypeScript: const success = !!this.boost({ spa: 1, spd: 1 });
+                    // return pokemon.cureStatus() || success;
+                    BoolZeroUnion? boostSuccess = battle.Boost(
+                        new SparseBoostsTable { SpA = 1, SpD = 1 }, source, source, null, false, true);
+                    bool cured = source.CureStatus();
+                    // Return true if either boost or cureStatus succeeded
+                    return (boostSuccess?.IsTruthy() ?? false) || cured
+                        ? new VoidReturn()
+                        : false;
                 }),
                 Secondary = null,
                 Target = MoveTarget.Self,
@@ -3651,8 +3657,8 @@ public partial record Moves
                             battle.AttrLastMove("[still]");
                         }
 
-                        // Return NOT_FAIL equivalent - move worked but had no effect
-                        return new VoidReturn();
+                        // Return NOT_FAIL equivalent - move animation played but had no effect
+                        return new Empty();
                     }
 
                     // Eat the berry for all valid targets
@@ -3703,10 +3709,11 @@ public partial record Moves
                 {
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((_, source, _, _) =>
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
                 {
-                    if (source.SwitchFlag.IsTrue() || source.ForceSwitchFlag) return false;
-                    return true;
+                    // TypeScript: return !!this.canSwitch(source.side);
+                    // Fail if there are no Pokemon to switch to
+                    return battle.CanSwitch(source.Side) > 0;
                 }),
                 SelfSwitch = true,
                 Secondary = null,
@@ -3867,6 +3874,9 @@ public partial record Moves
                 },
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, source, _) =>
                 {
+                    // Only change type if the user is grounded
+                    if (source.IsGrounded() != true) return;
+                    
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, source))
                         move.Type = MoveType.Electric;
                     else if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, source))
@@ -3878,12 +3888,10 @@ public partial record Moves
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
                 {
-                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, source) ||
-                        battle.Field.IsTerrain(ConditionId.GrassyTerrain, source) ||
-                        battle.Field.IsTerrain(ConditionId.MistyTerrain, source) ||
-                        battle.Field.IsTerrain(ConditionId.PsychicTerrain, source))
+                    if (battle.Field.Terrain != ConditionId.None && source.IsGrounded() == true)
                     {
                         move.BasePower *= 2;
+                        battle.Debug("BP doubled in Terrain");
                     }
                 }),
                 Secondary = null,
@@ -3909,7 +3917,7 @@ public partial record Moves
                     NoAssist = true,
                     FailCopycat = true,
                 },
-                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, _) =>
+                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, move) =>
                 {
                     if (source.Item != ItemId.None || source.Volatiles.ContainsKey(ConditionId.Gem))
                     {
@@ -3922,8 +3930,14 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    if (!source.SetItem(yourItemUnion.Item.Id))
+                    // Check if source can receive the item (TakeItem event for the receiver)
+                    RelayVar? takeItemResult = battle.SingleEvent(EventId.TakeItem,
+                        yourItemUnion.Item, target.ItemState,
+                        new PokemonSingleEventTarget(source), target, move, yourItemUnion.Item);
+                    if (takeItemResult is BoolRelayVar { Value: false } ||
+                        !source.SetItem(yourItemUnion.Item.Id))
                     {
+                        // Put item back on target (bypass SetItem to avoid breaking choicelock)
                         target.Item = yourItemUnion.Item.Id;
                         return new VoidReturn();
                     }
