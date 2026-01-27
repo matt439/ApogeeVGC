@@ -1174,7 +1174,9 @@ public partial record Abilities
                         battle.Add("-enditem", pokemon, item.Name, "[eat]");
 
                         // Trigger berry eat effects
-                        if (battle.SingleEvent(EventId.Eat, item, null, pokemon) is BoolRelayVar)
+                        // In TS: if (this.singleEvent('Eat', item, null, pokemon, null, null)) - truthy check
+                        // Proceeds unless explicitly false
+                        if (battle.SingleEvent(EventId.Eat, item, null, pokemon) is not BoolRelayVar { Value: false })
                         {
                             battle.RunEvent(EventId.EatItem, pokemon, null, null, item);
                         }
