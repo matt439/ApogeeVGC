@@ -65,7 +65,10 @@ public partial record Conditions
 
                         if (damage is IntIntFalseUndefined d)
                         {
-                            battle.Heal(d.Value, target, pokemon);
+                            // Pass LeechSeed condition as effect so LiquidOoze can detect it
+                            var leechSeedCondition = battle.Library.Conditions[ConditionId.LeechSeed];
+                            battle.Heal(d.Value, target, pokemon,
+                                BattleHealEffect.FromIEffect(leechSeedCondition));
                         }
                     },
                     8),

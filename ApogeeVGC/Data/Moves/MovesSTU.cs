@@ -2596,7 +2596,7 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
                     // Fail if target's attack is already at minimum
                     if (target.Boosts.GetBoost(BoostId.Atk) == -6) return false;
@@ -2609,7 +2609,9 @@ public partial record Moves
                         target, source, null, false, true);
 
                     // Heal source by target's (pre-boost) attack stat
-                    var healResult = battle.Heal(targetAtk, source, target);
+                    // Pass the move as effect so LiquidOoze can detect it
+                    var healResult = battle.Heal(targetAtk, source, target,
+                        BattleHealEffect.FromIEffect(move));
 
                     // Move succeeds if either heal or boost worked
                     var success = healResult is not FalseIntFalseUnion ||

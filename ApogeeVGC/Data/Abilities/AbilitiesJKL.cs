@@ -133,6 +133,8 @@ public partial record Abilities
                 OnPrepareHit = new OnPrepareHitEventInfo((battle, source, _, move) =>
                 {
                     if (battle.EffectState.Libero == true) return new VoidReturn();
+                    // Note: TypeScript also checks move.sourceEffect === 'snatch', but Snatch
+                    // was removed in Gen 8+, so this check is omitted for Gen 9 targeting.
                     if (move.HasBounced == true || move.Flags.FutureMove == true ||
                         move.CallsMove == true)
                         return new VoidReturn();
