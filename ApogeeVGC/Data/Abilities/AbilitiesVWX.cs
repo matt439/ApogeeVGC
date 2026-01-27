@@ -141,7 +141,7 @@ public partial record Abilities
                     var sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.FailSkillSwap == true) return;
 
-                    if (battle.CheckMoveMakesContact(move, source, target, !source.IsAlly(target)))
+                    if (battle.CheckMoveMakesContact(move, source, target))
                     {
                         var targetCanBeSet =
                             battle.RunEvent(EventId.SetAbility, target, source, battle.Effect,
@@ -390,6 +390,7 @@ public partial record Abilities
                         showMsg = true;
                     }
 
+                    // Note: Octolock check omitted - isNonstandard: "Past" in Gen 9
                     if (showMsg && effect is not ActiveMove { Secondaries: not null })
                     {
                         battle.Add("-fail", target, "unboost", "[from] ability: White Smoke",
@@ -539,7 +540,7 @@ public partial record Abilities
                 // OnModifyAccuracyPriority = 10
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, move) =>
                 {
-                    if (move.Category == MoveCategory.Status)
+                    if (move.Category == MoveCategory.Status && accuracy.HasValue)
                     {
                         battle.Debug("Wonder Skin - setting accuracy to 50");
                         return 50;
