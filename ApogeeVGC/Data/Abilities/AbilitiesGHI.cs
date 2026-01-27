@@ -55,7 +55,7 @@ public partial record Abilities
                         // Note: MultiAttack, NaturalGift, and TechnoBlast are not in Gen 9 VGC
                     };
 
-                    if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
+                    if (move.Type == MoveType.Normal &&
                         !noModifyType.Contains(move.Id) &&
                         !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                     {
@@ -357,7 +357,7 @@ public partial record Abilities
 
                     if (!canHarvest) return;
                     if (pokemon.Hp == 0) return;
-                    if (pokemon.Item == ItemId.None) return;
+                    if (pokemon.Item != ItemId.None) return; // Already has an item, can't harvest
 
                     var lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
                     if (lastItem is not { IsBerry: true }) return;
@@ -637,8 +637,11 @@ public partial record Abilities
                         if (target is null) return new VoidReturn();
                         if (move.Category != MoveCategory.Physical ||
                             target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
-                        if (target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                            (move.Flags.BypassSub != true)) return new VoidReturn();
+                        // Check if the move hits the substitute (not the Pokemon directly)
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     (move is not ActiveMove am || am.Infiltrates != true);
+                        if (hitSub) return new VoidReturn();
                         if (move is ActiveMove activeMove && !target.RunImmunity(activeMove))
                             return new VoidReturn();
                         return BoolVoidUnion.FromBool(false);
