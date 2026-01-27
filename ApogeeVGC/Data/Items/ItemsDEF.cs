@@ -265,6 +265,9 @@ public partial record Items
                 Num = 547,
                 Gen = 5,
             },
+            // TODO: TypeScript uses OnUseItem callback to validate item use (return false to block).
+            // C# OnUseItemEventInfo returns void, so validation is done in TryUseEjectPack helper.
+            // Consider updating OnUseItemEventInfo to support BoolVoidUnion return type.
             [ItemId.EjectPack] = new()
             {
                 Id = ItemId.EjectPack,
