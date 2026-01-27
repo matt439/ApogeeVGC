@@ -58,7 +58,7 @@ public partial record Abilities
                         return new VoidReturn();
 
                     if (target.IsAlly(source) || move.HasBounced == true ||
-                        move.Flags.Reflectable != true || abilityHolder.IsSemiInvulnerable())
+                        move.Flags.Reflectable != true || target.IsSemiInvulnerable())
                     {
                         return new VoidReturn();
                     }
@@ -246,11 +246,12 @@ public partial record Abilities
                 Num = 250,
                 Rating = 0.0,
                 // OnSwitchInPriority = -1
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -1),
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState,
                         pokemon);
-                }, -1),
+                }),
                 OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
                 {
                     var terrain = battle.Field.Terrain;
