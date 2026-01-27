@@ -133,7 +133,7 @@ public partial record Abilities
                         return;
                     }
 
-                    battle.Add("-ability", target, "ability: Perish Body");
+                    battle.Add("-ability", target, "Perish Body");
                     source.AddVolatile(ConditionId.PerishSong);
                     target.AddVolatile(ConditionId.PerishSong);
                 }),
