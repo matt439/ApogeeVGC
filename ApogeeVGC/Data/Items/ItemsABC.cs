@@ -35,8 +35,8 @@ public partial record Items
                 OnSetAbility = new OnSetAbilityEventInfo((battle, _, target, source, effect) =>
                 {
                     // Block ability changes from other abilities (except Trace)
-                    if (effect.EffectType == EffectType.Ability &&
-                        effect.EffectStateId != AbilityId.Trace)
+                    if (effect != null && effect.EffectType == EffectType.Ability &&
+                        effect.Name != "Trace")
                     {
                         battle.Add("-ability", source, effect.Name);
                     }
@@ -86,7 +86,7 @@ public partial record Items
                         (_, _, pokemon, source, _) =>
                         {
                             // Dialga (num 483) can't have this item removed
-                            if (source.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
+                            if (source?.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
                             {
                                 return BoolVoidUnion.FromBool(false); // Prevent removal
                             }
@@ -136,7 +136,7 @@ public partial record Items
                         return;
                     }
 
-                    if (effect != null && effect.EffectStateId == AbilityId.Intimidate)
+                    if (effect != null && effect.Name == "Intimidate")
                     {
                         target.UseItem();
                     }
@@ -404,17 +404,21 @@ public partial record Items
                         _, _, effect) =>
                     {
                         // BigRoot boosts healing from: drain moves, Leech Seed, Ingrain, Aqua Ring, Strength Sap
-                        bool isBigRootHeal = effect.EffectStateId switch
+                        // TS checks effect.id for: 'drain', 'leechseed', 'ingrain', 'aquaring', 'strengthsap'
+                        bool isBigRootHeal = effect switch
                         {
-                            MoveEffectStateId moveId => moveId.MoveId is MoveId.Absorb
-                                or MoveId.MegaDrain or MoveId.GigaDrain or MoveId.LeechLife
-                                or MoveId.DrainPunch or MoveId.HornLeech or MoveId.DrainingKiss
-                                or MoveId.ParabolicCharge or MoveId.DreamEater
-                                or MoveId.StrengthSap,
-                            ConditionEffectStateId condId => condId.ConditionId is
-                                ConditionId.LeechSeed or ConditionId.Ingrain
-                                or ConditionId.AquaRing,
-                            _ => false
+                            // Drain healing uses DrainBattleHealEffect (covers all drain moves)
+                            DrainBattleHealEffect => true,
+                            // Strength Sap healing passes the move as the effect
+                            EffectBattleHealEffect { Effect: ActiveMove { Id: MoveId.StrengthSap } } => true,
+                            // Condition-based healing (Leech Seed, Ingrain, Aqua Ring)
+                            _ => effect.EffectStateId switch
+                            {
+                                ConditionEffectStateId condId => condId.ConditionId is
+                                    ConditionId.LeechSeed or ConditionId.Ingrain
+                                    or ConditionId.AquaRing,
+                                _ => false
+                            }
                         };
 
                         if (isBigRootHeal)
@@ -768,8 +772,9 @@ public partial record Items
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
                     {
                         battle.Debug("ChoiceBand: Removing existing choicelock on switch-in");
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                     }
+
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
@@ -802,8 +807,9 @@ public partial record Items
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
                     {
                         battle.Debug("ChoiceScarf: Removing existing choicelock on switch-in");
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                     }
+
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
@@ -838,9 +844,9 @@ public partial record Items
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
                     {
                         battle.Debug("ChoiceSpecs: Removing existing choicelock on switch-in");
-
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                     }
+
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
