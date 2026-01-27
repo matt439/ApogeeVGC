@@ -95,7 +95,7 @@ public partial record Conditions
                 AssociatedAbility = AbilityId.ZenMode,
                 OnStart = new OnStartEventInfo((_, target, _, _) =>
                 {
-                    if (target is null) return new VoidReturn();
+                    if (target is null) return BoolVoidUnion.FromVoid();
 
                     // Check if it's a Galar form
                     var isGalar = target.Species.Forme is FormeId.Galar or FormeId.GalarZen;
@@ -115,7 +115,7 @@ public partial record Conditions
                         }
                     }
 
-                    return new VoidReturn();
+                    return BoolVoidUnion.FromVoid();
                 }),
                 OnEnd = new OnEndEventInfo((_, pokemon) =>
                 {
