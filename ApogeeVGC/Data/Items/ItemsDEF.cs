@@ -277,7 +277,9 @@ public partial record Items
                 OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, target, _, _) =>
                 {
                     // Don't trigger if already set to eject
-                    if (target.ItemState.Eject == true) return;
+                    // Note: OnAfterBoost is called with target = item holder, so we can use
+                    // battle.EffectState which is set to the item holder's ItemState
+                    if (battle.EffectState.Eject == true) return;
                     // Don't trigger from Parting Shot (user switches out anyway)
                     if (battle.ActiveMove?.Id == MoveId.PartingShot) return;
                     // Check if any stat was lowered
@@ -289,32 +291,39 @@ public partial record Items
                         boost.Accuracy is < 0 ||
                         boost.Evasion is < 0)
                     {
-                        target.ItemState.Eject = true;
+                        battle.EffectState.Eject = true;
                     }
                 }),
-                OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, pokemon) =>
+                // OnAny* handlers: the pokemon parameter is the event target (Pokemon switching in/moving),
+                // NOT the item holder. Use battle.EffectState.Target to get the item holder.
+                OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, _) =>
                 {
-                    if (pokemon.ItemState.Eject != true) return;
-                    TryUseEjectPack(battle, pokemon);
+                    if (battle.EffectState.Eject != true) return;
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
+                    TryUseEjectPack(battle, target.Pokemon);
                 }, -4),
-                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, pokemon) =>
+                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, _) =>
                 {
-                    if (pokemon.ItemState.Eject != true) return;
-                    TryUseEjectPack(battle, pokemon);
+                    if (battle.EffectState.Eject != true) return;
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
+                    TryUseEjectPack(battle, target.Pokemon);
                 }),
-                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, target, _, _) =>
+                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, _, _, _) =>
                 {
-                    if (target.ItemState.Eject != true) return BoolVoidUnion.FromVoid();
-                    TryUseEjectPack(battle, target);
+                    if (battle.EffectState.Eject != true) return BoolVoidUnion.FromVoid();
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target)
+                        return BoolVoidUnion.FromVoid();
+                    TryUseEjectPack(battle, target.Pokemon);
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = new OnResidualEventInfo((battle, _, _, _) =>
                 {
-                    if (pokemon.ItemState.Eject != true) return;
-                    TryUseEjectPack(battle, pokemon);
+                    if (battle.EffectState.Eject != true) return;
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
+                    TryUseEjectPack(battle, target.Pokemon);
                 }, order: 29),
                 OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((_, pokemon) => { pokemon.SwitchFlag = true; })),
-                OnEnd = new OnEndEventInfo((_, pokemon) => { pokemon.ItemState.Eject = null; }),
+                OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Eject = null; }),
                 Num = 1119,
                 Gen = 8,
             },
