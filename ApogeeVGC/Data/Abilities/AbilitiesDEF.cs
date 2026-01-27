@@ -57,7 +57,7 @@ public partial record Abilities
                 OnAnyDamage = new OnAnyDamageEventInfo((_, _, _, _, effect) =>
                 {
                     // Block Aftermath damage
-                    if (effect is Ability { Name: "Aftermath" })
+                    if (effect is Ability { Id: AbilityId.Aftermath })
                     {
                         return false;
                     }
@@ -359,6 +359,7 @@ public partial record Abilities
                             ? SpecieId.MimikyuBustedTotem
                             : SpecieId.MimikyuBusted;
                         pokemon.FormeChange(bustedSpeciesId, battle.Effect, true);
+                        // Note: TS passes the species as the effect, but we use the default effect here
                         battle.Damage(pokemon.BaseMaxHp / 8, pokemon, pokemon);
                     }
                 }),
