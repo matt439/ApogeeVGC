@@ -1241,11 +1241,12 @@ public partial record Abilities
                         battle.EffectState.Counter = fallen;
                     }
                 }),
-                OnEnd = new OnEndEventInfo((battle, _) =>
+                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
-                    if (battle.EffectState.Counter != null)
+                    if (battle.EffectState.Counter != null &&
+                        pokemonUnion is PokemonSideFieldPokemon { Pokemon: var pokemon })
                     {
-                        // battle.Add("-end", pokemon, $"fallen{battle.EffectState.Counter}", "[silent]");
+                        battle.Add("-end", pokemon, $"fallen{battle.EffectState.Counter}", "[silent]");
                     }
                 }),
                 // OnBasePowerPriority = 21
@@ -1363,10 +1364,11 @@ public partial record Abilities
                 Name = "Swift Swim",
                 Num = 33,
                 Rating = 3.0,
-                OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
-                    if (battle.Field.IsWeather(ConditionId.RainDance) ||
-                        battle.Field.IsWeather(ConditionId.PrimordialSea))
+                    // Use pokemon's effective weather which accounts for Utility Umbrella
+                    ConditionId effectiveWeather = pokemon.EffectiveWeather();
+                    if (effectiveWeather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(spe);
