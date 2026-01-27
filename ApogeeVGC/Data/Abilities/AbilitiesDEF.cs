@@ -845,8 +845,10 @@ public partial record Abilities
                 }, -2),
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    // Check current weather and change forme if needed
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                    // Trigger the weather change event to potentially change forme
+                    // OnStart delegates to the weather change logic
+                    if (!pokemon.IsActive ||
+                        pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
                         pokemon.Transformed) return;
                     if (pokemon.Hp == 0) return;
 
@@ -870,7 +872,8 @@ public partial record Abilities
                 }),
                 OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                    if (!pokemon.IsActive ||
+                        pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
                         pokemon.Transformed) return;
                     if (pokemon.Hp == 0) return;
 
@@ -1084,6 +1087,26 @@ public partial record Abilities
                     // This is implemented via OnStart which calls OnWeatherChange
                 }, -2),
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
+                        pokemon.Transformed) return;
+
+                    ConditionId? weather = pokemon.EffectiveWeather();
+                    var targetForme = weather switch
+                    {
+                        ConditionId.SunnyDay or ConditionId.DesolateLand => SpecieId.CastformSunny,
+                        ConditionId.RainDance or ConditionId.PrimordialSea =>
+                            SpecieId.CastformRainy,
+                        ConditionId.Snowscape => SpecieId.CastformSnowy,
+                        _ => SpecieId.Castform,
+                    };
+
+                    if (pokemon.IsActive && pokemon.Species.Id != targetForme)
+                    {
+                        pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
+                    }
+                }),
+                OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, _) =>
                 {
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
                         pokemon.Transformed) return;
