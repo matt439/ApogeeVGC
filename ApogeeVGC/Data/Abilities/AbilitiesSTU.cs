@@ -239,12 +239,24 @@ public partial record Abilities
                 // OnModifyMovePriority = -5
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
                 {
-                    // Set IgnoreImmunity for Fighting and Normal types vs Ghost
-                    move.IgnoreImmunity = new Dictionary<PokemonType, bool>
+                    // If IgnoreImmunity is null, create a new dictionary
+                    if (move.IgnoreImmunity == null)
                     {
-                        [PokemonType.Fighting] = true,
-                        [PokemonType.Normal] = true,
-                    };
+                        move.IgnoreImmunity = new Dictionary<PokemonType, bool>();
+                    }
+
+                    // If IgnoreImmunity is true (ignore all), don't modify
+                    if (move.IgnoreImmunity is BoolMoveDataIgnoreImmunity { Value: true })
+                    {
+                        return;
+                    }
+
+                    // If it's a dictionary, add Fighting and Normal immunities
+                    if (move.IgnoreImmunity is TypeMoveDataIgnoreImmunity typeIgnore)
+                    {
+                        typeIgnore.TypeImmunities[PokemonType.Fighting] = true;
+                        typeIgnore.TypeImmunities[PokemonType.Normal] = true;
+                    }
                 }, -5),
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
@@ -713,10 +725,11 @@ public partial record Abilities
                 Num = 94,
                 Rating = 2.0,
                 // OnModifySpAPriority = 5
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, _) =>
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, attacker, _, _) =>
                 {
-                    if (battle.Field.IsWeather(ConditionId.SunnyDay) ||
-                        battle.Field.IsWeather(ConditionId.DesolateLand))
+                    // Use attacker's effective weather which accounts for Utility Umbrella
+                    ConditionId effectiveWeather = attacker.EffectiveWeather();
+                    if (effectiveWeather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.ChainModify(1.5);
                         return battle.FinalModify(spa);
@@ -899,11 +912,17 @@ public partial record Abilities
                     CantSuppress = true,
                 },
                 // OnModifyMovePriority = 1
+                // TODO: When MoveId.KingsShield is implemented, update this to handle King's Shield:
+                // - Status moves don't trigger forme change, except King's Shield
+                // - King's Shield should change to Shield Forme (base Aegislash)
+                // - All other attacking moves change to Blade Forme
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, attacker, _) =>
                 {
                     if (attacker.BaseSpecies.BaseSpecies != SpecieId.Aegislash ||
                         attacker.Transformed)
                         return;
+                    // Currently only handles attacking moves -> Blade Forme
+                    // King's Shield handling will be added when the move is implemented
                     if (move.Category == MoveCategory.Status)
                         return;
 
