@@ -52,18 +52,19 @@ public partial record Abilities
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                     {
                         // List of moves that should not be affected by type-changing abilities
+                        // TODO: Add MoveId.Multiattack when it's implemented (currently isNonstandard: Past)
                         MoveId[] noModifyType =
                         [
                             MoveId.Judgment,
-                            MoveId.RevelationDance, MoveId.TerrainPulse,
+                            MoveId.RevelationDance,
+                            MoveId.TerrainPulse,
                             MoveId.WeatherBall,
                         ];
 
                         // Change Normal-type moves to Flying
                         if (move.Type == MoveType.Normal &&
                             !noModifyType.Contains(move.Id) &&
-                            !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null) &&
-                            move.Category != MoveCategory.Status)
+                            !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                         {
                             move.Type = MoveType.Flying;
                             move.TypeChangerBoosted = battle.Effect;
@@ -212,7 +213,7 @@ public partial record Abilities
                         ? BoolVoidUnion.FromBool(battle.EffectState.CheckedAngerShell ?? true)
                         : BoolVoidUnion.FromBool(true);
                 })),
-                OnAfterMoveSecondary =
+            OnAfterMoveSecondary =
                     new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
                     {
                         battle.EffectState.CheckedAngerShell = true;
@@ -222,7 +223,8 @@ public partial record Abilities
                         var lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;
 
-                        var damage = move.MultiHit != null && move.SmartTarget != true
+                        // AngerShell uses multihit check only (no smartTarget check unlike Berserk)
+                        var damage = move.MultiHit != null
                             ? totalDamage.Value
                             : lastAttackedBy.Damage;
 
@@ -562,7 +564,7 @@ public partial record Abilities
                     new OnSourceAfterFaintEventInfo((battle, _, _, source, effect) =>
                     {
                         if (source.BondTriggered) return;
-                        if (effect.EffectType != EffectType.Move) return;
+                        if (effect?.EffectType != EffectType.Move) return;
                         if (source.Species.Id == SpecieId.GreninjaBond && source
                                 is { Hp: > 0, Transformed: false } &&
                             source.Side.FoePokemonLeft() > 0)
@@ -708,6 +710,8 @@ public partial record Abilities
                     if (boost.Def is not null && boost.Def < 0)
                     {
                         boost.Def = null;
+                        // TODO: Add Octolock check when ConditionId.Octolock is implemented
+                        // TS: effect.id !== 'octolock'
                         if (effect is not ActiveMove { Secondaries: not null })
                         {
                             battle.Add("-fail", target, "unboost", "Defense",
@@ -862,6 +866,8 @@ public partial record Abilities
                         showMsg = true;
                     }
 
+                    // TODO: Add Octolock check when ConditionId.Octolock is implemented
+                    // TS: effect.id !== 'octolock'
                     if (showMsg && effect is not ActiveMove { Secondaries: not null })
                     {
                         battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
