@@ -131,6 +131,27 @@ public partial record Items
                 Fling = new FlingData
                 {
                     BasePower = 10,
+                    Effect = (battle, target, _, _) =>
+                    {
+                        bool activate = false;
+                        var boosts = new SparseBoostsTable();
+                        foreach (BoostId stat in Enum.GetValues<BoostId>())
+                        {
+                            if (target.Boosts.GetBoost(stat) < 0)
+                            {
+                                activate = true;
+                                boosts.SetBoost(stat, 0);
+                            }
+                        }
+
+                        if (activate)
+                        {
+                            target.SetBoost(boosts);
+                            battle.Add("-clearnegativeboost", target, "[silent]");
+                        }
+
+                        return BoolEmptyVoidUnion.FromVoid();
+                    }
                 },
                 OnStart = new OnStartEventInfo(TryUseWhiteHerb),
                 OnAnySwitchIn = new OnAnySwitchInEventInfo(TryUseWhiteHerb, priority: -2),
