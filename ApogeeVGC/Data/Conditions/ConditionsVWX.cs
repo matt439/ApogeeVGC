@@ -102,7 +102,8 @@ public partial record Conditions
                     if (move.Target != MoveTarget.AllAdjacent &&
                         move.Target != MoveTarget.AllAdjacentFoes)
                     {
-                        return BoolIntEmptyVoidUnion.FromVoid();
+                        // TypeScript: return; (undefined) - don't interfere, let other handlers run
+                        return null;
                     }
 
                     if (battle.DisplayUi)
