@@ -55,11 +55,11 @@ public partial record Conditions
                         return BoolVoidUnion.FromBool(false);
                     }
 
-                    // Check if this is from copying abilities (Costar, Imposter, Psych Up, Transform)
-                    // These are moves/abilities that copy stat changes, so we show silently
+                    // Check if this is from copying abilities/moves (Costar, Imposter, Psych Up, Transform)
+                    // These copy stat changes, so we show silently
                     bool isCopied =
                         effect is Ability { Id: AbilityId.Costar or AbilityId.Imposter } ||
-                        effect is Move { Name: "Psych Up" or "Transform" };
+                        effect is Move { Id: MoveId.PsychUp or MoveId.Transform };
                     if (isCopied)
                     {
                         if (battle.DisplayUi)
@@ -213,7 +213,8 @@ public partial record Conditions
                     if (lockedMove is not null &&
                         source.Volatiles[ConditionId.LockedMove].Duration == 2)
                     {
-                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                        // Use DeleteVolatile to match TS 'delete' behavior (no OnEnd event)
+                        source.DeleteVolatile(ConditionId.LockedMove);
                     }
 
                     return new Empty();
@@ -489,10 +490,10 @@ public partial record Conditions
                         return BoolVoidUnion.FromBool(false);
                     }
 
-                    // Check if this is from copying abilities (Costar, Imposter, Psych Up, Transform)
+                    // Check if this is from copying abilities/moves (Costar, Imposter, Psych Up, Transform)
                     bool isCopied =
                         effect is Ability { Id: AbilityId.Costar or AbilityId.Imposter } ||
-                        effect is Move { Name: "Psych Up" or "Transform" };
+                        effect is Move { Id: MoveId.PsychUp or MoveId.Transform };
                     if (battle.DisplayUi)
                     {
                         if (isCopied)
