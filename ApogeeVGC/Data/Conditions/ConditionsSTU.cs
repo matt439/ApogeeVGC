@@ -335,21 +335,21 @@ public partial record Conditions
                         battle.Actions.GetDamage(source, target, move);
 
                     // If damage calculation failed or returned false, fail the move
-                    if (damageResult is FalseIntUndefinedFalseUnion)
+                    // TS: if (!damage && damage !== 0) - checks for falsy but not 0
+                    if (damageResult is FalseIntUndefinedFalseUnion or UndefinedIntUndefinedFalseUnion)
                     {
-                        return IntBoolVoidUnion.FromVoid();
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source);
+                        }
+                        // TODO: battle.AttrLastMove("[still]");
+                        return null; // return null to suppress additional failure messages
                     }
 
                     // Get the actual damage value
                     int damage = damageResult is IntIntUndefinedFalseUnion intDmg
                         ? intDmg.Value
                         : 0;
-
-                    // If no damage, let the move continue (might still have secondary effects)
-                    if (damage == 0)
-                    {
-                        return IntBoolVoidUnion.FromVoid();
-                    }
 
                     // Cap damage at substitute's remaining HP
                     int subHp = battle.EffectState.Hp ?? 0;
@@ -358,11 +358,19 @@ public partial record Conditions
                     // Subtract damage from substitute's HP
                     battle.EffectState.Hp = subHp - damage;
 
+                    // Track the last damage dealt
+                    source.LastDamage = damage;
+
                     // Check if substitute broke
                     if ((battle.EffectState.Hp ?? 0) <= 0)
                     {
                         if (battle.DisplayUi)
                         {
+                            // Show OHKO message if applicable
+                            if (move.Ohko == true)
+                            {
+                                battle.Add("-ohko");
+                            }
                             battle.Add("-end", target, "Substitute");
                         }
 
@@ -378,8 +386,8 @@ public partial record Conditions
                         }
                     }
 
-                    // Handle recoil damage if move has recoil
-                    if (move.Recoil != null)
+                    // Handle recoil damage if move has recoil or is Chloroblast
+                    if (move.Recoil != null || move.Id == MoveId.Chloroblast)
                     {
                         int recoilDamage = battle.Actions.CalcRecoilDamage(damage, move, source);
                         battle.Damage(recoilDamage, source, source,
@@ -613,13 +621,9 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Torment,
                 NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
-                    if (effect is Move { Id: MoveId.GMaxMeltdown })
-                    {
-                        battle.EffectState.Duration = 3;
-                    }
-
+                    // Note: G-Max Meltdown check removed - not available in Gen 9
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, "Torment");
