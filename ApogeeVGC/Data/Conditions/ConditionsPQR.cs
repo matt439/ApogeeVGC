@@ -995,22 +995,29 @@ public partial record Conditions
                     if (move.Priority <= 0.1 || move.Target == MoveTarget.Self)
                         return BoolIntEmptyVoidUnion.FromVoid();
 
-                    // Target must be grounded and not semi-invulnerable
-                    var isGrounded = target.IsGrounded();
-                    var isSemiInvulnerable = target.IsSemiInvulnerable();
-                    if (!(isGrounded ?? false) || isSemiInvulnerable)
+                    // Check semi-invulnerable and ally before grounded check
+                    if (target.IsSemiInvulnerable() || target.IsAlly(source))
                         return BoolIntEmptyVoidUnion.FromVoid();
 
-                    // Don't block if target is ally of source
-                    if (target.IsAlly(source))
+                    // Check if target is grounded - if not, show hint for priority moves
+                    var isGrounded = target.IsGrounded();
+                    if (!(isGrounded ?? false))
+                    {
+                        // Show hint for non-grounded Pokemon that priority moves don't affect them
+                        if (move.Priority > 0 && battle.DisplayUi)
+                        {
+                            battle.Hint("Psychic Terrain doesn't affect Pokémon immune to Ground.");
+                        }
+
                         return BoolIntEmptyVoidUnion.FromVoid();
+                    }
 
                     if (battle.DisplayUi)
                     {
                         battle.Add("-activate", target, "move: Psychic Terrain");
                     }
 
-                    return new Empty(); // Block the move
+                    return null; // Silent failure - block the move
                 }, 4),
                 // OnBasePowerPriority = 6
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
