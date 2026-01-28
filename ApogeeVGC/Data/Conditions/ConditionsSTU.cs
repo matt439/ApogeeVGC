@@ -703,6 +703,8 @@ public partial record Conditions
 
                     battle.EffectState.Layers = 1;
                 }),
+                // TODO: TS onSideRestart returns false when layers >= 2 to signal failure.
+                // OnSideRestartEventInfo delegate is Action (void return). Consider changing to Func<..., BoolVoidUnion>.
                 OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
                 {
                     if ((battle.EffectState.Layers ?? 0) >= 2) return;
@@ -1344,6 +1346,8 @@ public partial record Conditions
 
                     battle.EffectState.Layers = 1;
                 }),
+                // TODO: TS onSideRestart returns false when layers >= 3 to signal failure.
+                // OnSideRestartEventInfo delegate is Action (void return). Consider changing to Func<..., BoolVoidUnion>.
                 OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
                 {
                     if ((battle.EffectState.Layers ?? 0) >= 3) return;
