@@ -265,16 +265,13 @@ public partial record Items
                 Num = 547,
                 Gen = 5,
             },
-            // TODO: TypeScript uses OnUseItem callback to validate item use (return false to block).
-            // C# OnUseItemEventInfo returns void, so validation is done in TryUseEjectPack helper.
-            // Consider updating OnUseItemEventInfo to support BoolVoidUnion return type.
             [ItemId.EjectPack] = new()
             {
                 Id = ItemId.EjectPack,
                 Name = "Eject Pack",
                 SpriteNum = 714,
                 Fling = new FlingData { BasePower = 50 },
-                OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, target, _, _) =>
+                OnAfterBoost = new OnAfterBoostEventInfo((battle, boost, _, _, _) =>
                 {
                     // Don't trigger if already set to eject
                     // Note: OnAfterBoost is called with target = item holder, so we can use
@@ -300,29 +297,50 @@ public partial record Items
                 {
                     if (battle.EffectState.Eject != true) return;
                     if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
-                    TryUseEjectPack(battle, target.Pokemon);
+                    target.Pokemon.UseItem();
                 }, -4),
                 OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, _) =>
                 {
                     if (battle.EffectState.Eject != true) return;
                     if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
-                    TryUseEjectPack(battle, target.Pokemon);
+                    target.Pokemon.UseItem();
                 }),
                 OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, _, _, _) =>
                 {
                     if (battle.EffectState.Eject != true) return BoolVoidUnion.FromVoid();
                     if (battle.EffectState.Target is not PokemonEffectStateTarget target)
                         return BoolVoidUnion.FromVoid();
-                    TryUseEjectPack(battle, target.Pokemon);
+                    target.Pokemon.UseItem();
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnResidual = new OnResidualEventInfo((battle, _, _, _) =>
                 {
                     if (battle.EffectState.Eject != true) return;
                     if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
-                    TryUseEjectPack(battle, target.Pokemon);
+                    target.Pokemon.UseItem();
                 }, order: 29),
-                OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((_, pokemon) => { pokemon.SwitchFlag = true; })),
+                // OnUse validates whether item can be used, returning false blocks the use
+                OnUse = new OnUseEventInfo((Func<Battle, Pokemon, BoolVoidUnion>)((battle, pokemon) =>
+                {
+                    // Can't switch if no available switches
+                    if (battle.CanSwitch(pokemon.Side) == 0) return BoolVoidUnion.FromBool(false);
+                    // Can't eject if Commanding/Commanded
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.Commanding) ||
+                        pokemon.Volatiles.ContainsKey(ConditionId.Commanded))
+                    {
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    // Can't eject if another Pokemon already has switch flag set
+                    foreach (Pokemon active in battle.GetAllActive())
+                    {
+                        if (active.SwitchFlag.IsTrue()) return BoolVoidUnion.FromBool(false);
+                    }
+
+                    // Allow use and set switch flag
+                    pokemon.SwitchFlag = true;
+                    return BoolVoidUnion.FromBool(true);
+                })),
                 OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Eject = null; }),
                 Num = 1119,
                 Gen = 8,
@@ -694,25 +712,5 @@ public partial record Items
                 IsPokeball = true,
             },
         };
-    }
-
-    /// <summary>
-    /// Helper method for Eject Pack to validate and trigger item use.
-    /// </summary>
-    private static void TryUseEjectPack(Battle battle, Pokemon pokemon)
-    {
-        // Can't switch if no available switches
-        if (battle.CanSwitch(pokemon.Side) == 0) return;
-        // Can't eject if Commanding/Commanded
-        if (pokemon.Volatiles.ContainsKey(ConditionId.Commanding) ||
-            pokemon.Volatiles.ContainsKey(ConditionId.Commanded)) return;
-        // Can't eject if another Pokemon already has switch flag set
-        if (battle.GetAllActive().Any(active => active.SwitchFlag.IsTrue()))
-        {
-            return;
-        }
-
-        // Try to use the item
-        pokemon.UseItem();
     }
 }
