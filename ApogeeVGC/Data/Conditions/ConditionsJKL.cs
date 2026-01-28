@@ -212,7 +212,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
                 Duration = 2,
-                OnResidual = new OnResidualEventInfo((_, target, _, _) =>
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
                 {
                     if (target.Status == ConditionId.Sleep)
                     {
@@ -220,11 +220,8 @@ public partial record Conditions
                         target.DeleteVolatile(ConditionId.LockedMove);
                     }
 
-                    if (target.Volatiles.TryGetValue(ConditionId.LockedMove,
-                            out EffectState? state))
-                    {
-                        state.TrueDuration = (state.TrueDuration ?? 0) - 1;
-                    }
+                    // Decrement trueDuration unconditionally (matches TS: this.effectState.trueDuration--)
+                    battle.EffectState.TrueDuration = (battle.EffectState.TrueDuration ?? 0) - 1;
                 }),
                 OnStart = new OnStartEventInfo((battle, _, _, effect) =>
                 {
@@ -254,13 +251,12 @@ public partial record Conditions
                     target.AddVolatile(ConditionId.Confusion);
                 }),
                 OnLockMove = new OnLockMoveEventInfo(
-                    (Func<Battle, Pokemon, MoveIdVoidUnion>)((_, pokemon) =>
+                    (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, _) =>
                     {
-                        if (pokemon.Volatiles.TryGetValue(ConditionId.LockedMove,
-                                out EffectState? state) &&
-                            state.Move.HasValue)
+                        // TS: return this.effectState.move
+                        if (battle.EffectState.Move.HasValue)
                         {
-                            return state.Move.Value;
+                            return battle.EffectState.Move.Value;
                         }
 
                         return MoveIdVoidUnion.FromVoid();
