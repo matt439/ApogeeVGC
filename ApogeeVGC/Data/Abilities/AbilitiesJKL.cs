@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
@@ -72,7 +73,7 @@ public partial record Abilities
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     // End the item effect when switching in
-                    var item = pokemon.GetItem();
+                    Item item = pokemon.GetItem();
                     battle.SingleEvent(EventId.End, item, pokemon.ItemState, pokemon);
                 }, priority: 1),
             },
@@ -87,7 +88,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnSetStatus = new OnSetStatusEventInfo((battle, _, target, _, effect) =>
                 {
-                    var weather = target.EffectiveWeather();
+                    ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         if (effect is ActiveMove { Status: not ConditionId.None })
@@ -104,7 +105,7 @@ public partial record Abilities
                 {
                     if (status.Id == ConditionId.Yawn)
                     {
-                        var weather = target.EffectiveWeather();
+                        ConditionId weather = target.EffectiveWeather();
                         if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                         {
                             battle.Add("-immune", target, "[from] ability: Leaf Guard");
@@ -139,14 +140,14 @@ public partial record Abilities
                         move.CallsMove == true)
                         return new VoidReturn();
 
-                    var type = move.Type;
-                    var pokemonType = type.ConvertToPokemonType();
+                    MoveType type = move.Type;
+                    PokemonType pokemonType = type.ConvertToPokemonType();
                     var currentTypes = source.GetTypes();
 
                     // TypeScript: source.getTypes().join() !== type
                     // Only change type if current types (joined) don't match the move type
                     // This means: only skip type change if Pokemon is mono-typed with exactly that type
-                    var joinedTypes = string.Join(",", currentTypes.Select(t => t.ToString()));
+                    string joinedTypes = string.Join(",", currentTypes.Select(t => t.ToString()));
                     var moveTypeStr = pokemonType.ToString();
 
                     if (type != MoveType.Unknown && joinedTypes != moveTypeStr)
@@ -182,7 +183,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Electric)
                     {
-                        var boostResult =
+                        BoolZeroUnion? boostResult =
                             battle.Boost(new SparseBoostsTable { SpA = 1 });
                         if (boostResult is not BoolBoolZeroUnion { Value: true })
                         {
@@ -200,7 +201,7 @@ public partial record Abilities
                         if (move.Type != MoveType.Electric || move.Flags.PledgeCombo == true)
                             return target;
 
-                        var redirectTarget =
+                        MoveTarget redirectTarget =
                             move.Target is MoveTarget.RandomNormal or MoveTarget.AdjacentFoe
                                 ? MoveTarget.Normal
                                 : move.Target;
@@ -260,7 +261,7 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
                 {
-                    var sourceAbility = source.GetAbility();
+                    Ability sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.CantSuppress == true ||
                         sourceAbility.Id == AbilityId.LingeringAroma)
                     {
@@ -269,16 +270,16 @@ public partial record Abilities
 
                     if (battle.CheckMoveMakesContact(move, source, target, !source.IsAlly(target)))
                     {
-                        var oldAbilityResult =
+                        AbilityIdFalseUnion? oldAbilityResult =
                             source.SetAbility(AbilityId.LingeringAroma, target);
                         if (oldAbilityResult is AbilityIdAbilityIdFalseUnion
                             {
                                 AbilityId: var oldAbilityId,
                             })
                         {
-                            var oldAbilityName =
+                            string oldAbilityName =
                                 battle.Library.Abilities.TryGetValue(oldAbilityId,
-                                    out var oldAbilityData)
+                                    out Ability? oldAbilityData)
                                     ? oldAbilityData.Name
                                     : oldAbilityId.ToString();
                             battle.Add("-activate", target, "ability: Lingering Aroma",
@@ -301,7 +302,7 @@ public partial record Abilities
 
                         // Check if this healing effect should trigger Liquid Ooze damage
                         // TypeScript: const canOoze = ['drain', 'leechseed', 'strengthsap'];
-                        var shouldOoze = effect switch
+                        bool shouldOoze = effect switch
                         {
                             Condition c => c.Id is ConditionId.Drain or ConditionId.LeechSeed,
                             ActiveMove m => m.Id == MoveId.StrengthSap,
