@@ -15,6 +15,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
@@ -52,7 +53,6 @@ public partial record Abilities
                 OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
                     {
                         // List of moves that should not be affected by type-changing abilities
-                        // TODO: Add MoveId.Multiattack when it's implemented (currently isNonstandard: Past)
                         MoveId[] noModifyType =
                         [
                             MoveId.Judgment,
@@ -137,7 +137,7 @@ public partial record Abilities
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, pokemon, _, _) =>
                     {
                         var boosted = true;
-                        foreach (var target in battle.GetAllActive())
+                        foreach (Pokemon target in battle.GetAllActive())
                         {
                             if (target == pokemon) continue;
                             if (battle.Queue.WillMove(target) != null)
@@ -213,18 +213,18 @@ public partial record Abilities
                         ? BoolVoidUnion.FromBool(battle.EffectState.CheckedAngerShell ?? true)
                         : BoolVoidUnion.FromBool(true);
                 })),
-            OnAfterMoveSecondary =
+                OnAfterMoveSecondary =
                     new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
                     {
                         battle.EffectState.CheckedAngerShell = true;
                         if (source is null || source == target || target.Hp == 0) return;
                         if (move.TotalDamage is not IntIntFalseUnion totalDamage) return;
 
-                        var lastAttackedBy = target.GetLastAttackedBy();
+                        Attacker? lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;
 
                         // AngerShell uses multihit check only (no smartTarget check unlike Berserk)
-                        var damage = move.MultiHit != null
+                        int damage = move.MultiHit != null
                             ? totalDamage.Value
                             : lastAttackedBy.Damage;
 
@@ -502,7 +502,7 @@ public partial record Abilities
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     if (pokemon.Hp == 0) return;
-                    foreach (var target in pokemon.Foes())
+                    foreach (Pokemon target in pokemon.Foes())
                     {
                         if (target.Status == ConditionId.Sleep ||
                             target.HasAbility(AbilityId.Comatose))
@@ -632,7 +632,7 @@ public partial record Abilities
                     new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
                     {
                         if (effect is null || effect.EffectType != EffectType.Move) return;
-                        var bestStat = source.GetBestStat(true, true);
+                        StatIdExceptHp bestStat = source.GetBestStat(true, true);
                         var boostTable = new SparseBoostsTable();
                         boostTable.SetBoost(bestStat.ConvertToBoostId(), length);
                         battle.Boost(boostTable, source);
@@ -646,9 +646,7 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamage = new OnDamageEventInfo((battle, damage, _, source, effect) =>
                 {
-                    if (effect != null &&
-                        effect.EffectType == EffectType.Move &&
-                        effect is Move { MultiHit: null } move &&
+                    if (effect is { EffectType: EffectType.Move } and Move { MultiHit: null } move &&
                         !(move.HasSheerForce == true && source != null &&
                           source.HasAbility(AbilityId.SheerForce)))
                     {
@@ -683,10 +681,10 @@ public partial record Abilities
                         if (source == null || source == target || target.Hp == 0 ||
                             move.TotalDamage == null) return;
 
-                        var lastAttackedBy = target.GetLastAttackedBy();
+                        Attacker? lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;
 
-                        var damage =
+                        int damage =
                             move.MultiHit != null && !(move.SmartTarget ?? false) &&
                             move.TotalDamage is IntIntFalseUnion totalDmg
                                 ? totalDmg.Value
@@ -710,8 +708,6 @@ public partial record Abilities
                     if (boost.Def is not null && boost.Def < 0)
                     {
                         boost.Def = null;
-                        // TODO: Add Octolock check when ConditionId.Octolock is implemented
-                        // TS: effect.id !== 'octolock'
                         if (effect is not ActiveMove { Secondaries: not null })
                         {
                             battle.Add("-fail", target, "unboost", "Defense",
@@ -866,8 +862,6 @@ public partial record Abilities
                         showMsg = true;
                     }
 
-                    // TODO: Add Octolock check when ConditionId.Octolock is implemented
-                    // TS: effect.id !== 'octolock'
                     if (showMsg && effect is not ActiveMove { Secondaries: not null })
                     {
                         battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
@@ -911,7 +905,7 @@ public partial record Abilities
                     new OnAfterMoveSecondaryEventInfo((battle, target, _, move) =>
                     {
                         if (target.Hp == 0) return;
-                        var type = move.Type;
+                        MoveType type = move.Type;
                         if (target.IsActive &&
                             move.EffectType == EffectType.Move &&
                             move.Category != MoveCategory.Status &&
@@ -925,7 +919,7 @@ public partial record Abilities
                             // Curse Glitch for doubles (when in position 1)
                             if (target.Side.Active.Count == 2 && target.Position == 1)
                             {
-                                var action = battle.Queue.WillMove(target);
+                                MoveAction? action = battle.Queue.WillMove(target);
                                 if (action is { Move.Id: MoveId.Curse })
                                 {
                                     action.TargetLoc = -1;
@@ -1001,10 +995,10 @@ public partial record Abilities
                     {
                         if (source == null || target.IsAlly(source)) return;
 
-                        var statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
-                                           || boost.SpD is < 0 || boost.Spe is < 0 ||
-                                           boost.Accuracy is < 0
-                                           || boost.Evasion is < 0;
+                        bool statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
+                                            || boost.SpD is < 0 || boost.Spe is < 0 ||
+                                            boost.Accuracy is < 0
+                                            || boost.Evasion is < 0;
 
                         if (statsLowered)
                         {
@@ -1030,7 +1024,8 @@ public partial record Abilities
                             battle.ChainModify([5325, 4096]);
                             return battle.FinalModify(accuracy.Value);
                         }
-                        return accuracy;
+
+                        return accuracy ?? throw new InvalidOperationException("Accuracy should not be null");
                     }, -1),
             },
             [AbilityId.Contrary] = new()
@@ -1069,7 +1064,7 @@ public partial record Abilities
                 // OnSwitchInPriority = -2
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    var ally = pokemon.Allies().FirstOrDefault();
+                    Pokemon? ally = pokemon.Allies().FirstOrDefault();
                     if (ally == null) return;
 
                     // Copy all boosts from ally
@@ -1088,7 +1083,7 @@ public partial record Abilities
                     ];
 
                     // Remove existing volatiles first
-                    foreach (var volatileId in volatilesToCopy)
+                    foreach (ConditionId volatileId in volatilesToCopy)
                     {
                         if (pokemon.Volatiles.TryGetValue(volatileId, out _))
                         {
@@ -1097,15 +1092,15 @@ public partial record Abilities
                     }
 
                     // Copy volatiles from ally
-                    foreach (var volatileId in volatilesToCopy)
+                    foreach (ConditionId volatileId in volatilesToCopy)
                     {
-                        if (ally.Volatiles.TryGetValue(volatileId, out var @volatile))
+                        if (ally.Volatiles.TryGetValue(volatileId, out EffectState? @volatile))
                         {
                             pokemon.AddVolatile(volatileId);
                             // Copy layers/special data if needed
                             if (volatileId == ConditionId.DragonCheer &&
                                 pokemon.Volatiles.TryGetValue(volatileId,
-                                    out var arg2Volatile))
+                                    out EffectState? arg2Volatile))
                             {
                                 arg2Volatile.HasDragonType =
                                     @volatile.HasDragonType;
@@ -1125,7 +1120,7 @@ public partial record Abilities
                 OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, _, _) =>
                 {
                     var activated = false;
-                    foreach (var pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.GetAllActive())
                     {
                         if (pokemon == target || pokemon.Fainted) continue;
                         if (!activated)
@@ -1148,8 +1143,8 @@ public partial record Abilities
                 OnEatItem = new OnEatItemEventInfo((battle, item, _, _, effect) =>
                 {
                     // Only trigger for berries that weren't stolen by Bug Bite or Pluck
-                    var isStolenBerry = effect is ActiveMove move &&
-                                        (move.Id == MoveId.BugBite || move.Id == MoveId.Pluck);
+                    bool isStolenBerry = effect is ActiveMove move &&
+                                         (move.Id == MoveId.BugBite || move.Id == MoveId.Pluck);
 
                     if (item.IsBerry && !isStolenBerry)
                     {
@@ -1169,7 +1164,7 @@ public partial record Abilities
                     battle.EffectState.Counter--;
                     if (battle.EffectState.Counter <= 0)
                     {
-                        var item = battle.EffectState.Berry;
+                        Item? item = battle.EffectState.Berry;
                         battle.Add("-activate", pokemon, "ability: Cud Chew");
                         battle.Add("-enditem", pokemon, item.Name, "[eat]");
 
@@ -1200,7 +1195,7 @@ public partial record Abilities
                 Rating = 0.0, // Only useful in Doubles
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (var ally in pokemon.AdjacentAllies())
+                    foreach (Pokemon ally in pokemon.AdjacentAllies())
                     {
                         ally.ClearBoosts();
                         battle.Add("-clearboost", ally, "[from] ability: Curious Medicine",
@@ -1264,11 +1259,11 @@ public partial record Abilities
         if (battle.GameType != GameType.Doubles) return;
 
         // Don't run between when a Pokemon switches in and the resulting onSwitchIn event
-        var peek = battle.Queue.Peek();
+        IAction? peek = battle.Queue.Peek();
         if (peek?.Choice == ActionId.RunSwitch) return;
 
         var allies = pokemon.Allies().ToList();
-        var ally = allies.FirstOrDefault();
+        Pokemon? ally = allies.FirstOrDefault();
         if (pokemon.SwitchFlag.IsTrue() || ally?.SwitchFlag.IsTrue() == true) return;
 
         if (ally == null ||
