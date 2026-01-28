@@ -159,4 +159,8 @@ public enum ConditionId
     Uproar,
     SupercellSlam,
     HelpingHand,
+
+    // CantUseTwice move conditions (placeholder volatiles for moves that can't be used consecutively)
+    GigatonHammer,
+    BloodMoon,
 }

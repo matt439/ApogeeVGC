@@ -505,6 +505,15 @@ public partial record Conditions
                     return battle.ChainModify(battle.EffectState.DoubleMultiplier ?? 1.0);
                 }, 10),
             },
+            // CantUseTwice volatile condition placeholder - tracks that Gigaton Hammer was used last turn
+            [ConditionId.GigatonHammer] = new()
+            {
+                Id = ConditionId.GigatonHammer,
+                Name = "Gigaton Hammer",
+                AssociatedMove = MoveId.GigatonHammer,
+                EffectType = EffectType.Condition,
+                // No handlers needed - this is just a volatile marker for cantUseTwice tracking
+            },
         };
     }
 }

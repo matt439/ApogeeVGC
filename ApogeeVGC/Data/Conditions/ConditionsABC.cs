@@ -790,6 +790,15 @@ public partial record Conditions
                     battle.Queue.CancelAction(pokemon);
                 }),
             },
+            // CantUseTwice volatile condition placeholder - tracks that Blood Moon was used last turn
+            [ConditionId.BloodMoon] = new()
+            {
+                Id = ConditionId.BloodMoon,
+                Name = "Blood Moon",
+                AssociatedMove = MoveId.BloodMoon,
+                EffectType = EffectType.Condition,
+                // No handlers needed - this is just a volatile marker for cantUseTwice tracking
+            },
         };
     }
 }
