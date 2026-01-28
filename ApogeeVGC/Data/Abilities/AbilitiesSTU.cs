@@ -128,11 +128,10 @@ public partial record Abilities
                     if (accuracy.HasValue && battle.Field.IsWeather(ConditionId.Sandstorm))
                     {
                         battle.Debug("Sand Veil - decreasing accuracy");
-                        battle.ChainModify([3277, 4096]);
-                        return battle.FinalModify(accuracy.Value);
+                        return battle.ChainModify([3277, 4096]);
                     }
 
-                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
+                    return new VoidReturn();
                 }, -1),
             },
             [AbilityId.SapSipper] = new()
@@ -698,11 +697,10 @@ public partial record Abilities
                     if (accuracy.HasValue && battle.Field.IsWeather(ConditionId.Snowscape))
                     {
                         battle.Debug("Snow Cloak - decreasing accuracy");
-                        battle.ChainModify([3277, 4096]);
-                        return battle.FinalModify(accuracy.Value);
+                        return battle.ChainModify([3277, 4096]);
                     }
 
-                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
+                    return new VoidReturn();
                 }, -1),
             },
             [AbilityId.SnowWarning] = new()
@@ -1488,11 +1486,10 @@ public partial record Abilities
                     if (accuracy.HasValue && target.Volatiles.ContainsKey(ConditionId.Confusion))
                     {
                         battle.Debug("Tangled Feet - decreasing accuracy");
-                        battle.ChainModify(0.5);
-                        return battle.FinalModify(accuracy.Value);
+                        return battle.ChainModify(0.5);
                     }
 
-                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
+                    return new VoidReturn();
                 }, -1),
             },
             [AbilityId.TanglingHair] = new()

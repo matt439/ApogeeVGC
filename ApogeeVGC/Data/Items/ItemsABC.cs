@@ -595,11 +595,10 @@ public partial record Items
                     if (accuracy.HasValue)
                     {
                         battle.Debug("brightpowder - decreasing accuracy");
-                        battle.ChainModify([3686, 4096]);
-                        return battle.FinalModify(accuracy.Value);
+                        return battle.ChainModify([3686, 4096]);
                     }
 
-                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
+                    return new VoidReturn();
                 }, -2),
                 Num = 213,
                 Gen = 2,

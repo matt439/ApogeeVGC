@@ -519,11 +519,10 @@ public partial record Abilities
                         // (TypeScript checks: move.category === 'Physical' && typeof accuracy === 'number')
                         if (move.Category == MoveCategory.Physical && accuracy.HasValue)
                         {
-                            battle.ChainModify([3277, 4096]);
-                            return battle.FinalModify(accuracy.Value);
+                            return battle.ChainModify([3277, 4096]);
                         }
 
-                        return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
+                        return new VoidReturn();
                     }, -1),
             },
             [AbilityId.Hydration] = new()
