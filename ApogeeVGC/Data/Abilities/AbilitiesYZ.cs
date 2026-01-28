@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -45,7 +46,7 @@ public partial record Abilities
                         return;
                     }
 
-                    var isInZenForme = pokemon.Species.Forme is FormeId.Zen or FormeId.GalarZen;
+                    bool isInZenForme = pokemon.Species.Forme is FormeId.Zen or FormeId.GalarZen;
 
                     // Check if HP is at or below 50%
                     if (pokemon.Hp <= pokemon.MaxHp / 2 && !isInZenForme)
@@ -63,7 +64,7 @@ public partial record Abilities
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    var pokemon = psfp.Pokemon;
+                    Pokemon pokemon = psfp.Pokemon;
 
                     // Add null check for Volatiles dictionary
                     if (pokemon.Volatiles == null ||
@@ -79,7 +80,7 @@ public partial record Abilities
                             BaseSpecies: SpecieId.Darmanitan, Forme: FormeId.Zen or FormeId.GalarZen
                         })
                     {
-                        var baseForme = pokemon.Species.Forme == FormeId.GalarZen
+                        SpecieId baseForme = pokemon.Species.Forme == FormeId.GalarZen
                             ? SpecieId.DarmanitanGalar
                             : SpecieId.Darmanitan;
                         pokemon.FormeChange(baseForme, battle.Effect, message: "[silent]");
