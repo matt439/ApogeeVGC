@@ -138,17 +138,19 @@ public partial record Conditions
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.Metronome,
                             out EffectState? effectState))
-                        return null;
+                        return BoolEmptyVoidUnion.FromVoid();
 
                     // Remove volatile if no longer holding the item
+                    // TS: return; (undefined - ignore handler result)
                     if (!source.HasItem(ItemId.Metronome))
                     {
                         source.RemoveVolatile(_library.Conditions[ConditionId.Metronome]);
-                        return null;
+                        return BoolEmptyVoidUnion.FromVoid();
                     }
 
                     // Don't track moves that call other moves
-                    if (move.CallsMove == true) return null;
+                    // TS: return; (undefined - ignore handler result)
+                    if (move.CallsMove == true) return BoolEmptyVoidUnion.FromVoid();
 
                     // Track consecutive move usage
                     bool lastMoveMatches = effectState.LastMove == move.Id.ToString();
@@ -175,7 +177,8 @@ public partial record Conditions
                     }
 
                     effectState.LastMove = move.Id.ToString();
-                    return null;
+                    // TS: implicit return undefined
+                    return BoolEmptyVoidUnion.FromVoid();
                 }, -2),
                 OnModifyDamage = new OnModifyDamageEventInfo((battle, _, source, _, _) =>
                 {
@@ -265,10 +268,11 @@ public partial record Conditions
                         return IntBoolVoidUnion.FromBool(true); // Always hit
                     }
 
-                    // Pass through accuracy unchanged (null for always-hit, value for numeric)
+                    // Pass through accuracy unchanged
+                    // TS: return accuracy; (which is number | true)
                     return accuracy.HasValue 
                         ? IntBoolVoidUnion.FromInt(accuracy.Value) 
-                        : null;
+                        : IntBoolVoidUnion.FromBool(true); // Always-hit moves have accuracy = true
                 }),
             },
             [ConditionId.MirrorCoat] = new()
