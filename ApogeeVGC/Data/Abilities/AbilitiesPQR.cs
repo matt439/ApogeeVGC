@@ -55,7 +55,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (var ally in pokemon.AlliesAndSelf())
+                    foreach (Pokemon ally in pokemon.AlliesAndSelf())
                     {
                         if (ally.Status is ConditionId.Poison or ConditionId.Toxic)
                         {
@@ -79,7 +79,7 @@ public partial record Abilities
                             Pokemon: var target,
                         })
                         return;
-                    foreach (var ally in target.AlliesAndSelf())
+                    foreach (Pokemon ally in target.AlliesAndSelf())
                     {
                         if (ally.Status is ConditionId.Poison or ConditionId.Toxic)
                         {
@@ -154,7 +154,7 @@ public partial record Abilities
                             source.SwitchFlag == true)
                             return;
 
-                        var yourItemResult = source.TakeItem(target);
+                        ItemFalseUnion yourItemResult = source.TakeItem(target);
                         if (yourItemResult is not ItemItemFalseUnion { Item: var yourItem })
                             return;
                         if (!target.SetItem(yourItem.Id))
@@ -188,11 +188,11 @@ public partial record Abilities
 
                     if (pickupTargets.Count == 0) return;
 
-                    var randomTarget = battle.Sample(pickupTargets);
-                    var item = randomTarget.LastItem;
+                    Pokemon randomTarget = battle.Sample(pickupTargets);
+                    ItemId item = randomTarget.LastItem;
                     randomTarget.LastItem = ItemId.None;
 
-                    if (battle.Library.Items.TryGetValue(item, out var itemData))
+                    if (battle.Library.Items.TryGetValue(item, out Item? itemData))
                     {
                         battle.Add("-item", pokemon, itemData.Name, "[from] ability: Pickup");
                     }
@@ -244,7 +244,7 @@ public partial record Abilities
                 // OnModifySpAPriority = 5
                 OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
                 {
-                    foreach (var allyActive in pokemon.Allies())
+                    foreach (Pokemon allyActive in pokemon.Allies())
                     {
                         if (allyActive.HasAbility(AbilityId.Minus) ||
                             allyActive.HasAbility(AbilityId.Plus))
@@ -389,7 +389,7 @@ public partial record Abilities
                 OnAllyFaint = new OnAllyFaintEventInfo((_, target, pokemon, _) =>
                 {
                     if (pokemon.Hp == 0) return;
-                    var ability = target.GetAbility();
+                    Ability ability = target.GetAbility();
                     if (ability.Flags.NoReceiver == true || ability.Id == AbilityId.None) return;
                     pokemon.SetAbility(ability.Id, target);
                 }),
@@ -473,9 +473,9 @@ public partial record Abilities
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    var pokemon = psfp.Pokemon;
+                    Pokemon pokemon = psfp.Pokemon;
                     if (battle.Field.WeatherState.Source != pokemon) return;
-                    foreach (var target in battle.GetAllActive())
+                    foreach (Pokemon target in battle.GetAllActive())
                     {
                         if (target == pokemon) continue;
                         if (target.HasAbility(AbilityId.PrimordialSea))
@@ -533,10 +533,10 @@ public partial record Abilities
                         move.CallsMove == true)
                         return new VoidReturn();
 
-                    var type = move.Type;
+                    MoveType type = move.Type;
                     if (type != MoveType.Unknown)
                     {
-                        var pokemonType = type.ConvertToPokemonType();
+                        PokemonType pokemonType = type.ConvertToPokemonType();
                         // TS: source.getTypes().join() !== type - compares joined type string to move type
                         var currentTypes = source.GetTypes();
                         // Only change type if pokemon doesn't already have exactly this single type
@@ -721,7 +721,7 @@ public partial record Abilities
                 }),
                 OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
                 {
-                    var quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
+                    Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
 
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
@@ -882,7 +882,7 @@ public partial record Abilities
                 OnAllyFaint = new OnAllyFaintEventInfo((_, target, pokemon, _) =>
                 {
                     if (pokemon.Hp == 0) return;
-                    var ability = target.GetAbility();
+                    Ability ability = target.GetAbility();
                     if (ability.Flags.NoReceiver == true || ability.Id == AbilityId.None) return;
                     pokemon.SetAbility(ability.Id, target);
                 }),
