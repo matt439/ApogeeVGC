@@ -260,8 +260,12 @@ public partial record Conditions
                         }
                     }
                 }),
-                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, _, _, _, _) =>
-                    battle.ChainModify([6840, 4096])),
+                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
+                {
+                    // Only modify accuracy for moves with numeric accuracy (not always-hit moves)
+                    if (accuracy == null) return new VoidReturn();
+                    return battle.ChainModify([6840, 4096]);
+                }),
                 OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
                 {
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots)
@@ -359,11 +363,6 @@ public partial record Conditions
                 Name = "Healing Wish",
                 AssociatedMove = MoveId.HealingWish,
                 EffectType = EffectType.Condition,
-                OnStart = new OnStartEventInfo((battle, _, source, _) =>
-                {
-                    battle.Add("-activate", source, "move: Healing Wish");
-                    return new VoidReturn();
-                }),
                 OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
                 {
                     // Trigger the onSwap event
