@@ -29,8 +29,7 @@ public partial record Conditions
                     battle.EffectState.StartingTurn = battle.GetOverflowedTurnCount();
                     if (battle.EffectState.StartingTurn == 255)
                     {
-                        // In Gen 8+, Wish will never resolve when used on the 255th turn
-                        // The hint is not displayed since this is a rare edge case
+                        battle.Hint($"In Gen 8+, Wish will never resolve when used on the {battle.Turn}th turn.");
                     }
 
                     return BoolVoidUnion.FromVoid();
