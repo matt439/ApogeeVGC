@@ -13,6 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Items;
@@ -35,7 +36,7 @@ public partial record Items
                 OnSetAbility = new OnSetAbilityEventInfo((battle, _, target, source, effect) =>
                 {
                     // Block ability changes from other abilities (except Trace)
-                    if (effect != null && effect.EffectType == EffectType.Ability &&
+                    if (effect is { EffectType: EffectType.Ability } &&
                         effect.Name != "Trace")
                     {
                         battle.Add("-ability", source, effect.Name);
@@ -136,7 +137,7 @@ public partial record Items
                         return;
                     }
 
-                    if (effect != null && effect.Name == "Intimidate")
+                    if (effect is { Name: "Intimidate" })
                     {
                         target.UseItem();
                     }
@@ -405,20 +406,18 @@ public partial record Items
                     {
                         // BigRoot boosts healing from: drain moves, Leech Seed, Ingrain, Aqua Ring, Strength Sap
                         // TS checks effect.id for: 'drain', 'leechseed', 'ingrain', 'aquaring', 'strengthsap'
-                        bool isBigRootHeal = effect switch
+                        // The effect passed here is always an IEffect (Condition or Move), not BattleHealEffect
+                        // Drain healing is passed as the Drain condition (ConditionId.Drain)
+                        // Strength Sap passes MoveId.StrengthSap
+                        bool isBigRootHeal = effect.EffectStateId switch
                         {
-                            // Drain healing uses DrainBattleHealEffect (covers all drain moves)
-                            DrainBattleHealEffect => true,
-                            // Strength Sap healing passes the move as the effect
-                            EffectBattleHealEffect { Effect: ActiveMove { Id: MoveId.StrengthSap } } => true,
-                            // Condition-based healing (Leech Seed, Ingrain, Aqua Ring)
-                            _ => effect.EffectStateId switch
+                            ConditionEffectStateId
                             {
-                                ConditionEffectStateId condId => condId.ConditionId is
-                                    ConditionId.LeechSeed or ConditionId.Ingrain
-                                    or ConditionId.AquaRing,
-                                _ => false
-                            }
+                                ConditionId: ConditionId.Drain or ConditionId.LeechSeed
+                                or ConditionId.Ingrain or ConditionId.AquaRing
+                            } => true,
+                            MoveEffectStateId { MoveId: MoveId.StrengthSap } => true,
+                            _ => false
                         };
 
                         if (isBigRootHeal)
@@ -599,7 +598,8 @@ public partial record Items
                         battle.ChainModify([3686, 4096]);
                         return battle.FinalModify(accuracy.Value);
                     }
-                    return accuracy;
+
+                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
                 }, -2),
                 Num = 213,
                 Gen = 2,
