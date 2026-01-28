@@ -59,7 +59,7 @@ public partial record Abilities
                             {
                                 Pokemon: var abilityHolder,
                             })
-                            return accuracy;
+                            return accuracy ?? throw new InvalidOperationException("Accuracy cannot be null here.");
                         // Only modify numeric accuracy
                         if (accuracy.HasValue && source.IsAlly(abilityHolder))
                         {
@@ -67,7 +67,7 @@ public partial record Abilities
                             return battle.FinalModify(accuracy.Value);
                         }
 
-                        return accuracy;
+                        return accuracy ?? throw new InvalidOperationException("Accuracy cannot be null here.");
                     }, -1),
             },
             [AbilityId.VitalSpirit] = new()
@@ -546,7 +546,7 @@ public partial record Abilities
                         return 50;
                     }
 
-                    return accuracy;
+                    return accuracy ?? throw new InvalidOperationException("Accuracy cannot be null here.");
                 }, 10),
             },
 
