@@ -29,9 +29,9 @@ public partial record Items
                     {
                         if (move.Type == MoveType.Ice && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -97,7 +97,7 @@ public partial record Items
                         {
                             battle.Debug("Zoom Lens boosting accuracy");
                             battle.ChainModify([4915, 4096]);
-                            var result = battle.FinalModify(accuracy.Value);
+                            int result = battle.FinalModify(accuracy.Value);
                             return DoubleVoidUnion.FromDouble(result);
                         }
 

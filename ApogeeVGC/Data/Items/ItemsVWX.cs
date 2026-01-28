@@ -187,7 +187,7 @@ public partial record Items
                 SpriteNum = 537,
                 Fling = new FlingData { BasePower = 10 },
                 OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
-                    (battle, accuracy, _, _, move) =>
+                    (battle, accuracy, _, _, _) =>
                     {
                         // Only modify numeric accuracy (TypeScript: typeof accuracy === 'number')
                         // Moves with true accuracy (always hit) have accuracy == null
