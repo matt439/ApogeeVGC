@@ -14,6 +14,7 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
@@ -131,7 +132,7 @@ public partial record Abilities
                         return battle.FinalModify(accuracy.Value);
                     }
 
-                    return accuracy;
+                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
                 }, -1),
             },
             [AbilityId.SapSipper] = new()
@@ -240,10 +241,7 @@ public partial record Abilities
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
                 {
                     // If IgnoreImmunity is null, create a new dictionary
-                    if (move.IgnoreImmunity == null)
-                    {
-                        move.IgnoreImmunity = new Dictionary<PokemonType, bool>();
-                    }
+                    move.IgnoreImmunity ??= new Dictionary<PokemonType, bool>();
 
                     // If IgnoreImmunity is true (ignore all), don't modify
                     if (move.IgnoreImmunity is BoolMoveDataIgnoreImmunity { Value: true })
@@ -276,7 +274,7 @@ public partial record Abilities
                 Rating = 2.0,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    bool activated = false;
+                    var activated = false;
                     ConditionId[] screens =
                         [ConditionId.Reflect, ConditionId.LightScreen, ConditionId.AuroraVeil];
                     foreach (ConditionId sideCondition in screens)
@@ -704,7 +702,7 @@ public partial record Abilities
                         return battle.FinalModify(accuracy.Value);
                     }
 
-                    return accuracy;
+                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
                 }, -1),
             },
             [AbilityId.SnowWarning] = new()
@@ -912,21 +910,16 @@ public partial record Abilities
                     CantSuppress = true,
                 },
                 // OnModifyMovePriority = 1
-                // TODO: When MoveId.KingsShield is implemented, update this to handle King's Shield:
-                // - Status moves don't trigger forme change, except King's Shield
-                // - King's Shield should change to Shield Forme (base Aegislash)
-                // - All other attacking moves change to Blade Forme
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, attacker, _) =>
                 {
                     if (attacker.BaseSpecies.BaseSpecies != SpecieId.Aegislash ||
                         attacker.Transformed)
                         return;
                     // Currently only handles attacking moves -> Blade Forme
-                    // King's Shield handling will be added when the move is implemented
                     if (move.Category == MoveCategory.Status)
                         return;
 
-                    SpecieId targetForme = SpecieId.AegislashBlade;
+                    const SpecieId targetForme = SpecieId.AegislashBlade;
 
                     if (attacker.Species.Id != targetForme)
                     {
@@ -1499,7 +1492,7 @@ public partial record Abilities
                         return battle.FinalModify(accuracy.Value);
                     }
 
-                    return accuracy;
+                    return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
                 }, -1),
             },
             [AbilityId.TanglingHair] = new()
@@ -1878,7 +1871,7 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Seek != true) return;
 
-                    List<Pokemon> possibleTargets = pokemon.AdjacentFoes()
+                    var possibleTargets = pokemon.AdjacentFoes()
                         .Where(target =>
                             target.GetAbility().Flags.NoTrace != true &&
                             target.Ability != AbilityId.None)
