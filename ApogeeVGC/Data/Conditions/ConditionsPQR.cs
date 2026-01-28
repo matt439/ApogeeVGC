@@ -498,19 +498,19 @@ public partial record Conditions
                 }, 25),
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
-                    // Check if pokemon is terastallized - if so and has Flying type, Roost's type suppression fails
+                    // TS: if (target.terastallized) { ... return false; }
+                    // If Pokemon is Terastallized, Roost's type suppression doesn't activate
                     if (target.Terastallized is not null)
                     {
-                        if (target.HasType(PokemonType.Flying))
+                        // Only show the hint if the Pokemon actually has Flying type
+                        if (target.HasType(PokemonType.Flying) && battle.DisplayUi)
                         {
-                            if (battle.DisplayUi)
-                            {
-                                battle.Hint(
-                                    "Roost's type suppression effect does not activate when a Terastallized Pokémon has the Flying type.");
-                            }
-
-                            return BoolVoidUnion.FromBool(false);
+                            battle.Hint(
+                                "If a Terastallized Pokemon uses Roost, it remains Flying-type.");
                         }
+
+                        // Return false for ALL Terastallized Pokemon (not just Flying types)
+                        return BoolVoidUnion.FromBool(false);
                     }
 
                     if (battle.DisplayUi)
@@ -518,10 +518,14 @@ public partial record Conditions
                         battle.Add("-singleturn", target, "move: Roost");
                     }
 
+
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnType = new OnTypeEventInfo((battle, types, _) =>
                 {
+                    // TODO: TS stores the whole types array in effectState.typeWas, but our 
+                    // EffectState.TypeWas only supports a single PokemonType. Consider adding
+                    // a TypesWas property if this becomes an issue. For now, store first type.
                     battle.EffectState.TypeWas = types.FirstOrDefault();
                     // Filter out Flying type
                     return types.Where(t => t != PokemonType.Flying).ToArray();
@@ -893,13 +897,13 @@ public partial record Conditions
                 Duration = 5,
                 OnSetStatus = new OnSetStatusEventInfo((battle, _, target, source, effect) =>
                 {
-                    if (effect == null || source == null || effect is Condition
-                        {
-                            Id: ConditionId.Yawn
-                        }) return null;
-                    // Check if move has Infiltrates and target is not ally of source
+                    // TS: if (!effect || !source) return; - return undefined = allow
+                    if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                    // TS: if (effect.id === 'yawn') return; - Yawn is allowed through
+                    if (effect is Condition { Id: ConditionId.Yawn }) return BoolVoidUnion.FromVoid();
+                    // Check if move has Infiltrates and target is not ally of source - allow through
                     if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
-                        return null;
+                        return BoolVoidUnion.FromVoid();
                     if (target != source)
                     {
                         if (battle.DisplayUi)
@@ -918,15 +922,17 @@ public partial record Conditions
                         return null; // Silent failure - TS returns null
                     }
 
-                    return null;
+                    // TS: implicit return undefined when target === source - allow self-inflicted status
+                    return BoolVoidUnion.FromVoid();
                 }),
                 OnTryAddVolatile =
                     new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
                     {
-                        if (effect == null || source == null) return null;
-                        // Check if move has Infiltrates and target is not ally of source
+                        // TS: if (!effect || !source) return; - return undefined = allow
+                        if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                        // Check if move has Infiltrates and target is not ally of source - allow through
                         if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
-                            return null;
+                            return BoolVoidUnion.FromVoid();
                         if (status?.Id is ConditionId.Confusion or ConditionId.Yawn &&
                             target != source)
                         {
@@ -942,7 +948,8 @@ public partial record Conditions
                             return null; // Silent failure - TS returns null
                         }
 
-                        return null;
+                        // TS: implicit return undefined - allow
+                        return BoolVoidUnion.FromVoid();
                     }),
                 OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
                 {
@@ -971,7 +978,7 @@ public partial record Conditions
                 EffectType = EffectType.Terrain,
                 AssociatedMove = MoveId.PsychicTerrain,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
                 {
                     if (source != null && source.HasItem(ItemId.TerrainExtender))
                     {
