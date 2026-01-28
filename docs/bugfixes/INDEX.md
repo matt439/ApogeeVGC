@@ -20,6 +20,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Disguise Ability Null Effect Fix](#disguise-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 - [Adrenaline Orb Null Effect Fix](#adrenaline-orb-null-effect-fix) - NullReferenceException when effect parameter is null in OnAfterBoost handler
 - [Berserk Ability Null Effect Fix](#berserk-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
+- [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -1309,6 +1310,21 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
-*Last Updated*: 2025-01-19  
-*Total Bug Fixes Documented*: 26  
+### Grassy Glide ModifyPriority Source Fix
+**File**: `GrassyGlideModifyPrioritySourceFix.md`  
+**Severity**: Medium  
+**Systems Affected**: Move-specific OnModifyPriority handlers
+
+**Problem**: Grassy Glide's `OnModifyPriority` handler threw `NullReferenceException` when checking if the Pokemon using the move is grounded in Grassy Terrain. The `source` parameter was `null`.
+
+**Root Cause**: In `GetActionSpeed`, `SingleEvent` was called with `source = null`. The handler expected to access the Pokemon using the move via the `source` parameter (following the `ModifierSourceMove` pattern), but C#'s name-based parameter resolution mapped `source` to `SourcePokemon` which was null.
+
+**Solution**: Pass `moveAction.Pokemon` as both `target` and `source` parameters to `SingleEvent`, ensuring handlers using the `ModifierSourceMove` pattern can access the Pokemon via the `source` parameter name.
+
+**Keywords**: `ModifyPriority`, `Grassy Glide`, `SingleEvent`, `source`, `target`, `NullReferenceException`, `EventHandlerAdapter`, `ModifierSourceMove`
+
+---
+
+*Last Updated*: 2025-01-20  
+*Total Bug Fixes Documented*: 27  
 *Reference Guides*: 1
