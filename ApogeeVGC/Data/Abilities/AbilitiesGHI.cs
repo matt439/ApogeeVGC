@@ -11,6 +11,7 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
@@ -522,7 +523,7 @@ public partial record Abilities
                             return battle.FinalModify(accuracy.Value);
                         }
 
-                        return accuracy;
+                        return accuracy ?? throw new InvalidOperationException("Unexpected null accuracy");
                     }, -1),
             },
             [AbilityId.Hydration] = new()
