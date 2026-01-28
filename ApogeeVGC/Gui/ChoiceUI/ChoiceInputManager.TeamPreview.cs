@@ -328,9 +328,10 @@ public partial class ChoiceInputManager
 
         if (_currentRequest is MoveRequest moveRequest)
         {
-            if (number <= moveRequest.Active[0].Moves.Count)
+            // Check if first active Pokemon has valid request data (not fainted)
+            if (moveRequest.Active[0] is { } firstPokemon && number <= firstPokemon.Moves.Count)
             {
-                SelectMove(number - 1, moveRequest.Active[0]);
+                SelectMove(number - 1, firstPokemon);
             }
         }
         else if (_currentRequest is SwitchRequest or TeamPreviewRequest)

@@ -33,10 +33,17 @@ public partial class ChoiceInputManager
         // Legacy UI for other request types (force switch, etc.)
         int y = TopMargin;
 
+
         // Get the first active Pokemon's moves
         if (request.Active.Count > 0)
         {
-            PokemonMoveRequestData pokemonRequest = request.Active[0];
+            PokemonMoveRequestData? pokemonRequest = request.Active[0];
+            // Skip if null (fainted Pokemon)
+            if (pokemonRequest == null)
+            {
+                return;
+            }
+            
             int moveIndex = 1;
 
             foreach (PokemonMoveData moveData in pokemonRequest.Moves)
@@ -143,12 +150,11 @@ public partial class ChoiceInputManager
             case MainBattlePhaseState.MoveSelectionFirstPokemon:
                 Console.WriteLine(
                     "[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionFirstPokemon buttons");
-                if (request.Active.Count > 0)
+                if (request.Active.Count > 0 && request.Active[0] is { } pokemonDataFirst)
                 {
-                    PokemonMoveRequestData pokemonData = request.Active[0];
-                    bool canTera = pokemonData.CanTerastallize != null;
+                    bool canTera = pokemonDataFirst.CanTerastallize != null;
                     _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
-                        pokemonData,
+                        pokemonDataFirst,
                         canTera,
                         TurnSelection.FirstPokemonTerastallize,
                         (moveIndex, useTera) => HandleMoveSelection(0, moveIndex, useTera),
@@ -197,14 +203,13 @@ public partial class ChoiceInputManager
             case MainBattlePhaseState.MoveSelectionSecondPokemon:
                 Console.WriteLine(
                     "[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionSecondPokemon buttons");
-                if (request.Active.Count > 1)
+                if (request.Active.Count > 1 && request.Active[1] is { } pokemonDataSecond)
                 {
-                    PokemonMoveRequestData pokemonData = request.Active[1];
                     // Only allow tera if first Pokemon hasn't already selected it
-                    bool canTera = pokemonData.CanTerastallize != null &&
+                    bool canTera = pokemonDataSecond.CanTerastallize != null &&
                                    !TurnSelection.FirstPokemonTerastallize;
                     _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
-                        pokemonData,
+                        pokemonDataSecond,
                         canTera,
                         TurnSelection.SecondPokemonTerastallize,
                         (moveIndex, useTera) => HandleMoveSelection(1, moveIndex, useTera),
@@ -240,10 +245,9 @@ public partial class ChoiceInputManager
             case MainBattlePhaseState.TargetSelectionFirstPokemon:
                 Console.WriteLine(
                     "[ChoiceInputManager.SetupMainBattleUi] Setting up TargetSelectionFirstPokemon (visual box selection)");
-                if (request.Active.Count > 0 && TurnSelection.FirstPokemonMoveIndex.HasValue)
+                if (request.Active.Count > 0 && request.Active[0] is { } targetPokemonDataFirst && TurnSelection.FirstPokemonMoveIndex.HasValue)
                 {
-                    PokemonMoveRequestData pokemonData = request.Active[0];
-                    PokemonMoveData moveData = pokemonData.Moves[TurnSelection.FirstPokemonMoveIndex.Value];
+                    PokemonMoveData moveData = targetPokemonDataFirst.Moves[TurnSelection.FirstPokemonMoveIndex.Value];
                     SetupVisualTargetSelection(moveData, 0); // Current Pokemon index
                     Console.WriteLine(
                         $"[ChoiceInputManager.SetupMainBattleUi] Set up {ValidTargets.Count} valid targets for visual selection");
@@ -253,10 +257,9 @@ public partial class ChoiceInputManager
             case MainBattlePhaseState.TargetSelectionSecondPokemon:
                 Console.WriteLine(
                     "[ChoiceInputManager.SetupMainBattleUi] Setting up TargetSelectionSecondPokemon (visual box selection)");
-                if (request.Active.Count > 1 && TurnSelection.SecondPokemonMoveIndex.HasValue)
+                if (request.Active.Count > 1 && request.Active[1] is { } targetPokemonDataSecond && TurnSelection.SecondPokemonMoveIndex.HasValue)
                 {
-                    PokemonMoveRequestData pokemonData = request.Active[1];
-                    PokemonMoveData moveData = pokemonData.Moves[TurnSelection.SecondPokemonMoveIndex.Value];
+                    PokemonMoveData moveData = targetPokemonDataSecond.Moves[TurnSelection.SecondPokemonMoveIndex.Value];
                     SetupVisualTargetSelection(moveData, 1); // Current Pokemon index
                     Console.WriteLine(
                         $"[ChoiceInputManager.SetupMainBattleUi] Set up {ValidTargets.Count} valid targets for visual selection");
@@ -612,8 +615,8 @@ public partial class ChoiceInputManager
             TurnSelection.FirstPokemonTerastallize = useTera;
 
             // Check if we need to select a target
-            PokemonMoveRequestData pokemonData = request.Active[0];
-            PokemonMoveData moveData = pokemonData.Moves[moveIndex];
+            if (request.Active[0] is not { } pokemonData0) return;
+            PokemonMoveData moveData = pokemonData0.Moves[moveIndex];
 
             if (MoveRequiresTargetSelection(moveData))
             {
@@ -626,7 +629,7 @@ public partial class ChoiceInputManager
                 TurnSelection.FirstPokemonTarget = 0;
 
                 // In singles, submit immediately. In doubles, move to second Pokemon
-                if (request.Active.Count > 1)
+                if (request.Active.Count > 1 && request.Active[1] != null)
                 {
                     TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
                 }
@@ -643,8 +646,8 @@ public partial class ChoiceInputManager
             TurnSelection.SecondPokemonTerastallize = useTera;
 
             // Check if we need to select a target
-            PokemonMoveRequestData pokemonData = request.Active[1];
-            PokemonMoveData moveData = pokemonData.Moves[moveIndex];
+            if (request.Active[1] is not { } pokemonData1) return;
+            PokemonMoveData moveData = pokemonData1.Moves[moveIndex];
 
             if (MoveRequiresTargetSelection(moveData))
             {
@@ -870,17 +873,16 @@ public partial class ChoiceInputManager
         var actions = new List<ChosenAction>();
 
         // Add first Pokemon action
-        if (TurnSelection.FirstPokemonMoveIndex.HasValue)
+        if (TurnSelection.FirstPokemonMoveIndex.HasValue && request.Active[0] is { } pokemonDataSubmit0)
         {
-            PokemonMoveRequestData pokemonData = request.Active[0];
             PokemonMoveData moveData =
-                pokemonData.Moves[TurnSelection.FirstPokemonMoveIndex.Value];
+                pokemonDataSubmit0.Moves[TurnSelection.FirstPokemonMoveIndex.Value];
 
             // Get Tera type if terastallizing
             MoveType? teraType = null;
-            if (TurnSelection.FirstPokemonTerastallize && pokemonData.CanTerastallize != null)
+            if (TurnSelection.FirstPokemonTerastallize && pokemonDataSubmit0.CanTerastallize != null)
             {
-                teraType = pokemonData.CanTerastallize switch
+                teraType = pokemonDataSubmit0.CanTerastallize switch
                 {
                     MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
                     _ => null,
@@ -906,26 +908,36 @@ public partial class ChoiceInputManager
                 Index = TurnSelection.FirstPokemonSwitchIndex.Value,
             });
         }
+        else if (request.Active[0] == null)
+        {
+            // Fainted Pokemon - add pass action
+            actions.Add(new ChosenAction
+            {
+                Choice = ChoiceType.Pass,
+                Pokemon = null,
+                MoveId = MoveId.None,
+            });
+        }
 
         // Add second Pokemon action (if doubles)
         if (request.Active.Count > 1)
         {
-            if (TurnSelection.SecondPokemonMoveIndex.HasValue)
+            if (TurnSelection.SecondPokemonMoveIndex.HasValue && request.Active[1] is { } pokemonDataSubmit1)
             {
-                PokemonMoveRequestData pokemonData = request.Active[1];
                 PokemonMoveData moveData =
-                    pokemonData.Moves[TurnSelection.SecondPokemonMoveIndex.Value];
+                    pokemonDataSubmit1.Moves[TurnSelection.SecondPokemonMoveIndex.Value];
 
                 // Get Tera type if terastallizing
                 MoveType? teraType = null;
-                if (TurnSelection.SecondPokemonTerastallize && pokemonData.CanTerastallize != null)
+                if (TurnSelection.SecondPokemonTerastallize && pokemonDataSubmit1.CanTerastallize != null)
                 {
-                    teraType = pokemonData.CanTerastallize switch
+                    teraType = pokemonDataSubmit1.CanTerastallize switch
                     {
                         MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
                         _ => null,
                     };
                 }
+
 
                 actions.Add(new ChosenAction
                 {
@@ -944,6 +956,16 @@ public partial class ChoiceInputManager
                     Pokemon = null,
                     MoveId = MoveId.None,
                     Index = TurnSelection.SecondPokemonSwitchIndex.Value,
+                });
+            }
+            else if (request.Active[1] == null)
+            {
+                // Fainted Pokemon - add pass action
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Pass,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
                 });
             }
         }

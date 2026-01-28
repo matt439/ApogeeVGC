@@ -53,6 +53,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
 - [GUI Team Preview Fix](#gui-team-preview-fix) - No Pokémon displayed during GUI team preview
 
+
 ### Battle Lifecycle
 - [Collection Modified During Enumeration Fix](#collection-modified-during-enumeration-fix) - InvalidOperationException when side.Active is modified during foreach iteration
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
@@ -60,6 +61,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended during request generation
 - [Player 2 Always Wins Bug Fix](#player-2-always-wins-bug-fix) - Winner detection comparing player names against side IDs incorrectly
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player always returning invalid target location 0 for targeting moves in doubles
+
+### Choice System
+- [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position to index into Active-sized arrays
 
 ---
 
@@ -514,6 +518,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
 - [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix) - VoidVoidFalseUnion cannot be converted to RelayVar
 - [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix) - IntIntBoolUnion cannot be converted to RelayVar
+- [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
@@ -1242,6 +1247,32 @@ if (effect.EffectType == EffectType.Ability &&
 **Impact**: Makes `PlayerRandom` functional in doubles format. The infinite loop is resolved, allowing doubles battles to complete normally.
 
 **Keywords**: `PlayerRandom`, `doubles battle`, `infinite loop`, `target location`, `targeting moves`, `TargetTypeChoices`, `MoveTarget`, `GetRandomTargetLocation`, `Side.ChooseMove`, `AdjacentFoe`, `Normal target`, `doubles format`, `auto-targeting`, `move validation`
+
+---
+
+### Pokemon Position Index Mismatch Fix
+**File**: `PokemonPositionIndexMismatchFix.md`  
+**Severity**: High  
+**Systems Affected**: Choice system, switching, trapped Pokemon handling, move request generation
+
+**Problem**: `ArgumentOutOfRangeException` and `InvalidOperationException` when attempting to switch with a trapped Pokemon. The crash occurred in `UpdateRequestForPokemon` when accessing `moveRequest.Active[index]`.
+
+**Root Cause**: Two related issues:
+1. The code assumed `pokemon.Position` always equals the active slot index, but this invariant wasn't always maintained
+2. More critically, `moveRequest.Active` was built using `.Where().Select()` which **filtered out** fainted Pokemon and changed the indices. TypeScript uses `.map()` which **preserves** indices with undefined entries
+
+Example: If `Active[0]` is fainted and `Active[1]` is alive:
+- C# (old): `moveRequest.Active` = [alive_data] (size 1)
+- TypeScript: `moveRequest.Active` = [null, alive_data] (size 2, index preserved)
+
+**Solution**: 
+1. Changed request generation to use `.Select()` preserving indices with null for fainted Pokemon
+2. Made `MoveRequest.Active` property nullable (`IReadOnlyList<PokemonMoveRequestData?>`)
+3. Use `Active.IndexOf(pokemon)` instead of `pokemon.Position` for lookups
+
+**Files Changed**: `MoveRequest.cs`, `Battle.Requests.cs`, `Side.Choices.cs`
+
+**Keywords**: `Position`, `Active`, `SlotConditions`, `ArgumentOutOfRangeException`, `trapped`, `ChooseSwitch`, `UpdateRequestForPokemon`, `index mismatch`, `MoveRequest`, `fainted Pokemon`
 
 ---
 

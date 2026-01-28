@@ -263,14 +263,15 @@ public partial class Battle
                     // Don't check PokemonLeft here - a side can make moves if they have active Pokemon
                     // PokemonLeft is for win condition checking, not for determining if moves can be made
 
-                    // Get move request data for each active, non-fainted Pokemon
+                    // Get move request data for each active slot, preserving indices
+                    // Fainted or null Pokemon produce null entries (matching TypeScript behavior)
+                    // This ensures Side.Active[i] maps to moveRequest.Active[i]
                     var activeData = side.Active
-                        .Where(pokemon => pokemon is { Fainted: false })
-                        .Select(pokemon => pokemon!.GetMoveRequestData())
+                        .Select(pokemon => pokemon is { Fainted: false } ? pokemon.GetMoveRequestData() : null)
                         .ToList();
 
-// Only create a move request if there are active Pokemon that can make moves
-                    if (activeData.Count > 0)
+                    // Only create a move request if there are active Pokemon that can make moves
+                    if (activeData.Any(data => data != null))
                     {
                         var moveRequest = new MoveRequest
                         {

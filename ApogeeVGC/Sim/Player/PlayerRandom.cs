@@ -183,16 +183,24 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             throw new InvalidOperationException("MoveRequest.Side cannot be null");
         }
 
+
         var actions = new List<ChosenAction>();
 
         // Handle each active Pokemon
         for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
         {
-            PokemonMoveRequestData pokemonRequest = request.Active[pokemonIndex];
+            PokemonMoveRequestData? pokemonRequest = request.Active[pokemonIndex];
 
+            // Null entries represent fainted Pokemon or empty slots - add a pass action
             if (pokemonRequest == null)
             {
-                throw new InvalidOperationException($"Active Pokemon request data at index {pokemonIndex} cannot be null");
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Pass,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
+                });
+                continue;
             }
 
             // Build list of all available choices (moves with and without tera, plus switch option)
