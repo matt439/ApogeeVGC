@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -193,10 +194,10 @@ public partial record Abilities
                     {
                         if (source == null || target.IsAlly(source)) return;
 
-                        var statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
-                                           || boost.SpD is < 0 || boost.Spe is < 0 ||
-                                           boost.Accuracy is < 0
-                                           || boost.Evasion is < 0;
+                        bool statsLowered = boost.Atk is < 0 || boost.Def is < 0 || boost.SpA is < 0
+                                            || boost.SpD is < 0 || boost.Spe is < 0 ||
+                                            boost.Accuracy is < 0
+                                            || boost.Evasion is < 0;
 
                         if (statsLowered)
                         {
@@ -230,9 +231,9 @@ public partial record Abilities
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    var pokemon = psfp.Pokemon;
+                    Pokemon pokemon = psfp.Pokemon;
                     if (battle.Field.WeatherState.Source != pokemon) return;
-                    foreach (var target in battle.GetAllActive())
+                    foreach (Pokemon target in battle.GetAllActive())
                     {
                         if (target == pokemon) continue;
                         if (target.HasAbility(AbilityId.DeltaStream))
@@ -270,9 +271,9 @@ public partial record Abilities
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    var pokemon = psfp.Pokemon;
+                    Pokemon pokemon = psfp.Pokemon;
                     if (battle.Field.WeatherState.Source != pokemon) return;
-                    foreach (var target in battle.GetAllActive())
+                    foreach (Pokemon target in battle.GetAllActive())
                     {
                         if (target == pokemon) continue;
                         if (target.HasAbility(AbilityId.DesolateLand))
@@ -305,8 +306,7 @@ public partial record Abilities
                 // OnDamagePriority = 1
                 OnDamage = new OnDamageEventInfo((battle, damage, target, _, effect) =>
                 {
-                    if (effect != null &&
-                        effect.EffectType == EffectType.Move &&
+                    if (effect is { EffectType: EffectType.Move } &&
                         target.Species.Id is SpecieId.Mimikyu or SpecieId.MimikyuTotem)
                     {
                         battle.Add("-activate", target, "ability: Disguise");
@@ -327,10 +327,10 @@ public partial record Abilities
                             return new VoidReturn();
                         }
 
-                        var infiltrates = move is ActiveMove { Infiltrates: true };
-                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                     (move.Flags.BypassSub != true) &&
-                                     !infiltrates;
+                        bool infiltrates = move is ActiveMove { Infiltrates: true };
+                        bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                      (move.Flags.BypassSub != true) &&
+                                      !infiltrates;
                         if (hitSub) return new VoidReturn();
 
                         if (move is ActiveMove am && !target.RunImmunity(am))
@@ -344,8 +344,8 @@ public partial record Abilities
                          target.Species.Id != SpecieId.MimikyuTotem))
                         return new VoidReturn();
 
-                    var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                 (move.Flags.BypassSub != true) && move.Infiltrates != true;
+                    bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                  (move.Flags.BypassSub != true) && move.Infiltrates != true;
                     if (hitSub || !target.RunImmunity(move)) return new VoidReturn();
 
                     return 0;
@@ -355,7 +355,7 @@ public partial record Abilities
                     if (pokemon.Species.Id is SpecieId.Mimikyu or SpecieId.MimikyuTotem &&
                         (battle.EffectState.Busted ?? false))
                     {
-                        var bustedSpeciesId = pokemon.Species.Id == SpecieId.MimikyuTotem
+                        SpecieId bustedSpeciesId = pokemon.Species.Id == SpecieId.MimikyuTotem
                             ? SpecieId.MimikyuBustedTotem
                             : SpecieId.MimikyuBusted;
                         pokemon.FormeChange(bustedSpeciesId, battle.Effect, true);
@@ -374,7 +374,7 @@ public partial record Abilities
                 {
                     var totalDef = 0;
                     var totalSpd = 0;
-                    foreach (var target in pokemon.Foes())
+                    foreach (Pokemon target in pokemon.Foes())
                     {
                         totalDef += target.GetStat(StatIdExceptHp.Def, false, true);
                         totalSpd += target.GetStat(StatIdExceptHp.SpD, false, true);
@@ -456,7 +456,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Water)
                     {
-                        var healResult = battle.Heal(target.BaseMaxHp / 4, target);
+                        IntFalseUnion healResult = battle.Heal(target.BaseMaxHp / 4, target);
                         if (healResult is FalseIntFalseUnion)
                         {
                             battle.Add("-immune", target, "[from] ability: Dry Skin");
@@ -512,7 +512,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Ground)
                     {
-                        var healResult = battle.Heal(target.BaseMaxHp / 4, target);
+                        IntFalseUnion healResult = battle.Heal(target.BaseMaxHp / 4, target);
                         if (healResult is FalseIntFalseUnion)
                         {
                             battle.Add("-immune", target, "[from] ability: Earth Eater");
@@ -536,7 +536,7 @@ public partial record Abilities
                         source.Status == ConditionId.None &&
                         source.RunStatusImmunity(ConditionId.Powder))
                     {
-                        var r = battle.Random(100);
+                        int r = battle.Random(100);
                         if (r < 11)
                         {
                             source.SetStatus(ConditionId.Sleep, target);
@@ -690,9 +690,9 @@ public partial record Abilities
                         return;
 
                     // Clear all switch flags
-                    foreach (var side in battle.Sides)
+                    foreach (Side side in battle.Sides)
                     {
-                        foreach (var active in side.Active)
+                        foreach (Pokemon? active in side.Active)
                         {
                             if (active != null)
                                 active.SwitchFlag = false;
@@ -804,7 +804,7 @@ public partial record Abilities
                     {
                         // Note: In TS, move.accuracy is set to true here
                         // We cannot modify init-only Accuracy, but the hit will still be blocked
-                        var addResult = target.AddVolatile(ConditionId.FlashFire);
+                        RelayVar addResult = target.AddVolatile(ConditionId.FlashFire);
                         if (addResult is BoolRelayVar { Value: false })
                         {
                             battle.Add("-immune", target, "[from] ability: Flash Fire");
@@ -1003,8 +1003,8 @@ public partial record Abilities
                     new OnAllySetStatusEventInfo((battle, status, target, source, effect) =>
                     {
                         // Check if effect is Yawn
-                        var isYawn = effect?.EffectStateId == ConditionId.Yawn ||
-                                     status.Id == ConditionId.Yawn;
+                        bool isYawn = effect?.EffectStateId == ConditionId.Yawn ||
+                                      status.Id == ConditionId.Yawn;
                         if (!target.HasType(PokemonType.Grass) || source == null ||
                             target == source ||
                             effect == null || isYawn)
@@ -1092,7 +1092,7 @@ public partial record Abilities
                         pokemon.Transformed) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();
-                    var targetForme = weather switch
+                    SpecieId targetForme = weather switch
                     {
                         ConditionId.SunnyDay or ConditionId.DesolateLand => SpecieId.CastformSunny,
                         ConditionId.RainDance or ConditionId.PrimordialSea =>
@@ -1112,7 +1112,7 @@ public partial record Abilities
                         pokemon.Transformed) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();
-                    var targetForme = weather switch
+                    SpecieId targetForme = weather switch
                     {
                         ConditionId.SunnyDay or ConditionId.DesolateLand => SpecieId.CastformSunny,
                         ConditionId.RainDance or ConditionId.PrimordialSea =>
@@ -1137,12 +1137,12 @@ public partial record Abilities
                 {
                     List<(Move Move, Pokemon Target)> warnMoves = [];
                     var warnBp = 1;
-                    foreach (var target in pokemon.Foes())
+                    foreach (Pokemon target in pokemon.Foes())
                     {
-                        foreach (var moveSlot in target.MoveSlots)
+                        foreach (MoveSlot moveSlot in target.MoveSlots)
                         {
-                            var move = battle.Library.Moves[moveSlot.Id];
-                            var bp = move.BasePower;
+                            Move move = battle.Library.Moves[moveSlot.Id];
+                            int bp = move.BasePower;
                             if (move.Ohko != null) bp = 150;
                             MoveId[] counterMoves =
                                 [MoveId.Counter, MoveId.MetalBurst, MoveId.MirrorCoat];
@@ -1162,7 +1162,7 @@ public partial record Abilities
                     }
 
                     if (warnMoves.Count == 0) return;
-                    var (warnMove, warnTarget) = battle.Sample(warnMoves);
+                    (Move warnMove, Pokemon warnTarget) = battle.Sample(warnMoves);
                     battle.Add("-activate", pokemon, "ability: Forewarn", warnMove.Name,
                         $"[of] {warnTarget}");
                 }),
@@ -1199,7 +1199,7 @@ public partial record Abilities
                 Rating = 1.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (var target in pokemon.Foes()
+                    foreach (Pokemon target in pokemon.Foes()
                                  .Where(target => target.Item != ItemId.None))
                     {
                         battle.Add("-item", target, battle.Library.Items[target.Item].Name,
