@@ -1248,8 +1248,8 @@ public partial record Conditions
                     // Trigger Life Orb recoil if applicable (Gen 5+)
                     if (source.IsActive && source.HasItem(ItemId.LifeOrb))
                     {
-                        battle.RunEvent(EventId.AfterMoveSecondarySelf, source,
-                            RunEventSource.FromNullablePokemon(target), source.GetItem());
+                        battle.SingleEvent(EventId.AfterMoveSecondarySelf, source.GetItem(),
+                            source.ItemState, source, target, source.GetItem());
                     }
 
                     battle.ActiveMove = null;
