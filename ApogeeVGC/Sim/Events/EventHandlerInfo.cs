@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events;
@@ -27,17 +28,20 @@ public abstract record EventHandlerInfo
     /// The actual delegate handler for this event (can be null if not implemented).
     /// This is the legacy delegate that takes specific parameters.
     /// </summary>
+    [JsonIgnore]
     public Delegate? Handler { get; init; }
     
     /// <summary>
     /// The context-based handler (can be null if using legacy Handler).
     /// This is the new, simplified handler that takes EventContext.
     /// </summary>
+    [JsonIgnore]
     public EventHandlerDelegate? ContextHandler { get; init; }
     
     /// <summary>
     /// True if this handler uses the new context-based approach.
     /// </summary>
+    [JsonIgnore]
     public bool UsesContextHandler => ContextHandler != null;
 
     // Metadata from EventIdInfo
@@ -109,11 +113,13 @@ public abstract record EventHandlerInfo
     /// <summary>
     /// Expected parameter types for this event's delegate
     /// </summary>
+    [JsonIgnore]
     public Type[]? ExpectedParameterTypes { get; init; }
 
     /// <summary>
     /// Expected return type for this event's delegate
     /// </summary>
+    [JsonIgnore]
     public Type? ExpectedReturnType { get; init; }
 
     /// <summary>

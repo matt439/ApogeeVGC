@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Conditions;
+﻿using System.Text.Json.Serialization;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
@@ -14,6 +15,7 @@ public record FlingData
     public int BasePower { get; init; }
     public ConditionId? Status { get; init; }
     public ConditionId? VolatileStatus { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? Effect { get; init; }
 }
 
