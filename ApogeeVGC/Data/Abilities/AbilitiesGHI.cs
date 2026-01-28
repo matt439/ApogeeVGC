@@ -164,7 +164,7 @@ public partial record Abilities
                 {
                     var choiceLock = pokemon.AbilityState.ChoiceLock;
                     if (choiceLock == null) return;
-                    foreach (var moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
                     {
                         if (moveSlot.Id != choiceLock)
                         {
@@ -261,7 +261,7 @@ public partial record Abilities
                 {
                     if (source.Hp == 0 || !source.IsActive || target.IsSemiInvulnerable()) return;
 
-                    var specieId = target.Species.Id;
+                    SpecieId specieId = target.Species.Id;
                     if (specieId is SpecieId.CramorantGulping or SpecieId.CramorantGorging)
                     {
                         battle.Damage(source.BaseMaxHp / 4, source, target);
@@ -284,7 +284,7 @@ public partial record Abilities
                         if (move.Id == MoveId.Surf && source.HasAbility(AbilityId.GulpMissile) &&
                             source.Species.Id == SpecieId.Cramorant)
                         {
-                            var forme = source.Hp <= source.MaxHp / 2
+                            SpecieId forme = source.Hp <= source.MaxHp / 2
                                 ? SpecieId.CramorantGorging
                                 : SpecieId.CramorantGulping;
                             source.FormeChange(forme, move);
@@ -319,7 +319,7 @@ public partial record Abilities
                 Rating = 4.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    var terrainSet = battle.Field.SetTerrain(
+                    bool terrainSet = battle.Field.SetTerrain(
                         _library.Conditions[ConditionId.ElectricTerrain]);
 
                     if (!terrainSet &&
@@ -352,7 +352,7 @@ public partial record Abilities
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     // 50% chance normally, 100% in sun
-                    var canHarvest =
+                    bool canHarvest =
                         battle.Field.IsWeather([ConditionId.SunnyDay, ConditionId.DesolateLand]) ||
                         battle.RandomChance(1, 2);
 
@@ -360,7 +360,7 @@ public partial record Abilities
                     if (pokemon.Hp == 0) return;
                     if (pokemon.Item != ItemId.None) return; // Already has an item, can't harvest
 
-                    var lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
+                    Item? lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
                     if (lastItem is not { IsBerry: true }) return;
 
                     pokemon.SetItem(lastItem.Id);
@@ -377,7 +377,7 @@ public partial record Abilities
                 // OnResidualOrder = 5, OnResidualSubOrder = 3
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    foreach (var allyActive in pokemon.AdjacentAllies())
+                    foreach (Pokemon allyActive in pokemon.AdjacentAllies())
                     {
                         if (allyActive.Status != ConditionId.None && battle.RandomChance(3, 10))
                         {
@@ -456,7 +456,7 @@ public partial record Abilities
                 OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    foreach (var ally in pokemon.AdjacentAllies())
+                    foreach (Pokemon ally in pokemon.AdjacentAllies())
                     {
                         battle.Heal(ally.BaseMaxHp / 4, ally, pokemon);
                     }
@@ -496,7 +496,7 @@ public partial record Abilities
                     if (pokemon.Species.BaseSpecies != SpecieId.Morpeko) return;
                     if (pokemon.Terastallized != null) return;
 
-                    var targetForme = pokemon.Species.Id == SpecieId.Morpeko
+                    SpecieId targetForme = pokemon.Species.Id == SpecieId.Morpeko
                         ? SpecieId.MorpekoHangry
                         : SpecieId.Morpeko;
                     pokemon.FormeChange(targetForme);
@@ -639,9 +639,9 @@ public partial record Abilities
                         if (move.Category != MoveCategory.Physical ||
                             target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
                         // Check if the move hits the substitute (not the Pokemon directly)
-                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                     move.Flags.BypassSub != true &&
-                                     (move is not ActiveMove am || am.Infiltrates != true);
+                        bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                      move.Flags.BypassSub != true &&
+                                      (move is not ActiveMove am || am.Infiltrates != true);
                         if (hitSub) return new VoidReturn();
                         if (move is ActiveMove activeMove && !target.RunImmunity(activeMove))
                             return new VoidReturn();
@@ -651,8 +651,8 @@ public partial record Abilities
                 {
                     if (target is null || move.Category != MoveCategory.Physical ||
                         target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
-                    var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                 (move.Flags.BypassSub != true) && move.Infiltrates != true;
+                    bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                  (move.Flags.BypassSub != true) && move.Infiltrates != true;
                     if (hitSub) return new VoidReturn();
                     if (!target.RunImmunity(move)) return new VoidReturn();
                     return 0;
@@ -738,9 +738,9 @@ public partial record Abilities
                 {
                     pokemon.Illusion = null;
                     // Find a non-fainted Pokemon to the right of this Pokemon to use as illusion
-                    for (var i = pokemon.Side.Pokemon.Count - 1; i > pokemon.Position; i--)
+                    for (int i = pokemon.Side.Pokemon.Count - 1; i > pokemon.Position; i--)
                     {
-                        var possibleTarget = pokemon.Side.Pokemon[i];
+                        Pokemon possibleTarget = pokemon.Side.Pokemon[i];
                         if (!possibleTarget.Fainted)
                         {
                             // If Ogerpon/Terapagos is in the last slot while the Illusion Pokemon is Terastallized
@@ -768,12 +768,12 @@ public partial record Abilities
                 OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    var pokemon = psfp.Pokemon;
+                    Pokemon pokemon = psfp.Pokemon;
                     if (pokemon.Illusion != null)
                     {
                         battle.Debug("illusion cleared");
                         pokemon.Illusion = null;
-                        var details = pokemon.GetUpdatedDetails();
+                        Pokemon.PokemonDetails details = pokemon.GetUpdatedDetails();
                         battle.Add("replace", pokemon, details.ToString());
                         battle.Add("-end", pokemon, "Illusion");
                     }
@@ -823,10 +823,10 @@ public partial record Abilities
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
                     // Imposter copies the Pokemon across from it
-                    var targetIndex = pokemon.Side.Foe.Active.Count - 1 - pokemon.Position;
+                    int targetIndex = pokemon.Side.Foe.Active.Count - 1 - pokemon.Position;
                     if (targetIndex >= 0 && targetIndex < pokemon.Side.Foe.Active.Count)
                     {
-                        var target = pokemon.Side.Foe.Active[targetIndex];
+                        Pokemon? target = pokemon.Side.Foe.Active[targetIndex];
                         if (target != null)
                         {
                             pokemon.TransformInto(target,
@@ -925,7 +925,7 @@ public partial record Abilities
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     var activated = false;
-                    foreach (var target in pokemon.AdjacentFoes())
+                    foreach (Pokemon target in pokemon.AdjacentFoes())
                     {
                         if (!activated)
                         {
