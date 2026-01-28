@@ -29,6 +29,11 @@ public partial record Conditions
                 Name = "Ally Switch",
                 AssociatedMove = MoveId.AllySwitch,
                 Duration = 2,
+                OnStart = new OnStartEventInfo((_, pokemon, _, _) =>
+                {
+                    pokemon.Volatiles[ConditionId.AllySwitch].Counter = 3;
+                    return new VoidReturn();
+                }),
                 OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
                 {
                     int counter = pokemon.Volatiles[ConditionId.AllySwitch].Counter ?? 1;
@@ -403,7 +408,8 @@ public partial record Conditions
                         min = 3;
                     }
 
-                    battle.EffectState.Time = battle.Random(min, 6);
+                    // Set Time on the pokemon's volatile state, not battle.EffectState
+                    target.Volatiles[ConditionId.Confusion].Time = battle.Random(min, 6);
                     return new VoidReturn();
                 }),
                 OnEnd = new OnEndEventInfo((battle, target) =>
@@ -639,7 +645,9 @@ public partial record Conditions
                 {
                     if (effect is { Name: "Electromorphosis" or "Wind Power" })
                     {
-                        battle.Add("-start", pokemon, "Charge", $"[from] ability: {effect.Name}");
+                        // TypeScript: this.add('-start', pokemon, 'Charge', this.activeMove!.name, '[from] ability: ' + effect.name)
+                        battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
+                            $"[from] ability: {effect.Name}");
                     }
                     else
                     {
@@ -652,7 +660,9 @@ public partial record Conditions
                 {
                     if (effect is { Name: "Electromorphosis" or "Wind Power" })
                     {
-                        battle.Add("-start", pokemon, "Charge", $"[from] ability: {effect.Name}");
+                        // TypeScript: this.add('-start', pokemon, 'Charge', this.activeMove!.name, '[from] ability: ' + effect.name)
+                        battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
+                            $"[from] ability: {effect.Name}");
                     }
                     else
                     {
