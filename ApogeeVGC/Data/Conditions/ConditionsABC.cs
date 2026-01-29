@@ -569,15 +569,15 @@ public partial record Conditions
 
                     return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
-                OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
+                OnSourceBasePower =
+                    new OnSourceBasePowerEventInfo((battle, basePower, _, _, move) =>
                     {
                         if (move.Id is MoveId.Gust or MoveId.Twister)
                         {
                             return battle.ChainModify(2);
                         }
 
-                        return damage;
+                        return DoubleVoidUnion.FromVoid();
                     }),
             },
             [ConditionId.BurningBulwark] = new()

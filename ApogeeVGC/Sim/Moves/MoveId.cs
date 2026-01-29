@@ -58,6 +58,7 @@ public enum MoveId
     Absorb,
     Accelerock,
     Acid,
+    AcidArmor,
     AcidSpray,
     Acrobatics,
     Acupressure,

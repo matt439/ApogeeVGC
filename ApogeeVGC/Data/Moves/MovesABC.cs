@@ -91,6 +91,21 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Poison,
             },
+            [MoveId.AcidArmor] = new()
+            {
+                Id = MoveId.AcidArmor,
+                Num = 151,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Acid Armor",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Snatch = true, Metronome = true },
+                SelfBoost = new SparseBoostsTable { Def = 2 },
+                Target = MoveTarget.Self,
+                Type = MoveType.Poison,
+            },
             [MoveId.Acrobatics] = new()
             {
                 Id = MoveId.Acrobatics,
@@ -130,9 +145,9 @@ public partial record Moves
                 Type = MoveType.Normal,
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
-                    // Only check stats that can be boosted (not Accuracy/Evasion for Acupressure)
+                    // Check all boostable stats including Accuracy and Evasion
                     List<BoostId> stats = [];
-                    BoostId[] boostableStats = [BoostId.Atk, BoostId.Def, BoostId.SpA, BoostId.SpD, BoostId.Spe];
+                    BoostId[] boostableStats = [BoostId.Atk, BoostId.Def, BoostId.SpA, BoostId.SpD, BoostId.Spe, BoostId.Accuracy, BoostId.Evasion];
                     foreach (var stat in boostableStats)
                     {
                         if (target.Boosts.GetBoost(stat) < 6)
