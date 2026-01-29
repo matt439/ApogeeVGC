@@ -918,6 +918,31 @@ public partial record Moves
                     { Protect = true, Mirror = true, AllyAnim = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    // Filter allies: the user itself OR allies that are not fainted and have no status
+                    move.Allies = pokemon.Side.Pokemon
+                        .Where(ally => ally == pokemon || (!ally.Fainted && ally.Status == ConditionId.None))
+                        .ToList();
+                    move.MultiHit = move.Allies.Count;
+                }),
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                {
+                    // Shift the first ally from the list
+                    if (move.Allies == null || move.Allies.Count == 0)
+                    {
+                        return IntFalseUnion.FromFalse();
+                    }
+
+                    var ally = move.Allies[0];
+                    move.Allies.RemoveAt(0);
+
+                    // Get the species from the ally's set (original species, not transformed)
+                    var setSpecies = battle.Library.Species[ally.Set.Species];
+                    var bp = 5 + (int)Math.Floor(setSpecies.BaseStats.Atk / 10.0);
+                    battle.Debug($"BP for {setSpecies.Name} hit: {bp}");
+                    return bp;
+                }),
             },
             [MoveId.Belch] = new()
             {
@@ -936,6 +961,13 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Poison,
+                OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
+                {
+                    if (!pokemon.AteBerry)
+                    {
+                        pokemon.DisableMove(MoveId.Belch);
+                    }
+                }),
             },
             [MoveId.BellyDrum] = new()
             {
@@ -950,6 +982,20 @@ public partial record Moves
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
+                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                {
+                    // Fail if HP is 50% or less, or if Attack is already maxed, or if Shedinja (1 HP)
+                    if (target.Hp <= target.MaxHp / 2 ||
+                        target.Boosts.Atk >= 6 ||
+                        target.MaxHp == 1)
+                    {
+                        return false;
+                    }
+
+                    battle.DirectDamage(target.MaxHp / 2, target);
+                    battle.Boost(new SparseBoostsTable { Atk = 12 }, target);
+                    return new VoidReturn();
+                }),
             },
             [MoveId.Bind] = new()
             {
@@ -1137,7 +1183,13 @@ public partial record Moves
                 Flags = new MoveFlags { Reflectable = true, Mirror = true, Metronome = true },
                 OnHit = new OnHitEventInfo((_, target, source, move) =>
                 {
-                    target.AddVolatile(ConditionId.Trapped, source, move);
+                    // Return the result of AddVolatile - returns false if already trapped
+                    var result = target.AddVolatile(ConditionId.Trapped, source, move);
+                    if (result is BoolRelayVar { Value: false })
+                    {
+                        return false;
+                    }
+
                     return new VoidReturn();
                 }),
                 Target = MoveTarget.Normal,
