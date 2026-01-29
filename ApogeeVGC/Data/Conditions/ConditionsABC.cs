@@ -339,20 +339,21 @@ public partial record Conditions
                 Name = "Counter",
                 Duration = 1,
                 NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, _, _, _) =>
+                OnStart = new OnStartEventInfo((_, pokemon, _, _) =>
                 {
-                    battle.EffectState.Slot = null;
-                    battle.EffectState.TotalDamage = 0;
+                    // Initialize the volatile's state on the pokemon that has the Counter volatile
+                    pokemon.Volatiles[ConditionId.Counter].Slot = null;
+                    pokemon.Volatiles[ConditionId.Counter].TotalDamage = 0;
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnRedirectTarget = new OnRedirectTargetEventInfo(
-                    (battle, target, source, _, move) =>
+                    (battle, _, source, _, move) =>
                     {
                         if (move.Id != MoveId.Counter) return PokemonVoidUnion.FromVoid();
 
-                        EffectState? effectState =
-                            source.Volatiles.GetValueOrDefault(ConditionId.Counter);
-                        if (source != target || effectState?.Slot == null)
+                        // source is the pokemon using Counter - check if it has the Counter volatile
+                        if (!source.Volatiles.TryGetValue(ConditionId.Counter, out var effectState) ||
+                            effectState.Slot == null)
                         {
                             return PokemonVoidUnion.FromVoid();
                         }
