@@ -1716,10 +1716,7 @@ public partial record Moves
                 {
                     Contact = true, Protect = true, Mirror = true, Metronome = true, Slicing = true,
                 },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                },
+                Secondary = new SecondaryEffect {}, // Sheer Force-boosted
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
                 OnAfterHit = new OnAfterHitEventInfo((_, _, source, move) =>
