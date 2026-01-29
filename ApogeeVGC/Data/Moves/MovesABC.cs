@@ -1522,12 +1522,16 @@ public partial record Moves
                             battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
                                 "[move] Bug Bite", $"[of] {source}");
                             // Trigger the Eat event on the item for the source
-                            battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
+                            // Only run EatItem and set staleness if singleEvent returns truthy
+                            var eatResult = battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
                                 source, source, move);
-                            battle.RunEvent(EventId.EatItem, source, source, move, takenItem.Item);
-                            if (takenItem.Item.Id == ItemId.LeppaBerry)
+                            if (eatResult is not BoolRelayVar { Value: false })
                             {
-                                target.Staleness = StalenessId.External;
+                                battle.RunEvent(EventId.EatItem, source, source, move, takenItem.Item);
+                                if (takenItem.Item.Id == ItemId.LeppaBerry)
+                                {
+                                    target.Staleness = StalenessId.External;
+                                }
                             }
 
                             if (takenItem.Item.OnEat != null)
@@ -1854,11 +1858,7 @@ public partial record Moves
                 {
                     source.AddVolatile(ConditionId.ChillyReception);
                 }),
-                OnHitField = new OnHitFieldEventInfo((battle, _, source, _) =>
-                {
-                    battle.Field.SetWeather(ConditionId.Snowscape, source);
-                    return new VoidReturn();
-                }),
+                Weather = ConditionId.Snowscape,
             },
             [MoveId.Chloroblast] = new()
             {
@@ -1908,10 +1908,7 @@ public partial record Moves
                 {
                     Protect = true, Mirror = true, Sound = true, BypassSub = true, Metronome = true,
                 },
-                Self = new SecondaryEffect
-                {
-                    Boosts = new SparseBoostsTable { Def = -1 },
-                },
+                SelfBoost = new SparseBoostsTable { Def = -1 },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dragon,
             },

@@ -557,7 +557,6 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Bounce,
                 Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
                 {
                     // SkyUppercut and ThousandArrows are isNonstandard: "Past" in Gen 9
