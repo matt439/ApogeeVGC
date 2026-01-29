@@ -79,7 +79,9 @@ public class EffectState
 
     // Counter and Mirror Coat tracking
     public PokemonSlot? Slot { get; set; } // For Counter/Mirror Coat damage source slot
-    public int? TotalDamage { get; set; } // For Counter/Mirror Coat damage tracking
+
+    //public int? TotalDamage { get; set; } // For Counter/Mirror Coat damage tracking
+    public int? Damage { get; set; }
     public Pokemon? LastDamageSource { get; set; } // For Counter/Mirror Coat damage source
 
     public int? GetProperty(EffectStateKey? key)

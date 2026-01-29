@@ -286,7 +286,7 @@ public partial record Conditions
                 OnStart = new OnStartEventInfo((battle, _, _, _) =>
                 {
                     battle.EffectState.Slot = null;
-                    battle.EffectState.TotalDamage = 0;
+                    battle.EffectState.Damage = 0;
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnRedirectTarget = new OnRedirectTargetEventInfo(
@@ -318,7 +318,7 @@ public partial record Conditions
                             out EffectState? effectState)) return;
 
                     effectState.Slot = source.GetSlot();
-                    effectState.TotalDamage = 2 * damage;
+                    effectState.Damage = 2 * damage;
                 }),
             },
             [ConditionId.Mist] = new()

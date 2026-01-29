@@ -331,7 +331,7 @@ public partial record Conditions
                         pokemon.DisableMove(moveSlot.Id, false,
                             effectState.SourceEffect);
                     }
-                }),
+                }), 
             },
             [ConditionId.Counter] = new()
             {
@@ -343,7 +343,7 @@ public partial record Conditions
                 {
                     // Initialize the volatile's state on the pokemon that has the Counter volatile
                     pokemon.Volatiles[ConditionId.Counter].Slot = null;
-                    pokemon.Volatiles[ConditionId.Counter].TotalDamage = 0;
+                    pokemon.Volatiles[ConditionId.Counter].Damage = 0;
                     return BoolVoidUnion.FromVoid();
                 }),
                 OnRedirectTarget = new OnRedirectTargetEventInfo(
@@ -376,7 +376,7 @@ public partial record Conditions
                         return;
 
                     effectState.Slot = source.GetSlot();
-                    effectState.TotalDamage = 2 * damage;
+                    effectState.Damage = 2 * damage;
                 }),
             },
             [ConditionId.Confusion] = new()
