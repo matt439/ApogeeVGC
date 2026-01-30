@@ -40,6 +40,8 @@ public partial record Conditions
 
                     return BoolVoidUnion.FromVoid();
                 }),
+                // Prevent restarting the condition when used again
+                OnRestart = new OnRestartEventInfo((_, _, _, _) => null),
             },
             [ConditionId.DragonCheer] = new()
             {

@@ -208,15 +208,14 @@ public partial record Moves
                     {
                         if (target.Side.RemoveSideCondition(condition))
                         {
-                            // Only show message for hazards (screens have their own end messages)
-                            if (hazards.Contains(condition))
+                            // Only show message and set success for hazards (screens have their own end messages)
+                            if (!hazards.Contains(condition)) continue;
+                            
+                            var conditionData = battle.Library.Conditions[condition];
+                            if (battle.DisplayUi)
                             {
-                                var conditionData = battle.Library.Conditions[condition];
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Add("-sideend", target.Side, conditionData.Name,
-                                        "[from] move: Defog", $"[of] {source}");
-                                }
+                                battle.Add("-sideend", target.Side, conditionData.Name,
+                                    "[from] move: Defog", $"[of] {source}");
                             }
 
                             success = true;
