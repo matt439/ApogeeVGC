@@ -2021,7 +2021,12 @@ public partial record Moves
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-                DamageCallback = new DamageCallbackEventInfo((_, source, _, _) => source.Hp),
+                DamageCallback = new DamageCallbackEventInfo((_, source, _, _) =>
+                {
+                    var damage = source.Hp;
+                    source.Faint();
+                    return damage;
+                }),
             },
             [MoveId.FireBlast] = new()
             {
