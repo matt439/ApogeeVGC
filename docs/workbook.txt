@@ -1,3 +1,5 @@
-review moves Flatter to FreezeDry
 
-review moves FreezeShock to FutureSight
+
+review moves GastroAcid to GrassPledge
+
+revie moves GrassyGlide to HappyHour

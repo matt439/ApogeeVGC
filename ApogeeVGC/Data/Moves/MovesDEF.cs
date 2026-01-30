@@ -3139,11 +3139,15 @@ public partial record Moves
                         return false;
 
                     // Store move data in slot condition state
+                    // Note: Store with IgnoreImmunity = false to match TS (actual hit respects immunity)
                     var slotCondition =
                         target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.FutureSight;
                     slotCondition.Source = source;
-                    slotCondition.MoveData = battle.Library.Moves[MoveId.FutureSight];
+                    slotCondition.MoveData = battle.Library.Moves[MoveId.FutureSight] with
+                    {
+                        IgnoreImmunity = false,
+                    };
 
                     battle.Add("-start", source, "Future Sight");
                     return new Empty();
