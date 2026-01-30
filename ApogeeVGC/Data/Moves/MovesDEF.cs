@@ -1064,7 +1064,7 @@ public partial record Moves
                 Flags = new MoveFlags
                 {
                     Protect = true, FailEncore = true, NoSleepTalk = true, FailCopycat = true,
-                    FailMimic = true, FailInstruct = true,
+                    FailMimic = true, FailInstruct = true, NoParentalBond = true,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
