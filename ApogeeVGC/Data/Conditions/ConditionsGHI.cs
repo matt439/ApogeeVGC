@@ -70,7 +70,7 @@ public partial record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, "Imprison");
+                        battle.Add("-start", pokemon, "move: Imprison");
                     }
 
                     return BoolVoidUnion.FromVoid();
@@ -125,7 +125,7 @@ public partial record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, "Ingrain");
+                        battle.Add("-start", pokemon, "move: Ingrain");
                     }
 
                     return BoolVoidUnion.FromVoid();
