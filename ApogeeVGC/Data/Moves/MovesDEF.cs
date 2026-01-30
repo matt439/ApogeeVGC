@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
@@ -490,7 +491,17 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    // Note: Cramorant Gulp Missile forme change is handled by the ability, not the move
+                    // Gulp Missile forme change for Cramorant
+                    if (attacker.HasAbility(AbilityId.GulpMissile) &&
+                        attacker.Species.Id == SpecieId.Cramorant &&
+                        !attacker.Transformed)
+                    {
+                        var forme = attacker.Hp <= attacker.MaxHp / 2
+                            ? SpecieId.CramorantGorging
+                            : SpecieId.CramorantGulping;
+                        attacker.FormeChange(forme, move, true);
+                    }
+
                     // Starting the charge turn - show prepare message
                     battle.Add("-prepare", attacker, move.Name);
                     // Run ChargeMove event (for Power Herb, etc.)
@@ -664,7 +675,7 @@ public partial record Moves
                         if (battle.DisplayUi)
                         {
                             var typeString = string.Join("/",
-                                source.GetTypes().Select(t => t.ToString()));
+                                source.GetTypes().Select(t => t.ConvertToString()));
                             battle.Add("-start", source, "typechange", typeString,
                                 "[from] move: Double Shock");
                         }
