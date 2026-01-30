@@ -1,6 +1,4 @@
-*review moves IceBurn to Inferno
-
-review moves Infestation to IvyCudgel
+*review moves Infestation to IvyCudgel
 
 
 review moves JawLock to LastResort

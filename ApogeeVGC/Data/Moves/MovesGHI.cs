@@ -1954,7 +1954,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
-                    Protect = true, BypassSub = true, AllyAnim = true, Metronome = true,
+                    Protect = true, BypassSub = true, AllyAnim = true,
                     FailInstruct = true,
                 },
                 Target = MoveTarget.Normal,
