@@ -1082,7 +1082,7 @@ public partial record Moves
             [MoveId.HardPress] = new()
             {
                 Id = MoveId.HardPress,
-                Num = 876,
+                Num = 912,
                 Accuracy = 100,
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
@@ -1300,7 +1300,7 @@ public partial record Moves
                 BasePp = 15,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Atk = 1, Accuracy = 1 },
+                Boosts = new SparseBoostsTable { Atk = 1, Accuracy = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Dark,
             },
@@ -1448,7 +1448,7 @@ public partial record Moves
             [MoveId.HydroSteam] = new()
             {
                 Id = MoveId.HydroSteam,
-                Num = 875,
+                Num = 876,
                 Accuracy = 100,
                 BasePower = 80,
                 Category = MoveCategory.Special,

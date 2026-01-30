@@ -1,6 +1,4 @@
-*review moves Harden to HeadlongRush
-
-review moves HeavySlam to HornAttack
+*review moves HeavySlam to HornAttack
 
 review moves HornDrill to IceBeam
 
