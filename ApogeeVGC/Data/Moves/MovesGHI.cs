@@ -1457,6 +1457,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Protect = true, Mirror = true, Defrost = true, Metronome = true },
+                ThawsTarget = true,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
             },
@@ -1572,7 +1573,7 @@ public partial record Moves
                 Name = "Hyperspace Hole",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { Mirror = true, Metronome = true, BypassSub = true },
+                Flags = new MoveFlags { Mirror = true, BypassSub = true },
                 BreaksProtect = true,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,

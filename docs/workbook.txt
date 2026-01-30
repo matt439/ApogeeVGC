@@ -1,6 +1,4 @@
-*review moves HeavySlam to HornAttack
-
-review moves HornDrill to IceBeam
+*review moves HornDrill to IceBeam
 
 review moves IceBurn to Inferno
 
