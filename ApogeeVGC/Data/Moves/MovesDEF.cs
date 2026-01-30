@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
@@ -2470,6 +2471,98 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
+                Condition = _library.Conditions[ConditionId.Fling],
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, target, source, move) =>
+                {
+                    // Fail if source is ignoring items (e.g., Klutz, Magic Room, Embargo)
+                    if (source.IgnoringItem(true)) return false;
+
+                    var item = source.GetItem();
+
+                    // Run TakeItem event to check if item can be taken
+                    var takeItemResult = battle.SingleEvent(EventId.TakeItem, item, source.ItemState,
+                        source, source, move, item);
+                    if (takeItemResult is BoolRelayVar { Value: false }) return false;
+
+                    // Check if item has fling data
+                    if (item.Fling == null) return false;
+
+                    // Set base power from item
+                    move.BasePower = item.Fling.BasePower;
+                    battle.Debug($"BP: {move.BasePower}");
+
+                    // Handle berry items
+                    if (item.IsBerry)
+                    {
+                        // Trigger Cud Chew ability if source has it
+                        if (source.HasAbility(AbilityId.CudChew))
+                        {
+                            battle.SingleEvent(EventId.EatItem, source.GetAbility(),
+                                source.AbilityState, source, source, move, item);
+                        }
+
+                        // Set OnHit to make target eat the berry
+                        move.OnHit = new OnHitEventInfo((innerBattle, foe, innerSource, innerMove) =>
+                        {
+                            var eatResult = innerBattle.SingleEvent(EventId.Eat, item,
+                                innerSource.ItemState, foe, innerSource, innerMove);
+                            if (eatResult is not BoolRelayVar { Value: false })
+                            {
+                                innerBattle.RunEvent(EventId.EatItem, foe, innerSource, innerMove, item);
+                                // Leppa Berry marks external staleness
+                                if (item.Id == ItemId.LeppaBerry)
+                                {
+                                    foe.Staleness = StalenessId.External;
+                                }
+                            }
+
+                            // Mark that berry was eaten if item has OnEat
+                            if (item.OnEat != null)
+                            {
+                                foe.AteBerry = true;
+                            }
+
+                            return new VoidReturn();
+                        });
+                    }
+                    // Handle items with custom fling effects
+                    else if (item.Fling.Effect != null)
+                    {
+                        // Wrap the ResultMoveHandler in OnHitEventInfo
+                        var effectHandler = item.Fling.Effect;
+                        move.OnHit = new OnHitEventInfo((b, t, s, m) => effectHandler(b, t, s, m));
+                    }
+                    // Handle items with status/volatile status effects
+                    else
+                    {
+                        // Initialize secondaries array if needed
+                        if (move.Secondaries == null)
+                        {
+                            move.Secondaries = [];
+                        }
+
+                        // Add status effect if specified
+                        if (item.Fling.Status != null)
+                        {
+                            var secondaries = move.Secondaries.ToList();
+                            secondaries.Add(new SecondaryEffect { Status = item.Fling.Status.Value });
+                            move.Secondaries = [.. secondaries];
+                        }
+                        // Add volatile status effect if specified
+                        else if (item.Fling.VolatileStatus != null)
+                        {
+                            var secondaries = move.Secondaries.ToList();
+                            secondaries.Add(new SecondaryEffect
+                                { VolatileStatus = item.Fling.VolatileStatus.Value });
+                            move.Secondaries = [.. secondaries];
+                        }
+                    }
+
+                    // Add Fling volatile to trigger item removal in condition
+                    source.AddVolatile(ConditionId.Fling);
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.FlipTurn] = new()
             {
@@ -2535,7 +2628,7 @@ public partial record Moves
                             battle.Add("-fail", target, "heal");
                         }
 
-                        return false;
+                        return new Empty(); // NOT_FAIL
                     }
 
                     return new VoidReturn();
@@ -2775,7 +2868,6 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OverrideOffensiveStat = StatIdExceptHp.Atk,
                 OverrideOffensivePokemon = MoveOverridePokemon.Target,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
@@ -2827,6 +2919,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
+                Condition = _library.Conditions[ConditionId.FreezeShock],
                 OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
                 {
                     // If already charged (volatile exists), remove it and execute the attack

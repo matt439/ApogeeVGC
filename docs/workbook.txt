@@ -1,5 +1,3 @@
-review moves FinalGambit to FlashCannon
-
 review moves Flatter to FreezeDry
 
 review moves FreezeShock to FutureSight
