@@ -1,5 +1,9 @@
+*review moves Harden to HeadlongRush
 
+review moves HeavySlam to HornAttack
 
-review moves GastroAcid to GrassPledge
+review moves HornDrill to IceBeam
 
-revie moves GrassyGlide to HappyHour
+review moves IceBurn to Inferno
+
+review moves Infestation to IvyCudgel

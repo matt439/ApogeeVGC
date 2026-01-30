@@ -376,7 +376,7 @@ public partial record Conditions
                         (target.Hp < target.MaxHp || target.Status != ConditionId.None))
                     {
                         target.Heal(target.MaxHp);
-                        target.CureStatus(silent: true);
+                        target.ClearStatus();
                         if (battle.DisplayUi)
                         {
                             battle.Add("-heal", target, target.GetHealth,
