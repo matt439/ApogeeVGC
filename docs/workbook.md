@@ -8,9 +8,9 @@
 
 ^ review moves AuraWheel to Belch
 
-@ review moves BellyDrum to BodySlam
+^ review moves BellyDrum to BodySlam
 
-review moves BoltStrike to BugBuzz
+@ review moves BoltStrike to BugBuzz
 
 review moves BulkUp to Chloroblast
 
