@@ -1,8 +1,4 @@
-*review moves PollenPuff to PowerTrick
-
-review moves PowerTrip to PsychUp
-
-review moves Psychic to QuickAttack
+*review moves Psychic to QuickAttack
 
 review moves QuickGuard to RapidSpin
 
@@ -11,3 +7,48 @@ review moves Recharge to RelicSong
 review moves RevelationDance to RolePlay
 
 review moves Rollout to Ruination
+
+
+
+
+
+
+review moves SacredFire to Scratch
+
+review moves Screech to ShedTail
+
+review moves SheerCold to Sing
+
+review moves Sketch to SleepPowder
+
+review moves SleepTalk to Snowscape
+
+review moves Soak to SparklingAria
+
+review moves SpeedSwap to Spore
+
+review moves SpringtideStorm to StompingTantrum
+
+review moves StoneAxe to StuffCheeks
+
+review moves StunSpore to Swagger
+
+review moves Swallow to ThunderWave
+
+review moves TrickRoom to Teatime
+
+review moves TeeterDance to ThroatChop
+
+review moves 
+
+review moves 
+
+review moves 
+
+review moves 
+
+review moves 
+
+review moves 
+
+review moves 

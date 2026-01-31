@@ -679,10 +679,23 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
                     if (source.IsAlly(target))
                     {
+                        // If target has a heal-blocking effect (Psychic Noise applies 'healblock'),
+                        // show the specific cant message and return NOT_FAIL.
+                        // In TS this is handled by the healblock condition's onTryHeal, but in C#
+                        // the Heal method doesn't pass the ActiveMove as the effect, so the condition
+                        // handler can't identify Pollen Puff. We handle it here instead.
+                        if (target.Volatiles.ContainsKey(ConditionId.PsychicNoise) &&
+                            target.Hp != target.MaxHp)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.Add("cant", source, "move: Heal Block", move);
+                            return BoolEmptyVoidUnion.FromEmpty(); // NOT_FAIL equivalent
+                        }
+
                         // Heal ally by 50% of their max HP
                         var healResult =
                             battle.Heal(target.BaseMaxHp / 2, target, source);
