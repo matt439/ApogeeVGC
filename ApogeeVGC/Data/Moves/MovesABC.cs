@@ -2234,7 +2234,7 @@ public partial record Moves
                         return false;
                     }
 
-                    battle.Add("-start", source, "typechange", randomType.ConvertToMoveType().ConvertToString());
+                    battle.Add("-start", source, "typechange", randomType.ConvertToString());
                     return new VoidReturn();
                 }),
             },
