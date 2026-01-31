@@ -989,6 +989,7 @@ public partial record Moves
 
                     var sketchedMove = new MoveSlot()
                     {
+                        Id = move.Id,
                         Move = move.Id,
                         Pp = move.BasePp,
                         MaxPp = move.BasePp,
@@ -1034,11 +1035,17 @@ public partial record Moves
                     }
 
                     // Check if source can receive target's ability
+                    // TS: if (!sourceCanBeSet) return sourceCanBeSet;
+                    // Preserves false (FAIL) vs null (SILENT_FAIL, e.g. Ability Shield)
                     var sourceCanBeSet = battle.RunEvent(EventId.SetAbility, source, source, move,
                         targetAbility);
                     if (sourceCanBeSet is BoolRelayVar { Value: false })
                     {
                         return false;
+                    }
+                    if (sourceCanBeSet is null)
+                    {
+                        return null;
                     }
 
                     // Check if target can receive source's ability
@@ -1047,6 +1054,10 @@ public partial record Moves
                     if (targetCanBeSet is BoolRelayVar { Value: false })
                     {
                         return false;
+                    }
+                    if (targetCanBeSet is null)
+                    {
+                        return null;
                     }
 
                     return new VoidReturn();
