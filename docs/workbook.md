@@ -24,13 +24,13 @@
 
 ^ review moves DazzlingGleam to DiamondStorm
 
-@ review moves Dig to DoubleEdge
+^ review moves Dig to DoubleEdge
 
-review moves DoubleHit to DragonTail
+^ review moves DoubleHit to DragonTail
 
-review moves DrainingKiss to Earthquake
+ review moves DrainingKiss to Earthquake
 
-review moves EchoedVoice to Endure
+@ review moves EchoedVoice to Endure
 
 review moves EnergyBall to FeatherDance
 

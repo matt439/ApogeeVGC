@@ -106,7 +106,7 @@ public partial record Conditions
                     {
                         if (battle.DisplayUi && effect is Condition { Id: ConditionId.Yawn } or
                                 Move { Id: MoveId.Yawn } or
-                                ActiveMove { Secondaries: not null })
+                                ActiveMove { Secondaries: null })
                         {
                             battle.Add("-activate", target, "move: Electric Terrain");
                         }
