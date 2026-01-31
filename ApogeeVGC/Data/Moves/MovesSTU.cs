@@ -547,7 +547,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return new VoidReturn(); // ChargeMove failed - continue but don't set up
+                        return false;
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
@@ -1135,7 +1135,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return new VoidReturn(); // ChargeMove failed - continue but don't set up
+                        return false;
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
@@ -1573,7 +1573,7 @@ public partial record Moves
                             battle.Add("-fail", target);
                         }
 
-                        return new Empty(); // null equivalent - move worked but failed silently
+                        return null; // failed silently - suppress additional failure messages
                     }
 
                     if (battle.DisplayUi)
