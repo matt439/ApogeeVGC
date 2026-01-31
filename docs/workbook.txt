@@ -1,6 +1,4 @@
-*review moves Psychic to QuickAttack
-
-review moves QuickGuard to RapidSpin
+*review moves QuickGuard to RapidSpin
 
 review moves Recharge to RelicSong
 

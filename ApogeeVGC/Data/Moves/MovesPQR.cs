@@ -1609,7 +1609,7 @@ public partial record Moves
                 OnHitSide = new OnHitSideEventInfo((_, _, source, _) =>
                 {
                     source.AddVolatile(ConditionId.Stall);
-                    return true;
+                    return new VoidReturn(); // TS returns undefined (no return statement)
                 }),
                 Secondary = null,
                 Target = MoveTarget.AllySide,
@@ -1708,7 +1708,7 @@ public partial record Moves
                     target.Side.RemoveSideCondition(ConditionId.Reflect);
                     target.Side.RemoveSideCondition(ConditionId.LightScreen);
                     target.Side.RemoveSideCondition(ConditionId.AuroraVeil);
-                    return null; // Continue with the move
+                    return new VoidReturn(); // TS returns undefined - continue with the move
                 }),
                 OnModifyType = new OnModifyTypeEventInfo((_, move, source, _) =>
                 {
@@ -1768,6 +1768,7 @@ public partial record Moves
                 {
                     Metronome = true,
                 },
+                Weather = ConditionId.RainDance,
                 Condition = _library.Conditions[ConditionId.RainDance],
                 Secondary = null,
                 Target = MoveTarget.All,
