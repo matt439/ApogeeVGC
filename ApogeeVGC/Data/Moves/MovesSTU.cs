@@ -2254,11 +2254,10 @@ public partial record Moves
                 MindBlownRecoil = true,
                 OnAfterMove = new OnAfterMoveEventInfo((battle, source, _, move) =>
                 {
-                    if (move.MindBlownRecoil == true && source.Hp > 0 &&
-                        move.MultiHit is null)
+                    if (move.MindBlownRecoil == true && move.MultiHit is null)
                     {
                         var hpBeforeRecoil = source.Hp;
-                        battle.Damage(source.MaxHp / 2, source, source,
+                        battle.Damage((int)Math.Round(source.MaxHp / 2.0), source, source,
                             BattleDamageEffect.FromIEffect(move),
                             true);
                         if (source.Hp <= source.MaxHp / 2 && hpBeforeRecoil > source.MaxHp / 2)
@@ -2290,15 +2289,9 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                OnTry = new OnTryEventInfo((battle, _, _, _) =>
                 {
-                    if (battle.Field.Terrain == ConditionId.None)
-                    {
-                        battle.Add("-fail", source, "move: Steel Roller");
-                        return false;
-                    }
-
-                    return true;
+                    return battle.Field.Terrain != ConditionId.None;
                 }),
                 OnHit = new OnHitEventInfo((battle, _, _, _) =>
                 {
@@ -2433,7 +2426,7 @@ public partial record Moves
                 },
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
                 {
-                    if (source.MoveLastTurnResult?.IsTruthy() == false)
+                    if (source.MoveLastTurnResult is BoolBoolUndefinedUnion { Value: false })
                     {
                         battle.Debug("doubling Stomping Tantrum BP due to previous move failure");
                         return move.BasePower * 2;

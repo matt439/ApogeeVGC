@@ -1,12 +1,4 @@
-review moves Sketch to SleepPowder
-
-review moves SleepTalk to Snowscape
-
-review moves Soak to SparklingAria
-
-review moves SpeedSwap to Spore
-
-review moves SpringtideStorm to StompingTantrum
+*review moves SpringtideStorm to StompingTantrum
 
 review moves StoneAxe to StuffCheeks
 
@@ -38,24 +30,54 @@ review moves WillOWisp to XScissor
 
 
 
-
-
 review moves Yawn to ZingZap
 
-review moves 
 
-review moves 
 
-review moves 
 
-review moves 
 
-review moves 
+review moves Absorb to AllySwitch
 
-review moves 
+review moves Amnesia to AuraSphere
 
-review moves 
+review moves AuraWheel to Belch
 
-review moves 
+review moves BellyDrum to BodySlam
 
-review moves 
+review moves BoltStrike to BugBuzz
+
+review moves BulkUp to Chloroblast
+
+review moves CircleThrow to Conversion
+
+review moves Conversion2 to Covet
+
+review moves Crabhammer to Crunch
+
+
+
+review moves DazzlingGleam to DiamondStorm
+
+review moves Dig to DoubleEdge
+
+review moves DoubleHit to DragonTail
+
+review moves DrainingKiss to Earthquake
+
+review moves EchoedVoice to Endure
+
+review moves EnergyBall to FeatherDance
+
+review moves Feint to FireSpin
+
+review moves FirePledge to Flatter
+
+review moves FleurCannon to FocusBlast
+
+review moves FocusEnergy to FuryAttack
+
+review moves FuryCutter to FutureSight
+
+
+
+300 line move review started with Flatter
