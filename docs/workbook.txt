@@ -1,6 +1,6 @@
 *review moves TeeterDance to ThroatChop
 
-review moves Thunder to TidyUp
+$review moves Thunder to TidyUp
 
 review moves TopsyTurvy to TriAttack
 
@@ -172,52 +172,55 @@ review items ClearAmulet to CustapBerry
 
 
 
-review items 
+review items DampRock to EjectButton
 
-review items 
+review items EjectPack to FireStone
 
-review items 
+review items FistPlate to FriendBall
 
-review items 
 
-review items 
 
-review items 
+review items GalaricaCuff to HondewBerry
 
-review items 
+review items IapapaBerry to IronPlate
 
-review items 
 
-review items 
 
-review items 
+review items JabocaBerry to LiechiBerry
 
-review items 
+review items LifeOrb to LuxuryBall
 
-review items 
 
-review items 
 
-review items 
+review items MachoBrace to Metronome
 
-review items 
+review items MicleBerry to NomelBerry
 
-review items 
+review items NormalGem to None
 
-review items 
 
-review items 
 
-review items 
+review items PamtreBerry to PowerBelt
 
-review items 
+review items PowerBracer to RazorClaw
 
-review items 
+review items RockyHelmet to RustedSword
 
-review items 
 
-review items 
 
+review items SafariBall to SkyPlate
+
+review items SmoothRock to StickyBarb
+
+review items StonePlate to UtilityUmbrella
+
+
+
+review items WacanBerry to WiseGlasses
+
+
+
+review items YacheBerry to ZoomLens
 
 
 
