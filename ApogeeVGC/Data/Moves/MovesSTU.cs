@@ -547,7 +547,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return false;
+                        return new VoidReturn(); // ChargeMove was consumed (e.g. Power Herb) - proceed with the attack
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
@@ -1135,7 +1135,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return false;
+                        return new VoidReturn(); // ChargeMove was consumed (e.g. Power Herb) - proceed with the attack
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
@@ -1652,7 +1652,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return false;
+                        return new VoidReturn(); // ChargeMove was consumed (e.g. Power Herb) - proceed with the attack
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
@@ -1724,7 +1724,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return false;
+                        return new VoidReturn(); // ChargeMove was consumed (e.g. Power Herb) - proceed with the attack
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
