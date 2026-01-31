@@ -1920,6 +1920,22 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    // Fail if already has an item or never had one
+                    if (target.Item != ItemId.None || target.LastItem == ItemId.None)
+                    {
+                        return false;
+                    }
+
+                    var item = target.LastItem;
+                    target.LastItem = ItemId.None;
+                    battle.Add("-item", target, battle.Library.Items[item].Name,
+                        "[from] move: Recycle");
+                    target.SetItem(item, source, move);
+                    return new VoidReturn();
+                }),
+                Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -1934,6 +1950,49 @@ public partial record Moves
                 BasePp = 5,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Heal = true, Metronome = true },
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    // Already asleep or has Comatose
+                    if (source.Status == ConditionId.Sleep ||
+                        source.HasAbility(AbilityId.Comatose))
+                    {
+                        return false;
+                    }
+
+                    // At full HP
+                    if (source.Hp == source.MaxHp)
+                    {
+                        battle.Add("-fail", source, "heal");
+                        return null;
+                    }
+
+                    // Insomnia and Vital Spirit checks are separate so that the message is accurate
+                    if (source.HasAbility(AbilityId.Insomnia))
+                    {
+                        battle.Add("-fail", source, "[from] ability: Insomnia",
+                            $"[of] {source}");
+                        return null;
+                    }
+
+                    if (source.HasAbility(AbilityId.VitalSpirit))
+                    {
+                        battle.Add("-fail", source, "[from] ability: Vital Spirit",
+                            $"[of] {source}");
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    var result = target.SetStatus(ConditionId.Sleep, source, move);
+                    if (!result) return false;
+                    target.StatusState.Time = 3;
+                    target.StatusState.StartTime = 3;
+                    battle.Heal(target.MaxHp);
+                    return new VoidReturn();
+                }),
+                Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
             },
@@ -2036,7 +2095,21 @@ public partial record Moves
                 Name = "Revival Blessing",
                 BasePp = 1,
                 Priority = 0,
-                Flags = new MoveFlags { Heal = true },
+                Flags = new MoveFlags { Heal = true, NoSketch = true },
+                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                {
+                    // Fail if no fainted allies on the user's side
+                    if (!target.Side.Pokemon.Any(ally => ally.Fainted))
+                    {
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
+                SlotCondition = ConditionId.RevivalBlessing,
+                SelfSwitch = true,
+                Condition = _library.Conditions[ConditionId.RevivalBlessing],
+                Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -2189,6 +2262,10 @@ public partial record Moves
                     Chance = 10,
                     Status = ConditionId.Sleep,
                 },
+                // TODO: TS has an onHit handler that sets move.willChangeForme = true when the move
+                // actually hits a target. The onAfterMoveSecondarySelf then checks this flag.
+                // Without this guard, the forme change can trigger even when the move misses all
+                // targets. Consider adding a WillChangeForme property to ActiveMove.
                 OnAfterMoveSecondarySelf =
                     new OnAfterMoveSecondarySelfEventInfo((_, source, _, move) =>
                     {

@@ -1,6 +1,4 @@
-*review moves QuickGuard to RapidSpin
-
-review moves Recharge to RelicSong
+*review moves Recharge to RelicSong
 
 review moves RevelationDance to RolePlay
 
@@ -36,6 +34,34 @@ review moves Swallow to ThunderWave
 review moves TrickRoom to Teatime
 
 review moves TeeterDance to ThroatChop
+
+review moves Thunder to TidyUp
+
+review moves TopsyTurvy to TriAttack
+
+review moves Trick to Twister
+
+review moves UpperHand to UTurn
+
+
+
+
+review moves VacuumWave to WaterPledge
+
+review moves WaterPulse to WildCharge
+
+review moves WillOWisp to XScissor
+
+
+
+
+
+
+review moves Yawn to ZingZap
+
+review moves 
+
+review moves 
 
 review moves 
 

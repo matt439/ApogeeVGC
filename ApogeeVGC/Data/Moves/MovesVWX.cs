@@ -17,118 +17,6 @@ public partial record Moves
     {
         return new Dictionary<MoveId, Move>
         {
-            // ===== U MOVES =====
-
-            [MoveId.UpperHand] = new()
-            {
-                Id = MoveId.UpperHand,
-                Num = 918,
-                Accuracy = 100,
-                BasePower = 65,
-                Category = MoveCategory.Physical,
-                Name = "Upper Hand",
-                BasePp = 15,
-                Priority = 3,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                OnTry = new OnTryEventInfo((battle, _, target, _) =>
-                {
-                    // Check if target will move with a priority move that isn't Status
-                    var action = battle.Queue.WillMove(target);
-                    var move = action?.Move;
-                    if (move is not { Priority: > 0 } || move.Category == MoveCategory.Status)
-                    {
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    VolatileStatus = ConditionId.Flinch,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-            },
-            [MoveId.Uproar] = new()
-            {
-                Id = MoveId.Uproar,
-                Num = 253,
-                Accuracy = 100,
-                BasePower = 90,
-                Category = MoveCategory.Special,
-                Name = "Uproar",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Mirror = true,
-                    Sound = true,
-                    BypassSub = true,
-                    Metronome = true,
-                    NoSleepTalk = true,
-                    FailInstruct = true,
-                },
-                Self = new SecondaryEffect
-                {
-                    VolatileStatus = ConditionId.Uproar,
-                },
-                Condition = _library.Conditions[ConditionId.Uproar],
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
-                {
-                    // Wake up all sleeping Pokemon on both sides
-                    foreach (var pokemon in target.Side.Active)
-                    {
-                        if (pokemon?.Status == ConditionId.Sleep)
-                        {
-                            pokemon.CureStatus();
-                        }
-                    }
-
-                    foreach (var pokemon in target.Side.Foe.Active)
-                    {
-                        if (pokemon?.Status == ConditionId.Sleep)
-                        {
-                            pokemon.CureStatus();
-                        }
-                    }
-
-                    return new VoidReturn();
-                }),
-                Secondary = null,
-                Target = MoveTarget.RandomNormal,
-                Type = MoveType.Normal,
-            },
-            [MoveId.UTurn] = new()
-            {
-                Id = MoveId.UTurn,
-                Num = 369,
-                Accuracy = 100,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "U-turn",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                SelfSwitch = true,
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Bug,
-            },
-
             // ===== V MOVES =====
 
             [MoveId.VacuumWave] = new()
@@ -374,7 +262,7 @@ public partial record Moves
                 }),
                 OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
                 {
-                    // Check the battle queue for ally Pokémon using Fire Pledge or Grass Pledge
+                    // Check the battle queue for ally Pokï¿½mon using Fire Pledge or Grass Pledge
                     if (battle.Queue.List != null)
                     {
                         foreach (var action in battle.Queue.List)
