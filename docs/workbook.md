@@ -2,7 +2,7 @@
 
 ## MovesABC
 
-review moves Absorb to AllySwitch
+@ review moves Absorb to AllySwitch
 
 review moves Amnesia to AuraSphere
 
@@ -138,7 +138,7 @@ review moves x to Spore
 
 ## MovesYZ
 
-@ review moves Yawn to ZingZap
+^ review moves Yawn to ZingZap
 
 
 # Abilities
