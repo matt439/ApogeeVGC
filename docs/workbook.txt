@@ -1,6 +1,4 @@
-*review moves Recharge to RelicSong
-
-review moves RevelationDance to RolePlay
+*review moves RevelationDance to RolePlay
 
 review moves Rollout to Ruination
 

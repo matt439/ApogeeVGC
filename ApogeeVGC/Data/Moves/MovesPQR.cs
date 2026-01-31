@@ -2022,21 +2022,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
-            [MoveId.Revenge] = new()
-            {
-                Id = MoveId.Revenge,
-                Num = 279,
-                Accuracy = 100,
-                BasePower = 60,
-                Category = MoveCategory.Physical,
-                Name = "Revenge",
-                BasePp = 10,
-                Priority = -4,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-            },
             [MoveId.Reversal] = new()
             {
                 Id = MoveId.Reversal,
@@ -2583,7 +2568,7 @@ public partial record Moves
                         return false;
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
@@ -2594,9 +2579,16 @@ public partial record Moves
                     }
 
                     var oldAbility = source.SetAbility(target.Ability, target);
+                    // TS: if (!oldAbility) return oldAbility as false | null;
+                    // SetAbility returns false for failure, null for silent failure
                     if (oldAbility is FalseAbilityIdFalseUnion)
                     {
                         return false;
+                    }
+
+                    if (oldAbility is null)
+                    {
+                        return null;
                     }
 
                     return new VoidReturn();

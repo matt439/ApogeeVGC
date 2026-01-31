@@ -421,7 +421,6 @@ public enum MoveId
     RelicSong,
     Rest,
     Retaliate,
-    Revenge,
     RevelationDance,
     Reversal,
     RisingVoltage,
