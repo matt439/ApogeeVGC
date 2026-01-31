@@ -134,11 +134,11 @@ review moves x to Spore
 
 ^ review moves WaterPulse to WildCharge
 
-@ review moves WillOWisp to XScissor
+^ review moves WillOWisp to XScissor
 
 ## MovesYZ
 
-review moves Yawn to ZingZap
+@ review moves Yawn to ZingZap
 
 
 # Abilities
