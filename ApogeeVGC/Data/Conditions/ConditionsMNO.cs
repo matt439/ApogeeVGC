@@ -462,11 +462,7 @@ public partial record Conditions
                             (defender.IsGrounded() ?? false) &&
                             !defender.IsSemiInvulnerable())
                         {
-                            if (battle.DisplayUi)
-                            {
-                                battle.Debug("misty terrain weaken");
-                            }
-
+                            battle.Debug("misty terrain weaken");
                             return battle.ChainModify([2048, 4096]);
                         }
 
@@ -495,7 +491,7 @@ public partial record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-fieldend", "move: Misty Terrain");
+                        battle.Add("-fieldend", "Misty Terrain");
                     }
                 }),
             },

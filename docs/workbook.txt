@@ -1,6 +1,4 @@
-*review moves Metronome to MistyExplosion
-
-review moves MistyTerrain to MuddyWater
+*review moves MistyTerrain to MuddyWater
 
 review moves MudShot to Nuzzle
 
