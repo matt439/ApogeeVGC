@@ -1,6 +1,4 @@
-*review moves StunSpore to Swagger
-
-review moves Swallow to ThunderWave
+*review moves Swallow to ThunderWave
 
 review moves TrickRoom to Teatime
 

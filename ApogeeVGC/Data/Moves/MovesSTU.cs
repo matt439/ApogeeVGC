@@ -3761,7 +3761,7 @@ public partial record Moves
                 },
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
                 {
-                    if (source.MoveLastTurnResult?.IsTruthy() == false)
+                    if (source.MoveLastTurnResult is BoolBoolUndefinedUnion { Value: false })
                     {
                         battle.Debug("doubling Temper Flare BP due to previous move failure");
                         return move.BasePower * 2;
@@ -4123,7 +4123,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((battle, source, target, _) =>
+                OnTry = new OnTryEventInfo((battle, _, target, _) =>
                 {
                     var action = battle.Queue.WillMove(target);
                     var targetMove = action?.Choice == ActionId.Move ? action.Move : null;
@@ -4131,8 +4131,6 @@ public partial record Moves
                         targetMove.Category == MoveCategory.Status ||
                         target.Volatiles.ContainsKey(ConditionId.MustRecharge))
                     {
-                        battle.Add("-fail", source);
-                        battle.AttrLastMove("[still]");
                         return false;
                     }
 
