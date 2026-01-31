@@ -701,7 +701,9 @@ public partial record Moves
                     battle.AttrLastMove("[still]");
                     battle.Add("-fail", source, "move: Aura Wheel");
                     battle.Hint("Only a Pokemon whose form is Morpeko or Morpeko-Hangry can use this move.");
-                    return BoolEmptyVoidUnion.FromBool(false);
+                    // TODO: TypeScript returns null here to suppress default fail message.
+                    // Check if BoolEmptyVoidUnion should support null or if we need a different return type.
+                    return null;
                 }),
                 OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
                 {
@@ -794,6 +796,9 @@ public partial record Moves
                 Type = MoveType.Fighting,
                 OnMoveFail = new OnMoveFailEventInfo((battle, _, source, move) =>
                 {
+                    // TypeScript uses this.dex.conditions.get('High Jump Kick') for historical consistency,
+                    // but in C# architecture, Move doesn't implement IEffect (only ActiveMove does).
+                    // Using the current move is functionally equivalent for crash damage.
                     battle.Damage(source.BaseMaxHp / 2, source, source,
                         BattleDamageEffect.FromIEffect(move));
                 }),
