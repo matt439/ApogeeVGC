@@ -46,25 +46,81 @@ review moves FuryCutter to FutureSight
 
 ## MovesGHI
 
-f
+review moves GastroAcid to GrassPledge
+
+review moves GrassyGlide to HappyHour
+
+review moves Harden to HeadlongRush
+
+review moves HeavySlam to HornAttack
+
+review moves HornDrill to IceBeam
+
+review moves IceBurn to Inferno
+
+review moves Infestation to IvyCudgel
 
 ## MovesJKL
 
-f
+review moves JawLock to LastResort
+
+review moves LastRespects to LunarBlessing
+
+review moves LunarDance to LusterPurge
 
 ## MovesMNO
 
-f
+review moves MachPunch to MeanLook
+
+review moves MegaDrain to MeteorMash
+
+review moves Metronome to MistyExplosion
+
+review moves MistyTerrain to MuddyWater
+
+review moves MudShot to Nuzzle
+
+review moves OrderUp to Overheat
 
 ## MovesPQR
 
-f
+review moves PainSplit to PhantomForce
+
+review moves PhotonGeyser to PoisonTail
+
+review moves PollenPuff to PowerTrick
+
+review moves PowerTrip to PsychUp
+
+review moves Psychic to QuickAttack
+
+review moves QuckGuard to RapidSpin
+
+review moves Recharge to RelicSong
+
+review moves RevelationDance to RolePlay
+
+review moves Rollout to Ruination
 
 ## MovesSTU
 
+review moves 
+
+review moves x to Spore
+
+review moves SpringtideStorm to StompingTantrum
+
+review moves StoneAxe to StuffCheeks
+
+review moves StunSpore to Swagger
+
+review moves Swallow to ThunderWave
+
+review moves TrickRoom to TeaTime
+
 *review moves TeeterDance to ThroatChop
 
-$review moves Thunder to TidyUp
+review moves Thunder to TidyUp
 
 review moves TopsyTurvy to TriAttack
 
