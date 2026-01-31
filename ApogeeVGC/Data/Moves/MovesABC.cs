@@ -1189,7 +1189,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((_, target, source, move) =>
                 {
                     // Return the result of AddVolatile - returns false if already trapped
-                    var result = target.AddVolatile(ConditionId.Trapped, source, move);
+                    var result = target.AddVolatile(ConditionId.Trapped, source, move, ConditionId.Trapper);
                     if (result is BoolRelayVar { Value: false })
                     {
                         return false;

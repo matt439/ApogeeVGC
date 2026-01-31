@@ -6,9 +6,9 @@
 
 ^ review moves Amnesia to AuraSphere
 
-@ review moves AuraWheel to Belch
+^ review moves AuraWheel to Belch
 
-review moves BellyDrum to BodySlam
+@ review moves BellyDrum to BodySlam
 
 review moves BoltStrike to BugBuzz
 
