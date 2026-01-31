@@ -2,9 +2,9 @@
 
 ## MovesABC
 
-@ review moves Absorb to AllySwitch
+^ review moves Absorb to AllySwitch
 
-review moves Amnesia to AuraSphere
+@ review moves Amnesia to AuraSphere
 
 review moves AuraWheel to Belch
 
