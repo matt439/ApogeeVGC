@@ -18,11 +18,11 @@
 
 ^ review moves Conversion2 to Covet
 
-@ review moves Crabhammer to Crunch
+^ review moves Crabhammer to Crunch
 
 ## MovesDEF
 
-review moves DazzlingGleam to DiamondStorm
+@ review moves DazzlingGleam to DiamondStorm
 
 review moves Dig to DoubleEdge
 

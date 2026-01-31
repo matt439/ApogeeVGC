@@ -155,6 +155,7 @@ public partial record Moves
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
                 Boosts = new SparseBoostsTable { Def = 1 },
                 VolatileStatus = ConditionId.DefenseCurl,
+                Condition = _library.Conditions[ConditionId.DefenseCurl],
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -258,6 +259,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags { BypassSub = true, NoAssist = true, FailCopycat = true },
                 VolatileStatus = ConditionId.DestinyBond,
+                Condition = _library.Conditions[ConditionId.DestinyBond],
                 Target = MoveTarget.Self,
                 Type = MoveType.Ghost,
                 OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
@@ -376,6 +378,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 VolatileStatus = ConditionId.Disable,
+                Condition = _library.Conditions[ConditionId.Disable],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
