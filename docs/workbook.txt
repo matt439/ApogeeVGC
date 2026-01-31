@@ -1,6 +1,4 @@
-*review moves PainSplit to PhantomForce
-
-review moves PhotonGeyser to PoisonTail
+*review moves PhotonGeyser to PoisonTail
 
 review moves PollenPuff to PowerTrick
 

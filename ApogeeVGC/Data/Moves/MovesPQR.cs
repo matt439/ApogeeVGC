@@ -469,9 +469,13 @@ public partial record Moves
                             battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
                                 "[move] Pluck", $"[of] {source}");
                             // Trigger the Eat event on the item for the source
-                            battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
+                            // Only run EatItem if singleEvent returns truthy
+                            var eatResult = battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
                                 source, source, move);
-                            battle.RunEvent(EventId.EatItem, source, source, move, takenItem.Item);
+                            if (eatResult is not BoolRelayVar { Value: false })
+                            {
+                                battle.RunEvent(EventId.EatItem, source, source, move, takenItem.Item);
+                            }
                             if (takenItem.Item.OnEat != null)
                             {
                                 source.AteBerry = true;
