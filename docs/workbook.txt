@@ -1,8 +1,4 @@
-*review moves SpringtideStorm to StompingTantrum
-
-review moves StoneAxe to StuffCheeks
-
-review moves StunSpore to Swagger
+*review moves StunSpore to Swagger
 
 review moves Swallow to ThunderWave
 
@@ -81,3 +77,6 @@ review moves FuryCutter to FutureSight
 
 
 300 line move review started with Flatter
+
+
+

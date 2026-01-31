@@ -3292,7 +3292,7 @@ public partial record Moves
                     if (!success)
                     {
                         battle.Add("-fail", target, "heal");
-                        return false; // NOT_FAIL
+                        return new Empty(); // NOT_FAIL - heal failed but move itself didn't fail
                     }
 
                     return new VoidReturn();
