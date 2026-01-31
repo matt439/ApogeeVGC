@@ -1,30 +1,6 @@
-*review moves TeeterDance to ThroatChop
+# Moves
 
-$review moves Thunder to TidyUp
-
-review moves TopsyTurvy to TriAttack
-
-review moves Trick to Twister
-
-review moves UpperHand to UTurn
-
-
-
-
-review moves VacuumWave to WaterPledge
-
-review moves WaterPulse to WildCharge
-
-review moves WillOWisp to XScissor
-
-
-
-
-review moves Yawn to ZingZap
-
-
-
-
+## MovesABC
 
 review moves Absorb to AllySwitch
 
@@ -44,7 +20,7 @@ review moves Conversion2 to Covet
 
 review moves Crabhammer to Crunch
 
-
+## MovesDEF
 
 review moves DazzlingGleam to DiamondStorm
 
@@ -68,13 +44,50 @@ review moves FocusEnergy to FuryAttack
 
 review moves FuryCutter to FutureSight
 
+## MovesGHI
+
+f
+
+## MovesJKL
+
+f
+
+## MovesMNO
+
+f
+
+## MovesPQR
+
+f
+
+## MovesSTU
+
+*review moves TeeterDance to ThroatChop
+
+$review moves Thunder to TidyUp
+
+review moves TopsyTurvy to TriAttack
+
+review moves Trick to Twister
+
+review moves UpperHand to UTurn
+
+## MovesVWX
+
+review moves VacuumWave to WaterPledge
+
+review moves WaterPulse to WildCharge
+
+review moves WillOWisp to XScissor
+
+## MovesYZ
+
+review moves Yawn to ZingZap
 
 
-300 line move review started with Flatter
+# Abilities
 
-
-
-## Abilities ##
+## AbilitiesABC
 
 review abilities Adaptability to ArmorTail
 
@@ -85,7 +98,7 @@ review abilities Berserk to Comatose
 review abilities Commander to CuteCharm
 
 
-
+## AbilitiesDEF
 
 review abilities Damp to DesolateLand
 
@@ -97,7 +110,7 @@ review abilities FlowerGift to Forecast
 
 review abilities Forewarn to FurCoat
 
-
+## AbilitiesGHI
 
 review abilities GaleWings to Guts
 
@@ -107,11 +120,11 @@ review abilities IceFace to InnerFocus
 
 review abilities Insomnia to IronFist
 
-
+## AbilitiesJKL
 
 review abilities Justified to LongReach
 
-
+## AbilitiesMNO
 
 review abilities MagicBounce to MindsEye
 
@@ -121,7 +134,7 @@ review abilities NaturalCure to Normalize
 
 review abilities Oblivious to OwnTempo
 
-
+## AbilitiesPQR
 
 review abilities ParentalBond to PoisonPuppeteer
 
@@ -131,7 +144,7 @@ review abilities PunkRock to Reckless
 
 review abilities Refrigerate to RunAway
 
-
+## AbilitiesSTU
 
 review abilities SandForce to SereneGrace
 
@@ -147,20 +160,20 @@ review abilities Technician to ToxicChain
 
 review abilities ToxicDebris to UnseenFist
 
-
+## AbilitiesVWX
 
 review abilities VesselOfRuin to WeakArmor
 
 review abilities WellBakedBody to WonderSkin
 
-
+## AbilitiesYZ
 
 review abilities ZenMode to ZeroToHero
 
 
+# Items
 
-
-## Items ##
+## ItemsABC
 
 review items AbilityShield to AssaultVest
 
@@ -170,7 +183,7 @@ review items Charcoal to ChopleBerry
 
 review items ClearAmulet to CustapBerry
 
-
+## ItemsDEF
 
 review items DampRock to EjectButton
 
@@ -178,19 +191,19 @@ review items EjectPack to FireStone
 
 review items FistPlate to FriendBall
 
-
+## ItemsGHI
 
 review items GalaricaCuff to HondewBerry
 
 review items IapapaBerry to IronPlate
 
-
+## ItemsJKL
 
 review items JabocaBerry to LiechiBerry
 
 review items LifeOrb to LuxuryBall
 
-
+## ItemsMNO
 
 review items MachoBrace to Metronome
 
@@ -198,7 +211,7 @@ review items MicleBerry to NomelBerry
 
 review items NormalGem to None
 
-
+## ItemsPQR
 
 review items PamtreBerry to PowerBelt
 
@@ -206,7 +219,7 @@ review items PowerBracer to RazorClaw
 
 review items RockyHelmet to RustedSword
 
-
+## ItemsSTU
 
 review items SafariBall to SkyPlate
 
@@ -214,17 +227,15 @@ review items SmoothRock to StickyBarb
 
 review items StonePlate to UtilityUmbrella
 
-
+## ItemsVWX
 
 review items WacanBerry to WiseGlasses
 
-
+## ItemsYZ
 
 review items YacheBerry to ZoomLens
 
-
-
-## Conditions ##
+# Conditions
 
 Burn
 Paralysis
