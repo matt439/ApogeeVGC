@@ -3354,7 +3354,7 @@ public partial record Moves
             [MoveId.ThunderWave] = new()
             {
                 Id = MoveId.ThunderWave,
-                Num = 87,
+                Num = 86,
                 Accuracy = 90,
                 BasePower = 0,
                 Category = MoveCategory.Status,

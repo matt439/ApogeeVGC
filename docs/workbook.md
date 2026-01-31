@@ -118,9 +118,9 @@ review moves Swallow to ThunderWave
 
 review moves TrickRoom to TeaTime
 
-*review moves TeeterDance to ThroatChop
+^ review moves TeeterDance to ThroatChop
 
-review moves Thunder to TidyUp
+@ review moves Thunder to TidyUp
 
 review moves TopsyTurvy to TriAttack
 
