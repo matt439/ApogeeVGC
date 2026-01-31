@@ -1,5 +1,17 @@
-*review moves MistyTerrain to MuddyWater
+*review moves PainSplit to PhantomForce
 
-review moves MudShot to Nuzzle
+review moves PhotonGeyser to PoisonTail
 
-review moves OrderUp to Overheat
+review moves PollenPuff to PowerTrick
+
+review moves PowerTrip to PsychUp
+
+review moves Psychic to QuickAttack
+
+review moves QuickGuard to RapidSpin
+
+review moves Recharge to RelicSong
+
+review moves RevelationDance to RolePlay
+
+review moves Rollout to Ruination

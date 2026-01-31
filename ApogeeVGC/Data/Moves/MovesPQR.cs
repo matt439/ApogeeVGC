@@ -332,7 +332,7 @@ public partial record Moves
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
-                        return false;
+                        return new VoidReturn(); // TS returns undefined here - proceed with attack (e.g. Power Herb)
                     }
 
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
