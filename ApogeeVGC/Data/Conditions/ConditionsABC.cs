@@ -628,11 +628,8 @@ public partial record Conditions
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
                     // Handle Z-Moves/Max Moves that break through but still make contact
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        source.TrySetStatus(ConditionId.Burn, target);
-                    }
-
+                    // TODO: Check for move.IsZOrMaxPowered when Z/Max moves are implemented
+                    // Since Gen 9 doesn't have Z/Max moves, this handler does nothing
                     return BoolEmptyVoidUnion.FromVoid();
                 }),
             },

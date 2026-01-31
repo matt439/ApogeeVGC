@@ -10,9 +10,9 @@
 
 ^ review moves BellyDrum to BodySlam
 
-@ review moves BoltStrike to BugBuzz
+^ review moves BoltStrike to BugBuzz
 
-review moves BulkUp to Chloroblast
+@ review moves BulkUp to Chloroblast
 
 review moves CircleThrow to Conversion
 
