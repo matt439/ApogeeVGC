@@ -22,9 +22,9 @@
 
 ## MovesDEF
 
-@ review moves DazzlingGleam to DiamondStorm
+^ review moves DazzlingGleam to DiamondStorm
 
-review moves Dig to DoubleEdge
+@ review moves Dig to DoubleEdge
 
 review moves DoubleHit to DragonTail
 

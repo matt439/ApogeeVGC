@@ -552,7 +552,9 @@ public partial record Moves
 
                             var oldAbility =
                                 pokemon.SetAbility(target.Ability, null, move);
-                            if (oldAbility is AbilityIdAbilityIdFalseUnion)
+                            // Check if ability was successfully changed (truthy check in TS)
+                            // oldAbility returns the old AbilityId if successful, false if failed, null if something else
+                            if (oldAbility is not (FalseAbilityIdFalseUnion or null))
                             {
                                 success = true;
                             }
