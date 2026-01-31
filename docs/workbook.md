@@ -38,69 +38,69 @@ review moves Feint to FireSpin
 
 review moves FirePledge to Flatter
 
-review moves FleurCannon to FocusBlast
+^ review moves FleurCannon to FocusBlast
 
-review moves FocusEnergy to FuryAttack
+^ review moves FocusEnergy to FuryAttack
 
-review moves FuryCutter to FutureSight
+^ review moves FuryCutter to FutureSight
 
 ## MovesGHI
 
-review moves GastroAcid to GrassPledge
+^ review moves GastroAcid to GrassPledge
 
-review moves GrassyGlide to HappyHour
+^ review moves GrassyGlide to HappyHour
 
-review moves Harden to HeadlongRush
+^ review moves Harden to HeadlongRush
 
-review moves HeavySlam to HornAttack
+^ review moves HeavySlam to HornAttack
 
-review moves HornDrill to IceBeam
+^ review moves HornDrill to IceBeam
 
-review moves IceBurn to Inferno
+^ review moves IceBurn to Inferno
 
-review moves Infestation to IvyCudgel
+^ review moves Infestation to IvyCudgel
 
 ## MovesJKL
 
-review moves JawLock to LastResort
+^ review moves JawLock to LastResort
 
-review moves LastRespects to LunarBlessing
+^ review moves LastRespects to LunarBlessing
 
-review moves LunarDance to LusterPurge
+^ review moves LunarDance to LusterPurge
 
 ## MovesMNO
 
-review moves MachPunch to MeanLook
+^ review moves MachPunch to MeanLook
 
-review moves MegaDrain to MeteorMash
+^ review moves MegaDrain to MeteorMash
 
-review moves Metronome to MistyExplosion
+^ review moves Metronome to MistyExplosion
 
-review moves MistyTerrain to MuddyWater
+^ review moves MistyTerrain to MuddyWater
 
-review moves MudShot to Nuzzle
+^ review moves MudShot to Nuzzle
 
-review moves OrderUp to Overheat
+^ review moves OrderUp to Overheat
 
 ## MovesPQR
 
-review moves PainSplit to PhantomForce
+^ review moves PainSplit to PhantomForce
 
-review moves PhotonGeyser to PoisonTail
+^ review moves PhotonGeyser to PoisonTail
 
-review moves PollenPuff to PowerTrick
+^ review moves PollenPuff to PowerTrick
 
-review moves PowerTrip to PsychUp
+^ review moves PowerTrip to PsychUp
 
-review moves Psychic to QuickAttack
+^ review moves Psychic to QuickAttack
 
-review moves QuckGuard to RapidSpin
+^ review moves QuckGuard to RapidSpin
 
-review moves Recharge to RelicSong
+^ review moves Recharge to RelicSong
 
-review moves RevelationDance to RolePlay
+^ review moves RevelationDance to RolePlay
 
-review moves Rollout to Ruination
+^ review moves Rollout to Ruination
 
 ## MovesSTU
 
@@ -108,31 +108,31 @@ review moves
 
 review moves x to Spore
 
-review moves SpringtideStorm to StompingTantrum
+^ review moves SpringtideStorm to StompingTantrum
 
-review moves StoneAxe to StuffCheeks
+^ review moves StoneAxe to StuffCheeks
 
-review moves StunSpore to Swagger
+^ review moves StunSpore to Swagger
 
-review moves Swallow to ThunderWave
+^ review moves Swallow to ThunderWave
 
-review moves TrickRoom to TeaTime
+^ review moves TrickRoom to TeaTime
 
 ^ review moves TeeterDance to ThroatChop
 
-@ review moves Thunder to TidyUp
+^ review moves Thunder to TidyUp
 
-review moves TopsyTurvy to TriAttack
+^ review moves TopsyTurvy to TriAttack
 
-review moves Trick to Twister
+^ review moves Trick to Twister
 
-review moves UpperHand to UTurn
+^ review moves UpperHand to UTurn
 
 ## MovesVWX
 
-review moves VacuumWave to WaterPledge
+^ review moves VacuumWave to WaterPledge
 
-review moves WaterPulse to WildCharge
+^ review moves WaterPulse to WildCharge
 
 review moves WillOWisp to XScissor
 
