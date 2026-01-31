@@ -699,7 +699,8 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SelfBoost = new SparseBoostsTable
+                // TS uses boosts with target: "self", so Boosts is correct here (not SelfBoost)
+                Boosts = new SparseBoostsTable
                 {
                     Def = 1,
                 },
@@ -765,7 +766,8 @@ public partial record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SelfBoost = new SparseBoostsTable
+                // TS uses boosts with target: "self", so Boosts is correct here (not SelfBoost)
+                Boosts = new SparseBoostsTable
                 {
                     Atk = 1,
                     SpA = 1,
@@ -818,21 +820,22 @@ public partial record Moves
                     // Set target's ability to Insomnia
                     var oldAbility = target.SetAbility(AbilityId.Insomnia, source);
 
-                    // Check for success - SetAbility returns the old AbilityId on success
-                    if (oldAbility is AbilityIdAbilityIdFalseUnion)
+                    // TS: if (!oldAbility) return oldAbility as false | null;
+                    // Check for failure first - if SetAbility returned false or null, return it
+                    if (oldAbility is not AbilityIdAbilityIdFalseUnion)
                     {
-                        // Cure sleep if the target was asleep
-                        if (target.Status == ConditionId.Sleep)
-                        {
-                            target.CureStatus();
-                        }
-
-                        return new VoidReturn();
+                        // Failed - return false or null depending on what was returned
+                        return oldAbility is FalseAbilityIdFalseUnion ? false : null;
                     }
 
-                    // Return false if SetAbility failed with false, or null if it returned null
-                    // This matches the TS: if (!oldAbility) return oldAbility as false | null;
-                    return oldAbility is FalseAbilityIdFalseUnion ? false : null;
+                    // Success - cure sleep if the target was asleep
+                    if (target.Status == ConditionId.Sleep)
+                    {
+                        target.CureStatus();
+                    }
+
+                    // Implicit return undefined in TS = return VoidReturn in C#
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
