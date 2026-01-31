@@ -16,9 +16,9 @@
 
 ^ review moves CircleThrow to Conversion
 
-@ review moves Conversion2 to Covet
+^ review moves Conversion2 to Covet
 
-review moves Crabhammer to Crunch
+@ review moves Crabhammer to Crunch
 
 ## MovesDEF
 
