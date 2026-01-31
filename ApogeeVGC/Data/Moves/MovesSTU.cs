@@ -3661,7 +3661,7 @@ public partial record Moves
                         var tryHitResult =
                             battle.RunEvent(EventId.TryHit, pokemon, source, move);
                         var item = pokemon.GetItem();
-                        if (tryHitResult is not null && item.IsBerry)
+                        if (tryHitResult is not null and not (BoolRelayVar { Value: false }) && item.IsBerry)
                         {
                             targets.Add(pokemon);
                         }

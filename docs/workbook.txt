@@ -1,6 +1,4 @@
-*review moves Swallow to ThunderWave
-
-review moves TrickRoom to Teatime
+*review moves TrickRoom to Teatime
 
 review moves TeeterDance to ThroatChop
 
@@ -78,3 +76,153 @@ review moves FuryCutter to FutureSight
 
 
 
+## Abilities ##
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+review abilities 
+
+
+
+## Items ##
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+review items 
+
+
+
+
+## Conditions ##
+
+Burn
+Paralysis
+Sleep
+Freeze
+Poison
+Toxic
+Confusion
+Flinch
+Trapped
+Trapper
+PartiallyTrapped
+LockedMove
+TwoTurnMove
+ChoiceLock
+MustRecharge
+FutureMove
+HealReplacement
+Stall
+Gem
+RainDance
+PriomordialSea
+SunnyDay
+DesolateLand
+Sandstorm
+Snowscape
+DeltaStream
+Commanded
+Commanding
+Arceus
+Silvally
+RolloutStorage
