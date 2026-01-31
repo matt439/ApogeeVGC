@@ -714,7 +714,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((battle, _, target, _) =>
+                OnTry = new OnTryEventInfo((_, _, target, _) =>
                 {
                     // Fail if target has no item
                     if (target.Item == ItemId.None)
@@ -722,6 +722,10 @@ public partial record Moves
                         return false;
                     }
 
+                    return new VoidReturn();
+                }),
+                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                {
                     // Display the item being manipulated
                     var item = battle.Library.Items[target.Item];
                     battle.Add("-activate", target, "move: Poltergeist", item.Name);
