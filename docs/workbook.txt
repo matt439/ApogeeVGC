@@ -1,8 +1,7 @@
-*review moves Infestation to IvyCudgel
+*review moves Metronome to MistyExplosion
 
+review moves MistyTerrain to MuddyWater
 
-review moves JawLock to LastResort
+review moves MudShot to Nuzzle
 
-review moves LastRespects to LuminaCrash
-
-review moves LunarBlessing to LusterPurge
+review moves OrderUp to Overheat

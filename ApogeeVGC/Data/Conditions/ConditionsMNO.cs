@@ -294,6 +294,8 @@ public partial record Conditions
                     {
                         if (move.Id != MoveId.MirrorCoat) return PokemonVoidUnion.FromVoid();
 
+                        // TS: if (source !== this.effectState.target || !this.effectState.slot) return;
+                        // target = volatile holder; source != target checks move user is the volatile holder
                         EffectState? effectState =
                             source.Volatiles.GetValueOrDefault(ConditionId.MirrorCoat);
                         if (source != target || effectState?.Slot == null)
@@ -350,8 +352,9 @@ public partial record Conditions
                             }
                         }
 
-                        // Show message if stat drops were blocked and move has no secondaries
-                        if (showMsg && effect is ActiveMove { Secondaries: null })
+                        // Show message if stat drops were blocked and effect has no secondaries
+                        // TS: !(effect as ActiveMove).secondaries - true for non-Move effects too
+                        if (showMsg && effect is not ActiveMove { Secondaries: not null })
                         {
                             if (battle.DisplayUi)
                             {

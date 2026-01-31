@@ -823,13 +823,13 @@ public partial record Moves
                         return IntFalseUnion.FromInt(0);
                     }
 
-                    return IntFalseUnion.FromInt(effectState.Damage ?? 1);
+                    return IntFalseUnion.FromInt(effectState.Damage > 0 ? effectState.Damage.Value : 1);
                 }),
                 BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.MirrorCoat);
                 }),
-                OnTry = new OnTryEventInfo((_, source, _, _) =>
+                OnTry = new OnTryEventInfo((_, _, source, _) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.MirrorCoat,
                             out var effectState))
