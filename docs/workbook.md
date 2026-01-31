@@ -12,9 +12,9 @@
 
 ^ review moves BoltStrike to BugBuzz
 
-@ review moves BulkUp to Chloroblast
+^ review moves BulkUp to Chloroblast
 
-review moves CircleThrow to Conversion
+@ review moves CircleThrow to Conversion
 
 review moves Conversion2 to Covet
 
