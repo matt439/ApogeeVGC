@@ -1,6 +1,4 @@
-*review moves TrickRoom to Teatime
-
-review moves TeeterDance to ThroatChop
+*review moves TeeterDance to ThroatChop
 
 review moves Thunder to TidyUp
 
@@ -78,71 +76,101 @@ review moves FuryCutter to FutureSight
 
 ## Abilities ##
 
-review abilities 
+review abilities Adaptability to ArmorTail
 
-review abilities 
+review abilities AromaVeil to BeastBoost
 
-review abilities 
+review abilities Berserk to Comatose
 
-review abilities 
+review abilities Commander to CuteCharm
 
-review abilities 
 
-review abilities 
 
-review abilities 
 
-review abilities 
+review abilities Damp to DesolateLand
 
-review abilities 
+review abilities Disguise to EmbodyAspectCornerstone
 
-review abilities 
+review abilities EmbodyAspectHearthflame to FlashFire
 
-review abilities 
+review abilities FlowerGift to Forecast
 
-review abilities 
+review abilities Forewarn to FurCoat
 
-review abilities 
 
-review abilities 
 
-review abilities 
+review abilities GaleWings to Guts
 
-review abilities 
+review abilities HadronEngine to IceBody
 
-review abilities 
+review abilities IceFace to InnerFocus
 
-review abilities 
+review abilities Insomnia to IronFist
 
-review abilities 
 
-review abilities 
 
-review abilities 
+review abilities Justified to LongReach
 
-review abilities 
 
-review abilities 
 
-review abilities 
+review abilities MagicBounce to MindsEye
 
-review abilities 
+review abilities Minus to MyceliumMight
 
-review abilities 
+review abilities NaturalCure to Normalize
 
-review abilities 
+review abilities Oblivious to OwnTempo
+
+
+
+review abilities ParentalBond to PoisonPuppeteer
+
+review abilities PoisonTouch to PsychicSurge
+
+review abilities PunkRock to Reckless
+
+review abilities Refrigerate to RunAway
+
+
+
+review abilities SandForce to SereneGrace
+
+review abilities ShadowShield to SlowStart
+
+review abilities SlushRush to StanceChange
+
+review abilities Static to SupersweetSyrup
+
+review abilities SupremeOverlord to TanglingHair
+
+review abilities Technician to ToxicChain
+
+review abilities ToxicDebris to UnseenFist
+
+
+
+review abilities VesselOfRuin to WeakArmor
+
+review abilities WellBakedBody to WonderSkin
+
+
+
+review abilities ZenMode to ZeroToHero
+
 
 
 
 ## Items ##
 
-review items 
+review items AbilityShield to AssaultVest
 
-review items 
+review items BabiriBerry to CellBattery
 
-review items 
+review items Charcoal to ChopleBerry
 
-review items 
+review items ClearAmulet to CustapBerry
+
+
 
 review items 
 

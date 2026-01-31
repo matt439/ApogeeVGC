@@ -4021,7 +4021,11 @@ public partial record Moves
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
-                    VolatileStatus = ConditionId.ThroatChop,
+                    OnHit = (_, target, _, _) =>
+                    {
+                        target.AddVolatile(ConditionId.ThroatChop);
+                        return new VoidReturn();
+                    },
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
