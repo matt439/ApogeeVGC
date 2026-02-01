@@ -34,9 +34,9 @@
 
 ^ review moves EnergyBall to FeatherDance
 
-@ review moves Feint to FireSpin
+^ review moves Feint to FireSpin
 
-review moves FirePledge to Flatter
+@ review moves FirePledge to Flatter
 
 ^ review moves FleurCannon to FocusBlast
 
