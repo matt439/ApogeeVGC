@@ -395,15 +395,8 @@ public partial record Abilities
                     (battle, pokemon) =>
                     {
                         if (battle.EffectState.Unnerved is true) return;
-                        if (battle.DisplayUi)
-                        {
-                            //UiGenerator.PrintAbilityEvent(pokemon, "As One");
-                            //UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
-
-                            battle.Add("-ability", pokemon, "As One");
-                            battle.Add("-ability", pokemon, "Unnerve");
-                        }
-
+                        battle.Add("-ability", pokemon, "As One");
+                        battle.Add("-ability", pokemon, "Unnerve");
                         battle.EffectState.Unnerved = true;
                     },
                     1
@@ -444,12 +437,8 @@ public partial record Abilities
                     (battle, pokemon) =>
                     {
                         if (battle.EffectState.Unnerved is true) return;
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-ability", pokemon, "As One");
-                            battle.Add("-ability", pokemon, "Unnerve");
-                        }
-
+                        battle.Add("-ability", pokemon, "As One");
+                        battle.Add("-ability", pokemon, "Unnerve");
                         battle.EffectState.Unnerved = true;
                     },
                     1
@@ -644,7 +633,7 @@ public partial record Abilities
                 Name = "Berserk",
                 Num = 201,
                 Rating = 2.0,
-                OnDamage = new OnDamageEventInfo((battle, damage, _, source, effect) =>
+                OnDamage = new OnDamageEventInfo((battle, _, _, source, effect) =>
                 {
                     if (effect is { EffectType: EffectType.Move } and Move { MultiHit: null } move &&
                         !(move.HasSheerForce == true && source != null &&
@@ -657,7 +646,7 @@ public partial record Abilities
                         battle.EffectState.CheckedBerserk = true;
                     }
 
-                    return damage;
+                    return new VoidReturn();
                 }),
                 OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, item, _) =>
                 {

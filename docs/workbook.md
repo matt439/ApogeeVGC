@@ -145,13 +145,13 @@ review moves x to Spore
 
 ## AbilitiesABC
 
-@ review abilities Adaptability to ArmorTail
+^ review abilities Adaptability to ArmorTail
 
-review abilities AromaVeil to BeastBoost
+^ review abilities AromaVeil to BeastBoost
 
-review abilities Berserk to Comatose
+^ review abilities Berserk to Comatose
 
-review abilities Commander to CuteCharm
+@ review abilities Commander to CuteCharm
 
 
 ## AbilitiesDEF
