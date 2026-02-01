@@ -210,7 +210,7 @@ public partial record Abilities
                     ];
 
                     return healingItems.Contains(item.Id)
-                        ? BoolVoidUnion.FromBool(battle.EffectState.CheckedAngerShell ?? true)
+                        ? BoolVoidUnion.FromBool(battle.EffectState.CheckedAngerShell ?? false)
                         : BoolVoidUnion.FromBool(true);
                 })),
                 OnAfterMoveSecondary =
