@@ -151,7 +151,7 @@ review moves x to Spore
 
 ^ review abilities Berserk to Comatose
 
-@ review abilities Commander to CuteCharm
+^ review abilities Commander to CuteCharm
 
 
 ## AbilitiesDEF
@@ -178,7 +178,7 @@ review abilities Insomnia to IronFist
 
 ## AbilitiesJKL
 
-review abilities Justified to LongReach
+@ review abilities Justified to LongReach
 
 ## AbilitiesMNO
 
@@ -224,7 +224,7 @@ review abilities WellBakedBody to WonderSkin
 
 ## AbilitiesYZ
 
-review abilities ZenMode to ZeroToHero
+^ review abilities ZenMode to ZeroToHero
 
 
 # Items

@@ -81,7 +81,7 @@ public partial record Conditions
                 AssociatedMove = MoveId.LightScreen,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
-                    source.HasItem(ItemId.LightClay) ? 8 : 5),
+                    source?.HasItem(ItemId.LightClay) == true ? 8 : 5),
                 OnAnyModifyDamage =
                     new OnAnyModifyDamageEventInfo((battle, _, source, target, move) =>
                     {

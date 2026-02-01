@@ -83,7 +83,7 @@ public partial record Abilities
                         SpecieId baseForme = pokemon.Species.Forme == FormeId.GalarZen
                             ? SpecieId.DarmanitanGalar
                             : SpecieId.Darmanitan;
-                        pokemon.FormeChange(baseForme, battle.Effect, message: "[silent]");
+                        pokemon.FormeChange(baseForme, battle.Effect, isPermanent: false, message: "[silent]");
                     }
                 }),
             },

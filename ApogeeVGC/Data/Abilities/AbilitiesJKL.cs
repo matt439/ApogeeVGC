@@ -170,7 +170,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnModifyWeight =
                     new OnModifyWeightEventInfo(
-                        (battle, weighthg, _) => battle.Trunc(weighthg / 2), 1),
+                        (battle, weighthg, _) => battle.Trunc(weighthg / 2)),
             },
             [AbilityId.LightningRod] = new()
             {
