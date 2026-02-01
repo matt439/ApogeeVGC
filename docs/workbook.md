@@ -36,7 +36,7 @@
 
 ^ review moves Feint to FireSpin
 
-@ review moves FirePledge to Flatter
+^ review moves FirePledge to Flatter
 
 ^ review moves FleurCannon to FocusBlast
 
@@ -145,7 +145,7 @@ review moves x to Spore
 
 ## AbilitiesABC
 
-review abilities Adaptability to ArmorTail
+@ review abilities Adaptability to ArmorTail
 
 review abilities AromaVeil to BeastBoost
 
