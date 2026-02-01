@@ -32,9 +32,9 @@
 
 ^ review moves EchoedVoice to Endure
 
-@ review moves EnergyBall to FeatherDance
+^ review moves EnergyBall to FeatherDance
 
-review moves Feint to FireSpin
+@ review moves Feint to FireSpin
 
 review moves FirePledge to Flatter
 
