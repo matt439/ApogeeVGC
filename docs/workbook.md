@@ -28,15 +28,15 @@
 
 ^ review moves DoubleHit to DragonTail
 
- review moves DrainingKiss to Earthquake
+^ review moves DrainingKiss to Earthquake
 
-@ review moves EchoedVoice to Endure
+^ review moves EchoedVoice to Endure
 
-review moves EnergyBall to FeatherDance
+^ review moves EnergyBall to FeatherDance
 
-review moves Feint to FireSpin
+^ review moves Feint to FireSpin
 
-review moves FirePledge to Flatter
+@ review moves FirePledge to Flatter
 
 ^ review moves FleurCannon to FocusBlast
 

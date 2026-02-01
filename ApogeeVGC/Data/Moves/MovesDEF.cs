@@ -1147,7 +1147,7 @@ public partial record Moves
                         pokemon.Status != ConditionId.Sleep)
                     {
                         battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
-                        battle.ChainModify(2);
+                        return battle.ChainModify(2);
                     }
 
                     return new VoidReturn();
@@ -1606,7 +1606,10 @@ public partial record Moves
                 {
                     // Set target's ability to source's ability
                     var oldAbility = target.SetAbility(source.Ability, source);
-                    if (oldAbility is FalseAbilityIdFalseUnion or null) return false;
+                    // TS: if (!oldAbility) return oldAbility as false | null;
+                    // Preserve the distinction: false = fail, null = silent fail
+                    if (oldAbility is null) return null;
+                    if (oldAbility is FalseAbilityIdFalseUnion) return false;
 
                     // Mark staleness if targeting opponent
                     if (!target.IsAlly(source))
