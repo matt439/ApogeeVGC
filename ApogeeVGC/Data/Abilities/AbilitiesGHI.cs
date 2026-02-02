@@ -242,7 +242,7 @@ public partial record Abilities
                 // OnTryBoostPriority = 2
                 OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
                 {
-                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
+                    if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null; // Delete the atk boost
                         battle.Boost(new SparseBoostsTable { Atk = 1 }, target, target, null, false,

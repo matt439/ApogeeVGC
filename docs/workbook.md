@@ -158,17 +158,17 @@ review moves x to Spore
 
 ^ review abilities Damp to DesolateLand
 
-@ review abilities Disguise to EmbodyAspectCornerstone
+^ review abilities Disguise to EmbodyAspectCornerstone
 
-review abilities EmbodyAspectHearthflame to FlashFire
+^ review abilities EmbodyAspectHearthflame to FlashFire
 
-review abilities FlowerGift to Forecast
+^ review abilities FlowerGift to Forecast
 
-review abilities Forewarn to FurCoat
+^ review abilities Forewarn to FurCoat
 
 ## AbilitiesGHI
 
-review abilities GaleWings to Guts
+@ review abilities GaleWings to Guts
 
 review abilities HadronEngine to IceBody
 
