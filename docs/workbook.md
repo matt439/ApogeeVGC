@@ -196,9 +196,9 @@ review moves x to Spore
 
 ^ review abilities PoisonTouch to PsychicSurge
 
-@ review abilities PunkRock to Reckless
+^ review abilities PunkRock to Reckless
 
-review abilities Refrigerate to RunAway
+^ review abilities Refrigerate to RunAway
 
 ## AbilitiesSTU
 
@@ -218,7 +218,7 @@ review abilities ToxicDebris to UnseenFist
 
 ## AbilitiesVWX
 
-review abilities VesselOfRuin to WeakArmor
+@ review abilities VesselOfRuin to WeakArmor
 
 review abilities WellBakedBody to WonderSkin
 
