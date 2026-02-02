@@ -579,15 +579,8 @@ public partial record Abilities
                         battle.Heal(target.BaseMaxHp / 16);
                     }
                 }),
-                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
-                {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Snowscape })
-                    {
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
+                // Note: TS has onImmunity for hail damage, but hail doesn't exist in Gen 9
+                // and Snowscape doesn't deal residual damage, so the handler is omitted.
             },
             [AbilityId.IceFace] = new()
             {

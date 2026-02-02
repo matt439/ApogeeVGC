@@ -168,9 +168,9 @@ review moves x to Spore
 
 ## AbilitiesGHI
 
-@ review abilities GaleWings to Guts
+^ review abilities GaleWings to Guts
 
-review abilities HadronEngine to IceBody
+@ review abilities HadronEngine to IceBody
 
 review abilities IceFace to InnerFocus
 
