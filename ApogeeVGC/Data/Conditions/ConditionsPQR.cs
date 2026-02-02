@@ -1003,10 +1003,11 @@ public partial record Conditions
                     var isGrounded = target.IsGrounded();
                     if (!(isGrounded ?? false))
                     {
-                        // Show hint for non-grounded Pokemon that priority moves don't affect them
-                        if (move.Priority > 0 && battle.DisplayUi)
+                        // Use base move priority (not active move priority which may include Prankster etc.)
+                        Move baseMove = _library.Moves[move.Id];
+                        if (baseMove.Priority > 0 && battle.DisplayUi)
                         {
-                            battle.Hint("Psychic Terrain doesn't affect Pokémon immune to Ground.");
+                            battle.Hint("Psychic Terrain doesn't affect PokÃ©mon immune to Ground.");
                         }
 
                         return BoolIntEmptyVoidUnion.FromVoid();

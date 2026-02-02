@@ -192,9 +192,9 @@ review moves x to Spore
 
 ## AbilitiesPQR
 
-@ review abilities ParentalBond to PoisonPuppeteer
+^ review abilities ParentalBond to PoisonPuppeteer
 
-review abilities PoisonTouch to PsychicSurge
+@ review abilities PoisonTouch to PsychicSurge
 
 review abilities PunkRock to Reckless
 
