@@ -186,9 +186,9 @@ review moves x to Spore
 
 ^ review abilities Minus to MyceliumMight
 
-@ review abilities NaturalCure to Normalize
+^ review abilities NaturalCure to Normalize
 
-review abilities Oblivious to OwnTempo
+@ review abilities Oblivious to OwnTempo
 
 ## AbilitiesPQR
 

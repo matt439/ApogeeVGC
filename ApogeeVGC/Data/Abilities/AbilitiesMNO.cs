@@ -958,8 +958,8 @@ public partial record Abilities
                 Rating = 3.0,
                 OnFoeAfterBoost = new OnFoeAfterBoostEventInfo((battle, boost, _, _, effect) =>
                 {
-                    if (effect.EffectStateId == AbilityId.Opportunist ||
-                        effect.EffectStateId == ItemId.MirrorHerb) return;
+                    if (effect?.EffectStateId == AbilityId.Opportunist ||
+                        effect?.EffectStateId == ItemId.MirrorHerb) return;
                     battle.EffectState.Boosts ??= new SparseBoostsTable();
 
                     SparseBoostsTable? boostPlus = battle.EffectState.Boosts;
