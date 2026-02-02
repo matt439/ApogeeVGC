@@ -202,9 +202,9 @@ review moves x to Spore
 
 ## AbilitiesSTU
 
-review abilities SandForce to SereneGrace
+^ review abilities SandForce to SereneGrace
 
-review abilities ShadowShield to SlowStart
+^ review abilities ShadowShield to SlowStart
 
 review abilities SlushRush to StanceChange
 
@@ -218,9 +218,9 @@ review abilities ToxicDebris to UnseenFist
 
 ## AbilitiesVWX
 
-@ review abilities VesselOfRuin to WeakArmor
+^ review abilities VesselOfRuin to WeakArmor
 
-review abilities WellBakedBody to WonderSkin
+^ review abilities WellBakedBody to WonderSkin
 
 ## AbilitiesYZ
 
