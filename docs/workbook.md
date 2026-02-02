@@ -170,11 +170,11 @@ review moves x to Spore
 
 ^ review abilities GaleWings to Guts
 
-@ review abilities HadronEngine to IceBody
+^ review abilities HadronEngine to IceBody
 
-review abilities IceFace to InnerFocus
+^ review abilities IceFace to InnerFocus
 
-review abilities Insomnia to IronFist
+^ review abilities Insomnia to IronFist
 
 ## AbilitiesJKL
 
@@ -182,9 +182,9 @@ review abilities Insomnia to IronFist
 
 ## AbilitiesMNO
 
-review abilities MagicBounce to MindsEye
+^ review abilities MagicBounce to MindsEye
 
-review abilities Minus to MyceliumMight
+@ review abilities Minus to MyceliumMight
 
 review abilities NaturalCure to Normalize
 

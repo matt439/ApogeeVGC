@@ -476,7 +476,7 @@ public partial record Abilities
                     {
                         BoolZeroUnion? boostResult =
                             battle.Boost(new SparseBoostsTable { Spe = 1 });
-                        if (boostResult is ZeroBoolZeroUnion)
+                        if (boostResult is not BoolBoolZeroUnion { Value: true })
                         {
                             battle.Add("-immune", target, "[from] ability: Motor Drive");
                         }
