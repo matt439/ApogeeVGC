@@ -640,9 +640,8 @@ public partial record Conditions
                 AssociatedMove = MoveId.Charge,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
                 {
-                    if (effect is { Name: "Electromorphosis" or "Wind Power" })
+                    if (effect is Ability { Id: AbilityId.Electromorphosis or AbilityId.WindPower })
                     {
-                        // TypeScript: this.add('-start', pokemon, 'Charge', this.activeMove!.name, '[from] ability: ' + effect.name)
                         battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
                             $"[from] ability: {effect.Name}");
                     }
@@ -655,9 +654,8 @@ public partial record Conditions
                 }),
                 OnRestart = new OnRestartEventInfo((battle, pokemon, _, effect) =>
                 {
-                    if (effect is { Name: "Electromorphosis" or "Wind Power" })
+                    if (effect is Ability { Id: AbilityId.Electromorphosis or AbilityId.WindPower })
                     {
-                        // TypeScript: this.add('-start', pokemon, 'Charge', this.activeMove!.name, '[from] ability: ' + effect.name)
                         battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
                             $"[from] ability: {effect.Name}");
                     }

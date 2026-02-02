@@ -156,9 +156,9 @@ review moves x to Spore
 
 ## AbilitiesDEF
 
-review abilities Damp to DesolateLand
+^ review abilities Damp to DesolateLand
 
-review abilities Disguise to EmbodyAspectCornerstone
+@ review abilities Disguise to EmbodyAspectCornerstone
 
 review abilities EmbodyAspectHearthflame to FlashFire
 
@@ -178,7 +178,7 @@ review abilities Insomnia to IronFist
 
 ## AbilitiesJKL
 
-@ review abilities Justified to LongReach
+^ review abilities Justified to LongReach
 
 ## AbilitiesMNO
 

@@ -106,7 +106,7 @@ public partial record Conditions
                     {
                         if (battle.DisplayUi && effect is Condition { Id: ConditionId.Yawn } or
                                 Move { Id: MoveId.Yawn } or
-                                ActiveMove { Secondaries: null })
+                                Move { Secondaries: null })
                         {
                             battle.Add("-activate", target, "move: Electric Terrain");
                         }
@@ -164,9 +164,7 @@ public partial record Conditions
                         battle.Add("-fieldstart", "move: Electric Terrain");
                     }
                 }),
-                //OnFieldResidualOrder = 27,
-                //OnFieldResidualSubOrder = 7,
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
                 {
                     Order = 27,
                     SubOrder = 7,
