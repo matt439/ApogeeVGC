@@ -629,7 +629,7 @@ public partial record Abilities
                             continue;
                         }
 
-                        if (curPoke.ShowCure != null)
+                        if (curPoke.ShowCure == true)
                         {
                             continue;
                         }
@@ -756,6 +756,7 @@ public partial record Abilities
                         AbilityId.DeltaStream,
                     ];
 
+                    Ability ngAbility = battle.Library.Abilities[AbilityId.NeutralizingGas];
                     foreach (Pokemon target in battle.GetAllActive())
                     {
                         if (target.HasItem(ItemId.AbilityShield))
@@ -774,7 +775,7 @@ public partial record Abilities
                         {
                             Ability illusionAbility = battle.Library.Abilities[AbilityId.Illusion];
                             battle.SingleEvent(EventId.End, illusionAbility, target.AbilityState,
-                                target, pokemon);
+                                target, pokemon, ngAbility);
                         }
 
                         // Note: Slow Start is handled via ability state counter, not a volatile
@@ -784,7 +785,7 @@ public partial record Abilities
                         {
                             Ability targetAbility = target.GetAbility();
                             battle.SingleEvent(EventId.End, targetAbility, target.AbilityState,
-                                target, pokemon);
+                                target, pokemon, ngAbility);
                         }
                     }
                 }, 2),
