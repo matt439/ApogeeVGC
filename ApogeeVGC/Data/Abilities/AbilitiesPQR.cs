@@ -116,6 +116,8 @@ public partial record Abilities
                             }
                         }
 
+                        // TODO: TS returns false here (action failed), but PokemonVoidUnion? doesn't support bool.
+                        // Returning null (silent failure) has the same effect since -block message is already shown.
                         return null;
                     }),
             },

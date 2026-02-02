@@ -188,11 +188,11 @@ review moves x to Spore
 
 ^ review abilities NaturalCure to Normalize
 
-@ review abilities Oblivious to OwnTempo
+^ review abilities Oblivious to OwnTempo
 
 ## AbilitiesPQR
 
-review abilities ParentalBond to PoisonPuppeteer
+@ review abilities ParentalBond to PoisonPuppeteer
 
 review abilities PoisonTouch to PsychicSurge
 
