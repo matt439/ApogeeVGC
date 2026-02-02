@@ -155,16 +155,13 @@ public partial record Conditions
                 AssociatedAbility = AbilityId.QuarkDrive,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
                 {
-                    if (effect is Item item)
+                    if (effect is Item { Id: ItemId.BoosterEnergy })
                     {
-                        if (item.Id == ItemId.BoosterEnergy)
+                        battle.EffectState.FromBooster = true;
+                        if (battle.DisplayUi)
                         {
-                            battle.EffectState.FromBooster = true;
-                            if (battle.DisplayUi)
-                            {
-                                battle.Add("-activate", pokemon, "ability: Quark Drive",
-                                    "[fromitem]");
-                            }
+                            battle.Add("-activate", pokemon, "ability: Quark Drive",
+                                "[fromitem]");
                         }
                     }
                     else if (battle.DisplayUi)

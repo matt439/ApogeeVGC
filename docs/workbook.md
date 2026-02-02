@@ -194,9 +194,9 @@ review moves x to Spore
 
 ^ review abilities ParentalBond to PoisonPuppeteer
 
-@ review abilities PoisonTouch to PsychicSurge
+^ review abilities PoisonTouch to PsychicSurge
 
-review abilities PunkRock to Reckless
+@ review abilities PunkRock to Reckless
 
 review abilities Refrigerate to RunAway
 

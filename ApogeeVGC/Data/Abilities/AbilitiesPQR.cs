@@ -767,10 +767,11 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnFoeTryMove = new OnFoeTryMoveEventInfo((battle, target, source, move) =>
                 {
-                    string[] targetAllExceptions = ["perishsong", "flowershield", "rototiller"];
+                    // FlowerShield and Rototiller are isNonstandard: "Past", not in Gen 9
+                    MoveId[] targetAllExceptions = [MoveId.PerishSong];
                     if (move.Target == MoveTarget.FoeSide ||
                         (move.Target == MoveTarget.All &&
-                         !targetAllExceptions.Contains(move.Id.ToString().ToLower())))
+                         !targetAllExceptions.Contains(move.Id)))
                     {
                         return new VoidReturn();
                     }
