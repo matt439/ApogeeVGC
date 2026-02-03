@@ -83,7 +83,7 @@ public partial record Conditions
                 DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
                     source?.HasItem(ItemId.LightClay) == true ? 8 : 5),
                 OnAnyModifyDamage =
-                    new OnAnyModifyDamageEventInfo((battle, _, source, target, move) =>
+                    new OnAnyModifyDamageEventInfo((battle, damage, source, target, move) =>
                     {
                         if (target != source &&
                             battle.EffectState.Target is SideEffectStateTarget side &&
@@ -97,9 +97,15 @@ public partial record Conditions
                                     battle.Debug("Light Screen weaken");
                                 }
 
-                                return battle.ActivePerHalf > 1
-                                    ? battle.ChainModify([2732, 4096])
-                                    : battle.ChainModify(0.5);
+                                if (battle.ActivePerHalf > 1)
+                                {
+                                    battle.ChainModify([2732, 4096]);
+                                }
+                                else
+                                {
+                                    battle.ChainModify(0.5);
+                                }
+                                return battle.FinalModify(damage);
                             }
                         }
 

@@ -245,19 +245,19 @@ review moves x to Spore
 
 ^ review items EjectPack to FireStone
 
-@ review items FistPlate to FriendBall
+^ review items FistPlate to FriendBall
 
 ## ItemsGHI
 
-review items GalaricaCuff to HondewBerry
+^ review items GalaricaCuff to HondewBerry
 
-review items IapapaBerry to IronPlate
+^ review items IapapaBerry to IronPlate
 
 ## ItemsJKL
 
-review items JabocaBerry to LiechiBerry
+^ review items JabocaBerry to LiechiBerry
 
-review items LifeOrb to LuxuryBall
+@ review items LifeOrb to LuxuryBall
 
 ## ItemsMNO
 

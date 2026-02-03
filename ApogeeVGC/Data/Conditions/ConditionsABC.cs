@@ -154,6 +154,7 @@ public partial record Conditions
                         if (target != source &&
                             target.Side.GetSideCondition(ConditionId.AuroraVeil) != null)
                         {
+                            // Don't stack with Reflect or Light Screen
                             if ((target.Side.GetSideCondition(ConditionId.Reflect) != null &&
                                  move.Category == MoveCategory.Physical) ||
                                 (target.Side.GetSideCondition(ConditionId.LightScreen) != null &&
@@ -168,11 +169,12 @@ public partial record Conditions
                                 if (battle.ActivePerHalf > 1)
                                 {
                                     battle.ChainModify(2732, 4096);
-                                    return damage;
                                 }
-
-                                battle.ChainModify(0.5);
-                                return damage;
+                                else
+                                {
+                                    battle.ChainModify(0.5);
+                                }
+                                return battle.FinalModify(damage);
                             }
                         }
 
