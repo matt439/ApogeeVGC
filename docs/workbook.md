@@ -322,5 +322,5 @@ review moves x to Spore
 ^ Commanded
 ^ Commanding
 ^ Arceus
-Silvally
-RolloutStorage
+^ Silvally
+^ RolloutStorage
