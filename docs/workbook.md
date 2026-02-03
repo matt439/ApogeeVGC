@@ -295,12 +295,12 @@ review moves x to Spore
 
 ^ Burn
 ^ Paralysis
-@Sleep
-@Freeze
-@Poison
-Toxic
-Confusion
-Flinch
+^ Sleep
+^ Freeze
+^ Poison
+^ Toxic
+^ Confusion
+^ Flinch
 Trapped
 Trapper
 PartiallyTrapped

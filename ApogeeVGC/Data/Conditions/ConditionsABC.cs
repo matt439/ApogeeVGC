@@ -451,7 +451,7 @@ public partial record Conditions
                             Id = MoveId.Confused,
                             Accuracy = IntTrueUnion.FromTrue(),
                             Num = 100200,
-                            Type = MoveType.Normal,
+                            Type = MoveType.Unknown, // TS uses type: '???' (typeless)
                             MoveSlot = new MoveSlot(),
                         };
                         battle.Damage(damage, pokemon, pokemon,
