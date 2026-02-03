@@ -231,9 +231,9 @@ review moves x to Spore
 
 ## ItemsABC
 
-@ review items AbilityShield to AssaultVest
+^ review items AbilityShield to AssaultVest
 
-review items BabiriBerry to CellBattery
+@ review items BabiriBerry to CellBattery
 
 review items Charcoal to ChopleBerry
 

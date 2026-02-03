@@ -301,7 +301,7 @@ public partial record Items
                 {
                     foreach (MoveSlot moveSlot in from moveSlot in pokemon.MoveSlots
                              let move = _library.Moves[moveSlot.Move]
-                             where move.Category == MoveCategory.Status
+                             where move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst
                              select moveSlot)
                     {
                         pokemon.DisableMove(moveSlot.Id);
@@ -353,29 +353,7 @@ public partial record Items
                 Num = 851,
                 Gen = 7,
             },
-            [ItemId.BerryJuice] = new()
-            {
-                Id = ItemId.BerryJuice,
-                Name = "Berry Juice",
-                SpriteNum = 22,
-                Fling = new FlingData { BasePower = 30 },
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
-                {
-                    if (pokemon.Hp <= pokemon.MaxHp / 2)
-                    {
-                        // Check TryHeal event first, then use item if allowed
-                        RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
-                            battle.Effect, 20);
-                        if (canHeal is not BoolRelayVar { Value: false } && pokemon.UseItem())
-                        {
-                            battle.Heal(20);
-                        }
-                    }
-                }),
-                Num = 43,
-                Gen = 2,
-                // isNonstandard: "Past"
-            },
+            // BerryJuice removed - isNonstandard: "Past"
             [ItemId.BerrySweet] = new()
             {
                 Id = ItemId.BerrySweet,
@@ -426,7 +404,8 @@ public partial record Items
                             return IntBoolUnion.FromInt(battle.FinalModify(damage));
                         }
 
-                        return IntBoolUnion.FromInt(damage);
+                        // Return null to match TS undefined - "don't modify, pass through"
+                        return null;
                     }), 1),
                 Num = 296,
                 Gen = 4,
@@ -499,35 +478,7 @@ public partial record Items
                 Num = 281,
                 Gen = 4,
             },
-            [ItemId.BlueOrb] = new()
-            {
-                Id = ItemId.BlueOrb,
-                Name = "Blue Orb",
-                SpriteNum = 41,
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
-                {
-                    if (pokemon is
-                        { IsActive: true, BaseSpecies.Id: SpecieId.Kyogre, Transformed: false })
-                    {
-                        pokemon.FormeChange(SpecieId.KyogrePrimal, battle.Effect, true);
-                    }
-                }, -1),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
-                        (_, _, pokemon, _, _) =>
-                        {
-                            // Kyogre can't have this item removed (TS only checks holder)
-                            if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Kyogre)
-                            {
-                                return BoolVoidUnion.FromBool(false); // Prevent removal
-                            }
-
-                            return BoolVoidUnion.FromBool(true); // Allow removal
-                        })),
-                IsPrimalOrb = true,
-                Num = 535,
-                Gen = 6,
-            },
+            // BlueOrb removed - isNonstandard: "Past"
             [ItemId.BlunderPolicy] = new()
             {
                 Id = ItemId.BlunderPolicy,
@@ -544,6 +495,7 @@ public partial record Items
                 Name = "Booster Energy",
                 SpriteNum = 745,
                 Fling = new FlingData { BasePower = 30 },
+                // TODO: TS has onSwitchInPriority: -2 - add priority parameter if OnStartEventInfo supports it
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     pokemon.ItemState.Started = true;
