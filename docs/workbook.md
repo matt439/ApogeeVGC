@@ -295,9 +295,9 @@ review moves x to Spore
 
 ^ Burn
 ^ Paralysis
-Sleep
-Freeze
-Poison
+@Sleep
+@Freeze
+@Poison
 Toxic
 Confusion
 Flinch
