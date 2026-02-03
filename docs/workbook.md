@@ -281,7 +281,7 @@ review moves x to Spore
 
 ^ review items SmoothRock to StickyBarb
 
-review items StonePlate to UtilityUmbrella
+@ review items StonePlate to UtilityUmbrella
 
 ## ItemsVWX
 

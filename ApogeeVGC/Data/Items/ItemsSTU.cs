@@ -680,28 +680,7 @@ public partial record Items
                 Num = 879,
                 Gen = 7,
             },
-            [ItemId.ThickClub] = new()
-            {
-                Id = ItemId.ThickClub,
-                Name = "Thick Club",
-                SpriteNum = 491,
-                Fling = new FlingData { BasePower = 90 },
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
-                {
-                    // Cubone or Marowak (includes Alola forms via BaseSpecies check)
-                    if (pokemon.BaseSpecies.BaseSpecies is SpecieId.Cubone or SpecieId.Marowak)
-                    {
-                        battle.ChainModify(2);
-                        return battle.FinalModify(atk);
-                    }
-
-                    return atk;
-                }, 1),
-                // itemUser: ["Marowak", "Marowak-Alola", "Marowak-Alola-Totem", "Cubone"],
-                Num = 258,
-                Gen = 2,
-                // IsNonstandard = "Past",
-            },
+            // ThickClub skipped - isNonstandard: "Past"
             [ItemId.ThroatSpray] = new()
             {
                 Id = ItemId.ThroatSpray,
