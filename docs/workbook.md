@@ -273,11 +273,11 @@ review moves x to Spore
 
 ^ review items PowerBracer to RazorClaw
 
-@ review items RockyHelmet to RustedSword
+^ review items RockyHelmet to RustedSword
 
 ## ItemsSTU
 
-review items SafariBall to SkyPlate
+@ review items SafariBall to SkyPlate
 
 review items SmoothRock to StickyBarb
 

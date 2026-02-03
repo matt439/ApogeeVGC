@@ -62,16 +62,7 @@ public partial record Items
                 Num = 650,
                 Gen = 6,
             },
-            [ItemId.SailFossil] = new()
-            {
-                Id = ItemId.SailFossil,
-                Name = "Sail Fossil",
-                SpriteNum = 695,
-                Fling = new FlingData { BasePower = 100 },
-                Num = 711,
-                Gen = 6,
-                // IsNonstandard = "Past",
-            },
+            // SailFossil skipped - isNonstandard: "Past"
             [ItemId.SalacBerry] = new()
             {
                 Id = ItemId.SalacBerry,
@@ -109,26 +100,7 @@ public partial record Items
                 Num = 232,
                 Gen = 2,
             },
-            [ItemId.SeaIncense] = new()
-            {
-                Id = ItemId.SeaIncense,
-                Name = "Sea Incense",
-                SpriteNum = 430,
-                Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
-                {
-                    if (move.Type == MoveType.Water)
-                    {
-                        battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
-                    }
-
-                    return basePower;
-                }, 15),
-                Num = 254,
-                Gen = 3,
-                // IsNonstandard = "Past",
-            },
+            // SeaIncense skipped - isNonstandard: "Past"
             [ItemId.SharpBeak] = new()
             {
                 Id = ItemId.SharpBeak,

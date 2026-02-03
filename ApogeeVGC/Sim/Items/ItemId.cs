@@ -233,10 +233,8 @@ public enum ItemId
     // S items
     SafariBall,
     SafetyGoggles,
-    SailFossil,
     SalacBerry,
     ScopeLens,
-    SeaIncense,
     SharpBeak,
     ShedShell,
     ShellBell,
