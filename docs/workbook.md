@@ -206,9 +206,9 @@ review moves x to Spore
 
 ^ review abilities ShadowShield to SlowStart
 
-@ review abilities SlushRush to StanceChange
+^ review abilities SlushRush to StanceChange
 
-review abilities Static to SupersweetSyrup
+@ review abilities Static to SupersweetSyrup
 
 review abilities SupremeOverlord to TanglingHair
 

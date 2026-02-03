@@ -886,10 +886,9 @@ public partial record Abilities
                     battle.Boost(new SparseBoostsTable { Def = 1 });
                 }),
             },
-            // Note: In Gen 9, Aegislash is isNonstandard: "Past" (not available in standard formats).
-            // King's Shield is also isNonstandard: "Past", so the Shield Forme reversion mechanism
-            // doesn't exist in Gen 9. This implementation only handles Blade Forme transformation
-            // which is sufficient for Gen 9 standard play.
+            // Note: In Gen 9, King's Shield is isNonstandard: "Past", so the Shield Forme reversion
+            // mechanism doesn't exist in Gen 9 standard play. Aegislash IS available in Gen 9.
+            // This implementation only handles Blade Forme transformation which is sufficient.
             // TODO: For National Dex support, add King's Shield handling to revert to Shield Forme.
             [AbilityId.StanceChange] = new()
             {
@@ -1439,8 +1438,9 @@ public partial record Abilities
                         if (effect is Condition { Id: ConditionId.ToxicSpikes }) return;
                         if (status.Id is ConditionId.Sleep or ConditionId.Freeze) return;
                         battle.Add("-activate", target, "ability: Synchronize");
-                        // Hack to make status-prevention abilities think Synchronize is a status move
-                        source.TrySetStatus(status.Id, target);
+                        // TS uses a hack { status: status.id, id: 'synchronize' } to make status-prevention
+                        // abilities think Synchronize is a status move. We pass the ability as the effect.
+                        source.TrySetStatus(status.Id, target, effect: target.Ability);
                     }),
             },
 
