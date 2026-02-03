@@ -436,7 +436,7 @@ public partial record Conditions
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
-                    source.HasItem(ItemId.DampRock) ? 8 : 5),
+                    source?.HasItem(ItemId.DampRock) == true ? 8 : 5),
                 OnWeatherModifyDamage =
                     new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
                     {
@@ -457,14 +457,17 @@ public partial record Conditions
                     }),
                 OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
                 {
-                    if (!battle.DisplayUi) return;
                     if (effect is Ability)
                     {
+                        // Gen <= 5: ability-induced weather lasts indefinitely
                         if (battle.Gen <= 5) battle.EffectState.Duration = 0;
-                        battle.Add("-weather", "RainDance", "[from] ability: " + effect.Name,
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-weather", "RainDance", "[from] ability: " + effect.Name,
+                                $"[of] {source}");
+                        }
                     }
-                    else
+                    else if (battle.DisplayUi)
                     {
                         battle.Add("-weather", "RainDance");
                     }

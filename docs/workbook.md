@@ -307,12 +307,12 @@ review moves x to Spore
 ^ LockedMove
 ^ TwoTurnMove
 ^ ChoiceLock
-@ MustRecharge
-@ FutureMove
-@ HealReplacement
-Stall
-Gem
-RainDance
+^ MustRecharge
+^ FutureMove
+^ HealReplacement
+@ Stall
+@ Gem
+@ RainDance
 PriomordialSea
 SunnyDay
 DesolateLand
