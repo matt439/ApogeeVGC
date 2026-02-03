@@ -637,26 +637,7 @@ public partial record Items
                 Num = 184,
                 Gen = 4,
             },
-            [ItemId.OddIncense] = new()
-            {
-                Id = ItemId.OddIncense,
-                Name = "Odd Incense",
-                SpriteNum = 312,
-                Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
-                {
-                    if (move.Type == MoveType.Psychic)
-                    {
-                        battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
-                    }
-
-                    return basePower;
-                }, 15),
-                Num = 314,
-                Gen = 4,
-                // IsNonstandard = "Past",
-            },
+            // OddIncense removed - isNonstandard: "Past"
             [ItemId.OranBerry] = new()
             {
                 Id = ItemId.OranBerry,

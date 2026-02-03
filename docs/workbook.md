@@ -263,9 +263,9 @@ review moves x to Spore
 
 ^ review items MachoBrace to Metronome
 
-@ review items MicleBerry to NomelBerry
+^ review items MicleBerry to NomelBerry
 
-review items NormalGem to None
+@ review items NormalGem to None
 
 ## ItemsPQR
 
