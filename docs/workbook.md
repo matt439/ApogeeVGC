@@ -265,11 +265,11 @@ review moves x to Spore
 
 ^ review items MicleBerry to NomelBerry
 
-@ review items NormalGem to None
+^ review items NormalGem to None
 
 ## ItemsPQR
 
-review items PamtreBerry to PowerBelt
+@ review items PamtreBerry to PowerBelt
 
 review items PowerBracer to RazorClaw
 

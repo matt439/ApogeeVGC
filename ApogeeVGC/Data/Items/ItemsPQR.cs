@@ -23,18 +23,7 @@ public partial record Items
         return new Dictionary<ItemId, Item>
         {
             // P items
-            [ItemId.PamtreBerry] = new()
-            {
-                Id = ItemId.PamtreBerry,
-                Name = "Pamtre Berry",
-                SpriteNum = 323,
-                IsBerry = true,
-                NaturalGift = (90, "Steel"),
-                // onEat: false - used for Poffin/Pokeblock creation, not relevant in Gen 9 battles
-                Num = 180,
-                Gen = 3,
-                // IsNonstandard = "Past",
-            },
+            // Skip pamtreberry - isNonstandard: Past
             [ItemId.PasshoBerry] = new()
             {
                 Id = ItemId.PasshoBerry,
@@ -173,18 +162,7 @@ public partial record Items
             // Skip pidgeotite - mega stone
             // Skip pikaniumz - z-move
             // Skip pikashuniumz - z-move
-            [ItemId.PinapBerry] = new()
-            {
-                Id = ItemId.PinapBerry,
-                Name = "Pinap Berry",
-                SpriteNum = 337,
-                IsBerry = true,
-                NaturalGift = (90, "Grass"),
-                // onEat: false - used for wild Pokemon mechanics, not relevant in Gen 9 battles
-                Num = 168,
-                Gen = 3,
-                // IsNonstandard = "Past",
-            },
+            // Skip pinapberry - isNonstandard: Past
             // Skip pinsirite - mega stone
             [ItemId.PixiePlate] = new()
             {
@@ -217,16 +195,7 @@ public partial record Items
                 Num = 644,
                 Gen = 6,
             },
-            [ItemId.PlumeFossil] = new()
-            {
-                Id = ItemId.PlumeFossil,
-                Name = "Plume Fossil",
-                SpriteNum = 339,
-                Fling = new FlingData { BasePower = 100 },
-                Num = 573,
-                Gen = 5,
-                // IsNonstandard = "Past",
-            },
+            // Skip plumefossil - isNonstandard: Past
             [ItemId.PoisonBarb] = new()
             {
                 Id = ItemId.PoisonBarb,

@@ -186,15 +186,12 @@ public enum ItemId
     OvalStone,
 
     // P items
-    PamtreBerry,
     PasshoBerry,
     PayapaBerry,
     PechaBerry,
     PersimBerry,
     PetayaBerry,
-    PinapBerry,
     PixiePlate,
-    PlumeFossil,
     PoisonBarb,
     PokeBall,
     PomegBerry,
