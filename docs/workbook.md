@@ -269,11 +269,11 @@ review moves x to Spore
 
 ## ItemsPQR
 
-@ review items PamtreBerry to PowerBelt
+^ review items PamtreBerry to PowerBelt
 
-review items PowerBracer to RazorClaw
+^ review items PowerBracer to RazorClaw
 
-review items RockyHelmet to RustedSword
+@ review items RockyHelmet to RustedSword
 
 ## ItemsSTU
 

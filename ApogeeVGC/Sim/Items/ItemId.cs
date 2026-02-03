@@ -228,8 +228,6 @@ public enum ItemId
     RindoBerry,
     RingTarget,
     RoomService,
-    RootFossil,
-    RoseIncense,
     RoseliBerry,
 
     // S items

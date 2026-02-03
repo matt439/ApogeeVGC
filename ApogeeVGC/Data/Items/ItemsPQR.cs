@@ -773,36 +773,8 @@ public partial record Items
                 Num = 1122,
                 Gen = 8,
             },
-            [ItemId.RootFossil] = new()
-            {
-                Id = ItemId.RootFossil,
-                Name = "Root Fossil",
-                SpriteNum = 418,
-                Fling = new FlingData { BasePower = 100 },
-                Num = 99,
-                Gen = 3,
-                // isNonstandard: "Past"
-            },
-            [ItemId.RoseIncense] = new()
-            {
-                Id = ItemId.RoseIncense,
-                Name = "Rose Incense",
-                SpriteNum = 419,
-                Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
-                {
-                    if (move.Type == MoveType.Grass)
-                    {
-                        battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
-                    }
-
-                    return basePower;
-                }, 15),
-                Num = 318,
-                Gen = 4,
-                // isNonstandard: "Past"
-            },
+            // Skip rootfossil - isNonstandard: "Past"
+            // Skip roseincense - isNonstandard: "Past"
             [ItemId.RoseliBerry] = new()
             {
                 Id = ItemId.RoseliBerry,
