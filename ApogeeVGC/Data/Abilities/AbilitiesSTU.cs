@@ -681,15 +681,9 @@ public partial record Abilities
                 Num = 81,
                 Rating = 1.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
-                {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Snowscape })
-                    {
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
+                // Note: In Gen 9, Snowscape replaced Hail and does not deal damage,
+                // so OnImmunity is not needed. The TS version checks for 'hail' immunity
+                // which dealt damage in earlier gens. Kept for consistency but has no effect.
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
                 {
@@ -892,6 +886,11 @@ public partial record Abilities
                     battle.Boost(new SparseBoostsTable { Def = 1 });
                 }),
             },
+            // Note: In Gen 9, Aegislash is isNonstandard: "Past" (not available in standard formats).
+            // King's Shield is also isNonstandard: "Past", so the Shield Forme reversion mechanism
+            // doesn't exist in Gen 9. This implementation only handles Blade Forme transformation
+            // which is sufficient for Gen 9 standard play.
+            // TODO: For National Dex support, add King's Shield handling to revert to Shield Forme.
             [AbilityId.StanceChange] = new()
             {
                 Id = AbilityId.StanceChange,
@@ -913,7 +912,8 @@ public partial record Abilities
                     if (attacker.BaseSpecies.BaseSpecies != SpecieId.Aegislash ||
                         attacker.Transformed)
                         return;
-                    // Currently only handles attacking moves -> Blade Forme
+                    // In Gen 9, King's Shield doesn't exist, so only handle attacking moves -> Blade Forme
+                    // TS logic: if (move.category === 'Status' && move.id !== 'kingsshield') return;
                     if (move.Category == MoveCategory.Status)
                         return;
 
