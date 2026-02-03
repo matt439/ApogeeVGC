@@ -304,9 +304,9 @@ review moves x to Spore
 ^ Trapped
 ^ Trapper
 ^ PartiallyTrapped
-LockedMove
-TwoTurnMove
-ChoiceLock
+@ LockedMove
+@ TwoTurnMove
+@ ChoiceLock
 MustRecharge
 FutureMove
 HealReplacement

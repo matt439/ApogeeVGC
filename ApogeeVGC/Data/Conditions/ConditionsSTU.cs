@@ -1302,8 +1302,8 @@ public partial record Conditions
                         }
                     }
 
-                    // Note: AttrLastMove("[still]") from TS is not implemented yet
-                    // This would add the [still] attribute to suppress move animation
+                    // Add [still] attribute to suppress move animation
+                    battle.AttrLastMove("[still]");
 
                     // Run side-effects normally associated with hitting (e.g., Protean, Libero)
                     battle.RunEvent(EventId.PrepareHit, attacker, defender, effect);
@@ -1314,7 +1314,14 @@ public partial record Conditions
                 {
                     if (battle.EffectState.Move != null)
                     {
-                        target.DeleteVolatile((ConditionId)battle.EffectState.Move);
+                        // Use string-based enum parsing for safe MoveId -> ConditionId conversion
+                        // (same approach as OnStart uses for adding the volatile)
+                        MoveId moveId = battle.EffectState.Move.Value;
+                        if (Enum.TryParse(moveId.ToString(), out ConditionId conditionId) &&
+                            _library.Conditions.ContainsKey(conditionId))
+                        {
+                            target.DeleteVolatile(conditionId);
+                        }
                     }
                 }),
                 OnLockMove = new OnLockMoveEventInfo(

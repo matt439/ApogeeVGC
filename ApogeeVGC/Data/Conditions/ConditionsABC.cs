@@ -231,21 +231,40 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
-                    // Don't set the move here - it will be set in OnModifyMove
-                    // This handler is called when the volatile is added, which happens
-                    // during the Choice item's OnModifyMove
+                    // TS: if (!this.activeMove) throw new Error("Battle.activeMove is null");
+                    if (battle.ActiveMove == null)
+                    {
+                        battle.Debug($"[ChoiceLock.OnStart] {pokemon.Name}: ActiveMove is null, rejecting volatile");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    // TS: if (!this.activeMove.id || this.activeMove.hasBounced || this.activeMove.sourceEffect === 'snatch') return false;
+                    // Note: Snatch check omitted - Snatch is isNonstandard: "Past" (removed in Gen 8)
+                    bool hasBounced = battle.ActiveMove.HasBounced ?? false;
+
+                    if (battle.ActiveMove.Id == default || hasBounced)
+                    {
+                        battle.Debug(
+                            $"[ChoiceLock.OnStart] {pokemon.Name}: Rejecting volatile (id={battle.ActiveMove.Id}, hasBounced={hasBounced})");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    // TS: this.effectState.move = this.activeMove.id;
+                    battle.EffectState.Move = battle.ActiveMove.Id;
                     battle.Debug(
-                        $"[ChoiceLock.OnStart] {pokemon.Name}: Volatile added, move will be set by ChoiceLock.OnModifyMove");
+                        $"[ChoiceLock.OnStart] {pokemon.Name}: Volatile added, locked to {battle.ActiveMove.Id}");
                     return new VoidReturn();
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
-                    // Set the locked move if it hasn't been set yet
-                    if (pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+                    // Fallback: Set the locked move if it hasn't been set yet
+                    // (OnStart should have set it, but this provides defense in depth)
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.ChoiceLock, out EffectState? effectState) &&
+                        effectState.Move == null)
                     {
                         battle.Debug(
-                            $"[ChoiceLock.OnModifyMove] {pokemon.Name}: Locking to {move.Id}");
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
+                            $"[ChoiceLock.OnModifyMove] {pokemon.Name}: Locking to {move.Id} (fallback)");
+                        effectState.Move = move.Id;
                     }
                 }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
@@ -327,8 +346,9 @@ public partial record Conditions
                         $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Disabling all except {effectState.Move}");
 
                     // Disable all moves except the locked move
+                    // TS: for (const moveSlot of pokemon.moveSlots) { if (moveSlot.id !== this.effectState.move) ... }
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
-                                 moveSlot.Move != effectState.Move))
+                                 moveSlot.Id != effectState.Move))
                     {
                         pokemon.DisableMove(moveSlot.Id, false,
                             effectState.SourceEffect);
