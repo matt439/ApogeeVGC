@@ -243,9 +243,9 @@ review moves x to Spore
 
 ^ review items DampRock to EjectButton
 
-@ review items EjectPack to FireStone
+^ review items EjectPack to FireStone
 
-review items FistPlate to FriendBall
+@ review items FistPlate to FriendBall
 
 ## ItemsGHI
 
