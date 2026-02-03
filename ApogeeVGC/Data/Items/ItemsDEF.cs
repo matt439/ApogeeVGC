@@ -240,7 +240,7 @@ public partial record Items
                             move.Category != MoveCategory.Status && move.Flags.FutureMove != true)
                         {
                             if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag ||
-                                target.BeingCalledBack)
+                                target.BeingCalledBack || target.IsSkyDropped())
                                 return;
                             if (target.Volatiles.ContainsKey(ConditionId.Commanding) ||
                                 target.Volatiles.ContainsKey(ConditionId.Commanded))

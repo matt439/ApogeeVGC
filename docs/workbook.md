@@ -241,7 +241,7 @@ review moves x to Spore
 
 ## ItemsDEF
 
-review items DampRock to EjectButton
+@ review items DampRock to EjectButton
 
 review items EjectPack to FireStone
 
