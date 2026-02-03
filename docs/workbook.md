@@ -293,8 +293,8 @@ review moves x to Spore
 
 # Conditions
 
-Burn
-Paralysis
+^ Burn
+^ Paralysis
 Sleep
 Freeze
 Poison

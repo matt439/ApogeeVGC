@@ -33,7 +33,7 @@ public partial record Conditions
                 {
                     if (!battle.DisplayUi) return new VoidReturn();
 
-                    if (sourceEffect is Ability)
+                    if (sourceEffect?.EffectType == EffectType.Ability)
                     {
                         battle.Add("-status", target, "par", "[from] ability: " + sourceEffect.Name,
                             $"[of] {source}");
