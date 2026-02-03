@@ -208,9 +208,9 @@ review moves x to Spore
 
 ^ review abilities SlushRush to StanceChange
 
-@ review abilities Static to SupersweetSyrup
+^ review abilities Static to SupersweetSyrup
 
-review abilities SupremeOverlord to TanglingHair
+@ review abilities SupremeOverlord to TanglingHair
 
 review abilities Technician to ToxicChain
 

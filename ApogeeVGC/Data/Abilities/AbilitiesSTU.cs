@@ -1412,6 +1412,8 @@ public partial record Abilities
                     if (myItemResult is not ItemItemFalseUnion { Item: var myItem }) return;
 
                     // Check if the item can be received by the ally (e.g., Memory items only for Silvally)
+                    // TODO: TS passes source.itemState as effectState parameter instead of null.
+                    // If item state is needed for certain item TakeItem checks, this might cause issues.
                     Ability symbiosis = battle.Library.Abilities[AbilityId.Symbiosis];
                     if (battle.SingleEvent(EventId.TakeItem, myItem, null, pokemon, source,
                             symbiosis, myItem) is BoolRelayVar { Value: false } ||
