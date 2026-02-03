@@ -404,7 +404,9 @@ public partial record Items
                         RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
                             battle.Effect,
                             pokemon.BaseMaxHp / 4);
-                        if (canHeal is BoolRelayVar { Value: false })
+                        // TS: if (!this.runEvent(...)) return false
+                        // Returns false for any falsy value (false, null, undefined)
+                        if (canHeal is null or BoolRelayVar { Value: false })
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
@@ -474,7 +476,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
-                    if (move.Type == MoveType.Fairy)
+                    if (move != null && move.Type == MoveType.Fairy)
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -517,7 +519,9 @@ public partial record Items
                         RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
                             battle.Effect,
                             pokemon.BaseMaxHp / 3);
-                        if (canHeal is BoolRelayVar { Value: false })
+                        // TS: if (!this.runEvent(...)) return false
+                        // Returns false for any falsy value (false, null, undefined)
+                        if (canHeal is null or BoolRelayVar { Value: false })
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
