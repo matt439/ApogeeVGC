@@ -301,9 +301,9 @@ review moves x to Spore
 ^ Toxic
 ^ Confusion
 ^ Flinch
-Trapped
-Trapper
-PartiallyTrapped
+^ Trapped
+^ Trapper
+^ PartiallyTrapped
 LockedMove
 TwoTurnMove
 ChoiceLock

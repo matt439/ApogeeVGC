@@ -750,6 +750,7 @@ public partial record Conditions
             [ConditionId.Trapped] = new()
             {
                 Id = ConditionId.Trapped,
+                Name = "Trapped",
                 NoCopy = true,
                 OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) => { pokemon.TryTrap(); }),
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
