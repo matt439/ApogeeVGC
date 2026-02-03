@@ -277,9 +277,9 @@ review moves x to Spore
 
 ## ItemsSTU
 
-@ review items SafariBall to SkyPlate
+^ review items SafariBall to SkyPlate
 
-review items SmoothRock to StickyBarb
+@ review items SmoothRock to StickyBarb
 
 review items StonePlate to UtilityUmbrella
 

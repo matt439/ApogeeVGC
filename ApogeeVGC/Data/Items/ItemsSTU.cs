@@ -390,18 +390,7 @@ public partial record Items
                 Num = 247,
                 Gen = 2,
             },
-            [ItemId.SpelonBerry] = new()
-            {
-                Id = ItemId.SpelonBerry,
-                Name = "Spelon Berry",
-                SpriteNum = 462,
-                IsBerry = true,
-                NaturalGift = (90, "Dark"),
-                // onEat: false - used for Poffin/Pokeblock creation, not relevant in Gen 9 battles
-                Num = 179,
-                Gen = 3,
-                // IsNonstandard = "Past",
-            },
+            // SpelonBerry skipped - isNonstandard: "Past"
             [ItemId.SplashPlate] = new()
             {
                 Id = ItemId.SplashPlate,
@@ -527,29 +516,7 @@ public partial record Items
                 Num = 1114,
                 Gen = 8,
             },
-            // Skip steelixite, steelgem, steelmemory, steeliumz - not Gen 9
-            [ItemId.Stick] = new()
-            {
-                Id = ItemId.Stick,
-                Name = "Stick",
-                SpriteNum = 475,
-                Fling = new FlingData { BasePower = 60 },
-                OnModifyCritRatio =
-                    new OnModifyCritRatioEventInfo((_, critRatio, source, _, _) =>
-                    {
-                        // Farfetch'd check (base species only, not Sirfetch'd)
-                        if (source.BaseSpecies.BaseSpecies == SpecieId.Farfetchd)
-                        {
-                            return DoubleVoidUnion.FromDouble(critRatio + 2);
-                        }
-
-                        return DoubleVoidUnion.FromVoid();
-                    }),
-                // itemUser: ["Farfetch'd"],
-                Num = 259,
-                Gen = 2,
-                // IsNonstandard = "Past",
-            },
+            // Skip steelixite, steelgem, steelmemory, steeliumz, stick - isNonstandard: "Past"
             [ItemId.StickyBarb] = new()
             {
                 Id = ItemId.StickyBarb,
