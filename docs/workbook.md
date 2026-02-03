@@ -310,12 +310,12 @@ review moves x to Spore
 ^ MustRecharge
 ^ FutureMove
 ^ HealReplacement
-@ Stall
-@ Gem
-@ RainDance
-PriomordialSea
-SunnyDay
-DesolateLand
+^ Stall
+^ Gem
+^ RainDance
+@ PriomordialSea
+@ SunnyDay
+@ DesolateLand
 Sandstorm
 Snowscape
 DeltaStream

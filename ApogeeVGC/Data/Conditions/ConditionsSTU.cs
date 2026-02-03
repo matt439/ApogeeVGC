@@ -933,7 +933,7 @@ public partial record Conditions
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
-                    source.HasItem(ItemId.SmoothRock) ? 8 : 5),
+                    source?.HasItem(ItemId.SmoothRock) == true ? 8 : 5),
                 // This should be applied directly to the stat before any of the other modifiers are chained
                 // So we give it increased priority.
                 //OnModifySpDPriority = 10,
@@ -992,7 +992,7 @@ public partial record Conditions
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
-                    source.HasItem(ItemId.IcyRock) ? 8 : 5),
+                    source?.HasItem(ItemId.IcyRock) == true ? 8 : 5),
                 //OnModifyDefPriority = 10,
                 OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
                     {
@@ -1048,7 +1048,7 @@ public partial record Conditions
                 EffectType = EffectType.Weather,
                 Duration = 5,
                 DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
-                    source.HasItem(ItemId.HeatRock) ? 8 : 5),
+                    source?.HasItem(ItemId.HeatRock) == true ? 8 : 5),
                 OnWeatherModifyDamage =
                     new OnWeatherModifyDamageEventInfo((battle, _, attacker, defender, move) =>
                     {
