@@ -393,14 +393,14 @@ public partial record Items
                 Name = "Mirror Herb",
                 SpriteNum = 748,
                 Fling = new FlingData { BasePower = 30 },
-                OnFoeAfterBoost = new OnFoeAfterBoostEventInfo((_, boost, _, pokemon, effect) =>
+                OnFoeAfterBoost = new OnFoeAfterBoostEventInfo((battle, boost, _, _, effect) =>
                 {
                     // Don't trigger from Opportunist or Mirror Herb
                     if (effect?.EffectStateId == AbilityId.Opportunist ||
                         effect?.EffectStateId == ItemId.MirrorHerb) return;
 
-                    pokemon.ItemState.Boosts ??= new SparseBoostsTable();
-                    SparseBoostsTable? boostPlus = pokemon.ItemState.Boosts;
+                    battle.EffectState.Boosts ??= new SparseBoostsTable();
+                    SparseBoostsTable? boostPlus = battle.EffectState.Boosts;
 
                     foreach (BoostId stat in Enum.GetValues<BoostId>())
                     {
@@ -409,47 +409,52 @@ public partial record Items
                         {
                             int existing = boostPlus.GetBoost(stat) ?? 0;
                             boostPlus.SetBoost(stat, existing + boostValue.Value);
-                            pokemon.ItemState.Ready = true;
+                            battle.EffectState.Ready = true;
                         }
                     }
                 }),
-                OnAnySwitchIn = new OnAnySwitchInEventInfo((_, pokemon) =>
+                OnAnySwitchIn = new OnAnySwitchInEventInfo((battle, _) =>
                 {
-                    if (pokemon.ItemState.Ready != true) return;
-                    pokemon.UseItem();
+                    if (battle.EffectState.Ready != true) return;
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
+                    target.Pokemon.UseItem();
                 }, -3),
-                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((_, pokemon) =>
+                OnAnyAfterMega = new OnAnyAfterMegaEventInfo((battle, _) =>
                 {
-                    if (pokemon.ItemState.Ready != true) return;
-                    pokemon.UseItem();
+                    if (battle.EffectState.Ready != true) return;
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
+                    target.Pokemon.UseItem();
                 }),
-                OnAnyAfterTerastallization = new OnAnyAfterTerastallizationEventInfo((_, pokemon) =>
+                OnAnyAfterTerastallization = new OnAnyAfterTerastallizationEventInfo((battle, _) =>
                 {
-                    if (pokemon.ItemState.Ready != true) return;
-                    pokemon.UseItem();
+                    if (battle.EffectState.Ready != true) return;
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
+                    target.Pokemon.UseItem();
                 }),
-                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((_, pokemon, _, _) =>
+                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, _, _, _) =>
                 {
-                    if (pokemon.ItemState.Ready != true) return BoolVoidUnion.FromVoid();
-                    pokemon.UseItem();
+                    if (battle.EffectState.Ready != true) return BoolVoidUnion.FromVoid();
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return BoolVoidUnion.FromVoid();
+                    target.Pokemon.UseItem();
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
+                OnResidual = new OnResidualEventInfo((battle, _, _, _) =>
                 {
-                    if (pokemon.ItemState.Ready != true) return;
-                    pokemon.UseItem();
+                    if (battle.EffectState.Ready != true) return;
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return;
+                    target.Pokemon.UseItem();
                 }, order: 29),
                 OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
-                    if (pokemon.ItemState.Boosts != null)
+                    if (battle.EffectState.Boosts != null)
                     {
-                        battle.Boost(pokemon.ItemState.Boosts, pokemon);
+                        battle.Boost(battle.EffectState.Boosts, pokemon);
                     }
                 })),
-                OnEnd = new OnEndEventInfo((_, pokemon) =>
+                OnEnd = new OnEndEventInfo((battle, _) =>
                 {
-                    pokemon.ItemState.Boosts = null;
-                    pokemon.ItemState.Ready = null;
+                    battle.EffectState.Boosts = null;
+                    battle.EffectState.Ready = null;
                 }),
                 Num = 1883,
                 Gen = 9,
@@ -537,18 +542,7 @@ public partial record Items
             },
 
             // N items
-            [ItemId.NanabBerry] = new()
-            {
-                Id = ItemId.NanabBerry,
-                Name = "Nanab Berry",
-                SpriteNum = 302,
-                IsBerry = true,
-                NaturalGift = (90, "Water"),
-                // onEat: false - used for wild Pokemon mechanics, not relevant in Gen 9 battles
-                Num = 166,
-                Gen = 3,
-                // IsNonstandard = "Past",
-            },
+            // NanabBerry removed - isNonstandard: "Past"
             [ItemId.NestBall] = new()
             {
                 Id = ItemId.NestBall,
@@ -586,18 +580,7 @@ public partial record Items
                 Num = 246,
                 Gen = 2,
             },
-            [ItemId.NomelBerry] = new()
-            {
-                Id = ItemId.NomelBerry,
-                Name = "Nomel Berry",
-                SpriteNum = 306,
-                IsBerry = true,
-                NaturalGift = (90, "Dragon"),
-                // onEat: false - used for Poffin/Pokeblock creation, not relevant in Gen 9 battles
-                Num = 178,
-                Gen = 3,
-                // IsNonstandard = "Past",
-            },
+            // NomelBerry removed - isNonstandard: "Past"
             [ItemId.NormalGem] = new()
             {
                 Id = ItemId.NormalGem,

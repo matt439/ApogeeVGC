@@ -261,9 +261,9 @@ review moves x to Spore
 
 ## ItemsMNO
 
-@ review items MachoBrace to Metronome
+^ review items MachoBrace to Metronome
 
-review items MicleBerry to NomelBerry
+@ review items MicleBerry to NomelBerry
 
 review items NormalGem to None
 

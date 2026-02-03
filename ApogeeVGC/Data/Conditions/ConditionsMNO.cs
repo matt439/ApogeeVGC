@@ -123,14 +123,11 @@ public partial record Conditions
                 Name = "Metronome",
                 EffectType = EffectType.Condition,
                 AssociatedItem = ItemId.Metronome,
-                OnStart = new OnStartEventInfo((_, pokemon, _, _) =>
+                OnStart = new OnStartEventInfo((battle, _, _, _) =>
                 {
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.Metronome,
-                            out EffectState? state))
-                    {
-                        state.LastMove = "";
-                        state.NumConsecutive = 0;
-                    }
+                    // TS: this.effectState.lastMove = ''; this.effectState.numConsecutive = 0;
+                    battle.EffectState.LastMove = "";
+                    battle.EffectState.NumConsecutive = 0;
 
                     return new VoidReturn();
                 }),
