@@ -210,11 +210,11 @@ review moves x to Spore
 
 ^ review abilities Static to SupersweetSyrup
 
-@ review abilities SupremeOverlord to TanglingHair
+^ review abilities SupremeOverlord to TanglingHair
 
-review abilities Technician to ToxicChain
+^ review abilities Technician to ToxicChain
 
-review abilities ToxicDebris to UnseenFist
+^ review abilities ToxicDebris to UnseenFist
 
 ## AbilitiesVWX
 
@@ -231,7 +231,7 @@ review abilities ToxicDebris to UnseenFist
 
 ## ItemsABC
 
-review items AbilityShield to AssaultVest
+@ review items AbilityShield to AssaultVest
 
 review items BabiriBerry to CellBattery
 
