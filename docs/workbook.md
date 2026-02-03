@@ -235,9 +235,9 @@ review moves x to Spore
 
 ^ review items BabiriBerry to CellBattery
 
-@ review items Charcoal to ChopleBerry
+^ review items Charcoal to ChopleBerry
 
-review items ClearAmulet to CustapBerry
+^ review items ClearAmulet to CustapBerry
 
 ## ItemsDEF
 
