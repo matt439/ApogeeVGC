@@ -281,15 +281,15 @@ review moves x to Spore
 
 ^ review items SmoothRock to StickyBarb
 
-@ review items StonePlate to UtilityUmbrella
+^ review items StonePlate to UtilityUmbrella
 
 ## ItemsVWX
 
-review items WacanBerry to WiseGlasses
+^ review items WacanBerry to WiseGlasses
 
 ## ItemsYZ
 
-review items YacheBerry to ZoomLens
+^ review items YacheBerry to ZoomLens
 
 # Conditions
 
