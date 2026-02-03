@@ -316,11 +316,11 @@ review moves x to Spore
 ^ PriomordialSea
 ^ SunnyDay
 ^ DesolateLand
-@ Sandstorm
-@ Snowscape
-@ DeltaStream
-Commanded
-Commanding
-Arceus
+^ Sandstorm
+^ Snowscape
+^ DeltaStream
+^ Commanded
+^ Commanding
+^ Arceus
 Silvally
 RolloutStorage

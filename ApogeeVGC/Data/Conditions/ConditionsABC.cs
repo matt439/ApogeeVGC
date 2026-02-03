@@ -766,14 +766,9 @@ public partial record Conditions
                     }, pokemon);
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                OnDragOut = new OnDragOutEventInfo((_, _, _, _) =>
                 {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-block", pokemon, "Commanded");
-                    }
-
-                    return null; // Prevent drag-out
+                    return false; // Prevent drag-out - "action failed"
                 }, 2),
                 OnTrapPokemon =
                     new OnTrapPokemonEventInfo(
@@ -787,18 +782,15 @@ public partial record Conditions
                 NoCopy = true,
                 AssociatedAbility = AbilityId.Commander,
                 // This is applied to Tatsugiri when it uses Commander (hides inside Dondozo)
-                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                OnDragOut = new OnDragOutEventInfo((_, _, _, _) =>
                 {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-block", pokemon, "Commanding");
-                    }
-
-                    return null; // Prevent drag-out
+                    return false; // Prevent drag-out - "action failed"
                 }, 2),
                 OnTrapPokemon =
                     new OnTrapPokemonEventInfo(
                         (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),
+                // TODO: Verify that a handler returning false is equivalent to TS static `onInvulnerability: false`
+                // TS uses a static false value, not a handler function
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
                     BoolIntEmptyVoidUnion.FromBool(false)),
                 OnBeforeTurn = new OnBeforeTurnEventInfo((battle, pokemon) =>
