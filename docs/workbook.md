@@ -313,12 +313,12 @@ review moves x to Spore
 ^ Stall
 ^ Gem
 ^ RainDance
-@ PriomordialSea
-@ SunnyDay
-@ DesolateLand
-Sandstorm
-Snowscape
-DeltaStream
+^ PriomordialSea
+^ SunnyDay
+^ DesolateLand
+@ Sandstorm
+@ Snowscape
+@ DeltaStream
 Commanded
 Commanding
 Arceus
