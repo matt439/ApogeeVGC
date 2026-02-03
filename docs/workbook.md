@@ -257,11 +257,11 @@ review moves x to Spore
 
 ^ review items JabocaBerry to LiechiBerry
 
-@ review items LifeOrb to LuxuryBall
+^ review items LifeOrb to LuxuryBall
 
 ## ItemsMNO
 
-review items MachoBrace to Metronome
+@ review items MachoBrace to Metronome
 
 review items MicleBerry to NomelBerry
 

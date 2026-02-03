@@ -201,8 +201,8 @@ public partial record Conditions
                 OnSourceAccuracy =
                     new OnSourceAccuracyEventInfo((battle, accuracy, _, source, move) =>
                     {
-                        // OHKO moves bypass Micle Berry boost entirely
-                        if (move.Ohko != null) return null;
+                        // OHKO moves bypass Micle Berry boost entirely - return void (TS: undefined)
+                        if (move.Ohko != null) return IntBoolVoidUnion.FromVoid();
 
                         // For non-OHKO moves, always consume the berry and show message
                         if (battle.DisplayUi)
@@ -213,7 +213,7 @@ public partial record Conditions
                         source.RemoveVolatile(_library.Conditions[ConditionId.MicleBerry]);
 
                         // Only boost if accuracy is numeric (always-hit moves pass through unchanged)
-                        if (!accuracy.HasValue) return null;
+                        if (!accuracy.HasValue) return IntBoolVoidUnion.FromVoid();
 
                         // Boost accuracy by 1.2x (4915/4096 ≈ 1.2)
                         int modifiedAccuracy = (int)Math.Floor(accuracy.Value * 4915.0 / 4096.0);
