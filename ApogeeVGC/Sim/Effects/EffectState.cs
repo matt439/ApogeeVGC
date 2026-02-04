@@ -40,7 +40,7 @@ public class EffectState
     public bool? Ending { get; set; }
     public bool? Resisted { get; set; }
     public bool? IsSlotCondition { get; set; }
-    public PokemonType? TypeWas { get; set; }
+    public PokemonType[]? TypeWas { get; set; }
     public bool? HasDragonType { get; set; }
     public int? ContactHitCount { get; set; }
     public bool? CheckedAngerShell { get; set; }

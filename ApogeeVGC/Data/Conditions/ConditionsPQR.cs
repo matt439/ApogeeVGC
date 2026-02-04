@@ -530,10 +530,8 @@ public partial record Conditions
                 }),
                 OnType = new OnTypeEventInfo((battle, types, _) =>
                 {
-                    // TODO: TS stores the whole types array in effectState.typeWas, but our 
-                    // EffectState.TypeWas only supports a single PokemonType. Consider adding
-                    // a TypesWas property if this becomes an issue. For now, store first type.
-                    battle.EffectState.TypeWas = types.FirstOrDefault();
+                    // Store the whole types array before filtering out Flying type
+                    battle.EffectState.TypeWas = types;
                     // Filter out Flying type
                     return types.Where(t => t != PokemonType.Flying).ToArray();
                 }, -1),
