@@ -345,33 +345,6 @@ public partial record Moves
                 Target = MoveTarget.Any,
                 Type = MoveType.Water,
             },
-            [MoveId.WaterSpout] = new()
-            {
-                Id = MoveId.WaterSpout,
-                Num = 323,
-                Accuracy = 100,
-                BasePower = 150,
-                Category = MoveCategory.Special,
-                Name = "Water Spout",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
-                {
-                    // Base power scales with user's HP percentage
-                    int bp = move.BasePower * source.Hp / source.MaxHp;
-                    battle.Debug($"[Water Spout] BP: {bp}");
-                    return bp;
-                }),
-                Secondary = null,
-                Target = MoveTarget.AllAdjacentFoes,
-                Type = MoveType.Water,
-            },
             [MoveId.WaterShuriken] = new()
             {
                 Id = MoveId.WaterShuriken,
@@ -398,6 +371,33 @@ public partial record Moves
                 MultiHit = new[] { 2, 5 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
+                Type = MoveType.Water,
+            },
+            [MoveId.WaterSpout] = new()
+            {
+                Id = MoveId.WaterSpout,
+                Num = 323,
+                Accuracy = 100,
+                BasePower = 150,
+                Category = MoveCategory.Special,
+                Name = "Water Spout",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                {
+                    // Base power scales with user's HP percentage
+                    int bp = move.BasePower * source.Hp / source.MaxHp;
+                    battle.Debug($"[Water Spout] BP: {bp}");
+                    return bp;
+                }),
+                Secondary = null,
+                Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Water,
             },
             [MoveId.WaveCrash] = new()
