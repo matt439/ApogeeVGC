@@ -1,5 +1,7 @@
 namespace ApogeeVGC.Sim.Conditions;
 
+// ReSharper disable IdentifierTypo
+
 public enum ConditionId
 {
     None,
