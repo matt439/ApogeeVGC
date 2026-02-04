@@ -707,17 +707,16 @@ public partial record Conditions
 
                     battle.EffectState.Layers = 1;
                 }),
-                // TODO: TS onSideRestart returns false when layers >= 2 to signal failure.
-                // OnSideRestartEventInfo delegate is Action (void return). Consider changing to Func<..., BoolVoidUnion>.
                 OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
                 {
-                    if ((battle.EffectState.Layers ?? 0) >= 2) return;
+                    if ((battle.EffectState.Layers ?? 0) >= 2) return VoidFalseUnion.FromFalse();
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sidestart", side, "move: Toxic Spikes");
                     }
 
                     battle.EffectState.Layers = (battle.EffectState.Layers ?? 0) + 1;
+                    return VoidFalseUnion.FromVoid();
                 }),
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {
@@ -1358,17 +1357,16 @@ public partial record Conditions
 
                     battle.EffectState.Layers = 1;
                 }),
-                // TODO: TS onSideRestart returns false when layers >= 3 to signal failure.
-                // OnSideRestartEventInfo delegate is Action (void return). Consider changing to Func<..., BoolVoidUnion>.
                 OnSideRestart = new OnSideRestartEventInfo((battle, side, _, _) =>
                 {
-                    if ((battle.EffectState.Layers ?? 0) >= 3) return;
+                    if ((battle.EffectState.Layers ?? 0) >= 3) return VoidFalseUnion.FromFalse();
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sidestart", side, "Spikes");
                     }
 
                     battle.EffectState.Layers = (battle.EffectState.Layers ?? 0) + 1;
+                    return VoidFalseUnion.FromVoid();
                 }),
                 OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
                 {

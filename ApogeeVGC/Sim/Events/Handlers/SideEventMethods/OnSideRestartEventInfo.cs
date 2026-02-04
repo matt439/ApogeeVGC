@@ -2,13 +2,14 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 
 /// <summary>
 /// Event handler info for OnSideRestart event (side-specific).
 /// Triggered when a side condition restarts/reactivates.
-/// Signature: Action&lt;Battle, Side, Pokemon, IEffect&gt;
+/// Signature: Func&lt;Battle, Side, Pokemon, IEffect, VoidFalseUnion&gt;
 /// </summary>
 public sealed record OnSideRestartEventInfo : EventHandlerInfo
 {
@@ -19,7 +20,7 @@ public sealed record OnSideRestartEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnSideRestartEventInfo(
-    Action<Battle, Side, Pokemon, IEffect> handler,
+    Func<Battle, Side, Pokemon, IEffect, VoidFalseUnion> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
@@ -29,7 +30,7 @@ public sealed record OnSideRestartEventInfo : EventHandlerInfo
         Priority = priority;
    UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Side), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(void);
+        ExpectedReturnType = typeof(VoidFalseUnion);
         
     // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = new[] { false, false, false, false };
