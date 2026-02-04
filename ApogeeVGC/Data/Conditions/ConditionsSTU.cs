@@ -897,6 +897,89 @@ public partial record Conditions
                     return BoolVoidUnion.FromVoid();
                 }),
             },
+            [ConditionId.Safeguard] = new()
+            {
+                Id = ConditionId.Safeguard,
+                Name = "Safeguard",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Safeguard,
+                Duration = 5,
+                OnSetStatus = new OnSetStatusEventInfo((battle, _, target, source, effect) =>
+                {
+                    // TS: if (!effect || !source) return; - return undefined = allow
+                    if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                    // TS: if (effect.id === 'yawn') return; - Yawn is allowed through
+                    if (effect is Condition { Id: ConditionId.Yawn }) return BoolVoidUnion.FromVoid();
+                    // Check if move has Infiltrates and target is not ally of source - allow through
+                    if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
+                        return BoolVoidUnion.FromVoid();
+                    if (target != source)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("interrupting setStatus");
+                            // Show activation message for Synchronize ability or moves without secondaries
+                            if (effect is Ability { Name: "Synchronize" } or ActiveMove
+                                {
+                                    Secondaries: null
+                                })
+                            {
+                                battle.Add("-activate", target, "move: Safeguard");
+                            }
+                        }
+
+                        return null; // Silent failure - TS returns null
+                    }
+
+                    // TS: implicit return undefined when target === source - allow self-inflicted status
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTryAddVolatile =
+                    new OnTryAddVolatileEventInfo((battle, status, target, source, effect) =>
+                    {
+                        // TS: if (!effect || !source) return; - return undefined = allow
+                        if (effect == null || source == null) return BoolVoidUnion.FromVoid();
+                        // Check if move has Infiltrates and target is not ally of source - allow through
+                        if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
+                            return BoolVoidUnion.FromVoid();
+                        if (status?.Id is ConditionId.Confusion or ConditionId.Yawn &&
+                            target != source)
+                        {
+                            if (battle.DisplayUi)
+                            {
+                                // Show activation message only for moves without secondaries
+                                if (effect is ActiveMove { Secondaries: null })
+                                {
+                                    battle.Add("-activate", target, "move: Safeguard");
+                                }
+                            }
+
+                            return null; // Silent failure - TS returns null
+                        }
+
+                        // TS: implicit return undefined - allow
+                        return BoolVoidUnion.FromVoid();
+                    }),
+                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "Safeguard");
+                    }
+                }),
+                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 26,
+                    SubOrder = 3,
+                },
+                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sideend", side, "Safeguard");
+                    }
+                }),
+            },
             [ConditionId.SaltCure] = new()
             {
                 Id = ConditionId.SaltCure,
