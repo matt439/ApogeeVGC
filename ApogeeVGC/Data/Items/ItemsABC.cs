@@ -276,15 +276,6 @@ public partial record Items
                 Num = 153,
                 Gen = 3,
             },
-            [ItemId.AuspiciousArmor] = new()
-            {
-                Id = ItemId.AuspiciousArmor,
-                Name = "Auspicious Armor",
-                SpriteNum = 753,
-                Fling = new FlingData { BasePower = 30 },
-                Num = 2344,
-                Gen = 9,
-            },
             [ItemId.AssaultVest] = new()
             {
                 Id = ItemId.AssaultVest,
@@ -309,6 +300,15 @@ public partial record Items
                 }),
                 Num = 640,
                 Gen = 6,
+            },
+            [ItemId.AuspiciousArmor] = new()
+            {
+                Id = ItemId.AuspiciousArmor,
+                Name = "Auspicious Armor",
+                SpriteNum = 753,
+                Fling = new FlingData { BasePower = 30 },
+                Num = 2344,
+                Gen = 9,
             },
 
             // B items
