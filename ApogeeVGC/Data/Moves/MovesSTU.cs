@@ -3329,72 +3329,6 @@ public partial record Moves
 
             // ===== T MOVES =====
 
-            [MoveId.Tailwind] = new()
-            {
-                Id = MoveId.Tailwind,
-                Num = 366,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Tailwind",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Snatch = true,
-                    Metronome = true,
-                    Wind = true,
-                },
-                SideCondition = ConditionId.Tailwind,
-                Condition = _library.Conditions[ConditionId.Tailwind],
-                Secondary = null,
-                Target = MoveTarget.AllySide,
-                Type = MoveType.Flying,
-            },
-            [MoveId.ThunderWave] = new()
-            {
-                Id = MoveId.ThunderWave,
-                Num = 86,
-                Accuracy = 90,
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Thunder Wave",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Reflectable = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                Status = ConditionId.Paralysis,
-                IgnoreImmunity = false,
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Electric,
-            },
-            [MoveId.TrickRoom] = new()
-            {
-                Id = MoveId.TrickRoom,
-                Num = 433,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Trick Room",
-                BasePp = 5,
-                Priority = -7,
-                Flags = new MoveFlags
-                {
-                    Mirror = true,
-                    Metronome = true,
-                },
-                PseudoWeather = ConditionId.TrickRoom,
-                Condition = _library.Conditions[ConditionId.TrickRoom],
-                Secondary = null,
-                Target = MoveTarget.All,
-                Type = MoveType.Psychic,
-            },
             [MoveId.TachyonCutter] = new()
             {
                 Id = MoveId.TachyonCutter,
@@ -3501,6 +3435,28 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Normal,
+            },
+            [MoveId.Tailwind] = new()
+            {
+                Id = MoveId.Tailwind,
+                Num = 366,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tailwind",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                    Wind = true,
+                },
+                SideCondition = ConditionId.Tailwind,
+                Condition = _library.Conditions[ConditionId.Tailwind],
+                Secondary = null,
+                Target = MoveTarget.AllySide,
+                Type = MoveType.Flying,
             },
             [MoveId.TakeDown] = new()
             {
@@ -4245,6 +4201,29 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
+            [MoveId.ThunderWave] = new()
+            {
+                Id = MoveId.ThunderWave,
+                Num = 86,
+                Accuracy = 90,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Thunder Wave",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Status = ConditionId.Paralysis,
+                IgnoreImmunity = false,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
             [MoveId.Tickle] = new()
             {
                 Id = MoveId.Tickle,
@@ -4665,6 +4644,27 @@ public partial record Moves
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.TrickRoom] = new()
+            {
+                Id = MoveId.TrickRoom,
+                Num = 433,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Trick Room",
+                BasePp = 5,
+                Priority = -7,
+                Flags = new MoveFlags
+                {
+                    Mirror = true,
+                    Metronome = true,
+                },
+                PseudoWeather = ConditionId.TrickRoom,
+                Condition = _library.Conditions[ConditionId.TrickRoom],
+                Secondary = null,
+                Target = MoveTarget.All,
                 Type = MoveType.Psychic,
             },
             [MoveId.TripleArrows] = new()
