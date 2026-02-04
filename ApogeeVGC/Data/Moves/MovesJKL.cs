@@ -192,92 +192,32 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
-            [MoveId.LeechSeed] = new()
+            [MoveId.Lashout] = new()
             {
-                Id = MoveId.LeechSeed,
-                Num = 73,
-                Accuracy = 90,
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Leech Seed",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Reflectable = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                VolatileStatus = ConditionId.LeechSeed,
-                Condition = _library.Conditions[ConditionId.LeechSeed],
-                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
-                    !target.HasType(PokemonType.Grass)),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Grass,
-            },
-            [MoveId.LightScreen] = new()
-            {
-                Id = MoveId.LightScreen,
-                Num = 113,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Light Screen",
-                BasePp = 30,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Snatch = true,
-                    Metronome = true,
-                },
-                SideCondition = ConditionId.LightScreen,
-                Condition = _library.Conditions[ConditionId.LightScreen],
-                Secondary = null,
-                Target = MoveTarget.AllySide,
-                Type = MoveType.Psychic,
-            },
-            [MoveId.LowKick] = new()
-            {
-                Id = MoveId.LowKick,
-                Num = 67,
+                Id = MoveId.Lashout,
+                Num = 808,
                 Accuracy = 100,
-                BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Lash Out",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
                 {
-                    int targetWeight = target.GetWeight();
-                    int bp = targetWeight switch
+                    if (source.StatsLoweredThisTurn)
                     {
-                        >= 2000 => 120,
-                        >= 1000 => 100,
-                        >= 500 => 80,
-                        >= 250 => 60,
-                        >= 100 => 40,
-                        _ => 20,
-                    };
-                    if (battle.DisplayUi)
-                    {
-                        battle.Debug($"BP: {bp}");
+                        battle.Debug("lashout buff");
+                        battle.ChainModify(2);
+                        return battle.FinalModify(basePower);
                     }
 
-                    return bp;
+                    return basePower;
                 }),
-                Category = MoveCategory.Physical,
-                Name = "Low Kick",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                // OnTryHit only applies to dynamax
                 Secondary = null,
                 Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
+                Type = MoveType.Dark,
             },
             [MoveId.LastResort] = new()
             {
@@ -448,6 +388,31 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
             },
+            [MoveId.LeechSeed] = new()
+            {
+                Id = MoveId.LeechSeed,
+                Num = 73,
+                Accuracy = 90,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Leech Seed",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.LeechSeed,
+                Condition = _library.Conditions[ConditionId.LeechSeed],
+                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
+                    !target.HasType(PokemonType.Grass)),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
             [MoveId.Leer] = new()
             {
                 Id = MoveId.Leer,
@@ -501,6 +466,27 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Allies,
                 Type = MoveType.Water,
+            },
+            [MoveId.LightScreen] = new()
+            {
+                Id = MoveId.LightScreen,
+                Num = 113,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Light Screen",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SideCondition = ConditionId.LightScreen,
+                Condition = _library.Conditions[ConditionId.LightScreen],
+                Secondary = null,
+                Target = MoveTarget.AllySide,
+                Type = MoveType.Psychic,
             },
             [MoveId.Liquidation] = new()
             {
@@ -567,6 +553,67 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+            [MoveId.LowKick] = new()
+            {
+                Id = MoveId.LowKick,
+                Num = 67,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                {
+                    int targetWeight = target.GetWeight();
+                    int bp = targetWeight switch
+                    {
+                        >= 2000 => 120,
+                        >= 1000 => 100,
+                        >= 500 => 80,
+                        >= 250 => 60,
+                        >= 100 => 40,
+                        _ => 20,
+                    };
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug($"BP: {bp}");
+                    }
+
+                    return bp;
+                }),
+                Category = MoveCategory.Physical,
+                Name = "Low Kick",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // OnTryHit only applies to dynamax
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.LowSweep] = new()
+            {
+                Id = MoveId.LowSweep,
+                Num = 490,
+                Accuracy = 100,
+                BasePower = 65,
+                Category = MoveCategory.Physical,
+                Name = "Low Sweep",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Spe = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
             [MoveId.LuminaCrash] = new()
             {
                 Id = MoveId.LuminaCrash,
@@ -593,6 +640,26 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
+            },
+            [MoveId.Lunge] = new()
+            {
+                Id = MoveId.Lunge,
+                Num = 679,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Lunge",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Atk = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
             },
             [MoveId.LunarBlessing] = new()
             {
@@ -657,73 +724,6 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
-            },
-            [MoveId.Lashout] = new()
-            {
-                Id = MoveId.Lashout,
-                Num = 808,
-                Accuracy = 100,
-                BasePower = 75,
-                Category = MoveCategory.Physical,
-                Name = "Lash Out",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
-                {
-                    if (source.StatsLoweredThisTurn)
-                    {
-                        battle.Debug("lashout buff");
-                        battle.ChainModify(2);
-                        return battle.FinalModify(basePower);
-                    }
-
-                    return basePower;
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Dark,
-            },
-            [MoveId.LowSweep] = new()
-            {
-                Id = MoveId.LowSweep,
-                Num = 490,
-                Accuracy = 100,
-                BasePower = 65,
-                Category = MoveCategory.Physical,
-                Name = "Low Sweep",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Spe = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-            },
-            [MoveId.Lunge] = new()
-            {
-                Id = MoveId.Lunge,
-                Num = 679,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Physical,
-                Name = "Lunge",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Bug,
             },
             [MoveId.LusterPurge] = new()
             {
