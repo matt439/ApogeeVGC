@@ -73,6 +73,21 @@ public partial record Moves
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Poison,
             },
+            [MoveId.AcidArmor] = new()
+            {
+                Id = MoveId.AcidArmor,
+                Num = 151,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Acid Armor",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Snatch = true, Metronome = true },
+                SelfBoost = new SparseBoostsTable { Def = 2 },
+                Target = MoveTarget.Self,
+                Type = MoveType.Poison,
+            },
             [MoveId.AcidSpray] = new()
             {
                 Id = MoveId.AcidSpray,
@@ -91,21 +106,6 @@ public partial record Moves
                     Boosts = new SparseBoostsTable { SpD = -2 },
                 },
                 Target = MoveTarget.Normal,
-                Type = MoveType.Poison,
-            },
-            [MoveId.AcidArmor] = new()
-            {
-                Id = MoveId.AcidArmor,
-                Num = 151,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Acid Armor",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Def = 2 },
-                Target = MoveTarget.Self,
                 Type = MoveType.Poison,
             },
             [MoveId.Acrobatics] = new()
@@ -2590,6 +2590,32 @@ public partial record Moves
                     return bp;
                 }),
             },
+            [MoveId.Crunch] = new()
+            {
+                Id = MoveId.Crunch,
+                Num = 242,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Crunch",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Bite = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 20,
+                    Boosts = new SparseBoostsTable { Def = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
             [MoveId.Curse] = new()
             {
                 Id = MoveId.Curse,
@@ -2645,32 +2671,6 @@ public partial record Moves
                     battle.DirectDamage(source.MaxHp / 2, source, source);
                     return new VoidReturn();
                 }),
-            },
-            [MoveId.Crunch] = new()
-            {
-                Id = MoveId.Crunch,
-                Num = 242,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Physical,
-                Name = "Crunch",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                    Bite = true,
-                },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 20,
-                    Boosts = new SparseBoostsTable { Def = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Dark,
             },
         };
     }
