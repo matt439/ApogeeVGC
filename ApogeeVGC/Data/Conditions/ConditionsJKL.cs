@@ -135,6 +135,63 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.LockedMove] = new()
+            {
+                Id = ConditionId.LockedMove,
+                Name = "Locked Move",
+                EffectType = EffectType.Condition,
+                // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
+                Duration = 2,
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                {
+                    if (target.Status == ConditionId.Sleep)
+                    {
+                        // Don't lock, and bypass confusion for calming
+                        target.DeleteVolatile(ConditionId.LockedMove);
+                    }
+
+                    // Decrement trueDuration unconditionally (matches TS: this.effectState.trueDuration--)
+                    battle.EffectState.TrueDuration = (battle.EffectState.TrueDuration ?? 0) - 1;
+                }),
+                OnStart = new OnStartEventInfo((battle, _, _, effect) =>
+                {
+                    battle.EffectState.TrueDuration = battle.Random(2, 4);
+                    battle.EffectState.Move = effect is Move move ? move.Id : null;
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRestart = new OnRestartEventInfo((battle, _, _, _) =>
+                {
+                    if ((battle.EffectState.TrueDuration ?? 0) >= 2)
+                    {
+                        battle.EffectState.Duration = 2;
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnAfterMove = new OnAfterMoveEventInfo((battle, source, _, _) =>
+                {
+                    if ((battle.EffectState.Duration ?? 0) == 1)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+                }),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
+                    target.AddVolatile(ConditionId.Confusion);
+                }),
+                OnLockMove = new OnLockMoveEventInfo(
+                    (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, _) =>
+                    {
+                        // TS: return this.effectState.move
+                        if (battle.EffectState.Move.HasValue)
+                        {
+                            return battle.EffectState.Move.Value;
+                        }
+
+                        return MoveIdVoidUnion.FromVoid();
+                    })),
+            },
             [ConditionId.LockOn] = new()
             {
                 Id = ConditionId.LockOn,
@@ -143,7 +200,7 @@ public partial record Conditions
                 AssociatedMove = MoveId.LockOn,
                 NoCopy = true, // doesn't get copied by Baton Pass
                 Duration = 2,
-                // If the move user is the Lock-On user and target is the locked Pokemon, 
+                // If the move user is the Lock-On user and target is the locked Pokemon,
                 // bypass invulnerability (return 0 means not invulnerable)
                 OnSourceInvulnerability = new OnSourceInvulnerabilityEventInfo(
                     (battle, target, source, move) =>
@@ -212,63 +269,6 @@ public partial record Conditions
                             _library.Conditions[ConditionId.LunarDance]);
                     }
                 }),
-            },
-            [ConditionId.LockedMove] = new()
-            {
-                Id = ConditionId.LockedMove,
-                Name = "Locked Move",
-                EffectType = EffectType.Condition,
-                // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
-                Duration = 2,
-                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
-                {
-                    if (target.Status == ConditionId.Sleep)
-                    {
-                        // Don't lock, and bypass confusion for calming
-                        target.DeleteVolatile(ConditionId.LockedMove);
-                    }
-
-                    // Decrement trueDuration unconditionally (matches TS: this.effectState.trueDuration--)
-                    battle.EffectState.TrueDuration = (battle.EffectState.TrueDuration ?? 0) - 1;
-                }),
-                OnStart = new OnStartEventInfo((battle, _, _, effect) =>
-                {
-                    battle.EffectState.TrueDuration = battle.Random(2, 4);
-                    battle.EffectState.Move = effect is Move move ? move.Id : null;
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnRestart = new OnRestartEventInfo((battle, _, _, _) =>
-                {
-                    if ((battle.EffectState.TrueDuration ?? 0) >= 2)
-                    {
-                        battle.EffectState.Duration = 2;
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnAfterMove = new OnAfterMoveEventInfo((battle, source, _, _) =>
-                {
-                    if ((battle.EffectState.Duration ?? 0) == 1)
-                    {
-                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
-                    }
-                }),
-                OnEnd = new OnEndEventInfo((battle, target) =>
-                {
-                    if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
-                    target.AddVolatile(ConditionId.Confusion);
-                }),
-                OnLockMove = new OnLockMoveEventInfo(
-                    (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, _) =>
-                    {
-                        // TS: return this.effectState.move
-                        if (battle.EffectState.Move.HasValue)
-                        {
-                            return battle.EffectState.Move.Value;
-                        }
-
-                        return MoveIdVoidUnion.FromVoid();
-                    })),
             },
         };
     }
