@@ -1,5 +1,7 @@
 ﻿namespace ApogeeVGC.Sim.Abilities;
 
+// ReSharper disable IdentifierTypo
+
 public enum AbilityId
 {
     Adaptability,
