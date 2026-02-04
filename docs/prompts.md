@@ -50,4 +50,4 @@ i am debugging my pokemon simulator by running battles between two random player
 
 ## Alphabetise entries
 
-check @ApogeeVGC/Data/Moves/MovesABC.cs and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).
+check @ApogeeVGC/Data/Moves/MovesGHI.cs  and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).
