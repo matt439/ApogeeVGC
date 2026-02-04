@@ -495,13 +495,12 @@ public partial record Items
                 Name = "Booster Energy",
                 SpriteNum = 745,
                 Fling = new FlingData { BasePower = 30 },
-                // TODO: TS has onSwitchInPriority: -2 - add priority parameter if OnStartEventInfo supports it
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     pokemon.ItemState.Started = true;
                     // Call the update logic immediately after marking as started
                     BoosterEnergyUpdate(battle, pokemon);
-                }),
+                }, priority: -2),
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
                     if (pokemon.ItemState.Started != true || pokemon.Transformed) return;
