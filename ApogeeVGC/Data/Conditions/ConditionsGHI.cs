@@ -59,91 +59,6 @@ public partial record Conditions
                     }
                 }),
             },
-            [ConditionId.Imprison] = new()
-            {
-                Id = ConditionId.Imprison,
-                Name = "Imprison",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.Imprison,
-                NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", pokemon, "move: Imprison");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnFoeDisableMove = new OnFoeDisableMoveEventInfo((battle, pokemon) =>
-                {
-                    // Get the source Pokemon from battle.EffectState
-                    Pokemon? source = battle.EffectState.Source;
-                    if (source == null) return;
-
-                    // Disable all moves that the source Pokemon also knows (except Struggle)
-                    foreach (MoveSlot moveSlot in source.MoveSlots)
-                    {
-                        if (moveSlot.Id == MoveId.Struggle) continue;
-                        pokemon.DisableMove(moveSlot.Id, true);
-                    }
-
-                    pokemon.MaybeDisabled = true;
-                }),
-                OnFoeBeforeMove = new OnFoeBeforeMoveEventInfo((battle, attacker, _, move) =>
-                {
-                    // Get the source Pokemon from battle.EffectState
-                    Pokemon? source = battle.EffectState.Source;
-                    if (source == null) return BoolVoidUnion.FromVoid();
-
-                    if (move.Id == MoveId.Struggle)
-                    {
-                        return BoolVoidUnion.FromVoid();
-                    }
-
-                    // Check if the source Pokemon also knows this move
-                    if (source.HasMove(move.Id))
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("cant", attacker, "move: Imprison", move.Name);
-                        }
-
-                        return BoolVoidUnion.FromBool(false);
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }, 4),
-            },
-            [ConditionId.Ingrain] = new()
-            {
-                Id = ConditionId.Ingrain,
-                Name = "Ingrain",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.Ingrain,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", pokemon, "move: Ingrain");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) => { pokemon.TryTrap(); }),
-                OnResidual = new OnResidualEventInfo(
-                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon); }, 7),
-                // groundedness implemented in Pokemon.IsGrounded()
-                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-activate", pokemon, "move: Ingrain");
-                    }
-
-                    return null; // Prevent drag-out silently
-                }),
-            },
             [ConditionId.Gem] = new()
             {
                 Id = ConditionId.Gem,
@@ -158,6 +73,15 @@ public partial record Conditions
                         return battle.ChainModify([5325, 4096]);
                     },
                     14),
+            },
+            // CantUseTwice volatile condition placeholder - tracks that Gigaton Hammer was used last turn
+            [ConditionId.GigatonHammer] = new()
+            {
+                Id = ConditionId.GigatonHammer,
+                Name = "Gigaton Hammer",
+                AssociatedMove = MoveId.GigatonHammer,
+                EffectType = EffectType.Condition,
+                // No handlers needed - this is just a volatile marker for cantUseTwice tracking
             },
             [ConditionId.GlaiveRush] = new()
             {
@@ -219,6 +143,90 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sideend", side, "Grass Pledge");
+                    }
+                }),
+            },
+            [ConditionId.GrassyTerrain] = new()
+            {
+                Id = ConditionId.GrassyTerrain,
+                Name = "Grassy Terrain",
+                EffectType = EffectType.Terrain,
+                AssociatedMove = MoveId.GrassyTerrain,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                {
+                    if (source != null && source.HasItem(ItemId.TerrainExtender))
+                    {
+                        return 8;
+                    }
+
+                    return 5;
+                }),
+                OnBasePower = new OnBasePowerEventInfo((battle, _, attacker, defender, move) =>
+                {
+                    // Weaken Earthquake, Bulldoze if defender is grounded
+                    MoveId[] weakenedMoves = [MoveId.Earthquake, MoveId.Bulldoze];
+                    if (weakenedMoves.Contains(move.Id) &&
+                        defender != null &&
+                        (defender.IsGrounded() ?? false) &&
+                        !defender.IsSemiInvulnerable())
+                    {
+                        battle.Debug("move weakened by grassy terrain");
+                        return battle.ChainModify(0.5);
+                    }
+
+                    // Boost Grass moves if attacker is grounded
+                    if (move.Type == MoveType.Grass && (attacker.IsGrounded() ?? false))
+                    {
+                        battle.Debug("grassy terrain boost");
+                        return battle.ChainModify([5325, 4096]);
+                    }
+
+                    return new VoidReturn();
+                }, 6),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        if (effect is Ability)
+                        {
+                            battle.Add("-fieldstart", "move: Grassy Terrain",
+                                $"[from] ability: {effect.Name}", $"[of] {source}");
+                        }
+                        else
+                        {
+                            battle.Add("-fieldstart", "move: Grassy Terrain");
+                        }
+                    }
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.IsGrounded() == true && !pokemon.IsSemiInvulnerable())
+                    {
+                        battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
+                    }
+                    else
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug(
+                                "Pokemon semi-invuln or not grounded; Grassy Terrain skipped");
+                        }
+                    }
+                }, 5)
+                {
+                    SubOrder = 2,
+                },
+                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                {
+                    Order = 27,
+                    SubOrder = 7,
+                },
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Grassy Terrain");
                     }
                 }),
             },
@@ -328,34 +336,6 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 // This is handled in the move's onHit, not as a persistent condition
             },
-            [ConditionId.HealReplacement] = new()
-            {
-                // This is a slot condition
-                Id = ConditionId.HealReplacement,
-                Name = "HealReplacement",
-                EffectType = EffectType.Condition,
-                OnStart = new OnStartEventInfo((battle, _, source, sourceEffect) =>
-                {
-                    battle.EffectState.SourceEffect = sourceEffect;
-                    battle.Add("-activate", source, "healreplacement");
-                    return new VoidReturn();
-                }),
-                OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
-                {
-                    if (!target.Fainted)
-                    {
-                        target.Heal(target.MaxHp);
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-heal", target, target.GetHealth,
-                                "[from] move: " + battle.EffectState.SourceEffect?.Name, "[zeffect]");
-                        }
-
-                        target.Side.RemoveSlotCondition(target,
-                            _library.Conditions[ConditionId.HealReplacement]);
-                    }
-                }),
-            },
             [ConditionId.HealingWish] = new()
             {
                 // This is a slot condition for Healing Wish
@@ -388,87 +368,31 @@ public partial record Conditions
                     }
                 }),
             },
-            [ConditionId.GrassyTerrain] = new()
+            [ConditionId.HealReplacement] = new()
             {
-                Id = ConditionId.GrassyTerrain,
-                Name = "Grassy Terrain",
-                EffectType = EffectType.Terrain,
-                AssociatedMove = MoveId.GrassyTerrain,
-                Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                // This is a slot condition
+                Id = ConditionId.HealReplacement,
+                Name = "HealReplacement",
+                EffectType = EffectType.Condition,
+                OnStart = new OnStartEventInfo((battle, _, source, sourceEffect) =>
                 {
-                    if (source != null && source.HasItem(ItemId.TerrainExtender))
-                    {
-                        return 8;
-                    }
-
-                    return 5;
-                }),
-                OnBasePower = new OnBasePowerEventInfo((battle, _, attacker, defender, move) =>
-                {
-                    // Weaken Earthquake, Bulldoze if defender is grounded
-                    MoveId[] weakenedMoves = [MoveId.Earthquake, MoveId.Bulldoze];
-                    if (weakenedMoves.Contains(move.Id) &&
-                        defender != null &&
-                        (defender.IsGrounded() ?? false) &&
-                        !defender.IsSemiInvulnerable())
-                    {
-                        battle.Debug("move weakened by grassy terrain");
-                        return battle.ChainModify(0.5);
-                    }
-
-                    // Boost Grass moves if attacker is grounded
-                    if (move.Type == MoveType.Grass && (attacker.IsGrounded() ?? false))
-                    {
-                        battle.Debug("grassy terrain boost");
-                        return battle.ChainModify([5325, 4096]);
-                    }
-
+                    battle.EffectState.SourceEffect = sourceEffect;
+                    battle.Add("-activate", source, "healreplacement");
                     return new VoidReturn();
-                }, 6),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        if (effect is Ability)
-                        {
-                            battle.Add("-fieldstart", "move: Grassy Terrain",
-                                $"[from] ability: {effect.Name}", $"[of] {source}");
-                        }
-                        else
-                        {
-                            battle.Add("-fieldstart", "move: Grassy Terrain");
-                        }
-                    }
                 }),
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
                 {
-                    if (pokemon.IsGrounded() == true && !pokemon.IsSemiInvulnerable())
+                    if (!target.Fainted)
                     {
-                        battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon);
-                    }
-                    else
-                    {
+                        target.Heal(target.MaxHp);
                         if (battle.DisplayUi)
                         {
-                            battle.Debug(
-                                "Pokemon semi-invuln or not grounded; Grassy Terrain skipped");
+                            battle.Add("-heal", target, target.GetHealth,
+                                "[from] move: " + battle.EffectState.SourceEffect?.Name, "[zeffect]");
                         }
-                    }
-                }, 5)
-                {
-                    SubOrder = 2,
-                },
-                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
-                {
-                    Order = 27,
-                    SubOrder = 7,
-                },
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-fieldend", "move: Grassy Terrain");
+
+                        target.Side.RemoveSlotCondition(target,
+                            _library.Conditions[ConditionId.HealReplacement]);
                     }
                 }),
             },
@@ -505,14 +429,90 @@ public partial record Conditions
                     return battle.ChainModify(battle.EffectState.DoubleMultiplier ?? 1.0);
                 }, 10),
             },
-            // CantUseTwice volatile condition placeholder - tracks that Gigaton Hammer was used last turn
-            [ConditionId.GigatonHammer] = new()
+            [ConditionId.Imprison] = new()
             {
-                Id = ConditionId.GigatonHammer,
-                Name = "Gigaton Hammer",
-                AssociatedMove = MoveId.GigatonHammer,
+                Id = ConditionId.Imprison,
+                Name = "Imprison",
                 EffectType = EffectType.Condition,
-                // No handlers needed - this is just a volatile marker for cantUseTwice tracking
+                AssociatedMove = MoveId.Imprison,
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Imprison");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnFoeDisableMove = new OnFoeDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    // Get the source Pokemon from battle.EffectState
+                    Pokemon? source = battle.EffectState.Source;
+                    if (source == null) return;
+
+                    // Disable all moves that the source Pokemon also knows (except Struggle)
+                    foreach (MoveSlot moveSlot in source.MoveSlots)
+                    {
+                        if (moveSlot.Id == MoveId.Struggle) continue;
+                        pokemon.DisableMove(moveSlot.Id, true);
+                    }
+
+                    pokemon.MaybeDisabled = true;
+                }),
+                OnFoeBeforeMove = new OnFoeBeforeMoveEventInfo((battle, attacker, _, move) =>
+                {
+                    // Get the source Pokemon from battle.EffectState
+                    Pokemon? source = battle.EffectState.Source;
+                    if (source == null) return BoolVoidUnion.FromVoid();
+
+                    if (move.Id == MoveId.Struggle)
+                    {
+                        return BoolVoidUnion.FromVoid();
+                    }
+
+                    // Check if the source Pokemon also knows this move
+                    if (source.HasMove(move.Id))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", attacker, "move: Imprison", move.Name);
+                        }
+
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }, 4),
+            },
+            [ConditionId.Ingrain] = new()
+            {
+                Id = ConditionId.Ingrain,
+                Name = "Ingrain",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Ingrain,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: Ingrain");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) => { pokemon.TryTrap(); }),
+                OnResidual = new OnResidualEventInfo(
+                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon); }, 7),
+                // groundedness implemented in Pokemon.IsGrounded()
+                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "move: Ingrain");
+                    }
+
+                    return null; // Prevent drag-out silently
+                }),
             },
         };
     }
