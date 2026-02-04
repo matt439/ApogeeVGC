@@ -265,7 +265,7 @@ public partial record Moves
                     // Check the battle queue for ally Pok�mon using Fire Pledge or Grass Pledge
                     if (battle.Queue.List != null)
                     {
-                        foreach (var action in battle.Queue.List)
+                        foreach (IAction action in battle.Queue.List)
                         {
                             if (action is not MoveAction moveAction ||
                                 moveAction.Move == null ||
@@ -364,7 +364,7 @@ public partial record Moves
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    var bp = move.BasePower * source.Hp / source.MaxHp;
+                    int bp = move.BasePower * source.Hp / source.MaxHp;
                     battle.Debug($"[Water Spout] BP: {bp}");
                     return bp;
                 }),
@@ -442,7 +442,7 @@ public partial record Moves
                 OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
                 {
                     // Use pokemon.EffectiveWeather() to account for Utility Umbrella
-                    var weather = pokemon.EffectiveWeather();
+                    ConditionId weather = pokemon.EffectiveWeather();
                     move.Type = weather switch
                     {
                         ConditionId.SunnyDay or ConditionId.DesolateLand => MoveType.Fire,
@@ -455,7 +455,7 @@ public partial record Moves
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
                 {
                     // Use pokemon.EffectiveWeather() to account for Utility Umbrella
-                    var weather = pokemon.EffectiveWeather();
+                    ConditionId weather = pokemon.EffectiveWeather();
                     if (weather != ConditionId.None)
                     {
                         move.BasePower *= 2;
@@ -807,7 +807,7 @@ public partial record Moves
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
                 {
                     // Fails if target's ability can't be suppressed
-                    var targetAbility = target.GetAbility();
+                    Ability targetAbility = target.GetAbility();
                     if (targetAbility.Flags.CantSuppress == true)
                     {
                         return false;
@@ -818,7 +818,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
                     // Set target's ability to Insomnia
-                    var oldAbility = target.SetAbility(AbilityId.Insomnia, source);
+                    AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Insomnia, source);
 
                     // TS: if (!oldAbility) return oldAbility as false | null;
                     // Check for failure first - if SetAbility returned false or null, return it

@@ -476,7 +476,7 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
-                    if (move != null && move.Type == MoveType.Fairy)
+                    if (move is { Type: MoveType.Fairy })
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -556,7 +556,7 @@ public partial record Items
                 OnPlate = PokemonType.Fighting,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
-                    if (move != null && move.Type == MoveType.Fighting)
+                    if (move is { Type: MoveType.Fighting })
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
@@ -619,7 +619,7 @@ public partial record Items
                 OnPlate = PokemonType.Fire,
                 OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
                 {
-                    if (move != null && move.Type == MoveType.Fire)
+                    if (move is { Type: MoveType.Fire })
                     {
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);

@@ -592,7 +592,7 @@ public partial record Conditions
                     return BoolIntEmptyVoidUnion.FromBool(false);
                 }),
                 OnSourceBasePower =
-                    new OnSourceBasePowerEventInfo((battle, basePower, _, _, move) =>
+                    new OnSourceBasePowerEventInfo((battle, _, _, _, move) =>
                     {
                         if (move.Id is MoveId.Gust or MoveId.Twister)
                         {
@@ -647,13 +647,7 @@ public partial record Conditions
 
                     return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
                 }, 3),
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                {
-                    // Handle Z-Moves/Max Moves that break through but still make contact
-                    // TODO: Check for move.IsZOrMaxPowered when Z/Max moves are implemented
-                    // Since Gen 9 doesn't have Z/Max moves, this handler does nothing
-                    return BoolEmptyVoidUnion.FromVoid();
-                }),
+                OnHit = new OnHitEventInfo((_, _, _, _) => BoolEmptyVoidUnion.FromVoid()),
             },
             [ConditionId.Charge] = new()
             {
@@ -766,10 +760,7 @@ public partial record Conditions
                     }, pokemon);
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnDragOut = new OnDragOutEventInfo((_, _, _, _) =>
-                {
-                    return false; // Prevent drag-out - "action failed"
-                }, 2),
+                OnDragOut = new OnDragOutEventInfo((_, _, _, _) => false, 2),
                 OnTrapPokemon =
                     new OnTrapPokemonEventInfo(
                         (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),
@@ -782,10 +773,7 @@ public partial record Conditions
                 NoCopy = true,
                 AssociatedAbility = AbilityId.Commander,
                 // This is applied to Tatsugiri when it uses Commander (hides inside Dondozo)
-                OnDragOut = new OnDragOutEventInfo((_, _, _, _) =>
-                {
-                    return false; // Prevent drag-out - "action failed"
-                }, 2),
+                OnDragOut = new OnDragOutEventInfo((_, _, _, _) => false, 2),
                 OnTrapPokemon =
                     new OnTrapPokemonEventInfo(
                         (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),

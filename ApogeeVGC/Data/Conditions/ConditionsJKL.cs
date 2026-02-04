@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Conditions;

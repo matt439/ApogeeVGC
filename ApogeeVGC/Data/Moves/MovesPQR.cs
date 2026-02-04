@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Items;
@@ -39,9 +40,9 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    var targetHp = target.Hp;
-                    var averageHp = Math.Max(1, (targetHp + source.Hp) / 2);
-                    var targetChange = targetHp - averageHp;
+                    int targetHp = target.Hp;
+                    int averageHp = Math.Max(1, (targetHp + source.Hp) / 2);
+                    int targetChange = targetHp - averageHp;
                     target.SetHp(target.Hp - targetChange);
                     source.SetHp(averageHp);
                     battle.Add("-sethp", target,
@@ -99,7 +100,7 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    var success =
+                    BoolZeroUnion? success =
                         battle.Boost(new SparseBoostsTable { Atk = -1, SpA = -1 }, target, source,
                             move);
                     // If the boost fails completely and target doesn't have Mirror Armor, prevent the switch
@@ -209,10 +210,10 @@ public partial record Moves
                 {
                     var result = false;
                     var message = false;
-                    foreach (var pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.GetAllActive())
                     {
                         // Check invulnerability
-                        var invulnResult = battle.RunEvent(EventId.Invulnerability, pokemon,
+                        RelayVar? invulnResult = battle.RunEvent(EventId.Invulnerability, pokemon,
                             source, move);
                         if (invulnResult is BoolRelayVar { Value: false })
                         {
@@ -222,7 +223,7 @@ public partial record Moves
                         }
 
                         // Check TryHit
-                        var tryHitResult =
+                        RelayVar? tryHitResult =
                             battle.RunEvent(EventId.TryHit, pokemon, source, move);
                         if (tryHitResult == null)
                         {
@@ -328,7 +329,7 @@ public partial record Moves
 
                     // Turn 1: Prepare the move
                     battle.Add("-prepare", source, move.Name);
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, source, target, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -460,17 +461,17 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    var item = target.GetItem();
+                    Item item = target.GetItem();
                     if (source.Hp > 0 && item.IsBerry)
                     {
-                        var takeResult = target.TakeItem(source);
+                        ItemFalseUnion takeResult = target.TakeItem(source);
                         if (takeResult is ItemItemFalseUnion takenItem)
                         {
                             battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
                                 "[move] Pluck", $"[of] {source}");
                             // Trigger the Eat event on the item for the source
                             // Only run EatItem if singleEvent returns truthy
-                            var eatResult = battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
+                            RelayVar? eatResult = battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
                                 source, source, move);
                             if (eatResult is not BoolRelayVar { Value: false })
                             {
@@ -697,7 +698,7 @@ public partial record Moves
                         }
 
                         // Heal ally by 50% of their max HP
-                        var healResult =
+                        IntFalseUnion healResult =
                             battle.Heal(target.BaseMaxHp / 2, target, source);
                         if (healResult is FalseIntFalseUnion)
                         {
@@ -740,7 +741,7 @@ public partial record Moves
                 OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
                 {
                     // Display the item being manipulated
-                    var item = battle.Library.Items[target.Item];
+                    Item item = battle.Library.Items[target.Item];
                     battle.Add("-activate", target, "move: Poltergeist", item.Name);
                     return new VoidReturn();
                 }),
@@ -879,12 +880,12 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
                     // Average Atk and SpA stats between user and target
-                    var newAtk = (target.StoredStats[StatIdExceptHp.Atk] +
+                    int newAtk = (target.StoredStats[StatIdExceptHp.Atk] +
                                   source.StoredStats[StatIdExceptHp.Atk]) / 2;
                     target.StoredStats[StatIdExceptHp.Atk] = newAtk;
                     source.StoredStats[StatIdExceptHp.Atk] = newAtk;
 
-                    var newSpA = (target.StoredStats[StatIdExceptHp.SpA] +
+                    int newSpA = (target.StoredStats[StatIdExceptHp.SpA] +
                                   source.StoredStats[StatIdExceptHp.SpA]) / 2;
                     target.StoredStats[StatIdExceptHp.SpA] = newSpA;
                     source.StoredStats[StatIdExceptHp.SpA] = newSpA;
@@ -917,10 +918,10 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
                     // Swap Atk and SpA boosts with target
-                    var targetAtk = target.Boosts.Atk;
-                    var targetSpA = target.Boosts.SpA;
-                    var sourceAtk = source.Boosts.Atk;
-                    var sourceSpA = source.Boosts.SpA;
+                    int targetAtk = target.Boosts.Atk;
+                    int targetSpA = target.Boosts.SpA;
+                    int sourceAtk = source.Boosts.Atk;
+                    int sourceSpA = source.Boosts.SpA;
 
                     source.SetBoost(new SparseBoostsTable { Atk = targetAtk, SpA = targetSpA });
                     target.SetBoost(new SparseBoostsTable { Atk = sourceAtk, SpA = sourceSpA });
@@ -1035,7 +1036,7 @@ public partial record Moves
                 },
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
                 {
-                    var rand = battle.Random(10);
+                    int rand = battle.Random(10);
                     if (rand < 2)
                     {
                         // 20% chance: heal target 1/4 HP (use Infiltrates as marker)
@@ -1063,7 +1064,7 @@ public partial record Moves
                     // If Infiltrates is true, this is a heal roll - heal the target
                     if (move.Infiltrates == true)
                     {
-                        var healAmount = target.BaseMaxHp / 4;
+                        int healAmount = target.BaseMaxHp / 4;
                         battle.Heal(healAmount, target, source);
                         return new VoidReturn();
                     }
@@ -1121,10 +1122,10 @@ public partial record Moves
                 {
                     // source is the Pokemon using Protect
                     // Always run both checks, let Stall condition handle the logic
-                    var willAct = battle.Queue.WillAct() is not null;
-                    var stallResult = battle.RunEvent(EventId.StallMove, source);
-                    var stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    var result = willAct && stallSuccess;
+                    bool willAct = battle.Queue.WillAct() is not null;
+                    RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
+                    bool stallSuccess = stallResult is BoolRelayVar { Value: true };
+                    bool result = willAct && stallSuccess;
 
                     // Return BoolEmptyVoidUnion explicitly
                     return result ? true : (BoolEmptyVoidUnion)false;
@@ -1141,7 +1142,7 @@ public partial record Moves
                     battle.Debug(
                         $"[Protect.OnHit] AFTER AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
                     if (source.Volatiles.TryGetValue(ConditionId.Stall,
-                            out var stallState))
+                            out EffectState? stallState))
                     {
                         battle.Debug(
                             $"[Protect.OnHit] Stall volatile state: Counter={stallState.Counter}, Duration={stallState.Duration}");
@@ -1240,12 +1241,12 @@ public partial record Moves
                     // Also copy certain volatiles (Focus Energy, Dragon Cheer)
                     var volatilesToCopy = new[]
                         { ConditionId.FocusEnergy, ConditionId.DragonCheer };
-                    foreach (var volatileId in volatilesToCopy)
+                    foreach (ConditionId volatileId in volatilesToCopy)
                     {
                         source.RemoveVolatile(battle.Library.Conditions[volatileId]);
                     }
 
-                    foreach (var volatileId in volatilesToCopy)
+                    foreach (ConditionId volatileId in volatilesToCopy)
                     {
                         if (target.Volatiles.ContainsKey(volatileId))
                         {
@@ -1253,9 +1254,9 @@ public partial record Moves
                             // Copy special properties
                             if (volatileId == ConditionId.DragonCheer &&
                                 target.Volatiles.TryGetValue(volatileId,
-                                    out var targetState) &&
+                                    out EffectState? targetState) &&
                                 source.Volatiles.TryGetValue(volatileId,
-                                    out var sourceState))
+                                    out EffectState? sourceState))
                             {
                                 sourceState.HasDragonType = targetState.HasDragonType;
                             }
@@ -1542,21 +1543,21 @@ public partial record Moves
                     }
 
                     // Get the target's queued move action
-                    var action = battle.Queue.WillMove(target);
+                    MoveAction? action = battle.Queue.WillMove(target);
                     if (action == null)
                     {
                         return false;
                     }
 
                     // Find the action in the queue and replace it with one that has order 201
-                    var index = battle.Queue.List.IndexOf(action);
+                    int index = battle.Queue.List.IndexOf(action);
                     if (index == -1)
                     {
                         return false;
                     }
 
                     // Create a new action with order 201 (makes it move last)
-                    var newAction = action with { Order = 201 };
+                    MoveAction newAction = action with { Order = 201 };
                     battle.Queue.List[index] = newAction;
 
                     battle.Add("-activate", target, "move: Quash");
@@ -1713,7 +1714,7 @@ public partial record Moves
                 OnModifyType = new OnModifyTypeEventInfo((_, move, source, _) =>
                 {
                     // Change type based on Tauros form
-                    var formeName = source.Species.Forme;
+                    FormeId formeName = source.Species.Forme;
                     if (formeName == FormeId.PaldeaCombat)
                     {
                         move.Type = MoveType.Fighting;
@@ -1832,7 +1833,7 @@ public partial record Moves
                         ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
                         ConditionId.StickyWeb
                     };
-                    foreach (var condition in sideConditions)
+                    foreach (ConditionId condition in sideConditions)
                     {
                         if (pokemon.Hp > 0 && pokemon.Side.RemoveSideCondition(condition))
                         {
@@ -1868,7 +1869,7 @@ public partial record Moves
                         ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
                         ConditionId.StickyWeb
                     };
-                    foreach (var condition in sideConditions)
+                    foreach (ConditionId condition in sideConditions)
                     {
                         if (pokemon.Hp > 0 && pokemon.Side.RemoveSideCondition(condition))
                         {
@@ -1928,7 +1929,7 @@ public partial record Moves
                         return false;
                     }
 
-                    var item = target.LastItem;
+                    ItemId item = target.LastItem;
                     target.LastItem = ItemId.None;
                     battle.Add("-item", target, battle.Library.Items[item].Name,
                         "[from] move: Recycle");
@@ -1985,7 +1986,7 @@ public partial record Moves
                 }),
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    var result = target.SetStatus(ConditionId.Sleep, source, move);
+                    bool result = target.SetStatus(ConditionId.Sleep, source, move);
                     if (!result) return false;
                     target.StatusState.Time = 3;
                     target.StatusState.StartTime = 3;
@@ -2036,7 +2037,7 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
                 {
-                    var ratio = Math.Max((int)Math.Floor(source.Hp * 48.0 / source.MaxHp), 1);
+                    int ratio = Math.Max((int)Math.Floor(source.Hp * 48.0 / source.MaxHp), 1);
                     int bp;
                     if (ratio < 2)
                     {
@@ -2258,7 +2259,7 @@ public partial record Moves
                         if (source.Species.BaseSpecies == SpecieId.Meloetta && !source.Transformed)
                         {
                             // Toggle between Aria and Pirouette formes
-                            var newSpecies = source.Species.Forme == FormeId.Pirouette
+                            SpecieId newSpecies = source.Species.Forme == FormeId.Pirouette
                                 ? SpecieId.Meloetta // Aria is the base form
                                 : SpecieId.MeloettaPirouette;
                             source.FormeChange(newSpecies, move, message: "[msg]");
@@ -2290,7 +2291,7 @@ public partial record Moves
                 {
                     // Change to user's primary type
                     var types = source.GetTypes();
-                    var primaryType = types.Length > 0 ? types[0] : PokemonType.Normal;
+                    PokemonType primaryType = types.Length > 0 ? types[0] : PokemonType.Normal;
                     if (primaryType == PokemonType.Unknown && types.Length > 1)
                     {
                         primaryType = types[1];
@@ -2560,8 +2561,8 @@ public partial record Moves
                     }
 
                     // Fail if target has FailRolePlay flag or source has CantSuppress flag
-                    var targetAbility = target.GetAbility();
-                    var sourceAbility = source.GetAbility();
+                    Ability targetAbility = target.GetAbility();
+                    Ability sourceAbility = source.GetAbility();
                     if (targetAbility.Flags.FailRolePlay == true ||
                         sourceAbility.Flags.CantSuppress == true)
                     {
@@ -2578,7 +2579,7 @@ public partial record Moves
                         return false;
                     }
 
-                    var oldAbility = source.SetAbility(target.Ability, target);
+                    AbilityIdFalseUnion? oldAbility = source.SetAbility(target.Ability, target);
                     // TS: if (!oldAbility) return oldAbility as false | null;
                     // SetAbility returns false for failure, null for silent failure
                     if (oldAbility is FalseAbilityIdFalseUnion)
@@ -2618,8 +2619,8 @@ public partial record Moves
                 },
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
                 {
-                    var bp = move.BasePower;
-                    pokemon.Volatiles.TryGetValue(ConditionId.Rollout, out var rolloutData);
+                    int bp = move.BasePower;
+                    pokemon.Volatiles.TryGetValue(ConditionId.Rollout, out EffectState? rolloutData);
                     if (rolloutData?.HitCount > 0)
                     {
                         bp *= (int)Math.Pow(2, rolloutData.ContactHitCount ?? 0);
@@ -2711,7 +2712,7 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((battle, _, _, move) =>
                 {
                     // Prioritize ally's Round actions so they go immediately after this one
-                    foreach (var action in battle.Queue.List)
+                    foreach (IAction action in battle.Queue.List)
                     {
                         if (action is not MoveAction moveAction) continue;
                         if (moveAction.Pokemon == null || moveAction.Move == null) continue;

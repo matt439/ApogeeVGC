@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
@@ -171,7 +172,7 @@ public partial record Moves
                     }
 
                     var didSomething = false;
-                    foreach (var unused in targets
+                    foreach (BoolZeroUnion? unused in targets
                                  .Select(target =>
                                      battle.Boost(new SparseBoostsTable { Def = 1, SpD = 1 },
                                          target, source, move, isSecondary: false, isSelf: true))
@@ -319,7 +320,7 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((_, target, source, move) =>
                 {
-                    var result = target.AddVolatile(ConditionId.Trapped, source, move,
+                    RelayVar result = target.AddVolatile(ConditionId.Trapped, source, move,
                         ConditionId.Trapper);
                     return result is BoolRelayVar { Value: true } ? new VoidReturn() : false;
                 }),
@@ -456,7 +457,7 @@ public partial record Moves
                 DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
                 {
                     // Get the last attacker who damaged the user this turn
-                    var lastDamagedBy = pokemon.GetLastDamagedBy(true);
+                    Attacker? lastDamagedBy = pokemon.GetLastDamagedBy(true);
 
                     if (lastDamagedBy != null)
                     {
@@ -472,7 +473,7 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((_, _, source, _) =>
                 {
                     // Find if any damage was taken this turn
-                    var lastDamagedBy = source.GetLastDamagedBy(true);
+                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
 
                     if (lastDamagedBy is not { ThisTurn: true })
                     {
@@ -483,10 +484,10 @@ public partial record Moves
                 }),
                 OnModifyTarget = new OnModifyTargetEventInfo((battle, relayTarget, source, _, _) =>
                 {
-                    var lastDamagedBy = source.GetLastDamagedBy(true);
+                    Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
                     if (lastDamagedBy != null)
                     {
-                        var pok = battle.GetAtSlot(lastDamagedBy.PokemonSlot);
+                        Pokemon? pok = battle.GetAtSlot(lastDamagedBy.PokemonSlot);
                         if (pok != null)
                         {
                             relayTarget.Target = pok;
@@ -580,7 +581,7 @@ public partial record Moves
                     // Boost SpA by 1 on charge turn
                     battle.Boost(new SparseBoostsTable { SpA = 1 }, attacker, attacker, move);
                     // Run ChargeMove event (for Power Herb, etc.)
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -656,7 +657,7 @@ public partial record Moves
                     }
 
                     // Randomly select a move
-                    var randomMove = battle.Sample(metronomeableMoves);
+                    Move randomMove = battle.Sample(metronomeableMoves);
 
                     // Use the selected move
                     battle.Actions.UseMove(randomMove, target);
@@ -733,7 +734,7 @@ public partial record Moves
                 },
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    var lastMove = target.LastMove;
+                    Move? lastMove = target.LastMove;
                     if (source.Transformed || lastMove == null ||
                         lastMove.Flags.FailMimic == true ||
                         source.Moves.Contains(lastMove.Id))
@@ -742,7 +743,7 @@ public partial record Moves
                     }
 
                     // Find the index of Mimic in source's move slots
-                    var mimicIndex = -1;
+                    int mimicIndex = -1;
                     for (var i = 0; i < source.MoveSlots.Count; i++)
                     {
                         if (source.MoveSlots[i].Id == MoveId.Mimic)
@@ -818,7 +819,7 @@ public partial record Moves
                 DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
                 {
                     if (!pokemon.Volatiles.TryGetValue(ConditionId.MirrorCoat,
-                            out var effectState))
+                            out EffectState? effectState))
                     {
                         return IntFalseUnion.FromInt(0);
                     }
@@ -832,7 +833,7 @@ public partial record Moves
                 OnTry = new OnTryEventInfo((_, _, source, _) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.MirrorCoat,
-                            out var effectState))
+                            out EffectState? effectState))
                     {
                         return BoolEmptyVoidUnion.FromBool(false);
                     }
@@ -1012,7 +1013,7 @@ public partial record Moves
                     var numerator = 1;
                     var denominator = 2; // Default 50%
 
-                    var weather = source.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         // 66.7% = 2/3
@@ -1027,8 +1028,8 @@ public partial record Moves
                         denominator = 4;
                     }
 
-                    var healAmount = battle.Modify(source.MaxHp, numerator, denominator);
-                    var healResult = battle.Heal(healAmount, source);
+                    int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                    IntFalseUnion healResult = battle.Heal(healAmount, source);
                     if (healResult is FalseIntFalseUnion)
                     {
                         battle.Add("-fail", source, "heal");
@@ -1063,7 +1064,7 @@ public partial record Moves
                     var numerator = 1;
                     var denominator = 2; // Default 50%
 
-                    var weather = source.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         // 66.7% = 2/3
@@ -1078,8 +1079,8 @@ public partial record Moves
                         denominator = 4;
                     }
 
-                    var healAmount = battle.Modify(source.MaxHp, numerator, denominator);
-                    var healResult = battle.Heal(healAmount, source);
+                    int healAmount = battle.Modify(source.MaxHp, numerator, denominator);
+                    IntFalseUnion healResult = battle.Heal(healAmount, source);
                     if (healResult is FalseIntFalseUnion)
                     {
                         battle.Add("-fail", source, "heal");
@@ -1127,11 +1128,11 @@ public partial record Moves
                         ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
                         ConditionId.StickyWeb
                     ];
-                    foreach (var hazard in hazards)
+                    foreach (ConditionId hazard in hazards)
                     {
                         if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
                         {
-                            var conditionData = battle.Library.Conditions[hazard];
+                            Condition conditionData = battle.Library.Conditions[hazard];
                             battle.Add("-sideend", source.Side, conditionData.Name,
                                 "[from] move: Mortal Spin", $"[of] {source}");
                         }
@@ -1164,11 +1165,11 @@ public partial record Moves
                         ConditionId.Spikes, ConditionId.ToxicSpikes, ConditionId.StealthRock,
                         ConditionId.StickyWeb
                     ];
-                    foreach (var hazard in hazards)
+                    foreach (ConditionId hazard in hazards)
                     {
                         if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
                         {
-                            var conditionData = battle.Library.Conditions[hazard];
+                            Condition conditionData = battle.Library.Conditions[hazard];
                             battle.Add("-sideend", source.Side, conditionData.Name,
                                 "[from] move: Mortal Spin", $"[of] {source}");
                         }
@@ -1517,12 +1518,12 @@ public partial record Moves
                     {
                         // Check if Dondozo is commanded by Tatsugiri
                         if (!source.Volatiles.TryGetValue(ConditionId.Commanded,
-                                out var commandedState))
+                                out EffectState? commandedState))
                         {
                             return new VoidReturn();
                         }
 
-                        var tatsugiri = commandedState.Source;
+                        Pokemon? tatsugiri = commandedState.Source;
                         if (tatsugiri == null ||
                             tatsugiri.Species.BaseSpecies != SpecieId.Tatsugiri)
                         {
@@ -1530,7 +1531,7 @@ public partial record Moves
                         }
 
                         // Boost based on Tatsugiri's forme
-                        var forme = tatsugiri.Species.Forme;
+                        FormeId forme = tatsugiri.Species.Forme;
                         switch (forme)
                         {
                             case FormeId.Droopy:

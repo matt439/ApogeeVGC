@@ -222,7 +222,7 @@ public partial record Moves
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
                 {
-                    var targetWeight = target.GetWeight();
+                    int targetWeight = target.GetWeight();
                     int bp;
                     if (targetWeight >= 2000)
                     {
@@ -315,7 +315,7 @@ public partial record Moves
                     // Check the battle queue for ally Pokémon using Water Pledge or Fire Pledge
                     if (battle.Queue.List != null)
                     {
-                        foreach (var action in battle.Queue.List)
+                        foreach (IAction action in battle.Queue.List)
                         {
                             if (action is not MoveAction moveAction ||
                                 moveAction.Move == null ||
@@ -519,7 +519,7 @@ public partial record Moves
                 OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
                 {
                     // In sun, boost to +2/+2 instead of +1/+1
-                    var weather = pokemon.EffectiveWeather();
+                    ConditionId weather = pokemon.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         move.Boosts = new SparseBoostsTable { Atk = 2, SpA = 2 };
@@ -546,10 +546,10 @@ public partial record Moves
                 Type = MoveType.Psychic,
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    var newDef = (target.StoredStats.Def + source.StoredStats.Def) / 2;
+                    int newDef = (target.StoredStats.Def + source.StoredStats.Def) / 2;
                     target.StoredStats.Def = newDef;
                     source.StoredStats.Def = newDef;
-                    var newSpD = (target.StoredStats.SpD + source.StoredStats.SpD) / 2;
+                    int newSpD = (target.StoredStats.SpD + source.StoredStats.SpD) / 2;
                     target.StoredStats.SpD = newSpD;
                     source.StoredStats.SpD = newSpD;
                     battle.Add("-activate", source, "move: Guard Split", $"[of] {target}");
@@ -579,10 +579,10 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
                     // Swap def and spd boosts
-                    var targetDef = target.Boosts.Def;
-                    var targetSpD = target.Boosts.SpD;
-                    var sourceDef = source.Boosts.Def;
-                    var sourceSpD = source.Boosts.SpD;
+                    int targetDef = target.Boosts.Def;
+                    int targetSpD = target.Boosts.SpD;
+                    int sourceDef = source.Boosts.Def;
+                    int sourceSpD = source.Boosts.SpD;
 
                     source.SetBoost(new SparseBoostsTable { Def = targetDef, SpD = targetSpD });
                     target.SetBoost(new SparseBoostsTable { Def = sourceDef, SpD = sourceSpD });
@@ -665,9 +665,9 @@ public partial record Moves
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
                 {
-                    var targetSpeed = target.GetStat(StatIdExceptHp.Spe);
-                    var userSpeed = pokemon.GetStat(StatIdExceptHp.Spe);
-                    var power = userSpeed > 0 ? 25 * targetSpeed / userSpeed + 1 : 1;
+                    int targetSpeed = target.GetStat(StatIdExceptHp.Spe);
+                    int userSpeed = pokemon.GetStat(StatIdExceptHp.Spe);
+                    int power = userSpeed > 0 ? 25 * targetSpeed / userSpeed + 1 : 1;
                     if (power > 150) power = 150;
                     if (battle.DisplayUi)
                     {
@@ -741,7 +741,7 @@ public partial record Moves
                 OnHitField = new OnHitFieldEventInfo((battle, _, _, _) =>
                 {
                     battle.Add("-clearallboost");
-                    foreach (var pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.GetAllActive())
                     {
                         pokemon.ClearBoosts();
                     }
@@ -811,7 +811,7 @@ public partial record Moves
                     // AllySide is only relevant for multi battles (4 player) which are not supported
                     List<Pokemon> allies = [..target.Side.Pokemon];
 
-                    foreach (var ally in allies)
+                    foreach (Pokemon ally in allies)
                     {
                         // Check if ally has ability immunity (except if source)
                         if (ally != source && !battle.SuppressingAbility(ally))
@@ -923,8 +923,8 @@ public partial record Moves
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
                 {
-                    var targetWeight = target.GetWeight();
-                    var pokemonWeight = pokemon.GetWeight();
+                    int targetWeight = target.GetWeight();
+                    int pokemonWeight = pokemon.GetWeight();
                     int bp;
                     if (pokemonWeight >= targetWeight * 5)
                     {
@@ -1003,8 +1003,8 @@ public partial record Moves
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
                 {
-                    var targetWeight = target.GetWeight();
-                    var pokemonWeight = pokemon.GetWeight();
+                    int targetWeight = target.GetWeight();
+                    int pokemonWeight = pokemon.GetWeight();
                     int bp;
                     if (pokemonWeight >= targetWeight * 5)
                     {
@@ -1087,12 +1087,12 @@ public partial record Moves
                 BasePower = 0,
                 BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
                 {
-                    var hp = target.Hp;
-                    var maxHp = target.MaxHp;
+                    int hp = target.Hp;
+                    int maxHp = target.MaxHp;
                     // Use 4096-based rounding to match game mechanics
                     // TypeScript: Math.floor(Math.floor((100 * (100 * Math.floor(hp * 4096 / maxHP)) + 2048 - 1) / 4096) / 100) || 1
                     var step1 = (int)Math.Floor((double)hp * 4096 / maxHp);
-                    var step2 = 100 * (100 * step1) + 2048 - 1; // 10000 * step1 + 2047
+                    int step2 = 100 * (100 * step1) + 2048 - 1; // 10000 * step1 + 2047
                     var step3 = (int)Math.Floor((double)step2 / 4096);
                     var bp = (int)Math.Floor((double)step3 / 100);
                     if (bp == 0) bp = 1;
@@ -1151,8 +1151,8 @@ public partial record Moves
                         healAmount = (int)Math.Ceiling(target.BaseMaxHp * 0.5);
                     }
 
-                    var healResult = battle.Heal(healAmount, target);
-                    var success = healResult is not FalseIntFalseUnion;
+                    IntFalseUnion healResult = battle.Heal(healAmount, target);
+                    bool success = healResult is not FalseIntFalseUnion;
 
                     if (success && !target.IsAlly(source))
                     {
@@ -1390,7 +1390,7 @@ public partial record Moves
                 {
                     if (target != null)
                     {
-                        var effectiveWeather = target.EffectiveWeather();
+                        ConditionId effectiveWeather = target.EffectiveWeather();
                         switch (effectiveWeather)
                         {
                             case ConditionId.RainDance:
@@ -1646,7 +1646,7 @@ public partial record Moves
                     // Starting the charge turn - show prepare message
                     battle.Add("-prepare", attacker, move.Name);
                     // Run ChargeMove event (for Power Herb, etc.)
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -1832,7 +1832,7 @@ public partial record Moves
                 Type = MoveType.Fire,
                 OnHit = new OnHitEventInfo((battle, target, source, _) =>
                 {
-                    var item = target.GetItem();
+                    Item item = target.GetItem();
                     if ((item.IsBerry || item.IsGem) &&
                         target.TakeItem(source) is ItemItemFalseUnion)
                     {
@@ -1967,8 +1967,8 @@ public partial record Moves
                         return false;
                     }
 
-                    var lastMove = target.LastMove;
-                    var moveSlot = target.GetMoveData(lastMove.Id);
+                    Move? lastMove = target.LastMove;
+                    MoveSlot? moveSlot = target.GetMoveData(lastMove.Id);
 
 
                     // Check various fail conditions
