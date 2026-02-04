@@ -1,25 +1,28 @@
-﻿namespace ApogeeVGC.Sim.Items;
+namespace ApogeeVGC.Sim.Items;
+
+// ReSharper disable IdentifierTypo
 
 public enum ItemId
 {
-    ChoiceSpecs,
-    FlameOrb,
-    RockyHelmet,
-    AssaultVest,
     AbilityShield,
+    Absolite,
     AbsorbBulb,
     AdamantCrystal,
     AdamantOrb,
     AdrenalineOrb,
+    Aggronite,
     AguavBerry,
     AirBalloon,
+    Altarianite,
     ApicotBerry,
     AspearBerry,
+    AssaultVest,
     AuspiciousArmor,
-
-    // B items
     BabiriBerry,
+    Banettite,
+    Barbaracite,
     BeastBall,
+    BerryJuice,
     BerrySweet,
     BigNugget,
     BigRoot,
@@ -27,19 +30,23 @@ public enum ItemId
     BlackBelt,
     BlackGlasses,
     BlackSludge,
+    BlueOrb,
+    BlunderPolicy,
+    BoosterEnergy,
     BottleCap,
     BrightPowder,
-
-    // C items
+    Cameruptite,
     CellBattery,
     Charcoal,
     ChartiBerry,
     CheriBerry,
+    Chesnaughtite,
     ChestoBerry,
     ChilanBerry,
     ChippedPot,
     ChoiceBand,
     ChoiceScarf,
+    ChoiceSpecs,
     ChopleBerry,
     ClearAmulet,
     CloverSweet,
@@ -49,13 +56,13 @@ public enum ItemId
     CovertCloak,
     CrackedPot,
     CustapBerry,
-
-    // D items
     DampRock,
     DawnStone,
+    Delphoxite,
     DestinyKnot,
     DiveBall,
     DracoPlate,
+    Dragalgite,
     DragonFang,
     DragonScale,
     DreadPlate,
@@ -63,41 +70,39 @@ public enum ItemId
     DubiousDisc,
     DuskBall,
     DuskStone,
-
-    // E items
     EarthPlate,
     EjectButton,
     EjectPack,
     Electirizer,
     ElectricSeed,
+    EnigmaBerry,
     Eviolite,
     ExpertBelt,
-
-    // F items
     FairyFeather,
     FastBall,
+    FigyBerry,
     FireStone,
     FistPlate,
+    FlameOrb,
     FlamePlate,
     FloatStone,
+    Floettite,
     FlowerSweet,
     FocusBand,
     FocusSash,
     FriendBall,
-
-    // G items
     GalaricaCuff,
     GalaricaWreath,
     GanlonBerry,
+    Glalitite,
     GoldBottleCap,
     GrassySeed,
     GreatBall,
     GrepaBerry,
+    Greninjite,
     GripClaw,
     GriseousCore,
     GriseousOrb,
-
-    // H items
     HabanBerry,
     HardStone,
     HealBall,
@@ -106,8 +111,6 @@ public enum ItemId
     HeavyBall,
     HeavyDutyBoots,
     HondewBerry,
-
-    // I items
     IapapaBerry,
     IceStone,
     IciclePlate,
@@ -115,20 +118,16 @@ public enum ItemId
     InsectPlate,
     IronBall,
     IronPlate,
-
-    // J items
     JabocaBerry,
-
-    // K items
     KasibBerry,
     KebiaBerry,
     KeeBerry,
     KelpsyBerry,
     KingsRock,
-
-    // L items
     LaggingTail,
     LansatBerry,
+    Latiasite,
+    Latiosite,
     LeafStone,
     Leftovers,
     LeppaBerry,
@@ -146,21 +145,24 @@ public enum ItemId
     LustrousGlobe,
     LustrousOrb,
     LuxuryBall,
-
-    // M items
     MachoBrace,
     Magmarizer,
     Magnet,
     MagoBerry,
+    Malamarite,
     MaliciousArmor,
+    Manectite,
     MarangaBerry,
     MasterBall,
     MasterpieceTeacup,
+    Mawilite,
     MeadowPlate,
+    Medichamite,
     MentalHerb,
     MetalAlloy,
     MetalCoat,
     MetalPowder,
+    Metagrossite,
     Metronome,
     MicleBerry,
     MindPlate,
@@ -171,21 +173,13 @@ public enum ItemId
     MoonStone,
     MuscleBand,
     MysticWater,
-
-    // N items
-    NanabBerry,
     NestBall,
     NetBall,
     NeverMeltIce,
-    NomelBerry,
     NormalGem,
-
-    // O items
     OccaBerry,
-    OddIncense,
+    OranBerry,
     OvalStone,
-
-    // P items
     PasshoBerry,
     PayapaBerry,
     PechaBerry,
@@ -199,22 +193,21 @@ public enum ItemId
     PowerBand,
     PowerBelt,
     PowerBracer,
+    PowerHerb,
     PowerLens,
     PowerWeight,
     PremierBall,
     PrettyFeather,
     PrismScale,
     Protector,
+    ProtectivePads,
     PsychicSeed,
     PunchingGlove,
-
-    // Q items
+    Pyroarite,
     QualotBerry,
     QuickBall,
     QuickClaw,
     QuickPowder,
-
-    // R items
     RabutaBerry,
     RareBone,
     RawstBerry,
@@ -223,26 +216,34 @@ public enum ItemId
     ReaperCloth,
     ReBattle,
     RedCard,
+    RedOrb,
     RepeatBall,
     RibbonSweet,
     RindoBerry,
     RingTarget,
+    RockyHelmet,
     RoomService,
     RoseliBerry,
-
-    // S items
+    RowapBerry,
+    RustedShield,
+    RustedSword,
+    Sablenite,
     SafariBall,
     SafetyGoggles,
     SalacBerry,
+    Salamencite,
     ScopeLens,
     SharpBeak,
+    Sharpedonite,
     ShedShell,
     ShellBell,
     ShinyStone,
     ShucaBerry,
     SilkScarf,
     SilverPowder,
+    SitrusBerry,
     SkyPlate,
+    SmoothRock,
     Snowball,
     SoftSand,
     SoulDew,
@@ -252,34 +253,26 @@ public enum ItemId
     SportBall,
     StarfBerry,
     StarSweet,
+    StickyBarb,
     StonePlate,
     StrawberrySweet,
     SunStone,
     SweetApple,
     SyrupyApple,
-
-    // T items
     TamatoBerry,
     TangaBerry,
     TartApple,
-    ThickClub,
+    TerrainExtender,
     ThroatSpray,
     ThunderStone,
     TimerBall,
+    ToxicOrb,
     ToxicPlate,
     TwistedSpoon,
-
-    // U items
     UltraBall,
     UnremarkableTeacup,
     UpGrade,
     UtilityUmbrella,
-
-    StickyBarb,
-
-    // V items - none for Gen 9 standard
-
-    // W items
     WacanBerry,
     WaterStone,
     WeaknessPolicy,
@@ -288,68 +281,8 @@ public enum ItemId
     WideLens,
     WikiBerry,
     WiseGlasses,
-
-    // X items - none for Gen 9 standard
-
-    // Y items
     YacheBerry,
-
-    // Z items
     ZapPlate,
     ZoomLens,
-
-    BoosterEnergy,
-    ToxicOrb,
-    TerrainExtender,
-    ProtectivePads,
-
-    EnigmaBerry,
-    FigyBerry,
-    SitrusBerry,
-    OranBerry,
-    BerryJuice,
-    RustedSword,
-    RustedShield,
-    PowerHerb,
-    RowapBerry,
-    BlunderPolicy,
-
-    // Mega Stones
-    Sablenite,
-    Mawilite,
-    Aggronite,
-    Medichamite,
-    Manectite,
-    Sharpedonite,
-    Cameruptite,
-    Altarianite,
-    Banettite,
-    Absolite,
-    Glalitite,
-    Salamencite,
-    Metagrossite,
-    Latiasite,
-    Latiosite,
-
-    // Gen 6 Mega Stones
-    Chesnaughtite,
-    Delphoxite,
-    Greninjite,
-    Pyroarite,
-    Floettite,
-    Malamarite,
-    Barbaracite,
-    Dragalgite,
-
-    // Primal Orbs
-    BlueOrb,
-    RedOrb,
-
-    // Ogerpon Masks (already defined above in W section, so commenting out duplicate)
-    // WellspringMask,
-
-    // Weather extending rocks
-    SmoothRock,
-
     None,
 }
