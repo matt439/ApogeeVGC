@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -135,6 +136,49 @@ public partial record Conditions
                 OnSideEnd = new OnSideEndEventInfo((_, _) =>
                 {
                     // Silent end - Wide Guard doesn't announce when it ends
+                }),
+            },
+            [ConditionId.Wish] = new()
+            {
+                Id = ConditionId.Wish,
+                Name = "Wish",
+                EffectType = EffectType.Condition,
+                // This is a slot condition
+                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                {
+                    battle.EffectState.Hp = source != null ? source.MaxHp / 2 : pokemon.MaxHp / 2;
+                    battle.EffectState.StartingTurn = battle.GetOverflowedTurnCount();
+                    if (battle.EffectState.StartingTurn == 255)
+                    {
+                        battle.Hint($"In Gen 8+, Wish will never resolve when used on the {battle.Turn}th turn.");
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                {
+                    // Use GetOverflowedTurnCount for proper Gen 8+ turn overflow handling
+                    if (battle.GetOverflowedTurnCount() <= battle.EffectState.StartingTurn) return;
+                    Pokemon? slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
+                    if (slotTarget != null)
+                    {
+                        target.Side.RemoveSlotCondition(slotTarget,
+                            _library.Conditions[ConditionId.Wish]);
+                    }
+                }, 4),
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (target is { Fainted: false })
+                    {
+                        int healAmount = battle.EffectState.Hp ?? 0;
+                        IntFalseUnion damage = battle.Heal(healAmount, target, target);
+                        if (damage is IntIntFalseUnion { Value: > 0 })
+                        {
+                            string wisherName = battle.EffectState.Source?.Name ?? "unknown";
+                            battle.Add("-heal", target, target.GetHealth,
+                                "[from] move: Wish", $"[wisher] {wisherName}");
+                        }
+                    }
                 }),
             },
             [ConditionId.WonderRoom] = new()
