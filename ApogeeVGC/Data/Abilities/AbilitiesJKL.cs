@@ -169,8 +169,7 @@ public partial record Abilities
                 Rating = 1.0,
                 Flags = new AbilityFlags { Breakable = true },
                 OnModifyWeight =
-                    new OnModifyWeightEventInfo(
-                        (battle, weighthg, _) => battle.Trunc(weighthg / 2)),
+                    new OnModifyWeightEventInfo((battle, weighthg, _) => battle.Trunc(weighthg / 2)),
             },
             [AbilityId.LightningRod] = new()
             {
