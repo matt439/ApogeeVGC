@@ -23,25 +23,6 @@ public partial record Moves
     {
         return new Dictionary<MoveId, Move>
         {
-            [MoveId.DazzlingGleam] = new()
-            {
-                Id = MoveId.DazzlingGleam,
-                Num = 605,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Special,
-                Name = "Dazzling Gleam",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                Target = MoveTarget.AllAdjacentFoes,
-                Type = MoveType.Fairy,
-            },
             [MoveId.DarkestLariat] = new()
             {
                 Id = MoveId.DarkestLariat,
@@ -112,6 +93,25 @@ public partial record Moves
 
                     return null;
                 }),
+            },
+            [MoveId.DazzlingGleam] = new()
+            {
+                Id = MoveId.DazzlingGleam,
+                Num = 605,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Dazzling Gleam",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Fairy,
             },
             [MoveId.Decorate] = new()
             {
@@ -363,6 +363,44 @@ public partial record Moves
                     return null; // Return null to skip the attack this turn
                 }),
             },
+            [MoveId.DireClaw] = new()
+            {
+                Id = MoveId.DireClaw,
+                Num = 827,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Dire Claw",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 50,
+                    OnHit = (battle, target, source, _) =>
+                    {
+                        // Randomly inflict poison, paralysis, or sleep
+                        int result = battle.Random(3);
+                        if (result == 0)
+                        {
+                            target.TrySetStatus(ConditionId.Poison, source);
+                        }
+                        else if (result == 1)
+                        {
+                            target.TrySetStatus(ConditionId.Paralysis, source);
+                        }
+                        else
+                        {
+                            target.TrySetStatus(ConditionId.Sleep, source);
+                        }
+
+                        return new VoidReturn();
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Poison,
+            },
             [MoveId.Disable] = new()
             {
                 Id = MoveId.Disable,
@@ -430,44 +468,6 @@ public partial record Moves
                 },
                 Target = MoveTarget.AllAdjacent,
                 Type = MoveType.Electric,
-            },
-            [MoveId.DireClaw] = new()
-            {
-                Id = MoveId.DireClaw,
-                Num = 827,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Physical,
-                Name = "Dire Claw",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 50,
-                    OnHit = (battle, target, source, _) =>
-                    {
-                        // Randomly inflict poison, paralysis, or sleep
-                        int result = battle.Random(3);
-                        if (result == 0)
-                        {
-                            target.TrySetStatus(ConditionId.Poison, source);
-                        }
-                        else if (result == 1)
-                        {
-                            target.TrySetStatus(ConditionId.Paralysis, source);
-                        }
-                        else
-                        {
-                            target.TrySetStatus(ConditionId.Sleep, source);
-                        }
-
-                        return new VoidReturn();
-                    },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Poison,
             },
             [MoveId.Dive] = new()
             {
@@ -1098,104 +1098,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
-            [MoveId.ElectroDrift] = new()
-            {
-                Id = MoveId.ElectroDrift,
-                Num = 879,
-                Accuracy = 100,
-                BasePower = 100,
-                Category = MoveCategory.Special,
-                Name = "Electro Drift",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags()
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
-                {
-                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
-                    // Only apply buff when super effective (> 0)
-                    battle.Debug("electro drift super effective buff");
-                    return battle.ChainModify([5461, 4096]);
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Electric,
-            },
-            [MoveId.Facade] = new()
-            {
-                Id = MoveId.Facade,
-                Num = 263,
-                Accuracy = 100,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Facade",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
-                {
-                    if (pokemon.Status is not ConditionId.None &&
-                        pokemon.Status != ConditionId.Sleep)
-                    {
-                        battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
-                        return battle.ChainModify(2);
-                    }
-
-                    return new VoidReturn();
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
-            [MoveId.FakeOut] = new()
-            {
-                Id = MoveId.FakeOut,
-                Num = 252,
-                Accuracy = 100,
-                BasePower = 40,
-                Category = MoveCategory.Physical,
-                Name = "Fake Out",
-                BasePp = 10,
-                Priority = 3,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
-                {
-                    if (source.ActiveMoveActions > 1)
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Hint("Fake Out only works on your first turn out.");
-                        }
-
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    VolatileStatus = ConditionId.Flinch,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
             [MoveId.EarthPower] = new()
             {
                 Id = MoveId.EarthPower,
@@ -1327,6 +1229,22 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
             },
+            [MoveId.ElectricTerrain] = new()
+            {
+                Id = MoveId.ElectricTerrain,
+                Num = 604,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Electric Terrain",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { NonSky = true, Metronome = true },
+                Terrain = ConditionId.ElectricTerrain,
+                Condition = _library.Conditions[ConditionId.ElectricTerrain],
+                Target = MoveTarget.All,
+                Type = MoveType.Electric,
+            },
             [MoveId.ElectroBall] = new()
             {
                 Id = MoveId.ElectroBall,
@@ -1366,20 +1284,31 @@ public partial record Moves
                     return bp;
                 }),
             },
-            [MoveId.ElectricTerrain] = new()
+            [MoveId.ElectroDrift] = new()
             {
-                Id = MoveId.ElectricTerrain,
-                Num = 604,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Electric Terrain",
-                BasePp = 10,
+                Id = MoveId.ElectroDrift,
+                Num = 879,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Special,
+                Name = "Electro Drift",
+                BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags { NonSky = true, Metronome = true },
-                Terrain = ConditionId.ElectricTerrain,
-                Condition = _library.Conditions[ConditionId.ElectricTerrain],
-                Target = MoveTarget.All,
+                Flags = new MoveFlags()
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                },
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
+                {
+                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
+                    // Only apply buff when super effective (> 0)
+                    battle.Debug("electro drift super effective buff");
+                    return battle.ChainModify([5461, 4096]);
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
             [MoveId.ElectroShot] = new()
@@ -1750,6 +1679,77 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+            [MoveId.Facade] = new()
+            {
+                Id = MoveId.Facade,
+                Num = 263,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Facade",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
+                {
+                    if (pokemon.Status is not ConditionId.None &&
+                        pokemon.Status != ConditionId.Sleep)
+                    {
+                        battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
+                        return battle.ChainModify(2);
+                    }
+
+                    return new VoidReturn();
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.FakeOut] = new()
+            {
+                Id = MoveId.FakeOut,
+                Num = 252,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "Fake Out",
+                BasePp = 10,
+                Priority = 3,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    if (source.ActiveMoveActions > 1)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Hint("Fake Out only works on your first turn out.");
+                        }
+
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    VolatileStatus = ConditionId.Flinch,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
             [MoveId.FairyLock] = new()
             {
                 Id = MoveId.FairyLock,
@@ -2099,43 +2099,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
-            [MoveId.FirePunch] = new()
-            {
-                Id = MoveId.FirePunch,
-                Num = 7,
-                Accuracy = 100,
-                BasePower = 75,
-                Category = MoveCategory.Physical,
-                Name = "Fire Punch",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true, Protect = true, Mirror = true, Punch = true, Metronome = true,
-                },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 10,
-                    Status = ConditionId.Burn,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fire,
-            },
-            [MoveId.FireSpin] = new()
-            {
-                Id = MoveId.FireSpin,
-                Num = 83,
-                Accuracy = 85,
-                BasePower = 35,
-                Category = MoveCategory.Special,
-                Name = "Fire Spin",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                VolatileStatus = ConditionId.PartiallyTrapped,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fire,
-            },
             [MoveId.FirePledge] = new()
             {
                 Id = MoveId.FirePledge,
@@ -2224,6 +2187,43 @@ public partial record Moves
                         move.SideCondition = ConditionId.FirePledge; // Applies to target side
                     }
                 }),
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
+            [MoveId.FirePunch] = new()
+            {
+                Id = MoveId.FirePunch,
+                Num = 7,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Fire Punch",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, Punch = true, Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Burn,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
+            [MoveId.FireSpin] = new()
+            {
+                Id = MoveId.FireSpin,
+                Num = 83,
+                Accuracy = 85,
+                BasePower = 35,
+                Category = MoveCategory.Special,
+                Name = "Fire Spin",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                VolatileStatus = ConditionId.PartiallyTrapped,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
