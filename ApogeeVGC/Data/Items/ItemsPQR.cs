@@ -300,6 +300,30 @@ public partial record Items
                 Num = 289,
                 Gen = 4,
             },
+            [ItemId.PowerHerb] = new()
+            {
+                Id = ItemId.PowerHerb,
+                Name = "Power Herb",
+                SpriteNum = 358,
+                Fling = new FlingData { BasePower = 10 },
+                OnChargeMove = new OnChargeMoveEventInfo((battle, pokemon, target, move) =>
+                {
+                    if (pokemon.UseItem())
+                    {
+                        battle.Debug($"power herb - remove charge turn for {move.Id}");
+                        battle.AttrLastMove("[still]");
+                        battle.AddMove("-anim",
+                            StringNumberDelegateObjectUnion.FromObject(pokemon),
+                            move.Name,
+                            StringNumberDelegateObjectUnion.FromObject(target));
+                        return BoolVoidUnion.FromBool(false); // skip charge turn
+                    }
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                Num = 271,
+                Gen = 4,
+            },
             [ItemId.PowerLens] = new()
             {
                 Id = ItemId.PowerLens,
@@ -349,30 +373,6 @@ public partial record Items
                 Gen = 5,
             },
             // Skip primariumz - z-move
-            [ItemId.PowerHerb] = new()
-            {
-                Id = ItemId.PowerHerb,
-                Name = "Power Herb",
-                SpriteNum = 358,
-                Fling = new FlingData { BasePower = 10 },
-                OnChargeMove = new OnChargeMoveEventInfo((battle, pokemon, target, move) =>
-                {
-                    if (pokemon.UseItem())
-                    {
-                        battle.Debug($"power herb - remove charge turn for {move.Id}");
-                        battle.AttrLastMove("[still]");
-                        battle.AddMove("-anim",
-                            StringNumberDelegateObjectUnion.FromObject(pokemon),
-                            move.Name,
-                            StringNumberDelegateObjectUnion.FromObject(target));
-                        return BoolVoidUnion.FromBool(false); // skip charge turn
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                Num = 271,
-                Gen = 4,
-            },
             [ItemId.PrismScale] = new()
             {
                 Id = ItemId.PrismScale,
@@ -580,25 +580,6 @@ public partial record Items
                 Num = 326,
                 Gen = 4,
             },
-            [ItemId.RockyHelmet] = new()
-            {
-                Id = ItemId.RockyHelmet,
-                Name = "Rocky Helmet",
-                SpriteNum = 417,
-                Fling = new FlingData { BasePower = 60 },
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
-                {
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        battle.Damage(source.BaseMaxHp / 6, source, target);
-                    }
-                })
-                {
-                    Order = 2,
-                },
-                Num = 540,
-                Gen = 5,
-            },
             [ItemId.RazorFang] = new()
             {
                 Id = ItemId.RazorFang,
@@ -745,6 +726,25 @@ public partial record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnNegateImmunity = new OnNegateImmunityEventInfo(false),
                 Num = 543,
+                Gen = 5,
+            },
+            [ItemId.RockyHelmet] = new()
+            {
+                Id = ItemId.RockyHelmet,
+                Name = "Rocky Helmet",
+                SpriteNum = 417,
+                Fling = new FlingData { BasePower = 60 },
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        battle.Damage(source.BaseMaxHp / 6, source, target);
+                    }
+                })
+                {
+                    Order = 2,
+                },
+                Num = 540,
                 Gen = 5,
             },
             [ItemId.RoomService] = new()
