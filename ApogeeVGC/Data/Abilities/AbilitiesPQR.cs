@@ -103,7 +103,7 @@ public partial record Abilities
                     new OnAllySetStatusEventInfo((battle, status, target, _, effect) =>
                     {
                         if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
-                            return PokemonVoidUnion.FromVoid();
+                            return PokemonFalseVoidUnion.FromVoid();
                         if (effect is ActiveMove { Status: not ConditionId.None })
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
@@ -116,9 +116,7 @@ public partial record Abilities
                             }
                         }
 
-                        // TODO: TS returns false here (action failed), but PokemonVoidUnion? doesn't support bool.
-                        // Returning null (silent failure) has the same effect since -block message is already shown.
-                        return null;
+                        return false;
                     }),
             },
             [AbilityId.PerishBody] = new()
