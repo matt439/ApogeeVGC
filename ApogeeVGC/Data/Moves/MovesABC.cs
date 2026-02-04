@@ -149,7 +149,11 @@ public partial record Moves
                 {
                     // Check all boostable stats including Accuracy and Evasion
                     List<BoostId> stats = [];
-                    BoostId[] boostableStats = [BoostId.Atk, BoostId.Def, BoostId.SpA, BoostId.SpD, BoostId.Spe, BoostId.Accuracy, BoostId.Evasion];
+                    BoostId[] boostableStats =
+                    [
+                        BoostId.Atk, BoostId.Def, BoostId.SpA, BoostId.SpD, BoostId.Spe, BoostId.Accuracy,
+                        BoostId.Evasion
+                    ];
                     foreach (BoostId stat in boostableStats)
                     {
                         if (target.Boosts.GetBoost(stat) < 6)
@@ -703,8 +707,6 @@ public partial record Moves
                     battle.AttrLastMove("[still]");
                     battle.Add("-fail", source, "move: Aura Wheel");
                     battle.Hint("Only a Pokemon whose form is Morpeko or Morpeko-Hangry can use this move.");
-                    // TODO: TypeScript returns null here to suppress default fail message.
-                    // Check if BoolEmptyVoidUnion should support null or if we need a different return type.
                     return null;
                 }),
                 OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>

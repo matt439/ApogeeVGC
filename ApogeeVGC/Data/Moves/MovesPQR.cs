@@ -477,6 +477,7 @@ public partial record Moves
                             {
                                 battle.RunEvent(EventId.EatItem, source, source, move, takenItem.Item);
                             }
+
                             if (takenItem.Item.OnEat != null)
                             {
                                 source.AteBerry = true;

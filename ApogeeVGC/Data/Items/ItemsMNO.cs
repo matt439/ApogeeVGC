@@ -434,7 +434,8 @@ public partial record Items
                 OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, _, _, _) =>
                 {
                     if (battle.EffectState.Ready != true) return BoolVoidUnion.FromVoid();
-                    if (battle.EffectState.Target is not PokemonEffectStateTarget target) return BoolVoidUnion.FromVoid();
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget target)
+                        return BoolVoidUnion.FromVoid();
                     target.Pokemon.UseItem();
                     return BoolVoidUnion.FromVoid();
                 }),

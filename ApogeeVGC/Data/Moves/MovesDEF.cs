@@ -214,7 +214,7 @@ public partial record Moves
                         {
                             // Only show message and set success for hazards (screens have their own end messages)
                             if (!hazards.Contains(condition)) continue;
-                            
+
                             Condition conditionData = battle.Library.Conditions[condition];
                             if (battle.DisplayUi)
                             {
@@ -2545,10 +2545,7 @@ public partial record Moves
                     else
                     {
                         // Initialize secondaries array if needed
-                        if (move.Secondaries == null)
-                        {
-                            move.Secondaries = [];
-                        }
+                        move.Secondaries ??= [];
 
                         // Add status effect if specified
                         if (item.Fling.Status != null)
