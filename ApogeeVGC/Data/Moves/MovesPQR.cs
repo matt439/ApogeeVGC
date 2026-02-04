@@ -1212,65 +1212,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
             },
-            [MoveId.PsychUp] = new()
-            {
-                Id = MoveId.PsychUp,
-                Num = 244,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Psych Up",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    BypassSub = true,
-                    AllyAnim = true,
-                    Metronome = true,
-                },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
-                {
-                    // Copy all boosts from target to source
-                    source.Boosts.Atk = target.Boosts.Atk;
-                    source.Boosts.Def = target.Boosts.Def;
-                    source.Boosts.SpA = target.Boosts.SpA;
-                    source.Boosts.SpD = target.Boosts.SpD;
-                    source.Boosts.Spe = target.Boosts.Spe;
-                    source.Boosts.Accuracy = target.Boosts.Accuracy;
-                    source.Boosts.Evasion = target.Boosts.Evasion;
-
-                    // Also copy certain volatiles (Focus Energy, Dragon Cheer)
-                    var volatilesToCopy = new[]
-                        { ConditionId.FocusEnergy, ConditionId.DragonCheer };
-                    foreach (ConditionId volatileId in volatilesToCopy)
-                    {
-                        source.RemoveVolatile(battle.Library.Conditions[volatileId]);
-                    }
-
-                    foreach (ConditionId volatileId in volatilesToCopy)
-                    {
-                        if (target.Volatiles.ContainsKey(volatileId))
-                        {
-                            source.AddVolatile(volatileId);
-                            // Copy special properties
-                            if (volatileId == ConditionId.DragonCheer &&
-                                target.Volatiles.TryGetValue(volatileId,
-                                    out EffectState? targetState) &&
-                                source.Volatiles.TryGetValue(volatileId,
-                                    out EffectState? sourceState))
-                            {
-                                sourceState.HasDragonType = targetState.HasDragonType;
-                            }
-                        }
-                    }
-
-                    battle.Add("-copyboost", source, target, "[from] move: Psych Up");
-                    return new VoidReturn();
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
             [MoveId.Psychic] = new()
             {
                 Id = MoveId.Psychic,
@@ -1421,6 +1362,65 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
+            },
+            [MoveId.PsychUp] = new()
+            {
+                Id = MoveId.PsychUp,
+                Num = 244,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Psych Up",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    BypassSub = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                {
+                    // Copy all boosts from target to source
+                    source.Boosts.Atk = target.Boosts.Atk;
+                    source.Boosts.Def = target.Boosts.Def;
+                    source.Boosts.SpA = target.Boosts.SpA;
+                    source.Boosts.SpD = target.Boosts.SpD;
+                    source.Boosts.Spe = target.Boosts.Spe;
+                    source.Boosts.Accuracy = target.Boosts.Accuracy;
+                    source.Boosts.Evasion = target.Boosts.Evasion;
+
+                    // Also copy certain volatiles (Focus Energy, Dragon Cheer)
+                    var volatilesToCopy = new[]
+                        { ConditionId.FocusEnergy, ConditionId.DragonCheer };
+                    foreach (ConditionId volatileId in volatilesToCopy)
+                    {
+                        source.RemoveVolatile(battle.Library.Conditions[volatileId]);
+                    }
+
+                    foreach (ConditionId volatileId in volatilesToCopy)
+                    {
+                        if (target.Volatiles.ContainsKey(volatileId))
+                        {
+                            source.AddVolatile(volatileId);
+                            // Copy special properties
+                            if (volatileId == ConditionId.DragonCheer &&
+                                target.Volatiles.TryGetValue(volatileId,
+                                    out EffectState? targetState) &&
+                                source.Volatiles.TryGetValue(volatileId,
+                                    out EffectState? sourceState))
+                            {
+                                sourceState.HasDragonType = targetState.HasDragonType;
+                            }
+                        }
+                    }
+
+                    battle.Add("-copyboost", source, target, "[from] move: Psych Up");
+                    return new VoidReturn();
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
             },
             [MoveId.PsyshieldBash] = new()
             {
@@ -1776,27 +1776,6 @@ public partial record Moves
                 Target = MoveTarget.All,
                 Type = MoveType.Water,
             },
-            [MoveId.Reflect] = new()
-            {
-                Id = MoveId.Reflect,
-                Num = 115,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Reflect",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Snatch = true,
-                    Metronome = true,
-                },
-                SideCondition = ConditionId.Reflect,
-                Condition = _library.Conditions[ConditionId.Reflect],
-                Secondary = null,
-                Target = MoveTarget.AllySide,
-                Type = MoveType.Psychic,
-            },
             [MoveId.RapidSpin] = new()
             {
                 Id = MoveId.RapidSpin,
@@ -1897,209 +1876,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
-            [MoveId.Recharge] = new()
-            {
-                Id = MoveId.Recharge,
-                Num = 0,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Recharge",
-                BasePp = 1,
-                Priority = 0,
-                Flags = new MoveFlags(),
-                Target = MoveTarget.Self,
-                Type = MoveType.Normal,
-            },
-            [MoveId.Recycle] = new()
-            {
-                Id = MoveId.Recycle,
-                Num = 278,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Recycle",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Metronome = true },
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                {
-                    // Fail if already has an item or never had one
-                    if (target.Item != ItemId.None || target.LastItem == ItemId.None)
-                    {
-                        return false;
-                    }
-
-                    ItemId item = target.LastItem;
-                    target.LastItem = ItemId.None;
-                    battle.Add("-item", target, battle.Library.Items[item].Name,
-                        "[from] move: Recycle");
-                    target.SetItem(item, source, move);
-                    return new VoidReturn();
-                }),
-                Secondary = null,
-                Target = MoveTarget.Self,
-                Type = MoveType.Normal,
-            },
-            [MoveId.Rest] = new()
-            {
-                Id = MoveId.Rest,
-                Num = 156,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Rest",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags { Snatch = true, Heal = true, Metronome = true },
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
-                {
-                    // Already asleep or has Comatose
-                    if (source.Status == ConditionId.Sleep ||
-                        source.HasAbility(AbilityId.Comatose))
-                    {
-                        return false;
-                    }
-
-                    // At full HP
-                    if (source.Hp == source.MaxHp)
-                    {
-                        battle.Add("-fail", source, "heal");
-                        return null;
-                    }
-
-                    // Insomnia and Vital Spirit checks are separate so that the message is accurate
-                    if (source.HasAbility(AbilityId.Insomnia))
-                    {
-                        battle.Add("-fail", source, "[from] ability: Insomnia",
-                            $"[of] {source}");
-                        return null;
-                    }
-
-                    if (source.HasAbility(AbilityId.VitalSpirit))
-                    {
-                        battle.Add("-fail", source, "[from] ability: Vital Spirit",
-                            $"[of] {source}");
-                        return null;
-                    }
-
-                    return new VoidReturn();
-                }),
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                {
-                    bool result = target.SetStatus(ConditionId.Sleep, source, move);
-                    if (!result) return false;
-                    target.StatusState.Time = 3;
-                    target.StatusState.StartTime = 3;
-                    battle.Heal(target.MaxHp);
-                    return new VoidReturn();
-                }),
-                Secondary = null,
-                Target = MoveTarget.Self,
-                Type = MoveType.Psychic,
-            },
-            [MoveId.Retaliate] = new()
-            {
-                Id = MoveId.Retaliate,
-                Num = 514,
-                Accuracy = 100,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Retaliate",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
-                {
-                    if (source.Side.FaintedLastTurn != null)
-                    {
-                        battle.Debug("Boosted for a faint last turn");
-                        return battle.ChainModify(2);
-                    }
-
-                    return basePower;
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
-            [MoveId.Reversal] = new()
-            {
-                Id = MoveId.Reversal,
-                Num = 179,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Physical,
-                Name = "Reversal",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
-                {
-                    int ratio = Math.Max((int)Math.Floor(source.Hp * 48.0 / source.MaxHp), 1);
-                    int bp;
-                    if (ratio < 2)
-                    {
-                        bp = 200;
-                    }
-                    else if (ratio < 5)
-                    {
-                        bp = 150;
-                    }
-                    else if (ratio < 10)
-                    {
-                        bp = 100;
-                    }
-                    else if (ratio < 17)
-                    {
-                        bp = 80;
-                    }
-                    else if (ratio < 33)
-                    {
-                        bp = 40;
-                    }
-                    else
-                    {
-                        bp = 20;
-                    }
-
-                    battle.Debug($"BP: {bp}");
-                    return bp;
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-            },
-            [MoveId.RevivalBlessing] = new()
-            {
-                Id = MoveId.RevivalBlessing,
-                Num = 863,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Revival Blessing",
-                BasePp = 1,
-                Priority = 0,
-                Flags = new MoveFlags { Heal = true, NoSketch = true },
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
-                {
-                    // Fail if no fainted allies on the user's side
-                    if (!target.Side.Pokemon.Any(ally => ally.Fainted))
-                    {
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
-                SlotCondition = ConditionId.RevivalBlessing,
-                SelfSwitch = true,
-                Condition = _library.Conditions[ConditionId.RevivalBlessing],
-                Secondary = null,
-                Target = MoveTarget.Self,
-                Type = MoveType.Normal,
-            },
             [MoveId.RazorLeaf] = new()
             {
                 Id = MoveId.RazorLeaf,
@@ -2148,6 +1924,20 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
             },
+            [MoveId.Recharge] = new()
+            {
+                Id = MoveId.Recharge,
+                Num = 0,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Recharge",
+                BasePp = 1,
+                Priority = 0,
+                Flags = new MoveFlags(),
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+            },
             [MoveId.Recover] = new()
             {
                 Id = MoveId.Recover,
@@ -2168,6 +1958,57 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
+            },
+            [MoveId.Recycle] = new()
+            {
+                Id = MoveId.Recycle,
+                Num = 278,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Recycle",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Snatch = true, Metronome = true },
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    // Fail if already has an item or never had one
+                    if (target.Item != ItemId.None || target.LastItem == ItemId.None)
+                    {
+                        return false;
+                    }
+
+                    ItemId item = target.LastItem;
+                    target.LastItem = ItemId.None;
+                    battle.Add("-item", target, battle.Library.Items[item].Name,
+                        "[from] move: Recycle");
+                    target.SetItem(item, source, move);
+                    return new VoidReturn();
+                }),
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Reflect] = new()
+            {
+                Id = MoveId.Reflect,
+                Num = 115,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Reflect",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SideCondition = ConditionId.Reflect,
+                Condition = _library.Conditions[ConditionId.Reflect],
+                Secondary = null,
+                Target = MoveTarget.AllySide,
+                Type = MoveType.Psychic,
             },
             [MoveId.ReflectType] = new()
             {
@@ -2285,6 +2126,89 @@ public partial record Moves
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Normal,
             },
+            [MoveId.Rest] = new()
+            {
+                Id = MoveId.Rest,
+                Num = 156,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Rest",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Snatch = true, Heal = true, Metronome = true },
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    // Already asleep or has Comatose
+                    if (source.Status == ConditionId.Sleep ||
+                        source.HasAbility(AbilityId.Comatose))
+                    {
+                        return false;
+                    }
+
+                    // At full HP
+                    if (source.Hp == source.MaxHp)
+                    {
+                        battle.Add("-fail", source, "heal");
+                        return null;
+                    }
+
+                    // Insomnia and Vital Spirit checks are separate so that the message is accurate
+                    if (source.HasAbility(AbilityId.Insomnia))
+                    {
+                        battle.Add("-fail", source, "[from] ability: Insomnia",
+                            $"[of] {source}");
+                        return null;
+                    }
+
+                    if (source.HasAbility(AbilityId.VitalSpirit))
+                    {
+                        battle.Add("-fail", source, "[from] ability: Vital Spirit",
+                            $"[of] {source}");
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    bool result = target.SetStatus(ConditionId.Sleep, source, move);
+                    if (!result) return false;
+                    target.StatusState.Time = 3;
+                    target.StatusState.StartTime = 3;
+                    battle.Heal(target.MaxHp);
+                    return new VoidReturn();
+                }),
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.Retaliate] = new()
+            {
+                Id = MoveId.Retaliate,
+                Num = 514,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Retaliate",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                {
+                    if (source.Side.FaintedLastTurn != null)
+                    {
+                        battle.Debug("Boosted for a faint last turn");
+                        return battle.ChainModify(2);
+                    }
+
+                    return basePower;
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
             [MoveId.RevelationDance] = new()
             {
                 Id = MoveId.RevelationDance,
@@ -2316,6 +2240,82 @@ public partial record Moves
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Reversal] = new()
+            {
+                Id = MoveId.Reversal,
+                Num = 179,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Physical,
+                Name = "Reversal",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                {
+                    int ratio = Math.Max((int)Math.Floor(source.Hp * 48.0 / source.MaxHp), 1);
+                    int bp;
+                    if (ratio < 2)
+                    {
+                        bp = 200;
+                    }
+                    else if (ratio < 5)
+                    {
+                        bp = 150;
+                    }
+                    else if (ratio < 10)
+                    {
+                        bp = 100;
+                    }
+                    else if (ratio < 17)
+                    {
+                        bp = 80;
+                    }
+                    else if (ratio < 33)
+                    {
+                        bp = 40;
+                    }
+                    else
+                    {
+                        bp = 20;
+                    }
+
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.RevivalBlessing] = new()
+            {
+                Id = MoveId.RevivalBlessing,
+                Num = 863,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Revival Blessing",
+                BasePp = 1,
+                Priority = 0,
+                Flags = new MoveFlags { Heal = true, NoSketch = true },
+                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                {
+                    // Fail if no fainted allies on the user's side
+                    if (!target.Side.Pokemon.Any(ally => ally.Fainted))
+                    {
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
+                SlotCondition = ConditionId.RevivalBlessing,
+                SelfSwitch = true,
+                Condition = _library.Conditions[ConditionId.RevivalBlessing],
+                Secondary = null,
+                Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
             [MoveId.RisingVoltage] = new()
@@ -2461,25 +2461,6 @@ public partial record Moves
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Rock,
             },
-            [MoveId.RockTomb] = new()
-            {
-                Id = MoveId.RockTomb,
-                Num = 317,
-                Accuracy = 95,
-                BasePower = 60,
-                Category = MoveCategory.Physical,
-                Name = "Rock Tomb",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Spe = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Rock,
-            },
             [MoveId.RockSmash] = new()
             {
                 Id = MoveId.RockSmash,
@@ -2522,6 +2503,25 @@ public partial record Moves
                     Metronome = true,
                 },
                 Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Rock,
+            },
+            [MoveId.RockTomb] = new()
+            {
+                Id = MoveId.RockTomb,
+                Num = 317,
+                Accuracy = 95,
+                BasePower = 60,
+                Category = MoveCategory.Physical,
+                Name = "Rock Tomb",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Spe = -1 },
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Rock,
             },
