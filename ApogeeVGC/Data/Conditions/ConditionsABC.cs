@@ -174,6 +174,7 @@ public partial record Conditions
                                 {
                                     battle.ChainModify(0.5);
                                 }
+
                                 return battle.FinalModify(damage);
                             }
                         }
@@ -353,7 +354,7 @@ public partial record Conditions
                         pokemon.DisableMove(moveSlot.Id, false,
                             effectState.SourceEffect);
                     }
-                }), 
+                }),
             },
             [ConditionId.Counter] = new()
             {
@@ -777,7 +778,6 @@ public partial record Conditions
                 OnTrapPokemon =
                     new OnTrapPokemonEventInfo(
                         (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),
-                // TODO: Verify that a handler returning false is equivalent to TS static `onInvulnerability: false`
                 // TS uses a static false value, not a handler function
                 OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
                     BoolIntEmptyVoidUnion.FromBool(false)),

@@ -267,8 +267,8 @@ public partial record Conditions
 
                     // Pass through accuracy unchanged
                     // TS: return accuracy; (which is number | true)
-                    return accuracy.HasValue 
-                        ? IntBoolVoidUnion.FromInt(accuracy.Value) 
+                    return accuracy.HasValue
+                        ? IntBoolVoidUnion.FromInt(accuracy.Value)
                         : IntBoolVoidUnion.FromBool(true); // Always-hit moves have accuracy = true
                 }),
             },
