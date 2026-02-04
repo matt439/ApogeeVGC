@@ -1442,7 +1442,7 @@ public partial record Abilities
                         battle.Add("-activate", target, "ability: Synchronize");
                         // TS uses a hack { status: status.id, id: 'synchronize' } to make status-prevention
                         // abilities think Synchronize is a status move. We pass the ability as the effect.
-                        source.TrySetStatus(status.Id, target, effect: target.Ability);
+                        source.TrySetStatus(status.Id, target, sourceEffect: _library.Abilities[target.Ability]);
                     }),
             },
 

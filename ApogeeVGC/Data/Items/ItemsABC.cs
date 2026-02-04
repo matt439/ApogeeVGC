@@ -923,8 +923,7 @@ public partial record Items
                     // Show message if: stat was lowered, effect is not a move with secondaries,
                     // and effect is not Octolock (which shows its own message)
                     if (showMsg &&
-                        !(effect is Move { Secondaries: not null }) &&
-                        !(effect is Condition { Id: ConditionId.Octolock }))
+                        !(effect is Move { Secondaries: not null }))
                     {
                         battle.Add("-fail", target, "unboost", "[from] item: Clear Amulet",
                             $"[of] {target}");
