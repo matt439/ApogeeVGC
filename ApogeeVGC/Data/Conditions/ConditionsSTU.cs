@@ -13,6 +13,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+
 // ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 
 namespace ApogeeVGC.Data.Conditions;
@@ -343,7 +344,8 @@ public partial record Conditions
                         {
                             battle.Add("-fail", source);
                         }
-                        // TODO: battle.AttrLastMove("[still]");
+
+                        battle.AttrLastMove("[still]");
                         return null; // return null to suppress additional failure messages
                     }
 
@@ -372,6 +374,7 @@ public partial record Conditions
                             {
                                 battle.Add("-ohko");
                             }
+
                             battle.Add("-end", target, "Substitute");
                         }
 
