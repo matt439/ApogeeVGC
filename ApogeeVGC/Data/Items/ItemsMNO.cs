@@ -582,6 +582,14 @@ public partial record Items
                 Gen = 2,
             },
             // NomelBerry removed - isNonstandard: "Past"
+            [ItemId.None] = new()
+            {
+                Id = ItemId.None,
+                Name = "None",
+                SpriteNum = 0,
+                Num = 0,
+                Gen = 0,
+            },
             [ItemId.NormalGem] = new()
             {
                 Id = ItemId.NormalGem,
@@ -678,15 +686,6 @@ public partial record Items
                 Fling = new FlingData { BasePower = 80 },
                 Num = 110,
                 Gen = 4,
-            },
-
-            [ItemId.None] = new()
-            {
-                Id = ItemId.None,
-                Name = "None",
-                SpriteNum = 0,
-                Num = 0,
-                Gen = 0,
             },
         };
     }
