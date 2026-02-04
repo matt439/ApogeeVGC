@@ -889,7 +889,6 @@ public partial record Abilities
             // Note: In Gen 9, King's Shield is isNonstandard: "Past", so the Shield Forme reversion
             // mechanism doesn't exist in Gen 9 standard play. Aegislash IS available in Gen 9.
             // This implementation only handles Blade Forme transformation which is sufficient.
-            // TODO: For National Dex support, add King's Shield handling to revert to Shield Forme.
             [AbilityId.StanceChange] = new()
             {
                 Id = AbilityId.StanceChange,
@@ -1411,11 +1410,8 @@ public partial record Abilities
                     ItemFalseUnion myItemResult = source.TakeItem();
                     if (myItemResult is not ItemItemFalseUnion { Item: var myItem }) return;
 
-                    // Check if the item can be received by the ally (e.g., Memory items only for Silvally)
-                    // TODO: TS passes source.itemState as effectState parameter instead of null.
-                    // If item state is needed for certain item TakeItem checks, this might cause issues.
                     Ability symbiosis = battle.Library.Abilities[AbilityId.Symbiosis];
-                    if (battle.SingleEvent(EventId.TakeItem, myItem, null, pokemon, source,
+                    if (battle.SingleEvent(EventId.TakeItem, myItem, source.ItemState, pokemon, source,
                             symbiosis, myItem) is BoolRelayVar { Value: false } ||
                         !pokemon.SetItem(myItem.Id))
                     {
