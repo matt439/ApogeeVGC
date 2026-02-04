@@ -1044,6 +1044,7 @@ public partial record Moves
                     {
                         return false;
                     }
+
                     if (sourceCanBeSet is null)
                     {
                         return null;
@@ -1056,6 +1057,7 @@ public partial record Moves
                     {
                         return false;
                     }
+
                     if (targetCanBeSet is null)
                     {
                         return null;
@@ -4845,7 +4847,7 @@ public partial record Moves
             },
 
             // ===== U MOVES =====
-            
+
             [MoveId.UpperHand] = new()
             {
                 Id = MoveId.UpperHand,

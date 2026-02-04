@@ -2249,13 +2249,27 @@ public partial record Moves
                     Chance = 10,
                     Status = ConditionId.Sleep,
                 },
-                // TODO: TS has an onHit handler that sets move.willChangeForme = true when the move
-                // actually hits a target. The onAfterMoveSecondarySelf then checks this flag.
-                // Without this guard, the forme change can trigger even when the move misses all
-                // targets. Consider adding a WillChangeForme property to ActiveMove.
+                OnHit = new OnHitEventInfo((_, _, source, move) =>
+                {
+                    // Mark that forme should change only if move hits AND source is Meloetta
+                    if (source.Species.BaseSpecies == SpecieId.Meloetta && !source.Transformed)
+                    {
+                        // Note: Requires WillChangeForme property on ActiveMove
+                        // Following TypeScript pattern: move.willChangeForme = true
+                        move.WillChangeForme = true;
+                    }
+
+                    return new VoidReturn();
+                }),
                 OnAfterMoveSecondarySelf =
                     new OnAfterMoveSecondarySelfEventInfo((_, source, _, move) =>
                     {
+                        // Only change forme if the move actually hit a target
+                        if (move.WillChangeForme != true)
+                        {
+                            return new VoidReturn();
+                        }
+
                         // Change Meloetta forme if applicable
                         if (source.Species.BaseSpecies == SpecieId.Meloetta && !source.Transformed)
                         {
