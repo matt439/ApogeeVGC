@@ -41,17 +41,10 @@ public partial class Pokemon
 
         // Copy types
         var types = pokemon.GetTypes(excludeAdded: true, preterastallized: true);
-        if (pokemon.Volatiles.TryGetValue(ConditionId.Roost, out var roostState))
+        if (pokemon.Volatiles.TryGetValue(ConditionId.Roost, out var roostState) && roostState.TypeWas is not null)
         {
             // Use the type stored in Roost volatile
-            if (roostState.TypeWas is not null)
-            {
-                SetType((PokemonType)roostState.TypeWas, enforce: true);
-            }
-            else
-            {
-                SetType(types, enforce: true);
-            }
+            SetType(roostState.TypeWas, enforce: true);
         }
         else
         {
@@ -60,7 +53,7 @@ public partial class Pokemon
 
         AddedType = pokemon.AddedType;
         KnownType = IsAlly(pokemon) && pokemon.KnownType;
-        ApparentType = pokemon.ApparentType.ToList();
+        ApparentType = [..pokemon.ApparentType];
 
         // Copy stats (except HP)
         foreach (var stat in Enum.GetValues<StatIdExceptHp>())
