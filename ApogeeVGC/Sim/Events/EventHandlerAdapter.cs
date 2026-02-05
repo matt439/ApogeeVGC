@@ -155,7 +155,20 @@ internal static class EventHandlerAdapter
         if (paramType == typeof(Pokemon) || typeof(Pokemon).IsAssignableFrom(paramType))
         {
             // Prefer target over source if ambiguous
-            return context.TargetPokemon ?? context.SourcePokemon;
+            Pokemon? pokemon = context.TargetPokemon ?? context.SourcePokemon;
+            
+            // Check nullability before returning
+            if (pokemon == null &&
+                handlerInfo.ParameterNullability != null &&
+                position < handlerInfo.ParameterNullability.Length &&
+                !handlerInfo.ParameterNullability[position])
+            {
+                throw new InvalidOperationException(
+                    $"Event {handlerInfo.Id}: Parameter {position} ({paramType.Name} {paramName}) is non-nullable " +
+                    $"but no Pokemon found in context (TargetPokemon={context.TargetPokemon != null}, SourcePokemon={context.SourcePokemon != null})");
+            }
+            
+            return pokemon;
         }
 
         // Add support for Field type

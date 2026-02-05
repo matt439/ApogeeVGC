@@ -2,21 +2,29 @@
 
 ## MovesABC
 
-review moves Absorb to AllySwitch
+review moves Absorb to AfterYou
 
-review moves Amnesia to AuraWheel
+review moves Agility to AquaCutter
 
-review moves AuroraBeam to BellyDrum
+review moves AquaJet to Attract
 
-review moves Bind to BoltStrike
+review moves AuraSphere to BarbBarrage
 
-review moves BoneRush to BulkUp
+review moves BatonPass to BlazeKick
 
-review moves Bulldoze to CircleThrow
+review moves BleakwindStorm to Bounce
 
-review moves ClangingScales to Conversion2
+review moves BranchPoke to BugBuzz
 
-review moves Copycat to Curse
+review moves BulkUp to Celebrate
+
+review moves Charge to CloseCombat
+
+review moves Coaching to Conversion2
+
+review moves Copycat to CourtChange
+
+review moves Covet to Curse
 
 ## MovesDEF
 

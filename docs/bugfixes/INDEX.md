@@ -16,6 +16,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [ModifyAccuracy Event Parameter Nullability Fix](#modifyaccuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves
 - [Accuracy Event Parameter Nullability Fix](#accuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves (Lock-On)
 - [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
+- [SwitchIn Null Pokemon Parameter Fix](#switchin-null-pokemon-parameter-fix) - EventHandlerAdapter returning null Pokemon without validation
 - [Ripen Ability Null Effect Fix](#ripen-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
 - [Disguise Ability Null Effect Fix](#disguise-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 - [Adrenaline Orb Null Effect Fix](#adrenaline-orb-null-effect-fix) - NullReferenceException when effect parameter is null in OnAfterBoost handler
@@ -843,6 +844,46 @@ OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, type, m
 
 ---
 
+### SwitchIn Null Pokemon Parameter Fix
+**File**: `SwitchInNullPokemonFix.md`  
+**Severity**: High  
+**Systems Affected**: Event parameter resolution, all event handlers expecting Pokemon parameters
+
+**Problem**: When a Pokemon with Stealth Rock on their side of the field switched in, the battle crashed with `NullReferenceException` at line 657 of `ConditionsSTU.cs` when trying to access `pokemon.HasItem(ItemId.HeavyDutyBoots)`. The handler's `pokemon` parameter was null.
+
+**Root Cause**: The `EventHandlerAdapter.ResolveParameter` method had a critical flaw in how it handled parameter resolution and nullability validation:
+1. **Early Return Without Validation**: When resolving a `Pokemon` parameter, the method returned `context.TargetPokemon ?? context.SourcePokemon` directly without checking if the result was null
+2. **Unreachable Null Check**: The nullability validation was only executed if NONE of the type-specific resolution blocks matched, making it unreachable for Pokemon parameters
+3. **Null Propagation**: When both `context.TargetPokemon` and `context.SourcePokemon` were null, the null coalescing operator returned null, which was passed directly to the handler
+
+**Solution**: Added nullability validation BEFORE returning the Pokemon parameter:
+```csharp
+Pokemon? pokemon = context.TargetPokemon ?? context.SourcePokemon;
+
+// Check nullability before returning
+if (pokemon == null &&
+    handlerInfo.ParameterNullability != null &&
+    position < handlerInfo.ParameterNullability.Length &&
+    !handlerInfo.ParameterNullability[position])
+{
+    throw new InvalidOperationException(
+        $"Event {handlerInfo.Id}: Parameter {position} ({paramType.Name} {paramName}) is non-nullable " +
+        $"but no Pokemon found in context");
+}
+
+return pokemon;
+```
+
+**Testing**: Ran 1000-battle random simulation - no SwitchIn-related errors occurred (449 successful battles, 551 failures were Residual-event related issues requiring separate fix).
+
+**Impact**: Ensures non-nullable Pokemon parameters are properly validated before being passed to handlers, preventing silent null propagation.
+
+**Pattern**: This validation pattern should be applied to other type-specific resolution blocks (Side, Field, Move, etc.) to prevent similar issues.
+
+**Keywords**: `EventHandlerAdapter`, `ResolveParameter`, `null validation`, `Pokemon parameter`, `Stealth Rock`, `OnSwitchIn`, `NullReferenceException`, `parameter nullability`
+
+---
+
 ### Ripen Ability Null Effect Fix
 **File**: `RipenNullEffectFix.md`  
 **Severity**: High  
@@ -1436,5 +1477,5 @@ if (effect == null)
 ---
 
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 30  
+*Total Bug Fixes Documented*: 31  
 *Reference Guides*: 1
