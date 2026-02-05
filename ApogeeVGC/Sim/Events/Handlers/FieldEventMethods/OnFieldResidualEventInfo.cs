@@ -37,8 +37,8 @@ public sealed record OnFieldResidualEventInfo : EventHandlerInfo
         ExpectedParameterTypes = [typeof(Battle), typeof(Field), typeof(Pokemon), typeof(IEffect)];
         ExpectedReturnType = typeof(void);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
+    // Nullability: Pokemon parameter (index 2) can be null for field-level residual events like weather
+        ParameterNullability = new[] { false, false, true, false };
         ReturnTypeNullable = false;
     
     // Validate configuration

@@ -24,6 +24,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
 - [Wind Rider Null SideCondition Fix](#wind-rider-null-sidecondition-fix) - NullReferenceException when sideCondition parameter is null in OnSideConditionStart handler
 - [Big Root Null Effect Fix](#big-root-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
+- [FieldResidual Pokemon Parameter Nullability Fix](#fieldresidual-pokemon-parameter-nullability-fix) - Non-nullable Pokemon parameter for field-level residual events
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -1476,6 +1477,35 @@ if (effect == null)
 
 ---
 
+### FieldResidual Pokemon Parameter Nullability Fix
+**File**: `FieldResidualPokemonParameterNullabilityFix.md`  
+**Severity**: High  
+**Systems Affected**: Field-level residual event handlers, weather conditions, pseudo-weather
+
+**Problem**: When weather (e.g., Sunny Day) was active and the FieldResidual event triggered at turn end, the battle crashed with `Event FieldResidual adapted handler failed on effect SunnyDay (Weather)` and inner exception `Parameter 2 (Pokemon _) is non-nullable but no Pokemon found in context (TargetPokemon=False, SourcePokemon=False)`.
+
+**Root Cause**: The `OnFieldResidualEventInfo` handler signature declared the `Pokemon` parameter (parameter index 2) as non-nullable in its `ParameterNullability` array, but field-level events (weather, terrain, pseudo-weather) don't have a Pokemon context when invoked. When `FieldEvent` called `InvokeEventHandlerInfo` with a `FieldSingleEventTarget`, no Pokemon was provided in the context, causing the parameter resolution to fail.
+
+**Solution**: Mark the `Pokemon` parameter as nullable in `OnFieldResidualEventInfo.ParameterNullability` array:
+```csharp
+// Before:
+ParameterNullability = new[] { false, false, false, false };
+
+// After:
+// Pokemon parameter (index 2) can be null for field-level residual events like weather
+ParameterNullability = new[] { false, false, true, false };
+```
+
+**Verification**: All existing weather condition FieldResidual handlers use discard parameters (`_`) for the Pokemon argument, so they correctly handle null Pokemon. Examples: SunnyDay, DeltaStream, PrimordialSea.
+
+**Pattern**: This follows the same pattern as previous nullable parameter fixes (Wind Rider, Ripen, Disguise, SwitchIn). When an event can be triggered at different scopes (field-level vs Pokemon-level), parameters specific to narrower scopes should be marked as nullable.
+
+**General Rule**: When an event can be triggered at different scopes (field-level vs Pokemon-level), parameters specific to narrower scopes (e.g., Pokemon for field events) should be marked as nullable.
+
+**Keywords**: `FieldResidual`, `weather`, `SunnyDay`, `Pokemon parameter`, `nullable`, `EventHandlerAdapter`, `parameter nullability`, `OnFieldResidualEventInfo`, `field event`, `residual`, `turn end`, `DeltaStream`, `PrimordialSea`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 31  
+*Total Bug Fixes Documented*: 32  
 *Reference Guides*: 1
