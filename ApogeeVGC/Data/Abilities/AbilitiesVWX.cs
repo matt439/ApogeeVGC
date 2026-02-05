@@ -487,7 +487,7 @@ public partial record Abilities
                                 Pokemon: var pokemon,
                             })
                             return;
-                        if (sideCondition.Id == ConditionId.Tailwind)
+                        if (sideCondition != null && sideCondition.Id == ConditionId.Tailwind)
                         {
                             battle.Boost(new SparseBoostsTable { Atk = 1 }, pokemon, pokemon);
                         }
