@@ -29,7 +29,7 @@ public class Driver
     private const int Team2EvalSeed = 67890;
 
     private const int RandomEvaluationNumTest = 1000;
-    private const int NumThreads = 16;
+    private const int NumThreads = 24;
     private const int BattleTimeoutMilliseconds = 3000; // 3 seconds timeout per battle
 
     // Format configuration - change this to use different VGC regulations

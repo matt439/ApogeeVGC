@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Player;
 using System.Threading.Channels;
+using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -425,7 +426,7 @@ public class Simulator : IBattleController
                     Console.WriteLine(
                         $"[Simulator.OnChoiceRequested] Error for {e.SideId}: {ex.Message}");
                 }
-
+                
                 // Auto-choose on error
                 Side side = Battle!.Sides.First(s => s.Id == e.SideId);
                 side.AutoChoose();

@@ -469,6 +469,11 @@ internal static class EventHandlerAdapter
             SparseBoostsTableSparseBoostsTableVoidUnion sparseBoostsVoid => new SparseBoostsTableRelayVar(sparseBoostsVoid.Table),
             VoidSparseBoostsTableVoidUnion => new VoidReturnRelayVar(),
 
+            // PokemonFalseVoidUnion -> Pokemon, false, or VoidReturn
+            PokemonPokemonFalseVoidUnion pokemonFalseVoid => new PokemonRelayVar(pokemonFalseVoid.Pokemon),
+            FalsePokemonFalseVoidUnion => new BoolRelayVar(false),
+            VoidPokemonFalseVoidUnion => new VoidReturnRelayVar(),
+
             // Primitive types
             bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),

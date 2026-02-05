@@ -46,7 +46,8 @@ I am converting move data from typescript #file:'C:\VSProjects\ApogeeVGC\pokemon
 
 ## Debugging
 
-i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunRndVsRndVgcRegIEvaluation':27313-34906 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. debug output:
+i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunRndVsRndVgcRegIEvaluation':27313-34906 . see #file:'C:\VSProjects\ApogeeVGC\docs\bugfixes\INDEX.md'  for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. debug output:
+
 
 ## Alphabetise entries
 

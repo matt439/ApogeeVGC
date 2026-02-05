@@ -1,0 +1,28 @@
+Execution Summary:
+Successful Battles: 30000
+Failed Battles (Exceptions): 0
+Total Battles Attempted: 30000
+
+Battle Results (Successful Battles Only):
+Player 1 Wins: 15060
+Player 2 Wins: 14940
+Ties: 0
+Win Rate for Player 1: 50.20%
+Win Rate for Player 2: 49.80%
+Tie Rate: 0.00%
+
+Performance Metrics:
+Number of threads: 24
+Total Execution Time: 00:06:22.972
+Total Execution Time (seconds): 382.972
+Time per Simulation: 12.766 ms
+Simulations per Second: 78
+
+Turn Statistics:
+Mean Turns: 36.10
+Standard Deviation of Turns: 15.92
+Median Turns: 31.00
+Minimum Turns: 10
+Maximum Turns: 108
+
+Press Enter key to exit...
