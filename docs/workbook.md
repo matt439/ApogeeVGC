@@ -86,39 +86,47 @@ review moves PhotonGeyser to PoisonTail
 
 review moves PollenPuff to PowerTrick
 
-review moves PowerTrip to PsychUp
+review moves PowerTrip to Psychic
 
-review moves Psychic to QuickAttack
+review moves PsychicFangs to PyroBall
 
-review moves QuckGuard to RapidSpin
+review moves Quash to RapidSpin
 
-review moves Recharge to RelicSong
+review moves RazorLeaf to RelicSong
 
-review moves RevelationDance to RolePlay
+review moves Rest to RockSmash
 
-review moves Rollout to Ruination
+review moves RockThrow to Ruination
 
 ## MovesSTU
 
-review moves 
+review moves SacredFire to Screech
 
-review moves x to Spore
+review moves SecretSword to SheerCold
 
-review moves SpringtideStorm to StompingTantrum
+review moves ShellSideArm to Sing
 
-review moves StoneAxe to StuffCheeks
+review moves Sketch to SleepTalk
 
-review moves StunSpore to Swagger
+review moves Sludge to Soak
 
-review moves Swallow to ThunderWave
+review moves SoftBoiled to SpicyExtract
 
-review moves TrickRoom to TeaTime
+review moves Spikes to SpringtideStorm
 
-review moves TeeterDance to ThroatChop
+review moves StealthRock to StoredPower
 
-review moves Thunder to TidyUp
+review moves StrangeSteam to SuckerPunch
 
-review moves TopsyTurvy to TriAttack
+review moves SunnyDay to Swift
+
+review moves Switcheroo to TarShot
+
+review moves Taunt to TerrainPulse
+
+review moves Thief to ThunderShock
+
+review moves ThunderWave to TriAttack
 
 review moves Trick to Twister
 

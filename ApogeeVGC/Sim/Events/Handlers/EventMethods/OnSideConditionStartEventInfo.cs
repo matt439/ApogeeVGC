@@ -19,7 +19,7 @@ public sealed record OnSideConditionStartEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnSideConditionStartEventInfo(
-     Action<Battle, Side, Pokemon, Condition> handler,
+     Action<Battle, Side, Pokemon, Condition?> handler,
         int? priority = null,
 bool usesSpeed = true)
     {
@@ -36,8 +36,8 @@ bool usesSpeed = true)
         ];
    ExpectedReturnType = typeof(void);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
+    // Nullability: sideCondition parameter can be null (position 3)
+        ParameterNullability = [false, false, false, true];
         ReturnTypeNullable = false;
     
     // Validate configuration

@@ -21,6 +21,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Adrenaline Orb Null Effect Fix](#adrenaline-orb-null-effect-fix) - NullReferenceException when effect parameter is null in OnAfterBoost handler
 - [Berserk Ability Null Effect Fix](#berserk-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 - [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
+- [Wind Rider Null SideCondition Fix](#wind-rider-null-sidecondition-fix) - NullReferenceException when sideCondition parameter is null in OnSideConditionStart handler
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -1356,6 +1357,27 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+### Wind Rider Null SideCondition Fix
+**File**: `WindRiderNullSideConditionFix.md`  
+**Severity**: High  
+**Systems Affected**: OnSideConditionStart event handlers, abilities that react to side conditions
+
+**Problem**: Wind Rider ability crashed with `NullReferenceException` when trying to access `sideCondition.Id` in its `OnSideConditionStart` handler. The error occurred during random battle testing when a Pokémon with Wind Rider was on the field and a side condition was added.
+
+**Root Cause**: The handler did not check if the `sideCondition` parameter was null before accessing its properties. The parameter was marked as non-nullable in the event handler info, but `EventHandlerAdapter.ResolveParameter` returns `context.SourceEffect` even if it's null when resolving `IEffect`-derived parameters.
+
+**Solution**:
+- Added null guard in Wind Rider's handler: `if (sideCondition != null && sideCondition.Id == ConditionId.Tailwind)`
+- Updated `OnSideConditionStartEventInfo` to mark the `sideCondition` parameter as nullable
+- Changed handler signature to `Action<Battle, Side, Pokemon, Condition?>` 
+- Updated `ParameterNullability` array to `[false, false, false, true]`
+
+**Pattern**: Follows the same defensive null checking pattern as Ripen, Disguise, Adrenaline Orb, and Berserk fixes. Event parameters that implement `IEffect` or derived types can be null when events are triggered without an associated effect.
+
+**Keywords**: `Wind Rider`, `OnSideConditionStart`, `null reference`, `sideCondition parameter`, `Tailwind`, `side condition`, `null check`, `IEffect`, `Condition`, `parameter nullability`, `defensive programming`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 27  
+*Total Bug Fixes Documented*: 28  
 *Reference Guides*: 1

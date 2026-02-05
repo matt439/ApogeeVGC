@@ -443,7 +443,8 @@ public partial record Abilities
                                 Pokemon: var pokemon,
                             })
                             return;
-                        if (sideCondition.Id == ConditionId.Tailwind)
+                        
+                        if (sideCondition != null && sideCondition.Id == ConditionId.Tailwind)
                         {
                             pokemon.AddVolatile(ConditionId.Charge);
                         }
