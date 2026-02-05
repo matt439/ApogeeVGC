@@ -33,7 +33,7 @@ public sealed record OnCriticalHitEventInfo : UnionEventHandlerInfo<OnCriticalHi
        typeof(Battle),
      typeof(Pokemon),
    typeof(Pokemon),
-        typeof(ActiveMove),
+        typeof(Move),
         ];
         ExpectedReturnType = typeof(BoolVoidUnion);
         

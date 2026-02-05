@@ -317,7 +317,7 @@ public partial record Abilities
                     return damage;
                 }, 1),
                 OnCriticalHit = new OnCriticalHitEventInfo(
-                    (Func<Battle, Pokemon, object?, Move, BoolVoidUnion>)((_, target, _,
+                    (Func<Battle, Pokemon, Pokemon, Move, BoolVoidUnion>)((_, target, _,
                         move) =>
                     {
                         if (target is null) return new VoidReturn();

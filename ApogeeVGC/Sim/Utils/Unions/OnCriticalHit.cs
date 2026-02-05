@@ -6,11 +6,11 @@ using ApogeeVGC.Sim.PokemonClasses;
 namespace ApogeeVGC.Sim.Utils.Unions;
 
 /// <summary>
-/// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) =&gt; boolean | void) | boolean
+/// ((this: Battle, pokemon: Pokemon, source: Pokemon, move: Move) =&gt; boolean | void) | boolean
 /// </summary>
 public abstract record OnCriticalHit : IUnionEventHandler
 {
-    public static implicit operator OnCriticalHit(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> function) =>
+    public static implicit operator OnCriticalHit(Func<Battle, Pokemon, Pokemon, Move, BoolVoidUnion> function) =>
      new OnCriticalHitFunc(function);
  public static implicit operator OnCriticalHit(bool value) => new OnCriticalHitBool(value);
 
@@ -19,8 +19,8 @@ public abstract record OnCriticalHit : IUnionEventHandler
     public abstract object? GetConstantValue();
 }
 
-public record OnCriticalHitFunc(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> Function)
-  : OnCriticalHit
+public record OnCriticalHitFunc(Func<Battle, Pokemon, Pokemon, Move, BoolVoidUnion> Function)
+: OnCriticalHit
 {
     public override Delegate GetDelegate() => Function;
     public override bool IsConstant() => false;

@@ -297,6 +297,12 @@ public partial record Abilities
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
                         target, source, effect) =>
                     {
+                        // Null check: effect can be null for healing from sources without an associated effect
+                        if (effect == null)
+                        {
+                            return null;
+                        }
+
                         battle.Debug($"Heal is occurring: {target} <- {source} :: {effect.Name}");
 
                         // Check if this healing effect should trigger Liquid Ooze damage
