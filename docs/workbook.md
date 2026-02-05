@@ -2,23 +2,21 @@
 
 ## MovesABC
 
-^ review moves Absorb to AllySwitch
+review moves Absorb to AllySwitch
 
-^ review moves Amnesia to AuraSphere
+review moves Amnesia to AuraWheel
 
-^ review moves AuraWheel to Belch
+review moves AuroraBeam to BellyDrum
 
-^ review moves BellyDrum to BodySlam
+review moves Bind to BoltStrike
 
-^ review moves BoltStrike to BugBuzz
+review moves BoneRush to BulkUp
 
-^ review moves BulkUp to Chloroblast
+review moves Bulldoze to CircleThrow
 
-^ review moves CircleThrow to Conversion
+review moves ClangingScales to Conversion2
 
-^ review moves Conversion2 to Covet
-
-^ review moves Crabhammer to Crunch
+review moves Copycat to Curse
 
 ## MovesDEF
 

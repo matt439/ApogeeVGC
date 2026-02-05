@@ -8,6 +8,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// Event handler info for OnFlinch event.
 /// Triggered when a Pokemon flinches.
 /// Signature: (Battle battle, Pokemon pokemon) => BoolVoidUnion | bool
+/// Note: TypeScript signature shows source/move params but they're always undefined in runEvent('Flinch', pokemon)
 /// </summary>
 public sealed record OnFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
 {
@@ -20,25 +21,25 @@ public sealed record OnFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
     public OnFlinchEventInfo(
         OnFlinch unionValue,
         int? priority = null,
-     bool usesSpeed = true)
+        bool usesSpeed = true)
     {
         Id = EventId.Flinch;
         UnionValue = unionValue;
         Handler = ExtractDelegate();
         Priority = priority;
         UsesSpeed = usesSpeed;
-   ExpectedParameterTypes =
- [
-      typeof(Battle),
-  typeof(Pokemon),
-     ];
+        ExpectedParameterTypes =
+        [
+            typeof(Battle),
+            typeof(Pokemon),
+        ];
         ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
+
+        // Nullability: All parameters non-nullable
         ParameterNullability = [false, false];
         ReturnTypeNullable = false;
-    
-    // Validate configuration
+
+        // Validate configuration
         ValidateConfiguration();
     }
 }

@@ -946,13 +946,13 @@ public partial record Abilities
                 Name = "Steadfast",
                 Num = 80,
                 Rating = 1.0,
-                OnFlinch = new OnFlinchEventInfo(
-                    (Func<Battle, Pokemon, object?, Move, BoolVoidUnion>)((battle, _, _, _) =>
-                    {
-                        battle.Boost(new SparseBoostsTable { Spe = 1 });
-                        return new VoidReturn();
-                    })),
-            },
+                    OnFlinch = new OnFlinchEventInfo(
+                        (Func<Battle, Pokemon, BoolVoidUnion>)((battle, _) =>
+                        {
+                            battle.Boost(new SparseBoostsTable { Spe = 1 });
+                            return new VoidReturn();
+                        })),
+                },
             [AbilityId.SteamEngine] = new()
             {
                 Id = AbilityId.SteamEngine,
