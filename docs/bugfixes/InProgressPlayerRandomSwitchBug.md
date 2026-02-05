@@ -1,16 +1,46 @@
-# [IN PROGRESS] Player Random Switch Choice Bug - Doubles Battle Infinite Loop
+# [RESOLVED] Player Random Switch Choice Bug - Doubles Battle Infinite Loop
 
-## Status: PARTIALLY DIAGNOSED - FIX IN PROGRESS
+## Status: FIXED
 
 **Last Updated**: 2025-01-20  
-**Priority**: High  
+**Priority**: High (Now Resolved)  
 **Systems Affected**: PlayerRandom AI, SyncSimulator, doubles battles with forced switches
 
 ---
 
 ## Problem Summary
 
-When running random vs random VGC Regulation I battles (doubles format), the simulator occasionally times out after 3 seconds. The timeout occurs during battle execution, not from hitting the turn limit. The battle enters an infinite validation retry loop when PlayerRandom generates invalid switch choices.
+When running random vs random VGC Regulation I battles (doubles format), the simulator entered an infinite validation retry loop when PlayerRandom generated switch choices for initial lead selection or mid-battle forced switches. The validation consistently failed with "Can't switch: You sent more switches than Pokémon that need to switch" even when the correct number of switches were generated.
+
+### Root Cause
+
+The bug was in `Side.Choices.cs` method `ClearChoice()` (line 568):
+
+```csharp
+// BEFORE (BUGGY):
+int canSwitchOut = Active.Count(pokemon => pokemon?.SwitchFlag.IsTrue() == true);
+```
+
+This only counted active Pokemon with `SwitchFlag.IsTrue()`, which returned **0** when:
+- Initial lead switch-in: `Active = [null, null]` (empty slots need filling)
+- No Pokemon had `SwitchFlag` set yet because they were null
+
+This caused `ForcedSwitchesLeft` to be set to 0, even though 2 switches were needed. The validation in `ChooseSwitch()` then rejected all switch attempts because the choice index exceeded the (incorrectly calculated) allowed switches.
+
+### Solution
+
+Changed `ClearChoice()` to count **null slots** as needing switches:
+
+```csharp
+// AFTER (FIXED):
+int canSwitchOut = Active.Count(pokemon => pokemon == null || pokemon.SwitchFlag.IsTrue());
+```
+
+This correctly identifies that empty Active slots need to be filled with switches, matching the behavior of the `ForceSwitch` table generation in `Battle.Requests.cs`.
+
+---
+
+## Status: FIXED
 
 ### Reproduction
 
@@ -30,302 +60,92 @@ When running random vs random VGC Regulation I battles (doubles format), the sim
 
 ---
 
-## Root Causes Identified
+## Changes Made
 
-### Primary Issue: GetRandomSwitchChoice() - Incomplete Actions for Multi-Switch
-
-**File**: `ApogeeVGC/Sim/Player/PlayerRandom.cs`  
-**Method**: `GetRandomSwitchChoice(SwitchRequest request)`  
-**Lines**: ~353-394 (original), ~353-425 (modified)
-
-**Original Behavior**:
-- Always generated exactly 1 switch action
-- Worked for singles and single forced switches in doubles
-- FAILED for doubles when both Pokemon faint (needs 2 switches)
-
-**Validation Errors Observed**:
-```
-[SyncSimulator] Error: Incomplete choice: ... - missing other pokemon
-[SyncSimulator] Error: Can't switch: You can't switch to an active Pokémon
-[SyncSimulator] Error: Can't switch: You can't switch to a fainted Pokémon
-[SyncSimulator] Error: You sent more switches than Pokémon that need to switch
-```
-
-**Expected Behavior**:
-- Generate one switch action per `true` value in `request.ForceSwitch` table
-- Example: `ForceSwitch = [true, true]` ? generate 2 switch actions
-- Example: `ForceSwitch = [false, true]` ? generate 1 switch action
-
-### Secondary Issue: No Retry Limit in SyncSimulator
+### 1. SyncSimulator.cs - Added Retry Limit ? IMPLEMENTED
 
 **File**: `ApogeeVGC/Sim/Core/SyncSimulator.cs`  
 **Method**: `OnChoiceRequested()`  
-**Lines**: ~156-173 (original)
+**Lines**: ~156-210
 
-**Problem**:
-- When `Battle.Choose()` returns false (validation failed), the handler just returns
-- Main loop in `Run()` sees `RequestState != None` and calls `RequestPlayerChoices()` again
-- No retry counter, so invalid choices cause infinite loop
-- No timeout mechanism at the choice level
+**Purpose**: Defensive fix to prevent infinite loops and provide diagnostics.
 
----
+**Changes**:
+- Added `MAX_RETRY_ATTEMPTS = 100` constant
+- Implemented retry loop with counter
+- Logs each failed validation attempt with error details
+- Throws `InvalidOperationException` with full diagnostics if max retries exceeded
+- This revealed the root cause validation error
 
-## Changes Made (Current State)
+### 2. PlayerRandom.cs - Enhanced Logging ? IMPLEMENTED
 
-### 1. PlayerRandom.cs - Modified GetRandomSwitchChoice() ? IMPLEMENTED
+**File**: `ApogeeVGC/Sim/Player/PlayerRandom.cs`  
+**Method**: `GetRandomSwitchChoice()`  
+**Lines**: ~353-430
 
-**Status**: Implemented but causing new issues
+**Purpose**: Diagnostic logging to understand switch generation.
 
+**Added logging for**:
+- SideId and ForceSwitch table contents
+- Active Pokemon count and details
+- Available Pokemon to switch in
+- Each switch selection with index
+- Total actions generated
+
+### 3. Side.Choices.cs - Fixed ClearChoice() ? FIXED ROOT CAUSE
+
+**File**: `ApogeeVGC/Sim/SideClasses/Side.Choices.cs`  
+**Method**: `ClearChoice()`  
+**Lines**: ~558-595
+
+**Purpose**: Fix ForcedSwitchesLeft calculation for null Active slots.
+
+**Changes**:
 ```csharp
-private Choice GetRandomSwitchChoice(SwitchRequest request)
-{
-    // Determine how many switches are needed based on ForceSwitch table
-    int switchesNeeded = request.ForceSwitch.Count(flag => flag);
-    
-    // Generate one switch action for each required slot
-    for (int i = 0; i < switchesNeeded; i++)
-    {
-        // Pick random Pokemon from available, avoiding duplicates
-        // Add to actions list
-    }
-    
-    return new Choice { Actions = actions };
-}
+// BEFORE:
+int canSwitchOut = Active.Count(pokemon => pokemon?.SwitchFlag.IsTrue() == true);
+
+// AFTER:
+int canSwitchOut = Active.Count(pokemon => pokemon == null || pokemon.SwitchFlag.IsTrue());
 ```
 
 **Added logging**:
-- ForceSwitch table contents
-- Number of switches needed
-- Each switch selection
-- Total actions generated
-
-### 2. SyncSimulator.cs - Added Validation Failure Logging ? IMPLEMENTED
-
-**Lines**: ~156-186
-
-```csharp
-private void OnChoiceRequested(object? sender, BattleChoiceRequestEventArgs e)
-{
-    // ... existing code ...
-    
-    bool success = Battle.Choose(e.SideId, choice);
-    
-    // DEBUG: Log if choice failed
-    if (!success && PrintDebug)
-    {
-        Console.WriteLine($"[SyncSimulator] Choice validation FAILED for {e.SideId}");
-        Console.WriteLine($"[SyncSimulator] Error: {side.GetChoice().Error}");
-        Console.WriteLine($"[SyncSimulator] Choice had {choice.Actions.Count} actions");
-        for (int i = 0; i < choice.Actions.Count; i++)
-        {
-            var action = choice.Actions[i];
-            Console.WriteLine($"[SyncSimulator]   Action {i}: {action.Choice}, Move={action.MoveId}, Target={action.TargetLoc}");
-        }
-    }
-}
-```
+- Active.Count, canSwitchOut, canSwitchIn values
+- ForcedSwitchesLeft and ForcedPassesLeft
+- Each Active slot status (null or Pokemon with SwitchFlag)
 
 ---
 
-## Current Issues with Fix
+## Technical Details
 
-### Issue 1: "You sent more switches than Pokémon that need to switch"
+### Why Null Slots Need Switches
 
-**Observation from logs**:
-```
-[PlayerRandom] ForceSwitch table: [False, True]
-[PlayerRandom] Switches needed: 1
-[PlayerRandom] Generated 1 switch actions
-[SyncSimulator] Error: You sent more switches than Pokémon that need to switch
-```
+In doubles battles:
+1. `Active` array is initialized with 2 null entries: `[null, null]`
+2. After team preview, Pokemon need to be switched into these empty slots
+3. The request system generates `ForceSwitch = [true, true]` based on these slots needing fills
+4. `ClearChoice()` must count these null slots to set `ForcedSwitchesLeft = 2`
+5. Validation then accepts 2 switch actions
 
-**Hypothesis**: The error occurs because:
-1. During a MoveRequest, PlayerRandom can voluntarily switch (mix of moves and switches)
-2. Choice accumulates actions: [Move, Switch] or [Switch, Move]
-3. One action fails validation (e.g., Terastallize used twice)
-4. Battle doesn't fully reset Choice state?
-5. Next validation sees 2 actions when only 1 switch was expected
+### Lead Selection vs Mid-Battle Switches
 
-**Need to investigate**:
-- How Choice.Actions is managed across validation attempts
-- Whether Choice is cleared when Battle.Choose() fails
-- Whether old actions persist when new request is made
+- **Lead selection** (battle start after team preview):
+  - `Active = [null, null]` ? empty slots
+  - `ForceSwitch = [true, true]` ? both need switches
+  - `ForcedSwitchesLeft` should be 2
 
-### Issue 2: Timeout During Team Preview / Lead Selection
+- **Mid-battle forced switch** (Pokemon fainted):
+  - `Active = [PokemonA, null]` ? one empty slot
+  - `ForceSwitch = [false, true]` ? one needs switch
+  - `ForcedSwitchesLeft` should be 1
 
-**Observation from logs**:
-```
-[IsChoiceDone] Player 1: Switch request - Actions=2, PokemonNeedingSwitch=0, done=True
-[IsChoiceDone]   Active Pokemon with SwitchFlag: Poliwrath:False, Tyrogue:False
-```
-
-**State**: Both players report `done=True` with 0 Pokemon needing switch but 2 actions generated.
-
-**Questions**:
-1. Why is SwitchRequest used for lead selection instead of TeamPreviewRequest?
-2. What should ForceSwitch contain during lead selection?
-3. Should we always generate actions equal to Active.Count for lead selection?
+The fix handles both cases correctly.
 
 ---
 
-## Next Steps (Priority Order)
+## Reproduction (Before Fix)
 
-### 1. ?? IMMEDIATE: Add Retry Limit to SyncSimulator (Defensive Fix)
-
-Prevent infinite loops while debugging the root cause:
-
-```csharp
-private void OnChoiceRequested(object? sender, BattleChoiceRequestEventArgs e)
-{
-    const int MAX_RETRY_ATTEMPTS = 100;
-    int retryCount = 0;
-    
-    while (retryCount < MAX_RETRY_ATTEMPTS)
-    {
-        Choice choice = player.GetChoiceSync(e.Request, e.RequestType, e.Perspective);
-        
-        if (choice.Actions.Count == 0)
-        {
-            side.AutoChoose();
-            choice = side.GetChoice();
-        }
-        
-        bool success = Battle.Choose(e.SideId, choice);
-        
-        if (success)
-        {
-            return; // Success, exit
-        }
-        
-        retryCount++;
-        
-        if (PrintDebug)
-        {
-            Console.WriteLine($"[SyncSimulator] Choice retry {retryCount}/{MAX_RETRY_ATTEMPTS} for {e.SideId}");
-            Console.WriteLine($"[SyncSimulator] Error: {side.GetChoice().Error}");
-        }
-    }
-    
-    // Max retries exceeded - throw exception with diagnostics
-    throw new InvalidOperationException(
-        $"Failed to generate valid choice for {e.SideId} after {MAX_RETRY_ATTEMPTS} attempts. " +
-        $"Last error: {side.GetChoice().Error}");
-}
-```
-
-### 2. Investigate Choice State Management
-
-**Questions to answer**:
-1. Is `Choice.Actions` cleared when `Battle.Choose()` fails?
-2. Is `Side.Choice` reset between validation attempts?
-3. Should we call `side.ClearChoice()` or similar after validation failure?
-
-**Files to examine**:
-- `ApogeeVGC/Sim/Choices/Choice.cs` - Choice structure
-- `ApogeeVGC/Sim/SideClasses/Side.Choices.cs` - Choice management methods
-- `ApogeeVGC/Sim/BattleClasses/Battle.Requests.cs` - Request/validation lifecycle
-
-### 3. Distinguish Between Request Types
-
-**Goal**: Understand when to use ForceSwitch vs Active.Count
-
-**Cases to handle**:
-1. **Lead Selection** (start of battle in doubles)
-   - Request type: SwitchRequest or something else?
-   - ForceSwitch: All false? Or missing?
-   - Expected actions: Equal to Active.Count (2 for doubles)
-
-2. **Forced Mid-Battle Switch** (Pokemon fainted)
-   - Request type: SwitchRequest with RequestState.SwitchIn
-   - ForceSwitch: Indicates which slots need switches
-   - Expected actions: Equal to count of `true` in ForceSwitch
-
-3. **Voluntary Switch During Moves** (handled by GetRandomMoveChoice)
-   - Request type: MoveRequest
-   - Each Pokemon can choose move OR switch
-   - GetRandomSwitchChoice should NOT be called for this
-
-**Investigation**:
-- Add logging to show RequestState and request type at start of GetRandomSwitchChoice
-- Check if there are multiple SwitchRequest scenarios we're not handling
-- Look at TypeScript reference to see how it distinguishes these cases
-
-### 4. Review TypeScript Reference Implementation
-
-**File to check**: `pokemon-showdown/sim/battle.ts` and `sim/side.ts`
-
-**Questions**:
-1. How does Pokemon Showdown handle switch requests?
-2. What does the ForceSwitch array mean in different contexts?
-3. Is there a different request type for lead selection?
-4. How does the random player decide how many switches to generate?
-
-### 5. Add Comprehensive Logging
-
-Before implementing final fix, add detailed logging to understand state:
-
-```csharp
-private Choice GetRandomSwitchChoice(SwitchRequest request)
-{
-    if (PrintDebug)
-    {
-        Console.WriteLine($"[PlayerRandom] === GetRandomSwitchChoice Called ===");
-        Console.WriteLine($"[PlayerRandom] SideId: {SideId}");
-        Console.WriteLine($"[PlayerRandom] Request type: {request.GetType().Name}");
-        Console.WriteLine($"[PlayerRandom] ForceSwitch table: [{string.Join(", ", request.ForceSwitch)}]");
-        Console.WriteLine($"[PlayerRandom] Side.Active.Count: {request.Side.Pokemon.Count(p => p.Active)}");
-        Console.WriteLine($"[PlayerRandom] Side.Pokemon (active): {string.Join(", ", 
-            request.Side.Pokemon.Where(p => p.Active).Select(p => p.Details))}");
-        Console.WriteLine($"[PlayerRandom] Side.Pokemon (available): {string.Join(", ", 
-            request.Side.Pokemon.Where(p => !p.Active && !p.Condition.Contains("fnt")).Select(p => p.Details))}");
-    }
-    
-    // ... rest of method
-}
-```
-
-### 6. Test Edge Cases
-
-Once fix is implemented, test with:
-1. Singles battles (ensure no regression)
-2. Doubles with 0 switches needed (lead selection?)
-3. Doubles with 1 switch needed (one Pokemon fainted)
-4. Doubles with 2 switches needed (both Pokemon fainted)
-5. Voluntary switches during move requests (shouldn't call GetRandomSwitchChoice)
-
----
-
-## Code Locations
-
-### Key Files:
-- `ApogeeVGC/Sim/Player/PlayerRandom.cs` - Random player AI
-  - `GetRandomMoveChoice()` - Lines ~117-305
-  - `GetRandomSwitchChoice()` - Lines ~353-425
-  - `GetRandomTargetLocation()` - Lines ~308-335
-
-- `ApogeeVGC/Sim/Core/SyncSimulator.cs` - Synchronous battle runner
-  - `Run()` - Main loop, Lines ~36-150
-  - `OnChoiceRequested()` - Choice handler, Lines ~156-186
-
-- `ApogeeVGC/Sim/SideClasses/Side.Choices.cs` - Choice validation
-  - `Choose()` - Lines ~629-698
-  - `IsChoiceDone()` - Lines ~1029-1075
-  - `ChooseSwitch()` - Lines ~255-416
-
-- `ApogeeVGC/Sim/BattleClasses/Battle.Requests.cs` - Request management
-  - `Choose()` - Lines ~378-429
-  - `GetRequests()` - Lines ~206-360
-  - `AllChoicesDone()` - Lines ~615-633
-
-### Related Bug Fixes:
-- `docs/bugfixes/PlayerRandomDoublesTargetingFix.md` - Fixed targeting for doubles moves
-- `docs/bugfixes/EndlessBattleLoopFix.md` - Fixed infinite turn loops
-
----
-
-## Diagnostic Commands
-
-### Run Debug Battle:
+**Seeds that triggered timeout**:
 ```powershell
 cd C:\VSProjects\ApogeeVGC
 dotnet run --project ApogeeVGC --configuration Debug --no-build

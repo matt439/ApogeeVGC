@@ -354,8 +354,27 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     {
         if (PrintDebug)
         {
-            Console.WriteLine($"[PlayerRandom] Generating random switch choice for {SideId}");
+            Console.WriteLine($"[PlayerRandom] === GetRandomSwitchChoice Called ===");
+            Console.WriteLine($"[PlayerRandom] SideId: {SideId}");
             Console.WriteLine($"[PlayerRandom] ForceSwitch table: [{string.Join(", ", request.ForceSwitch)}]");
+            Console.WriteLine($"[PlayerRandom] Side.Active count: {request.Side.Pokemon.Count(p => p.Active)}");
+            
+            var activePokemon = request.Side.Pokemon.Where(p => p.Active).ToList();
+            Console.WriteLine($"[PlayerRandom] Active Pokemon:");
+            for (int i = 0; i < activePokemon.Count; i++)
+            {
+                var p = activePokemon[i];
+                Console.WriteLine($"[PlayerRandom]   [{i}] {p.Details} - {p.Condition}");
+            }
+            
+            var availablePokemon = request.Side.Pokemon
+                .Where(p => !p.Active && !IsPokemonFainted(p)).ToList();
+            Console.WriteLine($"[PlayerRandom] Available Pokemon to switch in: {availablePokemon.Count}");
+            for (int i = 0; i < availablePokemon.Count; i++)
+            {
+                var p = availablePokemon[i];
+                Console.WriteLine($"[PlayerRandom]   [{i}] {p.Details} - {p.Condition}");
+            }
         }
 
         // Build list of available Pokemon (excluding active and fainted)
@@ -374,7 +393,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
         if (PrintDebug)
         {
-            Console.WriteLine($"[PlayerRandom] Switches needed: {switchesNeeded}");
+            Console.WriteLine($"[PlayerRandom] Switches needed (based on ForceSwitch): {switchesNeeded}");
         }
 
         if (switchesNeeded > availablePokemonWithIndex.Count)
@@ -408,7 +427,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             if (PrintDebug)
             {
                 Console.WriteLine(
-                    $"[PlayerRandom] Switch {i + 1}/{switchesNeeded}: Selected {selectedItem.PokemonData.Details}");
+                    $"[PlayerRandom] Switch {i + 1}/{switchesNeeded}: Selected index {selectedItem.OriginalIndex} ({selectedItem.PokemonData.Details})");
             }
 
             actions.Add(new ChosenAction
@@ -422,7 +441,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
         if (PrintDebug)
         {
-            Console.WriteLine($"[PlayerRandom] Generated {actions.Count} switch actions");
+            Console.WriteLine($"[PlayerRandom] Generated {actions.Count} switch actions total");
         }
 
         return new Choice

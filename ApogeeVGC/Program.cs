@@ -46,7 +46,7 @@ public class Program
         //DebugRandomBias.RunDebugTest();
 
         var driver = new Driver();
-        driver.Start(DriverMode.DebugSingleBattle);
+        driver.Start(DriverMode.RndVsRndVgcRegIEvaluation);
 
         //Console.WriteLine("Press Enter key to exit...");
         //Console.ReadLine();

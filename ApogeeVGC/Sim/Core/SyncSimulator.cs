@@ -152,37 +152,64 @@ public class SyncSimulator : IBattleController
     /// <summary>
     /// Event handler for when Battle requests a choice from a player.
     /// Synchronously gets the choice and submits it to the battle.
+    /// Retries up to MAX_RETRY_ATTEMPTS if validation fails.
     /// </summary>
     private void OnChoiceRequested(object? sender, BattleChoiceRequestEventArgs e)
     {
+        const int MAX_RETRY_ATTEMPTS = 100;
+        
         IPlayer player = GetPlayer(e.SideId);
         Side side = Battle!.Sides.First(s => s.Id == e.SideId);
-
-        // Get choice synchronously
-        Choice choice = player.GetChoiceSync(e.Request, e.RequestType, e.Perspective);
-
-        // If the choice is empty, use AutoChoose
-        if (choice.Actions.Count == 0)
-        {
-            side.AutoChoose();
-            choice = side.GetChoice();
-        }
-
-        // Submit the choice immediately (synchronous)
-        bool success = Battle.Choose(e.SideId, choice);
         
-        // DEBUG: Log if choice failed
-        if (!success && PrintDebug)
+        int retryCount = 0;
+        
+        while (retryCount < MAX_RETRY_ATTEMPTS)
         {
-            Console.WriteLine($"[SyncSimulator] Choice validation FAILED for {e.SideId}");
-            Console.WriteLine($"[SyncSimulator] Error: {side.GetChoice().Error}");
-            Console.WriteLine($"[SyncSimulator] Choice had {choice.Actions.Count} actions");
-            for (int i = 0; i < choice.Actions.Count; i++)
+            // Get choice synchronously
+            Choice choice = player.GetChoiceSync(e.Request, e.RequestType, e.Perspective);
+
+            // If the choice is empty, use AutoChoose
+            if (choice.Actions.Count == 0)
             {
-                var action = choice.Actions[i];
-                Console.WriteLine($"[SyncSimulator]   Action {i}: {action.Choice}, Move={action.MoveId}, Target={action.TargetLoc}");
+                side.AutoChoose();
+                choice = side.GetChoice();
+            }
+
+            // Submit the choice immediately (synchronous)
+            bool success = Battle.Choose(e.SideId, choice);
+            
+            if (success)
+            {
+                // Success - exit the retry loop
+                if (retryCount > 0 && PrintDebug)
+                {
+                    Console.WriteLine($"[SyncSimulator] Choice succeeded for {e.SideId} after {retryCount} retries");
+                }
+                return;
+            }
+            
+            // Choice validation failed - log and retry
+            retryCount++;
+            
+            if (PrintDebug)
+            {
+                Console.WriteLine($"[SyncSimulator] Choice validation FAILED for {e.SideId} (attempt {retryCount}/{MAX_RETRY_ATTEMPTS})");
+                Console.WriteLine($"[SyncSimulator] Error: {side.GetChoice().Error}");
+                Console.WriteLine($"[SyncSimulator] Choice had {choice.Actions.Count} actions");
+                for (int i = 0; i < choice.Actions.Count; i++)
+                {
+                    var action = choice.Actions[i];
+                    Console.WriteLine($"[SyncSimulator]   Action {i}: {action.Choice}, Move={action.MoveId}, Target={action.TargetLoc}");
+                }
             }
         }
+        
+        // Max retries exceeded - throw exception with diagnostics
+        string lastError = side.GetChoice().Error;
+        throw new InvalidOperationException(
+            $"Failed to generate valid choice for {e.SideId} after {MAX_RETRY_ATTEMPTS} attempts. " +
+            $"Last error: {lastError}. " +
+            $"RequestType: {e.RequestType}, RequestState: {side.RequestState}");
     }
 
     /// <summary>

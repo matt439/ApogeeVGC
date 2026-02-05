@@ -565,7 +565,8 @@ public partial class Side
             Battle.RequestState == RequestState.SwitchIn)
         {
             // Count active Pokemon that need to switch out
-            int canSwitchOut = Active.Count(pokemon => pokemon?.SwitchFlag.IsTrue() == true);
+            // This includes null slots (which implicitly need to be filled) and Pokemon with SwitchFlag=true
+            int canSwitchOut = Active.Count(pokemon => pokemon == null || pokemon.SwitchFlag.IsTrue());
 
             // Count bench Pokemon available to switch in (not active, not fainted)
             int canSwitchIn = Pokemon
@@ -577,6 +578,17 @@ public partial class Side
 
             // Any switches we can't fulfill become forced passes
             forcedPasses = canSwitchOut - forcedSwitches;
+            
+            if (Battle.DebugMode)
+            {
+                Battle.Debug($"[ClearChoice] {Name}: Active.Count={Active.Count}, canSwitchOut={canSwitchOut}, canSwitchIn={canSwitchIn}");
+                Battle.Debug($"[ClearChoice] {Name}: ForcedSwitchesLeft={forcedSwitches}, ForcedPassesLeft={forcedPasses}");
+                for (int i = 0; i < Active.Count; i++)
+                {
+                    var p = Active[i];
+                    Battle.Debug($"[ClearChoice] {Name}: Active[{i}] = {(p == null ? "null" : $"{p.Name}, SwitchFlag={p.SwitchFlag}")}");
+                }
+            }
         }
 
         // Reset choice to default state
