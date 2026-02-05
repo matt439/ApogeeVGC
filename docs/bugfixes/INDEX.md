@@ -43,6 +43,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Infinite loop in damage calculation for self-stat changes
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Secondary property not converted to Secondaries array
 - [Steel Beam & Mind Blown Recoil Fix](#steel-beam--mind-blown-recoil-fix) - MoveId does not have corresponding ConditionId for recoil damage effect
+- [Fillet Away Boosts Null Fix](#fillet-away-boosts-null-fix) - Boosts property not copied from Move to ActiveMove
 
 ### Status Conditions
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
@@ -995,6 +996,7 @@ foreach (Pokemon? pokemon in activeSnapshot) { ... }
 - **2025-01-XX**: Added Battle End Condition Null Request Fix (null request passed after battle ends mid-loop)
 - **2025-01-19**: Added Endless Battle Loop Fix (infinite loop when active Pokemon fainted without proper switch handling)
 - **2025-01-19**: Added Sync Simulator Request After Battle End Fix (RequestPlayerChoices called after battle ended during request generation)
+- **2025-01-20**: Added Fillet Away Boosts Null Fix (Boosts property not copied from Move to ActiveMove)
 
 ### Stat Modification Parameter Nullability and Type Conversion Fix
 **File**: `StatModificationParameterNullabilityFix.md`  
@@ -1346,6 +1348,34 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+### Fillet Away Boosts Null Fix
+**File**: `FilletAwayBoostsNullFix.md`  
+**Severity**: High  
+**Systems Affected**: Moves with Boosts property, move conversion (ToActiveMove)
+
+**Problem**: When Fillet Away (or any move with `Boosts` defined) was used, the battle crashed with `ArgumentNullException: Value cannot be null. (Parameter 'Boosts')` in the move's `OnTryHit` handler.
+
+**Root Cause**: The `Boosts` property (inherited from `HitEffect`) wasn't being explicitly copied from `Move` to `ActiveMove` in the `ToActiveMove()` method. When creating an `ActiveMove` with object initializer syntax without explicitly setting `Boosts`, it defaulted to `null` instead of copying the value from the source `Move`.
+
+**Solution**: Added `Boosts = Boosts,` to the object initializer in `Move.ToActiveMove()`:
+
+```csharp
+return new ActiveMove
+{
+    // ... other properties ...
+    BaseMoveType = BaseMoveType,
+    Boosts = Boosts,  // ? ADDED
+    BasePowerModifier = BasePowerModifier,
+    // ... rest of properties ...
+};
+```
+
+**Type System Context**: Record inheritance provides automatic property copying ONLY for constructor parameters. Properties set via object initializer must be explicitly listed or they default to their type's default value.
+
+**Keywords**: `Fillet Away`, `Boosts`, `ArgumentNullException`, `ToActiveMove`, `Move`, `ActiveMove`, `HitEffect`, `property copying`, `object initializer`, `record inheritance`, `stat boost`, `self-boost`
+
+---
+
 ### Grassy Glide ModifyPriority Source Fix
 **File**: `GrassyGlideModifyPrioritySourceFix.md`  
 **Severity**: Medium  
@@ -1406,5 +1436,5 @@ if (effect == null)
 ---
 
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 29  
+*Total Bug Fixes Documented*: 30  
 *Reference Guides*: 1

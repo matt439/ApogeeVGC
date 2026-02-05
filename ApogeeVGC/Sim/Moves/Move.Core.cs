@@ -215,6 +215,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
             HasSheerForce = HasSheerForce,
             AlwaysHit = AlwaysHit,
             BaseMoveType = BaseMoveType,
+            Boosts = Boosts,
             BasePowerModifier = BasePowerModifier,
             CritModifier = CritModifier,
             CritRatio = CritRatio,
