@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Conditions;
+﻿using System.Text.Json.Serialization;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Stats;
 
@@ -6,6 +7,7 @@ namespace ApogeeVGC.Sim.Moves;
 
 public record HitEffect
 {
+    [JsonIgnore]
     public ResultMoveHandler? OnHit { get; set; }
     public SparseBoostsTable? Boosts { get; set; }
     public ConditionId? Status { get; init; }
