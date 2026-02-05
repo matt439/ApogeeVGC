@@ -82,9 +82,11 @@ review moves Infestation to IvyCudgel
 
 ## MovesJKL
 
-review moves JawLock to LastRespects
+review moves JawLock to KowtowCleave
 
-review moves LavaPlume to LowKick
+review moves Lashout to LeechLife
+
+review moves LeechSeed to LowKick
 
 review moves LowSweep to LusterPurge
 

@@ -15,4 +15,5 @@ public enum DriverMode
     RandomVsRandomDoublesEvaluation,
 
     RndVsRndVgcRegIEvaluation,
+    DebugSingleBattle,
 }

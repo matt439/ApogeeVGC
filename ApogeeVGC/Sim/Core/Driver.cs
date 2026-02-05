@@ -69,6 +69,9 @@ public class Driver
             case DriverMode.RndVsRndVgcRegIEvaluation:
                 RunRndVsRndVgcRegIEvaluation();
                 break;
+            case DriverMode.DebugSingleBattle:
+                RunDebugSingleBattle();
+                break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
@@ -861,6 +864,122 @@ public class Driver
         sb.AppendLine($"Maximum Turns: {maxTurns}");
         Console.WriteLine(sb.ToString());
 
+        Console.WriteLine("Press Enter key to exit...");
+        Console.ReadLine();
+    }
+
+    /// <summary>
+    /// Debug method to run a single battle with specific seeds for reproduction.
+    /// Modify the seed values directly in this method when debugging specific issues.
+    /// </summary>
+    private void RunDebugSingleBattle()
+    {
+        Console.WriteLine("[Driver] Running Debug Single Battle");
+        Console.WriteLine("[Driver] This mode is for debugging specific battle issues");
+        Console.WriteLine();
+
+        // MODIFY THESE VALUES TO REPRODUCE SPECIFIC BATTLES
+        const int debugTeam1Seed = 56202;
+        const int debugTeam2Seed = 69772;
+        const int debugPlayer1Seed = 14228;
+        const int debugPlayer2Seed = 3702;
+        const int debugBattleSeed = 11761;
+        const bool debug = true;  // Set to true for verbose logging
+
+        Console.WriteLine("Seeds:");
+        Console.WriteLine($"  Team 1 Seed:   {debugTeam1Seed}");
+        Console.WriteLine($"  Team 2 Seed:   {debugTeam2Seed}");
+        Console.WriteLine($"  Player 1 Seed: {debugPlayer1Seed}");
+        Console.WriteLine($"  Player 2 Seed: {debugPlayer2Seed}");
+        Console.WriteLine($"  Battle Seed:   {debugBattleSeed}");
+        Console.WriteLine();
+
+        try
+        {
+            // Generate teams using same logic as evaluation
+            var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, debugTeam1Seed);
+            var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, debugTeam2Seed);
+
+            var team1 = team1Generator.GenerateTeam();
+            var team2 = team2Generator.GenerateTeam();
+
+            Console.WriteLine("Team 1:");
+            foreach (var set in team1)
+            {
+                Console.WriteLine($"  - {set.Name} (L{set.Level} {set.Species})");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Team 2:");
+            foreach (var set in team2)
+            {
+                Console.WriteLine($"  - {set.Name} (L{set.Level} {set.Species})");
+            }
+            Console.WriteLine();
+
+            PlayerOptions player1Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Player 1",
+                Team = team1,
+                Seed = new PrngSeed(debugPlayer1Seed),
+                PrintDebug = debug,
+            };
+
+            PlayerOptions player2Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Player 2",
+                Team = team2,
+                Seed = new PrngSeed(debugPlayer2Seed),
+                PrintDebug = debug,
+            };
+
+            BattleOptions battleOptions = new()
+            {
+                Id = FormatId.Gen9VgcRegulationI,
+                Player1Options = player1Options,
+                Player2Options = player2Options,
+                Debug = debug,
+                Sync = true,
+                Seed = new PrngSeed(debugBattleSeed),
+                MaxTurns = 1000,
+            };
+
+            Console.WriteLine("Starting battle...");
+            Console.WriteLine();
+
+            var simulator = new SyncSimulator();
+            var result = simulator.Run(Library, battleOptions, printDebug: debug);
+            var turn = simulator.Battle?.Turn ?? 0;
+
+            Console.WriteLine();
+            Console.WriteLine("=== Battle Result ===");
+            Console.WriteLine($"Result: {result}");
+            Console.WriteLine($"Turns: {turn}");
+            Console.WriteLine();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine();
+            Console.WriteLine("=== EXCEPTION OCCURRED ===");
+            Console.WriteLine($"Exception Type: {ex.GetType().Name}");
+            Console.WriteLine($"Message: {ex.Message}");
+            Console.WriteLine();
+            Console.WriteLine("Stack Trace:");
+            Console.WriteLine(ex.StackTrace);
+
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Inner Exception:");
+                Console.WriteLine($"  Type: {ex.InnerException.GetType().Name}");
+                Console.WriteLine($"  Message: {ex.InnerException.Message}");
+                Console.WriteLine($"  Stack Trace: {ex.InnerException.StackTrace}");
+            }
+        }
+
+        Console.WriteLine();
         Console.WriteLine("Press Enter key to exit...");
         Console.ReadLine();
     }

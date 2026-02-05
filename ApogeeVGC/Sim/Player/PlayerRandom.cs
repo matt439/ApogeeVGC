@@ -355,6 +355,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         if (PrintDebug)
         {
             Console.WriteLine($"[PlayerRandom] Generating random switch choice for {SideId}");
+            Console.WriteLine($"[PlayerRandom] ForceSwitch table: [{string.Join(", ", request.ForceSwitch)}]");
         }
 
         // Build list of available Pokemon (excluding active and fainted)
@@ -368,28 +369,65 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             throw new InvalidOperationException("No Pokemon available to switch");
         }
 
-        // Pick a random Pokemon
-        int randomIndex = _random.Random(0, availablePokemonWithIndex.Count);
-        var selectedItem = availablePokemonWithIndex[randomIndex];
+        // Determine how many switches are needed based on ForceSwitch table
+        int switchesNeeded = request.ForceSwitch.Count(flag => flag);
 
         if (PrintDebug)
         {
-            Console.WriteLine(
-                $"[PlayerRandom] Selected switch to: {selectedItem.PokemonData.Details}");
+            Console.WriteLine($"[PlayerRandom] Switches needed: {switchesNeeded}");
+        }
+
+        if (switchesNeeded > availablePokemonWithIndex.Count)
+        {
+            throw new InvalidOperationException(
+                $"Not enough Pokemon available to switch: need {switchesNeeded}, have {availablePokemonWithIndex.Count}");
+        }
+
+        var actions = new List<ChosenAction>();
+        var usedIndices = new HashSet<int>();
+
+        // Generate one switch action for each required slot
+        for (int i = 0; i < switchesNeeded; i++)
+        {
+            // Filter out already-used Pokemon
+            var stillAvailable = availablePokemonWithIndex
+                .Where(x => !usedIndices.Contains(x.OriginalIndex))
+                .ToList();
+
+            if (stillAvailable.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Ran out of Pokemon to switch after {i} of {switchesNeeded} switches");
+            }
+
+            // Pick a random Pokemon from those still available
+            int randomIndex = _random.Random(0, stillAvailable.Count);
+            var selectedItem = stillAvailable[randomIndex];
+            usedIndices.Add(selectedItem.OriginalIndex);
+
+            if (PrintDebug)
+            {
+                Console.WriteLine(
+                    $"[PlayerRandom] Switch {i + 1}/{switchesNeeded}: Selected {selectedItem.PokemonData.Details}");
+            }
+
+            actions.Add(new ChosenAction
+            {
+                Choice = ChoiceType.Switch,
+                Pokemon = null,
+                MoveId = MoveId.None,
+                Index = selectedItem.OriginalIndex,
+            });
+        }
+
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerRandom] Generated {actions.Count} switch actions");
         }
 
         return new Choice
         {
-            Actions = new List<ChosenAction>
-            {
-                new()
-                {
-                    Choice = ChoiceType.Switch,
-                    Pokemon = null,
-                    MoveId = MoveId.None,
-                    Index = selectedItem.OriginalIndex,
-                },
-            },
+            Actions = actions,
         };
     }
 }

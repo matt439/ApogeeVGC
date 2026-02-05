@@ -169,7 +169,20 @@ public class SyncSimulator : IBattleController
         }
 
         // Submit the choice immediately (synchronous)
-        Battle.Choose(e.SideId, choice);
+        bool success = Battle.Choose(e.SideId, choice);
+        
+        // DEBUG: Log if choice failed
+        if (!success && PrintDebug)
+        {
+            Console.WriteLine($"[SyncSimulator] Choice validation FAILED for {e.SideId}");
+            Console.WriteLine($"[SyncSimulator] Error: {side.GetChoice().Error}");
+            Console.WriteLine($"[SyncSimulator] Choice had {choice.Actions.Count} actions");
+            for (int i = 0; i < choice.Actions.Count; i++)
+            {
+                var action = choice.Actions[i];
+                Console.WriteLine($"[SyncSimulator]   Action {i}: {action.Choice}, Move={action.MoveId}, Target={action.TargetLoc}");
+            }
+        }
     }
 
     /// <summary>
