@@ -25,6 +25,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Wind Rider Null SideCondition Fix](#wind-rider-null-sidecondition-fix) - NullReferenceException when sideCondition parameter is null in OnSideConditionStart handler
 - [Big Root Null Effect Fix](#big-root-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
 - [FieldResidual Pokemon Parameter Nullability Fix](#fieldresidual-pokemon-parameter-nullability-fix) - Non-nullable Pokemon parameter for field-level residual events
+- [SideResidual Pokemon Parameter Nullability Fix](#sideresidual-pokemon-parameter-nullability-fix) - Non-nullable Pokemon parameter for side-level residual events
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -1506,6 +1507,38 @@ ParameterNullability = new[] { false, false, true, false };
 
 ---
 
+### SideResidual Pokemon Parameter Nullability Fix
+**File**: `SideResidualPokemonParameterNullabilityFix.md`  
+**Severity**: High  
+**Systems Affected**: Side-level residual event handlers, side conditions
+
+**Problem**: When Tailwind (or any side condition with a `SideResidual` handler) was active and the `SideResidual` event triggered at turn end, the battle crashed with `Event SideResidual adapted handler failed on effect Tailwind (Condition)` and inner exception `Parameter 2 (Pokemon _) is non-nullable but no Pokemon found in context (TargetPokemon=False, SourcePokemon=False)`.
+
+**Root Cause**: The `OnSideResidualEventInfo` handler signature declared the `Pokemon` parameter (parameter index 2) as non-nullable in its `ParameterNullability` array, but side-level residual events (like Tailwind countdown, Reflect duration tracking) don't have a Pokemon context when invoked - they operate on the entire side. When `FieldEvent` called `InvokeEventHandlerInfo` with a `SideSingleEventTarget`, no Pokemon was provided in the context, causing the parameter resolution to fail.
+
+**Solution**: Mark the `Pokemon` parameter as nullable in `OnSideResidualEventInfo.ParameterNullability` array:
+```csharp
+// Before:
+ParameterNullability = new[] { false, false, false, false };
+
+// After:
+// Pokemon parameter (index 2) can be null for side-level residual events like Tailwind
+ParameterNullability = new[] { false, false, true, false };
+```
+
+**Verification**: All existing side condition `SideResidual` handlers use discard parameters (`_`) for the Pokemon argument, so they correctly handle null Pokemon. Examples: Tailwind, Safeguard, Reflect, Light Screen.
+
+**Pattern**: This is the **third instance** of this exact pattern:
+1. FieldResidual Pokemon Parameter Nullability Fix - Field-level residual events (weather)
+2. SwitchIn Null Pokemon Parameter Fix - Event parameter resolution returning null
+3. SideResidual Pokemon Parameter Nullability Fix (this fix) - Side-level residual events
+
+**General Rule**: When an event can be triggered at different scopes (field-level, side-level, Pokemon-level), parameters specific to narrower scopes should be marked as nullable.
+
+**Keywords**: `SideResidual`, `side condition`, `Tailwind`, `Pokemon parameter`, `nullable`, `EventHandlerAdapter`, `parameter nullability`, `OnSideResidualEventInfo`, `side event`, `residual`, `turn end`, `Reflect`, `Light Screen`, `Safeguard`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 32  
+*Total Bug Fixes Documented*: 33  
 *Reference Guides*: 1

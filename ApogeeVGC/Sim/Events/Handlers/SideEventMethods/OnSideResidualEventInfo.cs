@@ -23,16 +23,17 @@ public sealed record OnSideResidualEventInfo : EventHandlerInfo
    int? subOrder = null,
       bool usesSpeed = true)
     {
- Id = EventId.SideResidual;
+        Id = EventId.SideResidual;
         Prefix = EventPrefix.None;
         Handler = handler;
-  Priority = priority;
-     Order = order;
+        Priority = priority;
+        Order = order;
         SubOrder = subOrder;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Side), typeof(Pokemon), typeof(IEffect)];
         ExpectedReturnType = typeof(void);
-        ParameterNullability = new[] { false, false, false, false };
+        // Pokemon parameter (index 2) can be null for side-level residual events like Tailwind
+        ParameterNullability = new[] { false, false, true, false };
         ReturnTypeNullable = false;
   ValidateConfiguration();
   }
