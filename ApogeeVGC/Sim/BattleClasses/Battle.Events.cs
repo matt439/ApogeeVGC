@@ -591,7 +591,8 @@ public partial class Battle
         {
             // Add side condition handlers (but not for ally sides in multi battles)
             // In single battles, side.N is always < 2, so this always executes
-            if (side.N < 2)
+            // Skip this for SwitchIn events since side condition handlers need Pokemon context
+            if (side.N < 2 && eventId != EventId.SwitchIn)
             {
                 handlers.AddRange(
                     FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));

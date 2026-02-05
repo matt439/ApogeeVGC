@@ -55,10 +55,6 @@ i am debugging my pokemon simulator by running battles between two random player
 check @ApogeeVGC/Data/Moves/MovesSTU.cs   and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).
 
 
-
-
-
-
-
-see @docs/workbook.md . it splits files into ~200 line chunks. it needs to be recreated because i have alphabetised some of the files. do @ApogeeVGC/Data/Moves/MovesABC.cs
+## Create subdivisions
+see @docs/workbook.md . it splits files into 200 line chunks. it needs to be recreated because i have alphabetised some of the files. do @ApogeeVGC/Data/Moves/MovesABC.cs
 

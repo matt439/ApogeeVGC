@@ -17,6 +17,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Accuracy Event Parameter Nullability Fix](#accuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves (Lock-On)
 - [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
 - [SwitchIn Null Pokemon Parameter Fix](#switchin-null-pokemon-parameter-fix) - EventHandlerAdapter returning null Pokemon without validation
+- [Stealth Rock SwitchIn Pokemon Context Fix](#stealth-rock-switchin-pokemon-context-fix) - Side condition handlers collected without Pokemon context for SwitchIn events
 - [Ripen Ability Null Effect Fix](#ripen-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
 - [Disguise Ability Null Effect Fix](#disguise-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 - [Adrenaline Orb Null Effect Fix](#adrenaline-orb-null-effect-fix) - NullReferenceException when effect parameter is null in OnAfterBoost handler
@@ -881,6 +882,61 @@ return pokemon;
 **Impact**: Ensures non-nullable Pokemon parameters are properly validated before being passed to handlers, preventing silent null propagation.
 
 **Pattern**: This validation pattern should be applied to other type-specific resolution blocks (Side, Field, Move, etc.) to prevent similar issues.
+
+**Keywords**: `EventHandlerAdapter`, `ResolveParameter`, `null validation`, `Pokemon parameter`, `Stealth Rock`, `OnSwitchIn`, `NullReferenceException`, `parameter nullability`, `early return`
+
+---
+
+### Stealth Rock SwitchIn Pokemon Context Fix
+**File**: `StealthRockSwitchInPokemonContextFix.md`  
+**Severity**: High  
+**Systems Affected**: Side condition handlers with OnSwitchIn, entry hazards (Stealth Rock, Sticky Web, Toxic Spikes)
+
+**Problem**: When a Pokemon switched in with Stealth Rock (or other side condition with OnSwitchIn handler) on their side of the field, the battle crashed with:
+```
+System.InvalidOperationException: Event SwitchIn adapted handler failed on effect Stealth Rock (Condition)
+Inner exception: InvalidOperationException: Event SwitchIn: Parameter 1 (Pokemon pokemon) is non-nullable but no Pokemon found in context (TargetPokemon=False, SourcePokemon=False)
+```
+
+**Root Cause**: The `FieldEvent` method was collecting side condition event handlers **twice** for SwitchIn events:
+1. **First collection (lines 594-598)**: Without Pokemon context
+   - Created handlers with `EffectHolder = side` (a `SideEffectHolder`)
+   - When invoked, these handlers produced a `SideSingleEventTarget`
+   - The `EventContext` had `TargetPokemon = null`
+2. **Second collection (line 615)**: With Pokemon context
+   - Created handlers with `EffectHolder = active` (a `PokemonEffectHolder`)  
+   - When invoked, these handlers produced a `PokemonSingleEventTarget`
+   - The `EventContext` had `TargetPokemon = <switching Pokemon>`
+
+The first handler (without Pokemon context) executed first and failed because Stealth Rock's OnSwitchIn handler has a non-nullable Pokemon parameter.
+
+**Solution**: Modified `FieldEvent` to skip collecting side condition handlers without Pokemon context for SwitchIn events:
+```csharp
+// Skip this for SwitchIn events since side condition handlers need Pokemon context
+if (side.N < 2 && eventId != EventId.SwitchIn)
+{
+    handlers.AddRange(
+        FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
+}
+```
+
+This ensures that for SwitchIn events:
+- Side condition handlers are ONLY collected with `customHolder: active`
+- All side condition handlers have the switching Pokemon as their EffectHolder
+- EventContext.TargetPokemon is properly set to the switching Pokemon
+
+**Testing**: Built successfully. The error should no longer occur when Pokemon switch in with entry hazards on the field.
+
+**Impact**: 
+- Fixes crash when switching in with Stealth Rock, Sticky Web, Toxic Spikes on the field
+- Ensures all side condition OnSwitchIn handlers receive proper Pokemon context
+- May affect other side conditions with SwitchIn handlers
+
+**Pattern Recognition**: Side-level/field-level events need Pokemon context when operating on individual Pokemon (checking stats, types, items, applying damage). Handlers should be collected with `customHolder: pokemon`.
+
+**Related Issues**: Previous "SwitchIn Null Pokemon Parameter Fix" added null validation that caught this issue. This fix addresses the root cause by ensuring Pokemon context is properly provided.
+
+**Keywords**: `FieldEvent`, `SwitchIn`, `side condition`, `Stealth Rock`, `Sticky Web`, `Toxic Spikes`, `entry hazards`, `customHolder`, `EffectHolder`, `EventContext`, `TargetPokemon`, `duplicate handlers`, `event collection`
 
 **Keywords**: `EventHandlerAdapter`, `ResolveParameter`, `null validation`, `Pokemon parameter`, `Stealth Rock`, `OnSwitchIn`, `NullReferenceException`, `parameter nullability`
 

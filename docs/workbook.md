@@ -28,41 +28,57 @@ review moves Covet to Curse
 
 ## MovesDEF
 
-review moves DarkestLariat to DiamondStorm
+review moves DarkestLariat to Defog
 
-review moves Dig to DoubleEdge
+review moves DestinyBond to Discharge
 
-review moves DoubleHit to DragonTail
+review moves Dive to DoubleKick
 
-review moves DrainingKiss to EerieSpell
+review moves DoubleShock to DragonEnergy
 
-review moves ElectricTerrain to Entrainment
+review moves DragonHammer to DualWingbeat
 
-review moves Eruption to FakeTears
+review moves DynamaxCannon to ElectroBall
 
-review moves FalseSurrender to FireLash
+review moves ElectroDrift to Endure
 
-review moves FirePledge to FlareBlitz
+review moves EnergyBall to Extrasensory
 
-review moves FlashCannon to Fly
+review moves ExtremeSpeed to FeatherDance
 
-review moves FlyingPress to FrostBreath
+review moves Feint to FireFang
 
-review moves FuryAttack to FutureSight
+review moves FireLash to Fissure
+
+review moves Flail to FleurCannon
+
+review moves Fling to Fly
+
+review moves FlyingPress to FreezeDry
+
+review moves FreezeShock to FutureSight
 
 ## MovesGHI
 
-review moves GastroAcid to GrassPledge
+review moves GastroAcid to Glare
 
-review moves GrassyGlide to GyroBall
+review moves GrassKnot to GravApple
 
-review moves HammerArm to HealPulse
+review moves Gravity to Gust
 
-review moves HeartSwap to HornAttack
+review moves GyroBall to HeadSmash
 
-review moves HornDrill to IceBurn
+review moves HealBell to HeartSwap
 
-review moves IceFang to IvyCudgel
+review moves HeatCrash to HighJumpKick
+
+review moves HoneClaws to HyperBeam
+
+review moves HyperDrill to IceFang
+
+review moves IceHammer to Inferno
+
+review moves Infestation to IvyCudgel
 
 ## MovesJKL
 
