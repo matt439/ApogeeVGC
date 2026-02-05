@@ -22,6 +22,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Berserk Ability Null Effect Fix](#berserk-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 - [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
 - [Wind Rider Null SideCondition Fix](#wind-rider-null-sidecondition-fix) - NullReferenceException when sideCondition parameter is null in OnSideConditionStart handler
+- [Big Root Null Effect Fix](#big-root-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -636,6 +637,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **Items.cs**:
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
+
+**ItemsABC.cs**:
+- [Big Root Null Effect Fix](#big-root-null-effect-fix)
 
 **Pokemon.Stats.cs**:
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
@@ -1378,6 +1382,29 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+### Big Root Null Effect Fix
+**File**: `BigRootNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Big Root item `OnTryHeal` event handler
+
+**Problem**: The Big Root item crashed with `NullReferenceException` when trying to access `effect.EffectStateId` in its `OnTryHeal` handler. The error occurred when a Pokémon holding Big Root was healed from sources that don't have an associated `IEffect` (e.g., natural regeneration, certain abilities).
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its `EffectStateId` property. The TypeScript reference implementation directly accesses `effect.id` without a null check, which works in JavaScript (accessing properties on `undefined` returns `undefined`), but in C# it throws a `NullReferenceException`.
+
+**Solution**: Added a null guard at the beginning of the `OnTryHeal` handler:
+```csharp
+if (effect == null)
+{
+    return null;
+}
+```
+
+**Impact**: When `effect` is null, the healing proceeds unchanged without activating Big Root's healing boost, matching the correct TypeScript behavior where Big Root only boosts specific healing sources (drain moves, Leech Seed, Ingrain, Aqua Ring, Strength Sap).
+
+**Keywords**: `big root`, `item`, `OnTryHeal`, `null reference`, `effect parameter`, `healing`, `drain`, `null check`, `TypeScript porting`, `Leech Seed`, `Ingrain`, `Aqua Ring`, `Strength Sap`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 28  
+*Total Bug Fixes Documented*: 29  
 *Reference Guides*: 1

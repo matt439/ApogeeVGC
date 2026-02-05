@@ -387,6 +387,11 @@ public partial record Items
                         // The effect passed here is always an IEffect (Condition or Move), not BattleHealEffect
                         // Drain healing is passed as the Drain condition (ConditionId.Drain)
                         // Strength Sap passes MoveId.StrengthSap
+                        if (effect == null)
+                        {
+                            return null;
+                        }
+
                         bool isBigRootHeal = effect.EffectStateId switch
                         {
                             ConditionEffectStateId
