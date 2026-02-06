@@ -38,41 +38,6 @@ public class Driver
     //private const FormatId DefaultSinglesFormat = FormatId.CustomSingles;
     //private const FormatId DefaultDoublesFormat = FormatId.CustomDoubles;
 
-    /// <summary>
-    /// Gets the current Git commit ID from the repository.
-    /// </summary>
-    /// <returns>The short commit ID (first 7 characters), or "Unknown" if unable to retrieve.</returns>
-    private static string GetGitCommitId()
-    {
-        try
-        {
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = "git",
-                Arguments = "rev-parse --short HEAD",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-
-            using var process = Process.Start(processStartInfo);
-            if (process == null)
-            {
-                return "Unknown";
-            }
-
-            var commitId = process.StandardOutput.ReadToEnd().Trim();
-            process.WaitForExit();
-
-            return string.IsNullOrWhiteSpace(commitId) ? "Unknown" : commitId;
-        }
-        catch
-        {
-            return "Unknown";
-        }
-    }
-
     public void Start(DriverMode mode)
     {
         switch (mode)
@@ -144,7 +109,7 @@ public class Driver
         Console.WriteLine("[Driver] Simulator created");
 
         // Run the battle synchronously on the main thread
-        var result =
+        SimulatorResult result =
             simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
@@ -185,7 +150,7 @@ public class Driver
         Console.WriteLine("[Driver] Simulator created");
 
         // Run the battle asynchronously on the main thread
-        var result =
+        SimulatorResult result =
             simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
@@ -334,7 +299,7 @@ public class Driver
             };
 
             var simulator = new SyncSimulator();
-            var result = simulator.Run(Library, battleOptions, printDebug: debug);
+            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }, cts.Token);
 
@@ -429,17 +394,17 @@ public class Driver
         Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
         {
             // Calculate unique seeds for this battle using atomic operations
-            var offset1 = Interlocked.Increment(ref seedCounter);
-            var offset2 = Interlocked.Increment(ref seedCounter);
-            var offset3 = Interlocked.Increment(ref seedCounter);
+            int offset1 = Interlocked.Increment(ref seedCounter);
+            int offset2 = Interlocked.Increment(ref seedCounter);
+            int offset3 = Interlocked.Increment(ref seedCounter);
 
-            var localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
-            var localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
-            var localBattleSeed = BattleEvalSeed + offset3;
+            int localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
+            int localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
+            int localBattleSeed = BattleEvalSeed + offset3;
 
             try
             {
-                var (result, turn) = RunBattleWithTimeout(
+                (SimulatorResult result, int turn) = RunBattleWithTimeout(
                     localPlayer1Seed,
                     localPlayer2Seed,
                     localBattleSeed,
@@ -449,7 +414,7 @@ public class Driver
                 simResults.Add(result);
                 turnOnBattleEnd.Add(turn);
 
-                var completed = Interlocked.Increment(ref completedBattles);
+                int completed = Interlocked.Increment(ref completedBattles);
                 if (completed % 100 == 0)
                 {
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
@@ -477,16 +442,16 @@ public class Driver
         var turnsList = turnOnBattleEnd.ToList();
         var exceptionsList = exceptions.ToList();
 
-        var successfulBattles = resultsList.Count;
-        var failedBattles = exceptionsList.Count;
-        var player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-        var player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
-        var ties = resultsList.Count(result => result == SimulatorResult.Tie);
+        int successfulBattles = resultsList.Count;
+        int failedBattles = exceptionsList.Count;
+        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+        int ties = resultsList.Count(result => result == SimulatorResult.Tie);
 
         // Calculate timing metrics
-        var totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        var timePerSimulation = totalSeconds / RandomEvaluationNumTest;
-        var simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
 
         // Calculate turn statistics (only if there are successful battles)
         double meanTurns = 0;
@@ -523,7 +488,7 @@ public class Driver
             sb.AppendLine("-----------------------------------------------------------");
             for (var i = 0; i < exceptionsList.Count; i++)
             {
-                var (p1Seed, p2Seed, bSeed, ex) = exceptionsList[i];
+                (int p1Seed, int p2Seed, int bSeed, Exception ex) = exceptionsList[i];
                 sb.AppendLine($"Exception #{i + 1}:");
                 sb.AppendLine($"  Player 1 Seed: {p1Seed}");
                 sb.AppendLine($"  Player 2 Seed: {p2Seed}");
@@ -591,17 +556,17 @@ public class Driver
         Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
         {
             // Calculate unique seeds for this battle using atomic operations
-            var offset1 = Interlocked.Increment(ref seedCounter);
-            var offset2 = Interlocked.Increment(ref seedCounter);
-            var offset3 = Interlocked.Increment(ref seedCounter);
+            int offset1 = Interlocked.Increment(ref seedCounter);
+            int offset2 = Interlocked.Increment(ref seedCounter);
+            int offset3 = Interlocked.Increment(ref seedCounter);
 
-            var localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
-            var localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
-            var localBattleSeed = BattleEvalSeed + offset3;
+            int localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
+            int localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
+            int localBattleSeed = BattleEvalSeed + offset3;
 
             try
             {
-                var (result, turn) = RunBattleWithTimeout(
+                (SimulatorResult result, int turn) = RunBattleWithTimeout(
                     localPlayer1Seed,
                     localPlayer2Seed,
                     localBattleSeed,
@@ -611,7 +576,7 @@ public class Driver
                 simResults.Add(result);
                 turnOnBattleEnd.Add(turn);
 
-                var completed = Interlocked.Increment(ref completedBattles);
+                int completed = Interlocked.Increment(ref completedBattles);
                 if (completed % 100 == 0)
                 {
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
@@ -639,16 +604,16 @@ public class Driver
         var turnsList = turnOnBattleEnd.ToList();
         var exceptionsList = exceptions.ToList();
 
-        var successfulBattles = resultsList.Count;
-        var failedBattles = exceptionsList.Count;
-        var player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-        var player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
-        var ties = resultsList.Count(result => result == SimulatorResult.Tie);
+        int successfulBattles = resultsList.Count;
+        int failedBattles = exceptionsList.Count;
+        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+        int ties = resultsList.Count(result => result == SimulatorResult.Tie);
 
         // Calculate timing metrics
-        var totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        var timePerSimulation = totalSeconds / RandomEvaluationNumTest;
-        var simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
 
         // Calculate turn statistics (only if there are successful battles)
         double meanTurns = 0;
@@ -685,7 +650,7 @@ public class Driver
             sb.AppendLine("-----------------------------------------------------------");
             for (var i = 0; i < exceptionsList.Count; i++)
             {
-                var (p1Seed, p2Seed, bSeed, ex) = exceptionsList[i];
+                (int p1Seed, int p2Seed, int bSeed, Exception ex) = exceptionsList[i];
                 sb.AppendLine($"Exception #{i + 1}:");
                 sb.AppendLine($"  Player 1 Seed: {p1Seed}");
                 sb.AppendLine($"  Player 2 Seed: {p2Seed}");
@@ -755,21 +720,21 @@ public class Driver
         Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
         {
             // Calculate unique seeds for this battle using atomic operations
-            var offset1 = Interlocked.Increment(ref seedCounter);
-            var offset2 = Interlocked.Increment(ref seedCounter);
-            var offset3 = Interlocked.Increment(ref seedCounter);
-            var offset4 = Interlocked.Increment(ref seedCounter);
-            var offset5 = Interlocked.Increment(ref seedCounter);
+            int offset1 = Interlocked.Increment(ref seedCounter);
+            int offset2 = Interlocked.Increment(ref seedCounter);
+            int offset3 = Interlocked.Increment(ref seedCounter);
+            int offset4 = Interlocked.Increment(ref seedCounter);
+            int offset5 = Interlocked.Increment(ref seedCounter);
 
-            var localTeam1Seed = Team1EvalSeed + offset1;
-            var localTeam2Seed = Team2EvalSeed + offset2;
-            var localPlayer1Seed = PlayerRandom1EvalSeed + offset3;
-            var localPlayer2Seed = PlayerRandom2EvalSeed + offset4;
-            var localBattleSeed = BattleEvalSeed + offset5;
+            int localTeam1Seed = Team1EvalSeed + offset1;
+            int localTeam2Seed = Team2EvalSeed + offset2;
+            int localPlayer1Seed = PlayerRandom1EvalSeed + offset3;
+            int localPlayer2Seed = PlayerRandom2EvalSeed + offset4;
+            int localBattleSeed = BattleEvalSeed + offset5;
 
             try
             {
-                var (result, turn) = RunBattleWithRandomTeamsAndTimeout(
+                (SimulatorResult result, int turn) = RunBattleWithRandomTeamsAndTimeout(
                     localTeam1Seed,
                     localTeam2Seed,
                     localPlayer1Seed,
@@ -780,7 +745,7 @@ public class Driver
                 simResults.Add(result);
                 turnOnBattleEnd.Add(turn);
 
-                var completed = Interlocked.Increment(ref completedBattles);
+                int completed = Interlocked.Increment(ref completedBattles);
                 if (completed % 100 == 0)
                 {
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
@@ -811,16 +776,16 @@ public class Driver
         var turnsList = turnOnBattleEnd.ToList();
         var exceptionsList = exceptions.ToList();
 
-        var successfulBattles = resultsList.Count;
-        var failedBattles = exceptionsList.Count;
-        var player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-        var player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
-        var ties = resultsList.Count(result => result == SimulatorResult.Tie);
+        int successfulBattles = resultsList.Count;
+        int failedBattles = exceptionsList.Count;
+        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+        int ties = resultsList.Count(result => result == SimulatorResult.Tie);
 
         // Calculate timing metrics
-        var totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        var timePerSimulation = totalSeconds / RandomEvaluationNumTest;
-        var simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
 
         // Calculate turn statistics (only if there are successful battles)
         double meanTurns = 0;
@@ -857,7 +822,7 @@ public class Driver
             sb.AppendLine("-----------------------------------------------------------");
             for (var i = 0; i < exceptionsList.Count; i++)
             {
-                var (t1Seed, t2Seed, p1Seed, p2Seed, bSeed, ex) = exceptionsList[i];
+                (int t1Seed, int t2Seed, int p1Seed, int p2Seed, int bSeed, Exception ex) = exceptionsList[i];
                 sb.AppendLine($"Exception #{i + 1}:");
                 sb.AppendLine($"  Team 1 Seed:   {t1Seed}");
                 sb.AppendLine($"  Team 2 Seed:   {t2Seed}");
@@ -954,7 +919,7 @@ public class Driver
             };
 
             var simulator = new SyncSimulator();
-            var result = simulator.Run(Library, battleOptions, printDebug: debug);
+            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }, cts.Token);
 
@@ -1029,6 +994,41 @@ public class Driver
 
         Console.WriteLine("-----------------------------------------------------------");
         Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Gets the current Git commit ID from the repository.
+    /// </summary>
+    /// <returns>The short commit ID (first 7 characters), or "Unknown" if unable to retrieve.</returns>
+    private static string GetGitCommitId()
+    {
+        try
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = "git",
+                Arguments = "rev-parse --short HEAD",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+
+            using Process? process = Process.Start(processStartInfo);
+            if (process == null)
+            {
+                return "Unknown";
+            }
+
+            string commitId = process.StandardOutput.ReadToEnd().Trim();
+            process.WaitForExit();
+
+            return string.IsNullOrWhiteSpace(commitId) ? "Unknown" : commitId;
+        }
+        catch
+        {
+            return "Unknown";
+        }
     }
 
     //private void RunRandomVsRandomSinglesTest()
