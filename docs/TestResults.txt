@@ -1,0 +1,62 @@
+Random vs Random Evaluation Results (10000 battles):
+Format: Doubles
+Git Commit: ec4c7bde
+
+Execution Summary:
+Successful Battles: 10000
+Failed Battles (Exceptions): 0
+Total Battles Attempted: 10000
+
+Battle Results (Successful Battles Only):
+Player 1 Wins: 4972
+Player 2 Wins: 5028
+Ties: 0
+Win Rate for Player 1: 49.72%
+Win Rate for Player 2: 50.28%
+Tie Rate: 0.00%
+
+Performance Metrics:
+Number of threads: 24
+Total Execution Time: 00:03:08.359
+Total Execution Time (seconds): 188.359
+Time per Simulation: 18.836 ms
+Simulations per Second: 53
+
+Turn Statistics:
+Mean Turns: 36.03
+Standard Deviation of Turns: 15.91
+Median Turns: 31.00
+Minimum Turns: 10
+Maximum Turns: 101
+
+
+Random vs Random Evaluation Results (1000 battles):
+Format: Doubles
+Git Commit: ec4c7bde
+
+Execution Summary:
+Successful Battles: 1000
+Failed Battles (Exceptions): 0
+Total Battles Attempted: 1000
+
+Battle Results (Successful Battles Only):
+Player 1 Wins: 475
+Player 2 Wins: 525
+Ties: 0
+Win Rate for Player 1: 47.50%
+Win Rate for Player 2: 52.50%
+Tie Rate: 0.00%
+
+Performance Metrics:
+Number of threads: 24
+Total Execution Time: 00:00:20.118
+Total Execution Time (seconds): 20.118
+Time per Simulation: 20.118 ms
+Simulations per Second: 50
+
+Turn Statistics:
+Mean Turns: 36.08
+Standard Deviation of Turns: 15.64
+Median Turns: 31.00
+Minimum Turns: 12
+Maximum Turns: 92

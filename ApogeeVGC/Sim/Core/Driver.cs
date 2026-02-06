@@ -29,7 +29,7 @@ public class Driver
     private const int Team2EvalSeed = 67890;
 
     private const int RandomEvaluationNumTest = 1000;
-    private const int NumThreads = 16;
+    private const int NumThreads = 24;
     private const int BattleTimeoutMilliseconds = 3000; // 3 seconds timeout per battle
 
     // Format configuration - change this to use different VGC regulations
@@ -37,6 +37,41 @@ public class Driver
     //private const FormatId DefaultVgcFormat = FormatId.Gen9VgcRegulationG;
     //private const FormatId DefaultSinglesFormat = FormatId.CustomSingles;
     //private const FormatId DefaultDoublesFormat = FormatId.CustomDoubles;
+
+    /// <summary>
+    /// Gets the current Git commit ID from the repository.
+    /// </summary>
+    /// <returns>The short commit ID (first 7 characters), or "Unknown" if unable to retrieve.</returns>
+    private static string GetGitCommitId()
+    {
+        try
+        {
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = "git",
+                Arguments = "rev-parse --short HEAD",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+
+            using var process = Process.Start(processStartInfo);
+            if (process == null)
+            {
+                return "Unknown";
+            }
+
+            var commitId = process.StandardOutput.ReadToEnd().Trim();
+            process.WaitForExit();
+
+            return string.IsNullOrWhiteSpace(commitId) ? "Unknown" : commitId;
+        }
+        catch
+        {
+            return "Unknown";
+        }
+    }
 
     public void Start(DriverMode mode)
     {
@@ -474,6 +509,7 @@ public class Driver
         sb.AppendLine();
         sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
         sb.AppendLine("Format: Singles");
+        sb.AppendLine($"Git Commit: {GetGitCommitId()}");
         sb.AppendLine();
         sb.AppendLine("Execution Summary:");
         sb.AppendLine($"Successful Battles: {successfulBattles}");
@@ -635,6 +671,7 @@ public class Driver
         sb.AppendLine();
         sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
         sb.AppendLine("Format: Doubles");
+        sb.AppendLine($"Git Commit: {GetGitCommitId()}");
         sb.AppendLine();
         sb.AppendLine("Execution Summary:");
         sb.AppendLine($"Successful Battles: {successfulBattles}");
@@ -806,6 +843,7 @@ public class Driver
         sb.AppendLine();
         sb.AppendLine($"Random Team vs Random Team VGC Reg I Evaluation Results ({RandomEvaluationNumTest} battles):");
         sb.AppendLine("Format: VGC 2025 Regulation I (Random Teams)");
+        sb.AppendLine($"Git Commit: {GetGitCommitId()}");
         sb.AppendLine();
         sb.AppendLine("Execution Summary:");
         sb.AppendLine($"Successful Battles: {successfulBattles}");
