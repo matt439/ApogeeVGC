@@ -108,11 +108,12 @@ public partial class BattleActions
                 pokemon.LastMove = newMove;
             }
 
+
             // Clear all volatiles from the old active Pokemon
             oldActive.ClearVolatile();
         }
 
-        // Update Pokemon states and positions
+        // Update Pokemon states (but NOT roster positions - those are fixed after team preview)
         if (oldActive != null)
         {
             oldActive.IsActive = false;
@@ -120,7 +121,7 @@ public partial class BattleActions
             oldActive.UsedItemThisTurn = false;
             oldActive.StatsRaisedThisTurn = false;
             oldActive.StatsLoweredThisTurn = false;
-            oldActive.Position = pokemon.Position;
+            // NOTE: Do NOT modify oldActive.Position or side.Pokemon - roster positions are fixed
 
             // Clear status if fainted
             if (oldActive.Fainted)
@@ -134,9 +135,6 @@ public partial class BattleActions
                 pokemon.LastItem = oldActive.LastItem;
                 oldActive.LastItem = ItemId.None;
             }
-
-            // Swap positions in the side's Pokemon list
-            side.Pokemon[oldActive.Position] = oldActive;
         }
 
         // CRITICAL: Capture perspective BEFORE placing new Pokemon in active slot
@@ -150,9 +148,8 @@ public partial class BattleActions
             preSwitchPerspective = Battle.GetPerspectiveForSide(SideId.P1, perspectiveType);
         }
 
-        // Swap positions in the side's Pokemon list
-        pokemon.Position = pos;
-        side.Pokemon[pokemon.Position] = pokemon;
+        // NOTE: Do NOT modify pokemon.Position or side.Pokemon - roster positions are fixed after team preview
+        // Only update the Active slot reference
 
         // Activate the new Pokemon
         pokemon.IsActive = true;

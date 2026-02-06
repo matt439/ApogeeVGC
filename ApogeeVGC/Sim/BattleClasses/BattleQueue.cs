@@ -109,6 +109,7 @@ public class BattleQueue(Battle battle)
                     Target = chosenAction.Target ??
                              throw new InvalidOperationException("Switch action requires a Target"),
                     Order = 103, // Order for regular switches
+                    TargetLoc = chosenAction.TargetLoc, // Copy Active slot index
                 },
                 ChoiceType.InstaSwitch => new SwitchAction
                 {
@@ -117,9 +118,10 @@ public class BattleQueue(Battle battle)
                               throw new InvalidOperationException(
                                   "InstaSwitch action requires a Pokemon"),
                     Target = chosenAction.Target ??
-                             throw new InvalidOperationException(
-                                 "InstaSwitch action requires a Target"),
+                              throw new InvalidOperationException(
+                                  "InstaSwitch action requires a Target"),
                     Order = 3, // Order for instant switches
+                    TargetLoc = chosenAction.TargetLoc, // Copy Active slot index
                 },
                 _ => action as IAction ??
                      throw new InvalidOperationException(

@@ -53,6 +53,12 @@ public record SwitchAction : IAction
     public required Pokemon Pokemon { get; init; }
     public required Pokemon Target { get; init; }
     public IEffect? SourceEffect { get; init; }
+    
+    /// <summary>
+    /// The Active slot index (0-based) that this switch is targeting.
+    /// Used during lead selection and forced switches to know which Active position to fill.
+    /// </summary>
+    public int? TargetLoc { get; init; }
 
     public int SubOrder => 0;
     public int EffectOrder => 0;

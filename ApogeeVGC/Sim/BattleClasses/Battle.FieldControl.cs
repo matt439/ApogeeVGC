@@ -48,41 +48,36 @@ public partial class Battle
             }
         }
 
+
         // Perform the swap
         Side side = pokemon.Side;
+        
+        // Get the current Active slot indices
+        int pokemonActiveSlot = pokemon.GetActiveSlotIndex();
+        int targetActiveSlot = target?.GetActiveSlotIndex() ?? -1;
 
-        // Swap in the Pokemon array (full team roster)
-        // Note: target can be null for position 1, handle accordingly
-        if (target != null)
+        // Swap in the Active array (only if both are active)
+        if (pokemonActiveSlot >= 0)
         {
-            side.Pokemon[pokemon.Position] = target;
-            side.Pokemon[newPosition] = pokemon;
+            if (target != null && targetActiveSlot >= 0)
+            {
+                // Swap both in the Active array
+                side.Active[pokemonActiveSlot] = target;
+                side.Active[newPosition] = pokemon;
 
-            // Swap in the Active array (currently active Pokemon)
-            side.Active[pokemon.Position] = side.Pokemon[pokemon.Position];
-            side.Active[newPosition] = side.Pokemon[newPosition];
+                // Trigger swap events for both Pokemon
+                RunEvent(EventId.Swap, target, RunEventSource.FromNullablePokemon(pokemon));
+                RunEvent(EventId.Swap, pokemon, RunEventSource.FromNullablePokemon(target));
+            }
+            else
+            {
+                // Swapping with an empty slot (only valid for position 1)
+                side.Active[pokemonActiveSlot] = null;
+                side.Active[newPosition] = pokemon;
 
-            // Update position properties
-            target.Position = pokemon.Position;
-            pokemon.Position = newPosition;
-
-            // Trigger swap events for both Pokemon
-            RunEvent(EventId.Swap, target, RunEventSource.FromNullablePokemon(pokemon));
-            RunEvent(EventId.Swap, pokemon, RunEventSource.FromNullablePokemon(target));
-        }
-        else
-        {
-            // Swapping with an empty slot (only valid for position 1)
-            side.Pokemon[pokemon.Position] = null;
-            side.Pokemon[newPosition] = pokemon;
-
-            side.Active[pokemon.Position] = null;
-            side.Active[newPosition] = pokemon;
-
-            pokemon.Position = newPosition;
-
-            // Trigger swap event only for the pokemon (no target)
-            RunEvent(EventId.Swap, pokemon, null);
+                // Trigger swap event only for the pokemon (no target)
+                RunEvent(EventId.Swap, pokemon, null);
+            }
         }
 
         return true;

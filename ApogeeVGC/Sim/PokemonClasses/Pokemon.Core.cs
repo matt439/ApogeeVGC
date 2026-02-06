@@ -286,13 +286,26 @@ public partial class Pokemon : IPriorityComparison
     }
 
     /// <summary>
+    /// Gets the Active slot index (0-based) for this Pokemon, or -1 if not active.
+    /// In doubles, this returns 0 or 1 for active Pokemon.
+    /// Note: This is different from Position, which is the roster index in Side.Pokemon.
+    /// </summary>
+    public int GetActiveSlotIndex()
+    {
+        if (!IsActive) return -1;
+        return Side.Active.IndexOf(this);
+    }
+
+    /// <summary>
     /// Gets the full slot identifier combining side ID and position letter.
     /// Simplified version for standard battle formats.
     /// </summary>
     public PokemonSlot GetSlot()
     {
+        // For active Pokemon, use the Active slot index; for inactive, use roster Position
+        int slotPosition = IsActive ? GetActiveSlotIndex() : Position;
         var positionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
-        var slotPosition = Position + positionOffset;
+        slotPosition += positionOffset;
         return new PokemonSlot(Side.Id, slotPosition);
     }
 

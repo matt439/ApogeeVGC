@@ -302,10 +302,12 @@ public partial class Battle
 
       List<(ConditionId id, EffectState state, Condition condition)> slotConditions = [];
       Side side = pokemon.Side;
-      if (pokemon.Position < side.SlotConditions.Count)
+      // Use Active slot index for slot conditions (not roster Position)
+      int activeSlot = pokemon.GetActiveSlotIndex();
+      if (activeSlot >= 0 && activeSlot < side.SlotConditions.Count)
         {
 var slotConditionsDict =
-        side.SlotConditions[pokemon.Position];
+        side.SlotConditions[activeSlot];
      foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditionsDict
 .ToList()) // Materialize
             {

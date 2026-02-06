@@ -606,6 +606,7 @@ public partial class Battle
             case ActionId.Team:
             {
                 var teamAction = (TeamAction)action;
+                
                 if (teamAction.Index == 0)
                 {
                     teamAction.Pokemon.Side.Pokemon = [];
@@ -613,6 +614,7 @@ public partial class Battle
 
                 teamAction.Pokemon.Side.Pokemon.Add(teamAction.Pokemon);
                 teamAction.Pokemon.Position = teamAction.Index;
+                
                 return false;
             }
 
@@ -630,7 +632,10 @@ public partial class Battle
                     SingleEvent(EventId.CheckShow, naturalCure, null, switchAction.Pokemon);
                 }
 
-                Actions.SwitchIn(switchAction.Target, switchAction.Pokemon.Position,
+                // Use TargetLoc if available (stores Active slot index for switches),
+                // otherwise fall back to Pokemon.Position (for backward compatibility)
+                int activeSlotIndex = switchAction.TargetLoc ?? switchAction.Pokemon.Position;
+                Actions.SwitchIn(switchAction.Target, activeSlotIndex,
                     switchAction.SourceEffect);
                 break;
             }
@@ -788,6 +793,7 @@ public partial class Battle
             .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
             .ToList();
 
+
         for (int i = 0; i < Sides.Count; i++)
         {
             bool reviveSwitch = false;
@@ -799,8 +805,11 @@ public partial class Battle
                 {
                     if (pokemon == null) continue;
 
-                    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
-                        ConditionId.RevivalBlessing);
+                    // Use Active slot index instead of roster Position
+                    int activeSlot = pokemon.GetActiveSlotIndex();
+                    IEffect? revivalBlessing = activeSlot >= 0 
+                        ? Sides[i].GetSlotCondition(activeSlot, ConditionId.RevivalBlessing)
+                        : null;
                     if (revivalBlessing != null)
                     {
                         reviveSwitch = true;

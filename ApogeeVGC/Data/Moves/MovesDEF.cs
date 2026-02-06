@@ -599,8 +599,9 @@ public partial record Moves
                         return false;
 
                     // Store move data in slot condition state
+                    int activeSlot = target.GetActiveSlotIndex();
                     EffectState slotCondition =
-                        target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
+                        target.Side.SlotConditions[activeSlot][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.DoomDesire;
                     slotCondition.Source = source;
                     slotCondition.MoveData = battle.Library.Moves[MoveId.DoomDesire];
@@ -3146,8 +3147,9 @@ public partial record Moves
 
                     // Store move data in slot condition state
                     // Note: Store with IgnoreImmunity = false to match TS (actual hit respects immunity)
+                    int activeSlot = target.GetActiveSlotIndex();
                     EffectState slotCondition =
-                        target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
+                        target.Side.SlotConditions[activeSlot][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.FutureSight;
                     slotCondition.Source = source;
                     slotCondition.MoveData = battle.Library.Moves[MoveId.FutureSight] with

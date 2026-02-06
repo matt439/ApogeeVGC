@@ -879,11 +879,11 @@ public class Driver
         Console.WriteLine();
 
         // MODIFY THESE VALUES TO REPRODUCE SPECIFIC BATTLES
-        const int debugTeam1Seed = 56202;
-        const int debugTeam2Seed = 69772;
-        const int debugPlayer1Seed = 14228;
-        const int debugPlayer2Seed = 3702;
-        const int debugBattleSeed = 11761;
+        const int debugTeam1Seed = 54522;
+        const int debugTeam2Seed = 68092;
+        const int debugPlayer1Seed = 12548;
+        const int debugPlayer2Seed = 2022;
+        const int debugBattleSeed = 10081;
         const bool debug = true;  // Set to true for verbose logging
 
         Console.WriteLine("Seeds:");

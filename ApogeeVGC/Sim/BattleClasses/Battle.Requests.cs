@@ -59,7 +59,8 @@ public partial class Battle
             foreach (Side side in Sides)
             {
                 // Check if this side has any Pokemon that need to switch
-                bool hasSwitchNeeded = side.Active.Any(p => p?.SwitchFlag.IsTrue() == true);
+                // Null slots (lead selection) also count as needing switches
+                bool hasSwitchNeeded = side.Active.Any(p => p == null || p.SwitchFlag.IsTrue());
 
                 if (hasSwitchNeeded)
                 {
@@ -67,9 +68,17 @@ public partial class Battle
                     int availableSwitches = CanSwitch(side);
 
                     // Check for Revival Blessing (special case)
-                    bool hasRevivalBlessing = side.Active.Any(p =>
-                        p != null &&
-                        side.GetSlotCondition(p.Position, ConditionId.RevivalBlessing) != null);
+                    // Use Active slot index, not roster Position
+                    bool hasRevivalBlessing = false;
+                    for (int slot = 0; slot < side.Active.Count; slot++)
+                    {
+                        var p = side.Active[slot];
+                        if (p != null && side.GetSlotCondition(slot, ConditionId.RevivalBlessing) != null)
+                        {
+                            hasRevivalBlessing = true;
+                            break;
+                        }
+                    }
 
                     if (availableSwitches > 0 || hasRevivalBlessing)
                     {
@@ -221,18 +230,31 @@ public partial class Battle
 
                     // Create a table of which active Pokemon need to switch
                     // Convert MoveIdBoolUnion to bool using IsTrue() method
+                    // Null slots (empty active positions) also need switches
                     var switchTable = side.Active
-                        .Select(pokemon => pokemon?.SwitchFlag.IsTrue() ?? false)
+                        .Select(pokemon => pokemon == null || pokemon.SwitchFlag.IsTrue())
                         .ToList();
+                    
+                    Debug($"[GetRequests] {side.Name} switchTable generation:");
+                    for (int j = 0; j < side.Active.Count; j++)
+                    {
+                        var p = side.Active[j];
+                        Debug($"  Active[{j}] = {(p == null ? "null" : $"{p.Name}, SwitchFlag={p.SwitchFlag}")} → switchTable[{j}] = {switchTable[j]}");
+                    }
 
                     // Only create a switch request if at least one Pokemon needs to switch
                     if (switchTable.Any(flag => flag))
                     {
+                        Debug($"[GetRequests] Creating SwitchRequest for {side.Name} with ForceSwitch = [{string.Join(", ", switchTable)}]");
                         requests[i] = new SwitchRequest
                         {
                             ForceSwitch = switchTable,
                             Side = side.GetRequestData(),
                         };
+                    }
+                    else
+                    {
+                        Debug($"[GetRequests] No switches needed for {side.Name}, skipping SwitchRequest");
                     }
                 }
 

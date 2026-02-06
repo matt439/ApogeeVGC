@@ -58,9 +58,20 @@ public partial class Pokemon
         // Convert move slots to Move objects
         var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
 
-        if (GetHealth().Secret is not SecretConditionId secretCondition)
+        // Determine condition - fainted Pokemon need explicit ConditionId.Fainted
+        // since GetHealth() returns "0 fnt" string which isn't a SecretConditionId
+        ConditionId condition;
+        if (Fainted || Hp <= 0)
         {
-            secretCondition = new SecretConditionId(ConditionId.None);
+            condition = ConditionId.Fainted;
+        }
+        else if (GetHealth().Secret is SecretConditionId secretCondition)
+        {
+            condition = secretCondition.Value;
+        }
+        else
+        {
+            condition = ConditionId.None;
         }
 
         // Create the base entry
@@ -68,7 +79,7 @@ public partial class Pokemon
         {
             Ident = Fullname,
             Details = Details.ToString(),
-            Condition = secretCondition.Value,
+            Condition = condition,
             Active = IsActive, // Use IsActive property instead of position check
             Stats = stats,
             Moves = moves,
@@ -95,10 +106,12 @@ public partial class Pokemon
             // Commanding: Pokemon has the Commanding volatile and is not fainted
             bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
 
-            // Reviving: Pokemon is active and has Revival Blessing slot condition at its position
+            // Reviving: Pokemon is active and has Revival Blessing slot condition at its Active slot
+            int activeSlot = GetActiveSlotIndex();
             bool reviving = IsActive &&
-                            Position < Side.SlotConditions.Count &&
-                            Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
+                            activeSlot >= 0 &&
+                            activeSlot < Side.SlotConditions.Count &&
+                            Side.SlotConditions[activeSlot].ContainsKey(ConditionId.RevivalBlessing);
 
             entry = entry with
             {

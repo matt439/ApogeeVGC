@@ -91,6 +91,20 @@ public class RandomTeamGenerator
             team.Add(pokemon);
         }
 
+        // Validate that all Pokemon have unique species
+        var speciesCount = team.Select(p => p.Species).Distinct().Count();
+        if (speciesCount != team.Count)
+        {
+            var duplicates = team.GroupBy(p => p.Species)
+                .Where(g => g.Count() > 1)
+                .Select(g => $"{g.Key} (x{g.Count()})")
+                .ToList();
+            
+            throw new InvalidOperationException(
+                $"RandomTeamGenerator created team with duplicate species: {string.Join(", ", duplicates)}. " +
+                $"This should never happen - usedSpecies tracking failed.");
+        }
+
         return team;
     }
 

@@ -274,8 +274,8 @@ public partial class Side
             return EmitChoiceError("Can't switch: You sent more choices than unfainted Pokémon");
         }
 
-        // Step 3: Get the currently active pokemon
-        Pokemon pokemon = GetActiveAt(index);
+        // Step 3: Get the currently active pokemon (may be null for lead selection)
+        Pokemon? pokemon = Active[index];
         int slot;
 
         // Step 4: Determine the target slot
@@ -287,11 +287,11 @@ public partial class Side
                 return EmitChoiceError("Can't switch: You need to select a Pokémon to switch in");
             }
 
-            // Check for Revival Blessing slot condition
+            // Check for Revival Blessing slot condition (only if pokemon is not null)
             // Use index (from GetChoiceIndex) instead of pokemon.Position to ensure we access
             // a valid SlotConditions entry. SlotConditions has Active.Count entries (e.g., 2 for doubles),
             // and index is guaranteed to be < Active.Count, but pokemon.Position may be a team roster index.
-            if (SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
+            if (pokemon != null && SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
             {
                 // Find first fainted Pokemon
                 slot = 0;
@@ -340,7 +340,8 @@ public partial class Side
             return EmitChoiceError(
                 $"Can't switch: You do not have a Pokémon in slot {slot + 1} to switch to");
         }
-        else if (slot < Active.Count &&
+        else if (Pokemon[slot].IsActive &&
+                 pokemon != null &&
                  !SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
         {
             return EmitChoiceError("Can't switch: You can't switch to an active Pokémon");
@@ -354,8 +355,8 @@ public partial class Side
         // Step 6: Get target Pokemon
         Pokemon targetPokemon = Pokemon[slot];
 
-        // Step 7: Handle Revival Blessing special case
-        if (SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
+        // Step 7: Handle Revival Blessing special case (only if pokemon is not null)
+        if (pokemon != null && SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
         {
             if (!targetPokemon.Fainted)
             {
@@ -364,7 +365,7 @@ public partial class Side
 
             // Decrement forced switches (clamp to prevent negative)
             Choice.ForcedSwitchesLeft = Math.Max(0, Choice.ForcedSwitchesLeft - 1);
-            pokemon.SwitchFlag = false;
+            // NOTE: Don't clear pokemon.SwitchFlag here - validation should not modify state
 
             Choice.Actions =
             [
@@ -389,7 +390,8 @@ public partial class Side
         // Step 9: Handle move phase switching (check for trapped)
         if (RequestState == RequestState.Move)
         {
-            if (pokemon.Trapped == PokemonTrapped.True)
+            // Only check trapped status if there's a Pokemon in the slot
+            if (pokemon != null && pokemon.Trapped == PokemonTrapped.True)
             {
                 return EmitChoiceError(
                     "Can't switch: The active Pokémon is trapped",
@@ -415,7 +417,7 @@ public partial class Side
                 );
             }
 
-            if (pokemon.MaybeTrapped)
+            if (pokemon != null && pokemon.MaybeTrapped)
             {
                 Choice.CantUndo = true;
             }
@@ -430,8 +432,8 @@ public partial class Side
 
             Choice.ForcedSwitchesLeft--;
 
-            // Clear the switch flag so IsChoiceDone() knows this Pokemon's switch has been handled
-            pokemon.SwitchFlag = false;
+            // NOTE: Don't clear pokemon.SwitchFlag here - it will be cleared during CommitChoices() or turn execution
+            // Clearing it here causes issues with retry logic since validation should not modify state
         }
 
         // Step 11: Record the switch
@@ -442,14 +444,21 @@ public partial class Side
                 ? ChoiceType.InstaSwitch
                 : ChoiceType.Switch;
 
+        // For lead selection (pokemon is null), use the target Pokemon as the source too
+        // since we're not really switching out anyone - just filling an empty slot
+        Pokemon sourcePokemon = pokemon ?? targetPokemon;
+
         Choice.Actions =
         [
             .. Choice.Actions, new ChosenAction
             {
                 MoveId = MoveId.None,
                 Choice = choiceType,
-                Pokemon = pokemon,
+                Pokemon = sourcePokemon,
                 Target = targetPokemon,
+                // Store the Active slot index in TargetLoc for switches
+                // This tells SwitchIn() which Active position to fill
+                TargetLoc = index,
             }
         ];
 
@@ -564,6 +573,29 @@ public partial class Side
         if (Battle.RequestState == RequestState.Switch ||
             Battle.RequestState == RequestState.SwitchIn)
         {
+            // IMPORTANT: For SwitchIn requests (lead selection), clear the Active array
+            // to prevent stale state from partial validation attempts.
+            // During lead selection, Active slots should be null until choices are committed.
+            if (Battle.RequestState == RequestState.SwitchIn)
+            {
+                // Check if Active array has been partially filled during failed validation
+                bool hasPartialSwitches = Active.Any(p => p != null && p.SwitchFlag.IsTrue());
+                
+                if (hasPartialSwitches)
+                {
+                    // Reset Active array to null - choices will repopulate it when committed
+                    for (int i = 0; i < Active.Count; i++)
+                    {
+                        if (Active[i] != null && Active[i]!.SwitchFlag.IsTrue())
+                        {
+                            // Remove Pokemon from Active slot
+                            Active[i]!.IsActive = false;
+                            Active[i] = null;
+                        }
+                    }
+                }
+            }
+            
             // Count active Pokemon that need to switch out
             // This includes null slots (which implicitly need to be filled) and Pokemon with SwitchFlag=true
             int canSwitchOut = Active.Count(pokemon => pokemon == null || pokemon.SwitchFlag.IsTrue());
@@ -758,6 +790,7 @@ public partial class Side
             }
 
             slot = pokemonIndex.Value;
+            
             // Update the action with the Pokemon reference for proper processing
             action = action with { Pokemon = Pokemon[slot] };
         }

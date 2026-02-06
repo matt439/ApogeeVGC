@@ -129,15 +129,15 @@ public partial class Side
         if (source == null)
             throw new InvalidOperationException("Setting slot condition without a source");
 
-        // Step 2: Convert target to position if it's a Pokemon
+        // Step 2: Convert target to Active slot index if it's a Pokemon
         int targetSlot = target switch
         {
-            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.Position,
+            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.GetActiveSlotIndex(),
             IntPokemonIntUnion intValue => intValue.Value,
             _ => throw new InvalidOperationException("Invalid target type"),
         };
 
-        // Step 3: Validate slot index
+        // Step 3: Validate slot index (must be valid Active slot)
         if (targetSlot < 0 || targetSlot >= SlotConditions.Count)
         {
             throw new InvalidOperationException($"Invalid slot index: {targetSlot}");
@@ -192,15 +192,15 @@ public partial class Side
 
     public IEffect? GetSlotCondition(PokemonIntUnion target, Condition status)
     {
-        // Convert target to position if it's a Pokemon
+        // Convert target to Active slot index if it's a Pokemon
         int targetSlot = target switch
         {
-            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.Position,
+            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.GetActiveSlotIndex(),
             IntPokemonIntUnion intValue => intValue.Value,
             _ => throw new InvalidOperationException("Invalid target type"),
         };
 
-        // Validate slot index
+        // Validate slot index (must be valid Active slot)
         if (targetSlot < 0 || targetSlot >= SlotConditions.Count)
         {
             throw new InvalidOperationException($"Invalid slot index: {targetSlot}");
@@ -221,15 +221,15 @@ public partial class Side
 
     public bool RemoveSlotCondition(PokemonIntUnion target, Condition status)
     {
-        // Convert target to position if it's a Pokemon
+        // Convert target to Active slot index if it's a Pokemon
         int targetSlot = target switch
         {
-            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.Position,
+            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.GetActiveSlotIndex(),
             IntPokemonIntUnion intValue => intValue.Value,
             _ => throw new InvalidOperationException("Invalid target type"),
         };
 
-        // Validate slot index
+        // Validate slot index (must be valid Active slot)
         if (targetSlot < 0 || targetSlot >= SlotConditions.Count)
         {
             throw new InvalidOperationException($"Invalid slot index: {targetSlot}");

@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils;
@@ -116,34 +117,32 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     private Choice GetRandomTeamPreviewChoice(TeamPreviewRequest request)
     {
-        if (PrintDebug)
-        {
-            Console.WriteLine($"[PlayerRandom] Generating random team preview choice for {SideId}");
-        }
-
         var pokemon = request.Side.Pokemon;
+        
+        // Determine how many Pokemon to bring to battle
+        // If MaxChosenTeamSize is set, use that; otherwise bring all Pokemon
+        int teamSize = request.MaxChosenTeamSize ?? pokemon.Count;
 
-        // Generate a random order for the team
-        var order = Enumerable.Range(0, pokemon.Count).ToList();
+        // Generate a random order for ALL Pokemon first
+        var allIndices = Enumerable.Range(0, pokemon.Count).ToList();
 
         // Shuffle using Fisher-Yates algorithm
-        for (int i = order.Count - 1; i > 0; i--)
+        for (int i = allIndices.Count - 1; i > 0; i--)
         {
             int j = _random.Random(0, i + 1);
-            (order[i], order[j]) = (order[j], order[i]);
+            (allIndices[i], allIndices[j]) = (allIndices[j], allIndices[i]);
         }
+        
+        // Take only the first 'teamSize' Pokemon
+        var selectedIndices = allIndices.Take(teamSize).ToList();
 
-        if (PrintDebug)
-        {
-            Console.WriteLine(
-                $"[PlayerRandom] Selected order: {string.Join(",", order.Select(i => i + 1))}");
-        }
-
-        // Build actions based on the randomly selected order
-        var actions = order.Select((originalPokemonIndex, newPosition) => new ChosenAction
+        // Build actions for only the selected Pokemon
+        // Index = position in battle team (0-based)
+        // TargetLoc = original Pokemon index in full roster (0-based)
+        var actions = selectedIndices.Select((originalPokemonIndex, newPosition) => new ChosenAction
         {
             Choice = ChoiceType.Team,
-            Pokemon = null,
+            Pokemon = null,  // Will be resolved by ProcessChosenTeamAction using TargetLoc
             MoveId = MoveId.None,
             Index = newPosition,
             TargetLoc = originalPokemonIndex,
@@ -345,38 +344,14 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     private bool IsPokemonFainted(PokemonSwitchRequestData pokemon)
     {
-        // The Reviving flag indicates a Pokemon being revived by Revival Blessing
-        // Treat these as fainted/unavailable for normal switching
-        return pokemon.Reviving;
+        // Check if Pokemon is fainted (Condition == Fainted) OR being revived by Revival Blessing
+        // Both cases make the Pokemon unavailable for normal switching
+        return pokemon.Condition == ConditionId.Fainted || pokemon.Reviving;
     }
+
 
     private Choice GetRandomSwitchChoice(SwitchRequest request)
     {
-        if (PrintDebug)
-        {
-            Console.WriteLine($"[PlayerRandom] === GetRandomSwitchChoice Called ===");
-            Console.WriteLine($"[PlayerRandom] SideId: {SideId}");
-            Console.WriteLine($"[PlayerRandom] ForceSwitch table: [{string.Join(", ", request.ForceSwitch)}]");
-            Console.WriteLine($"[PlayerRandom] Side.Active count: {request.Side.Pokemon.Count(p => p.Active)}");
-            
-            var activePokemon = request.Side.Pokemon.Where(p => p.Active).ToList();
-            Console.WriteLine($"[PlayerRandom] Active Pokemon:");
-            for (int i = 0; i < activePokemon.Count; i++)
-            {
-                var p = activePokemon[i];
-                Console.WriteLine($"[PlayerRandom]   [{i}] {p.Details} - {p.Condition}");
-            }
-            
-            var availablePokemon = request.Side.Pokemon
-                .Where(p => !p.Active && !IsPokemonFainted(p)).ToList();
-            Console.WriteLine($"[PlayerRandom] Available Pokemon to switch in: {availablePokemon.Count}");
-            for (int i = 0; i < availablePokemon.Count; i++)
-            {
-                var p = availablePokemon[i];
-                Console.WriteLine($"[PlayerRandom]   [{i}] {p.Details} - {p.Condition}");
-            }
-        }
-
         // Build list of available Pokemon (excluding active and fainted)
         var availablePokemonWithIndex = request.Side.Pokemon
             .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
@@ -385,7 +360,22 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
         if (availablePokemonWithIndex.Count == 0)
         {
-            throw new InvalidOperationException("No Pokemon available to switch");
+            // Build detailed error message showing why no Pokemon are available
+            var errorMsg = $"No Pokemon available to switch (SideId={SideId}):\n";
+            errorMsg += $"  Total Pokemon: {request.Side.Pokemon.Count}\n";
+            errorMsg += $"  Switches needed: {request.ForceSwitch.Count(f => f)}\n";
+            errorMsg += "  Pokemon status:\n";
+            for (int i = 0; i < request.Side.Pokemon.Count; i++)
+            {
+                var p = request.Side.Pokemon[i];
+                errorMsg += $"    [{i}] {p.Details}: Active={p.Active}, Condition={p.Condition}, Reviving={p.Reviving}, IsFainted={IsPokemonFainted(p)}\n";
+            }
+            
+            // This is a battle-ending condition - throw an exception to stop the battle
+            // The battle framework should detect that the player has no valid Pokemon and end the game
+            throw new InvalidOperationException(
+                $"Player {SideId} has no Pokemon available to switch but battle is requesting switches. " +
+                $"This indicates the battle did not properly detect the game-ending condition.\n{errorMsg}");
         }
 
         // Determine how many switches are needed based on ForceSwitch table
@@ -396,6 +386,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             Console.WriteLine($"[PlayerRandom] Switches needed (based on ForceSwitch): {switchesNeeded}");
         }
 
+
         if (switchesNeeded > availablePokemonWithIndex.Count)
         {
             throw new InvalidOperationException(
@@ -405,7 +396,17 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         var actions = new List<ChosenAction>();
         var usedIndices = new HashSet<int>();
 
-        // Generate one switch action for each required slot
+        // Determine which active slots need switches
+        var slotsNeedingSwitches = new List<int>();
+        for (int slot = 0; slot < request.ForceSwitch.Count; slot++)
+        {
+            if (request.ForceSwitch[slot])
+            {
+                slotsNeedingSwitches.Add(slot);
+            }
+        }
+
+        // Generate one switch action for each slot that needs a switch
         for (int i = 0; i < switchesNeeded; i++)
         {
             // Filter out already-used Pokemon
@@ -424,10 +425,13 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             var selectedItem = stillAvailable[randomIndex];
             usedIndices.Add(selectedItem.OriginalIndex);
 
+            // Get the active slot this switch is for
+            int targetSlot = slotsNeedingSwitches[i];
+
             if (PrintDebug)
             {
                 Console.WriteLine(
-                    $"[PlayerRandom] Switch {i + 1}/{switchesNeeded}: Selected index {selectedItem.OriginalIndex} ({selectedItem.PokemonData.Details})");
+                    $"[PlayerRandom] Switch {i + 1}/{switchesNeeded}: Selected Pokemon index {selectedItem.OriginalIndex} ({selectedItem.PokemonData.Details}) for Active slot {targetSlot}");
             }
 
             actions.Add(new ChosenAction
@@ -436,6 +440,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                 Pokemon = null,
                 MoveId = MoveId.None,
                 Index = selectedItem.OriginalIndex,
+                TargetLoc = targetSlot,  // Specify which active slot to fill
             });
         }
 

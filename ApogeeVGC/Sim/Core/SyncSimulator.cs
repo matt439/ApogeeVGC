@@ -165,6 +165,38 @@ public class SyncSimulator : IBattleController
         
         while (retryCount < MAX_RETRY_ATTEMPTS)
         {
+            // IMPORTANT: If this is a retry (not the first attempt), regenerate the request
+            // to get fresh state data. The cached request may be stale if partial validation
+            // succeeded but then failed, leaving Pokemon state modified.
+            if (retryCount > 0 && e.Request is SwitchRequest)
+            {
+                // Regenerate the switch request with current Active Pokemon state
+                var freshSwitchTable = side.Active
+                    .Select(pokemon => pokemon == null || pokemon.SwitchFlag.IsTrue())
+                    .ToList();
+                
+                // Only regenerate if there are switches needed
+                if (freshSwitchTable.Any(flag => flag))
+                {
+                    var freshRequest = new SwitchRequest
+                    {
+                        ForceSwitch = freshSwitchTable,
+                        Side = side.GetRequestData(),
+                    };
+                    
+                    e = new BattleChoiceRequestEventArgs
+                    {
+                        SideId = e.SideId,
+                        Request = freshRequest,
+                        RequestType = e.RequestType,
+                        Perspective = e.Perspective
+                    };
+                    
+                    // Update the side's active request with the fresh data
+                    side.ActiveRequest = freshRequest;
+                }
+            }
+            
             // Get choice synchronously
             Choice choice = player.GetChoiceSync(e.Request, e.RequestType, e.Perspective);
 
@@ -191,17 +223,29 @@ public class SyncSimulator : IBattleController
             // Choice validation failed - log and retry
             retryCount++;
             
-            if (PrintDebug)
+            // ALWAYS log validation failures (not just when PrintDebug is true)
+            Console.WriteLine($"\n[SyncSimulator] ===== VALIDATION FAILURE #{retryCount} for {e.SideId} =====");
+            Console.WriteLine($"[SyncSimulator] Error: {side.GetChoice().Error}");
+            Console.WriteLine($"[SyncSimulator] RequestState: {side.RequestState}, RequestType: {e.RequestType}");
+            Console.WriteLine($"[SyncSimulator] Active.Count: {side.Active.Count}");
+            for (int i = 0; i < side.Active.Count; i++)
             {
-                Console.WriteLine($"[SyncSimulator] Choice validation FAILED for {e.SideId} (attempt {retryCount}/{MAX_RETRY_ATTEMPTS})");
-                Console.WriteLine($"[SyncSimulator] Error: {side.GetChoice().Error}");
-                Console.WriteLine($"[SyncSimulator] Choice had {choice.Actions.Count} actions");
-                for (int i = 0; i < choice.Actions.Count; i++)
-                {
-                    var action = choice.Actions[i];
-                    Console.WriteLine($"[SyncSimulator]   Action {i}: {action.Choice}, Move={action.MoveId}, Target={action.TargetLoc}");
-                }
+                var p = side.Active[i];
+                Console.WriteLine($"[SyncSimulator]   Active[{i}] = {(p == null ? "NULL" : $"{p.Name}, SwitchFlag={p.SwitchFlag}")}");
             }
+            Console.WriteLine($"[SyncSimulator] ForcedSwitchesLeft: {side.Choice.ForcedSwitchesLeft}");
+            Console.WriteLine($"[SyncSimulator] Side.Choice.Actions.Count: {side.Choice.Actions.Count}");
+            Console.WriteLine($"[SyncSimulator] Input.Actions.Count: {choice.Actions.Count}");
+            for (int i = 0; i < choice.Actions.Count; i++)
+            {
+                var action = choice.Actions[i];
+                Console.WriteLine($"[SyncSimulator]   InputAction[{i}]: Type={action.Choice}, Index={action.Index}");
+            }
+            if (e.Request is SwitchRequest sr)
+            {
+                Console.WriteLine($"[SyncSimulator] ForceSwitch: [{string.Join(", ", sr.ForceSwitch)}]");
+            }
+            Console.WriteLine($"[SyncSimulator] ============================================\n");
         }
         
         // Max retries exceeded - throw exception with diagnostics

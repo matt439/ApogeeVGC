@@ -201,10 +201,21 @@ public partial class Pokemon
         targetLoc = Math.Abs(targetLoc);
 
         // Handle wrap-around for multi-battle formats (e.g., if position exceeds active Pokemon count)
-        if (targetLoc > side.Active.Count)
+        // Only apply wrap-around if there are more than 2 sides (multi-battle)
+        if (targetLoc > side.Active.Count && Battle.Sides.Count > 2)
         {
             targetLoc -= side.Active.Count;
-            side = Battle.Sides[side.N + 2];
+            int newSideIndex = side.N + 2;
+            if (newSideIndex < Battle.Sides.Count)
+            {
+                side = Battle.Sides[newSideIndex];
+            }
+        }
+
+        // Clamp targetLoc to valid range
+        if (targetLoc > side.Active.Count)
+        {
+            targetLoc = side.Active.Count;
         }
 
         // Return the Pokemon at the calculated position (adjust for 0-based indexing)

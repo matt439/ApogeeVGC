@@ -330,6 +330,14 @@ public record GenderRatio
                 M = 0.5;
                 F = 0.5;
                 break;
+            case GenderId.M875F125:
+                M = 0.875;
+                F = 0.125;
+                break;
+            case GenderId.M25F75:
+                M = 0.25;
+                F = 0.75;
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(gender), gender, null);
         }
