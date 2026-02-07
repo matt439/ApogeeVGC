@@ -14,7 +14,7 @@ public record PokemonSwitchRequestData
     public ConditionId Condition { get; init; }
     public bool Active { get; init; }
     public required StatsTable Stats { get; init; }
-    public required IReadOnlyList<Move> Moves { get; init; }
+    public required IReadOnlyList<MoveId> Moves { get; init; }
     public required Ability BaseAbility { get; init; }
     public required Item Item { get; init; }
     public PokeballId Pokeball { get; init; }

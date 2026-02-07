@@ -294,7 +294,7 @@ public partial class Pokemon
 
     public void DisableMove(MoveId moveId, bool isHidden = false, IEffect? sourceEffect = null)
     {
-        if (sourceEffect is not null && Battle.Event is not null)
+        if (sourceEffect is null && Battle.Event is not null)
         {
             sourceEffect = Battle.Event.Effect;
         }
@@ -303,8 +303,7 @@ public partial class Pokemon
                      moveSlot.Id == moveId && moveSlot.Disabled != true))
         {
             moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
-            moveSlot.DisabledSource =
-                sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
+            moveSlot.DisabledSource = sourceEffect?.EffectStateId ?? (EffectStateId)moveSlot.Move;
         }
     }
 }

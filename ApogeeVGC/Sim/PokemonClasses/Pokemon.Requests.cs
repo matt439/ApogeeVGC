@@ -55,8 +55,8 @@ public partial class Pokemon
         // Get move list - either base moves (for allies) or current moves
         var moveSource = forAlly ? BaseMoveSlots : MoveSlots;
 
-        // Convert move slots to Move objects
-        var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
+        // Extract move IDs from move slots (not full Move objects to avoid serializing handlers)
+        var moves = moveSource.Select(moveSlot => moveSlot.Id).ToList();
 
         if (GetHealth().Secret is not SecretConditionId secretCondition)
         {

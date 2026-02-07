@@ -173,9 +173,12 @@ public partial class Side
             return true;
         }
 
+
+
+
         // Step 10: Check for disabled moves
         bool isEnabled = false;
-        string disabledSource = string.Empty;
+        EffectStateId? disabledSource = null;
 
         foreach (PokemonMoveData m in moves.Where(m => m.Id == moveid))
         {
@@ -186,7 +189,7 @@ public partial class Side
             }
             else if (m.DisabledSource != null)
             {
-                disabledSource = m.DisabledSource.Name;
+                disabledSource = m.DisabledSource;
             }
         }
 
@@ -1075,8 +1078,10 @@ public partial class Side
     }
 
 
+
+
     private BoolVoidUnion UpdateDisabledRequestForMove(Pokemon pokemon, PokemonMoveRequestData req,
-        MoveId moveid, string disabledSource)
+        MoveId moveid, EffectStateId? disabledSource)
     {
         bool updated = UpdateDisabledRequest(pokemon, req);
 
@@ -1086,7 +1091,7 @@ public partial class Side
 
             // Check if we need to update the disabled state
             bool needsUpdate = m.Disabled is null or BoolMoveIdBoolUnion { Value: false } ||
-                               m.DisabledSource?.Name != disabledSource;
+                               m.DisabledSource != disabledSource;
 
             if (needsUpdate)
             {
