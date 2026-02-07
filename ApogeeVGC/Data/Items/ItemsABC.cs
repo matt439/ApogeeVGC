@@ -382,6 +382,12 @@ public partial record Items
                     (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
                         _, _, effect) =>
                     {
+                        // Early return if effect is null (e.g., Heal Pulse doesn't pass a Condition)
+                        if (effect == null)
+                        {
+                            return null;
+                        }
+
                         // BigRoot boosts healing from: drain moves, Leech Seed, Ingrain, Aqua Ring, Strength Sap
                         // TS checks effect.id for: 'drain', 'leechseed', 'ingrain', 'aquaring', 'strengthsap'
                         // The effect passed here is always an IEffect (Condition or Move), not BattleHealEffect

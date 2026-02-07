@@ -21,6 +21,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Adrenaline Orb Null Effect Fix](#adrenaline-orb-null-effect-fix) - NullReferenceException when effect parameter is null in OnAfterBoost handler
 - [Berserk Ability Null Effect Fix](#berserk-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 - [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
+- [Big Root Heal Pulse Null Effect Fix](#big-root-heal-pulse-null-effect-fix) - NullReferenceException when effect parameter is null in Big Root OnTryHeal handler
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -1341,6 +1342,7 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+
 ### Grassy Glide ModifyPriority Source Fix
 **File**: `GrassyGlideModifyPrioritySourceFix.md`  
 **Severity**: Medium  
@@ -1356,6 +1358,21 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+### Big Root Heal Pulse Null Effect Fix
+**File**: `BigRootHealPulseNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Big Root item OnTryHeal event handler
+
+**Problem**: Big Root's `OnTryHeal` handler threw `NullReferenceException` when a Pokémon holding Big Root was healed by Heal Pulse or other moves that don't pass an explicit effect parameter.
+
+**Root Cause**: When Heal Pulse calls `battle.Heal(healAmount, target)` with only damage and target, the `effect` parameter defaults to null. In `Battle.Heal()`, when `effect` is `null`, it tries `Effect as Condition`, but `Effect` is the move itself (not a Condition), so the cast returns null. This null effect is then passed to event handlers, causing the NullReferenceException when Big Root's handler tries to access `effect.EffectStateId`.
+
+**Solution**: Added a null check at the beginning of Big Root's `OnTryHeal` handler. When `effect` is null, return `null` (pass through unchanged), since the healing is not from one of the sources Big Root boosts (drain moves, Leech Seed, etc.).
+
+**Keywords**: `big root`, `item`, `OnTryHeal`, `null reference`, `effect parameter`, `heal pulse`, `healing`, `drain`, `NullReferenceException`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 27  
+*Total Bug Fixes Documented*: 28  
 *Reference Guides*: 1
