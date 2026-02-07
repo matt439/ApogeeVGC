@@ -1078,10 +1078,13 @@ public class Driver
     /// <summary>
     /// Runs a single battle with specific seeds for debugging.
     /// Edit the seed constants in this method to reproduce specific battle scenarios.
+    /// This method loads the DebugElementPools state from the JSON file to recreate
+    /// the exact same battle that failed during IncrementalDebugTest.
     /// </summary>
     private void RunSingleBattleDebug()
     {
         // !! EDIT THESE SEEDS TO DEBUG SPECIFIC BATTLES !!
+        // Copy the seeds from the IncrementalDebugTest failure output
         const int debugPlayer1Seed = 1453;
         const int debugPlayer2Seed = 1454;
         const int debugBattleSeed = 1455;
@@ -1091,21 +1094,68 @@ public class Driver
         Console.WriteLine($"[Driver] Seeds - Player1: {debugPlayer1Seed}, Player2: {debugPlayer2Seed}, Battle: {debugBattleSeed}");
         Console.WriteLine();
 
+        // Load the DebugElementPools state to recreate the exact same team generation
+        var pools = new DebugElementPools();
+        if (!pools.LoadState("."))
+        {
+            Console.WriteLine("WARNING: No debug-element-pools-state.json found!");
+            Console.WriteLine("This file is required to recreate battles from IncrementalDebugTest.");
+            Console.WriteLine("Make sure the state file exists in the working directory.");
+            Console.WriteLine();
+            Console.WriteLine("Press Enter key to exit...");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine("Loaded debug element pools state:");
+        Console.WriteLine(pools.GetSummary());
+        Console.WriteLine();
+
         try
         {
-            // Run the battle with the specified seeds
-            (SimulatorResult result, int turn) = RunBattleWithRandomTeamsAndTimeout(
-                team1Seed: debugPlayer1Seed,      // Use player seed as team seed
-                team2Seed: debugPlayer2Seed,      // Use player seed as team seed
-                player1Seed: debugPlayer1Seed,
-                player2Seed: debugPlayer2Seed,
-                battleSeed: debugBattleSeed,
-                debug: debug);
+            // Create teams using the same DebugTeamGenerator as IncrementalTestRunner
+            var team1Gen = new DebugTeamGenerator(Library, pools, debugPlayer1Seed);
+            var team2Gen = new DebugTeamGenerator(Library, pools, debugPlayer2Seed);
+
+            var team1 = team1Gen.GenerateTeam();
+            var team2 = team2Gen.GenerateTeam();
+
+            PlayerOptions player1Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Debug1",
+                Team = team1,
+                Seed = new PrngSeed(debugPlayer1Seed),
+                PrintDebug = debug,
+            };
+
+            PlayerOptions player2Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Debug2",
+                Team = team2,
+                Seed = new PrngSeed(debugPlayer2Seed),
+                PrintDebug = debug,
+            };
+
+            BattleOptions battleOptions = new()
+            {
+                Id = FormatId.CustomDoubles, // Same format as IncrementalTestRunner
+                Player1Options = player1Options,
+                Player2Options = player2Options,
+                Debug = debug,
+                Sync = true,
+                Seed = new PrngSeed(debugBattleSeed),
+                MaxTurns = 1000,
+            };
+
+            var simulator = new SyncSimulator();
+            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
 
             Console.WriteLine();
             Console.WriteLine("=== Battle Result ===");
             Console.WriteLine($"Winner: {result}");
-            Console.WriteLine($"Turns: {turn}");
+            Console.WriteLine($"Turns: {simulator.Battle?.Turn ?? 0}");
             Console.WriteLine($"Battle completed successfully!");
         }
         catch (Exception ex)

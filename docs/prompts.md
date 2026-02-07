@@ -52,6 +52,10 @@ i am debugging my pokemon simulator by running battles between two random player
 
 i am incrementally debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunIncrementalDebugTest':27313-34906 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. the exception occured when testing the move 'Crabhammer'. debug output:
 
+## Incremental Debugging Single
+
+i am incrementally debugging my pokemon simulator by running battles between two random players, each with random teams. an exception occured and now i am debugging by running that single battle. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunIncrementalDebugTest':27313-34906 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. the exception occured when testing with Player1Seed=1453, Player2Seed=1454, BattleSeed=1455. debug output:
+
 ## Alphabetise entries
 
 check @ApogeeVGC/Data/Moves/MovesSTU.cs   and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).
