@@ -1080,6 +1080,10 @@ public partial class Side
 
 
 
+
+
+
+
     private BoolVoidUnion UpdateDisabledRequestForMove(Pokemon pokemon, PokemonMoveRequestData req,
         MoveId moveid, EffectStateId? disabledSource)
     {
@@ -1095,6 +1099,9 @@ public partial class Side
 
             if (needsUpdate)
             {
+                // Actually update the disabled state, not just flag that it needs updating
+                m.Disabled = true;
+                m.DisabledSource = disabledSource;
                 updated = true;
             }
 

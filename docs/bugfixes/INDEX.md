@@ -66,6 +66,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ### Choice System
 - [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position to index into Active-sized arrays
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix) - Infinite loop when update callback detects but doesn't apply changes
 
 ---
 
@@ -563,6 +564,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Stack overflow from recursive secondary processing
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Battle runs for 1000+ turns
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player repeatedly failing move validation in doubles
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix) - Update callback detects but doesn't apply changes
 
 ### By Component
 
@@ -592,6 +594,10 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 
 **UI/Display**:
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
+**Choice/Request System**:
+- [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix)
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix)
 
 ### By File Modified
 
@@ -680,6 +686,12 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 
 **Battle.Requests.cs**:
 - [GUI Team Preview Fix](#gui-team-preview-fix)
+
+**PokemonMoveRequestData.cs**:
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix)
+
+**Side.Choices.cs**:
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix)
 
 ---
 
@@ -1300,6 +1312,50 @@ Example: If `Active[0]` is fainted and `Active[1]` is alive:
 
 ---
 
+### Disabled Source Endless Loop Fix
+**File**: `DisabledSourceEndlessLoopFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Choice validation, disabled move handling, request updates, random AI
+
+**Problem**: After refactoring `DisabledSource` from `IEffect?` to `EffectStateId?` (commit 06a1221), battle simulations entered persistent endless loops. Random battles consistently timed out with `BattleTimeoutException` after 3000ms, failing at ~495-499 battles out of 500.
+
+**Root Cause**: `UpdateDisabledRequestForMove` **detected** that an update was needed but **never actually modified** the data:
+```csharp
+if (needsUpdate)
+{
+    updated = true;  // ? Only flagged, never updated m.Disabled or m.DisabledSource!
+}
+```
+
+This created an infinite loop:
+1. Player selects disabled move ? choice rejected
+2. `UpdateDisabledRequestForMove` returns `true` (needs update)
+3. `EmitRequest` serializes **unchanged** stale data
+4. AI receives same incorrect disabled state
+5. AI makes same invalid choice ? repeat forever
+
+The bug existed before the refactor but was masked by string comparisons and `IEffect` references that could coincidentally match. The `EffectStateId` change exposed the flaw by making value comparisons more precise.
+
+**Solution**: 
+1. Changed `PokemonMoveData.DisabledSource` from `init` to `set` accessor (allow modification)
+2. Modified `UpdateDisabledRequestForMove` to actually update the properties:
+   ```csharp
+   if (needsUpdate)
+   {
+       m.Disabled = true;
+       m.DisabledSource = disabledSource;
+       updated = true;
+   }
+   ```
+
+**Key Insight**: Update callbacks must **actually update** the data, not just return `true`. Detecting the need for an update without applying it creates an infinite re-emission loop.
+
+**Files Modified**: `PokemonMoveRequestData.cs`, `Side.Choices.cs`
+
+**Keywords**: `endless loop`, `infinite loop`, `battle timeout`, `BattleTimeoutException`, `disabled move`, `DisabledSource`, `EffectStateId`, `UpdateDisabledRequestForMove`, `EmitChoiceError`, `choice validation`, `request update`, `init accessor`, `set accessor`, `mutable`, `ChoiceLock`, `stale data`, `request re-emission`, `update callback`, `incremental test`
+
+---
+
 ### BoostId To String Evasion/Accuracy Conversion Fix
 **File**: `BoostIdToStringEvasionAccuracyFix.md`  
 **Severity**: High  
@@ -1397,5 +1453,5 @@ BattleDamageEffect.FromIEffect(move)
 ---
 
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 28  
+*Total Bug Fixes Documented*: 29  
 *Reference Guides*: 1

@@ -15,7 +15,7 @@ public record PokemonMoveData
     public MoveId Id => Move.Id;
     public MoveTarget? Target { get; init; }
     public MoveIdBoolUnion? Disabled { get; set; }
-    public EffectStateId? DisabledSource { get; init; }
+    public EffectStateId? DisabledSource { get; set; }
     public int Pp { get; init; }
     public int MaxPp { get; init; }
 }
