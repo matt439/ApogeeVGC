@@ -75,6 +75,9 @@ public class Driver
             case DriverMode.IncrementalDebug:
                 RunIncrementalDebugTest();
                 break;
+            case DriverMode.SingleBattleDebug:
+                RunSingleBattleDebug();
+                break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
@@ -1066,6 +1069,55 @@ public class Driver
                           $"{summary.FailedAbilities.Count} abilities, " +
                           $"{summary.FailedItems.Count} items, " +
                           $"{summary.FailedSpecies.Count} species");
+
+        Console.WriteLine();
+        Console.WriteLine("Press Enter key to exit...");
+        Console.ReadLine();
+    }
+
+    /// <summary>
+    /// Runs a single battle with specific seeds for debugging.
+    /// Edit the seed constants in this method to reproduce specific battle scenarios.
+    /// </summary>
+    private void RunSingleBattleDebug()
+    {
+        // !! EDIT THESE SEEDS TO DEBUG SPECIFIC BATTLES !!
+        const int debugPlayer1Seed = 1453;
+        const int debugPlayer2Seed = 1454;
+        const int debugBattleSeed = 1455;
+        const bool debug = true;
+
+        Console.WriteLine("[Driver] Starting Single Battle Debug");
+        Console.WriteLine($"[Driver] Seeds - Player1: {debugPlayer1Seed}, Player2: {debugPlayer2Seed}, Battle: {debugBattleSeed}");
+        Console.WriteLine();
+
+        try
+        {
+            // Run the battle with the specified seeds
+            (SimulatorResult result, int turn) = RunBattleWithRandomTeamsAndTimeout(
+                team1Seed: debugPlayer1Seed,      // Use player seed as team seed
+                team2Seed: debugPlayer2Seed,      // Use player seed as team seed
+                player1Seed: debugPlayer1Seed,
+                player2Seed: debugPlayer2Seed,
+                battleSeed: debugBattleSeed,
+                debug: debug);
+
+            Console.WriteLine();
+            Console.WriteLine("=== Battle Result ===");
+            Console.WriteLine($"Winner: {result}");
+            Console.WriteLine($"Turns: {turn}");
+            Console.WriteLine($"Battle completed successfully!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine();
+            Console.WriteLine("=== Battle Failed ===");
+            Console.WriteLine($"Exception Type: {ex.GetType().Name}");
+            Console.WriteLine($"Message: {ex.Message}");
+            Console.WriteLine();
+            Console.WriteLine("Stack Trace:");
+            Console.WriteLine(ex.StackTrace);
+        }
 
         Console.WriteLine();
         Console.WriteLine("Press Enter key to exit...");

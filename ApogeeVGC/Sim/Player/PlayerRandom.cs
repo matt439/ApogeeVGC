@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils;
@@ -232,22 +233,41 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                 }
             }
 
-            // Add switch option (checking if any switches are available)
+            // Add switch option only if:
+            // 1. The Pokemon is not trapped
+            // 2. There are bench Pokemon available to switch in
+            bool isTrapped = pokemonRequest.Trapped == true;
             var availableSwitches = request.Side.Pokemon
                 .Select((p, index) => new { PokemonData = p, Index = index })
                 .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
                 .ToList();
 
-            bool canSwitch = availableSwitches.Count > 0;
+            bool canSwitch = !isTrapped && availableSwitches.Count > 0;
             if (canSwitch)
             {
                 availableChoices.Add((false, -1, false)); // Switch option
             }
 
-            // Pick a random choice
+            // If no choices available (all moves disabled and can't switch), 
+            // use the first move anyway - the battle engine will force Struggle
             if (availableChoices.Count == 0)
             {
-                throw new InvalidOperationException($"No available choices for random player at Pokemon index {pokemonIndex}");
+                if (pokemonRequest.Moves.Count > 0)
+                {
+                    // Use the first move (likely Struggle or will be converted to Struggle)
+                    availableChoices.Add((true, 0, false));
+                }
+                else
+                {
+                    // No moves at all - this shouldn't happen, but add a pass just in case
+                    actions.Add(new ChosenAction
+                    {
+                        Choice = ChoiceType.Pass,
+                        Pokemon = null,
+                        MoveId = MoveId.None,
+                    });
+                    continue;
+                }
             }
 
             int randomIndex = _random.Random(0, availableChoices.Count);
@@ -345,9 +365,9 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     private bool IsPokemonFainted(PokemonSwitchRequestData pokemon)
     {
-        // The Reviving flag indicates a Pokemon being revived by Revival Blessing
-        // Treat these as fainted/unavailable for normal switching
-        return pokemon.Reviving;
+        // Check if the Pokemon is fainted (Condition == Fainted)
+        // or being revived by Revival Blessing (Reviving flag)
+        return pokemon.Condition == ConditionId.Fainted || pokemon.Reviving;
     }
 
     private Choice GetRandomSwitchChoice(SwitchRequest request)

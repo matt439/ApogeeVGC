@@ -21,4 +21,10 @@ public enum DriverMode
     /// Starts with a baseline and adds one element at a time, running verification battles.
     /// </summary>
     IncrementalDebug,
+
+    /// <summary>
+    /// Runs a single battle with specific seeds for debugging purposes.
+    /// Useful for reproducing specific timeout or bug scenarios.
+    /// </summary>
+    SingleBattleDebug,
 }
