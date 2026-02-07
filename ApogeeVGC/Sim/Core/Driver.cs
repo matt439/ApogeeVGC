@@ -32,11 +32,14 @@ public class Driver
     private const int NumThreads = 24;
     private const int BattleTimeoutMilliseconds = 3000; // 3 seconds timeout per battle
 
+    private const int IncrementalDebugMaxIterations = 500;
+
     // Format configuration - change this to use different VGC regulations
     // Available: Gen9VgcRegulationA through Gen9VgcRegulationI, CustomSingles, CustomDoubles
     //private const FormatId DefaultVgcFormat = FormatId.Gen9VgcRegulationG;
     //private const FormatId DefaultSinglesFormat = FormatId.CustomSingles;
     //private const FormatId DefaultDoublesFormat = FormatId.CustomDoubles;
+
 
     public void Start(DriverMode mode)
     {
@@ -69,6 +72,9 @@ public class Driver
             case DriverMode.RndVsRndVgcRegIEvaluation:
                 RunRndVsRndVgcRegIEvaluation();
                 break;
+            case DriverMode.IncrementalDebug:
+                RunIncrementalDebugTest();
+                break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
@@ -77,6 +83,7 @@ public class Driver
     private void RunConsoleVsRandomSinglesTest()
     {
         const bool debug = true;
+
 
         PlayerOptions player1Options = new()
         {
@@ -1029,6 +1036,40 @@ public class Driver
         {
             return "Unknown";
         }
+    }
+
+    /// <summary>
+    /// Runs the incremental debug test to identify problematic elements.
+    /// Starts with a known-good baseline and incrementally adds elements.
+    /// </summary>
+    private void RunIncrementalDebugTest()
+    {
+        Console.WriteLine("[Driver] Starting Incremental Debug Test");
+        Console.WriteLine("[Driver] This mode incrementally tests elements to identify bugs.");
+        Console.WriteLine();
+
+        var runner = new IncrementalTestRunner(
+            Library,
+            formatId: FormatId.CustomDoubles,
+            battlesPerVerification: IncrementalDebugMaxIterations,
+            battleTimeoutMs: BattleTimeoutMilliseconds,
+            printDebug: false,
+            stateDirectory: ".");
+
+        // Run unlimited iterations (0 = test all elements)
+        IncrementalTestRunner.TestingSummary summary = runner.Run(maxIterations: 0);
+
+        Console.WriteLine();
+        Console.WriteLine("Incremental debug test complete.");
+        Console.WriteLine($"Total iterations: {summary.IterationsCompleted}");
+        Console.WriteLine($"Failed elements: {summary.FailedMoves.Count} moves, " +
+                          $"{summary.FailedAbilities.Count} abilities, " +
+                          $"{summary.FailedItems.Count} items, " +
+                          $"{summary.FailedSpecies.Count} species");
+
+        Console.WriteLine();
+        Console.WriteLine("Press Enter key to exit...");
+        Console.ReadLine();
     }
 
     //private void RunRandomVsRandomSinglesTest()
