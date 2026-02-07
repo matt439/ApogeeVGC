@@ -2476,7 +2476,7 @@ public partial record Moves
 
                     Item yourItem = yourItemUnion.Item;
                     RelayVar? takeItemResult = battle.SingleEvent(EventId.TakeItem, yourItem,
-                        target.ItemState, source, target, move);
+                        target.ItemState, source, target, move, yourItem);
                     if (takeItemResult is BoolRelayVar { Value: false } ||
                         !source.SetItem(yourItem.Id))
                     {

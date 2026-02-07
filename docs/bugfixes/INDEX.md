@@ -22,6 +22,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Berserk Ability Null Effect Fix](#berserk-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
 - [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
 - [Big Root Heal Pulse Null Effect Fix](#big-root-heal-pulse-null-effect-fix) - NullReferenceException when effect parameter is null in Big Root OnTryHeal handler
+- [Covet TakeItem RelayVar Fix](#covet-takeitem-relayvar-fix) - TakeItem event invoked without relayVar parameter causing type mismatch
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -145,6 +146,28 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - Added `BoolEmptyVoidUnion` conversion support in `EventHandlerAdapter`
 
 **Keywords**: `stalling`, `Protect`, `consecutive usage`, `move events`, `Stall condition`
+
+---
+
+### Covet TakeItem RelayVar Fix
+**File**: `CovetTakeItemRelayVarFix.md`  
+**Severity**: Medium  
+**Systems Affected**: Item-stealing moves (Covet), TakeItem event handlers
+
+**Problem**: When Covet attempted to steal an item (e.g., Mind Plate) from an opponent, the TakeItem event was invoked without the `relayVar` parameter, causing a type mismatch exception: "Object of type 'ApogeeVGC.Sim.Moves.ActiveMove' cannot be converted to type 'ApogeeVGC.Sim.Items.Item'."
+
+**Root Cause**: The Covet move's `OnAfterHit` handler invoked the TakeItem event without passing the item as the `relayVar` parameter. The `EventHandlerAdapter` uses the `relayVar` to provide type-specific values for parameter resolution. Without it, the adapter couldn't correctly resolve the `Item` parameter for handlers like Mind Plate's `OnTakeItem`.
+
+**Solution**: Added the item as the `relayVar` parameter when invoking the TakeItem event, matching the TypeScript implementation where the item is passed as both `effect` and `relayVar`.
+
+**TypeScript Reference**: 
+```typescript
+this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, yourItem)
+//                           ^^^^^^^^                                              ^^^^^^^^
+//                           effect                                                relayVar
+```
+
+**Keywords**: `TakeItem event`, `item stealing`, `Covet`, `Mind Plate`, `relayVar`, `EventHandlerAdapter`, `parameter resolution`
 
 ---
 
