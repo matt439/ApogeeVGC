@@ -974,6 +974,7 @@ public partial class Battle
         {
             Battle = this,
             EventId = handlerInfo.Id,
+            Effect = Effect,
             Target = target,
             Source = source,
             SourceEffect = sourceEffect,

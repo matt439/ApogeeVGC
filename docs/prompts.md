@@ -48,6 +48,10 @@ I am converting move data from typescript #file:'C:\VSProjects\ApogeeVGC\pokemon
 
 i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunRndVsRndVgcRegIEvaluation':27313-34906 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. debug output:
 
+## Incremental Debugging
+
+i am incrementally debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunIncrementalDebugTest':27313-34906 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. the exception occured when testing the move 'Crabhammer'. debug output:
+
 ## Alphabetise entries
 
 check @ApogeeVGC/Data/Moves/MovesSTU.cs   and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).

@@ -1,6 +1,9 @@
 using System.Reflection;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
@@ -227,6 +230,38 @@ internal static class EventHandlerAdapter
             }
         }
 
+        // Check for specific IEffect subtypes before the generic IEffect check
+        // This ensures that Item, Ability, Move, etc. are resolved correctly
+        // rather than incorrectly matching against SourceEffect
+        
+        // Check for Item type - should match context.Effect if it's an Item
+        if (paramType == typeof(Items.Item) || typeof(Items.Item).IsAssignableFrom(paramType))
+        {
+            if (context.Effect is Items.Item item)
+            {
+                return item;
+            }
+        }
+        
+        // Check for Ability type - should match context.Effect if it's an Ability
+        if (paramType == typeof(Abilities.Ability) || typeof(Abilities.Ability).IsAssignableFrom(paramType))
+        {
+            if (context.Effect is Abilities.Ability ability)
+            {
+                return ability;
+            }
+        }
+        
+        // Check for Condition type - should match context.Effect if it's a Condition
+        if (paramType == typeof(Conditions.Condition) || typeof(Conditions.Condition).IsAssignableFrom(paramType))
+        {
+            if (context.Effect is Conditions.Condition condition)
+            {
+                return condition;
+            }
+        }
+
+        // Generic IEffect check (fallback to SourceEffect)
         if (typeof(IEffect).IsAssignableFrom(paramType))
         {
             return context.SourceEffect;

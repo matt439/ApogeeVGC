@@ -26,6 +26,11 @@ public sealed class EventContext
     /// </summary>
     public required EventId EventId { get; init; }
     
+    /// <summary>
+    /// The effect whose handler is being invoked (e.g., the Item, Ability, Move, or Condition that owns this handler).
+    /// </summary>
+    public IEffect? Effect { get; init; }
+    
     // === Event Targets ===
     
     /// <summary>
