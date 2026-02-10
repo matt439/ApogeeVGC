@@ -417,11 +417,15 @@ review items None to OvalStone
 
 ## ItemsPQR
 
-review items PamtreBerry to PowerBelt
+review items PasshoBerry to PoisonBarb
 
-review items PowerBracer to RazorClaw
+review items PokeBall to ProtectivePads
 
-review items RockyHelmet to RustedSword
+review items PsychicSeed to RazorClaw
+
+review items RazorFang to RoomService
+
+review items RoseliBerry to RustedSword
 
 ## ItemsSTU
 
