@@ -324,19 +324,29 @@ review abilities RockHead to RunAway
 
 ## AbilitiesSTU
 
-review abilities SandForce to SereneGrace
+review abilities SandForce to SapSipper
 
-review abilities ShadowShield to SlowStart
+review abilities Schooling to ShadowShield
 
-review abilities SlushRush to StanceChange
+review abilities ShadowTag to ShieldDust
 
-review abilities Static to SupersweetSyrup
+review abilities ShieldsDown to Sniper
 
-review abilities SupremeOverlord to TanglingHair
+review abilities SnowCloak to Stall
 
-review abilities Technician to ToxicChain
+review abilities Stalwart to Stench
 
-review abilities ToxicDebris to UnseenFist
+review abilities StickyHold to SupersweetSyrup
+
+review abilities SupremeOverlord to SwordOfRuin
+
+review abilities Symbiosis to TeraformZero
+
+review abilities TeraShell to ToughClaws
+
+review abilities ToxicBoost to Turboblaze
+
+review abilities Unaware to UnseenFist
 
 ## AbilitiesVWX
 
