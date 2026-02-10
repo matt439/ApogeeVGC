@@ -254,13 +254,17 @@ review abilities CottonDown to CuteCharm
 
 ## AbilitiesDEF
 
-review abilities Damp to DesolateLand
+review abilities Damp to Defiant
 
-review abilities Disguise to EmbodyAspectCornerstone
+review abilities DeltaStream to Download
 
-review abilities EmbodyAspectHearthflame to FlashFire
+review abilities DragonsMaw to Electromorphosis
 
-review abilities FlowerGift to Forecast
+review abilities EmbodyAspectCornerstone to FlameBody
+
+review abilities FlareBoost to FlowerGift
+
+review abilities FlowerVeil to Forecast
 
 review abilities Forewarn to FurCoat
 
