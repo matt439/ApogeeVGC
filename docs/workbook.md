@@ -381,11 +381,13 @@ review items CloverSweet to CustapBerry
 
 ## ItemsDEF
 
-review items DampRock to EjectButton
+review items DampRock to DuskStone
 
-review items EjectPack to FireStone
+review items EarthPlate to ElectricSeed
 
-review items FistPlate to FriendBall
+review items EnigmaBerry to FistPlate
+
+review items FlameOrb to FriendBall
 
 ## ItemsGHI
 
