@@ -18,9 +18,9 @@
 
 ^ review moves BoltStrike to BrickBreak
 
-@ review moves Brine to BulletSeed
+^ review moves Brine to BulletSeed
 
-review moves BurningBulwark to Charm
+@ review moves BurningBulwark to Charm
 
 review moves ChillingWater to CloseCombat
 
