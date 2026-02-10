@@ -2,9 +2,9 @@
 
 ## MovesABC
 
-@ review moves Absorb to Aeroblast
+^ review moves Absorb to Aeroblast
 
-review moves AfterYou to AllySwitch
+@ review moves AfterYou to AllySwitch
 
 review moves Amnesia to AromaticMist
 
