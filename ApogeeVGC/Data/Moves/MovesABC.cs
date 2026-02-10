@@ -1860,6 +1860,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags(),
                 SelfSwitch = true,
+                Condition = _library.Conditions[ConditionId.ChillyReception],
                 Target = MoveTarget.All,
                 Type = MoveType.Ice,
                 PriorityChargeCallback = new PriorityChargeCallbackEventInfo((_, source) =>
@@ -1879,7 +1880,7 @@ public partial record Moves
                 BasePp = 5,
                 Priority = 0,
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                MindBlownRecoil = true,
+                // Recoil handled specially in BattleActions.HitSteps (move.Id == MoveId.Chloroblast)
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
             },

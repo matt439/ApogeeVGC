@@ -20,9 +20,9 @@
 
 ^ review moves Brine to BulletSeed
 
-@ review moves BurningBulwark to Charm
+^ review moves BurningBulwark to Charm
 
-review moves ChillingWater to CloseCombat
+@ review moves ChillingWater to CloseCombat
 
 review moves Coaching to Conversion
 
