@@ -72,19 +72,27 @@ review moves FuryCutter to FutureSight
 
 ## MovesGHI
 
-review moves GastroAcid to GrassPledge
+review moves GastroAcid to Glare
 
-review moves GrassyGlide to HappyHour
+review moves GrassKnot to GrassyTerrain
 
-review moves Harden to HeadlongRush
+review moves GravApple to Guillotine
 
-review moves HeavySlam to HornAttack
+review moves GunkShot to HardPress
 
-review moves HornDrill to IceBeam
+review moves Haze to HealingWish
 
-review moves IceBurn to Inferno
+review moves HealPulse to Heatwave
 
-review moves Infestation to IvyCudgel
+review moves HeavySlam to HornDrill
+
+review moves HornLeech to HyperDrill
+
+review moves HyperspaceFury to IceHammer
+
+review moves IcePunch to InfernalParade
+
+review moves Inferno to IvyCudgel
 
 ## MovesJKL
 
