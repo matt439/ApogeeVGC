@@ -2051,10 +2051,13 @@ public partial record Moves
                 Type = MoveType.Fighting,
                 OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
                 {
-                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
-                    // Only apply buff when super effective (> 0)
-                    battle.Debug("collision course super effective buff");
-                    return battle.ChainModify([5461, 4096]);
+                    if (target.RunEffectiveness(move) > 0)
+                    {
+                        battle.Debug("collision course super effective buff");
+                        return battle.ChainModify([5461, 4096]);
+                    }
+
+                    return DoubleVoidUnion.FromVoid();
                 }),
             },
             [MoveId.Comeuppance] = new()
