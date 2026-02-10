@@ -798,11 +798,11 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
+                // TODO: TS uses this.dex.conditions.get('High Jump Kick') as the damage effect for historical
+                // consistency, but C# has no ConditionId.HighJumpKick. Using the current move instead means
+                // the crash damage log will reference "Axe Kick" rather than "High Jump Kick".
                 OnMoveFail = new OnMoveFailEventInfo((battle, _, source, move) =>
                 {
-                    // TypeScript uses this.dex.conditions.get('High Jump Kick') for historical consistency,
-                    // but in C# architecture, Move doesn't implement IEffect (only ActiveMove does).
-                    // Using the current move is functionally equivalent for crash damage.
                     battle.Damage(source.BaseMaxHp / 2, source, source,
                         BattleDamageEffect.FromIEffect(move));
                 }),

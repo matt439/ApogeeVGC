@@ -264,18 +264,9 @@ public partial record Conditions
 
                     return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
                 }, 3),
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                {
-                    // Handle Z-Moves/Max Moves that break through but still make contact
-                    // Note: IsZOrMaxPowered property would need to be checked if available
-                    // For now, this handles the case where the move hits through protect
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        source.TrySetStatus(ConditionId.Poison, target);
-                    }
-
-                    return BoolEmptyVoidUnion.FromVoid();
-                }),
+                // TS onHit only triggers for Z/Max moves (move.isZOrMaxPowered), which don't exist
+                // in Gen 9. This handler is a no-op for Gen 9.
+                OnHit = new OnHitEventInfo((_, _, _, _) => BoolEmptyVoidUnion.FromVoid()),
             },
             [ConditionId.Block] = new()
             {
