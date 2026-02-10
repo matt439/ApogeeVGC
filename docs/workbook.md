@@ -407,11 +407,13 @@ review items LoadedDice to LuxuryBall
 
 ## ItemsMNO
 
-review items MachoBrace to Metronome
+review items MachoBrace to MeadowPlate
 
-review items MicleBerry to NomelBerry
+review items MentalHerb to MiracleSeed
 
-review items NormalGem to None
+review items MirrorHerb to NeverMeltIce
+
+review items None to OvalStone
 
 ## ItemsPQR
 
