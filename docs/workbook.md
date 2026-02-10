@@ -128,21 +128,33 @@ review moves Outrage to Overheat
 
 ## MovesPQR
 
-review moves PainSplit to PhantomForce
+review moves PainSplit to Peck
 
-review moves PhotonGeyser to PoisonTail
+review moves PerishSong to PhotonGeyser
 
-review moves PollenPuff to PowerTrick
+review moves PinMissile to PoisonJab
 
-review moves PowerTrip to PsychUp
+review moves PoisonPowder to Poltergeist
 
-review moves Psychic to QuickAttack
+review moves PopulationBomb to PowerSwap
 
-review moves QuckGuard to RapidSpin
+review moves PowerTrick to PrismaticLaser
 
-review moves Recharge to RelicSong
+review moves Protect to PsychicNoise
 
-review moves RevelationDance to RolePlay
+review moves PsychicTerrain to Psystrike
+
+review moves PyroBall to RagePowder
+
+review moves RagingBull to RapidSpin
+
+review moves RazorLeaf to ReflectType
+
+review moves RelicSong to RevelationDance
+
+review moves Reversal to RockPolish
+
+review moves RockSlide to RolePlay
 
 review moves Rollout to Ruination
 
