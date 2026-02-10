@@ -292,13 +292,19 @@ review abilities LightningRod to LongReach
 
 ## AbilitiesMNO
 
-review abilities MagicBounce to MindsEye
+review abilities MagicBounce to MegaLauncher
 
-review abilities Minus to MyceliumMight
+review abilities Merciless to MirrorArmor
 
-review abilities NaturalCure to Normalize
+review abilities MistySurge to Multiscale
 
-review abilities Oblivious to OwnTempo
+review abilities Multitype to NaturalCure
+
+review abilities Neuroforce to Normalize
+
+review abilities Oblivious to Opportunist
+
+review abilities OrichalcumPulse to OwnTempo
 
 ## AbilitiesPQR
 
