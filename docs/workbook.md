@@ -286,7 +286,9 @@ review abilities Infiltrator to IronFist
 
 ## AbilitiesJKL
 
-review abilities Justified to LongReach
+review abilities Justified to LightMetal
+
+review abilities LightningRod to LongReach
 
 ## AbilitiesMNO
 
