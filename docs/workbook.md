@@ -160,29 +160,59 @@ review moves Rollout to Ruination
 
 ## MovesSTU
 
-review moves 
+review moves SacredFire to SandTomb
 
-review moves x to Spore
+review moves Scald to SeedBomb
 
-review moves SpringtideStorm to StompingTantrum
+review moves SeedFlare to ShadowPunch
 
-review moves StoneAxe to StuffCheeks
+review moves ShadowSneak to Shelter
 
-review moves StunSpore to Swagger
+review moves ShiftGear to Sing
 
-review moves Swallow to ThunderWave
+review moves Sketch to SkitterSmack
 
-review moves TrickRoom to TeaTime
+review moves SkyAttack to SleepTalk
 
-review moves TeeterDance to ThroatChop
+review moves Sludge to Snarl
 
-review moves Thunder to TidyUp
+review moves SnipeShot to SoftBoiled
 
-review moves TopsyTurvy to TriAttack
+review moves SolarBeam to Spark
 
-review moves Trick to Twister
+review moves SparklingAria to SpinOut
 
-review moves UpperHand to UTurn
+review moves SpiritBreak to SpringtideStorm
+
+review moves StealthRock to Stockpile
+
+review moves Stomp to StrangeSteam
+
+review moves Strength to StuffCheeks
+
+review moves StunSpore to SuperFang
+
+review moves Superpower to SweetScent
+
+review moves Swift to SyrupBomb
+
+review moves TachyonCutter to TakeHeart
+
+review moves TarShot to Teleport
+
+review moves TemperFlare to TerrainPulse
+
+review moves Thief to ThunderCage
+
+review moves Thunderclap to Tickle
+
+review moves TidyUp to ToxicSpikes
+
+review moves ToxicThread to TriAttack
+
+review moves Trick to TripleDive
+
+review moves TripleKick to UTurn
 
 ## MovesVWX
 
