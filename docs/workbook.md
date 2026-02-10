@@ -235,13 +235,21 @@ review moves Yawn to ZingZap
 
 ## AbilitiesABC
 
-review abilities Adaptability to ArmorTail
+review abilities Adaptability to AngerPoint
 
-review abilities AromaVeil to BeastBoost
+review abilities AngerShell to ArmorTail
 
-review abilities Berserk to Comatose
+review abilities AromaVeil to AuraBreak
 
-review abilities Commander to CuteCharm
+review abilities BadDreams to BeastBoost
+
+review abilities Berserk to ChillingNeigh
+
+review abilities Chlorophyll to Comatose
+
+review abilities Commander to Costar
+
+review abilities CottonDown to CuteCharm
 
 
 ## AbilitiesDEF
