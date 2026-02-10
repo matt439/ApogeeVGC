@@ -350,9 +350,13 @@ review abilities Unaware to UnseenFist
 
 ## AbilitiesVWX
 
-review abilities VesselOfRuin to WeakArmor
+review abilities VesselOfRuin to VoltAbsorb
 
-review abilities WellBakedBody to WonderSkin
+review abilities WanderingSpirit to WaterVeil
+
+review abilities WeakArmor to WindPower
+
+review abilities WindRider to WonderSkin
 
 ## AbilitiesYZ
 
