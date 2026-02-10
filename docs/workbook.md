@@ -216,11 +216,15 @@ review moves TripleKick to UTurn
 
 ## MovesVWX
 
-review moves VacuumWave to WaterPledge
+review moves VacuumWave to Waterfall
 
-review moves WaterPulse to WildCharge
+review moves WaterGun to WaterSpout
 
-review moves WillOWisp to XScissor
+review moves WaveCrash to WildboltStorm
+
+review moves WildCharge to WorkUp
+
+review moves WorrySeed to XScissor
 
 ## MovesYZ
 
