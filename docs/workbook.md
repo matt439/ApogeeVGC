@@ -2,7 +2,7 @@
 
 ## MovesABC
 
-review moves Absorb to Aeroblast
+@ review moves Absorb to Aeroblast
 
 review moves AfterYou to AllySwitch
 
