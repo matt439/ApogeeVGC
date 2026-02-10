@@ -308,13 +308,19 @@ review abilities OrichalcumPulse to OwnTempo
 
 ## AbilitiesPQR
 
-review abilities ParentalBond to PoisonPuppeteer
+review abilities ParentalBond to Pickup
 
-review abilities PoisonTouch to PsychicSurge
+review abilities Pixilate to PowerOfAlchemy
 
-review abilities PunkRock to Reckless
+review abilities PowerSpot to Protean
 
-review abilities Refrigerate to RunAway
+review abilities Protosynthesis to PurifyingSalt
+
+review abilities QuarkDrive to Receiver
+
+review abilities Reckless to RksSystem
+
+review abilities RockHead to RunAway
 
 ## AbilitiesSTU
 
