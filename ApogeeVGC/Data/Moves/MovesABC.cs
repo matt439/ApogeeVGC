@@ -1192,11 +1192,13 @@ public partial record Moves
                 Flags = new MoveFlags { Reflectable = true, Mirror = true, Metronome = true },
                 OnHit = new OnHitEventInfo((_, target, source, move) =>
                 {
-                    // Return the result of AddVolatile - returns false if already trapped
+                    // TS: return target.addVolatile('trapped', source, move, 'trapper');
+                    // addVolatile returns Pokemon (truthy) on success, null on failure.
+                    // Returning null here = NOT_FAIL (fail silently), not false (which would show "But it failed!").
                     RelayVar result = target.AddVolatile(ConditionId.Trapped, source, move, ConditionId.Trapper);
                     if (result is BoolRelayVar { Value: false })
                     {
-                        return false;
+                        return null;
                     }
 
                     return new VoidReturn();

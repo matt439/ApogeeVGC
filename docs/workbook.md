@@ -12,9 +12,9 @@
 
 ^ review moves Avalanche to BatonPass
 
-@ review moves BeatUp to BitterMalice
+^ review moves BeatUp to BitterMalice
 
-review moves BlastBurn to BodySlam
+@ review moves BlastBurn to BodySlam
 
 review moves BoltStrike to BrickBreak
 
