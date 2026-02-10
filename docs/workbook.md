@@ -399,9 +399,11 @@ review items IapapaBerry to IronPlate
 
 ## ItemsJKL
 
-review items JabocaBerry to LiechiBerry
+review items JabocaBerry to LaggingTail
 
-review items LifeOrb to LuxuryBall
+review items LansatBerry to LightClay
+
+review items LoadedDice to LuxuryBall
 
 ## ItemsMNO
 
