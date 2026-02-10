@@ -59,3 +59,7 @@ i am incrementally debugging my pokemon simulator by running battles between two
 ## Alphabetise entries
 
 check @ApogeeVGC/Data/Moves/MovesSTU.cs   and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).
+
+## Create Splits in Workbook.md
+
+see @docs/workbook.md . it splits files into chunks by listing entry ranges. it needs to be recreated because i have alphabetised some of the files. each chunk must be no more than 200 lines. do @ApogeeVGC/Data/Moves/MovesABC.cs
