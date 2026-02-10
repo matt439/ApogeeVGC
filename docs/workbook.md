@@ -2,23 +2,35 @@
 
 ## MovesABC
 
-review moves Absorb to AllySwitch
+review moves Absorb to Aeroblast
 
-review moves Amnesia to AuraSphere
+review moves AfterYou to AllySwitch
 
-review moves AuraWheel to Belch
+review moves Amnesia to AromaticMist
 
-review moves BellyDrum to BodySlam
+review moves Assurance to AuroraVeil
 
-review moves BoltStrike to BugBuzz
+review moves Avalanche to BatonPass
 
-review moves BulkUp to Chloroblast
+review moves BeatUp to BitterMalice
 
-review moves CircleThrow to Conversion
+review moves BlastBurn to BodySlam
 
-review moves Conversion2 to Covet
+review moves BoltStrike to BrickBreak
 
-review moves Crabhammer to Crunch
+review moves Brine to BulletSeed
+
+review moves BurningBulwark to Charm
+
+review moves ChillingWater to CloseCombat
+
+review moves Coaching to Conversion
+
+review moves Conversion2 to Counter
+
+review moves CourtChange to CrossPoison
+
+review moves CrushClaw to Curse
 
 ## MovesDEF
 
