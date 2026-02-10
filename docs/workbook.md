@@ -429,11 +429,15 @@ review items RoseliBerry to RustedSword
 
 ## ItemsSTU
 
-review items SafariBall to SkyPlate
+review items SafariBall to SilkScarf
 
-review items SmoothRock to StickyBarb
+review items SilverPowder to SpellTag
 
-review items StonePlate to UtilityUmbrella
+review items SplashPlate to StickyBarb
+
+review items StonePlate to ToxicOrb
+
+review items ToxicPlate to UtilityUmbrella
 
 ## ItemsVWX
 
