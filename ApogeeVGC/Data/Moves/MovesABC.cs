@@ -2358,7 +2358,7 @@ public partial record Moves
                         return IntFalseUnion.FromInt(0);
                     }
 
-                    return IntFalseUnion.FromInt(effectState.Damage ?? 1);
+                    return IntFalseUnion.FromInt(effectState.Damage is > 0 ? effectState.Damage.Value : 1);
                 }),
                 BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _) =>
                 {

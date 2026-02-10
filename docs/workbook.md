@@ -24,9 +24,9 @@
 
 ^ review moves ChillingWater to CloseCombat
 
-@ review moves Coaching to Conversion
+^ review moves Coaching to Conversion
 
-review moves Conversion2 to Counter
+@ review moves Conversion2 to Counter
 
 review moves CourtChange to CrossPoison
 
