@@ -16,9 +16,9 @@
 
 ^ review moves BlastBurn to BodySlam
 
-@ review moves BoltStrike to BrickBreak
+^ review moves BoltStrike to BrickBreak
 
-review moves Brine to BulletSeed
+@ review moves Brine to BulletSeed
 
 review moves BurningBulwark to Charm
 
