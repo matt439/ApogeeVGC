@@ -391,7 +391,9 @@ review items FlameOrb to FriendBall
 
 ## ItemsGHI
 
-review items GalaricaCuff to HondewBerry
+review items GalaricaCuff to GriseousOrb
+
+review items HabanBerry to HondewBerry
 
 review items IapapaBerry to IronPlate
 
