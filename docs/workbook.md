@@ -270,13 +270,19 @@ review abilities Forewarn to FurCoat
 
 ## AbilitiesGHI
 
-review abilities GaleWings to Guts
+review abilities GaleWings to GorillaTactics
 
-review abilities HadronEngine to IceBody
+review abilities GrassPelt to Guts
 
-review abilities IceFace to InnerFocus
+review abilities HadronEngine to HoneyGather
 
-review abilities Insomnia to IronFist
+review abilities Hospitality to HyperCutter
+
+review abilities IceBody to IceScales
+
+review abilities Illuminate to Imposter
+
+review abilities Infiltrator to IronFist
 
 ## AbilitiesJKL
 
