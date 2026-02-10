@@ -101,7 +101,7 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
                 {
-                    if (source == null) return BoolVoidUnion.FromVoid();
+                    if (source == null) return BoolVoidUnion.FromBool(false);
                     if (!((pokemon.Gender == GenderId.M && source.Gender == GenderId.F) ||
                           (pokemon.Gender == GenderId.F && source.Gender == GenderId.M)))
                     {
