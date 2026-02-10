@@ -367,13 +367,17 @@ review abilities ZenMode to ZeroToHero
 
 ## ItemsABC
 
-review items AbilityShield to AssaultVest
+review items AbilityShield to AguavBerry
 
-review items BabiriBerry to CellBattery
+review items AirBalloon to BigNugget
 
-review items Charcoal to ChopleBerry
+review items BigRoot to BrightPowder
 
-review items ClearAmulet to CustapBerry
+review items CellBattery to ChoiceBand
+
+review items ChoiceScarf to ClearAmulet
+
+review items CloverSweet to CustapBerry
 
 ## ItemsDEF
 

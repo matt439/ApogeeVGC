@@ -62,4 +62,4 @@ check @ApogeeVGC/Data/Moves/MovesSTU.cs   and ensure all entries are in alphabet
 
 ## Create Splits in Workbook.md
 
-see @docs/workbook.md . it splits files into chunks by listing entry ranges. it needs to be recreated because i have alphabetised some of the files. each chunk must be no more than 200 lines. do @ApogeeVGC/Data/Abilities/AbilitiesABC.cs
+see @docs/workbook.md . it splits files into chunks by listing entry ranges. it needs to be recreated because i have alphabetised some of the files. each chunk must be no more than 200 lines. do @ApogeeVGC/Data/Items/ItemsABC.cs
