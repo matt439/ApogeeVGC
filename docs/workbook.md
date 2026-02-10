@@ -96,11 +96,13 @@ review moves Inferno to IvyCudgel
 
 ## MovesJKL
 
-review moves JawLock to LastResort
+review moves JawLock to KowtowCleave
 
-review moves LastRespects to LunarBlessing
+review moves Lashout to LeechLife
 
-review moves LunarDance to LusterPurge
+review moves LeechSeed to LockOn
+
+review moves LowKick to LusterPurge
 
 ## MovesMNO
 
