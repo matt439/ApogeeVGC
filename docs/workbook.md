@@ -441,7 +441,9 @@ review items ToxicPlate to UtilityUmbrella
 
 ## ItemsVWX
 
-review items WacanBerry to WiseGlasses
+review items WacanBerry to WhiteHerb
+
+review items WideLens to WiseGlasses
 
 ## ItemsYZ
 
