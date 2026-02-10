@@ -106,17 +106,25 @@ review moves LowKick to LusterPurge
 
 ## MovesMNO
 
-review moves MachPunch to MeanLook
+review moves MachPunch to MagneticFlux
 
-review moves MegaDrain to MeteorMash
+review moves MagnetRise to MegaHorn
 
-review moves Metronome to MistyExplosion
+review moves MegaKick to MetalSound
 
-review moves MistyTerrain to MuddyWater
+review moves MeteorBeam to MilkDrink
 
-review moves MudShot to Nuzzle
+review moves Mimic to MistBall
 
-review moves OrderUp to Overheat
+review moves MistyExplosion to MorningSun
+
+review moves MortalSpin to MudSlap
+
+review moves MysticalFire to NobleRoar
+
+review moves NoRetreat to OriginPulse
+
+review moves Outrage to Overheat
 
 ## MovesPQR
 
