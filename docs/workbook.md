@@ -34,25 +34,39 @@ review moves CrushClaw to Curse
 
 ## MovesDEF
 
-review moves DazzlingGleam to DiamondStorm
+review moves DarkestLariat to DefenseCurl
 
-review moves Dig to DoubleEdge
+review moves Defog to DiamondStorm
 
-review moves DoubleHit to DragonTail
+review moves Dig to Discharge
 
-review moves DrainingKiss to Earthquake
+review moves Dive to DoubleKick
 
-review moves EchoedVoice to Endure
+review moves DoubleShock to DragonDarts
 
-review moves EnergyBall to FeatherDance
+review moves DragonEnergy to DrillRun
 
-review moves Feint to FireSpin
+review moves DrumBeating to EerieImpulse
 
-review moves FirePledge to Flatter
+review moves EerieSpell to Electroweb
 
-review moves FleurCannon to FocusBlast
+review moves Ember to Eruption
 
-review moves FocusEnergy to FuryAttack
+review moves EsperWing to FairyLock
+
+review moves FairyWind to FieryDance
+
+review moves FieryWrath to FireLash
+
+review moves FirePledge to Fissure
+
+review moves Flail to FleurCannon
+
+review moves Fling to FlowerTrick
+
+review moves Fly to ForcePalm
+
+review moves ForestsCurse to FuryAttack
 
 review moves FuryCutter to FutureSight
 
