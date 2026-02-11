@@ -31,15 +31,7 @@ public partial record Conditions
                 AssociatedMove = MoveId.DefenseCurl,
                 NoCopy = true,
                 // This is a marker condition used by Rollout and Ice Ball to double their damage
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", pokemon, "move: Defense Curl");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
+                // No OnStart - this is a silent marker condition (no message shown)
                 // Prevent restarting the condition when used again
                 OnRestart = new OnRestartEventInfo((_, _, _, _) => null),
             },

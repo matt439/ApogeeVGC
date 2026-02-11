@@ -34,7 +34,7 @@
 
 ## MovesDEF
 
-review moves DarkestLariat to DefenseCurl
+^ review moves DarkestLariat to DefenseCurl
 
 review moves Defog to DiamondStorm
 
