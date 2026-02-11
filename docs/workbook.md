@@ -90,9 +90,9 @@
 
 ^ review moves HyperspaceFury to IceHammer
 
-@ review moves IcePunch to InfernalParade
+^ review moves IcePunch to InfernalParade
 
-review moves Inferno to IvyCudgel
+@ review moves Inferno to IvyCudgel
 
 ## MovesJKL
 

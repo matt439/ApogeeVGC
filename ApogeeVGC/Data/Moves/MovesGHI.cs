@@ -1997,8 +1997,7 @@ public partial record Moves
                     var resolvedActions = battle.Queue.ResolveAction(instructedAction);
                     if (resolvedActions.Count > 0 && resolvedActions[0] is MoveAction ma)
                     {
-                        battle.Queue.PrioritizeAction(ma,
-                            _library.Moves[MoveId.Instruct].ToActiveMove());
+                        battle.Queue.PrioritizeAction(ma);
                     }
 
                     return new VoidReturn();
@@ -2072,6 +2071,15 @@ public partial record Moves
                 CritRatio = 2,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, _, move) =>
+                {
+                    if (move.Type != MoveType.Grass)
+                    {
+                        battle.AttrLastMove($"[anim] Ivy Cudgel {move.Type}");
+                    }
+
+                    return new VoidReturn();
+                }),
                 OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
                 {
                     switch (pokemon.Species.Name)
