@@ -60,9 +60,9 @@
 
 ^ review moves FirePledge to Fissure
 
-@ review moves Flail to FleurCannon
+^ review moves Flail to FleurCannon
 
-review moves Fling to FlowerTrick
+@ review moves Fling to FlowerTrick
 
 review moves Fly to ForcePalm
 
