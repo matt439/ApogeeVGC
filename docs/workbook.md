@@ -48,9 +48,9 @@
 
 ^ review moves DrumBeating to EerieImpulse
 
-@ review moves EerieSpell to Electroweb
+^ review moves EerieSpell to Electroweb
 
-review moves Ember to Eruption
+@ review moves Ember to Eruption
 
 review moves EsperWing to FairyLock
 

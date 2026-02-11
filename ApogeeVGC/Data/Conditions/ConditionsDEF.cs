@@ -666,18 +666,24 @@ public partial record Conditions
                 }),
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    // Check if encored move has PP remaining
                     var encoredMove = battle.EffectState.Move;
                     if (encoredMove == null) return;
 
-                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                    // Find the move slot for the encored move
+                    MoveSlot? moveSlot = null;
+                    foreach (MoveSlot slot in pokemon.MoveSlots)
                     {
-                        if (moveSlot.Id == encoredMove && moveSlot.Pp <= 0)
+                        if (slot.Id == encoredMove)
                         {
-                            // End Encore if the encored move has no PP
-                            pokemon.RemoveVolatile(_library.Conditions[ConditionId.Encore]);
-                            return;
+                            moveSlot = slot;
+                            break;
                         }
+                    }
+
+                    // End Encore if the move is no longer available or has no PP
+                    if (moveSlot == null || moveSlot.Pp <= 0)
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Encore]);
                     }
                 }, 16),
                 OnEnd = new OnEndEventInfo((battle, target) =>
