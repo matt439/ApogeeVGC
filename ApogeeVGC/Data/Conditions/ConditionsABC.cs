@@ -783,8 +783,7 @@ public partial record Conditions
                 }),
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    battle.Damage(pokemon.BaseMaxHp / 4, pokemon, pokemon,
-                        BattleDamageEffect.FromIEffect(_library.Conditions[ConditionId.Curse]));
+                    battle.Damage(pokemon.BaseMaxHp / 4);
                 }, 12),
             },
         };

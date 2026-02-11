@@ -28,9 +28,9 @@
 
 ^ review moves Conversion2 to Counter
 
-@ review moves CourtChange to CrossPoison
+^ review moves CourtChange to CrossPoison
 
-review moves CrushClaw to Curse
+^ review moves CrushClaw to Curse
 
 ## MovesDEF
 
