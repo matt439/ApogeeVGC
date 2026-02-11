@@ -58,9 +58,9 @@
 
 ^ review moves FieryWrath to FireLash
 
-@ review moves FirePledge to Fissure
+^ review moves FirePledge to Fissure
 
-review moves Flail to FleurCannon
+@ review moves Flail to FleurCannon
 
 review moves Fling to FlowerTrick
 
