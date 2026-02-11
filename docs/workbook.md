@@ -40,9 +40,9 @@
 
 ^ review moves Dig to Discharge
 
-@ review moves Dive to DoubleKick
+^ review moves Dive to DoubleKick
 
-review moves DoubleShock to DragonDarts
+@ review moves DoubleShock to DragonDarts
 
 review moves DragonEnergy to DrillRun
 

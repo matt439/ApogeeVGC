@@ -692,7 +692,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                OnTryMove = new OnTryMoveEventInfo((battle, _, source, _) =>
+                OnTryMove = new OnTryMoveEventInfo((battle, source, _, _) =>
                 {
                     // Only works if user has Electric type
                     if (source.HasType(PokemonType.Electric))
