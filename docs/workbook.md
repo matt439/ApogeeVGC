@@ -54,7 +54,7 @@
 
 ^ review moves EsperWing to FairyLock
 
-review moves FairyWind to FieryDance
+@ review moves FairyWind to FieryDance
 
 review moves FieryWrath to FireLash
 
