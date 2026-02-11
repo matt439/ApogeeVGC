@@ -84,9 +84,9 @@
 
 ^ review moves HealPulse to Heatwave
 
-@ review moves HeavySlam to HornDrill
+^ review moves HeavySlam to HornDrill
 
-review moves HornLeech to HyperDrill
+@ review moves HornLeech to HyperDrill
 
 review moves HyperspaceFury to IceHammer
 
