@@ -504,7 +504,7 @@ public partial record Moves
                         SpecieId forme = attacker.Hp <= attacker.MaxHp / 2
                             ? SpecieId.CramorantGorging
                             : SpecieId.CramorantGulping;
-                        attacker.FormeChange(forme, move, true);
+                        attacker.FormeChange(forme, move);
                     }
 
                     // Starting the charge turn - show prepare message
