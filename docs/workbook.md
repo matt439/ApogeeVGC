@@ -78,9 +78,9 @@
 
 ^ review moves GravApple to Guillotine
 
-@ review moves GunkShot to HardPress
+^ review moves GunkShot to HardPress
 
-review moves Haze to HealingWish
+@ review moves Haze to HealingWish
 
 review moves HealPulse to Heatwave
 
