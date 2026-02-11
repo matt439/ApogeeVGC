@@ -56,9 +56,9 @@
 
 ^ review moves FairyWind to FieryDance
 
-@ review moves FieryWrath to FireLash
+^ review moves FieryWrath to FireLash
 
-review moves FirePledge to Fissure
+@ review moves FirePledge to Fissure
 
 review moves Flail to FleurCannon
 
