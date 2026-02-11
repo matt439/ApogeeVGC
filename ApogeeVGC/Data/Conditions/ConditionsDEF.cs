@@ -972,7 +972,7 @@ public partial record Conditions
                         @volatile.LostFocus = true;
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
                 {
