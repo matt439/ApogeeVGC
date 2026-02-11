@@ -3154,7 +3154,7 @@ public partial record Moves
                         IgnoreImmunity = false,
                     };
 
-                    battle.Add("-start", source, "Future Sight");
+                    battle.Add("-start", source, "move: Future Sight");
                     return new Empty();
                 }),
             },

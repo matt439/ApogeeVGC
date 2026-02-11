@@ -1121,7 +1121,6 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.FuryCutter,
                 Duration = 2,
-                NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, _, _, _) =>
                 {
                     battle.EffectState.Multiplier = 1;
