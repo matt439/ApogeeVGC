@@ -44,9 +44,9 @@
 
 ^ review moves DoubleShock to DragonDarts
 
-@ review moves DragonEnergy to DrillRun
+^ review moves DragonEnergy to DrillRun
 
-review moves DrumBeating to EerieImpulse
+@ review moves DrumBeating to EerieImpulse
 
 review moves EerieSpell to Electroweb
 

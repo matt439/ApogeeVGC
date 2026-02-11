@@ -1167,7 +1167,7 @@ public partial record Moves
                         bp = move.BasePower * multiplier;
                     }
 
-                    battle.Debug($"BP: {bp}");
+                    battle.Debug($"BP: {move.BasePower}");
                     return bp;
                 }),
             },
