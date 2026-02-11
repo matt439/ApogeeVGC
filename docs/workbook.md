@@ -76,9 +76,9 @@
 
 ^ review moves GrassKnot to GrassyTerrain
 
-@ review moves GravApple to Guillotine
+^ review moves GravApple to Guillotine
 
-review moves GunkShot to HardPress
+@ review moves GunkShot to HardPress
 
 review moves Haze to HealingWish
 
