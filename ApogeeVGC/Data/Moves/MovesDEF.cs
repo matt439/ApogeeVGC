@@ -1211,8 +1211,7 @@ public partial record Moves
 
                         // Get target's last move
                         Move? lastMove = target.LastMove;
-                        if (lastMove == null || lastMove.Id == MoveId.Struggle)
-                            return new VoidReturn();
+                        if (lastMove == null) return new VoidReturn();
 
                         // Deduct 3 PP from the last move
                         int ppDeducted = target.DeductPp(lastMove.Id, 3);
