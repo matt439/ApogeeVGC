@@ -82,9 +82,9 @@
 
 ^ review moves Haze to HealingWish
 
-@ review moves HealPulse to Heatwave
+^ review moves HealPulse to Heatwave
 
-review moves HeavySlam to HornDrill
+@ review moves HeavySlam to HornDrill
 
 review moves HornLeech to HyperDrill
 
