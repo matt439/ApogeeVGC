@@ -74,9 +74,9 @@
 
 ^ review moves GastroAcid to Glare
 
-@ review moves GrassKnot to GrassyTerrain
+^ review moves GrassKnot to GrassyTerrain
 
-review moves GravApple to Guillotine
+@ review moves GravApple to Guillotine
 
 review moves GunkShot to HardPress
 

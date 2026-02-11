@@ -442,11 +442,10 @@ public partial record Moves
                 {
                     if (battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
                     {
-                        battle.ChainModify(3, 2); // 1.5x = 3/2
-                        return battle.FinalModify(basePower);
+                        return battle.ChainModify(1.5);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
             },
             [MoveId.Gravity] = new()
@@ -465,6 +464,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 PseudoWeather = ConditionId.Gravity,
+                Condition = _library.Conditions[ConditionId.Gravity],
                 Target = MoveTarget.All,
                 Type = MoveType.Psychic,
             },
