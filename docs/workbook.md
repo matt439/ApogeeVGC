@@ -92,11 +92,11 @@
 
 ^ review moves IcePunch to InfernalParade
 
-@ review moves Inferno to IvyCudgel
+^ review moves Inferno to IvyCudgel
 
 ## MovesJKL
 
-review moves JawLock to KowtowCleave
+@ review moves JawLock to KowtowCleave
 
 review moves Lashout to LeechLife
 
