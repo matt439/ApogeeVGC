@@ -50,9 +50,9 @@
 
 ^ review moves EerieSpell to Electroweb
 
-@ review moves Ember to Eruption
+^ review moves Ember to Eruption
 
-review moves EsperWing to FairyLock
+^ review moves EsperWing to FairyLock
 
 review moves FairyWind to FieryDance
 
