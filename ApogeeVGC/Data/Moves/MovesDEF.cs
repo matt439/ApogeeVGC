@@ -1983,7 +1983,7 @@ public partial record Moves
                 Boosts = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                OnTry = new OnTryEventInfo((_, source, _, _) =>
                 {
                     // Fail if HP is less than or equal to half of max HP, or if max HP is 1
                     if (source.Hp <= source.MaxHp / 2 || source.MaxHp == 1)
