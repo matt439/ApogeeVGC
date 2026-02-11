@@ -68,11 +68,11 @@
 
 ^ review moves ForestsCurse to FuryAttack
 
-@ review moves FuryCutter to FutureSight
+^ review moves FuryCutter to FutureSight
 
 ## MovesGHI
 
-review moves GastroAcid to Glare
+@ review moves GastroAcid to Glare
 
 review moves GrassKnot to GrassyTerrain
 
