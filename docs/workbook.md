@@ -38,9 +38,9 @@
 
 ^ review moves Defog to DiamondStorm
 
-@ review moves Dig to Discharge
+^ review moves Dig to Discharge
 
-review moves Dive to DoubleKick
+@ review moves Dive to DoubleKick
 
 review moves DoubleShock to DragonDarts
 
