@@ -86,9 +86,9 @@
 
 ^ review moves HeavySlam to HornDrill
 
-@ review moves HornLeech to HyperDrill
+^ review moves HornLeech to HyperDrill
 
-review moves HyperspaceFury to IceHammer
+@ review moves HyperspaceFury to IceHammer
 
 review moves IcePunch to InfernalParade
 
