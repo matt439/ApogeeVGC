@@ -80,9 +80,9 @@
 
 ^ review moves GunkShot to HardPress
 
-@ review moves Haze to HealingWish
+^ review moves Haze to HealingWish
 
-review moves HealPulse to Heatwave
+@ review moves HealPulse to Heatwave
 
 review moves HeavySlam to HornDrill
 
