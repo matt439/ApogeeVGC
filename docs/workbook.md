@@ -100,9 +100,9 @@
 
 ^ review moves Lashout to LeechLife
 
-@ review moves LeechSeed to LockOn
+^ review moves LeechSeed to LockOn
 
-review moves LowKick to LusterPurge
+^ review moves LowKick to LusterPurge
 
 ## MovesMNO
 
