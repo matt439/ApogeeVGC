@@ -373,39 +373,51 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             Console.WriteLine($"[PlayerRandom] Generating random switch choice for {SideId}");
         }
 
-        // Build list of available Pokemon (excluding active and fainted)
-        var availablePokemonWithIndex = request.Side.Pokemon
-            .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
-            .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
-            .ToList();
+        var actions = new List<ChosenAction>();
+        var usedSlots = new HashSet<int>();
 
-        if (availablePokemonWithIndex.Count == 0)
+        // Generate a switch action for each active slot that needs to switch
+        for (int i = 0; i < request.ForceSwitch.Count; i++)
         {
-            throw new InvalidOperationException("No Pokemon available to switch");
-        }
-
-        // Pick a random Pokemon
-        int randomIndex = _random.Random(0, availablePokemonWithIndex.Count);
-        var selectedItem = availablePokemonWithIndex[randomIndex];
-
-        if (PrintDebug)
-        {
-            Console.WriteLine(
-                $"[PlayerRandom] Selected switch to: {selectedItem.PokemonData.Details}");
-        }
-
-        return new Choice
-        {
-            Actions = new List<ChosenAction>
+            if (!request.ForceSwitch[i])
             {
-                new()
-                {
-                    Choice = ChoiceType.Switch,
-                    Pokemon = null,
-                    MoveId = MoveId.None,
-                    Index = selectedItem.OriginalIndex,
-                },
-            },
-        };
+                continue;
+            }
+
+            // Build list of available Pokemon (excluding active, fainted, and already-picked)
+            var availablePokemonWithIndex = request.Side.Pokemon
+                .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
+                .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData)
+                             && !usedSlots.Contains(x.OriginalIndex))
+                .ToList();
+
+            if (availablePokemonWithIndex.Count == 0)
+            {
+                // No more Pokemon available to switch in — pass for this slot
+                actions.Add(new ChosenAction { Choice = ChoiceType.Pass, MoveId = MoveId.None });
+                continue;
+            }
+
+            // Pick a random Pokemon
+            int randomIndex = _random.Random(0, availablePokemonWithIndex.Count);
+            var selectedItem = availablePokemonWithIndex[randomIndex];
+            usedSlots.Add(selectedItem.OriginalIndex);
+
+            if (PrintDebug)
+            {
+                Console.WriteLine(
+                    $"[PlayerRandom] Selected switch to: {selectedItem.PokemonData.Details}");
+            }
+
+            actions.Add(new ChosenAction
+            {
+                Choice = ChoiceType.Switch,
+                Pokemon = null,
+                MoveId = MoveId.None,
+                Index = selectedItem.OriginalIndex,
+            });
+        }
+
+        return new Choice { Actions = actions };
     }
 }

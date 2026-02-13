@@ -1055,15 +1055,6 @@ public partial class Side
             return false;
         }
 
-        // For Switch/SwitchIn requests, also check if we have forced passes left
-        // This prevents IsChoiceDone from returning true when we still need to handle passes
-        if ((RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn) &&
-            Choice.ForcedPassesLeft > 0)
-        {
-            Battle.Debug($"[IsChoiceDone] {Name}: ForcedPassesLeft={Choice.ForcedPassesLeft}, returning false");
-            return false;
-        }
-
         if (RequestState == RequestState.TeamPreview)
         {
             bool done = Choice.Actions.Count >= PickedTeamSize();
@@ -1072,25 +1063,15 @@ public partial class Side
             return done;
         }
 
-        // For Switch/SwitchIn requests, only count Pokemon that actually need to switch
-        // In doubles, you might have 2 active Pokemon but only 1 needs to switch
-        if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
-        {
-            int pokemonNeedingSwitch = Active.Count(p => p?.SwitchFlag.IsTrue() == true);
-            GetChoiceIndex();
-            bool done = Choice.Actions.Count >= pokemonNeedingSwitch;
-            Battle.Debug(
-                $"[IsChoiceDone] {Name}: Switch request - Actions={Choice.Actions.Count}, PokemonNeedingSwitch={pokemonNeedingSwitch}, done={done}");
-            Battle.Debug(
-                $"[IsChoiceDone]   Active Pokemon with SwitchFlag: {string.Join(", ", Active.Where(p => p != null).Select(p => $"{p.Name}:{p.SwitchFlag}"))}");
-            return done;
-        }
-
+        // For move/switch requests, auto-pass Pokemon that don't need actions
+        // (fainted/commanding for moves, non-switching for switch requests)
+        // then check if all active slots have been handled.
+        // Matches TS: this.getChoiceIndex(); return this.choice.actions.length >= this.active.length;
         GetChoiceIndex();
-        bool moveDone = Choice.Actions.Count >= Active.Count;
+        bool isDone = Choice.Actions.Count >= Active.Count;
         Battle.Debug(
-            $"[IsChoiceDone] {Name}: Move request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={moveDone}");
-        return moveDone;
+            $"[IsChoiceDone] {Name}: {RequestState} request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={isDone}");
+        return isDone;
     }
 
 

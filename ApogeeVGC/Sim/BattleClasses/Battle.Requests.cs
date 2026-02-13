@@ -679,7 +679,13 @@ public partial class Battle
             RequestPlayerChoice(side.Id, side.ActiveRequest!, requestType);
         }
 
-        // Battle returns immediately - doesn't wait
-        // Simulator will call Choose() -> CommitChoices() to continue
+        // Safety: if all choices are done after iterating (e.g. recursive CommitChoices
+        // set up a new request where all sides auto-passed), commit now to avoid the
+        // SyncSimulator loop spinning forever with RequestState still set.
+        if (!Ended && AllChoicesDone())
+        {
+            Debug("[RequestPlayerChoices] All choices already done after iteration, committing");
+            CommitChoices();
+        }
     }
 }

@@ -166,20 +166,30 @@ public class SyncSimulator : IBattleController
         if (choice.Actions.Count == 0)
         {
             side.AutoChoose();
-            choice = side.GetChoice();
-            Battle.Choose(e.SideId, choice);
+            // AutoChoose builds the choice directly on the side. We must NOT
+            // re-submit via Battle.Choose because side.Choose -> ClearChoice()
+            // would recalculate ForcedSwitchesLeft from SwitchFlags that
+            // ChooseSwitch already cleared, causing switch actions to be rejected.
+            if (Battle.AllChoicesDone()) Battle.CommitChoices();
             return;
         }
 
         // Submit the choice — if it fails, fall back to AutoChoose.
         // This handles cases where PlayerRandom picks a hidden-disabled move
         // (e.g. from Imprison) that appears available in the restricted request
-        // data but is rejected by the battle engine's unrestricted validation.
+        // data but is rejected by the battle engine's unrestricted validation,
+        // or when the player submits an incomplete choice (e.g. 1 switch when
+        // 2 are needed in doubles).
         if (!Battle.Choose(e.SideId, choice))
         {
+            // Battle.Choose may have partially processed the choice, modifying
+            // Pokemon state (e.g. clearing SwitchFlags via ChooseSwitch).
+            // AutoChoose can complete the remaining actions from this state.
+            // We must NOT call Battle.Choose again after AutoChoose because
+            // ClearChoice() would recalculate ForcedSwitchesLeft from the
+            // now-cleared SwitchFlags, rejecting the switch actions.
             side.AutoChoose();
-            choice = side.GetChoice();
-            Battle.Choose(e.SideId, choice);
+            if (Battle.AllChoicesDone()) Battle.CommitChoices();
         }
     }
 

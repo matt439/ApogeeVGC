@@ -1085,9 +1085,9 @@ public class Driver
     {
         // !! EDIT THESE SEEDS TO DEBUG SPECIFIC BATTLES !!
         // Copy the seeds from the IncrementalDebugTest failure output
-        const int debugPlayer1Seed = 1453;
-        const int debugPlayer2Seed = 1454;
-        const int debugBattleSeed = 1455;
+        const int debugPlayer1Seed = 1480;
+        const int debugPlayer2Seed = 1481;
+        const int debugBattleSeed = 1482;
         const bool debug = true;
 
         Console.WriteLine("[Driver] Starting Single Battle Debug");
