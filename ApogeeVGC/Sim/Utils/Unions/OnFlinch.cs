@@ -1,16 +1,15 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Utils.Unions;
 
 /// <summary>
-/// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean
+/// ((this: Battle, pokemon: Pokemon) => boolean | void) | boolean
 /// </summary>
 public abstract record OnFlinch : IUnionEventHandler
 {
-    public static implicit operator OnFlinch(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> func) =>
+    public static implicit operator OnFlinch(Func<Battle, Pokemon, BoolVoidUnion> func) =>
      new OnFlinchFunc(func);
     public static implicit operator OnFlinch(bool value) => new OnFlinchBool(value);
 
@@ -19,7 +18,7 @@ public abstract record OnFlinch : IUnionEventHandler
     public abstract object? GetConstantValue();
 }
 
-public record OnFlinchFunc(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> Func) : OnFlinch
+public record OnFlinchFunc(Func<Battle, Pokemon, BoolVoidUnion> Func) : OnFlinch
 {
     public override Delegate GetDelegate() => Func;
     public override bool IsConstant() => false;

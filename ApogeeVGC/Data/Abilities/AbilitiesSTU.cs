@@ -947,7 +947,7 @@ public partial record Abilities
                 Num = 80,
                 Rating = 1.0,
                 OnFlinch = new OnFlinchEventInfo(
-                    (Func<Battle, Pokemon, object?, Move, BoolVoidUnion>)((battle, _, _, _) =>
+                    (Func<Battle, Pokemon, BoolVoidUnion>)((battle, _) =>
                     {
                         battle.Boost(new SparseBoostsTable { Spe = 1 });
                         return new VoidReturn();

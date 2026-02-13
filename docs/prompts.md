@@ -46,15 +46,23 @@ I am converting condition data from typescript @pokemon-showdown/data/conditions
 
 I am converting move data from typescript #file:'C:\VSProjects\ApogeeVGC\pokemon-showdown\data\moves.ts'  into C#  #class:'ApogeeVGC.Data.Moves.Moves':104-1401   . An initial conversion has been completed. Now complete a review pass, checking that no errors have occurred in the conversion process. Check that the logic in the event handlers matches the typescript reference. Note that if a move has a #field:'ApogeeVGC.Sim.Moves.Move.Condition':786-828 property, the condition data will be in  #class:'ApogeeVGC.Data.Conditions.Conditions':114-2355 . Also check the condition logic is correct. Check 'rollout'. Many moves have been deliberately omitted. My program is only targeting generation 9 so anything to do with dynamax, gigantmax, max moves, mega evolution, z-moves, hidden power, or anything not relevant to generation 9 can be skipped. I am also only targeting regular 1v1 and 2v2 formats, so 3v3 and other unusual formats are skipped. To know whether an ability, item, move, or condition should be skipped; check 'abilities.ts', 'items.ts', 'moves.ts', or 'conditions.ts' respectively and if there is an 'isNonStandard' property then it should be skipped. Attention should be paid to the return type in functions as it is critical to the operation of the program. See #file:'C:\VSProjects\ApogeeVGC\pokemon-showdown\CONTRIBUTING.md'  for the rules on null, undefined, and false. I have explicit #class:'ApogeeVGC.Sim.Utils.Unions.Undefined':155-179  ,  #class:'ApogeeVGC.Sim.Utils.Unions.VoidReturn':131-156 , and #class:'ApogeeVGC.Sim.Utils.Unions.Empty':240-260 types. Pay special attention to the return statements in methods to make sure they match the logic of the TS. If you think that the return type of a delegate needs to be modified, add a TODO statement. Check that any null checks are present in the C# implementation. In C# logic, strictly use Id enums instead of Name strings (except in Add, AddMove, AttrLastMove, Debug etc. where strings are acceptable). The moves GlacialLance, LeechSeed, TrickRoom, Protect, VoltSwitch, DazzlingGleam, ElectroDrift, DracoMeteor, Façade, Crunch, HeadlongRush, StruggleBug, Overheat, Tailwind, SpritBreak, ThunderWave, Reflect, LightScreen, FakeOut, HeavySlam, LowKick, and WildCharge (and their corresponding conditions) should be used as primary references as they have been verified as accurate conversions.
 
+## Alphabetise entries
+
+check @ApogeeVGC/Data/Moves/MovesSTU.cs   and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).
+
+## Create Splits in Workbook.md
+
+see @docs/workbook.md . it splits files into chunks by listing entry ranges. it needs to be recreated because i have alphabetised some of the files. each chunk must be no more than 200 lines. do @ApogeeVGC/Data/Items/ItemsABC.cs
+
 # Debugging
 
 ## RndVsRndVgcRegIEvaluation
 
-i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunRndVsRndVgcRegIEvaluation':27313-34906 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. debug output:
+i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunRndVsRndVgcRegIEvaluation':27313-34906 . see #file:'C:\VSProjects\ApogeeVGC\docs\bugfixes\INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. debug output:
 
 ## SingleBattleDebugVgcRegI
 
-i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is #method:'ApogeeVGC.Sim.Core.Driver.RunSingleBattleDebugVgcRegI':8484-11553 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. an error has occured with a particular set of random seeds. debug output:
+i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is #method:'ApogeeVGC.Sim.Core.Driver.RunSingleBattleDebugVgcRegI':8484-11553 . see #file:'C:\VSProjects\ApogeeVGC\docs\bugfixes\INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. an error has occured with a particular set of random seeds. debug output:
 
 ## Incremental Debugging
 
@@ -63,11 +71,3 @@ i am incrementally debugging my pokemon simulator by running battles between two
 ## Incremental Debugging Single
 
 i am incrementally debugging my pokemon simulator by running battles between two random players, each with random teams. an exception occured and now i am debugging by running that single battle. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunSingleBattleDebug':43816-47523 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. the exception occured when testing with Player1Seed=1453, Player2Seed=1454, BattleSeed=1455. debug output:
-
-## Alphabetise entries
-
-check @ApogeeVGC/Data/Moves/MovesSTU.cs   and ensure all entries are in alphabetical order. also make sure all entries are in the correct file (example: 'dog' should not be in ABC).
-
-## Create Splits in Workbook.md
-
-see @docs/workbook.md . it splits files into chunks by listing entry ranges. it needs to be recreated because i have alphabetised some of the files. each chunk must be no more than 200 lines. do @ApogeeVGC/Data/Items/ItemsABC.cs
