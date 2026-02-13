@@ -55,7 +55,7 @@ public record MoveAction : IAction
     public int Speed { get; init; }
     public required Pokemon Pokemon { get; init; }
     public int TargetLoc { get; set; }
-    public required Pokemon OriginalTarget { get; init; }
+    public Pokemon? OriginalTarget { get; init; }
     public MoveId MoveId { get; init; }
     public required Move Move { get; set; }
     public IEffect? SourceEffect { get; init; }

@@ -328,30 +328,29 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     /// <summary>
     /// Gets a random target location for a move.
     /// Returns 0 for most moves (auto-targeting), or a specific slot for targeting moves in doubles.
+    /// Positive values target foes, negative values target allies.
     /// </summary>
     private int GetRandomTargetLocation(MoveTarget targetType)
     {
-        // In singles, always use auto-targeting
-        // In doubles, moves that require explicit targeting (Normal, Any, AdjacentFoe, etc.)
-        // need a non-zero target location
-        
         // Check if this move type requires explicit targeting
-        var requiresExplicitTarget = targetType is MoveTarget.Normal 
-            or MoveTarget.Any 
-            or MoveTarget.AdjacentAlly 
-            or MoveTarget.AdjacentAllyOrSelf 
-            or MoveTarget.AdjacentFoe;
-
-        if (!requiresExplicitTarget)
+        // Positive locations = foe side, Negative locations = ally side
+        return targetType switch
         {
-            // Moves like AllAdjacent, AllAdjacentFoes, etc. use auto-targeting (0)
-            return 0;
-        }
+            // Foe-targeting moves: pick a random opponent slot (1 or 2)
+            MoveTarget.Normal or MoveTarget.Any or MoveTarget.AdjacentFoe =>
+                _random.Random(1, 3),
 
-        // For moves requiring explicit targets, pick a random opponent slot (1 or 2)
-        // In doubles: 1 = left opponent, 2 = right opponent
-        // Random player will pick between the two opponent slots
-        return _random.Random(1, 3); // Returns 1 or 2
+            // Ally-targeting moves: pick a random ally slot (-1 or -2)
+            MoveTarget.AdjacentAlly =>
+                -_random.Random(1, 3),
+
+            // Ally-or-self moves: pick a random ally slot (-1 or -2)
+            MoveTarget.AdjacentAllyOrSelf =>
+                -_random.Random(1, 3),
+
+            // All other moves (AllAdjacent, AllAdjacentFoes, Self, etc.) use auto-targeting
+            _ => 0,
+        };
     }
 
     private static bool IsDisabled(MoveIdBoolUnion? disabled)

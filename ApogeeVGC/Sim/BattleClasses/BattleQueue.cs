@@ -281,9 +281,13 @@ public class BattleQueue(Battle battle)
             }
 
             // Set the original target based on target location
+            // When targetLoc is 0 (no valid target found by GetRandomTarget), OriginalTarget is null
+            // This matches TS behavior where getAtLoc(0) returns undefined (active[-1])
             currentAction = moveAct with
             {
-                OriginalTarget = moveAct.Pokemon.GetAtLoc(moveAct.TargetLoc),
+                OriginalTarget = moveAct.TargetLoc != 0
+                    ? moveAct.Pokemon.GetAtLoc(moveAct.TargetLoc)
+                    : null,
             };
         }
 
