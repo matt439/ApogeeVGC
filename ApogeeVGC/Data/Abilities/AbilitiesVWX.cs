@@ -479,14 +479,14 @@ public partial record Abilities
                     return new VoidReturn();
                 }, 1),
                 OnSideConditionStart =
-                    new OnSideConditionStartEventInfo((battle, _, _, sideCondition) =>
+                    new OnSideConditionStartEventInfo((battle, _, _, condition) =>
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
                                 Pokemon: var pokemon,
                             })
                             return;
-                        if (sideCondition.Id == ConditionId.Tailwind)
+                        if (condition.Id == ConditionId.Tailwind)
                         {
                             battle.Boost(new SparseBoostsTable { Atk = 1 }, pokemon, pokemon);
                         }

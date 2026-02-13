@@ -24,7 +24,13 @@ public enum DriverMode
 
     /// <summary>
     /// Runs a single battle with specific seeds for debugging purposes.
-    /// Useful for reproducing specific timeout or bug scenarios.
+    /// Useful for reproducing specific timeout or bug scenarios from IncrementalDebugTest.
     /// </summary>
     SingleBattleDebug,
+
+    /// <summary>
+    /// Runs a single VGC Reg I battle with 5 specific seeds for debugging purposes.
+    /// Useful for reproducing failures from RndVsRndVgcRegIEvaluation.
+    /// </summary>
+    SingleBattleDebugVgcRegI,
 }
