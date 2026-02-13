@@ -492,6 +492,11 @@ internal static class EventHandlerAdapter
             PokemonPokemonVoidUnion pokemonVoid => new PokemonRelayVar(pokemonVoid.Pokemon),
             VoidPokemonVoidUnion => new VoidReturnRelayVar(),
 
+            // PokemonFalseVoidUnion -> Pokemon, false, or VoidReturn
+            PokemonPokemonFalseVoidUnion pokemonFalseVoid => new PokemonRelayVar(pokemonFalseVoid.Pokemon),
+            FalsePokemonFalseVoidUnion => new BoolRelayVar(false),
+            VoidPokemonFalseVoidUnion => new VoidReturnRelayVar(),
+
             // MoveIdVoidUnion -> MoveId or VoidReturn
             MoveIdMoveIdVoidUnion moveIdVoid => new MoveIdRelayVar(moveIdVoid.MoveId),
             VoidMoveIdVoidUnion => new VoidReturnRelayVar(),
