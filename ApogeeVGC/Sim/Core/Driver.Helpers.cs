@@ -7,8 +7,40 @@ using System.Diagnostics;
 
 namespace ApogeeVGC.Sim.Core;
 
+/// <summary>
+/// Holds seed values for the current battle simulation, used for debugging.
+/// Inspect <see cref="Driver.CurrentBattleSeeds"/> in the debugger to see seeds when an exception is thrown.
+/// </summary>
+public record BattleSeedContext(
+    int Team1Seed,
+    int Team2Seed,
+    int Player1Seed,
+    int Player2Seed,
+    int BattleSeed);
+
 public partial class Driver
 {
+    /// <summary>
+    /// Thread-static field holding the seed context for the currently executing battle.
+    /// Inspect this in the Watch/Locals window when the debugger breaks on an exception.
+    /// </summary>
+    [ThreadStatic]
+    public static BattleSeedContext? CurrentBattleSeeds;
+
+    /// <summary>
+    /// Enriches the exception's <see cref="Exception.Data"/> with seed values so they
+    /// appear in the VS Exception Details pane. Used as an exception filter (returns false
+    /// so the exception is never caught by this filter).
+    /// </summary>
+    private static bool EnrichExceptionWithSeeds(Exception ex, BattleSeedContext seeds)
+    {
+        ex.Data["Team1Seed"] = seeds.Team1Seed;
+        ex.Data["Team2Seed"] = seeds.Team2Seed;
+        ex.Data["Player1Seed"] = seeds.Player1Seed;
+        ex.Data["Player2Seed"] = seeds.Player2Seed;
+        ex.Data["BattleSeed"] = seeds.BattleSeed;
+        return false;
+    }
     /// <summary>
     /// Helper method to run a single battle simulation with timeout protection.
     /// </summary>
@@ -19,41 +51,59 @@ public partial class Driver
         FormatId formatId,
         bool debug)
     {
+        var seeds = new BattleSeedContext(0, 0, player1Seed, player2Seed, battleSeed);
+
         using var cts = new CancellationTokenSource();
         var simulationTask = Task.Run(() =>
         {
-            PlayerOptions player1Options = new()
+            // Set thread-static context so seeds are visible in the debugger Locals/Watch window
+            CurrentBattleSeeds = seeds;
+            try
             {
-                Type = Player.PlayerType.Random,
-                Name = "Random 1",
-                Team = TeamGenerator.GenerateTestTeam(Library),
-                Seed = new PrngSeed(player1Seed),
-                PrintDebug = debug,
-            };
+                PlayerOptions player1Options = new()
+                {
+                    Type = Player.PlayerType.Random,
+                    Name = "Random 1",
+                    Team = TeamGenerator.GenerateTestTeam(Library),
+                    Seed = new PrngSeed(player1Seed),
+                    PrintDebug = debug,
+                };
 
-            PlayerOptions player2Options = new()
+                PlayerOptions player2Options = new()
+                {
+                    Type = Player.PlayerType.Random,
+                    Name = "Random 2",
+                    Team = TeamGenerator.GenerateTestTeam(Library),
+                    Seed = new PrngSeed(player2Seed),
+                    PrintDebug = debug,
+                };
+
+                BattleOptions battleOptions = new()
+                {
+                    Id = formatId,
+                    Player1Options = player1Options,
+                    Player2Options = player2Options,
+                    Debug = debug,
+                    Sync = true, // Use synchronous mode for evaluation
+                    Seed = new PrngSeed(battleSeed),
+                    MaxTurns = 1000, // Enforce turn limit to detect infinite loops
+                };
+
+                var simulator = new SyncSimulator();
+                SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+                return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
+            }
+            // Exception filter enriches Exception.Data before the stack unwinds,
+            // making seeds visible in the VS Exception Details pane on first-chance break
+            catch (Exception ex) when (EnrichExceptionWithSeeds(ex, seeds))
             {
-                Type = Player.PlayerType.Random,
-                Name = "Random 2",
-                Team = TeamGenerator.GenerateTestTeam(Library),
-                Seed = new PrngSeed(player2Seed),
-                PrintDebug = debug,
-            };
-
-            BattleOptions battleOptions = new()
+                // Never reached: EnrichExceptionWithSeeds always returns false
+                throw;
+            }
+            finally
             {
-                Id = formatId,
-                Player1Options = player1Options,
-                Player2Options = player2Options,
-                Debug = debug,
-                Sync = true, // Use synchronous mode for evaluation
-                Seed = new PrngSeed(battleSeed),
-                MaxTurns = 1000, // Enforce turn limit to detect infinite loops
-            };
-
-            var simulator = new SyncSimulator();
-            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
-            return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
+                CurrentBattleSeeds = null;
+            }
         }, cts.Token);
 
         // Wait for simulation with timeout
@@ -81,9 +131,13 @@ public partial class Driver
         int battleSeed,
         bool debug)
     {
+        var seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
+
         using var cts = new CancellationTokenSource();
         var simulationTask = Task.Run(() =>
         {
+            // Set thread-static context so seeds are visible in the debugger Locals/Watch window
+            CurrentBattleSeeds = seeds;
             try
             {
                 // Generate random teams using the team seeds for VGC Regulation I
@@ -126,13 +180,24 @@ public partial class Driver
                 SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
                 return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
             }
+            // Exception filter enriches Exception.Data before the stack unwinds,
+            // making seeds visible in the VS Exception Details pane on first-chance break
+            catch (Exception ex) when (EnrichExceptionWithSeeds(ex, seeds))
+            {
+                // Never reached: EnrichExceptionWithSeeds always returns false
+                throw;
+            }
             catch (Exception ex)
             {
-                // Wrap exception with seed context so seeds appear in the exception details pane
+                // Wrap exception with seed context for the console summary output
                 throw new InvalidOperationException(
                     $"Battle failed. Seeds: Team1={team1Seed}, Team2={team2Seed}, " +
                     $"P1={player1Seed}, P2={player2Seed}, Battle={battleSeed}",
                     ex);
+            }
+            finally
+            {
+                CurrentBattleSeeds = null;
             }
         }, cts.Token);
 
@@ -141,6 +206,8 @@ public partial class Driver
         {
             // Timeout occurred - throw custom exception with seeds
             throw new BattleTimeoutException(
+                team1Seed,
+                team2Seed,
                 player1Seed,
                 player2Seed,
                 battleSeed,
