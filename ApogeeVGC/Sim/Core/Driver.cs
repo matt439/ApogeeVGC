@@ -1106,9 +1106,9 @@ public class Driver
     {
         // !! EDIT THESE VALUES TO DEBUG SPECIFIC BATTLES !!
         // Copy the seeds and testing element from the IncrementalDebugTest failure output.
-        const int debugPlayer1Seed = 43;
-        const int debugPlayer2Seed = 44;
-        const int debugBattleSeed = 45;
+        const int debugPlayer1Seed = 790;
+        const int debugPlayer2Seed = 791;
+        const int debugBattleSeed = 792;
         const bool debug = true;
 
         // Set the element that was being tested when the failure occurred.
