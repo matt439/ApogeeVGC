@@ -705,7 +705,6 @@ public partial class BattleActions
             if (move.SmartTarget == true && targets.Count > 1)
             {
                 targetsCopy = [targets[hit - 1]];
-                damage = [damage[hit - 1]];
             }
             else
             {
