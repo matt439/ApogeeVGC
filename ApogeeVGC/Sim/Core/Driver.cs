@@ -1,8 +1,12 @@
 using ApogeeVGC.Data;
 using ApogeeVGC.Gui;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
+using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -1060,7 +1064,25 @@ public class Driver
             stateDirectory: ".");
 
         // Run unlimited iterations (0 = test all elements)
-        IncrementalTestRunner.TestingSummary summary = runner.Run(maxIterations: 0);
+        IncrementalTestRunner.TestingSummary summary;
+        try
+        {
+            summary = runner.Run(maxIterations: 0);
+        }
+        catch (Exception ex)
+        {
+            // Each battle consumes 3 consecutive seeds, so the last battle used these:
+            int lastBattleSeed = runner.SeedCounter;
+            int lastP2Seed = lastBattleSeed - 1;
+            int lastP1Seed = lastBattleSeed - 2;
+
+            Console.WriteLine();
+            Console.WriteLine("[Driver] UNHANDLED EXCEPTION during incremental debug test!");
+            Console.WriteLine($"[Driver] Exception: {ex.GetType().Name}: {ex.Message}");
+            Console.WriteLine($"[Driver] Last seeds: P1={lastP1Seed}, P2={lastP2Seed}, Battle={lastBattleSeed}");
+            Console.WriteLine("[Driver] Use these seeds in RunSingleBattleDebug to reproduce the failure.");
+            throw;
+        }
 
         Console.WriteLine();
         Console.WriteLine("Incremental debug test complete.");
@@ -1077,26 +1099,34 @@ public class Driver
 
     /// <summary>
     /// Runs a single battle with specific seeds for debugging.
-    /// Edit the seed constants in this method to reproduce specific battle scenarios.
-    /// This method loads the DebugElementPools state from the JSON file to recreate
-    /// the exact same battle that failed during IncrementalDebugTest.
+    /// Edit the seed constants and testing element in this method to reproduce
+    /// specific battle scenarios from IncrementalDebugTest failures.
     /// </summary>
     private void RunSingleBattleDebug()
     {
-        // !! EDIT THESE SEEDS TO DEBUG SPECIFIC BATTLES !!
-        // Copy the seeds from the IncrementalDebugTest failure output
-        const int debugPlayer1Seed = 1480;
-        const int debugPlayer2Seed = 1481;
-        const int debugBattleSeed = 1482;
+        // !! EDIT THESE VALUES TO DEBUG SPECIFIC BATTLES !!
+        // Copy the seeds and testing element from the IncrementalDebugTest failure output.
+        const int debugPlayer1Seed = 43;
+        const int debugPlayer2Seed = 44;
+        const int debugBattleSeed = 45;
         const bool debug = true;
+
+        // Set the element that was being tested when the failure occurred.
+        // Only ONE of these should be set; the rest must remain None/default.
+        // Copy the value from the "Testing Moves/Abilities/Items:" output line.
+        const MoveId debugTestingMove = MoveId.Lashout;
+        const AbilityId debugTestingAbility = AbilityId.None;
+        const ItemId debugTestingItem = ItemId.None;
+        const SpecieId debugTestingSpecies = default; // SpecieId has no None; default (Bulbasaur) means "not set"
 
         Console.WriteLine("[Driver] Starting Single Battle Debug");
         Console.WriteLine($"[Driver] Seeds - Player1: {debugPlayer1Seed}, Player2: {debugPlayer2Seed}, Battle: {debugBattleSeed}");
         Console.WriteLine();
 
-        // Load the DebugElementPools state to recreate the exact same team generation
+        // Load the saved pools state (after failure, the testing element is in the Failed set).
+        // We restore it to Testing so Available = Allowed + Testing matches the failing battle.
         var pools = new DebugElementPools();
-        if (!pools.LoadState("."))
+        if (!pools.LoadState())
         {
             Console.WriteLine("WARNING: No debug-element-pools-state.json found!");
             Console.WriteLine("This file is required to recreate battles from IncrementalDebugTest.");
@@ -1105,6 +1135,28 @@ public class Driver
             Console.WriteLine("Press Enter key to exit...");
             Console.ReadLine();
             return;
+        }
+
+        // Restore the testing element from Failed back to Testing
+        if (debugTestingMove != MoveId.None)
+        {
+            pools.RestoreFailedToTesting(debugTestingMove);
+            Console.WriteLine($"Restored testing move: {debugTestingMove}");
+        }
+        if (debugTestingAbility != AbilityId.None)
+        {
+            pools.RestoreFailedToTesting(debugTestingAbility);
+            Console.WriteLine($"Restored testing ability: {debugTestingAbility}");
+        }
+        if (debugTestingItem != ItemId.None)
+        {
+            pools.RestoreFailedToTesting(debugTestingItem);
+            Console.WriteLine($"Restored testing item: {debugTestingItem}");
+        }
+        if (debugTestingSpecies != default)
+        {
+            pools.RestoreFailedToTesting(debugTestingSpecies);
+            Console.WriteLine($"Restored testing species: {debugTestingSpecies}");
         }
 
         Console.WriteLine("Loaded debug element pools state:");

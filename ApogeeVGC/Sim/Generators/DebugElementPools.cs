@@ -15,6 +15,7 @@ namespace ApogeeVGC.Sim.Generators;
 public class DebugElementPools
 {
     private const string StateFileName = "debug-element-pools-state.json";
+    private const string FailureSnapshotFileName = "debug-element-pools-failure-snapshot.json";
 
     /// <summary>
     /// Species that have been verified to work correctly.
@@ -262,6 +263,36 @@ public class DebugElementPools
     }
 
     /// <summary>
+    /// Moves a failed element back to testing so the failing battle can be reproduced.
+    /// </summary>
+    public void RestoreFailedToTesting(MoveId move)
+    {
+        FailedMoves.Remove(move);
+        TestingMoves.Add(move);
+    }
+
+    /// <inheritdoc cref="RestoreFailedToTesting(MoveId)"/>
+    public void RestoreFailedToTesting(AbilityId ability)
+    {
+        FailedAbilities.Remove(ability);
+        TestingAbilities.Add(ability);
+    }
+
+    /// <inheritdoc cref="RestoreFailedToTesting(MoveId)"/>
+    public void RestoreFailedToTesting(ItemId item)
+    {
+        FailedItems.Remove(item);
+        TestingItems.Add(item);
+    }
+
+    /// <inheritdoc cref="RestoreFailedToTesting(MoveId)"/>
+    public void RestoreFailedToTesting(SpecieId species)
+    {
+        FailedSpecies.Remove(species);
+        TestingSpecies.Add(species);
+    }
+
+    /// <summary>
     /// Gets all untested elements from the library.
     /// </summary>
     public (List<SpecieId> Species, List<MoveId> Moves, List<AbilityId> Abilities, List<ItemId> Items)
@@ -393,6 +424,20 @@ public class DebugElementPools
     /// </summary>
     public void SaveState(string directory = ".")
     {
+        SaveStateToFile(directory, StateFileName);
+    }
+
+    /// <summary>
+    /// Saves a snapshot of the current state before marking testing elements as failed.
+    /// This preserves the exact pools used during the failing battle for reproduction.
+    /// </summary>
+    public void SaveFailureSnapshot(string directory = ".")
+    {
+        SaveStateToFile(directory, FailureSnapshotFileName);
+    }
+
+    private void SaveStateToFile(string directory, string fileName)
+    {
         var state = new DebugElementPoolsState
         {
             AllowedSpecies = [.. AllowedSpecies],
@@ -413,7 +458,7 @@ public class DebugElementPools
 
         var options = new JsonSerializerOptions { WriteIndented = true };
         var json = JsonSerializer.Serialize(state, options);
-        var filePath = Path.Combine(directory, StateFileName);
+        var filePath = Path.Combine(directory, fileName);
         File.WriteAllText(filePath, json);
     }
 
@@ -423,7 +468,21 @@ public class DebugElementPools
     /// </summary>
     public bool LoadState(string directory = ".")
     {
-        var filePath = Path.Combine(directory, StateFileName);
+        return LoadStateFromFile(directory, StateFileName);
+    }
+
+    /// <summary>
+    /// Loads the failure snapshot state (pools as they were when the battle failed).
+    /// Returns true if the snapshot was loaded, false if no snapshot exists.
+    /// </summary>
+    public bool LoadFailureSnapshot(string directory = ".")
+    {
+        return LoadStateFromFile(directory, FailureSnapshotFileName);
+    }
+
+    private bool LoadStateFromFile(string directory, string fileName)
+    {
+        var filePath = Path.Combine(directory, fileName);
         if (!File.Exists(filePath))
         {
             return false;

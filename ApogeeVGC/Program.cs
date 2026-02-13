@@ -45,6 +45,8 @@ public class Program
         //// Debug test to investigate Player 2 bias
         //DebugRandomBias.RunDebugTest();
 
+
+        // SingleBattleDebug or IncrementalDebug
         var driver = new Driver();
         driver.Start(DriverMode.SingleBattleDebug);
 

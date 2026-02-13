@@ -30,6 +30,11 @@ public class IncrementalTestRunner
     private int _seedCounter;
 
     /// <summary>
+    /// The current seed counter value. Each battle consumes 3 consecutive seeds.
+    /// </summary>
+    public int SeedCounter => _seedCounter;
+
+    /// <summary>
     /// Category of element being tested.
     /// Order matters: Items first (fewest dependencies), then Moves, Abilities, Species.
     /// </summary>
@@ -157,6 +162,11 @@ public class IncrementalTestRunner
                 Console.WriteLine($"? FAILED after {result.BattlesRun} battles!");
                 Console.WriteLine($"  Exception: {result.Exception?.GetType().Name}: {result.Exception?.Message}");
                 Console.WriteLine($"  Seeds: P1={result.Player1Seed}, P2={result.Player2Seed}, Battle={result.BattleSeed}");
+
+                // Save a snapshot of the pools BEFORE marking as failed so
+                // RunSingleBattleDebug can reproduce the exact same battle.
+                _pools.SaveFailureSnapshot(_stateDirectory);
+
                 _pools.MarkTestingAsFailed();
             }
 
@@ -393,6 +403,7 @@ public class IncrementalTestRunner
             }
             catch (Exception ex)
             {
+                Console.Error.WriteLine($"  [BATTLE FAILED] Seeds: P1={p1Seed}, P2={p2Seed}, Battle={battleSeed} | {ex.GetType().Name}: {ex.Message}");
                 exceptions.Add((p1Seed, p2Seed, battleSeed, ex));
             }
         });
@@ -476,25 +487,43 @@ public class IncrementalTestRunner
             }
             catch (Exception ex)
             {
+                // Attach seeds to the exception so they are visible in the
+                // debugger's exception dialog before any outer catch runs.
+                ex.Data["P1Seed"] = p1Seed;
+                ex.Data["P2Seed"] = p2Seed;
+                ex.Data["BattleSeed"] = battleSeed;
                 taskException = ex;
                 throw;
             }
         });
 
-        // Wait for simulation with timeout
-        if (!simulationTask.Wait(_battleTimeoutMs))
+        // Wait for simulation with timeout.
+        // Task.Wait(int) throws AggregateException when the task faults before
+        // the timeout, so we must catch it here to unwrap the real exception.
+        bool completedInTime;
+        try
+        {
+            completedInTime = simulationTask.Wait(_battleTimeoutMs);
+        }
+        catch (AggregateException ae)
+        {
+            throw taskException
+                ?? ae.InnerException
+                ?? ae;
+        }
+
+        if (!completedInTime)
         {
             throw new BattleTimeoutException(p1Seed, p2Seed, battleSeed, _battleTimeoutMs);
         }
 
-        // Check if task completed with exception
+        // Check if task completed with exception (defensive; normally caught above)
         if (simulationTask.IsFaulted)
         {
-            var ex = taskException
+            throw taskException
                 ?? simulationTask.Exception?.InnerException
                 ?? (Exception?)simulationTask.Exception
                 ?? new InvalidOperationException("Task faulted but no exception captured");
-            throw ex;
         }
 
         // Get the result (may throw if task faulted)
