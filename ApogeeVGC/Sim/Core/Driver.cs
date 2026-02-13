@@ -1106,15 +1106,15 @@ public class Driver
     {
         // !! EDIT THESE VALUES TO DEBUG SPECIFIC BATTLES !!
         // Copy the seeds and testing element from the IncrementalDebugTest failure output.
-        const int debugPlayer1Seed = 790;
-        const int debugPlayer2Seed = 791;
-        const int debugBattleSeed = 792;
+        const int debugPlayer1Seed = 25834;
+        const int debugPlayer2Seed = debugPlayer1Seed + 1;
+        const int debugBattleSeed = debugPlayer2Seed + 1;
         const bool debug = true;
 
         // Set the element that was being tested when the failure occurred.
         // Only ONE of these should be set; the rest must remain None/default.
         // Copy the value from the "Testing Moves/Abilities/Items:" output line.
-        const MoveId debugTestingMove = MoveId.Lashout;
+        const MoveId debugTestingMove = MoveId.LunarDance;
         const AbilityId debugTestingAbility = AbilityId.None;
         const ItemId debugTestingItem = ItemId.None;
         const SpecieId debugTestingSpecies = default; // SpecieId has no None; default (Bulbasaur) means "not set"

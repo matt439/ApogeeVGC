@@ -89,20 +89,14 @@ public partial class Side
                 PokemonMoveData pokemonMoveData = request.Moves[i];
 
                 // Skip if disabled in the restricted request view
-                if (pokemonMoveData.Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion
-                    {
-                        Value: true
-                    })
+                if (pokemonMoveData.Disabled is not null && pokemonMoveData.Disabled.IsTrue())
                 {
                     continue;
                 }
 
                 // Also skip if disabled in the unrestricted moves list (catches hidden-disabled)
                 if (i < moves.Count && pokemonMoveData.Id == moves[i].Id &&
-                    moves[i].Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion
-                    {
-                        Value: true
-                    })
+                    moves[i].Disabled is not null && moves[i].Disabled.IsTrue())
                 {
                     continue;
                 }
@@ -198,7 +192,7 @@ public partial class Side
 
         foreach (PokemonMoveData m in moves.Where(m => m.Id == moveid))
         {
-            if (m.Disabled is null or BoolMoveIdBoolUnion { Value: false })
+            if (m.Disabled is null || !m.Disabled.IsTrue())
             {
                 isEnabled = true;
                 break;

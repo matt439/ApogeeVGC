@@ -181,24 +181,8 @@ public partial class Pokemon
             });
         }
 
-        // If no valid moves, return Struggle
-        if (!hasValidMove)
-        {
-            Move struggleMove = Battle.Library.Moves[MoveId.Struggle];
-            return
-            [
-                new PokemonMoveData
-                {
-                    Move = struggleMove,
-                    Target = null,
-                    Disabled = null,
-                    DisabledSource = null,
-                    Pp = struggleMove.BasePp,
-                    MaxPp = struggleMove.BasePp,
-                }
-            ];
-        }
-
+        // If no valid moves, return empty list (matches TypeScript getMoves behavior).
+        // Callers (ChooseMove, GetMoveRequestData) handle empty returns by falling back to Struggle.
         return hasValidMove ? moves : [];
     }
 
