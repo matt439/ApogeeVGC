@@ -67,6 +67,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 ### Choice System
 - [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position to index into Active-sized arrays
 - [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix) - Infinite loop when update callback detects but doesn't apply changes
+- [Hidden-Disabled Move Endless Loop Fix](#hidden-disabled-move-endless-loop-fix) - Infinite loop when autoChoose picks hidden-disabled move (Imprison) not checked against unrestricted moves list
 
 ---
 

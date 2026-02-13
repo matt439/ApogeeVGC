@@ -152,6 +152,7 @@ public class SyncSimulator : IBattleController
     /// <summary>
     /// Event handler for when Battle requests a choice from a player.
     /// Synchronously gets the choice and submits it to the battle.
+    /// Falls back to AutoChoose if the player's choice is rejected.
     /// </summary>
     private void OnChoiceRequested(object? sender, BattleChoiceRequestEventArgs e)
     {
@@ -166,10 +167,20 @@ public class SyncSimulator : IBattleController
         {
             side.AutoChoose();
             choice = side.GetChoice();
+            Battle.Choose(e.SideId, choice);
+            return;
         }
 
-        // Submit the choice immediately (synchronous)
-        Battle.Choose(e.SideId, choice);
+        // Submit the choice — if it fails, fall back to AutoChoose.
+        // This handles cases where PlayerRandom picks a hidden-disabled move
+        // (e.g. from Imprison) that appears available in the restricted request
+        // data but is rejected by the battle engine's unrestricted validation.
+        if (!Battle.Choose(e.SideId, choice))
+        {
+            side.AutoChoose();
+            choice = side.GetChoice();
+            Battle.Choose(e.SideId, choice);
+        }
     }
 
     /// <summary>

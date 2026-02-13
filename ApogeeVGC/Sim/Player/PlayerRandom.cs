@@ -354,13 +354,9 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         return _random.Random(1, 3); // Returns 1 or 2
     }
 
-    private bool IsDisabled(MoveIdBoolUnion disabled)
+    private static bool IsDisabled(MoveIdBoolUnion? disabled)
     {
-        return disabled switch
-        {
-            BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
-            _ => false
-        };
+        return disabled is not null && disabled.IsTrue();
     }
 
     private bool IsPokemonFainted(PokemonSwitchRequestData pokemon)

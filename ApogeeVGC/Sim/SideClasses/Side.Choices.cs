@@ -79,11 +79,27 @@ public partial class Side
         var moves = pokemon.GetMoves();
 
         // Step 6: Auto-choose first available move if needed
+        // Check both the restricted request view AND the unrestricted moves list.
+        // Hidden-disabled moves (e.g. from Imprison) appear as not disabled in the request
+        // when isLastActive=true, but ARE disabled in the unrestricted list.
         if (autoChoose)
         {
-            foreach (PokemonMoveData pokemonMoveData in request.Moves)
+            for (int i = 0; i < request.Moves.Count; i++)
             {
+                PokemonMoveData pokemonMoveData = request.Moves[i];
+
+                // Skip if disabled in the restricted request view
                 if (pokemonMoveData.Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion
+                    {
+                        Value: true
+                    })
+                {
+                    continue;
+                }
+
+                // Also skip if disabled in the unrestricted moves list (catches hidden-disabled)
+                if (i < moves.Count && pokemonMoveData.Id == moves[i].Id &&
+                    moves[i].Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion
                     {
                         Value: true
                     })
