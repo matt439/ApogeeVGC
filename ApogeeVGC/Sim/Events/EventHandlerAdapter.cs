@@ -143,7 +143,8 @@ internal static class EventHandlerAdapter
             return context.SourceEffect;
         }
 
-        if (paramName.Contains("side"))
+        if (paramName.Contains("side") &&
+            (paramType == typeof(ApogeeVGC.Sim.SideClasses.Side) || typeof(ApogeeVGC.Sim.SideClasses.Side).IsAssignableFrom(paramType)))
         {
             return context.TargetSide;
         }
@@ -252,12 +253,16 @@ internal static class EventHandlerAdapter
             }
         }
         
-        // Check for Condition type - should match context.Effect if it's a Condition
+        // Check for Condition type - should match context.Effect or context.SourceEffect if it's a Condition
         if (paramType == typeof(Conditions.Condition) || typeof(Conditions.Condition).IsAssignableFrom(paramType))
         {
             if (context.Effect is Conditions.Condition condition)
             {
                 return condition;
+            }
+            if (context.SourceEffect is Conditions.Condition sourceCondition)
+            {
+                return sourceCondition;
             }
         }
 

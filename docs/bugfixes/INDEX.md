@@ -23,6 +23,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
 - [Big Root Heal Pulse Null Effect Fix](#big-root-heal-pulse-null-effect-fix) - NullReferenceException when effect parameter is null in Big Root OnTryHeal handler
 - [Covet TakeItem RelayVar Fix](#covet-takeitem-relayvar-fix) - TakeItem event invoked without relayVar parameter causing type mismatch
+- [Wind Power SideCondition Parameter Fix](#wind-power-sidecondition-parameter-fix) - NullReferenceException when sideCondition parameter name matched "side" check instead of Condition type
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -1455,6 +1456,21 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+### Wind Power SideCondition Parameter Fix
+**File**: `WindPowerSideConditionParameterFix.md`  
+**Severity**: High  
+**Systems Affected**: EventHandlerAdapter parameter resolution for Condition-typed parameters with names containing "side"
+
+**Problem**: Wind Power's `OnSideConditionStart` handler threw `NullReferenceException` when accessing `sideCondition.Id` because the `sideCondition` parameter was resolved as `null`.
+
+**Root Cause**: In `ResolveParameter`, the name-based check `paramName.Contains("side")` matched the parameter name `sideCondition` and returned `context.TargetSide` (which was null) instead of allowing the type-based `Condition` check to correctly resolve it from `context.SourceEffect`.
+
+**Solution**: Added a type guard to the name-based "side" check so it only matches when the parameter type is actually `Side`. Also extended the `Condition` type check to also search `context.SourceEffect` (not just `context.Effect`).
+
+**Keywords**: `Wind Power`, `Tailwind`, `OnSideConditionStart`, `ResolveParameter`, `name-based matching`, `NullReferenceException`, `parameter resolution`, `sideCondition`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 29  
+*Total Bug Fixes Documented*: 30  
 *Reference Guides*: 1
