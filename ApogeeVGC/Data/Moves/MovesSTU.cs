@@ -921,12 +921,9 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
                     AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Simple, source);
-                    if (oldAbility != null)
-                    {
-                        return new VoidReturn();
-                    }
-
-                    return false;
+                    if (oldAbility is null) return null;
+                    if (oldAbility is FalseAbilityIdFalseUnion) return false;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
