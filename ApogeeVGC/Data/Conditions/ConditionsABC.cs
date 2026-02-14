@@ -135,7 +135,7 @@ public partial record Conditions
                 }),
                 OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
                 {
-                    if (pokemon.Volatiles[ConditionId.Attract].Source is { IsActive: false } &&
+                    if (battle.EffectState.Source is { IsActive: false } &&
                         pokemon.Volatiles.ContainsKey(ConditionId.Attract))
                     {
                         battle.Debug($"Removing Attract volatile on {pokemon}");
