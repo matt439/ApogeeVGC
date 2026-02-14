@@ -154,13 +154,13 @@
 
 ^ review moves Reversal to RockPolish
 
-@ review moves RockSlide to RolePlay
+^ review moves RockSlide to RolePlay
 
-review moves Rollout to Ruination
+^ review moves Rollout to Ruination
 
 ## MovesSTU
 
-review moves SacredFire to SandTomb
+@ review moves SacredFire to SandTomb
 
 review moves Scald to SeedBomb
 

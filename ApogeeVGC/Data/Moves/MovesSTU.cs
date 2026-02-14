@@ -155,9 +155,10 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, target) =>
                 {
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    if (target == null) return;
+                    ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         move.Accuracy = IntTrueUnion.FromTrue();
