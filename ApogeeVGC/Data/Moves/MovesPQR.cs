@@ -2590,12 +2590,6 @@ public partial record Moves
                 }),
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
-                    // Copy target's ability
-                    if (target.Ability == AbilityId.None)
-                    {
-                        return false;
-                    }
-
                     AbilityIdFalseUnion? oldAbility = source.SetAbility(target.Ability, target);
                     // TS: if (!oldAbility) return oldAbility as false | null;
                     // SetAbility returns false for failure, null for silent failure

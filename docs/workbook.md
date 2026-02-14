@@ -152,9 +152,9 @@
 
 ^ review moves RelicSong to RevelationDance
 
-@ review moves Reversal to RockPolish
+^ review moves Reversal to RockPolish
 
-review moves RockSlide to RolePlay
+@ review moves RockSlide to RolePlay
 
 review moves Rollout to Ruination
 
