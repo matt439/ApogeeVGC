@@ -48,7 +48,7 @@ public class Program
 
         // SingleBattleDebug or IncrementalDebug
         var driver = new Driver();
-        driver.Start(DriverMode.SingleBattleDebugVgcRegI);
+        driver.Start(DriverMode.RndVsRndVgcRegIEvaluation);
 
 
         //Console.WriteLine("Press Enter key to exit...");
