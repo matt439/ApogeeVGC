@@ -863,14 +863,13 @@ public partial record Conditions
                         if (battle.DisplayUi)
                         {
                             // Show OHKO message if applicable
-                            if (move.Ohko == true)
+                            if (move.Ohko != null)
                             {
                                 battle.Add("-ohko");
                             }
-
-                            battle.Add("-end", target, "Substitute");
                         }
 
+                        // RemoveVolatile triggers OnEnd which adds the "-end" message
                         target.RemoveVolatile(_library.Conditions[ConditionId.Substitute]);
                     }
                     else
@@ -887,7 +886,7 @@ public partial record Conditions
                     if (move.Recoil != null || move.Id == MoveId.Chloroblast)
                     {
                         int recoilDamage = battle.Actions.CalcRecoilDamage(damage, move, source);
-                        battle.Damage(recoilDamage, source, source,
+                        battle.Damage(recoilDamage, source, target,
                             BattleDamageEffect.FromIEffect(
                                 _library.Conditions[ConditionId.Recoil]));
                     }
