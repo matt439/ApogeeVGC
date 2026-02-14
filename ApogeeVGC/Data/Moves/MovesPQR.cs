@@ -2042,6 +2042,8 @@ public partial record Moves
                         return false;
                     }
 
+                    var oldApparentType = source.ApparentType.ToList();
+
                     // Get target's types
                     var newTypes = target.GetTypes(true).Where(t => t != PokemonType.Unknown)
                         .ToList();
@@ -2062,6 +2064,8 @@ public partial record Moves
                         $"[of] {target}");
                     source.SetType(newTypes.ToArray());
                     source.AddedType = target.AddedType;
+                    source.KnownType = target.IsAlly(source) && target.KnownType;
+                    if (!source.KnownType) source.ApparentType = oldApparentType;
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -2195,7 +2199,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     if (source.Side.FaintedLastTurn != null)
                     {
@@ -2203,7 +2207,7 @@ public partial record Moves
                         return battle.ChainModify(2);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -2299,6 +2303,7 @@ public partial record Moves
                 Category = MoveCategory.Status,
                 Name = "Revival Blessing",
                 BasePp = 1,
+                NoPpBoosts = true,
                 Priority = 0,
                 Flags = new MoveFlags { Heal = true, NoSketch = true },
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
