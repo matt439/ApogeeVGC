@@ -1650,7 +1650,7 @@ public partial record Moves
                     // Turn 1: Prepare the move
                     battle.Add("-prepare", source, move.Name);
                     // In sun, skip charge turn
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.AttrLastMove("[still]");
@@ -1670,14 +1670,14 @@ public partial record Moves
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
                     return null; // Stop the move on turn 1
                 }),
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     var weakWeathers = new[]
                     {
                         ConditionId.RainDance, ConditionId.PrimordialSea, ConditionId.Sandstorm,
                         ConditionId.Snowscape,
                     };
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
@@ -1722,7 +1722,7 @@ public partial record Moves
                     // Turn 1: Prepare the move
                     battle.Add("-prepare", source, move.Name);
                     // In sun, skip charge turn
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.AttrLastMove("[still]");
@@ -1742,14 +1742,14 @@ public partial record Moves
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
                     return null; // Stop the move on turn 1
                 }),
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     var weakWeathers = new[]
                     {
                         ConditionId.RainDance, ConditionId.PrimordialSea, ConditionId.Sandstorm,
                         ConditionId.Snowscape,
                     };
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
