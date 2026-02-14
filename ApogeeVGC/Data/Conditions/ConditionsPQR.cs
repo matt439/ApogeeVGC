@@ -423,7 +423,10 @@ public partial record Conditions
                         if (lockedMove is not null &&
                             source.Volatiles[ConditionId.LockedMove].Duration == 2)
                         {
-                            source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                            // TS uses `delete source.volatiles['lockedmove']` which bypasses OnEnd.
+                            // Use DeleteVolatile (not RemoveVolatile) to avoid triggering
+                            // LockedMove's OnEnd handler (which would cause confusion).
+                            source.DeleteVolatile(ConditionId.LockedMove);
                         }
 
                         battle.Debug("[Protect.OnTryHit] Returning Empty (block move)");
@@ -569,6 +572,11 @@ public partial record Conditions
                 // Note: In Gen 9, Psychic Noise prevents the target from healing for 2 turns.
                 // TypeScript uses the 'healblock' volatile with duration 2 when applied via Psychic Noise.
                 // The move's secondary applies this condition, and related code checks for it when blocking heals.
+                // TODO: The TS healblock condition also has onBeforeMove (priority 6) that blocks moves with
+                // the 'heal' flag (e.g. Recover, Drain Punch) before execution, and onDisableMove that
+                // disables healing moves in the selection menu. Currently only OnTryHeal blocks healing
+                // effects, but healing MOVES like Drain Punch can still execute (dealing damage without
+                // healing). To fully match TS, add OnBeforeMove and OnDisableMove handlers.
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)

@@ -1120,15 +1120,16 @@ public partial record Moves
 
                 OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
                 {
-                    // source is the Pokemon using Protect
-                    // Always run both checks, let Stall condition handle the logic
-                    bool willAct = battle.Queue.WillAct() is not null;
+                    // TS: return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
+                    // Short-circuit: if willAct is false, don't run StallMove event
+                    if (battle.Queue.WillAct() is null)
+                    {
+                        return (BoolEmptyVoidUnion)false;
+                    }
+
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    bool result = willAct && stallSuccess;
-
-                    // Return BoolEmptyVoidUnion explicitly
-                    return result ? true : (BoolEmptyVoidUnion)false;
+                    return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
 
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
