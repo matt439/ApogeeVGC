@@ -45,6 +45,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Infinite loop in damage calculation for self-stat changes
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Secondary property not converted to Secondaries array
 - [Steel Beam & Mind Blown Recoil Fix](#steel-beam--mind-blown-recoil-fix) - MoveId does not have corresponding ConditionId for recoil damage effect
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix) - HasBounced flag lost during ToActiveMove() conversion causing infinite bounce loop
 
 ### Status Conditions
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
@@ -571,6 +572,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Battle runs for 1000+ turns
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player repeatedly failing move validation in doubles
 - [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix) - Update callback detects but doesn't apply changes
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix) - Intermittent stack overflow from ability bouncing moves indefinitely
 
 ### By Component
 
@@ -592,6 +594,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [Headlong Rush Self-Stat Drops Fix](#headlong-rush-self-stat-drops-fix)
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix)
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix)
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix)
 
 **Status/Conditions**:
 - [TrySetStatus Logic Error](#trysetstatus-logic-error)
@@ -637,6 +640,9 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 **BattleActions.MoveEffects.cs**:
 - [Volt Switch Damage Type Bug](#volt-switch-damage-type-bug)
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix)
+
+**BattleActions.Moves.cs**:
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix)
 
 **BattleActions.MoveHit.cs**:
 - [Headlong Rush Self-Stat Drops Fix](#headlong-rush-self-stat-drops-fix)
@@ -1504,6 +1510,37 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+### Magic Bounce Infinite Recursion Fix
+**File**: `MagicBounceInfiniteRecursionFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Move execution pipeline, ability event handlers, parallel battle simulation
+
+**Problem**: When running large-scale parallel battle simulations with 32 threads, intermittent `System.InvalidOperationException: Stack overflow` exceptions occurred. The stack trace showed infinite recursion through the Magic Bounce ability handler. The bug was intermittent and not reproducible in single-battle debug mode with the same seeds.
+
+**Root Cause**: Two opposing Pokémon with Magic Bounce abilities would bounce a reflectable move back and forth indefinitely. When Magic Bounce's `OnTryHit` handler created a new `ActiveMove` and set `HasBounced = true` to prevent re-bouncing, this flag was lost when `UseMoveInner` called `move.ToActiveMove()`. The `ToActiveMove()` method creates a fresh `ActiveMove` from base `Move` properties only, not preserving `ActiveMove`-specific properties like `HasBounced`. Without the guard flag, the second Magic Bounce holder would bounce the move again, creating infinite recursion.
+
+**Why Intermittent**: Only triggered when both Pokémon had Magic Bounce (rare), one used a reflectable move, and recursion depth exceeded stack limits before natural battle termination (faint, PP depletion). Thread pool threads have 1 MB stacks vs. 4-8 MB main thread stacks, so the bug manifested in parallel execution but not single debug runs.
+
+**Solution**: Modified `UseMoveInner` in `BattleActions.Moves.cs` to preserve the `HasBounced` flag when converting an incoming `ActiveMove`:
+
+```csharp
+var activeMove = move.ToActiveMove();
+
+// Preserve HasBounced from the incoming move (e.g. set by Magic Bounce)
+if (move is ActiveMove { HasBounced: true })
+{
+    activeMove.HasBounced = true;
+}
+```
+
+This ensures the second Magic Bounce holder sees `HasBounced == true` and skips bouncing, breaking the recursion after 1-2 levels instead of 500+.
+
+**Pattern**: When using `ToActiveMove()`, consider whether any `ActiveMove`-specific properties need preservation across re-invocations. This establishes a pattern for preserving state during type conversions.
+
+**Keywords**: `Magic Bounce`, `infinite recursion`, `stack overflow`, `HasBounced`, `ToActiveMove`, `UseMoveInner`, `ActiveMove`, `thread stack size`, `parallel battles`, `intermittent bug`, `reflectable moves`, `bounce mechanics`, `property preservation`, `type conversion`, `Espeon`, `Xatu`, `Taunt`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 31  
+*Total Bug Fixes Documented*: 32  
 *Reference Guides*: 1
