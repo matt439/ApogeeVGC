@@ -10,6 +10,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Ability OnStart handlers not executing during switch-in
 - [Trick Room Bug Fix](#trick-room-bug-fix) - Field event handlers not mapped/invoked
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue) - Move event handlers not mapped
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix) - Condition/Item OnStart handlers not mapped causing Sleep to never end
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Int passed to RunEvent instead of IntRelayVar
 - [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix) - ConditionIdRelayVar not converted to PokemonTypeConditionIdUnion
 - [Condition to Ability Cast Fix](#condition-to-ability-cast-fix) - InvalidCastException when trying to cast Condition to Ability
@@ -115,6 +116,26 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - Extended `EventHandlerAdapter.ResolveParameter` to support Field and Side types
 
 **Keywords**: `field condition`, `pseudo-weather`, `Trick Room`, `event mapping`, `parameter resolution`
+
+---
+
+### Status Condition OnStart Handler Mapping Fix
+**File**: `StatusConditionOnStartHandlerMappingFix.md`  
+**Severity**: Critical  
+**Systems Affected**: All status conditions and items with OnStart/OnEnd/Restart handlers, Sleep status never ending
+
+**Problem**: Battle exceeded 1000-turn limit due to Sleep status that never ended, causing every move to be blocked indefinitely. Both Pokémon had Sleep status with `StatusState.Time=null` because the `OnStart` handler never executed despite `SetStatus` being called.
+
+**Root Cause**: `EventId.Start`, `EventId.End`, and `EventId.Restart` were only mapped in `AbilityEventMethodsMap` (for abilities) but completely missing from the base `EventMethodsMap`. When `SingleEvent` tried to find a handler for Condition/Item lifecycle events, `GetEventHandlerInfo` returned `null`, so handlers never executed. Since Sleep's `OnStart` never ran, `Time` stayed `null`, and `null--` stays `null` in C# (lifted nullable arithmetic), so `null <= 0` was always `false` and Sleep never cured itself.
+
+**Solution**: 
+- Added `EventId.Start`, `EventId.End`, `EventId.Restart` mappings to base `EventMethodsMap` in `EventHandlerInfoMapper`
+- Used type-based switching to route to `Condition.OnStart` or `Item.OnStart` properties
+- Abilities unaffected (checked first in separate map)
+
+**Impact**: Affects all status conditions (Sleep, Freeze, Burn, Paralysis), all volatile conditions (Confusion, Disable, LockedMove, TwoTurnMove, etc.), and all items with lifecycle handlers.
+
+**Keywords**: `status condition`, `Sleep`, `Freeze`, `OnStart`, `OnEnd`, `OnRestart`, `EventHandlerInfoMapper`, `event mapping`, `handler not executing`, `null Time`, `endless loop`, `turn limit`, `BattleTurnLimitException`, `Condition`, `Item`, `IEventMethods`, `lifecycle events`
 
 ---
 
@@ -569,6 +590,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Stack overflow
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple issues including recursion
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Stack overflow from recursive secondary processing
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix) - Sleep never ends causing 1000+ turn battles
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Battle runs for 1000+ turns
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player repeatedly failing move validation in doubles
 - [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix) - Update callback detects but doesn't apply changes
@@ -580,6 +602,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix)
 - [Trick Room Bug Fix](#trick-room-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix)
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) (partial)
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix)
 
@@ -597,6 +620,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix)
 
 **Status/Conditions**:
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix)
 - [TrySetStatus Logic Error](#trysetstatus-logic-error)
 - [Leech Seed Bug Fix](#leech-seed-bug-fix)
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix)
@@ -633,6 +657,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 **EventHandlerInfoMapper.cs**:
 - [Trick Room Bug Fix](#trick-room-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix)
 
 **BattleActions.Damage.cs**:
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix)
@@ -1047,6 +1072,7 @@ foreach (Pokemon? pokemon in activeSnapshot) { ... }
 - **2025-01-XX**: Added Battle End Condition Null Request Fix (null request passed after battle ends mid-loop)
 - **2025-01-19**: Added Endless Battle Loop Fix (infinite loop when active Pokemon fainted without proper switch handling)
 - **2025-01-19**: Added Sync Simulator Request After Battle End Fix (RequestPlayerChoices called after battle ended during request generation)
+- **2025-01-20**: Added Status Condition OnStart Handler Mapping Fix (Condition/Item OnStart handlers not mapped causing Sleep to never end and 1000+ turn battles)
 
 ### Stat Modification Parameter Nullability and Type Conversion Fix
 **File**: `StatModificationParameterNullabilityFix.md`  
@@ -1542,5 +1568,5 @@ This ensures the second Magic Bounce holder sees `HasBounced == true` and skips 
 ---
 
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 32  
+*Total Bug Fixes Documented*: 33  
 *Reference Guides*: 1

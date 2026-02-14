@@ -1,5 +1,7 @@
 using System.Collections.Frozen;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Items;
 
 namespace ApogeeVGC.Sim.Events;
 
@@ -112,6 +114,22 @@ public static class EventHandlerInfoMapper
                 [EventId.Weather] = e => e.OnWeather,
                 [EventId.WeatherChange] = e => e.OnWeatherChange,
                 [EventId.WeatherModifyDamage] = e => e.OnWeatherModifyDamage,
+
+                // Condition/Item-specific lifecycle event handlers
+                // Abilities use AbilityEventMethodsMap (checked first), so these only match Conditions and Items
+                [EventId.Start] = e => e switch
+                {
+                    Condition c => c.OnStart,
+                    Item i => i.OnStart,
+                    _ => null,
+                },
+                [EventId.End] = e => e switch
+                {
+                    Condition c => c.OnEnd,
+                    Item i => i.OnEnd,
+                    _ => null,
+                },
+                [EventId.Restart] = e => (e as Condition)?.OnRestart,
 
                 // Field event handlers
                 [EventId.FieldStart] = e => e is IFieldEventMethods f ? f.OnFieldStart : null,
