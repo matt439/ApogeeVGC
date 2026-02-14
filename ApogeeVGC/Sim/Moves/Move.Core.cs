@@ -253,6 +253,11 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
             Status = Status,
             AffectsFainted = AffectsFainted,
 
+            // Copy HitEffect properties inherited from base
+            Boosts = Boosts,
+            SlotCondition = SlotCondition,
+            Terrain = Terrain,
+
             // Copy event handlers
             BasePowerCallback = BasePowerCallback,
             BeforeMoveCallback = BeforeMoveCallback,
