@@ -859,7 +859,10 @@ public partial record Conditions
                     {
                         if (lockedMoveState.Duration == 2)
                         {
-                            source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                            // TS uses `delete source.volatiles['lockedmove']` which bypasses OnEnd.
+                            // Use DeleteVolatile (not RemoveVolatile) to avoid triggering
+                            // LockedMove's OnEnd handler (which would cause confusion).
+                            source.DeleteVolatile(ConditionId.LockedMove);
                         }
                     }
 

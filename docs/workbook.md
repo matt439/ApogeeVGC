@@ -140,11 +140,11 @@
 
 ^ review moves PowerTrick to PrismaticLaser
 
-@ review moves Protect to PsychicNoise
+^ review moves Protect to PsychicNoise
 
-review moves PsychicTerrain to Psystrike
+^ review moves PsychicTerrain to Psystrike
 
-review moves PyroBall to RagePowder
+@ review moves PyroBall to RagePowder
 
 review moves RagingBull to RapidSpin
 
