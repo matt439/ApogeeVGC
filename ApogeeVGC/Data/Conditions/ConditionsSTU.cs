@@ -266,7 +266,7 @@ public partial record Conditions
                     if (battle.CheckMoveMakesContact(move, source, target))
                     {
                         battle.Boost(new SparseBoostsTable { Spe = -1 }, source, target,
-                            (IEffect?)_library.Moves[MoveId.SilkTrap]);
+                            _library.Moves[MoveId.SilkTrap].ToActiveMove());
                     }
 
                     return new Empty(); // NOT_FAIL - move was blocked but don't show failure message
@@ -697,7 +697,7 @@ public partial record Conditions
                     // Get the first active opponent Pokemon as the source
                     Pokemon? source = pokemon.Side.Foe.Active.FirstOrDefault(p => p != null);
                     battle.Boost(new SparseBoostsTable { Spe = -1 }, pokemon, source,
-                        (IEffect?)_library.Moves[MoveId.StickyWeb]);
+                        _library.Moves[MoveId.StickyWeb].ToActiveMove());
                 }),
             },
             [ConditionId.StockpileStorage] = new()
