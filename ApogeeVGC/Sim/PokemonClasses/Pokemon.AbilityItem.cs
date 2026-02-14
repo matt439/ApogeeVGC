@@ -380,13 +380,10 @@ EffectStateId effectId = effect.EffectStateId;
             return Battle.Gen >= 5 && HasAbility(AbilityId.Klutz);
         }
 
-        // Regular Klutz check - ignores item unless item specifically ignores Klutz
-        if (HasAbility(AbilityId.Klutz))
-        {
-            return item.IgnoreKlutz != true;
-        }
-
-        return false;
+        // Check IgnoreKlutz before HasAbility to avoid infinite recursion:
+        // HasAbility(Klutz) → IgnoringAbility() → HasItem(AbilityShield) → IgnoringItem() → HasAbility(Klutz) → ...
+        // Matches TypeScript short-circuit: return !this.getItem().ignoreKlutz && this.hasAbility('klutz');
+        return item.IgnoreKlutz != true && HasAbility(AbilityId.Klutz);
     }
 
     public AbilityIdFalseUnion? SetAbility(AbilityId ability, Pokemon? source = null, IEffect? sourceEffect = null,
