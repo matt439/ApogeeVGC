@@ -196,21 +196,21 @@
 
 ^ review moves Swift to SyrupBomb
 
-@ review moves TachyonCutter to TakeHeart
+^ review moves TachyonCutter to TakeHeart
 
-review moves TarShot to Teleport
+^ review moves TarShot to Teleport
 
-review moves TemperFlare to TerrainPulse
+^ review moves TemperFlare to TerrainPulse
 
-review moves Thief to ThunderCage
+^ review moves Thief to ThunderCage
 
-review moves Thunderclap to Tickle
+^ review moves Thunderclap to Tickle
 
-review moves TidyUp to ToxicSpikes
+^ review moves TidyUp to ToxicSpikes
 
-review moves ToxicThread to TriAttack
+^ review moves ToxicThread to TriAttack
 
-review moves Trick to TripleDive
+@ review moves Trick to TripleDive
 
 review moves TripleKick to UTurn
 

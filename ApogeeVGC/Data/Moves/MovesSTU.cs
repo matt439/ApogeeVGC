@@ -3168,10 +3168,10 @@ public partial record Moves
                     !target.HasAbility(AbilityId.StickyHold)),
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    ItemFalseUnion? yourItem = target.TakeItem(source);
-                    ItemFalseUnion? myItem = source.TakeItem();
+                    ItemFalseUnion yourItem = target.TakeItem(source);
+                    ItemFalseUnion myItem = source.TakeItem();
                     if (target.Item != ItemId.None || source.Item != ItemId.None ||
-                        (yourItem == null && myItem == null))
+                        (yourItem is FalseItemFalseUnion && myItem is FalseItemFalseUnion))
                     {
                         if (yourItem is ItemItemFalseUnion yourItemVal)
                             target.Item = yourItemVal.Item.Id;
@@ -4576,10 +4576,10 @@ public partial record Moves
                     !target.HasAbility(AbilityId.StickyHold)),
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    ItemFalseUnion? yourItem = target.TakeItem(source);
-                    ItemFalseUnion? myItem = source.TakeItem();
+                    ItemFalseUnion yourItem = target.TakeItem(source);
+                    ItemFalseUnion myItem = source.TakeItem();
                     if (target.Item != ItemId.None || source.Item != ItemId.None ||
-                        (yourItem == null && myItem == null))
+                        (yourItem is FalseItemFalseUnion && myItem is FalseItemFalseUnion))
                     {
                         if (yourItem is ItemItemFalseUnion yourItemVal)
                             target.Item = yourItemVal.Item.Id;
