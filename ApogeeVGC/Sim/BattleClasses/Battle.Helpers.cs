@@ -114,6 +114,7 @@ public partial class Battle
             EventId.Start => EventId.SideStart,
             EventId.End => EventId.SideEnd,
             EventId.Restart => EventId.SideRestart,
+            EventId.SwitchIn => EventId.SideSwitchIn,
             _ => baseEvent,
         };
     }
