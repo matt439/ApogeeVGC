@@ -172,21 +172,21 @@
 
 ^ review moves Sketch to SkitterSmack
 
-@ review moves SkyAttack to SleepTalk
+^ review moves SkyAttack to SleepTalk
 
-review moves Sludge to Snarl
+^ review moves Sludge to Snarl
 
-review moves SnipeShot to SoftBoiled
+^ review moves SnipeShot to SoftBoiled
 
-review moves SolarBeam to Spark
+^ review moves SolarBeam to Spark
 
-review moves SparklingAria to SpinOut
+^ review moves SparklingAria to SpinOut
 
-review moves SpiritBreak to SpringtideStorm
+^ review moves SpiritBreak to SpringtideStorm
 
-review moves StealthRock to Stockpile
+^ review moves StealthRock to Stockpile
 
-review moves Stomp to StrangeSteam
+@ review moves Stomp to StrangeSteam
 
 review moves Strength to StuffCheeks
 

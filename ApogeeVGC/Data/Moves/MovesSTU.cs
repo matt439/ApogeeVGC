@@ -2518,18 +2518,10 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
                 {
-                    // Count all positive stat boosts
-                    var positiveBoosts = 0;
-                    foreach ((BoostId _, int value) in source.Boosts.GetBoosts())
-                    {
-                        if (value > 0) positiveBoosts += value;
-                    }
-
-                    Move storedPower = _library.Moves[MoveId.StoredPower];
-                    int bp = storedPower.BasePower + 20 * positiveBoosts;
-                    battle.Debug($"[Stored Power] BP: {bp}");
+                    int bp = move.BasePower + 20 * source.PositiveBoosts();
+                    battle.Debug($"BP: {bp}");
                     return bp;
                 }),
                 Secondary = null,
