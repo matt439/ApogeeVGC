@@ -24,6 +24,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Big Root Heal Pulse Null Effect Fix](#big-root-heal-pulse-null-effect-fix) - NullReferenceException when effect parameter is null in Big Root OnTryHeal handler
 - [Covet TakeItem RelayVar Fix](#covet-takeitem-relayvar-fix) - TakeItem event invoked without relayVar parameter causing type mismatch
 - [Wind Power SideCondition Parameter Fix](#wind-power-sidecondition-parameter-fix) - NullReferenceException when sideCondition parameter name matched "side" check instead of Condition type
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix) - EventHandlerInfo validation checking delegate parameter types in wrong direction
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -548,6 +549,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix) - VoidVoidFalseUnion cannot be converted to RelayVar
 - [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix) - IntIntBoolUnion cannot be converted to RelayVar
 - [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix) - Event validation checking parameter types in wrong direction
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
@@ -615,6 +617,15 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 - [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix)
 - [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix)
 - [SparseBoostsTableVoidUnion Return Conversion Fix](#sparsebooststablevoidunion-return-conversion-fix)
+
+**EventHandlerInfo.cs**:
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix)
+
+**UnionEventHandlerInfo.cs**:
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix)
+
+**OnCriticalHitEventInfo.cs**:
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix)
 
 **EventHandlerInfoMapper.cs**:
 - [Trick Room Bug Fix](#trick-room-bug-fix)
@@ -1471,6 +1482,28 @@ BattleDamageEffect.FromIEffect(move)
 
 ---
 
+### Disguise CriticalHit Parameter Type Fix
+**File**: `DisguiseCriticalHitParameterTypeFix.md`  
+**Severity**: High  
+**Systems Affected**: Event system validation, delegate type checking, all event handlers with base-type parameters
+
+**Problem**: When Shadow Claw targeted Mimikyu (with Disguise ability), the battle crashed with `EventHandlerInfo validation failed for event CriticalHit on effect Disguise (Ability): Event CriticalHit: Parameter 2 (_) type mismatch. Expected: Pokemon, Got: Object`.
+
+**Root Cause**: The `Validate()` method in `EventHandlerInfo` (and `UnionEventHandlerInfo`) was checking delegate parameter type compatibility in the wrong direction. It used `expectedBase.IsAssignableFrom(actualBase)` which checks if `Pokemon` can accept `object` (false), but delegate parameter contravariance requires checking if `object` can accept `Pokemon` (true).
+
+**Solution**: Fixed the parameter type validation direction in both `EventHandlerInfo.Validate()` and `UnionEventHandlerInfo.Validate()`:
+- Changed from: `if (!expectedBase.IsAssignableFrom(actualBase))`
+- Changed to: `if (!actualBase.IsAssignableFrom(expectedBase))`
+- Also updated `OnCriticalHitEventInfo` to mark source Pokemon parameter as nullable
+
+**Key Concept**: For delegate parameters, **contravariance** applies - a delegate with a more general parameter type (like `object`) can safely accept more specific arguments (like `Pokemon`).
+
+**Impact**: This fix applies to all event handlers where the delegate uses a base/interface type for a parameter but `ExpectedParameterTypes` declares a derived/concrete type.
+
+**Keywords**: `EventHandlerInfo`, `UnionEventHandlerInfo`, `Validate`, `delegate contravariance`, `parameter type`, `IsAssignableFrom`, `Disguise`, `OnCriticalHit`, `object`, `Pokemon`, `type mismatch`, `validation`, `Shadow Claw`, `Mimikyu`
+
+---
+
 *Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 30  
+*Total Bug Fixes Documented*: 31  
 *Reference Guides*: 1

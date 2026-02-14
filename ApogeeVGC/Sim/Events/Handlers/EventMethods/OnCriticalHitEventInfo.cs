@@ -37,8 +37,8 @@ public sealed record OnCriticalHitEventInfo : UnionEventHandlerInfo<OnCriticalHi
         ];
         ExpectedReturnType = typeof(BoolVoidUnion);
         
-    // Nullability: Battle (non-null), target (non-null), source (non-null), move (non-null)
-     ParameterNullability = [false, false, false, false];
+    // Nullability: Battle (non-null), target (non-null), source (nullable - can be null from RunEvent), move (non-null)
+     ParameterNullability = [false, false, true, false];
       ReturnTypeNullable = false; // BoolVoidUnion is a struct
 
         // Validate configuration
