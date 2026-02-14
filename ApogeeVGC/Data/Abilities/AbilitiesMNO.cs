@@ -366,7 +366,7 @@ public partial record Abilities
                 {
                     // Don't bounce self stat changes, or boosts that have already bounced
                     if (source == null || target == source ||
-                        effect.EffectStateId == AbilityId.MirrorArmor) return;
+                        effect?.EffectStateId == AbilityId.MirrorArmor) return;
 
                     foreach (BoostId b in Enum.GetValues<BoostId>())
                     {

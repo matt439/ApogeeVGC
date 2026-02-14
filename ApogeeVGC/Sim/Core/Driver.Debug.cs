@@ -195,7 +195,7 @@ public partial class Driver
     /// <summary>
     /// Runs a single VGC Reg I battle with specific seeds for debugging.
     /// Edit the seed constants in this method to reproduce specific battle
-    /// scenarios from RndVsRndVgcRegIEvaluation failures.
+    /// scenarios from RndVsRndVgcRegIEvaluation failures
     /// </summary>
     private void RunSingleBattleDebugVgcRegI()
     {
