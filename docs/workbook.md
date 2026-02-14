@@ -112,11 +112,11 @@
 
 ^ review moves MegaKick to MetalSound
 
-@ review moves MeteorBeam to MilkDrink
+^ review moves MeteorBeam to MilkDrink
 
-review moves Mimic to MistBall
+^ review moves Mimic to MistBall
 
-review moves MistyExplosion to MorningSun
+@ review moves MistyExplosion to MorningSun
 
 review moves MortalSpin to MudSlap
 

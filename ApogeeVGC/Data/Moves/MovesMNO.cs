@@ -910,17 +910,16 @@ public partial record Moves
                     Metronome = true,
                 },
                 SelfDestruct = MoveSelfDestruct.FromAlways(),
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.MistyTerrain, source) &&
                         (source.IsGrounded() ?? false))
                     {
                         battle.Debug("misty terrain boost");
-                        battle.ChainModify(3, 2); // 1.5x
-                        return battle.FinalModify(basePower);
+                        return battle.ChainModify(1.5);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.AllAdjacent,
