@@ -202,6 +202,9 @@ public partial record Abilities
                 }),
                 OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, item, _) =>
                 {
+                    if (item == null)
+                        return BoolVoidUnion.FromBool(true);
+
                     ItemId[] healingItems =
                     [
                         ItemId.AguavBerry, ItemId.EnigmaBerry, ItemId.FigyBerry, ItemId.IapapaBerry,
@@ -650,6 +653,9 @@ public partial record Abilities
                 }),
                 OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, item, _) =>
                 {
+                    if (item == null)
+                        return BoolVoidUnion.FromBool(true);
+
                     var healingItems = new[]
                     {
                         ItemId.AguavBerry, ItemId.EnigmaBerry, ItemId.FigyBerry, ItemId.IapapaBerry,
