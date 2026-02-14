@@ -338,6 +338,16 @@ public partial class BattleActions
 
         // Get active move
         var activeMove = move.ToActiveMove();
+
+        // Preserve HasBounced from the incoming move (e.g. set by Magic Bounce) because
+        // ToActiveMove() only copies base Move properties and drops ActiveMove-specific
+        // fields.  Without this, two opposing Magic Bounce holders infinitely re-bounce
+        // reflectable moves, causing a stack overflow.
+        if (move is ActiveMove { HasBounced: true })
+        {
+            activeMove.HasBounced = true;
+        }
+
         pokemon.LastMoveUsed = activeMove;
 
         // Copy priority and prankster boost from active move if it exists
