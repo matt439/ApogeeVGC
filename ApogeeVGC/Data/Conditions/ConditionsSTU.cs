@@ -1556,7 +1556,9 @@ public partial record Conditions
                     })),
                 OnMoveAborted = new OnMoveAbortedEventInfo((_, pokemon, _, _) =>
                 {
-                    pokemon.DeleteVolatile(ConditionId.TwoTurnMove);
+                    // Must use RemoveVolatile (not DeleteVolatile) to trigger OnEnd,
+                    // which cleans up the move-specific volatile (e.g., ShadowForce invulnerability)
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.TwoTurnMove]);
                 }),
             },
             [ConditionId.Unburden] = new()
