@@ -210,17 +210,17 @@
 
 ^ review moves ToxicThread to TriAttack
 
-@ review moves Trick to TripleDive
+^ review moves Trick to TripleDive
 
-review moves TripleKick to UTurn
+^ review moves TripleKick to UTurn
 
 ## MovesVWX
 
-review moves VacuumWave to Waterfall
+^ review moves VacuumWave to Waterfall
 
-review moves WaterGun to WaterSpout
+^ review moves WaterGun to WaterSpout
 
-review moves WaveCrash to WildboltStorm
+^ review moves WaveCrash to WildboltStorm
 
 review moves WildCharge to WorkUp
 

@@ -452,14 +452,18 @@ public partial record Moves
                         _ => move.Type,
                     };
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
                     // Use pokemon.EffectiveWeather() to account for Utility Umbrella
                     ConditionId weather = pokemon.EffectiveWeather();
-                    if (weather != ConditionId.None)
+                    if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand or
+                        ConditionId.RainDance or ConditionId.PrimordialSea or
+                        ConditionId.Sandstorm or ConditionId.Snowscape)
                     {
                         move.BasePower *= 2;
                     }
+
+                    battle.Debug($"BP: {move.BasePower}");
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
