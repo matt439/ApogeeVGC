@@ -2334,16 +2334,18 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, move) =>
                 {
                     // Double power on grounded targets in Electric Terrain
-                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, target) &&
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
                         target.IsGrounded() == true)
                     {
-                        return 140; // Doubled base power
+                        if (!source.IsAlly(target))
+                            battle.Hint($"{move.Name}'s BP doubled on grounded target.");
+                        return move.BasePower * 2;
                     }
 
-                    return 70; // Normal base power
+                    return move.BasePower;
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
