@@ -3490,7 +3490,7 @@ public partial record Moves
                     // TypeScript: const success = !!this.boost({ spa: 1, spd: 1 });
                     // return pokemon.cureStatus() || success;
                     BoolZeroUnion? boostSuccess = battle.Boost(
-                        new SparseBoostsTable { SpA = 1, SpD = 1 }, source, source, null, false, true);
+                        new SparseBoostsTable { SpA = 1, SpD = 1 }, source, source);
                     bool cured = source.CureStatus();
                     // Return true if either boost or cureStatus succeeded
                     return (boostSuccess?.IsTruthy() ?? false) || cured
