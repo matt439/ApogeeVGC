@@ -2109,21 +2109,16 @@ public partial record Moves
                 OnAfterMoveSecondarySelf =
                     new OnAfterMoveSecondarySelfEventInfo((_, source, _, move) =>
                     {
-                        // Only change forme if the move actually hit a target
                         if (move.WillChangeForme != true)
                         {
                             return new VoidReturn();
                         }
 
-                        // Change Meloetta forme if applicable
-                        if (source.Species.BaseSpecies == SpecieId.Meloetta && !source.Transformed)
-                        {
-                            // Toggle between Aria and Pirouette formes
-                            SpecieId newSpecies = source.Species.Forme == FormeId.Pirouette
-                                ? SpecieId.Meloetta // Aria is the base form
-                                : SpecieId.MeloettaPirouette;
-                            source.FormeChange(newSpecies, move, message: "[msg]");
-                        }
+                        // Toggle between Aria and Pirouette formes
+                        SpecieId newSpecies = source.Species.Forme == FormeId.Pirouette
+                            ? SpecieId.Meloetta // Aria is the base form
+                            : SpecieId.MeloettaPirouette;
+                        source.FormeChange(newSpecies, move, message: "[msg]");
 
                         return new VoidReturn();
                     }),
