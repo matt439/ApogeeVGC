@@ -1067,10 +1067,9 @@ public partial record Moves
                     {
                         int healAmount = target.BaseMaxHp / 4;
                         battle.Heal(healAmount, target, source);
-                        return new VoidReturn();
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,

@@ -116,29 +116,29 @@
 
 ^ review moves Mimic to MistBall
 
-@ review moves MistyExplosion to MorningSun
+^ review moves MistyExplosion to MorningSun
 
-review moves MortalSpin to MudSlap
+^ review moves MortalSpin to MudSlap
 
-review moves MysticalFire to NobleRoar
+^ review moves MysticalFire to NobleRoar
 
-review moves NoRetreat to OriginPulse
+^ review moves NoRetreat to OriginPulse
 
-review moves Outrage to Overheat
+^ review moves Outrage to Overheat
 
 ## MovesPQR
 
-review moves PainSplit to Peck
+^ review moves PainSplit to Peck
 
-review moves PerishSong to PhotonGeyser
+^ review moves PerishSong to PhotonGeyser
 
-review moves PinMissile to PoisonJab
+^ review moves PinMissile to PoisonJab
 
-review moves PoisonPowder to Poltergeist
+^ review moves PoisonPowder to Poltergeist
 
-review moves PopulationBomb to PowerSwap
+^ review moves PopulationBomb to PowerSwap
 
-review moves PowerTrick to PrismaticLaser
+@ review moves PowerTrick to PrismaticLaser
 
 review moves Protect to PsychicNoise
 
