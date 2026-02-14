@@ -190,11 +190,11 @@
 
 ^ review moves Strength to StuffCheeks
 
-@ review moves StunSpore to SuperFang
+^ review moves StunSpore to SuperFang
 
-review moves Superpower to SweetScent
+^ review moves Superpower to SweetScent
 
-review moves Swift to SyrupBomb
+@ review moves Swift to SyrupBomb
 
 review moves TachyonCutter to TakeHeart
 

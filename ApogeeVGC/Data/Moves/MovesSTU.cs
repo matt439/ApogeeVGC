@@ -3270,7 +3270,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
                     var factor = 0.5;
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                         factor = 0.667;
                     else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
