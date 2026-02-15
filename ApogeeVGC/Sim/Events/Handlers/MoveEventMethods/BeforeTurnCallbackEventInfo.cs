@@ -31,4 +31,36 @@ public sealed record BeforeTurnCallbackEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public BeforeTurnCallbackEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.BeforeTurnCallback;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static BeforeTurnCallbackEventInfo Create(
+        Action<Battle, Pokemon, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new BeforeTurnCallbackEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetPokemon(),
+                    context.GetSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

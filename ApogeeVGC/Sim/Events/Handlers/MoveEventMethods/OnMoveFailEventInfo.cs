@@ -31,4 +31,37 @@ public OnMoveFailEventInfo(
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnMoveFailEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.MoveFail;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnMoveFailEventInfo Create(
+        Action<Battle, Pokemon, Pokemon, ActiveMove> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnMoveFailEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetPokemon(),
+                    context.GetSourcePokemon(),
+                    context.GetMove()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

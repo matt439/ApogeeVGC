@@ -33,4 +33,42 @@ public sealed record DamageCallbackEventInfo : EventHandlerInfo
         // Validate configuration
         ValidateConfiguration();
     }
+
+    public DamageCallbackEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.DamageCallback;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static DamageCallbackEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new DamageCallbackEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetSourcePokemon(),
+                    context.GetTargetPokemon(),
+                    context.GetMove()
+                );
+                return result switch
+                {
+                    IntIntFalseUnion i => new IntRelayVar(i.Value),
+                    FalseIntFalseUnion => new BoolRelayVar(false),
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

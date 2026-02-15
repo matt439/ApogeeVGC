@@ -32,4 +32,43 @@ public OnModifyPriorityEventInfo(
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnModifyPriorityEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifyPriority;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnModifyPriorityEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnModifyPriorityEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetRelayVar<IntRelayVar>().Value,
+                    context.GetSourcePokemon(),
+                    context.GetTargetPokemon(),
+                    context.GetMove()
+                );
+                return result switch
+                {
+                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    VoidDoubleVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

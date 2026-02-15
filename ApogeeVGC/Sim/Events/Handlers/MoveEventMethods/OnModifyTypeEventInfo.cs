@@ -31,4 +31,37 @@ public OnModifyTypeEventInfo(
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnModifyTypeEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifyType;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnModifyTypeEventInfo Create(
+        Action<Battle, ActiveMove, Pokemon, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnModifyTypeEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetMove(),
+                    context.GetSourcePokemon(),
+                    context.GetTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

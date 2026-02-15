@@ -32,4 +32,42 @@ public sealed record BeforeMoveCallbackEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public BeforeMoveCallbackEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.BeforeMoveCallback;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static BeforeMoveCallbackEventInfo Create(
+        Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new BeforeMoveCallbackEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetTargetPokemon(),
+                    context.SourcePokemon,
+                    context.GetMove()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

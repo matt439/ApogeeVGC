@@ -32,4 +32,44 @@ public OnTryHitFieldEventInfo(
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnTryHitFieldEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TryHitField;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnTryHitFieldEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolEmptyVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnTryHitFieldEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetTargetPokemon(),
+                    context.GetSourcePokemon(),
+                    context.GetMove()
+                );
+                if (result == null) return null;
+                return result switch
+                {
+                    BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),
+                    EmptyBoolEmptyVoidUnion => null,
+                    VoidUnionBoolEmptyVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

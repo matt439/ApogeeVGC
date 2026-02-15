@@ -36,4 +36,35 @@ public sealed record OnCheckShowEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnCheckShowEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.CheckShow;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnCheckShowEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnCheckShowEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

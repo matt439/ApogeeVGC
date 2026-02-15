@@ -32,4 +32,42 @@ public OnAfterHitEventInfo(
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnAfterHitEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterHit;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnAfterHitEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAfterHitEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetTargetPokemon(),
+                    context.GetSourcePokemon(),
+                    context.GetMove()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

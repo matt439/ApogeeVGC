@@ -29,5 +29,36 @@ public sealed record PriorityChargeCallbackEventInfo : EventHandlerInfo
     
     // Validate configuration
         ValidateConfiguration();
- }
+  }
+
+    public PriorityChargeCallbackEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.PriorityChargeCallback;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static PriorityChargeCallbackEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new PriorityChargeCallbackEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

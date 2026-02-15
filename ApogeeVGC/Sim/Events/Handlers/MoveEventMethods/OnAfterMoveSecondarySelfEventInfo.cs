@@ -32,4 +32,42 @@ public OnAfterMoveSecondarySelfEventInfo(
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnAfterMoveSecondarySelfEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterMoveSecondarySelf;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnAfterMoveSecondarySelfEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAfterMoveSecondarySelfEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetTargetPokemon(),
+                    context.GetSourcePokemon(),
+                    context.GetMove()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

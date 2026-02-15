@@ -33,4 +33,44 @@ public OnTryHitSideEventInfo(
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnTryHitSideEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TryHitSide;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnTryHitSideEventInfo Create(
+        Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnTryHitSideEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetTargetSide(),
+                    context.GetSourcePokemon(),
+                    context.GetMove()
+                );
+                if (result == null) return null;
+                return result switch
+                {
+                    BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),
+                    EmptyBoolEmptyVoidUnion => null,
+                    VoidUnionBoolEmptyVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

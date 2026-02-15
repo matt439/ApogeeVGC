@@ -26,4 +26,35 @@ public sealed record OnCopyEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    public OnCopyEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.DurationCallback;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnCopyEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnCopyEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }
