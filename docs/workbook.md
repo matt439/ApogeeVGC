@@ -247,9 +247,9 @@
 
 ^ review abilities Chlorophyll to Comatose
 
-@ review abilities Commander to Costar
+^ review abilities Commander to Costar
 
-review abilities CottonDown to CuteCharm
+@ review abilities CottonDown to CuteCharm
 
 
 ## AbilitiesDEF
