@@ -278,9 +278,9 @@
 
 ^ review abilities Hospitality to HyperCutter
 
-@ review abilities IceBody to IceScales
+^ review abilities IceBody to IceScales
 
-review abilities Illuminate to Imposter
+@ review abilities Illuminate to Imposter
 
 review abilities Infiltrator to IronFist
 
