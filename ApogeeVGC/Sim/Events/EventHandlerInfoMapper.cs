@@ -656,4 +656,60 @@ public static class EventHandlerInfoMapper
 
         return true;
     }
+
+    /// <summary>
+    /// Builds a pre-computed handler cache for an effect by scanning all EventId × EventPrefix × EventSuffix
+    /// combinations. Only non-null results are stored, yielding a compact lookup table.
+    /// </summary>
+    public static FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
+        BuildHandlerCache(IEffect effect)
+    {
+        var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
+
+        foreach (EventId id in Enum.GetValues<EventId>())
+        {
+            foreach (EventPrefix prefix in Enum.GetValues<EventPrefix>())
+            {
+                foreach (EventSuffix suffix in Enum.GetValues<EventSuffix>())
+                {
+                    EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
+                    EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
+
+                    EventHandlerInfo? info = GetEventHandlerInfo(effect, id, p, s);
+                    if (info != null)
+                        cache[(id, prefix, suffix)] = info;
+                }
+            }
+        }
+
+        return cache.ToFrozenDictionary();
+    }
+
+    /// <summary>
+    /// Builds a pre-computed handler cache for a move effect by scanning all EventId × EventPrefix × EventSuffix
+    /// combinations against the MoveEventMethodsMap.
+    /// </summary>
+    public static FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
+        BuildMoveHandlerCache(IMoveEventMethods moveMethods)
+    {
+        var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
+
+        foreach (EventId id in Enum.GetValues<EventId>())
+        {
+            foreach (EventPrefix prefix in Enum.GetValues<EventPrefix>())
+            {
+                foreach (EventSuffix suffix in Enum.GetValues<EventSuffix>())
+                {
+                    EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
+                    EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
+
+                    EventHandlerInfo? info = GetMoveHandlerInfo(moveMethods, id, p, s);
+                    if (info != null)
+                        cache[(id, prefix, suffix)] = info;
+                }
+            }
+        }
+
+        return cache.ToFrozenDictionary();
+    }
 }
