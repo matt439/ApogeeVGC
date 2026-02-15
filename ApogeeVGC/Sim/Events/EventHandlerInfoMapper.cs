@@ -553,30 +553,29 @@ public static class EventHandlerInfoMapper
 
     /// <summary>
     /// Gets the EventHandlerInfo for a given EventId from an IEffect.
-    /// Uses static dictionaries for O(1) lookups without reflection.
+    /// Uses EffectType enum dispatch to avoid multiple interface casts per call.
     /// </summary>
-    /// <param name="effect">The effect to query</param>
-    /// <param name="id">The base EventId (without prefix/suffix)</param>
-    /// <param name="prefix">Optional event prefix (Foe, Source, Any, Ally)</param>
-    /// <param name="suffix">Optional event suffix</param>
-    /// <returns>The EventHandlerInfo if found, null otherwise</returns>
     public static EventHandlerInfo? GetEventHandlerInfo(
         IEffect effect,
         EventId id,
         EventPrefix? prefix = null,
         EventSuffix? suffix = null)
     {
-        // Try move-specific events first (if applicable)
-        if (effect is IMoveEventMethods moveMethods &&
-            MoveEventMethodsMap.TryGetValue(id, out var moveAccessor))
-        {
-            EventHandlerInfo? info = moveAccessor(moveMethods);
-            if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
-                return info;
-        }
+        // Species never has event handlers
+        if (effect.EffectType == EffectType.Specie)
+            return null;
 
-        // Try ability-specific events first (if applicable)
-        if (effect is IAbilityEventMethodsV2 abilityMethods &&
+        // Move only has move-specific events (doesn't implement IEventMethods)
+        if (effect.EffectType == EffectType.Move)
+            return GetMoveHandlerInfo((IMoveEventMethods)effect, id, prefix, suffix);
+
+        // For types implementing IEventMethods (Ability, Item, Condition, Format, etc.)
+        if (effect is not IEventMethods eventMethods)
+            return null;
+
+        // Ability has additional ability-specific events (Start, End, CheckShow)
+        if (effect.EffectType == EffectType.Ability &&
+            effect is IAbilityEventMethodsV2 abilityMethods &&
             AbilityEventMethodsMap.TryGetValue(id, out var abilityAccessor))
         {
             EventHandlerInfo? info = abilityAccessor(abilityMethods);
@@ -584,8 +583,35 @@ public static class EventHandlerInfoMapper
                 return info;
         }
 
+        return GetEventMethodsHandlerInfo(eventMethods, id, prefix, suffix,
+                   effect is IPokemonEventMethods pm ? pm : null);
+    }
+
+    private static EventHandlerInfo? GetMoveHandlerInfo(
+        IMoveEventMethods moveMethods,
+        EventId id,
+        EventPrefix? prefix,
+        EventSuffix? suffix)
+    {
+        if (MoveEventMethodsMap.TryGetValue(id, out var moveAccessor))
+        {
+            EventHandlerInfo? info = moveAccessor(moveMethods);
+            if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
+                return info;
+        }
+
+        return null;
+    }
+
+    private static EventHandlerInfo? GetEventMethodsHandlerInfo(
+        IEventMethods eventMethods,
+        EventId id,
+        EventPrefix? prefix,
+        EventSuffix? suffix,
+        IPokemonEventMethods? pokemonMethods)
+    {
         // Handle prefixed events
-        if (prefix.HasValue && effect is IEventMethods eventMethods)
+        if (prefix.HasValue)
         {
             EventHandlerInfo? info = prefix.Value switch
             {
@@ -595,7 +621,7 @@ public static class EventHandlerInfoMapper
                     accessor(eventMethods),
                 EventPrefix.Any when AnyEventMethodsMap.TryGetValue(id, out var accessor) =>
                     accessor(eventMethods),
-                EventPrefix.Ally when effect is IPokemonEventMethods pokemonMethods &&
+                EventPrefix.Ally when pokemonMethods != null &&
                                       AllyEventMethodsMap.TryGetValue(id, out var allyAccessor) =>
                     allyAccessor(pokemonMethods),
                 _ => null,
@@ -606,10 +632,9 @@ public static class EventHandlerInfoMapper
         }
 
         // Handle base events (no prefix)
-        if (effect is IEventMethods baseMethods &&
-            EventMethodsMap.TryGetValue(id, out var baseAccessor))
+        if (EventMethodsMap.TryGetValue(id, out var baseAccessor))
         {
-            EventHandlerInfo? info = baseAccessor(baseMethods);
+            EventHandlerInfo? info = baseAccessor(eventMethods);
             if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
                 return info;
         }
