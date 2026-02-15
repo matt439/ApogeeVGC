@@ -245,9 +245,9 @@
 
 ^ review abilities Berserk to ChillingNeigh
 
-@ review abilities Chlorophyll to Comatose
+^ review abilities Chlorophyll to Comatose
 
-review abilities Commander to Costar
+@ review abilities Commander to Costar
 
 review abilities CottonDown to CuteCharm
 
