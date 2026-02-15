@@ -254,9 +254,9 @@
 
 ## AbilitiesDEF
 
-@ review abilities Damp to Defiant
+^ review abilities Damp to Defiant
 
-review abilities DeltaStream to Download
+@ review abilities DeltaStream to Download
 
 review abilities DragonsMaw to Electromorphosis
 

@@ -317,7 +317,7 @@ public partial record Abilities
                     return damage;
                 }, 1),
                 OnCriticalHit = new OnCriticalHitEventInfo(
-                    (Func<Battle, Pokemon, object?, Move, BoolVoidUnion>)((_, target, _,
+                    (Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion>)((_, target, _,
                         move) =>
                     {
                         if (target is null) return new VoidReturn();
@@ -327,13 +327,12 @@ public partial record Abilities
                             return new VoidReturn();
                         }
 
-                        bool infiltrates = move is ActiveMove { Infiltrates: true };
                         bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
                                       (move.Flags.BypassSub != true) &&
-                                      !infiltrates;
+                                      move.Infiltrates != true;
                         if (hitSub) return new VoidReturn();
 
-                        if (move is ActiveMove am && !target.RunImmunity(am))
+                        if (!target.RunImmunity(move))
                             return new VoidReturn();
                         return BoolVoidUnion.FromBool(false);
                     })),
