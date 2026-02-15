@@ -584,7 +584,8 @@ public partial class Battle
         EventId sideEventId = GetSideEventId(eventId);
 
         // Collect all handlers from field-level effects
-        var handlers = FindFieldEventHandlers(Field, fieldEventId, EventPrefix.None, getKey);
+        List<EventListener> handlers = [];
+        FindFieldEventHandlers(handlers, Field, fieldEventId, EventPrefix.None, getKey);
 
         // Collect handlers from sides and active Pokemon
         foreach (Side side in Sides)
@@ -593,8 +594,7 @@ public partial class Battle
             // In single battles, side.N is always < 2, so this always executes
             if (side.N < 2)
             {
-                handlers.AddRange(
-                    FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
+                FindSideEventHandlers(handlers, side, sideEventId, EventPrefix.None, getKey);
             }
 
             // Process each active Pokemon on this side
@@ -603,18 +603,18 @@ public partial class Battle
                 // For SwitchIn events, also trigger AnySwitchIn handlers
                 if (eventId == EventId.SwitchIn)
                 {
-                    handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.Any));
+                    FindPokemonEventHandlers(handlers, active, eventId, EventPrefix.Any);
                 }
 
                 // If targets were specified, only process those Pokemon
                 if (targets != null && !targets.Contains(active)) continue;
 
                 // Collect handlers from this Pokemon and related effects
-                handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.None,
-                    getKey));
-                handlers.AddRange(FindSideEventHandlers(side, eventId, customHolder: active));
-                handlers.AddRange(FindFieldEventHandlers(Field, eventId, customHolder: active));
-                handlers.AddRange(FindBattleEventHandlers(eventId, getKey, active));
+                FindPokemonEventHandlers(handlers, active, eventId, EventPrefix.None,
+                    getKey);
+                FindSideEventHandlers(handlers, side, eventId, customHolder: active);
+                FindFieldEventHandlers(handlers, Field, eventId, customHolder: active);
+                FindBattleEventHandlers(handlers, eventId, getKey, active);
             }
         }
 
