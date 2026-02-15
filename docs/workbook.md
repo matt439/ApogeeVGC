@@ -228,14 +228,14 @@
 
 ## MovesYZ
 
-@ review moves Yawn to ZingZap
+^ review moves Yawn to ZingZap
 
 
 # Abilities
 
 ## AbilitiesABC
 
-review abilities Adaptability to AngerPoint
+@ review abilities Adaptability to AngerPoint
 
 review abilities AngerShell to ArmorTail
 
