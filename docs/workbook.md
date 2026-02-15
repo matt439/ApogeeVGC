@@ -241,9 +241,9 @@
 
 ^ review abilities AromaVeil to AuraBreak
 
-@ review abilities BadDreams to BeastBoost
+^ review abilities BadDreams to BeastBoost
 
-review abilities Berserk to ChillingNeigh
+@ review abilities Berserk to ChillingNeigh
 
 review abilities Chlorophyll to Comatose
 
