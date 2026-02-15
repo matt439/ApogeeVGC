@@ -370,18 +370,14 @@ public partial class Driver
 
         Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
         {
-            // Calculate unique seeds for this battle using atomic operations
-            int offset1 = Interlocked.Increment(ref seedCounter);
-            int offset2 = Interlocked.Increment(ref seedCounter);
-            int offset3 = Interlocked.Increment(ref seedCounter);
-            int offset4 = Interlocked.Increment(ref seedCounter);
-            int offset5 = Interlocked.Increment(ref seedCounter);
+            // Batch seed allocation: single atomic add instead of 5 separate increments
+            int baseOffset = Interlocked.Add(ref seedCounter, 5) - 4;
 
-            int localTeam1Seed = Team1EvalSeed + offset1;
-            int localTeam2Seed = Team2EvalSeed + offset2;
-            int localPlayer1Seed = PlayerRandom1EvalSeed + offset3;
-            int localPlayer2Seed = PlayerRandom2EvalSeed + offset4;
-            int localBattleSeed = BattleEvalSeed + offset5;
+            int localTeam1Seed = Team1EvalSeed + baseOffset;
+            int localTeam2Seed = Team2EvalSeed + baseOffset + 1;
+            int localPlayer1Seed = PlayerRandom1EvalSeed + baseOffset + 2;
+            int localPlayer2Seed = PlayerRandom2EvalSeed + baseOffset + 3;
+            int localBattleSeed = BattleEvalSeed + baseOffset + 4;
 
             try
             {
@@ -392,8 +388,8 @@ public partial class Driver
                 var team1 = team1Generator.GenerateTeam();
                 var team2 = team2Generator.GenerateTeam();
 
-                // Track coverage for both teams
-                foreach (var set in team1.Concat(team2))
+                // Track coverage for both teams (no Concat allocation)
+                foreach (var set in team1)
                 {
                     speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
                     abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
@@ -404,7 +400,19 @@ public partial class Driver
                     }
                 }
 
-                (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsAndTimeout(
+                foreach (var set in team2)
+                {
+                    speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
+                    abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
+                    itemCoverage.AddOrUpdate(set.Item, 1, static (_, count) => count + 1);
+                    foreach (var move in set.Moves)
+                    {
+                        moveCoverage.AddOrUpdate(move, 1, static (_, count) => count + 1);
+                    }
+                }
+
+                // Run directly on Parallel.For thread — no Task.Run + Wait overhead
+                (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
                     team1,
                     team2,
                     localTeam1Seed,

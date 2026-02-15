@@ -305,6 +305,68 @@ public partial class Driver
     }
 
     /// <summary>
+    /// Runs a battle with pre-built teams directly on the calling thread (no Task.Run wrapper).
+    /// Designed for use inside Parallel.For where the caller already manages parallelism.
+    /// Timeout protection is provided by MaxTurns; no separate Task + Wait overhead.
+    /// </summary>
+    private (SimulatorResult Result, int Turn) RunBattleWithPrebuiltTeamsDirect(
+        List<PokemonSet> team1,
+        List<PokemonSet> team2,
+        int team1Seed,
+        int team2Seed,
+        int player1Seed,
+        int player2Seed,
+        int battleSeed,
+        bool debug)
+    {
+        var seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
+        CurrentBattleSeeds = seeds;
+        try
+        {
+            PlayerOptions player1Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Random 1",
+                Team = team1,
+                Seed = new PrngSeed(player1Seed),
+                PrintDebug = debug,
+            };
+
+            PlayerOptions player2Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Random 2",
+                Team = team2,
+                Seed = new PrngSeed(player2Seed),
+                PrintDebug = debug,
+            };
+
+            BattleOptions battleOptions = new()
+            {
+                Id = FormatId.Gen9VgcRegulationI,
+                Player1Options = player1Options,
+                Player2Options = player2Options,
+                Debug = debug,
+                Sync = true,
+                Seed = new PrngSeed(battleSeed),
+                MaxTurns = 1000,
+            };
+
+            var simulator = new SyncSimulator();
+            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+            return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
+        }
+        catch (Exception ex) when (EnrichExceptionWithSeeds(ex, seeds))
+        {
+            throw;
+        }
+        finally
+        {
+            CurrentBattleSeeds = null;
+        }
+    }
+
+    /// <summary>
     /// Helper method to log exception details with seed reproduction instructions.
     /// </summary>
     private void LogExceptionWithSeeds(
