@@ -249,12 +249,12 @@
 
 ^ review abilities Commander to Costar
 
-@ review abilities CottonDown to CuteCharm
+^ review abilities CottonDown to CuteCharm
 
 
 ## AbilitiesDEF
 
-review abilities Damp to Defiant
+@ review abilities Damp to Defiant
 
 review abilities DeltaStream to Download
 
