@@ -237,9 +237,9 @@
 
 ^ review abilities Adaptability to AngerPoint
 
-@ review abilities AngerShell to ArmorTail
+^ review abilities AngerShell to ArmorTail
 
-review abilities AromaVeil to AuraBreak
+@ review abilities AromaVeil to AuraBreak
 
 review abilities BadDreams to BeastBoost
 
