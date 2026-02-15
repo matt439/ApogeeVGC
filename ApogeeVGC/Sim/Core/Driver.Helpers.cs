@@ -2,6 +2,7 @@ using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Diagnostics;
 
@@ -205,6 +206,92 @@ public partial class Driver
         if (!simulationTask.Wait(BattleTimeoutMilliseconds))
         {
             // Timeout occurred - throw custom exception with seeds
+            throw new BattleTimeoutException(
+                team1Seed,
+                team2Seed,
+                player1Seed,
+                player2Seed,
+                battleSeed,
+                BattleTimeoutMilliseconds);
+        }
+
+        return simulationTask.Result;
+    }
+
+    /// <summary>
+    /// Helper method to run a battle with pre-built teams and timeout protection.
+    /// Used when the caller generates teams externally (e.g., for coverage tracking).
+    /// </summary>
+    private (SimulatorResult Result, int Turn) RunBattleWithPrebuiltTeamsAndTimeout(
+        List<PokemonSet> team1,
+        List<PokemonSet> team2,
+        int team1Seed,
+        int team2Seed,
+        int player1Seed,
+        int player2Seed,
+        int battleSeed,
+        bool debug)
+    {
+        var seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
+
+        using var cts = new CancellationTokenSource();
+        var simulationTask = Task.Run(() =>
+        {
+            CurrentBattleSeeds = seeds;
+            try
+            {
+                PlayerOptions player1Options = new()
+                {
+                    Type = Player.PlayerType.Random,
+                    Name = "Random 1",
+                    Team = team1,
+                    Seed = new PrngSeed(player1Seed),
+                    PrintDebug = debug,
+                };
+
+                PlayerOptions player2Options = new()
+                {
+                    Type = Player.PlayerType.Random,
+                    Name = "Random 2",
+                    Team = team2,
+                    Seed = new PrngSeed(player2Seed),
+                    PrintDebug = debug,
+                };
+
+                BattleOptions battleOptions = new()
+                {
+                    Id = FormatId.Gen9VgcRegulationI,
+                    Player1Options = player1Options,
+                    Player2Options = player2Options,
+                    Debug = debug,
+                    Sync = true,
+                    Seed = new PrngSeed(battleSeed),
+                    MaxTurns = 1000,
+                };
+
+                var simulator = new SyncSimulator();
+                SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+                return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
+            }
+            catch (Exception ex) when (EnrichExceptionWithSeeds(ex, seeds))
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Battle failed. Seeds: Team1={team1Seed}, Team2={team2Seed}, " +
+                    $"P1={player1Seed}, P2={player2Seed}, Battle={battleSeed}",
+                    ex);
+            }
+            finally
+            {
+                CurrentBattleSeeds = null;
+            }
+        }, cts.Token);
+
+        if (!simulationTask.Wait(BattleTimeoutMilliseconds))
+        {
             throw new BattleTimeoutException(
                 team1Seed,
                 team2Seed,
