@@ -270,9 +270,9 @@
 
 ## AbilitiesGHI
 
-@ review abilities GaleWings to GorillaTactics
+^ review abilities GaleWings to GorillaTactics
 
-review abilities GrassPelt to Guts
+@ review abilities GrassPelt to Guts
 
 review abilities HadronEngine to HoneyGather
 
