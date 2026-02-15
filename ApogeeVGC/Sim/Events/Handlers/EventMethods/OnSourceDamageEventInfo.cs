@@ -45,4 +45,49 @@ public sealed record OnSourceDamageEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSourceDamageEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Damage;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceDamageEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceDamageEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+                );
+                return result switch
+                {
+                    IntIntBoolVoidUnion i => new IntRelayVar(i.Value),
+                    BoolIntBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidIntBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

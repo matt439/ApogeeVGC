@@ -46,4 +46,42 @@ public sealed record OnSetAbilityEventInfo : EventHandlerInfo
         // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSetAbilityEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.SetAbility;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSetAbilityEventInfo Create(
+        Func<Battle, Ability, Pokemon, Pokemon, IEffect, VoidReturn?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSetAbilityEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                (Ability)context.Effect!,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

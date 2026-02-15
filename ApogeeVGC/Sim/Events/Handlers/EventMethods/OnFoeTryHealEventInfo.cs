@@ -46,13 +46,67 @@ public sealed record OnFoeTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
   ParameterNullability = null; // Handled in custom validation
       ReturnTypeNullable = true; // Both signatures return nullable types
     
-   // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
-  // Custom validation happens in Validate() method
-    }
+     // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
+   // Custom validation happens in Validate() method
+     }
 
-    /// <summary>
-    /// Custom validation for OnFoeTryHeal which supports multiple delegate signatures.
-    /// </summary>
+     /// <summary>
+     /// Creates event handler using context-based pattern.
+     /// </summary>
+     public OnFoeTryHealEventInfo(
+         EventHandlerDelegate contextHandler,
+         int? priority = null,
+         bool usesSpeed = true)
+     {
+         Id = EventId.TryHeal;
+         Prefix = EventPrefix.Foe;
+         ContextHandler = contextHandler;
+         Priority = priority;
+         UsesSpeed = usesSpeed;
+     }
+
+     /// <summary>
+     /// Creates strongly-typed context-based handler (5-param signature).
+     /// </summary>
+     public static OnFoeTryHealEventInfo Create(
+         Func<Battle, int, Pokemon, Pokemon, IEffect, RelayVar?> handler,
+         int? priority = null,
+         bool usesSpeed = true)
+     {
+         return new OnFoeTryHealEventInfo(
+             context => handler(
+                 context.Battle,
+                 context.GetRelayVar<IntRelayVar>().Value,
+                 context.GetTargetPokemon(),
+                 context.GetSourcePokemon(),
+                 context.GetSourceEffect<IEffect>()
+             ),
+             priority,
+             usesSpeed
+         );
+     }
+
+     /// <summary>
+     /// Creates strongly-typed context-based handler (2-param signature).
+     /// </summary>
+     public static OnFoeTryHealEventInfo Create(
+         Func<Battle, Pokemon, RelayVar?> handler,
+         int? priority = null,
+         bool usesSpeed = true)
+     {
+         return new OnFoeTryHealEventInfo(
+             context => handler(
+                 context.Battle,
+                 context.GetTargetPokemon()
+             ),
+             priority,
+             usesSpeed
+         );
+     }
+
+     /// <summary>
+     /// Custom validation for OnFoeTryHeal which supports multiple delegate signatures.
+     /// </summary>
     public new void Validate()
     {
         if (UnionValue == null) return;

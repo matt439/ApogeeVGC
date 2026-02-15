@@ -41,4 +41,44 @@ public sealed record OnFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFlinchEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Flinch;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFlinchEventInfo Create(
+        Func<Battle, Pokemon, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFlinchEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetPokemon()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

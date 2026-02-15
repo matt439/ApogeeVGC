@@ -30,4 +30,45 @@ public sealed record OnFoeStallMoveEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeStallMoveEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.StallMove;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeStallMoveEventInfo Create(
+        Func<Battle, Pokemon, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeStallMoveEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetPokemon()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

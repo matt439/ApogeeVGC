@@ -45,11 +45,64 @@ bool usesSpeed = true)
         ParameterNullability = null; // Handled in custom validation
         ReturnTypeNullable = true; // Both signatures return nullable types
     
-      // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
-        // Custom validation happens in Validate() method
-    }
+          // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
+          // Custom validation happens in Validate() method
+      }
 
-    /// <summary>
+      /// <summary>
+      /// Creates event handler using context-based pattern.
+      /// </summary>
+      public OnTryHealEventInfo(
+          EventHandlerDelegate contextHandler,
+          int? priority = null,
+          bool usesSpeed = true)
+      {
+          Id = EventId.TryHeal;
+          ContextHandler = contextHandler;
+          Priority = priority;
+          UsesSpeed = usesSpeed;
+      }
+
+      /// <summary>
+      /// Creates strongly-typed context-based handler (5-param signature).
+      /// </summary>
+      public static OnTryHealEventInfo Create(
+          Func<Battle, int, Pokemon, Pokemon, IEffect, RelayVar?> handler,
+          int? priority = null,
+          bool usesSpeed = true)
+      {
+          return new OnTryHealEventInfo(
+              context => handler(
+                  context.Battle,
+                  context.GetRelayVar<IntRelayVar>().Value,
+                  context.GetTargetPokemon(),
+                  context.GetSourcePokemon(),
+                  context.GetSourceEffect<IEffect>()
+              ),
+              priority,
+              usesSpeed
+          );
+      }
+
+      /// <summary>
+      /// Creates strongly-typed context-based handler (2-param signature).
+      /// </summary>
+      public static OnTryHealEventInfo Create(
+          Func<Battle, Pokemon, RelayVar?> handler,
+          int? priority = null,
+          bool usesSpeed = true)
+      {
+          return new OnTryHealEventInfo(
+              context => handler(
+                  context.Battle,
+                  context.GetTargetPokemon()
+              ),
+              priority,
+              usesSpeed
+          );
+      }
+
+      /// <summary>
     /// Custom validation for OnTryHeal which supports multiple delegate signatures.
 /// </summary>
     public new void Validate()

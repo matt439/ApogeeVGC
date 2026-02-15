@@ -30,4 +30,42 @@ UsesSpeed = usesSpeed;
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSourceFaintEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Faint;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceFaintEventInfo Create(
+        Action<Battle, Pokemon, Pokemon, IEffect> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceFaintEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

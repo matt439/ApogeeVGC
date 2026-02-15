@@ -2,6 +2,8 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 
+using ApogeeVGC.Sim.Utils.Unions;
+
 namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
@@ -42,5 +44,43 @@ public sealed record OnAfterFaintEventInfo : EventHandlerInfo
     
     // Validate configuration
         ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnAfterFaintEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterFaint;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAfterFaintEventInfo Create(
+        Action<Battle, int, Pokemon, Pokemon, IEffect> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAfterFaintEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

@@ -29,4 +29,41 @@ public sealed record OnFoeImmunityEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeImmunityEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Immunity;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeImmunityEventInfo Create(
+        Action<Battle, PokemonType, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeImmunityEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.SourceType!.Value,
+                context.GetSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

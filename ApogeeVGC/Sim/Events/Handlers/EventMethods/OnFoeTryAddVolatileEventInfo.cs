@@ -32,4 +32,48 @@ public sealed record OnFoeTryAddVolatileEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeTryAddVolatileEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TryAddVolatile;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeTryAddVolatileEventInfo Create(
+        Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeTryAddVolatileEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetSourceEffect<Condition>(),
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

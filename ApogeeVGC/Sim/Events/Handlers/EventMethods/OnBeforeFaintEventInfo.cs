@@ -41,4 +41,40 @@ public sealed record OnBeforeFaintEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnBeforeFaintEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.BeforeFaint;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnBeforeFaintEventInfo Create(
+        Action<Battle, Pokemon, IEffect> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnBeforeFaintEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.GetSourceEffect<IEffect>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

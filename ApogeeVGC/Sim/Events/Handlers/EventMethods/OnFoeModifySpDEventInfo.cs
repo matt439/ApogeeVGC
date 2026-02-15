@@ -45,4 +45,48 @@ public sealed record OnFoeModifySpDEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeModifySpDEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifySpD;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeModifySpDEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeModifySpDEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    VoidDoubleVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

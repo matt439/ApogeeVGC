@@ -31,4 +31,48 @@ public sealed record OnFoeModifyAtkEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeModifyAtkEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifyAtk;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeModifyAtkEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeModifyAtkEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetSourcePokemon(),
+                context.GetTargetPokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    VoidDoubleVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

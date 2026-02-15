@@ -45,4 +45,42 @@ public sealed record OnEatItemEventInfo : EventHandlerInfo
         // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnEatItemEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.EatItem;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnEatItemEventInfo Create(
+        Action<Battle, Item, Pokemon, Pokemon?, IEffect?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnEatItemEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                (Item)context.Effect!,
+                context.GetTargetPokemon(),
+                context.SourcePokemon,
+                context.TryGetSourceEffect<IEffect>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

@@ -31,4 +31,48 @@ public sealed record OnFoeEffectivenessEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeEffectivenessEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Effectiveness;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeEffectivenessEventInfo Create(
+        Func<Battle, int, Pokemon?, PokemonType, ActiveMove, IntVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeEffectivenessEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.SourceType!.Value,
+                context.GetMove()
+                );
+                return result switch
+                {
+                    IntIntVoidUnion i => new IntRelayVar(i.Value),
+                    VoidIntVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

@@ -39,4 +39,42 @@ public sealed record OnSourceFractionalPriorityEventInfo : UnionEventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSourceFractionalPriorityEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.FractionalPriority;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceFractionalPriorityEventInfo Create(
+        Func<Battle, int, Pokemon, ActiveMove, double> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceFractionalPriorityEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.GetMove()
+                );
+                return new DecimalRelayVar((decimal)result);
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

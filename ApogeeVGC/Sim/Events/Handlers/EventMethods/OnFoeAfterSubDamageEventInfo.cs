@@ -2,6 +2,8 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 
+using ApogeeVGC.Sim.Utils.Unions;
+
 namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
@@ -43,5 +45,44 @@ int? priority = null,
     
     // Validate configuration
         ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeAfterSubDamageEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterSubDamage;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeAfterSubDamageEventInfo Create(
+        Action<Battle, int, Pokemon, Pokemon, ActiveMove> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeAfterSubDamageEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetMove()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

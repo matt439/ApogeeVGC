@@ -31,4 +31,48 @@ Priority = priority;
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnAnyTryPrimaryHitEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TryPrimaryHit;
+        Prefix = EventPrefix.Any;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAnyTryPrimaryHitEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAnyTryPrimaryHitEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    IntIntBoolVoidUnion i => new IntRelayVar(i.Value),
+                    BoolIntBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidIntBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

@@ -30,4 +30,42 @@ UsesSpeed = usesSpeed;
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSourceDragOutEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.DragOut;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceDragOutEventInfo Create(
+        Action<Battle, Pokemon, Pokemon, ActiveMove> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceDragOutEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetMove()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

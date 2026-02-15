@@ -45,4 +45,43 @@ typeof(Condition),
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeAfterSetStatusEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterSetStatus;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeAfterSetStatusEventInfo Create(
+        Action<Battle, Condition, Pokemon, Pokemon, IEffect> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeAfterSetStatusEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetSourceEffect<Condition>(),
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

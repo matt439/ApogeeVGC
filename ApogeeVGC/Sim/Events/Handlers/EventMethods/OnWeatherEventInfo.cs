@@ -42,4 +42,41 @@ ExpectedParameterTypes =
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnWeatherEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Weather;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnWeatherEventInfo Create(
+        Action<Battle, Pokemon, object, Condition> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnWeatherEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.SourcePokemon,
+                context.GetSourceEffect<Condition>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

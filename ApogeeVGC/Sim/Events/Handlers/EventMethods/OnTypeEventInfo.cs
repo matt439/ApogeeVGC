@@ -41,4 +41,45 @@ typeof(Pokemon),
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnTypeEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Type;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnTypeEventInfo Create(
+        Func<Battle, PokemonType[], Pokemon, TypesVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnTypeEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetRelayVar<TypesRelayVar>().Types.ToArray(),
+                context.GetSourcePokemon()
+                );
+                return result switch
+                {
+                    TypesTypesVoidUnion t => new TypesRelayVar(t.Types.ToList()),
+                    VoidTypesVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

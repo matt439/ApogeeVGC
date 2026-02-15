@@ -42,4 +42,41 @@ typeof(Pokemon),
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnPseudoWeatherChangeEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.PseudoWeatherChange;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnPseudoWeatherChangeEventInfo Create(
+        Action<Battle, Pokemon, Pokemon, Condition> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnPseudoWeatherChangeEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<Condition>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

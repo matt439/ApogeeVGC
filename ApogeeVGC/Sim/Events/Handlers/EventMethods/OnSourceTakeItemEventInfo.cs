@@ -39,4 +39,47 @@ public sealed record OnSourceTakeItemEventInfo : UnionEventHandlerInfo<OnTakeIte
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSourceTakeItemEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TakeItem;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceTakeItemEventInfo Create(
+        Func<Battle, Item, Pokemon, Pokemon, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceTakeItemEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                (Item)context.Effect!,
+                context.GetSourcePokemon(),
+                context.GetTargetPokemon()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

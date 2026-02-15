@@ -41,4 +41,40 @@ public sealed record OnAfterTakeItemEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
   }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnAfterTakeItemEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterTakeItem;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAfterTakeItemEventInfo Create(
+        Action<Battle, Item, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAfterTakeItemEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                (Item)context.Effect!,
+                context.GetTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

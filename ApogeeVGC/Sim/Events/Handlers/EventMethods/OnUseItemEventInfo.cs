@@ -41,4 +41,40 @@ ExpectedReturnType = typeof(void);
     // Validate configuration
         ValidateConfiguration();
  }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnUseItemEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.UseItem;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnUseItemEventInfo Create(
+        Action<Battle, Item, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnUseItemEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                (Item)context.Effect!,
+                context.GetTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

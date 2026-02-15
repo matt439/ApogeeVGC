@@ -30,4 +30,42 @@ Priority = priority;
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnAnyPseudoWeatherChangeEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.PseudoWeatherChange;
+        Prefix = EventPrefix.Any;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAnyPseudoWeatherChangeEventInfo Create(
+        Action<Battle, Pokemon, Pokemon, Condition> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAnyPseudoWeatherChangeEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<Condition>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

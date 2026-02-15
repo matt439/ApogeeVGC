@@ -43,4 +43,46 @@ Handler = handler;
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnOverrideActionEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.OverrideAction;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnOverrideActionEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnOverrideActionEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetSourcePokemon(),
+                context.GetTargetPokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    DelegateDelegateVoidUnion d => throw new NotImplementedException("DelegateVoidUnion delegate return not supported in Create pattern"),
+                    VoidDelegateVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

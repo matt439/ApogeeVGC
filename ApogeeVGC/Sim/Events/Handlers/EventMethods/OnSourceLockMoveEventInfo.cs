@@ -39,4 +39,44 @@ public sealed record OnSourceLockMoveEventInfo : UnionEventHandlerInfo<OnLockMov
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSourceLockMoveEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.LockMove;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceLockMoveEventInfo Create(
+        Func<Battle, Pokemon, ActiveMove> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceLockMoveEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetPokemon()
+                );
+                return result switch
+                {
+                    null => null,
+                    _ => new EffectRelayVar(result)
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

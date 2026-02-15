@@ -43,4 +43,41 @@ bool usesSpeed = true)
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSideConditionStartEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.SideConditionStart;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSideConditionStartEventInfo Create(
+        Action<Battle, Side, Pokemon, Condition> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSideConditionStartEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetSide(),
+                context.GetTargetPokemon(),
+                context.GetSourceEffect<Condition>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

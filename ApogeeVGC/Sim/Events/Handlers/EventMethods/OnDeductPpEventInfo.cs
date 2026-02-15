@@ -1,6 +1,8 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 
+using ApogeeVGC.Sim.Utils.Unions;
+
 namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
@@ -39,5 +41,41 @@ public sealed record OnDeductPpEventInfo : EventHandlerInfo
     
     // Validate configuration
         ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnDeductPpEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.DeductPp;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnDeductPpEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, int> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnDeductPpEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon()
+                );
+                return new IntRelayVar(result);
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

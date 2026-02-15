@@ -36,4 +36,35 @@ public sealed record OnEmergencyExitEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnEmergencyExitEventInfo(
+        EventHandlerDelegate contextHandler,
+        bool usesSpeed = true)
+    {
+        Id = EventId.EmergencyExit;
+        ContextHandler = contextHandler;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnEmergencyExitEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        bool usesSpeed = true)
+    {
+        return new OnEmergencyExitEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetPokemon()
+                );
+                return null;
+            },
+            usesSpeed
+        );
+    }
 }
