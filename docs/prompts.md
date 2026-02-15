@@ -71,3 +71,14 @@ i am incrementally debugging my pokemon simulator by running battles between two
 ## Incremental Debugging Single
 
 i am incrementally debugging my pokemon simulator by running battles between two random players, each with random teams. an exception occured and now i am debugging by running that single battle. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunSingleBattleDebug':43816-47523 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. the exception occured when testing with Player1Seed=1453, Player2Seed=1454, BattleSeed=1455. debug output:
+
+
+# Extra
+
+i am running #method:'ApogeeVGC.Sim.Core.Driver.RunRndVsRndVgcRegIEvaluation':14488-25653 . i want to profile and optimise the program. particularly for the way that battles are run concurrently.
+
+{BattleSeedContext { Team1Seed = 470617, Team2Seed = 484187, Player1Seed = 428643, Player2Seed = 418117, BattleSeed = 426176 }}
+
+see #file:'C:\VSProjects\ApogeeVGC\docs\migration\EventHandlerContextMigrationPlan.md' . implement phase 1
+
+Commit 0065a648 'Optimize event handler lookup with precomputed caches' may need to be reverted if it doesn't improve performance
