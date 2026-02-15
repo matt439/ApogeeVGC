@@ -953,6 +953,41 @@ public partial record Moves
                     return bp;
                 }),
             },
+            [MoveId.BehemothBash] = new()
+            {
+                Id = MoveId.BehemothBash,
+                Num = 782,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Physical,
+                Name = "Behemoth Bash",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, FailCopycat = true, FailMimic = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
+            },
+            [MoveId.BehemothBlade] = new()
+            {
+                Id = MoveId.BehemothBlade,
+                Num = 781,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Physical,
+                Name = "Behemoth Blade",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true, Protect = true, Mirror = true, FailCopycat = true, FailMimic = true,
+                    Slicing = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
+            },
             [MoveId.Belch] = new()
             {
                 Id = MoveId.Belch,
