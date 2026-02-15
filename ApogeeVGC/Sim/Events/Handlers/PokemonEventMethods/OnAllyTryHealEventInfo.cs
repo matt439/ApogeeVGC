@@ -140,4 +140,58 @@ Type? expectedRetType;
  $"Got: {actualReturnType.Name}");
         }
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnAllyTryHealEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TryHeal;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler (5-param signature).
+    /// </summary>
+    public static OnAllyTryHealEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, IEffect, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyTryHealEventInfo(
+            context => handler(
+                context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+            ),
+            priority,
+            usesSpeed
+        );
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler (2-param signature).
+    /// </summary>
+    public static OnAllyTryHealEventInfo Create(
+        Func<Battle, Pokemon, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyTryHealEventInfo(
+            context => handler(
+                context.Battle,
+                context.GetTargetPokemon()
+            ),
+            priority,
+            usesSpeed
+        );
+    }
 }

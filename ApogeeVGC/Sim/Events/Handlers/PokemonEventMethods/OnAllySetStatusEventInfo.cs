@@ -33,4 +33,51 @@ public sealed record OnAllySetStatusEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
   }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnAllySetStatusEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.SetStatus;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAllySetStatusEventInfo Create(
+        Func<Battle, Condition, Pokemon, Pokemon, IEffect, PokemonFalseVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllySetStatusEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetSourceEffect<Condition>(),
+                    context.GetTargetPokemon(),
+                    context.GetSourcePokemon(),
+                    context.GetSourceEffect<IEffect>()
+                );
+                return result switch
+                {
+                    PokemonPokemonFalseVoidUnion p => new PokemonRelayVar(p.Pokemon),
+                    FalsePokemonFalseVoidUnion => new BoolRelayVar(false),
+                    VoidPokemonFalseVoidUnion => null,
+                    null => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

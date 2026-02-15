@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 
@@ -31,4 +32,46 @@ public sealed record OnAllyAfterFaintEventInfo : EventHandlerInfo
     // Validate configuration
         ValidateConfiguration();
   }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, RelayVar (int damage), TargetPokemon, SourcePokemon, SourceEffect
+    /// </summary>
+    public OnAllyAfterFaintEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterFaint;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// Best of both worlds: strongly-typed parameters + context performance.
+    /// </summary>
+    public static OnAllyAfterFaintEventInfo Create(
+        Action<Battle, int, Pokemon, Pokemon, IEffect> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyAfterFaintEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetRelayVar<IntRelayVar>().Value,
+                    context.GetTargetPokemon(),
+                    context.GetSourcePokemon(),
+                    context.GetSourceEffect<IEffect>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }
