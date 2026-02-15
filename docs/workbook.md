@@ -256,13 +256,13 @@
 
 ^ review abilities Damp to Defiant
 
-@ review abilities DeltaStream to Download
+^ review abilities DeltaStream to Download
 
-review abilities DragonsMaw to Electromorphosis
+^ review abilities DragonsMaw to Electromorphosis
 
-review abilities EmbodyAspectCornerstone to FlameBody
+^ review abilities EmbodyAspectCornerstone to FlameBody
 
-review abilities FlareBoost to FlowerGift
+@ review abilities FlareBoost to FlowerGift
 
 review abilities FlowerVeil to Forecast
 
