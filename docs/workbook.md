@@ -282,11 +282,11 @@
 
 ^ review abilities Illuminate to Imposter
 
-@ review abilities Infiltrator to IronFist
+^ review abilities Infiltrator to IronFist
 
 ## AbilitiesJKL
 
-review abilities Justified to LightMetal
+@ review abilities Justified to LightMetal
 
 review abilities LightningRod to LongReach
 
