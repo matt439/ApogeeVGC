@@ -276,9 +276,9 @@
 
 ^ review abilities HadronEngine to HoneyGather
 
-@ review abilities Hospitality to HyperCutter
+^ review abilities Hospitality to HyperCutter
 
-review abilities IceBody to IceScales
+@ review abilities IceBody to IceScales
 
 review abilities Illuminate to Imposter
 
