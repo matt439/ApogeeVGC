@@ -13,7 +13,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnTryMoveEventInfo : EventHandlerInfo
 {
     /// <summary>
-    /// Creates a new OnTryMove event handler.
+    /// Creates a new OnTryMove event handler using the legacy strongly-typed pattern.
     /// </summary>
     /// <param name="handler">The event handler delegate</param>
  /// <param name="priority">Execution priority (higher executes first)</param>
@@ -35,12 +35,47 @@ typeof(Battle),
    typeof(ActiveMove),
    ];
         ExpectedReturnType = typeof(BoolEmptyVoidUnion);
-        
+
     // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false, false, false];
         ReturnTypeNullable = false;
-    
+
     // Validate configuration
         ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, SourcePokemon, TargetPokemon, Move
+    /// </summary>
+    public OnTryMoveEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TryMove;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnTryMoveEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnTryMoveEventInfo(
+            context => handler(
+                context.Battle,
+                context.GetSourcePokemon(),
+                context.GetTargetPokemon(),
+                context.GetMove()
+            ),
+            priority,
+            usesSpeed
+        );
     }
 }

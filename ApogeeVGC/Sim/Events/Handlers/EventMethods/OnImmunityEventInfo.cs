@@ -12,7 +12,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnImmunityEventInfo : EventHandlerInfo
 {
     /// <summary>
-    /// Creates a new OnImmunity event handler.
+    /// Creates a new OnImmunity event handler using the legacy strongly-typed pattern.
     /// </summary>
     /// <param name="handler">The event handler delegate</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
@@ -40,5 +40,49 @@ public sealed record OnImmunityEventInfo : EventHandlerInfo
 
         // Validate configuration
         ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, RelayVar (PokemonType or ConditionId), TargetPokemon
+    /// </summary>
+    public OnImmunityEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Immunity;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnImmunityEventInfo Create(
+        Func<Battle, PokemonTypeConditionIdUnion, Pokemon, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnImmunityEventInfo(
+            context =>
+            {
+                PokemonTypeConditionIdUnion typeOrCondition = context.RelayVar switch
+                {
+                    PokemonTypeRelayVar t => new PokemonTypeConditionIdUnion(t.Type),
+                    ConditionIdRelayVar { Id: not null } c => new PokemonTypeConditionIdUnion(c.Id.Value),
+                    _ => throw new InvalidOperationException(
+                        $"Event {EventId.Immunity}: Cannot resolve PokemonTypeConditionIdUnion from relay var {context.RelayVar?.GetType().Name ?? "null"}")
+                };
+                return handler(
+                    context.Battle,
+                    typeOrCondition,
+                    context.GetTargetPokemon()
+                );
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

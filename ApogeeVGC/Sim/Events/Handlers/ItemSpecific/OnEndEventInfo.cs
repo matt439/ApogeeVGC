@@ -15,12 +15,36 @@ public sealed record OnEndEventInfo : EventHandlerInfo
         Handler = handler;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
         ExpectedReturnType = typeof(void);
-        
+
     // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = new[] { false, false };
         ReturnTypeNullable = false;
-    
+
     // Validate configuration
         ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, TargetPokemon
+    /// </summary>
+    public OnEndEventInfo(EventHandlerDelegate contextHandler)
+    {
+        Id = EventId.End;
+        ContextHandler = contextHandler;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnEndEventInfo Create(Action<Battle, Pokemon> handler)
+    {
+        return new OnEndEventInfo(
+            context =>
+            {
+                handler(context.Battle, context.GetTargetPokemon());
+                return null;
+            }
+        );
     }
 }

@@ -13,7 +13,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnDamageEventInfo : EventHandlerInfo
 {
     /// <summary>
-    /// Creates a new OnDamage event handler.
+    /// Creates a new OnDamage event handler using the legacy strongly-typed pattern.
     /// </summary>
     /// <param name="handler">The event handler delegate</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
@@ -36,12 +36,48 @@ public sealed record OnDamageEventInfo : EventHandlerInfo
         typeof(IEffect),
    ];
   ExpectedReturnType = typeof(IntBoolVoidUnion);
-        
+
     // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false, false, false, false];
         ReturnTypeNullable = false;
-    
+
     // Validate configuration
         ValidateConfiguration();
 }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, RelayVar (int damage), TargetPokemon, SourcePokemon, SourceEffect
+    /// </summary>
+    public OnDamageEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.Damage;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnDamageEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, IEffect, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnDamageEventInfo(
+            context => handler(
+                context.Battle,
+                context.GetRelayVar<IntRelayVar>().Value,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.GetSourceEffect<IEffect>()
+            ),
+            priority,
+            usesSpeed
+        );
+    }
 }

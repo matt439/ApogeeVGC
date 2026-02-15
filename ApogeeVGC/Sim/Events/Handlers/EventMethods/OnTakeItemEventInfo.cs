@@ -15,7 +15,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
 {
     /// <summary>
-    /// Creates a new OnTakeItem event handler.
+    /// Creates a new OnTakeItem event handler using the legacy union pattern.
     /// </summary>
     /// <param name="unionValue">The union value (delegate or bool constant)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
@@ -46,5 +46,41 @@ public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
 
         // Validate configuration
         ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, Effect (Item), TargetPokemon, SourcePokemon, Move
+    /// </summary>
+    public OnTakeItemEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TakeItem;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnTakeItemEventInfo Create(
+        Func<Battle, Item, Pokemon, Pokemon, Move?, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnTakeItemEventInfo(
+            context => handler(
+                context.Battle,
+                (Item)context.Effect!,
+                context.GetTargetPokemon(),
+                context.GetSourcePokemon(),
+                context.Move
+            ),
+            priority,
+            usesSpeed
+        );
     }
 }
