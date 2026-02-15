@@ -224,11 +224,11 @@
 
 ^ review moves WildCharge to WorkUp
 
-@ review moves WorrySeed to XScissor
+^ review moves WorrySeed to XScissor
 
 ## MovesYZ
 
-review moves Yawn to ZingZap
+@ review moves Yawn to ZingZap
 
 
 # Abilities
