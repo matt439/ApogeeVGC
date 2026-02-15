@@ -822,7 +822,8 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
                     // Set target's ability to Insomnia
-                    AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Insomnia, source);
+                    // TS: target.setAbility('insomnia') - does NOT pass source
+                    AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Insomnia);
 
                     // TS: if (!oldAbility) return oldAbility as false | null;
                     // Check for failure first - if SetAbility returned false or null, return it
