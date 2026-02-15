@@ -1476,12 +1476,9 @@ public partial record Conditions
                             attacker.AddVolatile(moveConditionId.Value);
 
                             // Handle target location tracking
-                            // lastMoveTargetLoc is the location of the originally targeted slot before any redirection
+                            // lastMoveTargetLoc is the relative location of the originally targeted slot
                             // note that this is not updated for moves called by other moves (e.g., Metronome calling Dig)
-                            PokemonSlot? moveTargetLoc = attacker.LastMoveTargetLoc != null
-                                ? new PokemonSlot(defender.Side.Id,
-                                    attacker.LastMoveTargetLoc.Value)
-                                : null;
+                            int? moveTargetLoc = attacker.LastMoveTargetLoc;
 
                             if (effect is ActiveMove { SourceEffect: not null } &&
                                 _library.Moves.TryGetValue(move.Id, out Move? moveData) &&
@@ -1509,15 +1506,20 @@ public partial record Conditions
                                                     throw new InvalidOperationException();
                                 }
 
-                                moveTargetLoc = targetPokemon.GetSlot();
+                                moveTargetLoc = attacker.GetLocOf(targetPokemon);
                             }
 
-                            // Store target location in the move-specific volatile state
-                            if (moveTargetLoc != null &&
-                                attacker.Volatiles.TryGetValue(moveConditionId.Value,
-                                    out EffectState? volatileState))
+                            // Store target location in both the move-specific volatile
+                            // and the TwoTurnMove volatile for direct enum-based lookup
+                            if (moveTargetLoc != null)
                             {
-                                volatileState.TargetSlot = moveTargetLoc;
+                                battle.EffectState.TargetLoc = moveTargetLoc;
+
+                                if (attacker.Volatiles.TryGetValue(moveConditionId.Value,
+                                        out EffectState? volatileState))
+                                {
+                                    volatileState.TargetLoc = moveTargetLoc;
+                                }
                             }
                         }
                     }
