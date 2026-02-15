@@ -15,55 +15,23 @@ public partial class Battle
 {
     /// <summary>
     /// Gets the event handler info for a given effect and event.
-    /// Handles special Gen 5+ logic where abilities/items use onStart during SwitchIn instead of a separate Start event.
+    /// Uses the effect's pre-computed handler cache for O(1) lookups.
+    /// SwitchIn→OnStart fallback for abilities/items is pre-computed in the cache.
     /// </summary>
     /// <param name="target">The target of the event (Pokemon, Side, Field, or Battle)</param>
     /// <param name="effect">The effect to check for handlers (Ability, Item, Condition, etc.)</param>
     /// <param name="callbackName">The base event to look for handlers for</param>
-    /// <param name="prefix">Optional event prefix (Ally, Foe, Source, Any)</param>
-    /// <param name="suffix">Optional event suffix</param>
+    /// <param name="prefix">Event prefix (None, Ally, Foe, Source, Any)</param>
+    /// <param name="suffix">Event suffix (None, SwitchIn, RedirectTarget)</param>
     /// <returns>EventHandlerInfo if the effect has a handler for this event, null otherwise</returns>
     private EventHandlerInfo? GetHandlerInfo(RunEventTarget target, IEffect effect,
         EventId callbackName, EventPrefix prefix = EventPrefix.None,
         EventSuffix suffix = EventSuffix.None)
     {
-        EventPrefix? prefixArg = prefix == EventPrefix.None ? null : prefix;
-        EventSuffix? suffixArg = suffix == EventSuffix.None ? null : suffix;
+        if (!effect.HasAnyEventHandlers)
+            return null;
 
-        EventHandlerInfo? handlerInfo =
-            effect.GetEventHandlerInfo(callbackName, prefixArg, suffixArg);
-
-        // Special case: In Gen 5+, abilities and items trigger onStart during SwitchIn
-        // instead of having a separate Start event
-        // This matches the behavior in pokemon-showdown where getCallback has special logic:
-        // callback === undefined && target instanceof Pokemon && this.gen >= 5 && 
-        // callbackName === 'onSwitchIn' && !(effect as any).onAnySwitchIn &&
-        // (['Ability', 'Item'].includes(effect.effectType) || innate ability/item check)
-        if (handlerInfo is null &&
-            target is PokemonRunEventTarget pokemonTarget &&
-            Gen >= 5 &&
-            callbackName == EventId.SwitchIn &&
-            prefix == EventPrefix.None &&
-            suffix == EventSuffix.None &&
-            effect.GetEventHandlerInfo(EventId.AnySwitchIn, null, null) == null && // Check onAnySwitchIn doesn't exist
-            (IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect)))
-        {
-            // Use onStart handler for the SwitchIn event
-            EventHandlerInfo? startHandler = effect.GetEventHandlerInfo(EventId.Start, null, null);
-            if (startHandler != null)
-            {
-                // Create a modified handler with SwitchIn as the event ID
-                // This ensures the handler is properly invoked during the SwitchIn event
-                handlerInfo = startHandler with { Id = EventId.SwitchIn };
-                
-                if (DisplayUi)
-                {
-                    Debug($"[GetHandlerInfo] Using OnStart for SwitchIn event: {effect.Name} (Type: {effect.EffectType}) for Pokemon");
-                }
-            }
-        }
-
-        return handlerInfo;
+        return effect.GetEventHandlerInfo(callbackName, prefix, suffix);
     }
 
     private EventHandlerInfo? GetHandlerInfo(Pokemon pokemon, IEffect effect, EventId callbackName,

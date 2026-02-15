@@ -660,6 +660,8 @@ public static class EventHandlerInfoMapper
     /// <summary>
     /// Builds a pre-computed handler cache for an effect by scanning all EventId × EventPrefix × EventSuffix
     /// combinations. Only non-null results are stored, yielding a compact lookup table.
+    /// For Ability/Item/innate effects, pre-computes the SwitchIn→OnStart fallback so the
+    /// runtime conditional in GetHandlerInfo is eliminated.
     /// </summary>
     public static FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
         BuildHandlerCache(IEffect effect)
@@ -682,7 +684,35 @@ public static class EventHandlerInfoMapper
             }
         }
 
+        // Pre-compute SwitchIn→OnStart fallback for Ability, Item, and innate effects.
+        // In Gen 5+, if an ability/item has OnStart but not OnSwitchIn and not OnAnySwitchIn,
+        // the OnStart handler is used for SwitchIn events. Gen is always 9 in this codebase.
+        if (IsSwitchInFallbackCandidate(effect) &&
+            cache.TryGetValue((EventId.Start, EventPrefix.None, EventSuffix.None), out EventHandlerInfo startHandler) &&
+            !cache.ContainsKey((EventId.SwitchIn, EventPrefix.None, EventSuffix.None)) &&
+            !cache.ContainsKey((EventId.AnySwitchIn, EventPrefix.None, EventSuffix.None)))
+        {
+            cache[(EventId.SwitchIn, EventPrefix.None, EventSuffix.None)] =
+                startHandler with { Id = EventId.SwitchIn };
+        }
+
         return cache.ToFrozenDictionary();
+    }
+
+    /// <summary>
+    /// Checks whether an effect qualifies for the SwitchIn→OnStart fallback pre-computation.
+    /// Matches the runtime check: IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect).
+    /// </summary>
+    private static bool IsSwitchInFallbackCandidate(IEffect effect)
+    {
+        if (effect.EffectType is EffectType.Ability or EffectType.Item)
+            return true;
+
+        // Innate ability/item: a Condition with EffectType.Status that has an associated ability or item
+        if (effect.EffectType == EffectType.Status && effect is Condition condition)
+            return condition.AssociatedItem is not null || condition.AssociatedAbility is not null;
+
+        return false;
     }
 
     /// <summary>

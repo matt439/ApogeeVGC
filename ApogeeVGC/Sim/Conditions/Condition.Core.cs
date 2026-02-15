@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Abilities;
+﻿using System.Collections.Frozen;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
@@ -234,13 +235,19 @@ public partial record Condition : ISideEventMethods, IFieldEventMethods, IEffect
     //    };
     //}
 
+    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
+    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
+        _handlerCache ??= EventHandlerInfoMapper.BuildHandlerCache(this);
+
+    public bool HasAnyEventHandlers => HandlerCache.Count > 0;
+
     /// <summary>
     /// Gets event handler information for the specified event.
-    /// Uses high-performance mapper with O(1) lookups.
+    /// Uses a pre-computed cache for O(1) lookups.
     /// </summary>
-    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null)
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-      return EventHandlerInfoMapper.GetEventHandlerInfo(this, id, prefix, suffix);
+      return HandlerCache.TryGetValue((id, prefix, suffix), out var info) ? info : null;
     }
 
     //public int? GetPriority(EventId id)
