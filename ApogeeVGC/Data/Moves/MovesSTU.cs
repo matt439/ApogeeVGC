@@ -155,9 +155,10 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, target) =>
                 {
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    if (target == null) return;
+                    ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         move.Accuracy = IntTrueUnion.FromTrue();
@@ -920,12 +921,9 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
                     AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Simple, source);
-                    if (oldAbility != null)
-                    {
-                        return new VoidReturn();
-                    }
-
-                    return false;
+                    if (oldAbility is null) return null;
+                    if (oldAbility is FalseAbilityIdFalseUnion) return false;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1652,7 +1650,7 @@ public partial record Moves
                     // Turn 1: Prepare the move
                     battle.Add("-prepare", source, move.Name);
                     // In sun, skip charge turn
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.AttrLastMove("[still]");
@@ -1672,14 +1670,14 @@ public partial record Moves
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
                     return null; // Stop the move on turn 1
                 }),
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     var weakWeathers = new[]
                     {
                         ConditionId.RainDance, ConditionId.PrimordialSea, ConditionId.Sandstorm,
                         ConditionId.Snowscape,
                     };
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
@@ -1724,7 +1722,7 @@ public partial record Moves
                     // Turn 1: Prepare the move
                     battle.Add("-prepare", source, move.Name);
                     // In sun, skip charge turn
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.AttrLastMove("[still]");
@@ -1744,14 +1742,14 @@ public partial record Moves
                     source.AddVolatile(ConditionId.TwoTurnMove, target);
                     return null; // Stop the move on turn 1
                 }),
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     var weakWeathers = new[]
                     {
                         ConditionId.RainDance, ConditionId.PrimordialSea, ConditionId.Sandstorm,
                         ConditionId.Snowscape,
                     };
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = source.EffectiveWeather();
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
@@ -2520,18 +2518,10 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
                 {
-                    // Count all positive stat boosts
-                    var positiveBoosts = 0;
-                    foreach ((BoostId _, int value) in source.Boosts.GetBoosts())
-                    {
-                        if (value > 0) positiveBoosts += value;
-                    }
-
-                    Move storedPower = _library.Moves[MoveId.StoredPower];
-                    int bp = storedPower.BasePower + 20 * positiveBoosts;
-                    battle.Debug($"[Stored Power] BP: {bp}");
+                    int bp = move.BasePower + 20 * source.PositiveBoosts();
+                    battle.Debug($"BP: {bp}");
                     return bp;
                 }),
                 Secondary = null,
@@ -3178,10 +3168,10 @@ public partial record Moves
                     !target.HasAbility(AbilityId.StickyHold)),
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    ItemFalseUnion? yourItem = target.TakeItem(source);
-                    ItemFalseUnion? myItem = source.TakeItem();
+                    ItemFalseUnion yourItem = target.TakeItem(source);
+                    ItemFalseUnion myItem = source.TakeItem();
                     if (target.Item != ItemId.None || source.Item != ItemId.None ||
-                        (yourItem == null && myItem == null))
+                        (yourItem is FalseItemFalseUnion && myItem is FalseItemFalseUnion))
                     {
                         if (yourItem is ItemItemFalseUnion yourItemVal)
                             target.Item = yourItemVal.Item.Id;
@@ -3280,7 +3270,7 @@ public partial record Moves
                 OnHit = new OnHitEventInfo((battle, target, _, _) =>
                 {
                     var factor = 0.5;
-                    ConditionId weather = battle.Field.EffectiveWeather();
+                    ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                         factor = 0.667;
                     else if (weather is ConditionId.RainDance or ConditionId.PrimordialSea
@@ -3500,7 +3490,7 @@ public partial record Moves
                     // TypeScript: const success = !!this.boost({ spa: 1, spd: 1 });
                     // return pokemon.cureStatus() || success;
                     BoolZeroUnion? boostSuccess = battle.Boost(
-                        new SparseBoostsTable { SpA = 1, SpD = 1 }, source, source, null, false, true);
+                        new SparseBoostsTable { SpA = 1, SpD = 1 }, source, source);
                     bool cured = source.CureStatus();
                     // Return true if either boost or cureStatus succeeded
                     return (boostSuccess?.IsTruthy() ?? false) || cured
@@ -4586,10 +4576,10 @@ public partial record Moves
                     !target.HasAbility(AbilityId.StickyHold)),
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    ItemFalseUnion? yourItem = target.TakeItem(source);
-                    ItemFalseUnion? myItem = source.TakeItem();
+                    ItemFalseUnion yourItem = target.TakeItem(source);
+                    ItemFalseUnion myItem = source.TakeItem();
                     if (target.Item != ItemId.None || source.Item != ItemId.None ||
-                        (yourItem == null && myItem == null))
+                        (yourItem is FalseItemFalseUnion && myItem is FalseItemFalseUnion))
                     {
                         if (yourItem is ItemItemFalseUnion yourItemVal)
                             target.Item = yourItemVal.Item.Id;

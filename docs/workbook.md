@@ -106,123 +106,123 @@
 
 ## MovesMNO
 
-review moves MachPunch to MagneticFlux
+^ review moves MachPunch to MagneticFlux
 
-review moves MagnetRise to MegaHorn
+^ review moves MagnetRise to MegaHorn
 
-review moves MegaKick to MetalSound
+^ review moves MegaKick to MetalSound
 
-review moves MeteorBeam to MilkDrink
+^ review moves MeteorBeam to MilkDrink
 
-review moves Mimic to MistBall
+^ review moves Mimic to MistBall
 
-review moves MistyExplosion to MorningSun
+^ review moves MistyExplosion to MorningSun
 
-review moves MortalSpin to MudSlap
+^ review moves MortalSpin to MudSlap
 
-review moves MysticalFire to NobleRoar
+^ review moves MysticalFire to NobleRoar
 
-review moves NoRetreat to OriginPulse
+^ review moves NoRetreat to OriginPulse
 
-review moves Outrage to Overheat
+^ review moves Outrage to Overheat
 
 ## MovesPQR
 
-review moves PainSplit to Peck
+^ review moves PainSplit to Peck
 
-review moves PerishSong to PhotonGeyser
+^ review moves PerishSong to PhotonGeyser
 
-review moves PinMissile to PoisonJab
+^ review moves PinMissile to PoisonJab
 
-review moves PoisonPowder to Poltergeist
+^ review moves PoisonPowder to Poltergeist
 
-review moves PopulationBomb to PowerSwap
+^ review moves PopulationBomb to PowerSwap
 
-review moves PowerTrick to PrismaticLaser
+^ review moves PowerTrick to PrismaticLaser
 
-review moves Protect to PsychicNoise
+^ review moves Protect to PsychicNoise
 
-review moves PsychicTerrain to Psystrike
+^ review moves PsychicTerrain to Psystrike
 
-review moves PyroBall to RagePowder
+^ review moves PyroBall to RagePowder
 
-review moves RagingBull to RapidSpin
+^ review moves RagingBull to RapidSpin
 
-review moves RazorLeaf to ReflectType
+^ review moves RazorLeaf to ReflectType
 
-review moves RelicSong to RevelationDance
+^ review moves RelicSong to RevelationDance
 
-review moves Reversal to RockPolish
+^ review moves Reversal to RockPolish
 
-review moves RockSlide to RolePlay
+^ review moves RockSlide to RolePlay
 
-review moves Rollout to Ruination
+^ review moves Rollout to Ruination
 
 ## MovesSTU
 
-review moves SacredFire to SandTomb
+^ review moves SacredFire to SandTomb
 
-review moves Scald to SeedBomb
+^ review moves Scald to SeedBomb
 
-review moves SeedFlare to ShadowPunch
+^ review moves SeedFlare to ShadowPunch
 
-review moves ShadowSneak to Shelter
+^ review moves ShadowSneak to Shelter
 
-review moves ShiftGear to Sing
+^ review moves ShiftGear to Sing
 
-review moves Sketch to SkitterSmack
+^ review moves Sketch to SkitterSmack
 
-review moves SkyAttack to SleepTalk
+^ review moves SkyAttack to SleepTalk
 
-review moves Sludge to Snarl
+^ review moves Sludge to Snarl
 
-review moves SnipeShot to SoftBoiled
+^ review moves SnipeShot to SoftBoiled
 
-review moves SolarBeam to Spark
+^ review moves SolarBeam to Spark
 
-review moves SparklingAria to SpinOut
+^ review moves SparklingAria to SpinOut
 
-review moves SpiritBreak to SpringtideStorm
+^ review moves SpiritBreak to SpringtideStorm
 
-review moves StealthRock to Stockpile
+^ review moves StealthRock to Stockpile
 
-review moves Stomp to StrangeSteam
+^ review moves Stomp to StrangeSteam
 
-review moves Strength to StuffCheeks
+^ review moves Strength to StuffCheeks
 
-review moves StunSpore to SuperFang
+^ review moves StunSpore to SuperFang
 
-review moves Superpower to SweetScent
+^ review moves Superpower to SweetScent
 
-review moves Swift to SyrupBomb
+^ review moves Swift to SyrupBomb
 
-review moves TachyonCutter to TakeHeart
+^ review moves TachyonCutter to TakeHeart
 
-review moves TarShot to Teleport
+^ review moves TarShot to Teleport
 
-review moves TemperFlare to TerrainPulse
+^ review moves TemperFlare to TerrainPulse
 
-review moves Thief to ThunderCage
+^ review moves Thief to ThunderCage
 
-review moves Thunderclap to Tickle
+^ review moves Thunderclap to Tickle
 
-review moves TidyUp to ToxicSpikes
+^ review moves TidyUp to ToxicSpikes
 
-review moves ToxicThread to TriAttack
+^ review moves ToxicThread to TriAttack
 
-review moves Trick to TripleDive
+^ review moves Trick to TripleDive
 
-review moves TripleKick to UTurn
+^ review moves TripleKick to UTurn
 
 ## MovesVWX
 
-review moves VacuumWave to Waterfall
+^ review moves VacuumWave to Waterfall
 
-review moves WaterGun to WaterSpout
+^ review moves WaterGun to WaterSpout
 
-review moves WaveCrash to WildboltStorm
+^ review moves WaveCrash to WildboltStorm
 
-review moves WildCharge to WorkUp
+^ review moves WildCharge to WorkUp
 
 review moves WorrySeed to XScissor
 

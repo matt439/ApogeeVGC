@@ -1067,10 +1067,9 @@ public partial record Moves
                     {
                         int healAmount = target.BaseMaxHp / 4;
                         battle.Heal(healAmount, target, source);
-                        return new VoidReturn();
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1121,15 +1120,16 @@ public partial record Moves
 
                 OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
                 {
-                    // source is the Pokemon using Protect
-                    // Always run both checks, let Stall condition handle the logic
-                    bool willAct = battle.Queue.WillAct() is not null;
+                    // TS: return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
+                    // Short-circuit: if willAct is false, don't run StallMove event
+                    if (battle.Queue.WillAct() is null)
+                    {
+                        return (BoolEmptyVoidUnion)false;
+                    }
+
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    bool result = willAct && stallSuccess;
-
-                    // Return BoolEmptyVoidUnion explicitly
-                    return result ? true : (BoolEmptyVoidUnion)false;
+                    return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
 
                 OnHit = new OnHitEventInfo((battle, _, source, _) =>
@@ -2042,6 +2042,8 @@ public partial record Moves
                         return false;
                     }
 
+                    var oldApparentType = source.ApparentType.ToList();
+
                     // Get target's types
                     var newTypes = target.GetTypes(true).Where(t => t != PokemonType.Unknown)
                         .ToList();
@@ -2062,6 +2064,8 @@ public partial record Moves
                         $"[of] {target}");
                     source.SetType(newTypes.ToArray());
                     source.AddedType = target.AddedType;
+                    source.KnownType = target.IsAlly(source) && target.KnownType;
+                    if (!source.KnownType) source.ApparentType = oldApparentType;
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -2105,21 +2109,16 @@ public partial record Moves
                 OnAfterMoveSecondarySelf =
                     new OnAfterMoveSecondarySelfEventInfo((_, source, _, move) =>
                     {
-                        // Only change forme if the move actually hit a target
                         if (move.WillChangeForme != true)
                         {
                             return new VoidReturn();
                         }
 
-                        // Change Meloetta forme if applicable
-                        if (source.Species.BaseSpecies == SpecieId.Meloetta && !source.Transformed)
-                        {
-                            // Toggle between Aria and Pirouette formes
-                            SpecieId newSpecies = source.Species.Forme == FormeId.Pirouette
-                                ? SpecieId.Meloetta // Aria is the base form
-                                : SpecieId.MeloettaPirouette;
-                            source.FormeChange(newSpecies, move, message: "[msg]");
-                        }
+                        // Toggle between Aria and Pirouette formes
+                        SpecieId newSpecies = source.Species.Forme == FormeId.Pirouette
+                            ? SpecieId.Meloetta // Aria is the base form
+                            : SpecieId.MeloettaPirouette;
+                        source.FormeChange(newSpecies, move, message: "[msg]");
 
                         return new VoidReturn();
                     }),
@@ -2195,7 +2194,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
                 {
                     if (source.Side.FaintedLastTurn != null)
                     {
@@ -2203,7 +2202,7 @@ public partial record Moves
                         return battle.ChainModify(2);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -2299,6 +2298,7 @@ public partial record Moves
                 Category = MoveCategory.Status,
                 Name = "Revival Blessing",
                 BasePp = 1,
+                NoPpBoosts = true,
                 Priority = 0,
                 Flags = new MoveFlags { Heal = true, NoSketch = true },
                 OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
@@ -2334,16 +2334,18 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, move) =>
                 {
                     // Double power on grounded targets in Electric Terrain
-                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, target) &&
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
                         target.IsGrounded() == true)
                     {
-                        return 140; // Doubled base power
+                        if (!source.IsAlly(target))
+                            battle.Hint($"{move.Name}'s BP doubled on grounded target.");
+                        return move.BasePower * 2;
                     }
 
-                    return 70; // Normal base power
+                    return move.BasePower;
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -2588,12 +2590,6 @@ public partial record Moves
                 }),
                 OnHit = new OnHitEventInfo((_, target, source, _) =>
                 {
-                    // Copy target's ability
-                    if (target.Ability == AbilityId.None)
-                    {
-                        return false;
-                    }
-
                     AbilityIdFalseUnion? oldAbility = source.SetAbility(target.Ability, target);
                     // TS: if (!oldAbility) return oldAbility as false | null;
                     // SetAbility returns false for failure, null for silent failure
