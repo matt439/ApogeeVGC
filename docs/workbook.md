@@ -272,9 +272,9 @@
 
 ^ review abilities GaleWings to GorillaTactics
 
-@ review abilities GrassPelt to Guts
+^ review abilities GrassPelt to Guts
 
-review abilities HadronEngine to HoneyGather
+@ review abilities HadronEngine to HoneyGather
 
 review abilities Hospitality to HyperCutter
 
