@@ -328,9 +328,9 @@
 
 ^ review abilities Schooling to ShadowShield
 
-@ review abilities ShadowTag to ShieldDust
+^ review abilities ShadowTag to ShieldDust
 
-review abilities ShieldsDown to Sniper
+@ review abilities ShieldsDown to Sniper
 
 review abilities SnowCloak to Stall
 
