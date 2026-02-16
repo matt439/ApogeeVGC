@@ -76,4 +76,29 @@ public sealed record DurationCallbackEventInfo : EventHandlerInfo
             usesSpeed
         );
     }
+
+    /// <summary>
+    /// Invokes the duration callback, handling both legacy and context-based handlers.
+    /// </summary>
+    public int InvokeDuration(Battle battle, Pokemon target, Pokemon source, IEffect? sourceEffect)
+    {
+        if (ContextHandler is not null)
+        {
+            var context = new EventContext
+            {
+                Battle = battle,
+                EventId = EventId.DurationCallback,
+                TargetPokemon = target,
+                SourcePokemon = source,
+                SourceEffect = sourceEffect
+            };
+            var result = ContextHandler(context);
+            return result is IntRelayVar irv
+                ? irv.Value
+                : throw new InvalidOperationException("DurationCallback ContextHandler did not return IntRelayVar.");
+        }
+
+        var handler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)GetDelegateOrThrow();
+        return handler(battle, target, source, sourceEffect);
+    }
 }
