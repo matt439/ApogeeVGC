@@ -342,9 +342,9 @@
 
 ^ review abilities Symbiosis to TeraformZero
 
-@ review abilities TeraShell to ToughClaws
+^ review abilities TeraShell to ToughClaws
 
-review abilities ToxicBoost to Turboblaze
+@ review abilities ToxicBoost to Turboblaze
 
 review abilities Unaware to UnseenFist
 
