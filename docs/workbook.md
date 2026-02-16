@@ -316,9 +316,9 @@
 
 ^ review abilities Protosynthesis to PurifyingSalt
 
-@ review abilities QuarkDrive to Receiver
+^ review abilities QuarkDrive to Receiver
 
-review abilities Reckless to RksSystem
+^ review abilities Reckless to RksSystem
 
 review abilities RockHead to RunAway
 
