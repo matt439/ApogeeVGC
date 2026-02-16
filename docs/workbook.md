@@ -320,11 +320,11 @@
 
 ^ review abilities Reckless to RksSystem
 
-@ review abilities RockHead to RunAway
+^ review abilities RockHead to RunAway
 
 ## AbilitiesSTU
 
-review abilities SandForce to SapSipper
+@ review abilities SandForce to SapSipper
 
 review abilities Schooling to ShadowShield
 
