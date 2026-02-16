@@ -436,8 +436,10 @@ public partial record Abilities
                 {
                     if (move.Secondaries != null)
                     {
+                        move.Secondaries = null;
+                        // Technically not a secondary effect, but it is negated
+                        move.Self = null;
                         move.HasSheerForce = true;
-                        // Note: Secondaries removal is handled in the battle engine
                     }
                 }),
                 // OnBasePowerPriority = 21
@@ -468,8 +470,9 @@ public partial record Abilities
                 Num = 19,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnModifySecondaries = new OnModifySecondariesEventInfo((_, secondaries, _, _, _) =>
+                OnModifySecondaries = new OnModifySecondariesEventInfo((battle, secondaries, _, _, _) =>
                 {
+                    battle.Debug("Shield Dust prevent secondary");
                     // Filter out secondaries that don't target self (return only self-targeting effects)
                     return secondaries.Where(effect => effect.Self != null).ToArray();
                 }),
