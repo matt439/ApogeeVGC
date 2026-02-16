@@ -340,9 +340,9 @@
 
 ^ review abilities SupremeOverlord to SwordOfRuin
 
-@ review abilities Symbiosis to TeraformZero
+^ review abilities Symbiosis to TeraformZero
 
-review abilities TeraShell to ToughClaws
+@ review abilities TeraShell to ToughClaws
 
 review abilities ToxicBoost to Turboblaze
 
