@@ -294,13 +294,13 @@
 
 ^ review abilities MagicBounce to MegaLauncher
 
-@ review abilities Merciless to MirrorArmor
+^ review abilities Merciless to MirrorArmor
 
-review abilities MistySurge to Multiscale
+^ review abilities MistySurge to Multiscale
 
-review abilities Multitype to NaturalCure
+^ review abilities Multitype to NaturalCure
 
-review abilities Neuroforce to Normalize
+@ review abilities Neuroforce to Normalize
 
 review abilities Oblivious to Opportunist
 

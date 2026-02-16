@@ -866,7 +866,7 @@ public partial record Abilities
                             }
                         }
 
-                        return accuracy;
+                        return new VoidReturn();
                     }),
             },
             [AbilityId.Normalize] = new()
