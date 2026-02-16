@@ -1374,7 +1374,7 @@ public partial record Abilities
             {
                 Id = AbilityId.SwordOfRuin,
                 Name = "Sword of Ruin",
-                Num = 285,
+                Num = 286,
                 Rating = 4.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
@@ -1451,7 +1451,7 @@ public partial record Abilities
             {
                 Id = AbilityId.TabletsOfRuin,
                 Name = "Tablets of Ruin",
-                Num = 284,
+                Num = 285,
                 Rating = 4.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {

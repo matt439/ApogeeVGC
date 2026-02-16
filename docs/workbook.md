@@ -346,11 +346,11 @@
 
 ^ review abilities ToxicBoost to Turboblaze
 
-@ review abilities Unaware to UnseenFist
+^ review abilities Unaware to UnseenFist
 
 ## AbilitiesVWX
 
-review abilities VesselOfRuin to VoltAbsorb
+@ review abilities VesselOfRuin to VoltAbsorb
 
 review abilities WanderingSpirit to WaterVeil
 
