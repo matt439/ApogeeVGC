@@ -356,11 +356,11 @@
 
 ^ review abilities WeakArmor to WindPower
 
-@ review abilities WindRider to WonderSkin
+^ review abilities WindRider to WonderSkin
 
 ## AbilitiesYZ
 
-review abilities ZenMode to ZeroToHero
+^ review abilities ZenMode to ZeroToHero
 
 
 # Items
