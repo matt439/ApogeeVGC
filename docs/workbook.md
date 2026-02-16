@@ -344,9 +344,9 @@
 
 ^ review abilities TeraShell to ToughClaws
 
-@ review abilities ToxicBoost to Turboblaze
+^ review abilities ToxicBoost to Turboblaze
 
-review abilities Unaware to UnseenFist
+@ review abilities Unaware to UnseenFist
 
 ## AbilitiesVWX
 
