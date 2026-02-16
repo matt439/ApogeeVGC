@@ -354,9 +354,9 @@
 
 ^ review abilities WanderingSpirit to WaterVeil
 
-@ review abilities WeakArmor to WindPower
+^ review abilities WeakArmor to WindPower
 
-review abilities WindRider to WonderSkin
+@ review abilities WindRider to WonderSkin
 
 ## AbilitiesYZ
 
