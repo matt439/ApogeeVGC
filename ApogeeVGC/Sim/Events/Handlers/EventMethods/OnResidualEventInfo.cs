@@ -84,8 +84,8 @@ context =>
             {
            handler(
        context.Battle,
-       context.GetTargetPokemon(),
-context.GetSourcePokemon(),
+       context.GetTargetOrSourcePokemon(),
+context.GetSourceOrTargetPokemon(),
       context.GetSourceEffect<IEffect>()
     );
        return null; // void return

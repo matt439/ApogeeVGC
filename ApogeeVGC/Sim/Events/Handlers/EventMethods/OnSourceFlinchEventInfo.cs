@@ -66,7 +66,7 @@ public sealed record OnSourceFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return result switch
                 {

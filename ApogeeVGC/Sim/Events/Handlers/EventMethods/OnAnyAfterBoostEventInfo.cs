@@ -58,8 +58,8 @@ public sealed record OnAnyAfterBoostEventInfo : EventHandlerInfo
                 handler(
                     context.Battle,
                 context.GetRelayVar<SparseBoostsTableRelayVar>().Table,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
                 return null;

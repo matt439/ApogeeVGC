@@ -60,8 +60,8 @@ public sealed record OnAllyDeductPpEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                    context.GetTargetPokemon(),
-                    context.GetSourcePokemon()
+                    context.GetTargetOrSourcePokemon(),
+                    context.GetSourceOrTargetPokemon()
                 );
                 return result switch
                 {

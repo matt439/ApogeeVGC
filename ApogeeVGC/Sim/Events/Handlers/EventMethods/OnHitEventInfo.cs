@@ -70,8 +70,8 @@ public sealed record OnHitEventInfo : EventHandlerInfo
         return new OnHitEventInfo(
             context => handler(
                 context.Battle,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
             ),
             priority,

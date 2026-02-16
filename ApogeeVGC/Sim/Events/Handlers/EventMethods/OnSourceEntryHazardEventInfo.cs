@@ -57,7 +57,7 @@ public sealed record OnSourceEntryHazardEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

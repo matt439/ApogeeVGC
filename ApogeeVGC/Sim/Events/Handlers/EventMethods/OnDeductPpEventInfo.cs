@@ -69,8 +69,8 @@ public sealed record OnDeductPpEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon()
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
                 );
                 return new IntRelayVar(result);
             },

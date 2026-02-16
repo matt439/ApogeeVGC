@@ -74,9 +74,9 @@ public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
         return new OnTakeItemEventInfo(
             context => handler(
                 context.Battle,
-                (Item)context.Effect!,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetRelayVarEffect<Item>(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.Move
             ),
             priority,

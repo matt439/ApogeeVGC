@@ -63,7 +63,7 @@ public sealed record OnFoeTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatIt
      var result = handler(
           context.Battle,
   context.GetSourceEffect<Item>(),
-   context.GetTargetPokemon()
+   context.GetTargetOrSourcePokemon()
              );
      return result switch
    {

@@ -73,7 +73,7 @@ bool usesSpeed = true)
   {
                 handler(
          context.Battle,
-                  context.GetTargetPokemon()
+                  context.GetTargetOrSourcePokemon()
           );
        return null;
         },

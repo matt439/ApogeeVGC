@@ -57,7 +57,7 @@ public sealed record OnFoeAfterTerastallizationEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

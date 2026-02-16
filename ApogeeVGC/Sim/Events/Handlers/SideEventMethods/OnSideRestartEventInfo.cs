@@ -63,7 +63,7 @@ public sealed record OnSideRestartEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                     context.GetTargetSide(),
-                    context.GetTargetPokemon(),
+                    context.GetTargetOrSourcePokemon(),
                     context.GetSourceEffect<IEffect>()
                 );
                 if (result is FalseVoidFalseUnion)

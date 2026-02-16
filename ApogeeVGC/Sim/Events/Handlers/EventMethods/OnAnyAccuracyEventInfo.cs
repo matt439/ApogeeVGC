@@ -59,9 +59,9 @@ Priority = priority;
             {
                 var result = handler(
                     context.Battle,
-                context.TryGetRelayVar<IntRelayVar>()?.Value,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetNullableIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return result switch

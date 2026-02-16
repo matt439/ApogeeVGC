@@ -59,7 +59,7 @@ public sealed record OnAllyBeforeFaintEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
                 return null;

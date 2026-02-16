@@ -58,8 +58,8 @@ public sealed record OnAllyAttractEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon()
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
                 );
                 return null;
             },

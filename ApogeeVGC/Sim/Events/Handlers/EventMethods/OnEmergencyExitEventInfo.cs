@@ -60,7 +60,7 @@ public sealed record OnEmergencyExitEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

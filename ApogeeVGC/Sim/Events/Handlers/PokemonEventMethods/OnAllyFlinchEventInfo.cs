@@ -67,7 +67,7 @@ Handler = ExtractDelegate();
             {
                 var result = handler(
                     context.Battle,
-                    context.GetTargetPokemon()
+                    context.GetTargetOrSourcePokemon()
                 );
                 return result switch
                 {

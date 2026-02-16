@@ -96,23 +96,17 @@ internal static class EventHandlerAdapter
         // Check for RelayVar types
         if (context.HasRelayVar)
         {
-            context.Battle.Debug($"[ResolveParameter] Event={handlerInfo.Id}, Position={position}, ParamType={paramType.Name}, RelayVar={context.RelayVar?.GetType().Name}");
-            
             if (paramType.IsInstanceOfType(context.RelayVar!))
             {
-                context.Battle.Debug($"[ResolveParameter] Returning RelayVar directly");
                 return context.RelayVar;
             }
 
             // Check for primitive unwrapping
             if (TryUnwrapRelayVar(context.RelayVar!, paramType, out object? unwrapped))
             {
-                context.Battle.Debug($"[ResolveParameter] Unwrapped to: {unwrapped}");
                 return unwrapped;
             }
-            
-            context.Battle.Debug($"[ResolveParameter] TryUnwrapRelayVar failed");
-            
+
             // Check for Effect unwrapping from EffectRelayVar
             // This handles cases like TryAddVolatile where a Condition is passed as RelayVar
             if (context.RelayVar is EffectRelayVar effectRelayVar && 

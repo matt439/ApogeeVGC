@@ -58,9 +58,9 @@ Priority = priority;
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.GetMove()
                 );
                 return null;

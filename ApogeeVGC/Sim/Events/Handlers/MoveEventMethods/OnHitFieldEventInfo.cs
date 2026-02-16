@@ -55,8 +55,8 @@ public OnHitFieldEventInfo(
             {
                 var result = handler(
                     context.Battle,
-                    context.GetTargetPokemon(),
-                    context.GetSourcePokemon(),
+                    context.GetTargetOrSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
                     context.GetMove()
                 );
                 if (result == null) return null;

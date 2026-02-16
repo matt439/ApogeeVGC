@@ -58,7 +58,7 @@ public sealed record OnSourceImmunityEventInfo : EventHandlerInfo
                 handler(
                     context.Battle,
                 context.SourceType!.Value,
-                context.GetSourcePokemon()
+                context.GetSourceOrTargetPokemon()
                 );
                 return null;
             },

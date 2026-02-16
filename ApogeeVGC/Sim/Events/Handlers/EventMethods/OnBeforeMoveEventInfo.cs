@@ -88,8 +88,8 @@ public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
         return new OnBeforeMoveEventInfo(
        context => handler(
          context.Battle,
-                context.GetTargetPokemon(),
-        context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+        context.GetSourceOrTargetPokemon(),
     context.GetMove()
  ),
        priority,

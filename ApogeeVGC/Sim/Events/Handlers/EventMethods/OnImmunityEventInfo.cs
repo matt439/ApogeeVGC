@@ -78,7 +78,7 @@ public sealed record OnImmunityEventInfo : EventHandlerInfo
                 return handler(
                     context.Battle,
                     typeOrCondition,
-                    context.GetTargetPokemon()
+                    context.GetTargetOrSourcePokemon()
                 );
             },
             priority,

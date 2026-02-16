@@ -60,8 +60,8 @@ public sealed record OnAllyModifyMoveEventInfo : EventHandlerInfo
                 handler(
                     context.Battle,
                 context.GetMove(),
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon()
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
                 );
                 return null;
             },

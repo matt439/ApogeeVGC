@@ -55,7 +55,7 @@ public OnEffectivenessEventInfo(
             {
                 var result = handler(
                     context.Battle,
-                    context.GetRelayVar<IntRelayVar>().Value,
+                    context.GetIntRelayVar(),
                     context.TargetPokemon,
                     context.SourceType!.Value,
                     context.GetMove()

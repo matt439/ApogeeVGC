@@ -58,8 +58,8 @@ UsesSpeed = usesSpeed;
             {
                 handler(
                     context.Battle,
-                (Item)context.Effect!,
-                context.GetTargetPokemon()
+                context.GetRelayVarEffect<Item>(),
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

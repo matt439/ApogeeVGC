@@ -29,8 +29,8 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.MagicRoom,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, _, _) => 5),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((_, _, _, _) => 5),
+                OnFieldStart = OnFieldStartEventInfo.Create((battle, _, source, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -44,17 +44,17 @@ public partial record Conditions
                             pokemon);
                     }
                 }),
-                OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>
+                OnFieldRestart = OnFieldRestartEventInfo.Create((battle, _, _, _) =>
                 {
                     // Using Magic Room again removes it
                     battle.Field.RemovePseudoWeather(ConditionId.MagicRoom);
                 }),
-                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                OnFieldResidual = OnFieldResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 27,
                     SubOrder = 6,
                 },
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -78,7 +78,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.MagnetRise,
                 Duration = 5,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -87,21 +87,21 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
-                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
+                OnImmunity = OnImmunityEventInfo.Create((_, type, _) =>
                 {
                     // Grant immunity to Ground-type moves
                     if (type is { IsPokemonType: true, AsPokemonType: PokemonType.Ground })
                     {
-                        return BoolVoidUnion.FromBool(false);
+                        return new BoolRelayVar(false);
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnResidual = new OnResidualEventInfo((_, _, _, _) => { })
+                OnResidual = OnResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 18,
                 },
-                OnEnd = new OnEndEventInfo((battle, target) =>
+                OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -123,7 +123,7 @@ public partial record Conditions
                 Name = "Metronome",
                 EffectType = EffectType.Condition,
                 AssociatedItem = ItemId.Metronome,
-                OnStart = new OnStartEventInfo((battle, _, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, _, _, _) =>
                 {
                     // TS: this.effectState.lastMove = ''; this.effectState.numConsecutive = 0;
                     battle.EffectState.LastMove = "";
@@ -131,23 +131,23 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
-                OnTryMove = new OnTryMoveEventInfo((_, source, _, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((_, source, _, move) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.Metronome,
                             out EffectState? effectState))
-                        return BoolEmptyVoidUnion.FromVoid();
+                        return null;
 
                     // Remove volatile if no longer holding the item
                     // TS: return; (undefined - ignore handler result)
                     if (!source.HasItem(ItemId.Metronome))
                     {
                         source.RemoveVolatile(_library.Conditions[ConditionId.Metronome]);
-                        return BoolEmptyVoidUnion.FromVoid();
+                        return null;
                     }
 
                     // Don't track moves that call other moves
                     // TS: return; (undefined - ignore handler result)
-                    if (move.CallsMove == true) return BoolEmptyVoidUnion.FromVoid();
+                    if (move.CallsMove == true) return null;
 
                     // Track consecutive move usage
                     bool lastMoveMatches = effectState.LastMove == move.Id.ToString();
@@ -175,17 +175,17 @@ public partial record Conditions
 
                     effectState.LastMove = move.Id.ToString();
                     // TS: implicit return undefined
-                    return BoolEmptyVoidUnion.FromVoid();
+                    return null;
                 }, -2),
-                OnModifyDamage = new OnModifyDamageEventInfo((battle, _, source, _, _) =>
+                OnModifyDamage = OnModifyDamageEventInfo.Create((battle, _, source, _, _) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.Metronome,
                             out EffectState? effectState))
-                        return DoubleVoidUnion.FromVoid();
+                        return null;
 
                     int[] dmgMod = [4096, 4915, 5734, 6553, 7372, 8192];
                     int numConsecutive = Math.Min(effectState.NumConsecutive ?? 0, 5);
-                    return battle.ChainModify([dmgMod[numConsecutive], 4096]);
+                    return new DecimalRelayVar((decimal)battle.ChainModify([dmgMod[numConsecutive], 4096]));
                 }),
             },
             [ConditionId.MicleBerry] = new()
@@ -196,7 +196,7 @@ public partial record Conditions
                 AssociatedItem = ItemId.MicleBerry,
                 Duration = 2,
                 OnSourceAccuracy =
-                    new OnSourceAccuracyEventInfo((battle, accuracy, _, source, move) =>
+                    OnSourceAccuracyEventInfo.Create((battle, accuracy, _, source, move) =>
                     {
                         // OHKO moves bypass Micle Berry boost entirely - return void (TS: undefined)
                         if (move.Ohko != null) return IntBoolVoidUnion.FromVoid();
@@ -232,8 +232,8 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Minimize,
                 NoCopy = true,
-                OnRestart = new OnRestartEventInfo((_, _, _, _) => null),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, _, _, _, move) =>
+                OnRestart = OnRestartEventInfo.Create((_, _, _, _) => null),
+                OnSourceModifyDamage = OnSourceModifyDamageEventInfo.Create((battle, _, _, _, move) =>
                 {
                     // Moves that deal double damage to Minimized targets
                     // Note: Steamroller and MaliciousMoonsault are not in Gen 9 VGC
@@ -250,7 +250,7 @@ public partial record Conditions
 
                     return DoubleVoidUnion.FromVoid();
                 }),
-                OnAccuracy = new OnAccuracyEventInfo((_, accuracy, _, _, move) =>
+                OnAccuracy = OnAccuracyEventInfo.Create((_, accuracy, _, _, move) =>
                 {
                     // Moves that bypass accuracy check against Minimized targets
                     // Note: Steamroller and MaliciousMoonsault are not in Gen 9 VGC
@@ -280,13 +280,13 @@ public partial record Conditions
                 AssociatedMove = MoveId.MirrorCoat,
                 Duration = 1,
                 NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, _, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, _, _, _) =>
                 {
                     battle.EffectState.Slot = null;
                     battle.EffectState.Damage = 0;
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnRedirectTarget = new OnRedirectTargetEventInfo(
+                OnRedirectTarget = OnRedirectTargetEventInfo.Create(
                     (battle, target, source, _, move) =>
                     {
                         if (move.Id != MoveId.MirrorCoat) return PokemonVoidUnion.FromVoid();
@@ -308,7 +308,7 @@ public partial record Conditions
 
                         return PokemonVoidUnion.FromVoid();
                     }, -1),
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, damage, target, source, move) =>
                 {
                     if (source.IsAlly(target)) return;
                     if (battle.GetCategory(move) != MoveCategory.Special) return;
@@ -327,7 +327,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Mist,
                 Duration = 5,
-                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                OnTryBoost = OnTryBoostEventInfo.Create((battle, boost, target, source, effect) =>
                 {
                     // Allow infiltrating moves to bypass Mist
                     if (effect is ActiveMove move && (move.Infiltrates ?? false) &&
@@ -360,7 +360,7 @@ public partial record Conditions
                         }
                     }
                 }),
-                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, side, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -369,12 +369,12 @@ public partial record Conditions
                 }),
                 //OnSideResidualOrder = 26,
                 //OnSideResidualSubOrder = 4,
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 26,
                     SubOrder = 4,
                 },
-                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -389,12 +389,12 @@ public partial record Conditions
                 AssociatedMove = MoveId.MistyTerrain,
                 EffectType = EffectType.Terrain,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((_, source, _, _) =>
                     source.HasItem(ItemId.TerrainExtender) ? 8 : 5),
                 // Block status conditions for grounded Pokemon
                 // TS: if (!target.isGrounded() || target.isSemiInvulnerable()) return; (allows status)
                 //     return false; (blocks status)
-                OnSetStatus = new OnSetStatusEventInfo((battle, _, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, _, target, _, effect) =>
                 {
                     // Allow status if target is NOT grounded OR IS semi-invulnerable
                     if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable())
@@ -424,7 +424,7 @@ public partial record Conditions
                 }),
                 // Block confusion for grounded Pokemon
                 OnTryAddVolatile =
-                    new OnTryAddVolatileEventInfo((battle, status, target, _, effect) =>
+                    OnTryAddVolatileEventInfo.Create((battle, status, target, _, effect) =>
                     {
                         // Allow volatile if target is NOT grounded OR IS semi-invulnerable
                         if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable())
@@ -453,7 +453,7 @@ public partial record Conditions
                     }),
 
                 //OnBasePowerPriority = 6,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, defender, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, defender, move) =>
                     {
                         if (move.Type == MoveType.Dragon &&
                             (defender.IsGrounded() ?? false) &&
@@ -466,7 +466,7 @@ public partial record Conditions
                         return new VoidReturn();
                     },
                     6),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                OnFieldStart = OnFieldStartEventInfo.Create((battle, _, source, effect) =>
                 {
                     if (!battle.DisplayUi) return;
                     if (effect is Ability)
@@ -479,12 +479,12 @@ public partial record Conditions
                         battle.Add("-fieldstart", "move: Misty Terrain");
                     }
                 }),
-                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                OnFieldResidual = OnFieldResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 27,
                     SubOrder = 7,
                 },
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -499,7 +499,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 2,
                 //OnBeforeMovePriority = 11,
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, _) =>
                     {
                         if (battle.DisplayUi)
                         {
@@ -511,7 +511,7 @@ public partial record Conditions
                         return null;
                     },
                     11),
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -528,7 +528,7 @@ public partial record Conditions
                 Name = "No Retreat",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.NoRetreat,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -537,7 +537,7 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
-                OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) => { pokemon.TryTrap(); }),
+                OnTrapPokemon = OnTrapPokemonEventInfo.Create((_, pokemon) => { pokemon.TryTrap(); }),
             },
             [ConditionId.None] = new()
             {

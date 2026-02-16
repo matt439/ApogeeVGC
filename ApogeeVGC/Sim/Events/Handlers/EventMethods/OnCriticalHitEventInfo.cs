@@ -71,7 +71,7 @@ public sealed record OnCriticalHitEventInfo : UnionEventHandlerInfo<OnCriticalHi
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourcePokemon,
                 context.GetMove()
                 );

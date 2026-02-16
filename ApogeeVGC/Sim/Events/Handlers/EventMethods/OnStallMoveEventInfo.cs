@@ -73,7 +73,7 @@ Func<Battle, Pokemon, BoolVoidUnion> handler,
   {
  var result = handler(
   context.Battle,
-    context.GetTargetPokemon()
+    context.GetTargetOrSourcePokemon()
      );
  return result switch
  {

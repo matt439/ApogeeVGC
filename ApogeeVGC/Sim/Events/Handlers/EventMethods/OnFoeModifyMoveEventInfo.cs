@@ -59,8 +59,8 @@ public sealed record OnFoeModifyMoveEventInfo : EventHandlerInfo
                 handler(
                     context.Battle,
                 context.GetMove(),
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon()
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
                 );
                 return null;
             },

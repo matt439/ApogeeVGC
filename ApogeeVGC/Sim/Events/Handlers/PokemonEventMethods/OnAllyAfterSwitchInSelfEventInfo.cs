@@ -58,7 +58,7 @@ public sealed record OnAllyAfterSwitchInSelfEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

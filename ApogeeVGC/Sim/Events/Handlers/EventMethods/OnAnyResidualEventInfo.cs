@@ -57,7 +57,7 @@ public sealed record OnAnyResidualEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

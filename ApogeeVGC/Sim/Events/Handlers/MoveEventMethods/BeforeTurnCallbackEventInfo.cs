@@ -54,8 +54,8 @@ public sealed record BeforeTurnCallbackEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                    context.GetTargetPokemon(),
-                    context.GetSourcePokemon()
+                    context.GetTargetOrSourcePokemon(),
+                    context.GetSourceOrTargetPokemon()
                 );
                 return null;
             },

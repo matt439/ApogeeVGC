@@ -71,8 +71,8 @@ public sealed record OnAnyFaintEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
                 return null;

@@ -50,7 +50,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, target, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, target, _) =>
                 {
                     // Double power if target is poisoned or badly poisoned
                     if (target.Status == ConditionId.Poison || target.Status == ConditionId.Toxic)
@@ -242,7 +242,7 @@ public partial record Moves
                     Metronome = true,
                     PledgeCombo = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, _, move) =>
                 {
                     // Check if this is being called as part of a pledge combo
                     if (move.SourceEffect is MoveEffectStateId
@@ -260,7 +260,7 @@ public partial record Moves
 
                     return move.BasePower;
                 }),
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
                 {
                     // Check the battle queue for ally Pok�mon using Fire Pledge or Grass Pledge
                     if (battle.Queue.List != null)
@@ -292,7 +292,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) =>
                 {
                     // Check if this move is being modified by a pledge combo
                     if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.GrassPledge })
@@ -356,7 +356,7 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 1,
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                BasePowerCallback = new BasePowerCallbackEventInfo((_, source, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((_, source, _, move) =>
                 {
                     // Greninja-Ash with Battle Bond (not transformed) gets +5 BP
                     if (source.Species.Id == SpecieId.GreninjaAsh &&
@@ -389,7 +389,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
                     int bp = move.BasePower * source.Hp / source.MaxHp;
@@ -439,7 +439,7 @@ public partial record Moves
                     Metronome = true,
                     Bullet = true,
                 },
-                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((_, move, pokemon, _) =>
                 {
                     // Use pokemon.EffectiveWeather() to account for Utility Umbrella
                     ConditionId weather = pokemon.EffectiveWeather();
@@ -452,7 +452,7 @@ public partial record Moves
                         _ => move.Type,
                     };
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
                 {
                     // Use pokemon.EffectiveWeather() to account for Utility Umbrella
                     ConditionId weather = pokemon.EffectiveWeather();
@@ -554,9 +554,9 @@ public partial record Moves
                 },
                 SideCondition = ConditionId.WideGuard,
                 Condition = _library.Conditions[ConditionId.WideGuard],
-                OnTry = new OnTryEventInfo((battle, _, _, _) =>
+                OnTry = OnTryEventInfo.Create((battle, _, _, _) =>
                     battle.Queue.WillAct() != null ? new VoidReturn() : false),
-                OnHitSide = new OnHitSideEventInfo((_, _, source, _) =>
+                OnHitSide = OnHitSideEventInfo.Create((_, _, source, _) =>
                 {
                     source.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
@@ -582,7 +582,7 @@ public partial record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, target) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, target) =>
                 {
                     // TS: if (target && ['raindance', 'primordialsea'].includes(target.effectiveWeather()))
                     // Use target's effective weather (accounts for Utility Umbrella)
@@ -798,7 +798,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
+                OnTryImmunity = OnTryImmunityEventInfo.Create((_, target, _, _) =>
                 {
                     // Fails against Truant or Insomnia - can't replace those
                     if (target.Ability is AbilityId.Truant or AbilityId.Insomnia)
@@ -808,7 +808,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, _, _) =>
                 {
                     // Fails if target's ability can't be suppressed
                     Ability targetAbility = target.GetAbility();
@@ -819,7 +819,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((_, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, target, source, _) =>
                 {
                     // Set target's ability to Insomnia
                     AbilityIdFalseUnion? oldAbility = target.SetAbility(AbilityId.Insomnia, source);

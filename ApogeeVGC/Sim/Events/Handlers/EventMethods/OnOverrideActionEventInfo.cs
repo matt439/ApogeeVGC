@@ -70,8 +70,8 @@ Handler = handler;
             {
                 var result = handler(
                     context.Battle,
-                context.GetSourcePokemon(),
-                context.GetTargetPokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.GetMove()
                 );
                 return result switch

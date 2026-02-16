@@ -71,9 +71,9 @@ public sealed record OnDamageEventInfo : EventHandlerInfo
         return new OnDamageEventInfo(
             context => handler(
                 context.Battle,
-                context.GetRelayVar<IntRelayVar>().Value,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
             ),
             priority,

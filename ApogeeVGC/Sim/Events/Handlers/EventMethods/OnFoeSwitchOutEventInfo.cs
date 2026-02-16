@@ -68,7 +68,7 @@ Prefix = EventPrefix.Foe;
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

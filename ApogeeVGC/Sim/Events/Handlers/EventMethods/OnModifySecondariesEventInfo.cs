@@ -73,8 +73,8 @@ public sealed record OnModifySecondariesEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                 context.GetRelayVar<SecondaryEffectArrayRelayVar>().Effects,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return new SecondaryEffectArrayRelayVar(result);

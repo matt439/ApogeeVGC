@@ -67,7 +67,7 @@ public sealed record OnSourceLockMoveEventInfo : UnionEventHandlerInfo<OnLockMov
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return result switch
                 {

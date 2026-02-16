@@ -55,7 +55,7 @@ public sealed record BeforeMoveCallbackEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                    context.GetTargetPokemon(),
+                    context.GetTargetOrSourcePokemon(),
                     context.SourcePokemon,
                     context.GetMove()
                 );

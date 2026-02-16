@@ -78,7 +78,7 @@ public partial record Moves
                     Metronome = true,
                     Powder = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Check if target is already pure Psychic type
                     var types = target.GetTypes();
@@ -159,7 +159,7 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                OnHitSide = new OnHitSideEventInfo((battle, side, source, move) =>
+                OnHitSide = OnHitSideEventInfo.Create((battle, side, source, move) =>
                 {
                     // Find allies with Plus or Minus abilities
                     var targets = side.Allies().Where(ally =>
@@ -205,7 +205,7 @@ public partial record Moves
                 },
                 VolatileStatus = ConditionId.MagnetRise,
                 Condition = _library.Conditions[ConditionId.MagnetRise],
-                OnTry = new OnTryEventInfo((battle, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((battle, _, source, move) =>
                 {
                     // Fail if source has Smack Down or Ingrain
                     if (source.Volatiles.ContainsKey(ConditionId.SmackDown) ||
@@ -318,7 +318,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((_, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((_, target, source, move) =>
                 {
                     RelayVar result = target.AddVolatile(ConditionId.Trapped, source, move,
                         ConditionId.Trapper);
@@ -454,7 +454,7 @@ public partial record Moves
                     FailMeFirst = true,
                 },
                 // Calculate damage as 1.5x the last damage taken this turn
-                DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
+                DamageCallback = DamageCallbackEventInfo.Create((_, pokemon, _, _) =>
                 {
                     // Get the last attacker who damaged the user this turn
                     Attacker? lastDamagedBy = pokemon.GetLastDamagedBy(true);
@@ -470,7 +470,7 @@ public partial record Moves
                     return IntFalseUnion.FromInt(0);
                 }),
                 // Check that the user was damaged this turn before allowing the move
-                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, _, source, _) =>
                 {
                     // Find if any damage was taken this turn
                     Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
@@ -482,7 +482,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnModifyTarget = new OnModifyTargetEventInfo((battle, relayTarget, source, _, _) =>
+                OnModifyTarget = OnModifyTargetEventInfo.Create((battle, relayTarget, source, _, _) =>
                 {
                     Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
                     if (lastDamagedBy != null)
@@ -568,7 +568,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already charged (TwoTurnMove volatile exists with this move), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
@@ -644,7 +644,7 @@ public partial record Moves
                     FailMimic = true,
                     FailInstruct = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Get all moves that have the Metronome flag
                     var metronomeableMoves = battle.Library.Moves.Values
@@ -732,7 +732,7 @@ public partial record Moves
                     FailMimic = true,
                     FailInstruct = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     Move? lastMove = target.LastMove;
                     if (source.Transformed || lastMove == null ||
@@ -816,7 +816,7 @@ public partial record Moves
                 Target = MoveTarget.Scripted,
                 Type = MoveType.Psychic,
                 Condition = _library.Conditions[ConditionId.MirrorCoat],
-                DamageCallback = new DamageCallbackEventInfo((_, pokemon, _, _) =>
+                DamageCallback = DamageCallbackEventInfo.Create((_, pokemon, _, _) =>
                 {
                     if (!pokemon.Volatiles.TryGetValue(ConditionId.MirrorCoat,
                             out EffectState? effectState))
@@ -826,11 +826,11 @@ public partial record Moves
 
                     return IntFalseUnion.FromInt(effectState.Damage > 0 ? effectState.Damage.Value : 1);
                 }),
-                BeforeTurnCallback = new BeforeTurnCallbackEventInfo((_, pokemon, _) =>
+                BeforeTurnCallback = BeforeTurnCallbackEventInfo.Create((_, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.MirrorCoat);
                 }),
-                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, _, source, _) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.MirrorCoat,
                             out EffectState? effectState))
@@ -910,7 +910,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 SelfDestruct = MoveSelfDestruct.FromAlways(),
-                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, source, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.MistyTerrain, source) &&
                         (source.IsGrounded() ?? false))
@@ -1006,7 +1006,7 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Determine heal factor based on weather
                     var numerator = 1;
@@ -1057,7 +1057,7 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Determine heal factor based on weather
                     var numerator = 1;
@@ -1109,7 +1109,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnAfterHit = new OnAfterHitEventInfo((battle, _, source, move) =>
+                OnAfterHit = OnAfterHitEventInfo.Create((battle, _, source, move) =>
                 {
                     if (move.HasSheerForce ?? false) return new VoidReturn();
 
@@ -1146,7 +1146,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, _, source, move) =>
+                OnAfterSubDamage = OnAfterSubDamageEventInfo.Create((battle, _, _, source, move) =>
                 {
                     if (move.HasSheerForce ?? false) return;
 
@@ -1450,7 +1450,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 VolatileStatus = ConditionId.NoRetreat,
-                OnTry = new OnTryEventInfo((_, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((_, _, source, move) =>
                 {
                     // Fail if source already has No Retreat
                     if (source.Volatiles.ContainsKey(ConditionId.NoRetreat))
@@ -1513,7 +1513,7 @@ public partial record Moves
                     Protect = true,
                 },
                 OnAfterMoveSecondarySelf =
-                    new OnAfterMoveSecondarySelfEventInfo((battle, source, _, _) =>
+                    OnAfterMoveSecondarySelfEventInfo.Create((battle, source, _, _) =>
                     {
                         // Check if Dondozo is commanded by Tatsugiri
                         if (!source.Volatiles.TryGetValue(ConditionId.Commanded,

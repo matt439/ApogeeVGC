@@ -77,9 +77,9 @@ ContextHandler = contextHandler;
           {
   handler(
          context.Battle,
-     context.GetRelayVar<IntRelayVar>().Value,
-              context.GetTargetPokemon(),
-     context.GetSourcePokemon(),
+     context.GetIntRelayVar(),
+              context.GetTargetOrSourcePokemon(),
+     context.GetSourceOrTargetPokemon(),
         context.GetMove()
         );
  return null;

@@ -60,8 +60,8 @@ public sealed record OnFoeFractionalPriorityEventInfo : UnionEventHandlerInfo<On
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVar<IntRelayVar>().Value,
-                context.GetTargetPokemon(),
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourcePokemon,
                 context.GetMove()
                 );

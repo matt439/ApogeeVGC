@@ -61,7 +61,7 @@ public sealed record OnStartEventInfo : EventHandlerInfo
         return new OnStartEventInfo(
             context =>
             {
-                handler(context.Battle, context.GetTargetPokemon());
+                handler(context.Battle, context.GetTargetOrSourcePokemon());
                 return null;
             },
             priority,

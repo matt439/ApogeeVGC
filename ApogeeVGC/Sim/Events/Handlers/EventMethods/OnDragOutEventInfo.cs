@@ -74,7 +74,7 @@ public sealed record OnDragOutEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourcePokemon,
                 context.Move
                 );

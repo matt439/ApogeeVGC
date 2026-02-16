@@ -55,7 +55,7 @@ public OnModifyMoveEventInfo(
                 handler(
                     context.Battle,
                     context.GetMove(),
-                    context.GetSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
                     context.TargetPokemon
                 );
                 return null;

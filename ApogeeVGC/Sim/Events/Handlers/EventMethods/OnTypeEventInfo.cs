@@ -69,7 +69,7 @@ typeof(Pokemon),
                 var result = handler(
                     context.Battle,
                 context.GetRelayVar<TypesRelayVar>().Types.ToArray(),
-                context.GetSourcePokemon()
+                context.GetSourceOrTargetPokemon()
                 );
                 return result switch
                 {

@@ -73,9 +73,9 @@ ExpectedReturnType = typeof(void);
             {
                 handler(
                     context.Battle,
-                context.GetSourceEffect<Condition>(),
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetRelayVarEffect<Condition>(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
                 return null;

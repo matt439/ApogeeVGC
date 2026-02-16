@@ -71,9 +71,9 @@ public sealed record OnAfterSetStatusEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetSourceEffect<Condition>(),
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetRelayVarEffect<Condition>(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
                 return null;

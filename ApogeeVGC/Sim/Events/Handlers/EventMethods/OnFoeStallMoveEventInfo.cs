@@ -58,7 +58,7 @@ public sealed record OnFoeStallMoveEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return result switch
                 {

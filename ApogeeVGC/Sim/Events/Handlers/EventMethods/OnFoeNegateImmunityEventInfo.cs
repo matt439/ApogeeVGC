@@ -59,7 +59,7 @@ public sealed record OnFoeNegateImmunityEventInfo : UnionEventHandlerInfo<OnNega
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourceType!.Value
                 );
                 return result switch

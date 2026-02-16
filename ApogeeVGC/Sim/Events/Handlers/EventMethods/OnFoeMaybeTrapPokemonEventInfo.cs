@@ -69,7 +69,7 @@ public sealed record OnFoeMaybeTrapPokemonEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourcePokemon
                 );
                 return null;

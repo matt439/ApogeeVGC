@@ -66,8 +66,8 @@ public sealed record DurationCallbackEventInfo : EventHandlerInfo
                 {
                     int result = handler(
                         context.Battle,
-                        context.GetTargetPokemon(),
-                        context.GetSourcePokemon(),
+                        context.GetTargetOrSourcePokemon(),
+                        context.GetSourceOrTargetPokemon(),
                         context.TryGetSourceEffect<IEffect>()
                         );
                     return new IntRelayVar(result);

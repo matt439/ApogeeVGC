@@ -73,9 +73,9 @@ public sealed record OnSetAbilityEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                (Ability)context.Effect!,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetRelayVarEffect<Ability>(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
                 return null;

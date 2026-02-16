@@ -25,7 +25,7 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Ice"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
+                    OnSourceModifyDamageEventInfo.Create((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Ice && target.GetMoveHitData(move).TypeMod > 0)
                         {
@@ -57,7 +57,7 @@ public partial record Items
                 Name = "Zap Plate",
                 SpriteNum = 572,
                 OnPlate = PokemonType.Electric,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Electric)
                     {
@@ -67,16 +67,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Arceus-Electric",
                 Num = 300,
@@ -88,7 +88,7 @@ public partial record Items
                 Name = "Zoom Lens",
                 SpriteNum = 574,
                 Fling = new FlingData { BasePower = 10 },
-                OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
+                OnSourceModifyAccuracy = OnSourceModifyAccuracyEventInfo.Create(
                     (battle, accuracy, target, _, _) =>
                     {
                         // TS checks: typeof accuracy === 'number' && !this.queue.willMove(target)

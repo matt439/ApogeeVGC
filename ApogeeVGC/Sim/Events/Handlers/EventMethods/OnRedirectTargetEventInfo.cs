@@ -72,8 +72,8 @@ public sealed record OnRedirectTargetEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>(),
                 context.GetMove()
                 );

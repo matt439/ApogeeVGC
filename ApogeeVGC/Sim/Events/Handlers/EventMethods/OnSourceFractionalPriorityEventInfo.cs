@@ -67,8 +67,8 @@ public sealed record OnSourceFractionalPriorityEventInfo : UnionEventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVar<IntRelayVar>().Value,
-                context.GetTargetPokemon(),
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
                 context.GetMove()
                 );
                 return new DecimalRelayVar((decimal)result);

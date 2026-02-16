@@ -71,7 +71,7 @@ bool usesSpeed = true)
                 handler(
                     context.Battle,
                 context.GetTargetSide(),
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.GetSourceEffect<Condition>()
                 );
                 return null;

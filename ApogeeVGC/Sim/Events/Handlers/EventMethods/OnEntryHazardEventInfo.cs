@@ -66,7 +66,7 @@ ExpectedReturnType = typeof(void);
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

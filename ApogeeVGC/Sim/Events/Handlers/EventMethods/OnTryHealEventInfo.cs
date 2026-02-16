@@ -74,9 +74,9 @@ bool usesSpeed = true)
           return new OnTryHealEventInfo(
               context => handler(
                   context.Battle,
-                  context.GetRelayVar<IntRelayVar>().Value,
-                  context.GetTargetPokemon(),
-                  context.GetSourcePokemon(),
+                  context.GetIntRelayVar(),
+                  context.GetTargetOrSourcePokemon(),
+                  context.GetSourceOrTargetPokemon(),
                   context.GetSourceEffect<IEffect>()
               ),
               priority,
@@ -95,7 +95,7 @@ bool usesSpeed = true)
           return new OnTryHealEventInfo(
               context => handler(
                   context.Battle,
-                  context.GetTargetPokemon()
+                  context.GetTargetOrSourcePokemon()
               ),
               priority,
               usesSpeed

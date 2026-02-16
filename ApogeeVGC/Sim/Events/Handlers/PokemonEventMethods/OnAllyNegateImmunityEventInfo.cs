@@ -67,7 +67,7 @@ public sealed record OnAllyNegateImmunityEventInfo : UnionEventHandlerInfo<OnNeg
             {
                 var result = handler(
                     context.Battle,
-                    context.GetTargetPokemon(),
+                    context.GetTargetOrSourcePokemon(),
                     context.SourceType!.Value
                 );
                 return result switch

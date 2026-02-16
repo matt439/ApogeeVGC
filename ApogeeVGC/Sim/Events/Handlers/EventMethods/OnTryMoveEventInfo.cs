@@ -70,8 +70,8 @@ typeof(Battle),
         return new OnTryMoveEventInfo(
             context => handler(
                 context.Battle,
-                context.GetSourcePokemon(),
-                context.GetTargetPokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.GetMove()
             ),
             priority,

@@ -122,7 +122,7 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                     context.GetMove(),
-                    context.GetSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
                     context.TargetPokemon // Direct access, can be null
                 );
 
@@ -132,6 +132,30 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                     return false; // Uses implicit operator RelayVar(bool)
                 }
 
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler for simple modifications (void return).
+    /// </summary>
+    public static OnModifyMoveEventInfo Create(
+        Action<Battle, ActiveMove, Pokemon, Pokemon?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnModifyMoveEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetMove(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.TargetPokemon
+                );
                 return null;
             },
             priority,

@@ -59,8 +59,8 @@ UsesSpeed = usesSpeed;
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVar<IntRelayVar>().Value,
-                context.GetTargetPokemon(),
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourceType!.Value,
                 context.GetMove()
                 );

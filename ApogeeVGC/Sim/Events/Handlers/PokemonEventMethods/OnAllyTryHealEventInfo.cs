@@ -167,9 +167,9 @@ Type? expectedRetType;
         return new OnAllyTryHealEventInfo(
             context => handler(
                 context.Battle,
-                context.GetRelayVar<IntRelayVar>().Value,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
             ),
             priority,
@@ -188,7 +188,7 @@ Type? expectedRetType;
         return new OnAllyTryHealEventInfo(
             context => handler(
                 context.Battle,
-                context.GetTargetPokemon()
+                context.GetTargetOrSourcePokemon()
             ),
             priority,
             usesSpeed

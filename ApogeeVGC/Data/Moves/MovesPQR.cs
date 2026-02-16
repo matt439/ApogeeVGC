@@ -38,7 +38,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     int targetHp = target.Hp;
                     int averageHp = Math.Max(1, (targetHp + source.Hp) / 2);
@@ -98,7 +98,7 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     BoolZeroUnion? success =
                         battle.Boost(new SparseBoostsTable { Atk = -1, SpA = -1 }, target, source,
@@ -133,7 +133,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, target, _) =>
                 {
                     // Double power if target has already moved this turn
                     if (target.NewlySwitched || battle.Queue.WillMove(target) is not null)
@@ -206,7 +206,7 @@ public partial record Moves
                     BypassSub = true,
                     Metronome = true,
                 },
-                OnHitField = new OnHitFieldEventInfo((battle, _, source, move) =>
+                OnHitField = OnHitFieldEventInfo.Create((battle, _, source, move) =>
                 {
                     var result = false;
                     var message = false;
@@ -319,7 +319,7 @@ public partial record Moves
                     FailInstruct = true,
                 },
                 BreaksProtect = true,
-                OnTryMove = new OnTryMoveEventInfo((battle, source, target, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
                     // If we have the volatile from turn 1, remove it and continue with the attack
                     if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
@@ -360,7 +360,7 @@ public partial record Moves
                     Mirror = true,
                 },
                 IgnoreAbility = true,
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, source, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, source, _) =>
                 {
                     // Use Physical category if Attack > Special Attack
                     if (source.GetStat(StatIdExceptHp.Atk, false, true) >
@@ -459,7 +459,7 @@ public partial record Moves
                     Distance = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     Item item = target.GetItem();
                     if (source.Hp > 0 && item.IsBerry)
@@ -655,7 +655,7 @@ public partial record Moves
                     Metronome = true,
                     Bullet = true,
                 },
-                OnTryMove = new OnTryMoveEventInfo((battle, source, target, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
                     // Fail if targeting ally while under a heal-blocking effect
                     // Note: TypeScript checks for 'healblock' volatile. HealBlock is not in Gen 9 VGC.
@@ -670,7 +670,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnTryHit = new OnTryHitEventInfo((_, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, source, move) =>
                 {
                     if (source.IsAlly(target))
                     {
@@ -681,7 +681,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (source.IsAlly(target))
                     {
@@ -729,7 +729,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((_, _, target, _) =>
+                OnTry = OnTryEventInfo.Create((_, _, target, _) =>
                 {
                     // Fail if target has no item
                     if (target.Item == ItemId.None)
@@ -739,7 +739,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Display the item being manipulated
                     Item item = battle.Library.Items[target.Item];
@@ -878,7 +878,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     // Average Atk and SpA stats between user and target
                     int newAtk = (target.StoredStats[StatIdExceptHp.Atk] +
@@ -916,7 +916,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     // Swap Atk and SpA boosts with target
                     int targetAtk = target.Boosts.Atk;
@@ -972,7 +972,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((_, source, _, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((_, source, _, _) =>
                     20 + 20 * source.PositiveBoosts()),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1035,7 +1035,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, _, _) =>
                 {
                     int rand = battle.Random(10);
                     if (rand < 2)
@@ -1060,7 +1060,7 @@ public partial record Moves
                         move.BasePower = 120;
                     }
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     // If Infiltrates is true, this is a heal roll - heal the target
                     if (move.Infiltrates == true)
@@ -1118,7 +1118,7 @@ public partial record Moves
                 StallingMove = true,
                 VolatileStatus = ConditionId.Protect,
 
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // TS: return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
                     // Short-circuit: if willAct is false, don't run StallMove event
@@ -1132,7 +1132,7 @@ public partial record Moves
                     return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
 
-                OnHit = new OnHitEventInfo((battle, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // source is the Pokemon using Protect
                     battle.Debug(
@@ -1198,7 +1198,7 @@ public partial record Moves
                     Metronome = true,
                     Slicing = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
@@ -1254,7 +1254,7 @@ public partial record Moves
                     Metronome = true,
                     Bite = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, _, _) =>
                 {
                     // Remove screens before hitting (will shatter screens through sub)
                     target.Side.RemoveSideCondition(ConditionId.Reflect);
@@ -1379,7 +1379,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     // Copy all boosts from target to source
                     source.Boosts.Atk = target.Boosts.Atk;
@@ -1535,7 +1535,7 @@ public partial record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Fails in singles
                     if (battle.ActivePerHalf == 1)
@@ -1605,10 +1605,10 @@ public partial record Moves
                 },
                 SideCondition = ConditionId.QuickGuard,
                 Condition = _library.Conditions[ConditionId.QuickGuard],
-                OnTry = new OnTryEventInfo((battle, _, _, _) => battle.Queue.WillAct() is not null
+                OnTry = OnTryEventInfo.Create((battle, _, _, _) => battle.Queue.WillAct() is not null
                     ? new VoidReturn()
                     : false),
-                OnHitSide = new OnHitSideEventInfo((_, _, source, _) =>
+                OnHitSide = OnHitSideEventInfo.Create((_, _, source, _) =>
                 {
                     source.AddVolatile(ConditionId.Stall);
                     return new VoidReturn(); // TS returns undefined (no return statement)
@@ -1658,7 +1658,7 @@ public partial record Moves
                     Mirror = true,
                     Punch = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((_, source, _, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((_, source, _, _) =>
                     Math.Min(350, 50 + 50 * source.TimesAttacked)),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1681,7 +1681,7 @@ public partial record Moves
                     Powder = true,
                 },
                 VolatileStatus = ConditionId.RagePowder,
-                OnTry = new OnTryEventInfo((battle, _, _, _) => battle.ActivePerHalf > 1
+                OnTry = OnTryEventInfo.Create((battle, _, _, _) => battle.ActivePerHalf > 1
                     ? new VoidReturn()
                     : false),
                 Secondary = null,
@@ -1704,7 +1704,7 @@ public partial record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, _, _) =>
                 {
                     // Remove screens before hitting (will shatter screens through sub)
                     target.Side.RemoveSideCondition(ConditionId.Reflect);
@@ -1712,7 +1712,7 @@ public partial record Moves
                     target.Side.RemoveSideCondition(ConditionId.AuroraVeil);
                     return new VoidReturn(); // TS returns undefined - continue with the move
                 }),
-                OnModifyType = new OnModifyTypeEventInfo((_, move, source, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((_, move, source, _) =>
                 {
                     // Change type based on Tauros form
                     FormeId formeName = source.Species.Forme;
@@ -1793,7 +1793,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnAfterHit = new OnAfterHitEventInfo((battle, _, pokemon, move) =>
+                OnAfterHit = OnAfterHitEventInfo.Create((battle, _, pokemon, move) =>
                 {
                     // Skip if move has Sheer Force boost (suppresses secondary effects)
                     if (move.HasSheerForce ?? false) return BoolVoidUnion.FromVoid();
@@ -1832,7 +1832,7 @@ public partial record Moves
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, _, pokemon, move) =>
+                OnAfterSubDamage = OnAfterSubDamageEventInfo.Create((battle, _, _, pokemon, move) =>
                 {
                     // Same logic as OnAfterHit - applies even when hitting a substitute
                     if (move.HasSheerForce ?? false) return;
@@ -1970,7 +1970,7 @@ public partial record Moves
                 BasePp = 10,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     // Fail if already has an item or never had one
                     if (target.Item != ItemId.None || target.LastItem == ItemId.None)
@@ -2027,7 +2027,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     // Arceus and Silvally cannot change types this way
                     if (source.Species.BaseSpecies == SpecieId.Arceus ||
@@ -2094,7 +2094,7 @@ public partial record Moves
                     Chance = 10,
                     Status = ConditionId.Sleep,
                 },
-                OnHit = new OnHitEventInfo((_, _, source, move) =>
+                OnHit = OnHitEventInfo.Create((_, _, source, move) =>
                 {
                     // Mark that forme should change only if move hits AND source is Meloetta
                     if (source.Species.BaseSpecies == SpecieId.Meloetta && !source.Transformed)
@@ -2107,7 +2107,7 @@ public partial record Moves
                     return new VoidReturn();
                 }),
                 OnAfterMoveSecondarySelf =
-                    new OnAfterMoveSecondarySelfEventInfo((_, source, _, move) =>
+                    OnAfterMoveSecondarySelfEventInfo.Create((_, source, _, move) =>
                     {
                         if (move.WillChangeForme != true)
                         {
@@ -2136,7 +2136,7 @@ public partial record Moves
                 BasePp = 5,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Heal = true, Metronome = true },
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, _) =>
                 {
                     // Already asleep or has Comatose
                     if (source.Status == ConditionId.Sleep ||
@@ -2169,7 +2169,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     bool result = target.SetStatus(ConditionId.Sleep, source, move);
                     if (!result) return false;
@@ -2194,7 +2194,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, source, _, _) =>
                 {
                     if (source.Side.FaintedLastTurn != null)
                     {
@@ -2225,7 +2225,7 @@ public partial record Moves
                     Dance = true,
                     Metronome = true,
                 },
-                OnModifyType = new OnModifyTypeEventInfo((_, move, source, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((_, move, source, _) =>
                 {
                     // Change to user's primary type
                     var types = source.GetTypes();
@@ -2253,7 +2253,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, _) =>
                 {
                     int ratio = Math.Max((int)Math.Floor(source.Hp * 48.0 / source.MaxHp), 1);
                     int bp;
@@ -2301,7 +2301,7 @@ public partial record Moves
                 NoPpBoosts = true,
                 Priority = 0,
                 Flags = new MoveFlags { Heal = true, NoSketch = true },
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, _, _) =>
                 {
                     // Fail if no fainted allies on the user's side
                     if (!target.Side.Pokemon.Any(ally => ally.Fainted))
@@ -2334,7 +2334,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, target, move) =>
                 {
                     // Double power on grounded targets in Electric Terrain
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
@@ -2569,7 +2569,7 @@ public partial record Moves
                     AllyAnim = true,
                     Metronome = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((_, target, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, source, _) =>
                 {
                     // Fail if same ability
                     if (target.Ability == source.Ability)
@@ -2588,7 +2588,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((_, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, target, source, _) =>
                 {
                     AbilityIdFalseUnion? oldAbility = source.SetAbility(target.Ability, target);
                     // TS: if (!oldAbility) return oldAbility as false | null;
@@ -2628,7 +2628,7 @@ public partial record Moves
                     FailInstruct = true,
                     NoParentalBond = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, pokemon, _, move) =>
                 {
                     int bp = move.BasePower;
                     pokemon.Volatiles.TryGetValue(ConditionId.Rollout, out EffectState? rolloutData);
@@ -2655,7 +2655,7 @@ public partial record Moves
                     battle.Debug($"BP: {bp}");
                     return bp;
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, target) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, pokemon, target) =>
                 {
                     if (pokemon.Volatiles.ContainsKey(ConditionId.Rollout) ||
                         pokemon.Status == ConditionId.Sleep ||
@@ -2709,7 +2709,7 @@ public partial record Moves
                 {
                     Protect = true, Mirror = true, Sound = true, BypassSub = true, Metronome = true
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, _, move) =>
                 {
                     // Double power if triggered by ally's Round
                     if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.Round })
@@ -2720,7 +2720,7 @@ public partial record Moves
 
                     return 60;
                 }),
-                OnTry = new OnTryEventInfo((battle, _, _, move) =>
+                OnTry = OnTryEventInfo.Create((battle, _, _, move) =>
                 {
                     // Prioritize ally's Round actions so they go immediately after this one
                     foreach (IAction action in battle.Queue.List)
@@ -2756,7 +2756,7 @@ public partial record Moves
                     Mirror = true,
                 },
                 DamageCallback =
-                    new DamageCallbackEventInfo((_, _, target, _) => Math.Max(1, target.Hp / 2)),
+                    DamageCallbackEventInfo.Create((_, _, target, _) => Math.Max(1, target.Hp / 2)),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,

@@ -60,9 +60,9 @@ public sealed record OnFoeSetAbilityEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                (Ability)context.Effect!,
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetRelayVarEffect<Ability>(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
                 return result switch

@@ -62,8 +62,8 @@ public sealed record OnFoeModifySecondariesEventInfo : EventHandlerInfo
                 handler(
                     context.Battle,
                 new List<SecondaryEffect>(context.GetRelayVar<SecondaryEffectArrayRelayVar>().Effects),
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return null;

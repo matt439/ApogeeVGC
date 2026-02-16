@@ -37,7 +37,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 ImmuneTypes = [PokemonType.Grass],
                 AssociatedMove = MoveId.LeechSeed,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -47,7 +47,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnResidualOrder = 8,
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                     {
                         Pokemon? target =
                             battle.GetAtSlot(pokemon.Volatiles[ConditionId.LeechSeed].SourceSlot);
@@ -81,10 +81,10 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.LightScreen,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
                     source?.HasItem(ItemId.LightClay) == true ? 8 : 5),
                 OnAnyModifyDamage =
-                    new OnAnyModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    OnAnyModifyDamageEventInfo.Create((battle, damage, source, target, move) =>
                     {
                         if (target != source &&
                             battle.EffectState.Target is SideEffectStateTarget side &&
@@ -113,7 +113,7 @@ public partial record Conditions
 
                         return new VoidReturn();
                     }),
-                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, side, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -122,12 +122,12 @@ public partial record Conditions
                 }),
                 //OnSideResidualOrder = 26,
                 //OnSideResidualSubOrder = 2,
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 26,
                     SubOrder = 2,
                 },
-                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -142,7 +142,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
                 Duration = 2,
-                OnResidual = new OnResidualEventInfo((battle, target, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, target, _, _) =>
                 {
                     if (target.Status == ConditionId.Sleep)
                     {
@@ -153,34 +153,34 @@ public partial record Conditions
                     // Decrement trueDuration unconditionally (matches TS: this.effectState.trueDuration--)
                     battle.EffectState.TrueDuration = (battle.EffectState.TrueDuration ?? 0) - 1;
                 }),
-                OnStart = new OnStartEventInfo((battle, _, _, effect) =>
+                OnStart = OnStartEventInfo.Create((battle, _, _, effect) =>
                 {
                     battle.EffectState.TrueDuration = battle.Random(2, 4);
                     battle.EffectState.Move = effect is Move move ? move.Id : null;
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnRestart = new OnRestartEventInfo((battle, _, _, _) =>
+                OnRestart = OnRestartEventInfo.Create((battle, _, _, _) =>
                 {
                     if ((battle.EffectState.TrueDuration ?? 0) >= 2)
                     {
                         battle.EffectState.Duration = 2;
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnAfterMove = new OnAfterMoveEventInfo((battle, source, _, _) =>
+                OnAfterMove = OnAfterMoveEventInfo.Create((battle, source, _, _) =>
                 {
                     if ((battle.EffectState.Duration ?? 0) == 1)
                     {
                         source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
                     }
                 }),
-                OnEnd = new OnEndEventInfo((battle, target) =>
+                OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
                     target.AddVolatile(ConditionId.Confusion);
                 }),
-                OnLockMove = new OnLockMoveEventInfo(
+                OnLockMove = OnLockMoveEventInfo.Create(
                     (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, _) =>
                     {
                         // TS: return this.effectState.move
@@ -202,7 +202,7 @@ public partial record Conditions
                 Duration = 2,
                 // If the move user is the Lock-On user and target is the locked Pokemon,
                 // bypass invulnerability (return 0 means not invulnerable)
-                OnSourceInvulnerability = new OnSourceInvulnerabilityEventInfo(
+                OnSourceInvulnerability = OnSourceInvulnerabilityEventInfo.Create(
                     (battle, target, source, move) =>
                     {
                         // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
@@ -218,7 +218,7 @@ public partial record Conditions
                 // If the move user is the Lock-On user and target is the locked Pokemon,
                 // bypass accuracy checks (return true)
                 OnSourceAccuracy =
-                    new OnSourceAccuracyEventInfo((battle, _, target, source, move) =>
+                    OnSourceAccuracyEventInfo.Create((battle, _, target, source, move) =>
                     {
                         // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
                         if (move != null &&
@@ -237,13 +237,13 @@ public partial record Conditions
                 Name = "Lunar Dance",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.LunarDance,
-                OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
+                OnSwitchIn = OnSwitchInEventInfo.Create((battle, target) =>
                 {
                     battle.SingleEvent(EventId.Swap,
                         battle.Library.Conditions[ConditionId.LunarDance],
                         battle.EffectState, new PokemonSingleEventTarget(target));
                 }),
-                OnSwap = new OnSwapEventInfo((battle, target, _) =>
+                OnSwap = OnSwapEventInfo.Create((battle, target, _) =>
                 {
                     // Check if target needs healing, status cure, or PP restoration
                     bool needsPpRestore = target.MoveSlots.Any(ms => ms.Pp < ms.MaxPp);

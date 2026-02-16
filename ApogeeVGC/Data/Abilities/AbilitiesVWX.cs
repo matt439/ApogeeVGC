@@ -26,12 +26,12 @@ public partial record Abilities
                 Name = "Vessel of Ruin",
                 Num = 284,
                 Rating = 4.5,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.SuppressingAbility(pokemon)) return;
                     battle.Add("-ability", pokemon, "Vessel of Ruin");
                 }),
-                OnAnyModifySpA = new OnAnyModifySpAEventInfo((battle, spa, source, _, move) =>
+                OnAnyModifySpA = OnAnyModifySpAEventInfo.Create((battle, spa, source, _, move) =>
                 {
                     if (battle.EffectState.Target is not PokemonEffectStateTarget
                         {
@@ -52,7 +52,7 @@ public partial record Abilities
                 Num = 162,
                 Rating = 2.0,
                 // OnAnyModifyAccuracyPriority = -1
-                OnAnyModifyAccuracy = new OnAnyModifyAccuracyEventInfo(
+                OnAnyModifyAccuracy = OnAnyModifyAccuracyEventInfo.Create(
                     (battle, accuracy, _, source, _) =>
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
@@ -79,7 +79,7 @@ public partial record Abilities
                 Num = 72,
                 Rating = 1.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Sleep)
                     {
@@ -87,7 +87,7 @@ public partial record Abilities
                         pokemon.CureStatus();
                     }
                 }),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Sleep) return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
@@ -97,7 +97,7 @@ public partial record Abilities
 
                     return false;
                 }),
-                OnTryAddVolatile = new OnTryAddVolatileEventInfo((battle, status, target, _, _) =>
+                OnTryAddVolatile = OnTryAddVolatileEventInfo.Create((battle, status, target, _, _) =>
                 {
                     if (status.Id == ConditionId.Yawn)
                     {
@@ -115,7 +115,7 @@ public partial record Abilities
                 Num = 10,
                 Rating = 3.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target != source && move.Type == MoveType.Electric)
                     {
@@ -138,7 +138,7 @@ public partial record Abilities
                 Name = "Wandering Spirit",
                 Num = 254,
                 Rating = 2.5,
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, source, move) =>
                 {
                     var sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.FailSkillSwap == true) return;
@@ -180,7 +180,7 @@ public partial record Abilities
                 Num = 11,
                 Rating = 3.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target != source && move.Type == MoveType.Water)
                     {
@@ -203,7 +203,7 @@ public partial record Abilities
                 Rating = 4.5,
                 Flags = new AbilityFlags { Breakable = true },
                 // OnSourceModifyAtkPriority = 5
-                OnSourceModifyAtk = new OnSourceModifyAtkEventInfo((battle, atk, _, _, move) =>
+                OnSourceModifyAtk = OnSourceModifyAtkEventInfo.Create((battle, atk, _, _, move) =>
                 {
                     if (move.Type == MoveType.Fire)
                     {
@@ -214,7 +214,7 @@ public partial record Abilities
                     return atk;
                 }, 5),
                 // OnSourceModifySpAPriority = 5
-                OnSourceModifySpA = new OnSourceModifySpAEventInfo((battle, spa, _, _, move) =>
+                OnSourceModifySpA = OnSourceModifySpAEventInfo.Create((battle, spa, _, _, move) =>
                 {
                     if (move.Type == MoveType.Fire)
                     {
@@ -224,7 +224,7 @@ public partial record Abilities
 
                     return spa;
                 }, 5),
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, move) =>
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, move) =>
                 {
                     if (move.Type == MoveType.Water)
                     {
@@ -234,7 +234,7 @@ public partial record Abilities
 
                     return atk;
                 }),
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, move) =>
+                OnModifySpA = OnModifySpAEventInfo.Create((battle, spa, _, _, move) =>
                 {
                     if (move.Type == MoveType.Water)
                     {
@@ -244,7 +244,7 @@ public partial record Abilities
 
                     return spa;
                 }),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Burn)
                     {
@@ -252,7 +252,7 @@ public partial record Abilities
                         pokemon.CureStatus();
                     }
                 }),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
@@ -269,7 +269,7 @@ public partial record Abilities
                 Name = "Water Compaction",
                 Num = 195,
                 Rating = 1.5,
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, _, _, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, _, _, move) =>
                 {
                     if (move.Type == MoveType.Water)
                     {
@@ -284,7 +284,7 @@ public partial record Abilities
                 Num = 41,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Burn)
                     {
@@ -292,7 +292,7 @@ public partial record Abilities
                         pokemon.CureStatus();
                     }
                 }),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
@@ -309,7 +309,7 @@ public partial record Abilities
                 Name = "Weak Armor",
                 Num = 133,
                 Rating = 1.0,
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, _, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, _, move) =>
                 {
                     if (move.Category == MoveCategory.Physical)
                     {
@@ -324,7 +324,7 @@ public partial record Abilities
                 Num = 273,
                 Rating = 3.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target != source && move.Type == MoveType.Fire)
                     {
@@ -346,7 +346,7 @@ public partial record Abilities
                 Num = 73,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                OnTryBoost = OnTryBoostEventInfo.Create((battle, boost, target, source, effect) =>
                 {
                     if (source != null && target == source) return;
                     var showMsg = false;
@@ -406,7 +406,7 @@ public partial record Abilities
                 Name = "Wimp Out",
                 Num = 193,
                 Rating = 1.0,
-                OnEmergencyExit = new OnEmergencyExitEventInfo((battle, target) =>
+                OnEmergencyExit = OnEmergencyExitEventInfo.Create((battle, target) =>
                 {
                     if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag ||
                         target.SwitchFlag == true)
@@ -428,7 +428,7 @@ public partial record Abilities
                 Num = 277,
                 Rating = 1.0,
                 // OnDamagingHitOrder = 1
-                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((_, _, target, _, move) =>
                 {
                     if (move.Flags.Wind == true)
                     {
@@ -436,7 +436,7 @@ public partial record Abilities
                     }
                 }, 1),
                 OnSideConditionStart =
-                    new OnSideConditionStartEventInfo((battle, _, _, sideCondition) =>
+                    OnSideConditionStartEventInfo.Create((battle, _, _, sideCondition) =>
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
@@ -456,14 +456,14 @@ public partial record Abilities
                 Num = 274,
                 Rating = 3.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Side.GetSideCondition(ConditionId.Tailwind) != null)
                     {
                         battle.Boost(new SparseBoostsTable { Atk = 1 }, pokemon, pokemon);
                     }
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target != source && move.Flags.Wind == true)
                     {
@@ -479,7 +479,7 @@ public partial record Abilities
                     return new VoidReturn();
                 }, 1),
                 OnSideConditionStart =
-                    new OnSideConditionStartEventInfo((battle, _, _, condition) =>
+                    OnSideConditionStartEventInfo.Create((battle, _, _, condition) =>
                     {
                         if (battle.EffectState.Target is not PokemonEffectStateTarget
                             {
@@ -506,7 +506,7 @@ public partial record Abilities
                     FailSkillSwap = true,
                     Breakable = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target == source || move.Category == MoveCategory.Status ||
                         move.Id == MoveId.Struggle)
@@ -540,7 +540,7 @@ public partial record Abilities
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
                 // OnModifyAccuracyPriority = 10
-                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, move) =>
+                OnModifyAccuracy = OnModifyAccuracyEventInfo.Create((battle, accuracy, _, _, move) =>
                 {
                     if (move.Category == MoveCategory.Status && accuracy.HasValue)
                     {

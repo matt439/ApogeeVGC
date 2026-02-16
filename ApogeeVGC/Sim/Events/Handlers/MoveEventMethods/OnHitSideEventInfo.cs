@@ -57,7 +57,7 @@ public OnHitSideEventInfo(
                 var result = handler(
                     context.Battle,
                     context.GetTargetSide(),
-                    context.GetSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
                     context.GetMove()
                 );
                 if (result == null) return null;

@@ -42,7 +42,7 @@ public sealed record OnEndEventInfo : EventHandlerInfo
         return new OnEndEventInfo(
             context =>
             {
-                handler(context.Battle, context.GetTargetPokemon());
+                handler(context.Battle, context.GetTargetOrSourcePokemon());
                 return null;
             }
         );

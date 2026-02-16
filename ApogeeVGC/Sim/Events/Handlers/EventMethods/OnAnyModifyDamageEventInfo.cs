@@ -65,9 +65,9 @@ context =>
      {
    var result = handler(
       context.Battle,
-     context.GetRelayVar<IntRelayVar>().Value,
-     context.GetSourcePokemon(),
-       context.GetTargetPokemon(),
+     context.GetIntRelayVar(),
+     context.GetSourceOrTargetPokemon(),
+       context.GetTargetOrSourcePokemon(),
    context.GetMove()
    );
      return result switch

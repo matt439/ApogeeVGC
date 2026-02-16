@@ -59,8 +59,8 @@ public sealed record OnFoeModifyBoostEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVar<SparseBoostsTableRelayVar>().Table,
-                context.GetTargetPokemon()
+                context.GetSparseBoostsTableRelayVar(),
+                context.GetTargetOrSourcePokemon()
                 );
                 return result switch
                 {

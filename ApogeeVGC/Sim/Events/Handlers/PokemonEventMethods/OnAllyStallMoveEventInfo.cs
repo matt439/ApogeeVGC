@@ -60,7 +60,7 @@ public sealed record OnAllyStallMoveEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                    context.GetTargetPokemon()
+                    context.GetTargetOrSourcePokemon()
                 );
                 return result switch
                 {

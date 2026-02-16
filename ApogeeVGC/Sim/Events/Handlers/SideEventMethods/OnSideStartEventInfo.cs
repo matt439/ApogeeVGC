@@ -74,7 +74,7 @@ public sealed record OnSideStartEventInfo : EventHandlerInfo
       handler(
         context.Battle,
    context.GetTargetSide(),
-       context.GetTargetPokemon(),
+       context.GetTargetOrSourcePokemon(),
       context.GetSourceEffect<IEffect>()
 );
       return null;

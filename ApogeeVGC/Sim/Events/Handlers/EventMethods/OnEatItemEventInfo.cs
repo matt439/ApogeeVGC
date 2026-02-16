@@ -72,8 +72,8 @@ public sealed record OnEatItemEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                (Item)context.Effect!,
-                context.GetTargetPokemon(),
+                context.GetRelayVarEffect<Item>(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourcePokemon,
                 context.TryGetSourceEffect<IEffect>()
                 );

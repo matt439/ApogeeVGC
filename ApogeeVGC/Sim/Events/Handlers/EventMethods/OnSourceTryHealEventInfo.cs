@@ -76,9 +76,9 @@ public sealed record OnSourceTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
           return new OnSourceTryHealEventInfo(
               context => handler(
                   context.Battle,
-                  context.GetRelayVar<IntRelayVar>().Value,
-                  context.GetTargetPokemon(),
-                  context.GetSourcePokemon(),
+                  context.GetIntRelayVar(),
+                  context.GetTargetOrSourcePokemon(),
+                  context.GetSourceOrTargetPokemon(),
                   context.GetSourceEffect<IEffect>()
               ),
               priority,
@@ -97,7 +97,7 @@ public sealed record OnSourceTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
           return new OnSourceTryHealEventInfo(
               context => handler(
                   context.Battle,
-                  context.GetTargetPokemon()
+                  context.GetTargetOrSourcePokemon()
               ),
               priority,
               usesSpeed

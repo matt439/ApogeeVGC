@@ -59,7 +59,7 @@ public sealed record OnCheckShowEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                    context.GetTargetPokemon()
+                    context.GetTargetOrSourcePokemon()
                 );
                 return null;
             },

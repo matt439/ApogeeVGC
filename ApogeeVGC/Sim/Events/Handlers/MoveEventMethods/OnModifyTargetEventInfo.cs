@@ -58,13 +58,13 @@ public OnModifyTargetEventInfo(
         return new OnModifyTargetEventInfo(
             context =>
             {
-                var relayPokemon = context.RelayVar is PokemonRelayVar prv ? prv.Pokemon : context.GetTargetPokemon();
+                var relayPokemon = context.RelayVar is PokemonRelayVar prv ? prv.Pokemon : context.GetTargetOrSourcePokemon();
                 var targetRelay = new TargetRelay { Target = relayPokemon };
                 handler(
                     context.Battle,
                     targetRelay,
-                    context.GetSourcePokemon(),
-                    context.GetTargetPokemon(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetTargetOrSourcePokemon(),
                     context.GetMove()
                 );
                 return new PokemonRelayVar(targetRelay.Target);

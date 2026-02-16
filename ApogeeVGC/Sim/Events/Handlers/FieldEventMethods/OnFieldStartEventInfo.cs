@@ -74,7 +74,7 @@ UsesSpeed = usesSpeed;
        handler(
    context.Battle,
   context.Battle.Field,
- context.GetTargetPokemon(),
+ context.GetTargetOrSourcePokemon(),
      context.GetSourceEffect<IEffect>()
      );
       return null;

@@ -78,9 +78,9 @@ Priority = priority;
 {
      var result = handler(
   context.Battle,
- context.GetSourceEffect<Condition>(),
-   context.GetTargetPokemon(),
-   context.GetSourcePokemon(),
+ context.GetRelayVarEffect<Condition>(),
+   context.GetTargetOrSourcePokemon(),
+   context.GetSourceOrTargetPokemon(),
 context.GetSourceEffect<IEffect>()
       );
      if (result == null) return null;

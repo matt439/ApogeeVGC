@@ -69,7 +69,7 @@ ExpectedParameterTypes =
             {
                 handler(
                     context.Battle,
-                context.GetTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
                 context.SourcePokemon,
                 context.GetSourceEffect<Condition>()
                 );

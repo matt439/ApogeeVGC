@@ -70,9 +70,9 @@ ExpectedParameterTypes =
             {
                 handler(
                     context.Battle,
-                context.GetSourcePokemon(),
-                context.GetTargetPokemon(),
-                context.GetSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return null;

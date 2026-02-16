@@ -43,7 +43,7 @@ public sealed record OnEatEventInfo : UnionEventHandlerInfo<OnItemEatUse>
         return new OnEatEventInfo(
             context =>
             {
-                handler(context.Battle, context.GetTargetPokemon());
+                handler(context.Battle, context.GetTargetOrSourcePokemon());
                 return null;
             }
         );
