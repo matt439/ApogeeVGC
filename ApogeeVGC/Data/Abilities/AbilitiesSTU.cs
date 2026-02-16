@@ -863,7 +863,7 @@ public partial record Abilities
                 Num = 100,
                 Rating = -1.0,
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
-                    (ModifierSourceMoveHandler)((_, _, _, _, _) => -0.1), -1),
+                    (ModifierSourceMoveHandler)((_, _, _, _, _) => -0.1)),
             },
             [AbilityId.Stalwart] = new()
             {
@@ -1027,10 +1027,11 @@ public partial record Abilities
                 Num = 1,
                 Rating = 0.5,
                 // OnModifyMovePriority = -1
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
                 {
                     if (move.Category != MoveCategory.Status)
                     {
+                        battle.Debug("Adding Stench flinch");
                         // Check if flinch secondary already exists
                         if (move.Secondaries == null ||
                             move.Secondaries.All(s => s.VolatileStatus != ConditionId.Flinch))
