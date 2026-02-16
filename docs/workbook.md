@@ -350,9 +350,9 @@
 
 ## AbilitiesVWX
 
-@ review abilities VesselOfRuin to VoltAbsorb
+^ review abilities VesselOfRuin to VoltAbsorb
 
-review abilities WanderingSpirit to WaterVeil
+@ review abilities WanderingSpirit to WaterVeil
 
 review abilities WeakArmor to WindPower
 

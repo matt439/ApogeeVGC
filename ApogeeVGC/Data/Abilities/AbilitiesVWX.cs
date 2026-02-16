@@ -148,7 +148,7 @@ public partial record Abilities
                         var targetCanBeSet =
                             battle.RunEvent(EventId.SetAbility, target, source, battle.Effect,
                                 sourceAbility);
-                        if (targetCanBeSet is BoolRelayVar { Value: false }) return;
+                        if (targetCanBeSet is BoolRelayVar { Value: false } or null) return;
 
                         var oldAbilityResult =
                             source.SetAbility(AbilityId.WanderingSpirit, target);
