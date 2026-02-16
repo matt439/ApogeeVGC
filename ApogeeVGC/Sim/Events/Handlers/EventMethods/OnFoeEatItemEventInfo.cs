@@ -58,7 +58,7 @@ public sealed record OnFoeEatItemEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetRelayVarEffect<Item>(),
+                context.GetEffectParam<Item>(),
                 context.GetTargetOrSourcePokemon()
                 );
                 return null;

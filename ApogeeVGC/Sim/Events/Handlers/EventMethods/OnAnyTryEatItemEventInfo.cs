@@ -67,7 +67,7 @@ public sealed record OnAnyTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatIt
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVarEffect<Item>(),
+                context.GetEffectParam<Item>(),
                 context.GetTargetOrSourcePokemon()
                 );
                 return result switch

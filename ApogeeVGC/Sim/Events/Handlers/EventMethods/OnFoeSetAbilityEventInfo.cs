@@ -60,7 +60,7 @@ public sealed record OnFoeSetAbilityEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVarEffect<Ability>(),
+                context.GetEffectParam<Ability>(),
                 context.GetTargetOrSourcePokemon(),
                 context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()

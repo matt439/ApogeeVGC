@@ -1495,15 +1495,21 @@ public partial record Conditions
 
                                     if (foes.Count == 0)
                                     {
-                                        throw new InvalidOperationException(
-                                            $"TwoTurnMove: Cannot find valid target for {move.Name} - all opponents are fainted");
+                                        // All opponents fainted — skip target tracking.
+                                        // The move will resolve its target on turn 2.
+                                        targetPokemon = null;
                                     }
-
-                                    targetPokemon = battle.Sample(foes) ??
-                                                    throw new InvalidOperationException();
+                                    else
+                                    {
+                                        targetPokemon = battle.Sample(foes) ??
+                                                        throw new InvalidOperationException();
+                                    }
                                 }
 
-                                moveTargetLoc = attacker.GetLocOf(targetPokemon);
+                                if (targetPokemon != null)
+                                {
+                                    moveTargetLoc = attacker.GetLocOf(targetPokemon);
+                                }
                             }
 
                             // Store target location in both the move-specific volatile

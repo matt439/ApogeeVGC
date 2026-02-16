@@ -68,7 +68,7 @@ public sealed record OnAfterTakeItemEventInfo : EventHandlerInfo
             {
                 handler(
                     context.Battle,
-                context.GetRelayVarEffect<Item>(),
+                context.GetEffectParam<Item>(),
                 context.GetTargetOrSourcePokemon()
                 );
                 return null;

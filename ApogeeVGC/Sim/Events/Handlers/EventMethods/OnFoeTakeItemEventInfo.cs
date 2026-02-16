@@ -61,7 +61,7 @@ Priority = priority;
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVarEffect<Item>(),
+                context.GetEffectParam<Item>(),
                 context.GetTargetOrSourcePokemon(),
                 context.GetSourceOrTargetPokemon(),
                 context.GetMove()

@@ -61,7 +61,7 @@ public sealed record OnAllyTryAddVolatileEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetRelayVarEffect<Condition>(),
+                context.GetEffectParam<Condition>(),
                 context.GetTargetOrSourcePokemon(),
                 context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()

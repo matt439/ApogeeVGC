@@ -68,7 +68,7 @@ public sealed record OnAllyTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
             {
                 var result = handler(
                     context.Battle,
-                    context.GetRelayVarEffect<Item>(),
+                    context.GetEffectParam<Item>(),
                     context.GetSourceOrTargetPokemon(),
                     context.GetTargetOrSourcePokemon()
                 );

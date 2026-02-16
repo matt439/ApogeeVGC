@@ -23,6 +23,7 @@ public sealed record OnStartEventInfo : EventHandlerInfo
         int? priority = null,
         bool usesSpeed = true)
     {
+        Id = EventId.Start;
         Prefix = EventPrefix.None;
         Handler = handler;
       Priority = priority;
@@ -48,6 +49,7 @@ public sealed record OnStartEventInfo : EventHandlerInfo
         int? priority = null,
         bool usesSpeed = true)
     {
+        Id = EventId.Start;
         Prefix = EventPrefix.None;
         ContextHandler = contextHandler;
      Priority = priority;

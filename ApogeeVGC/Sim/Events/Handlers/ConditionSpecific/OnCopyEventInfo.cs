@@ -11,7 +11,7 @@ public sealed record OnCopyEventInfo : EventHandlerInfo
         int? priority = null,
         bool usesSpeed = true)
     {
-        Id = EventId.DurationCallback;
+        Id = EventId.Copy;
         Prefix = EventPrefix.None;
         Handler = handler;
         Priority = priority;
@@ -32,7 +32,7 @@ public sealed record OnCopyEventInfo : EventHandlerInfo
         int? priority = null,
         bool usesSpeed = true)
     {
-        Id = EventId.DurationCallback;
+        Id = EventId.Copy;
         Prefix = EventPrefix.None;
         ContextHandler = contextHandler;
         Priority = priority;

@@ -186,6 +186,28 @@ public sealed class EventContext
         RelayVar is EffectRelayVar effectRelayVar ? effectRelayVar.Effect as TEffect : null;
 
     /// <summary>
+    /// Gets an effect parameter matching the legacy adapter's resolution order:
+    /// 1. Relay var (if it contains an EffectRelayVar wrapping the correct type)
+    /// 2. Effect (the handler's owning effect)
+    /// 3. SourceEffect
+    /// This handles the case where earlier handlers in a RunEvent chain replace the
+    /// relay var (e.g., from EffectRelayVar to BoolRelayVar), and the effect must be
+    /// resolved from the handler's owning effect instead.
+    /// </summary>
+    public TEffect GetEffectParam<TEffect>() where TEffect : class, IEffect
+    {
+        if (RelayVar is EffectRelayVar erv && erv.Effect is TEffect fromRelay)
+            return fromRelay;
+        if (Effect is TEffect fromEffect)
+            return fromEffect;
+        if (SourceEffect is TEffect fromSource)
+            return fromSource;
+        throw new InvalidOperationException(
+            $"Event {EventId} cannot resolve {typeof(TEffect).Name} from relay var, effect, or source effect " +
+            $"(RelayVar={RelayVar?.GetType().Name ?? "null"}, Effect={Effect?.GetType().Name ?? "null"}, SourceEffect={SourceEffect?.GetType().Name ?? "null"})");
+    }
+
+    /// <summary>
     /// Gets a SparseBoostsTable from the relay var, handling both SparseBoostsTableRelayVar
     /// and BoostsTableRelayVar (with conversion). Matches legacy adapter TryUnwrapRelayVar behavior.
     /// </summary>
