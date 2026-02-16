@@ -288,13 +288,13 @@
 
 ^ review abilities Justified to LightMetal
 
-review abilities LightningRod to LongReach
+^ review abilities LightningRod to LongReach
 
 ## AbilitiesMNO
 
-review abilities MagicBounce to MegaLauncher
+^ review abilities MagicBounce to MegaLauncher
 
-review abilities Merciless to MirrorArmor
+@ review abilities Merciless to MirrorArmor
 
 review abilities MistySurge to Multiscale
 
