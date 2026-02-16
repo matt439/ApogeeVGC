@@ -732,19 +732,11 @@ public partial record Abilities
                         pokemon.RemoveVolatile(quarkDrive);
                     }
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
                 {
-                    if (pokemon is not PokemonSideFieldPokemon pok)
-                    {
-                        throw new ArgumentException("Expecting a Pokemon here.");
-                    }
-
-                    pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
-
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", pok.Pokemon, "Quark Drive", "[silent]");
-                    }
+                    if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
+                    psfp.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
+                    battle.Add("-end", psfp.Pokemon, "Quark Drive", "[silent]");
                 }),
                 Flags = new AbilityFlags
                 {

@@ -312,11 +312,11 @@
 
 ^ review abilities Pixilate to PowerOfAlchemy
 
-@ review abilities PowerSpot to Protean
+^ review abilities PowerSpot to Protean
 
-review abilities Protosynthesis to PurifyingSalt
+^ review abilities Protosynthesis to PurifyingSalt
 
-review abilities QuarkDrive to Receiver
+@ review abilities QuarkDrive to Receiver
 
 review abilities Reckless to RksSystem
 
