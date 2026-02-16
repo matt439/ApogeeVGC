@@ -427,7 +427,7 @@ public partial record Abilities
                 Rating = 4.0,
                 OnModifyPriority = new OnModifyPriorityEventInfo((_, priority, _, _, move) =>
                 {
-                    if (move.Category != MoveCategory.Status) return new VoidReturn();
+                    if (move == null || move.Category != MoveCategory.Status) return new VoidReturn();
                     move.PranksterBoosted = true;
                     return priority + 1;
                 }),

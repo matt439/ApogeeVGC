@@ -300,19 +300,19 @@
 
 ^ review abilities Multitype to NaturalCure
 
-@ review abilities Neuroforce to Normalize
+^ review abilities Neuroforce to Normalize
 
-review abilities Oblivious to Opportunist
+^ review abilities Oblivious to Opportunist
 
-review abilities OrichalcumPulse to OwnTempo
+^ review abilities OrichalcumPulse to OwnTempo
 
 ## AbilitiesPQR
 
-review abilities ParentalBond to Pickup
+^ review abilities ParentalBond to Pickup
 
-review abilities Pixilate to PowerOfAlchemy
+^ review abilities Pixilate to PowerOfAlchemy
 
-review abilities PowerSpot to Protean
+@ review abilities PowerSpot to Protean
 
 review abilities Protosynthesis to PurifyingSalt
 
