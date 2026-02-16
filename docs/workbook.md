@@ -286,7 +286,7 @@
 
 ## AbilitiesJKL
 
-@ review abilities Justified to LightMetal
+^ review abilities Justified to LightMetal
 
 review abilities LightningRod to LongReach
 
