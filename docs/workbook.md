@@ -375,9 +375,9 @@
 
 ^ review items CellBattery to ChoiceBand
 
-@ review items ChoiceScarf to ClearAmulet
+^ review items ChoiceScarf to ClearAmulet
 
-review items CloverSweet to CustapBerry
+@ review items CloverSweet to CustapBerry
 
 ## ItemsDEF
 
