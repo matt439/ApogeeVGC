@@ -391,9 +391,9 @@
 
 ## ItemsGHI
 
-@ review items GalaricaCuff to GriseousOrb
+^ review items GalaricaCuff to GriseousOrb
 
-review items HabanBerry to HondewBerry
+@ review items HabanBerry to HondewBerry
 
 review items IapapaBerry to IronPlate
 
