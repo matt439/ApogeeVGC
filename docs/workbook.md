@@ -367,7 +367,7 @@
 
 ## ItemsABC
 
-review items AbilityShield to AguavBerry
+^ review items AbilityShield to AguavBerry
 
 review items AirBalloon to BigNugget
 

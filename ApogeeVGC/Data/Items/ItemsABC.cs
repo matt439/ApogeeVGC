@@ -36,8 +36,7 @@ public partial record Items
                 OnSetAbility = new OnSetAbilityEventInfo((battle, _, target, source, effect) =>
                 {
                     // Block ability changes from other abilities (except Trace)
-                    if (effect is { EffectType: EffectType.Ability } &&
-                        effect.Name != "Trace")
+                    if (effect is Ability { Id: not AbilityId.Trace })
                     {
                         battle.Add("-ability", source, effect.Name);
                     }
@@ -137,7 +136,7 @@ public partial record Items
                         return;
                     }
 
-                    if (effect is { Name: "Intimidate" })
+                    if (effect is Ability { Id: AbilityId.Intimidate })
                     {
                         target.UseItem();
                     }
@@ -169,7 +168,8 @@ public partial record Items
                         RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
                             battle.Effect,
                             pokemon.BaseMaxHp / 3);
-                        if (canHeal is BoolRelayVar { Value: false })
+                        // TS: !this.runEvent(...) — catches any falsy value (false, null, 0, undefined)
+                        if (canHeal is null or BoolRelayVar { Value: false })
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
