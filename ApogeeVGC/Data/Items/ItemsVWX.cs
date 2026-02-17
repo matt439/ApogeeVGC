@@ -30,7 +30,7 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Electric"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
+                    OnSourceModifyDamageEventInfo.Create((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Electric &&
                             target.GetMoveHitData(move).TypeMod > 0)
@@ -72,7 +72,7 @@ public partial record Items
                 Name = "Weakness Policy",
                 SpriteNum = 609,
                 Fling = new FlingData { BasePower = 80 },
-                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((_, _, target, _, move) =>
                 {
                     // Only trigger if the move doesn't have fixed damage (like Seismic Toss)
                     // TypeScript: !move.damage && !move.damageCallback
@@ -92,7 +92,7 @@ public partial record Items
                 Name = "Wellspring Mask",
                 SpriteNum = 759,
                 Fling = new FlingData { BasePower = 60 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, user, _, _) =>
                 {
                     // TS checks: user.baseSpecies.name.startsWith('Ogerpon-Wellspring')
                     if (user.BaseSpecies.Id == SpecieId.OgerponWellspring ||
@@ -104,18 +104,18 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, _, _) =>
                         {
                             // Ogerpon cannot have its mask removed
                             // TypeScript only checks the holder (pokemon), not the source
                             if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Ogerpon-Wellspring",
                 // itemUser: ["Ogerpon-Wellspring"],
@@ -150,30 +150,32 @@ public partial record Items
                             battle.Add("-clearnegativeboost", target, "[silent]");
                         }
 
-                        return BoolEmptyVoidUnion.FromVoid();
+                        return null;
                     }
                 },
-                OnStart = new OnStartEventInfo(TryUseWhiteHerb),
-                OnAnySwitchIn = new OnAnySwitchInEventInfo(TryUseWhiteHerb, priority: -2),
-                OnAnyAfterMega = new OnAnyAfterMegaEventInfo(TryUseWhiteHerb),
-                // Not in TS source - Gen 9 addition for Terastallization support
+                OnStart = OnStartEventInfo.Create(TryUseWhiteHerb),
+                OnAnySwitchIn = OnAnySwitchInEventInfo.Create(TryUseWhiteHerb, priority: -2),
+                OnAnyAfterMega = OnAnyAfterMegaEventInfo.Create(TryUseWhiteHerb),
                 OnAnyAfterTerastallization =
-                    new OnAnyAfterTerastallizationEventInfo(TryUseWhiteHerb),
-                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, pokemon, _, _) =>
+                    OnAnyAfterTerastallizationEventInfo.Create(TryUseWhiteHerb),
+                OnAnyAfterMove = OnAnyAfterMoveEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     TryUseWhiteHerb(battle, pokemon);
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnResidual = new OnResidualEventInfo(
+                OnResidual = OnResidualEventInfo.Create(
                     (battle, pokemon, _, _) => { TryUseWhiteHerb(battle, pokemon); }, order: 29),
-                OnUse = new OnUseEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                OnUse = OnUseEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.ItemState.Boosts != null)
                     {
                         pokemon.SetBoost(pokemon.ItemState.Boosts);
                         battle.Add("-clearnegativeboost", pokemon, "[silent]");
                     }
-                })),
+
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnEnd = OnEndEventInfo.Create((_, pokemon) => { pokemon.ItemState.Boosts = null; }),
                 Num = 214,
                 Gen = 3,
             },
@@ -183,7 +185,7 @@ public partial record Items
                 Name = "Wide Lens",
                 SpriteNum = 537,
                 Fling = new FlingData { BasePower = 10 },
-                OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
+                OnSourceModifyAccuracy = OnSourceModifyAccuracyEventInfo.Create(
                     (battle, accuracy, _, _, _) =>
                     {
                         // Only modify numeric accuracy (TypeScript: typeof accuracy === 'number')
@@ -207,7 +209,7 @@ public partial record Items
                 SpriteNum = 538,
                 IsBerry = true,
                 NaturalGift = (80, "Rock"),
-                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -217,8 +219,7 @@ public partial record Items
                         pokemon.EatItem();
                     }
                 }),
-                OnTryEatItem = new OnTryEatItemEventInfo(
-                    OnTryEatItem.FromFunc((battle, _, pokemon) =>
+                OnTryEatItem = OnTryEatItemEventInfo.Create((battle, _, pokemon) =>
                     {
                         RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
                             battle.Effect,
@@ -229,8 +230,8 @@ public partial record Items
                         }
 
                         return BoolVoidUnion.FromVoid();
-                    })),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                    }),
+                OnEat = OnEatEventInfo.Create((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     battle.Heal(pokemon.BaseMaxHp / 3);
                     if (pokemon.GetNature().Minus == StatIdExceptHp.SpA)
@@ -247,7 +248,7 @@ public partial record Items
                 Name = "Wise Glasses",
                 SpriteNum = 539,
                 Fling = new FlingData { BasePower = 10 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Category == MoveCategory.Special)
                     {

@@ -67,6 +67,7 @@ public class EffectState
     public int? Multiplier { get; set; } // For Echoed Voice
     public double? DoubleMultiplier { get; set; } // For Helping Hand
     public PokemonSlot? TargetSlot { get; set; } // For Future Sight target tracking
+    public int? TargetLoc { get; set; } // For two-turn move target tracking (relative location)
     public int? EndingTurn { get; set; } // For Future Sight timing
     public int? TrueDuration { get; set; } // For LockedMove (Outrage, etc.)
     public int? Layers { get; set; } // For entry hazards (Spikes, Toxic Spikes)

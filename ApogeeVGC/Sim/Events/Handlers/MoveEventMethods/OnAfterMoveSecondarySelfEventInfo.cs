@@ -12,24 +12,41 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 /// </summary>
 public sealed record OnAfterMoveSecondarySelfEventInfo : EventHandlerInfo
 {
-public OnAfterMoveSecondarySelfEventInfo(
+    public OnAfterMoveSecondarySelfEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterMoveSecondarySelf;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnAfterMoveSecondarySelfEventInfo Create(
         Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
         int? priority = null,
-   bool usesSpeed = true)
+        bool usesSpeed = true)
     {
-    Id = EventId.AfterMoveSecondarySelf;
-        Prefix = EventPrefix.None;
-        Handler = handler;
-        Priority = priority;
-      UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        return new OnAfterMoveSecondarySelfEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetTargetOrSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetMove()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

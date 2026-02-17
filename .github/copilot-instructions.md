@@ -16,3 +16,4 @@
     - `VoidReturn` = no return needed
     - `Undefined` = explicit "ignore this action" signal.
   - `Empty` = `NOT_FAIL ("")` = "move worked but produced no notable effect".
+  - Strictly use enums for logic, avoiding string-based enum lookups (e.g., no Enum.TryParse with ToString() for enum-to-enum conversion).

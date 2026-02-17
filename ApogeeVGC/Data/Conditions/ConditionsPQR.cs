@@ -29,7 +29,7 @@ public partial record Conditions
                 Name = "Paralysis",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Electric],
-                OnStart = new OnStartEventInfo((battle, target, source, sourceEffect) =>
+                OnStart = OnStartEventInfo.Create((battle, target, source, sourceEffect) =>
                 {
                     if (!battle.DisplayUi) return new VoidReturn();
 
@@ -46,7 +46,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnModifySpePriority = -101,
-                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, pokemon) =>
                     {
                         spe = battle.FinalModify(spe);
                         if (!pokemon.HasAbility(AbilityId.QuickFeet))
@@ -58,7 +58,7 @@ public partial record Conditions
                     },
                     -101),
                 //OnBeforeMovePriority = 1,
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, _) =>
                     {
                         if (!battle.RandomChance(1, 4)) return new VoidReturn();
                         if (battle.DisplayUi)
@@ -76,7 +76,7 @@ public partial record Conditions
                 Name = "Partially Trapped",
                 EffectType = EffectType.Condition,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((battle, _, source, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((battle, _, source, _) =>
                 {
                     if (source != null && source.HasItem(ItemId.GripClaw))
                     {
@@ -85,7 +85,7 @@ public partial record Conditions
 
                     return battle.Random(5, 7);
                 }),
-                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, source, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -96,9 +96,9 @@ public partial record Conditions
 
                     battle.EffectState.BoundDivisor =
                         (source != null && source.HasItem(ItemId.BindingBand)) ? 6 : 8;
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     var source = battle.EffectState.Source;
                     var sourceEffect = battle.EffectState.SourceEffect;
@@ -118,7 +118,7 @@ public partial record Conditions
 
                     battle.Damage(pokemon.BaseMaxHp / (battle.EffectState.BoundDivisor ?? 8));
                 }, 13),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -127,7 +127,7 @@ public partial record Conditions
                             "[partiallytrapped]");
                     }
                 }),
-                OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
+                OnTrapPokemon = OnTrapPokemonEventInfo.Create((battle, pokemon) =>
                 {
                     var source = battle.EffectState.Source;
                     if (source is { IsActive: true })
@@ -159,7 +159,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 4,
                 AssociatedMove = MoveId.PerishSong,
-                OnEnd = new OnEndEventInfo((battle, target) =>
+                OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -169,7 +169,7 @@ public partial record Conditions
                     target.Faint();
                 }),
                 // OnResidualOrder = 24
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (!pokemon.Volatiles.TryGetValue(ConditionId.PerishSong,
                             out var state)) return;
@@ -195,7 +195,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.PhantomForce,
                 Duration = 2,
-                OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
+                OnInvulnerability = OnInvulnerabilityEventInfo.Create((_, _, _, _) =>
                     BoolIntEmptyVoidUnion.FromBool(false)),
             },
             [ConditionId.Poison] = new()
@@ -204,7 +204,7 @@ public partial record Conditions
                 Name = "Poison",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Poison, PokemonType.Steel],
-                OnStart = new OnStartEventInfo((battle, target, source, sourceEffect) =>
+                OnStart = OnStartEventInfo.Create((battle, target, source, sourceEffect) =>
                 {
                     if (!battle.DisplayUi) return new VoidReturn();
 
@@ -221,7 +221,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 // OnResidualOrder = 9
-                OnResidual = new OnResidualEventInfo(
+                OnResidual = OnResidualEventInfo.Create(
                     (battle, pokemon, _, _) => { battle.Damage(pokemon.BaseMaxHp / 8); },
                     9),
             },
@@ -242,17 +242,17 @@ public partial record Conditions
                 Duration = 1,
                 // Note: Powder is marked as isNonstandard: "Past" in TypeScript, meaning it's not in Gen 9.
                 // Implementing for completeness in case it's ever needed.
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
                         battle.Add("-singleturn", target, "Powder");
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
                 // OnTryMovePriority = -1
-                OnTryMove = new OnTryMoveEventInfo((battle, pokemon, _, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, pokemon, _, move) =>
                 {
                     if (move.Type == MoveType.Fire)
                     {
@@ -265,10 +265,10 @@ public partial record Conditions
                         var damage = Math.Max(1, (int)Math.Round(pokemon.MaxHp / 4.0));
                         battle.Damage(damage);
                         battle.AttrLastMove("[still]");
-                        return BoolEmptyVoidUnion.FromBool(false);
+                        return new BoolRelayVar(false);
                     }
 
-                    return BoolEmptyVoidUnion.FromVoid();
+                    return null;
                 }, -1),
             },
             [ConditionId.PowerTrick] = new()
@@ -277,7 +277,7 @@ public partial record Conditions
                 Name = "Power Trick",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.PowerTrick,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -289,9 +289,9 @@ public partial record Conditions
                     var newDef = pokemon.StoredStats[StatIdExceptHp.Atk];
                     pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
                     pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnCopy = new OnCopyEventInfo((_, pokemon) =>
+                OnCopy = OnCopyEventInfo.Create((_, pokemon) =>
                 {
                     // Re-swap when copying (e.g., Baton Pass) to maintain the swapped state
                     var newAtk = pokemon.StoredStats[StatIdExceptHp.Def];
@@ -299,7 +299,7 @@ public partial record Conditions
                     pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
                     pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -312,11 +312,11 @@ public partial record Conditions
                     pokemon.StoredStats[StatIdExceptHp.Atk] = newAtk;
                     pokemon.StoredStats[StatIdExceptHp.Def] = newDef;
                 }),
-                OnRestart = new OnRestartEventInfo((_, pokemon, _, _) =>
+                OnRestart = OnRestartEventInfo.Create((_, pokemon, _, _) =>
                 {
                     // Using Power Trick again removes the volatile (toggles off)
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.PowerTrick]);
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
             },
             [ConditionId.PrimordialSea] = new()
@@ -326,7 +326,7 @@ public partial record Conditions
                 EffectType = EffectType.Weather,
                 Duration = 0,
                 //OnTryMovePriority = 1,
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, _, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, _, move) =>
                     {
                         if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status)
                         {
@@ -344,7 +344,7 @@ public partial record Conditions
                     },
                     1),
                 OnWeatherModifyDamage =
-                    new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
+                    OnWeatherModifyDamageEventInfo.Create((battle, _, _, defender, move) =>
                     {
                         if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
                         if (move.Type == MoveType.Water)
@@ -355,7 +355,7 @@ public partial record Conditions
 
                         return new VoidReturn();
                     }),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                OnFieldStart = OnFieldStartEventInfo.Create((battle, _, source, effect) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -364,7 +364,7 @@ public partial record Conditions
                     }
                 }),
                 //OnFieldResidualOrder = 1,
-                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
                         {
@@ -374,7 +374,7 @@ public partial record Conditions
                         battle.EachEvent(EventId.Weather);
                     },
                     1),
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -389,7 +389,7 @@ public partial record Conditions
                 Duration = 1,
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Protect,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     battle.Debug($"[Protect.OnStart] Adding Protect volatile to {target.Name}");
                     if (battle.DisplayUi)
@@ -400,7 +400,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnTryHitPriority = 3,
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                     {
                         battle.Debug(
                             $"[Protect.OnTryHit] CALLED! Target={target.Name}, Source={source.Name}, Move={move.Name}, HasProtectFlag={move.Flags.Protect ?? false}");
@@ -441,7 +441,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 NoCopy = true,
                 AssociatedAbility = AbilityId.Protosynthesis,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, effect) =>
                 {
                     if (effect is Item { Id: ItemId.BoosterEnergy })
                     {
@@ -467,7 +467,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 // OnModifyAtkPriority = 5
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.Atk ||
                             pokemon.IgnoringAbility())
@@ -485,7 +485,7 @@ public partial record Conditions
                     },
                     5),
                 // OnModifyDefPriority = 6
-                OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
+                OnModifyDef = OnModifyDefEventInfo.Create((battle, def, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.Def ||
                             pokemon.IgnoringAbility())
@@ -503,7 +503,7 @@ public partial record Conditions
                     },
                     6),
                 // OnModifySpAPriority = 5
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
+                OnModifySpA = OnModifySpAEventInfo.Create((battle, spa, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.SpA ||
                             pokemon.IgnoringAbility())
@@ -521,7 +521,7 @@ public partial record Conditions
                     },
                     5),
                 // OnModifySpDPriority = 6
-                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
+                OnModifySpD = OnModifySpDEventInfo.Create((battle, spd, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.SpD ||
                             pokemon.IgnoringAbility())
@@ -538,7 +538,7 @@ public partial record Conditions
                         return battle.FinalModify(spd);
                     },
                     6),
-                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, pokemon) =>
                 {
                     if (battle.EffectState.BestStat != StatIdExceptHp.Spe ||
                         pokemon.IgnoringAbility())
@@ -554,7 +554,7 @@ public partial record Conditions
                     battle.ChainModify(1.5);
                     return battle.FinalModify(spe);
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -577,16 +577,16 @@ public partial record Conditions
                 // disables healing moves in the selection menu. Currently only OnTryHeal blocks healing
                 // effects, but healing MOVES like Drain Punch can still execute (dealing damage without
                 // healing). To fully match TS, add OnBeforeMove and OnDisableMove handlers.
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, "move: Heal Block");
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -602,7 +602,7 @@ public partial record Conditions
                 EffectType = EffectType.Terrain,
                 AssociatedMove = MoveId.PsychicTerrain,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
                 {
                     if (source != null && source.HasItem(ItemId.TerrainExtender))
                     {
@@ -612,7 +612,7 @@ public partial record Conditions
                     return 5;
                 }),
                 // OnTryHitPriority = 4
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     // Psychic Terrain blocks priority moves targeting grounded Pokemon
                     // Excludes moves targeting self or with priority <= 0.1
@@ -645,7 +645,7 @@ public partial record Conditions
                     return null; // Silent failure - block the move
                 }, 4),
                 // OnBasePowerPriority = 6
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, attacker, _, move) =>
                 {
                     // Boost Psychic-type moves by 1.3x (5325/4096) when attacker is grounded
                     var attackerGrounded = attacker.IsGrounded();
@@ -663,7 +663,7 @@ public partial record Conditions
 
                     return basePower;
                 }, 6),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                OnFieldStart = OnFieldStartEventInfo.Create((battle, _, source, effect) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -678,12 +678,12 @@ public partial record Conditions
                         }
                     }
                 }),
-                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                OnFieldResidual = OnFieldResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 27,
                     SubOrder = 7,
                 },
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -698,7 +698,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 NoCopy = true,
                 AssociatedAbility = AbilityId.QuarkDrive,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, effect) =>
                 {
                     if (effect is Item { Id: ItemId.BoosterEnergy })
                     {
@@ -723,7 +723,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnModifyAtkPriority = 5,
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.Atk ||
                             pokemon.IgnoringAbility())
@@ -741,7 +741,7 @@ public partial record Conditions
                     },
                     5),
                 //OnModifyDefPriority = 6,
-                OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
+                OnModifyDef = OnModifyDefEventInfo.Create((battle, def, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.Def ||
                             pokemon.IgnoringAbility())
@@ -759,7 +759,7 @@ public partial record Conditions
                     },
                     6),
                 //OnModifySpAPriority = 5,
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
+                OnModifySpA = OnModifySpAEventInfo.Create((battle, spa, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.SpA ||
                             pokemon.IgnoringAbility())
@@ -777,7 +777,7 @@ public partial record Conditions
                     },
                     5),
                 //OnModifySpDPriority = 6,
-                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
+                OnModifySpD = OnModifySpDEventInfo.Create((battle, spd, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.SpD ||
                             pokemon.IgnoringAbility())
@@ -794,7 +794,7 @@ public partial record Conditions
                         return battle.FinalModify(spd);
                     },
                     6),
-                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, pokemon) =>
                 {
                     if (battle.EffectState.BestStat != StatIdExceptHp.Spe ||
                         pokemon.IgnoringAbility())
@@ -810,7 +810,7 @@ public partial record Conditions
                     battle.ChainModify(1.5);
                     return battle.FinalModify(spe);
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -825,7 +825,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 1,
                 AssociatedMove = MoveId.QuickGuard,
-                OnSideStart = new OnSideStartEventInfo((battle, _, source, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, _, source, _) =>
                 {
                     if (battle.DisplayUi && source != null)
                     {
@@ -833,7 +833,7 @@ public partial record Conditions
                     }
                 }),
                 // OnTryHitPriority = 4
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     // Quick Guard blocks moves with positive priority (> 0.1 to account for fractional priority)
                     // It blocks 0 priority moves boosted by Prankster or Gale Wings
@@ -868,15 +868,15 @@ public partial record Conditions
 
                     return new Empty(); // Equivalent to Battle.NOT_FAIL
                 }, 4),
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                })
+                }) with
                 {
                     Order = 26,
                     SubOrder = 2,
                 },
-                OnSideEnd = new OnSideEndEventInfo((_, _) =>
+                OnSideEnd = OnSideEndEventInfo.Create((_, _) =>
                 {
                     // Silent end - Quick Guard doesn't announce when it ends
                 }),
@@ -888,16 +888,16 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.RagePowder,
                 Duration = 1,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
                         battle.Add("-singleturn", pokemon, "move: Rage Powder");
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnFoeRedirectTarget = new OnFoeRedirectTargetEventInfo(
+                OnFoeRedirectTarget = OnFoeRedirectTargetEventInfo.Create(
                     (battle, _, source, _, move) =>
                     {
                         // Get the Pokemon that used Rage Powder from the effect state
@@ -955,10 +955,10 @@ public partial record Conditions
                 Name = "RainDance",
                 EffectType = EffectType.Weather,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
                     source?.HasItem(ItemId.DampRock) == true ? 8 : 5),
                 OnWeatherModifyDamage =
-                    new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
+                    OnWeatherModifyDamageEventInfo.Create((battle, _, _, defender, move) =>
                     {
                         if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
                         if (move.Type == MoveType.Water)
@@ -975,7 +975,7 @@ public partial record Conditions
 
                         return new VoidReturn();
                     }),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                OnFieldStart = OnFieldStartEventInfo.Create((battle, _, source, effect) =>
                 {
                     if (effect is Ability)
                     {
@@ -993,7 +993,7 @@ public partial record Conditions
                     }
                 }),
                 //OnFieldResidualOrder = 1,
-                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
                         {
@@ -1003,7 +1003,7 @@ public partial record Conditions
                         battle.EachEvent(EventId.Weather);
                     },
                     1),
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -1032,10 +1032,10 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Reflect,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
                     source.HasItem(ItemId.LightClay) ? 8 : 5),
                 OnAnyModifyDamage =
-                    new OnAnyModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    OnAnyModifyDamageEventInfo.Create((battle, damage, source, target, move) =>
                     {
                         if (target != source &&
                             battle.EffectState.Target is SideEffectStateTarget side &&
@@ -1064,7 +1064,7 @@ public partial record Conditions
 
                         return new VoidReturn();
                     }),
-                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, side, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -1073,12 +1073,12 @@ public partial record Conditions
                 }),
                 //OnSideResidualOrder = 26,
                 //OnSideResidualSubOrder = 1,
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 26,
                     SubOrder = 1,
                 },
-                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -1113,13 +1113,13 @@ public partial record Conditions
                 AssociatedMove = MoveId.Rollout,
                 Duration = 1,
                 OnLockMove = new OnLockMoveEventInfo(MoveId.Rollout),
-                OnStart = new OnStartEventInfo((battle, _, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, _, _, _) =>
                 {
                     battle.EffectState.HitCount = 0;
                     battle.EffectState.ContactHitCount = 0;
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnResidual = new OnResidualEventInfo((_, target, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((_, target, _, _) =>
                 {
                     // If the pokemon used Struggle, don't lock
                     if (target.LastMove?.Id == MoveId.Struggle)
@@ -1134,7 +1134,7 @@ public partial record Conditions
                 Name = "RolloutStorage",
                 EffectType = EffectType.Condition,
                 Duration = 2,
-                OnBasePower = new OnBasePowerEventInfo((_, _, source, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((_, _, source, _, move) =>
                 {
                     var bp = Math.Max(1, move.BasePower);
                     source.Volatiles.TryGetValue(ConditionId.RolloutStorage,
@@ -1157,11 +1157,11 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Roost,
                 Duration = 1,
-                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
                 }, 25),
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     // TS: if (target.terastallized) { ... return false; }
                     // If Pokemon is Terastallized, Roost's type suppression doesn't activate
@@ -1175,7 +1175,7 @@ public partial record Conditions
                         }
 
                         // Return false for ALL Terastallized Pokemon (not just Flying types)
-                        return BoolVoidUnion.FromBool(false);
+                        return new BoolRelayVar(false);
                     }
 
                     if (battle.DisplayUi)
@@ -1184,9 +1184,9 @@ public partial record Conditions
                     }
 
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnType = new OnTypeEventInfo((battle, types, _) =>
+                OnType = OnTypeEventInfo.Create((battle, types, _) =>
                 {
                     // Store the whole types array before filtering out Flying type
                     battle.EffectState.TypeWas = types;

@@ -12,31 +12,42 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
 {
-    /// <summary>
-    /// Creates a new OnAnyTryEatItem event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnAnyTryEatItemEventInfo(
-        OnTryEatItem unionValue,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.TryEatItem;
- Prefix = EventPrefix.Any;
-        UnionValue = unionValue;
-     Handler = ExtractDelegate();
+        Prefix = EventPrefix.Any;
+        ContextHandler = contextHandler;
         Priority = priority;
-     UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon)];
-    ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAnyTryEatItemEventInfo Create(
+        Func<Battle, Item, Pokemon, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAnyTryEatItemEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetEffectParam<Item>(),
+                context.GetTargetOrSourcePokemon()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

@@ -14,27 +14,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 /// </summary>
 public sealed record OnEndEventInfo : EventHandlerInfo
 {
-    public OnEndEventInfo(
-        Action<Battle, Pokemon> handler,
-    int? priority = null,
-   bool usesSpeed = true)
-    {
-   Id = EventId.End;
-        Prefix = EventPrefix.None;
-        Handler = handler;
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-  // Nullability: All parameters non-nullable by default (adjust as needed)
-   ParameterNullability = new[] { false, false };
-   ReturnTypeNullable = false;
-    
-        // Validate configuration
-        ValidateConfiguration();
-    }
-    
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, TargetPokemon
@@ -65,7 +44,7 @@ public sealed record OnEndEventInfo : EventHandlerInfo
        {
       handler(
            context.Battle,
- context.GetTargetPokemon()
+ context.GetTargetOrSourcePokemon()
         );
     return null;
             },

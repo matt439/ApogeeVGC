@@ -15,44 +15,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnModifyDefEventInfo : EventHandlerInfo
 {
- /// <summary>
-    /// Creates a new OnModifyDef event handler using the legacy strongly-typed pattern.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    public OnModifyDefEventInfo(
- Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
-   int? priority = null,
-        bool usesSpeed = true)
-    {
-  Id = EventId.ModifyDef;
-        Handler = handler;
-Priority = priority;
-        UsesSpeed = usesSpeed;
-  ExpectedParameterTypes =
-        [
-            typeof(Battle),
-        typeof(int),
-      typeof(Pokemon),
-   typeof(Pokemon),
-        typeof(ActiveMove),
-   ];
-        ExpectedReturnType = typeof(DoubleVoidUnion);
-        
-        // Nullability: Battle, int, and target Pokemon are non-nullable
-        // Source Pokemon and Move can be null (e.g., when calculating base stats)
-        ParameterNullability = [false, false, false, true, true];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-    ValidateConfiguration();
-    }
-    
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// Context provides: Battle, RelayVar (int value), TargetPokemon, SourcePokemon, Move
-    /// </summary>
     public OnModifyDefEventInfo(
 EventHandlerDelegate contextHandler,
         int? priority = null,
@@ -78,9 +40,9 @@ bool usesSpeed = true)
 {
    var result = handler(
        context.Battle,
-     context.GetRelayVar<IntRelayVar>().Value,
-    context.GetTargetPokemon(),
-       context.GetSourcePokemon(),
+     context.GetIntRelayVar(),
+    context.GetTargetOrSourcePokemon(),
+       context.GetSourceOrTargetPokemon(),
 context.GetMove()
 );
  return result switch

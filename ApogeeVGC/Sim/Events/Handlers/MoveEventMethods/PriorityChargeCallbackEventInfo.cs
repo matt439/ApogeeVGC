@@ -11,23 +11,33 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 public sealed record PriorityChargeCallbackEventInfo : EventHandlerInfo
 {
     public PriorityChargeCallbackEventInfo(
-        Action<Battle, Pokemon> handler,
-      int? priority = null,
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
         bool usesSpeed = true)
     {
-    Id = EventId.PriorityChargeCallback;
+        Id = EventId.PriorityChargeCallback;
         Prefix = EventPrefix.None;
-        Handler = handler;
- Priority = priority;
- UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
- ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
- }
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static PriorityChargeCallbackEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new PriorityChargeCallbackEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

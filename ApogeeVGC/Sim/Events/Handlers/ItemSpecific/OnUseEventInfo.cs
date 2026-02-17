@@ -25,4 +25,33 @@ public sealed record OnUseEventInfo : UnionEventHandlerInfo<OnItemUse>
         // Validate configuration
         ValidateConfiguration();
     }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, TargetPokemon
+    /// </summary>
+    public OnUseEventInfo(EventHandlerDelegate contextHandler)
+    {
+        Id = EventId.Use;
+        ContextHandler = contextHandler;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnUseEventInfo Create(Func<Battle, Pokemon, BoolVoidUnion> handler)
+    {
+        return new OnUseEventInfo(
+            context =>
+            {
+                var result = handler(context.Battle, context.GetTargetOrSourcePokemon());
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            }
+        );
+    }
 }

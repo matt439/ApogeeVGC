@@ -29,7 +29,7 @@ public partial record Abilities
                 Name = "Justified",
                 Num = 154,
                 Rating = 2.5,
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, _, _, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, _, _, move) =>
                 {
                     if (move.Type == MoveType.Dark)
                     {
@@ -46,7 +46,7 @@ public partial record Abilities
                 Num = 51,
                 Rating = 0.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                OnTryBoost = OnTryBoostEventInfo.Create((battle, boost, target, source, effect) =>
                 {
                     if (source != null && target == source) return;
                     if (boost.Accuracy is < 0)
@@ -59,7 +59,7 @@ public partial record Abilities
                         }
                     }
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) => { move.IgnoreEvasion = true; }),
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) => { move.IgnoreEvasion = true; }),
             },
             [AbilityId.Klutz] = new()
             {
@@ -70,7 +70,7 @@ public partial record Abilities
                 // Item suppression is implemented in Pokemon.IgnoringItem()
                 // Note: Klutz activates early enough via OnSwitchInPriority: 1 to beat most items
                 // In TypeScript this is onStart with onSwitchInPriority: 1
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     // End the item effect when switching in
                     Item item = pokemon.GetItem();
@@ -86,7 +86,7 @@ public partial record Abilities
                 Num = 102,
                 Rating = 0.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnSetStatus = new OnSetStatusEventInfo((battle, _, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, _, target, _, effect) =>
                 {
                     ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
@@ -101,7 +101,7 @@ public partial record Abilities
 
                     return new VoidReturn();
                 }),
-                OnTryAddVolatile = new OnTryAddVolatileEventInfo((battle, status, target, _, _) =>
+                OnTryAddVolatile = OnTryAddVolatileEventInfo.Create((battle, status, target, _, _) =>
                 {
                     if (status.Id == ConditionId.Yawn)
                     {
@@ -131,7 +131,7 @@ public partial record Abilities
                 Name = "Libero",
                 Num = 236,
                 Rating = 4.0,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, source, _, move) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, source, _, move) =>
                 {
                     if (battle.EffectState.Libero == true) return new VoidReturn();
                     // Note: TypeScript also checks move.sourceEffect === 'snatch', but Snatch
@@ -169,7 +169,7 @@ public partial record Abilities
                 Rating = 1.0,
                 Flags = new AbilityFlags { Breakable = true },
                 OnModifyWeight =
-                    new OnModifyWeightEventInfo((battle, weighthg, _) => battle.Trunc(weighthg / 2)),
+                    OnModifyWeightEventInfo.Create((battle, weighthg, _) => battle.Trunc(weighthg / 2)),
             },
             [AbilityId.LightningRod] = new()
             {
@@ -178,7 +178,7 @@ public partial record Abilities
                 Num = 31,
                 Rating = 3.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target != source && move.Type == MoveType.Electric)
                     {
@@ -195,7 +195,7 @@ public partial record Abilities
                     return new VoidReturn();
                 }),
                 OnAnyRedirectTarget =
-                    new OnAnyRedirectTargetEventInfo((battle, target, source, _, move) =>
+                    OnAnyRedirectTargetEventInfo.Create((battle, target, source, _, move) =>
                     {
                         if (move.Type != MoveType.Electric || move.Flags.PledgeCombo == true)
                             return PokemonVoidUnion.FromVoid();
@@ -233,7 +233,7 @@ public partial record Abilities
                 Num = 7,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Paralysis)
                     {
@@ -241,7 +241,7 @@ public partial record Abilities
                         pokemon.CureStatus();
                     }
                 }),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Paralysis) return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
@@ -258,7 +258,7 @@ public partial record Abilities
                 Name = "Lingering Aroma",
                 Num = 268,
                 Rating = 2.0,
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, source, move) =>
                 {
                     Ability sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.CantSuppress == true ||
@@ -293,8 +293,7 @@ public partial record Abilities
                 Name = "Liquid Ooze",
                 Num = 64,
                 Rating = 2.5,
-                OnSourceTryHeal = new OnSourceTryHealEventInfo(
-                    (Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage,
+                OnSourceTryHeal = OnSourceTryHealEventInfo.Create((battle, damage,
                         target, source, effect) =>
                     {
                         if (effect == null)
@@ -316,12 +315,12 @@ public partial record Abilities
                         if (shouldOoze)
                         {
                             battle.Damage(damage);
-                            return 0;
+                            return new IntRelayVar(0);
                         }
 
                         return
                             null; // Return null to allow default heal behavior (matches TypeScript returning undefined)
-                    })),
+                    }),
             },
             [AbilityId.LiquidVoice] = new()
             {
@@ -330,7 +329,7 @@ public partial record Abilities
                 Num = 204,
                 Rating = 1.5,
                 // OnModifyTypePriority = -1
-                OnModifyType = new OnModifyTypeEventInfo((_, move, _, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((_, move, _, _) =>
                 {
                     if (move.Flags.Sound == true)
                     {
@@ -344,7 +343,7 @@ public partial record Abilities
                 Name = "Long Reach",
                 Num = 203,
                 Rating = 1.0,
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) => { move.Flags.Contact = false; }),
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) => { move.Flags.Contact = false; }),
             },
         };
     }

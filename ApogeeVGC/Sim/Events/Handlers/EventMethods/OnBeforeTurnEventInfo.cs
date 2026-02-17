@@ -10,33 +10,40 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnBeforeTurnEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnBeforeTurn event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
 /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnBeforeTurnEventInfo(
-    Action<Battle, Pokemon> handler,
-   int? priority = null,
- bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.BeforeTurn;
- Handler = handler;
+        ContextHandler = contextHandler;
         Priority = priority;
-     UsesSpeed = usesSpeed;
-   ExpectedParameterTypes =
-   [
-  typeof(Battle),
-       typeof(Pokemon),
- ];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnBeforeTurnEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnBeforeTurnEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

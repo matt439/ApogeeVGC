@@ -10,28 +10,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 // / </summary>
 public sealed record OnFoeTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
 {
-  public OnFoeTryEatItemEventInfo(
-        OnTryEatItem unionValue,
-        int? priority = null,
-     bool usesSpeed = true)
-    {
- Id = EventId.TryEatItem;
-  Prefix = EventPrefix.Foe;
-  UnionValue = unionValue;
-        Handler = ExtractDelegate();
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-    
-        // Nullability: All parameters non-nullable by default (adjust as needed)
-   ParameterNullability = [false, false, false];
-        ReturnTypeNullable = false;
-    
-     // Validate configuration
-        ValidateConfiguration();
-    }
-    
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, Item, TargetPokemon
@@ -63,7 +41,7 @@ public sealed record OnFoeTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatIt
      var result = handler(
           context.Battle,
   context.GetSourceEffect<Item>(),
-   context.GetTargetPokemon()
+   context.GetTargetOrSourcePokemon()
              );
      return result switch
    {

@@ -9,15 +9,21 @@ public interface IEffect
     string Name { get; }
     string FullName { get; }
     EffectStateId EffectStateId { get; }
-    
+
+    /// <summary>
+    /// Whether this effect has any event handlers registered.
+    /// Used for fast-path skipping in event handler resolution.
+    /// </summary>
+    bool HasAnyEventHandlers { get; }
+
     /// <summary>
     /// Gets comprehensive event handler information including delegate, metadata, and type signature.
-    /// This replaces the need for separate GetDelegate, GetPriority, GetOrder, and GetSubOrder calls.
     /// Returns null if the event is not implemented by this effect.
+    /// Uses a pre-computed cache for O(1) lookups.
     /// </summary>
     /// <param name="id">The base event identifier</param>
-    /// <param name="prefix">Optional event prefix (Foe, Source, Any, Ally)</param>
-    /// <param name="suffix">Optional event suffix (Callback, etc.)</param>
+    /// <param name="prefix">Event prefix (None, Foe, Source, Any, Ally)</param>
+    /// <param name="suffix">Event suffix (None, SwitchIn, RedirectTarget)</param>
     /// <returns>Event handler information if the event is implemented, null otherwise</returns>
-    EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null);
+    EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None);
 }

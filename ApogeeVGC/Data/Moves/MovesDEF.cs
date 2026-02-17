@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
@@ -77,7 +77,7 @@ public partial record Moves
                 Status = ConditionId.Sleep,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dark,
-                OnTry = new OnTryEventInfo((battle, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((battle, _, source, move) =>
                 {
                     // Only Darkrai can use Dark Void (or if the move has bounced)
                     if (source.Species.BaseSpecies == SpecieId.Darkrai || (move.HasBounced ?? false))
@@ -177,7 +177,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Flying,
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     var success = false;
 
@@ -263,7 +263,7 @@ public partial record Moves
                 Condition = _library.Conditions[ConditionId.DestinyBond],
                 Target = MoveTarget.Self,
                 Type = MoveType.Ghost,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                     !source.RemoveVolatile(
                         battle.Library.Conditions[ConditionId.DestinyBond])),
             },
@@ -282,7 +282,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.Protect,
                 Target = MoveTarget.Self,
                 Type = MoveType.Fighting,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Check if queue will act and run StallMove event
                     bool willAct = battle.Queue.WillAct() is not null;
@@ -291,7 +291,7 @@ public partial record Moves
                     bool result = willAct && stallSuccess;
                     return result ? true : (BoolEmptyVoidUnion)false;
                 }),
-                OnHit = new OnHitEventInfo((_, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
                     // Add Stall volatile to track consecutive uses
                     source.AddVolatile(ConditionId.Stall);
@@ -339,7 +339,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
                 Condition = _library.Conditions[ConditionId.Dig],
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already underground (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Dig]))
@@ -420,7 +420,7 @@ public partial record Moves
                 Condition = _library.Conditions[ConditionId.Disable],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, _, _) =>
                 {
                     // Fails if target has no last move, or if last move is a Z-move, Max move, or Struggle
                     if (target.LastMove == null || target.LastMove.Id == MoveId.Struggle)
@@ -488,7 +488,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
                 Condition = _library.Conditions[ConditionId.Dive],
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already underwater (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Dive]))
@@ -536,7 +536,7 @@ public partial record Moves
                 Flags = new MoveFlags(),
                 Target = MoveTarget.AdjacentFoe,
                 Type = MoveType.Normal,
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     bool? success = false;
                     Ability targetAbility = target.GetAbility();
@@ -593,7 +593,7 @@ public partial record Moves
                 Flags = new MoveFlags { Metronome = true, FutureMove = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
-                OnTry = new OnTryEventInfo((battle, source, target, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, target, _) =>
                 {
                     if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
                         return false;
@@ -692,7 +692,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                OnTryMove = new OnTryMoveEventInfo((battle, source, _, _) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, source, _, _) =>
                 {
                     // Only works if user has Electric type
                     if (source.HasType(PokemonType.Electric))
@@ -854,7 +854,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dragon,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
                     int bp = move.BasePower * source.Hp / source.MaxHp;
@@ -985,7 +985,7 @@ public partial record Moves
                 Drain = (1, 2),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
+                OnTryImmunity = OnTryImmunityEventInfo.Create((_, target, _, _) =>
                     target.Status == ConditionId.Sleep ||
                     target.HasAbility(AbilityId.Comatose)),
             },
@@ -1149,13 +1149,13 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnTryMove = new OnTryMoveEventInfo((battle, _, _, _) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, _, _, _) =>
                 {
                     // Add the pseudo-weather to track consecutive uses
                     battle.Field.AddPseudoWeather(ConditionId.EchoedVoice);
                     return new VoidReturn();
                 }),
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, _, move) =>
                 {
                     int bp = move.BasePower;
                     EffectState? echoedVoiceState =
@@ -1258,7 +1258,7 @@ public partial record Moves
                     { Protect = true, Mirror = true, Metronome = true, Bullet = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, target, _) =>
                 {
                     // Base power varies based on speed ratio
                     int targetSpeed = target.GetStat(StatIdExceptHp.Spe);
@@ -1299,7 +1299,7 @@ public partial record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, target, move) =>
                 {
                     if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
                     // Only apply buff when super effective (> 0)
@@ -1325,7 +1325,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
                 HasSheerForce = true,
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already charged (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.ElectroShot]))
@@ -1437,9 +1437,9 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
                 DamageCallback =
-                    new DamageCallbackEventInfo((_, source, target, _) => target.Hp - source.Hp),
+                    DamageCallbackEventInfo.Create((_, source, target, _) => target.Hp - source.Hp),
                 OnTryImmunity =
-                    new OnTryImmunityEventInfo((_, target, source, _) => source.Hp < target.Hp),
+                    OnTryImmunityEventInfo.Create((_, target, source, _) => source.Hp < target.Hp),
             },
             [MoveId.Endure] = new()
             {
@@ -1456,7 +1456,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.Endure,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Check if queue will act and run StallMove event
                     bool willAct = battle.Queue.WillAct() is not null;
@@ -1465,7 +1465,7 @@ public partial record Moves
                     bool result = willAct && stallSuccess;
                     return result ? true : (BoolEmptyVoidUnion)false;
                 }),
-                OnHit = new OnHitEventInfo((_, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
                     // Add Stall volatile to track consecutive uses
                     source.AddVolatile(ConditionId.Stall);
@@ -1509,7 +1509,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnTryHit = new OnTryHitEventInfo((_, target, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, source, _) =>
                 {
                     // Fails if targeting self (Dynamax check skipped - not in Gen 9 VGC)
                     if (target == source) return false;
@@ -1531,7 +1531,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((_, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, target, source, _) =>
                 {
                     // Set target's ability to source's ability
                     AbilityIdFalseUnion? oldAbility = target.SetAbility(source.Ability, source);
@@ -1562,7 +1562,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Fire,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
                     int bp = move.BasePower * source.Hp / source.MaxHp;
@@ -1606,7 +1606,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, source, _, _) =>
                 {
                     // 1.5x base power in Psychic Terrain if user is grounded
                     if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, source) &&
@@ -1618,7 +1618,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, source, _) =>
                 {
                     // Change target to hit all adjacent foes in Psychic Terrain if user is grounded
                     if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, source) &&
@@ -1695,7 +1695,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, pokemon, _, _) =>
                 {
                     if (pokemon.Status is not ConditionId.None &&
                         pokemon.Status != ConditionId.Sleep)
@@ -1727,7 +1727,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, _) =>
                 {
                     if (source.ActiveMoveActions > 1)
                     {
@@ -1826,7 +1826,7 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnDamage = new OnDamageEventInfo((_, damage, target, _, _) =>
+                OnDamage = OnDamageEventInfo.Create((_, damage, target, _, _) =>
                 {
                     // Prevent KO - always leave target with at least 1 HP
                     if (damage >= target.Hp)
@@ -1887,7 +1887,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
                 OnAfterMoveSecondarySelf =
-                    new OnAfterMoveSecondarySelfEventInfo((battle, source, target, move) =>
+                    OnAfterMoveSecondarySelfEventInfo.Create((battle, source, target, move) =>
                     {
                         if (target == null || target.Fainted || target.Hp <= 0)
                         {
@@ -1910,7 +1910,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, pokemon, _, _) =>
                 {
                     // 30% chance to double base power
                     if (battle.RandomChance(3, 10))
@@ -1983,7 +1983,7 @@ public partial record Moves
                 Boosts = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                OnTry = new OnTryEventInfo((_, source, _, _) =>
+                OnTry = OnTryEventInfo.Create((_, source, _, _) =>
                 {
                     // Fail if HP is less than or equal to half of max HP, or if max HP is 1
                     if (source.Hp <= source.MaxHp / 2 || source.MaxHp == 1)
@@ -1993,7 +1993,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, _, _, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, _, _, move) =>
                 {
                     // TS uses ! to assert non-null Boosts. Check here to avoid exception.
                     if (move.Boosts is null) throw new ArgumentNullException(nameof(move.Boosts));
@@ -2009,7 +2009,7 @@ public partial record Moves
                     move.Boosts = null;
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Deal direct damage equal to half of max HP
                     battle.DirectDamage(target.MaxHp / 2, target);
@@ -2030,7 +2030,7 @@ public partial record Moves
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-                DamageCallback = new DamageCallbackEventInfo((_, source, _, _) =>
+                DamageCallback = DamageCallbackEventInfo.Create((_, source, _, _) =>
                 {
                     int damage = source.Hp;
                     source.Faint();
@@ -2113,7 +2113,7 @@ public partial record Moves
                     Protect = true, Mirror = true, NonSky = true, Metronome = true,
                     PledgeCombo = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, _, move) =>
                 {
                     // Check if this is being called as part of a pledge combo
                     if (move.SourceEffect is MoveEffectStateId
@@ -2131,9 +2131,9 @@ public partial record Moves
 
                     return move.BasePower;
                 }),
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
                 {
-                    // Check the battle queue for ally Pokémon using Grass Pledge or Water Pledge
+                    // Check the battle queue for ally Pok�mon using Grass Pledge or Water Pledge
                     if (battle.Queue.List != null)
                     {
                         foreach (IAction action in battle.Queue.List)
@@ -2163,7 +2163,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) =>
                 {
                     // Check if this move is being modified by a pledge combo
                     if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.WaterPledge })
@@ -2240,7 +2240,7 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, _) =>
                 {
                     if (source.ActiveMoveActions > 1)
                     {
@@ -2285,7 +2285,7 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, _) =>
                 {
                     int ratio = Math.Max(source.Hp * 48 / source.MaxHp, 1);
                     int bp;
@@ -2480,7 +2480,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
                 Condition = _library.Conditions[ConditionId.Fling],
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
                 {
                     // Fail if source is ignoring items (e.g., Klutz, Magic Room, Embargo)
                     if (source.IgnoringItem(true)) return false;
@@ -2510,7 +2510,7 @@ public partial record Moves
                         }
 
                         // Set OnHit to make target eat the berry
-                        move.OnHit = new OnHitEventInfo((innerBattle, foe, innerSource, innerMove) =>
+                        move.OnHit = OnHitEventInfo.Create((innerBattle, foe, innerSource, innerMove) =>
                         {
                             RelayVar? eatResult = innerBattle.SingleEvent(EventId.Eat, item,
                                 innerSource.ItemState, foe, innerSource, innerMove);
@@ -2538,7 +2538,7 @@ public partial record Moves
                     {
                         // Wrap the ResultMoveHandler in OnHitEventInfo
                         ResultMoveHandler? effectHandler = item.Fling.Effect;
-                        move.OnHit = new OnHitEventInfo((b, t, s, m) => effectHandler(b, t, s, m));
+                        move.OnHit = OnHitEventInfo.Create((b, t, s, m) => effectHandler(b, t, s, m));
                     }
                     // Handle items with status/volatile status effects
                     else
@@ -2602,7 +2602,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     int healAmount;
                     // Check if Grassy Terrain is active
@@ -2673,7 +2673,7 @@ public partial record Moves
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
                 Condition = _library.Conditions[ConditionId.Fly],
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already in the air (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Fly]))
@@ -2716,7 +2716,7 @@ public partial record Moves
                 Type = MoveType.Fighting,
                 // Flying Press deals Fighting + Flying type damage
                 // GetEffectiveness returns MoveEffectiveness enum which converts to int
-                OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, _, type, _) =>
+                OnEffectiveness = OnEffectivenessEventInfo.Create((battle, typeMod, _, type, _) =>
                     typeMod + (int)battle.Dex.GetEffectiveness(MoveType.Flying, type)),
             },
             [MoveId.FocusBlast] = new()
@@ -2772,11 +2772,11 @@ public partial record Moves
                 Condition = _library.Conditions[ConditionId.FocusPunch],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-                PriorityChargeCallback = new PriorityChargeCallbackEventInfo((_, pokemon) =>
+                PriorityChargeCallback = PriorityChargeCallbackEventInfo.Create((_, pokemon) =>
                 {
                     pokemon.AddVolatile(ConditionId.FocusPunch);
                 }),
-                BeforeMoveCallback = new BeforeMoveCallbackEventInfo((battle, pokemon, _, _) =>
+                BeforeMoveCallback = BeforeMoveCallbackEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (pokemon.Volatiles.TryGetValue(ConditionId.FocusPunch, out EffectState? state) &&
                         state.LostFocus == true)
@@ -2807,7 +2807,7 @@ public partial record Moves
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
                 // Follow Me fails in singles (only works in doubles/triples)
-                OnTry = new OnTryEventInfo((battle, _, _, _) => battle.ActivePerHalf > 1 ? new VoidReturn() : false),
+                OnTry = OnTryEventInfo.Create((battle, _, _, _) => battle.ActivePerHalf > 1 ? new VoidReturn() : false),
             },
             [MoveId.ForcePalm] = new()
             {
@@ -2846,7 +2846,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Fail if target already has Grass type
                     if (target.HasType(PokemonType.Grass)) return false;
@@ -2895,7 +2895,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
-                OnEffectiveness = new OnEffectivenessEventInfo((_, _, _, type, _) =>
+                OnEffectiveness = OnEffectivenessEventInfo.Create((_, _, _, type, _) =>
                 {
                     // Freeze-Dry is super effective against Water types
                     if (type == PokemonType.Water) return 1;
@@ -2925,7 +2925,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
                 Condition = _library.Conditions[ConditionId.FreezeShock],
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already charged (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.FreezeShock]))
@@ -3037,7 +3037,7 @@ public partial record Moves
                 Condition = _library.Conditions[ConditionId.FuryCutter],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, pokemon, _, move) =>
                 {
                     // Add volatile on first hit or if volatile doesn't exist
                     if (!pokemon.Volatiles.ContainsKey(ConditionId.FuryCutter) || move.Hit == 1)
@@ -3087,7 +3087,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, _) =>
                 {
                     // Double base power if Fusion Flare was used successfully this turn
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionFlare)
@@ -3112,7 +3112,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, _) =>
                 {
                     // Double base power if Fusion Bolt was used successfully this turn
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionBolt)
@@ -3138,7 +3138,7 @@ public partial record Moves
                 IgnoreImmunity = true, // For setup phase - actual hit respects immunity
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnTry = new OnTryEventInfo((battle, source, target, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, target, _) =>
                 {
                     if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
                         return false;

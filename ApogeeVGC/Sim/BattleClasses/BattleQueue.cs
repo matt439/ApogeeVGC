@@ -175,6 +175,7 @@ public class BattleQueue(Battle battle)
         }
 
         // Process pre-turn actions (not during midTurn)
+        // Only process for regular Move actions, not BeforeTurnMove/PriorityChargeMove to avoid infinite recursion
         if (!midTurn)
         {
             // Only process pre-turn callbacks for actual Move actions (not BeforeTurnMove, PriorityChargeMove, etc.)

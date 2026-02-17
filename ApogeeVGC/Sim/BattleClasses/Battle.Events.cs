@@ -584,7 +584,8 @@ public partial class Battle
         EventId sideEventId = GetSideEventId(eventId);
 
         // Collect all handlers from field-level effects
-        var handlers = FindFieldEventHandlers(Field, fieldEventId, EventPrefix.None, getKey);
+        List<EventListener> handlers = [];
+        FindFieldEventHandlers(handlers, Field, fieldEventId, EventPrefix.None, getKey);
 
         // Collect handlers from sides and active Pokemon
         foreach (Side side in Sides)
@@ -593,8 +594,7 @@ public partial class Battle
             // In single battles, side.N is always < 2, so this always executes
             if (side.N < 2)
             {
-                handlers.AddRange(
-                    FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
+                FindSideEventHandlers(handlers, side, sideEventId, EventPrefix.None, getKey);
             }
 
             // Process each active Pokemon on this side
@@ -603,18 +603,18 @@ public partial class Battle
                 // For SwitchIn events, also trigger AnySwitchIn handlers
                 if (eventId == EventId.SwitchIn)
                 {
-                    handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.Any));
+                    FindPokemonEventHandlers(handlers, active, eventId, EventPrefix.Any);
                 }
 
                 // If targets were specified, only process those Pokemon
                 if (targets != null && !targets.Contains(active)) continue;
 
                 // Collect handlers from this Pokemon and related effects
-                handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.None,
-                    getKey));
-                handlers.AddRange(FindSideEventHandlers(side, eventId, customHolder: active));
-                handlers.AddRange(FindFieldEventHandlers(Field, eventId, customHolder: active));
-                handlers.AddRange(FindBattleEventHandlers(eventId, getKey, active));
+                FindPokemonEventHandlers(handlers, active, eventId, EventPrefix.None,
+                    getKey);
+                FindSideEventHandlers(handlers, side, eventId, customHolder: active);
+                FindFieldEventHandlers(handlers, Field, eventId, customHolder: active);
+                FindBattleEventHandlers(handlers, eventId, getKey, active);
             }
         }
 
@@ -999,48 +999,8 @@ public partial class Battle
             }
         }
 
-        // Fall back to legacy handler
-        Delegate? handler = handlerInfo.Handler;
-        if (handler == null) return relayVar;
-
-        // Validate the handler signature matches the EventHandlerInfo specification
-        try
-        {
-            handlerInfo.Validate();
-        }
-        catch (InvalidOperationException ex)
-        {
-            // Add context about where this validation failed
-            throw new InvalidOperationException(
-                $"EventHandlerInfo validation failed for event {handlerInfo.Id} " +
-                $"on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType}): {ex.Message}",
-                ex);
-        }
-
-        // Use adapter to convert legacy handler to context-based
-        EventHandlerDelegate adaptedHandler =
-            EventHandlerAdapter.AdaptLegacyHandler(handler, handlerInfo);
-        EventContext context = invocationContext.ToEventContext();
-
-        try
-        {
-            return adaptedHandler(context);
-        }
-        catch (Exception ex)
-        {
-            // Log the inner exception details for debugging
-            string errorDetails = $"Event {handlerInfo.Id} adapted handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})";
-            if (ex.InnerException != null)
-            {
-                errorDetails += $"\nInner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
-                if (ex.InnerException.StackTrace != null)
-                {
-                    errorDetails += $"\nInner stack trace: {ex.InnerException.StackTrace.Split('\n').Take(5).Aggregate((a, b) => a + "\n" + b)}";
-                }
-            }
-            
-            throw new InvalidOperationException(errorDetails, ex);
-        }
+        // No handler available
+        return relayVar;
     }
 
     /// <summary>
@@ -1064,47 +1024,109 @@ public partial class Battle
     /// <summary>
     /// Invokes an EventHandlerInfo callback and extracts the return value.
     /// This is a helper for invoking callback properties like DurationCallback, BasePowerCallback, etc.
+    /// Supports both context-based handlers (Create pattern) and legacy delegate handlers.
     /// </summary>
     /// <typeparam name="TResult">The expected return type</typeparam>
     /// <param name="handlerInfo">The handler info to invoke</param>
-    /// <param name="args">Arguments to pass to the handler</param>
+    /// <param name="args">Arguments to pass to the handler.
+    /// Convention: args[0]=Battle, then Pokemon/ActiveMove/IEffect by position.</param>
     /// <returns>The result of the invocation, or default(TResult) if handler is null</returns>
     public TResult? InvokeCallback<TResult>(EventHandlerInfo? handlerInfo, params object?[] args)
     {
-        if (handlerInfo?.Handler == null)
+        if (handlerInfo == null) return default;
+
+        // Use context-based handler (set by Create factory)
+        if (handlerInfo.ContextHandler is not null)
         {
-            return default;
+            var context = BuildCallbackContext(handlerInfo.Id, args);
+            RelayVar? relayResult = handlerInfo.ContextHandler(context);
+            return ConvertRelayVarToCallbackResult<TResult>(relayResult);
         }
 
-        // Validate parameter nullability if specified
-        if (handlerInfo.ParameterNullability != null)
-        {
-            handlerInfo.ValidateParameterNullability(args);
-        }
+        return default;
+    }
 
-        // Invoke the delegate
-        object? result = handlerInfo.Handler.DynamicInvoke(args);
+    /// <summary>
+    /// Builds an EventContext from positional callback arguments.
+    /// Maps args by type: Battle, then first Pokemon ? Target, second Pokemon ? Source,
+    /// ActiveMove ? Move, IEffect ? SourceEffect.
+    /// </summary>
+    private static EventContext BuildCallbackContext(EventId eventId, object?[] args)
+    {
+        Battle? battle = null;
+        Pokemon? targetPokemon = null;
+        Pokemon? sourcePokemon = null;
+        ActiveMove? move = null;
+        IEffect? sourceEffect = null;
 
-        // Handle null return values
-        if (result == null)
+        foreach (object? arg in args)
         {
-            if (!handlerInfo.ReturnTypeNullable && handlerInfo.ExpectedReturnType != typeof(void))
+            switch (arg)
             {
-                throw new InvalidOperationException(
-                    $"Event {handlerInfo.Id}: Handler returned null but return type is non-nullable");
+                case Battle b:
+                    battle = b;
+                    break;
+                case Pokemon p when targetPokemon is null:
+                    targetPokemon = p;
+                    break;
+                case Pokemon p:
+                    sourcePokemon = p;
+                    break;
+                case ActiveMove m:
+                    move = m;
+                    break;
+                case IEffect e:
+                    sourceEffect = e;
+                    break;
             }
-
-            return default;
         }
 
-        // Cast to expected type
-        if (result is TResult typedResult)
+        return new EventContext
         {
-            return typedResult;
+            Battle = battle ?? throw new InvalidOperationException(
+                $"Callback {eventId}: No Battle argument found in args"),
+            EventId = eventId,
+            TargetPokemon = targetPokemon,
+            SourcePokemon = sourcePokemon,
+            Move = move,
+            SourceEffect = sourceEffect
+        };
+    }
+
+    /// <summary>
+    /// Converts a RelayVar? from a context handler back to the expected callback result type.
+    /// </summary>
+    private static TResult? ConvertRelayVarToCallbackResult<TResult>(RelayVar? relayVar)
+    {
+        if (relayVar is null) return default;
+
+        // Direct type match
+        if (relayVar is TResult directMatch) return directMatch;
+
+        // Unwrap common RelayVar types to primitives
+        object? unwrapped = relayVar switch
+        {
+            IntRelayVar irv => irv.Value,
+            BoolRelayVar brv => brv.Value,
+            DecimalRelayVar drv => drv.Value,
+            _ => null
+        };
+
+        if (unwrapped is TResult typedResult) return typedResult;
+
+        // For union return types, reconstruct from RelayVar
+        if (typeof(TResult) == typeof(IntFalseUnion))
+        {
+            object? union = relayVar switch
+            {
+                IntRelayVar i => (object)IntFalseUnion.FromInt(i.Value),
+                BoolRelayVar { Value: false } => IntFalseUnion.FromFalse(),
+                _ => null
+            };
+            if (union is TResult u) return u;
         }
 
-        throw new InvalidOperationException(
-            $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
+        return default;
     }
 
     #endregion

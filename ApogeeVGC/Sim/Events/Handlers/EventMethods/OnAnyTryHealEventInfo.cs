@@ -16,43 +16,60 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
 {
-    /// <summary>
-    /// Creates a new OnAnyTryHeal event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate with multiple possible signatures or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    public OnAnyTryHealEventInfo(
-        OnTryHeal unionValue,
-     int? priority = null,
-    bool usesSpeed = true)
-    {
-        Id = EventId.TryHeal;
-     Prefix = EventPrefix.Any;
-        UnionValue = unionValue;
-        Handler = ExtractDelegate();
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        // Don't set ExpectedParameterTypes/ExpectedReturnType here
-        // because OnTryHeal has 2 different delegate signatures
-        // Validation will determine which signature is used and validate without setting properties
-   ExpectedParameterTypes = null;
-   ExpectedReturnType = null;
-        
-     // Nullability info varies by signature - will be checked in custom Validate()
-        // Signature 1: (Battle, int, Pokemon, Pokemon, IEffect) - all non-nullable
-        // Signature 2: (Battle, Pokemon) - all non-nullable  
-  // Return type: nullable for both signatures
-    ParameterNullability = null; // Handled in custom validation
-   ReturnTypeNullable = true; // Both signatures return nullable types
-    
- // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
-        // Custom validation happens in Validate() method
-    }
+   public OnAnyTryHealEventInfo(
+       EventHandlerDelegate contextHandler,
+       int? priority = null,
+       bool usesSpeed = true)
+   {
+       Id = EventId.TryHeal;
+       Prefix = EventPrefix.Any;
+       ContextHandler = contextHandler;
+       Priority = priority;
+       UsesSpeed = usesSpeed;
+   }
 
-    /// <summary>
-    /// Custom validation for OnAnyTryHeal which supports multiple delegate signatures.
-    /// </summary>
+   /// <summary>
+   /// Creates strongly-typed context-based handler (5-param signature).
+   /// </summary>
+   public static OnAnyTryHealEventInfo Create(
+       Func<Battle, int, Pokemon, Pokemon, IEffect, RelayVar?> handler,
+       int? priority = null,
+       bool usesSpeed = true)
+   {
+       return new OnAnyTryHealEventInfo(
+           context => handler(
+               context.Battle,
+               context.GetIntRelayVar(),
+               context.GetTargetOrSourcePokemon(),
+               context.GetSourceOrTargetPokemon(),
+               context.GetSourceEffect<IEffect>()
+           ),
+           priority,
+           usesSpeed
+       );
+   }
+
+   /// <summary>
+   /// Creates strongly-typed context-based handler (2-param signature).
+   /// </summary>
+   public static OnAnyTryHealEventInfo Create(
+       Func<Battle, Pokemon, RelayVar?> handler,
+       int? priority = null,
+       bool usesSpeed = true)
+   {
+       return new OnAnyTryHealEventInfo(
+           context => handler(
+               context.Battle,
+               context.GetTargetOrSourcePokemon()
+           ),
+           priority,
+           usesSpeed
+       );
+   }
+
+   /// <summary>
+   /// Custom validation for OnAnyTryHeal which supports multiple delegate signatures.
+   /// </summary>
     public new void Validate()
     {
       if (UnionValue == null) return;

@@ -37,7 +37,7 @@ public partial record Abilities
                 },
                 Condition = ConditionId.ZenMode,
                 // OnResidualOrder = 29
-                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((_, pokemon, _, _) =>
                 {
                     // Only works for Darmanitan that hasn't transformed
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Darmanitan ||
@@ -61,7 +61,7 @@ public partial record Abilities
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ZenMode]);
                     }
                 }, order: 29),
-                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
                     Pokemon pokemon = psfp.Pokemon;
@@ -103,7 +103,7 @@ public partial record Abilities
                     CantSuppress = true,
                     NoTransform = true,
                 },
-                OnSwitchOut = new OnSwitchOutEventInfo((battle, pokemon) =>
+                OnSwitchOut = OnSwitchOutEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Palafin) return;
 
@@ -114,7 +114,7 @@ public partial record Abilities
                         pokemon.HeroMessageDisplayed = false;
                     }
                 }),
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                OnSwitchIn = OnSwitchInEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Palafin) return;
 

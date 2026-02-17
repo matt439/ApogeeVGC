@@ -21,78 +21,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnModifyMoveEventInfo : EventHandlerInfo
 {
     /// <summary>
-    /// Creates a new OnModifyMove event handler for simple modifications that don't need to return false.
-    /// </summary>
-    /// <param name="handler">The event handler delegate (void return)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    public OnModifyMoveEventInfo(
-        Action<Battle, ActiveMove, Pokemon, Pokemon?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.ModifyMove;
-
-        // Wrap Action in Func that returns null
-        VoidFalseUnion? WrappedHandler(Battle b, ActiveMove m, Pokemon p, Pokemon? t)
-        {
-            handler(b, m, p, t);
-            return null;
-        }
-
-        Handler = (Func<Battle, ActiveMove, Pokemon, Pokemon?, VoidFalseUnion?>)WrappedHandler;
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-            typeof(ActiveMove),
-            typeof(Pokemon),
-            typeof(Pokemon),
-        ];
-        ExpectedReturnType = typeof(VoidFalseUnion);
-
-        // Nullability: All parameters non-nullable by default, target can be null
-        ParameterNullability = [false, false, false, true];
-        ReturnTypeNullable = true;
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
-    /// Creates a new OnModifyMove event handler that can return false to prevent the move.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    public OnModifyMoveEventInfo(
-        Func<Battle, ActiveMove, Pokemon, Pokemon?, VoidFalseUnion?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.ModifyMove;
-        Handler = handler;
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-            typeof(ActiveMove),
-            typeof(Pokemon),
-            typeof(Pokemon),
-        ];
-        ExpectedReturnType = typeof(VoidFalseUnion);
-
-        // Nullability: All parameters non-nullable by default, target can be null
-        ParameterNullability = [false, false, false, true];
-        ReturnTypeNullable = true;
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, Move, SourcePokemon, TargetPokemon
     /// </summary>
@@ -122,7 +50,7 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                     context.GetMove(),
-                    context.GetSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
                     context.TargetPokemon // Direct access, can be null
                 );
 
@@ -132,6 +60,30 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                     return false; // Uses implicit operator RelayVar(bool)
                 }
 
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler for simple modifications (void return).
+    /// </summary>
+    public static OnModifyMoveEventInfo Create(
+        Action<Battle, ActiveMove, Pokemon, Pokemon?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnModifyMoveEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetMove(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.TargetPokemon
+                );
                 return null;
             },
             priority,

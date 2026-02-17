@@ -10,34 +10,36 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeAfterSwitchInSelfEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnFoeAfterSwitchInSelf event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnFoeAfterSwitchInSelfEventInfo(
-        Action<Battle, Pokemon> handler,
-  int? priority = null,
-   bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.AfterSwitchInSelf;
         Prefix = EventPrefix.Foe;
-    Handler = handler;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-   ExpectedParameterTypes =
-  [
-      typeof(Battle),
-  typeof(Pokemon),
-   ];
-    ExpectedReturnType = typeof(void);
-        
-  // Nullability: Battle (non-null), Pokemon (non-null)
-  ParameterNullability = [false, false];
-  ReturnTypeNullable = false; // void
-      
- // Validate configuration
-   ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeAfterSwitchInSelfEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeAfterSwitchInSelfEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

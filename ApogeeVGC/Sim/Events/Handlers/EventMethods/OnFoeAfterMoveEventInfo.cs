@@ -11,24 +11,46 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeAfterMoveEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnFoeAfterMoveEventInfo(
-     Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
-  int? priority = null,
-    bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
-      Id = EventId.AfterMove;
-     Prefix = EventPrefix.Foe;
-  Handler = handler;
-    Priority = priority;
+        Id = EventId.AfterMove;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
- ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-     ExpectedReturnType = typeof(BoolVoidUnion);
-        
-     // Nullability: All parameters non-nullable
-    ParameterNullability = [false, false, false, false];
-  ReturnTypeNullable = false; // BoolVoidUnion is a struct
-        
-   // Validate configuration
-  ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeAfterMoveEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeAfterMoveEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

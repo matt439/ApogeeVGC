@@ -48,7 +48,7 @@ public partial record Items
                 SpriteNum = 158,
                 IsBerry = true,
                 NaturalGift = (100, "Ice"),
-                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -58,7 +58,7 @@ public partial record Items
                         pokemon.EatItem();
                     }
                 }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, _) =>
+                OnEat = OnEatEventInfo.Create((Action<Battle, Pokemon>)((battle, _) =>
                 {
                     battle.Boost(new SparseBoostsTable { Def = 1 });
                 })),
@@ -80,7 +80,7 @@ public partial record Items
                 Name = "Grassy Seed",
                 SpriteNum = 667,
                 Fling = new FlingData { BasePower = 10 },
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                OnSwitchIn = OnSwitchInEventInfo.Create((battle, pokemon) =>
                 {
                     if (!pokemon.IgnoringItem() &&
                         battle.Field.IsTerrain(ConditionId.GrassyTerrain, null))
@@ -88,7 +88,7 @@ public partial record Items
                         pokemon.UseItem();
                     }
                 }, -1),
-                OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
+                OnTerrainChange = OnTerrainChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, null))
                     {
@@ -133,7 +133,7 @@ public partial record Items
                 Id = ItemId.GriseousCore,
                 Name = "Griseous Core",
                 SpriteNum = 743,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, user, _, move) =>
                 {
                     // Giratina has species number 487
                     if (user.BaseSpecies.Num == 487 &&
@@ -145,17 +145,17 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, source, _) =>
                         {
                             // Giratina (species number 487) can't have this item removed
                             if (source?.BaseSpecies.Num == 487 || pokemon.BaseSpecies.Num == 487)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Giratina-Origin",
                 Num = 1779,
@@ -167,7 +167,7 @@ public partial record Items
                 Name = "Griseous Orb",
                 SpriteNum = 180,
                 Fling = new FlingData { BasePower = 60 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, user, _, move) =>
                 {
                     // Giratina has species number 487
                     if (user.BaseSpecies.Num == 487 &&
@@ -193,7 +193,7 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Dragon"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
+                    OnSourceModifyDamageEventInfo.Create((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Dragon && target.GetMoveHitData(move).TypeMod > 0)
                         {
@@ -213,7 +213,7 @@ public partial record Items
 
                         return damage;
                     }),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                OnEat = OnEatEventInfo.Create((Action<Battle, Pokemon>)((_, _) => { })),
                 Num = 197,
                 Gen = 4,
             },
@@ -223,7 +223,7 @@ public partial record Items
                 Name = "Hard Stone",
                 SpriteNum = 187,
                 Fling = new FlingData { BasePower = 100 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Rock)
                     {
@@ -251,7 +251,7 @@ public partial record Items
                 Name = "Hearthflame Mask",
                 SpriteNum = 760,
                 Fling = new FlingData { BasePower = 60 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, user, _, _) =>
                 {
                     if (user.BaseSpecies.Id is SpecieId.OgerponHearthflame or SpecieId.OgerponHearthflameTera)
                     {
@@ -261,18 +261,18 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, _, _) =>
                         {
                             // Ogerpon cannot have its mask removed
                             // TypeScript only checks the holder (pokemon), not the source
                             if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Ogerpon-Hearthflame",
                 Num = 2408,
@@ -326,7 +326,7 @@ public partial record Items
                 SpriteNum = 217,
                 IsBerry = true,
                 NaturalGift = (80, "Dark"),
-                OnUpdate = new OnUpdateEventInfo((_, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((_, pokemon) =>
                 {
                     if (pokemon.Hp <= pokemon.MaxHp / 4 ||
                         (pokemon.Hp <= pokemon.MaxHp / 2 &&
@@ -336,8 +336,7 @@ public partial record Items
                         pokemon.EatItem();
                     }
                 }),
-                OnTryEatItem = new OnTryEatItemEventInfo(
-                    OnTryEatItem.FromFunc((battle, _, pokemon) =>
+                OnTryEatItem = OnTryEatItemEventInfo.Create((battle, _, pokemon) =>
                     {
                         RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
                             battle.Effect,
@@ -348,8 +347,8 @@ public partial record Items
                         }
 
                         return BoolVoidUnion.FromVoid();
-                    })),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                    }),
+                OnEat = OnEatEventInfo.Create((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     battle.Heal(pokemon.BaseMaxHp / 3);
                     if (pokemon.GetNature().Minus == StatIdExceptHp.Def)
@@ -375,7 +374,7 @@ public partial record Items
                 Name = "Icicle Plate",
                 SpriteNum = 220,
                 OnPlate = PokemonType.Ice,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Ice)
                     {
@@ -385,16 +384,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Arceus-Ice",
                 Num = 302,
@@ -415,7 +414,7 @@ public partial record Items
                 Name = "Insect Plate",
                 SpriteNum = 223,
                 OnPlate = PokemonType.Bug,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Bug)
                     {
@@ -425,16 +424,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Arceus-Bug",
                 Num = 308,
@@ -447,7 +446,7 @@ public partial record Items
                 SpriteNum = 224,
                 Fling = new FlingData { BasePower = 130 },
                 OnEffectiveness =
-                    new OnEffectivenessEventInfo((battle, typeMod, target, _, move) =>
+                    OnEffectivenessEventInfo.Create((battle, typeMod, target, _, move) =>
                     {
                         if (target == null ||
                             target.Volatiles.ContainsKey(ConditionId.Ingrain) ||
@@ -459,7 +458,7 @@ public partial record Items
                         return typeMod;
                     }),
                 // Airborneness negation implemented in Pokemon.IsGrounded()
-                OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
+                OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
                     return IntVoidUnion.FromInt(battle.FinalModify(spe));
@@ -473,7 +472,7 @@ public partial record Items
                 Name = "Iron Plate",
                 SpriteNum = 225,
                 OnPlate = PokemonType.Steel,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Steel)
                     {
@@ -483,16 +482,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Arceus-Steel",
                 Num = 313,

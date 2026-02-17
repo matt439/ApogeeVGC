@@ -11,24 +11,36 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 /// </summary>
 public sealed record OnModifyTypeEventInfo : EventHandlerInfo
 {
-public OnModifyTypeEventInfo(
+    public OnModifyTypeEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifyType;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnModifyTypeEventInfo Create(
         Action<Battle, ActiveMove, Pokemon, Pokemon> handler,
         int? priority = null,
-   bool usesSpeed = true)
+        bool usesSpeed = true)
     {
-    Id = EventId.ModifyType;
-        Prefix = EventPrefix.None;
-        Handler = handler;
-        Priority = priority;
-      UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(ActiveMove), typeof(Pokemon), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        return new OnModifyTypeEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetMove(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

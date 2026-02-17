@@ -11,31 +11,41 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnSourceFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
 {
-    /// <summary>
-    /// Creates a new OnSourceFlinch event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnSourceFlinchEventInfo(
-        OnFlinch unionValue,
-   int? priority = null,
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
         bool usesSpeed = true)
     {
-     Id = EventId.Flinch;
-    Prefix = EventPrefix.Source;
- UnionValue = unionValue;
-   Handler = ExtractDelegate();
+        Id = EventId.Flinch;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
         Priority = priority;
-  UsesSpeed = usesSpeed;
-   ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceFlinchEventInfo Create(
+        Func<Battle, Pokemon, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceFlinchEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

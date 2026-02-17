@@ -25,17 +25,17 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 NoCopy = true, // doesn't get copied by Baton Pass
                 Duration = 2,
-                OnStart = new OnStartEventInfo((battle, target, source, _) =>
+                OnStart = OnStartEventInfo.Create((battle, target, source, _) =>
                 {
                     // TS always adds the message (no DisplayUi check)
                     battle.Add("-start", target, "move: Yawn", $"[of] {source}");
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnResidual = new OnResidualEventInfo((_, _, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Yawn resolves at the end of the turn after it was applied
                 }, 23),
-                OnEnd = new OnEndEventInfo((battle, target) =>
+                OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     // TS always adds the message (no DisplayUi check)
                     battle.Add("-end", target, "move: Yawn", "[silent]");
@@ -49,9 +49,9 @@ public partial record Conditions
                 Name = "Zen Mode",
                 EffectType = EffectType.Condition,
                 AssociatedAbility = AbilityId.ZenMode,
-                OnStart = new OnStartEventInfo((_, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((_, target, _, _) =>
                 {
-                    if (target is null) return BoolVoidUnion.FromVoid();
+                    if (target is null) return null;
 
                     // Check if it's a Galar form
                     bool isGalar = target.Species.Forme is FormeId.Galar or FormeId.GalarZen;
@@ -71,9 +71,9 @@ public partial record Conditions
                         }
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnEnd = new OnEndEventInfo((_, pokemon) =>
+                OnEnd = OnEndEventInfo.Create((_, pokemon) =>
                 {
                     if (pokemon == null) return;
 

@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 
@@ -11,24 +12,37 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 /// </summary>
 public sealed record OnAfterSubDamageEventInfo : EventHandlerInfo
 {
-public OnAfterSubDamageEventInfo(
+    public OnAfterSubDamageEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.AfterSubDamage;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnAfterSubDamageEventInfo Create(
         Action<Battle, int, Pokemon, Pokemon, ActiveMove> handler,
         int? priority = null,
-   bool usesSpeed = true)
+        bool usesSpeed = true)
     {
-    Id = EventId.AfterSubDamage;
-        Prefix = EventPrefix.None;
-        Handler = handler;
-        Priority = priority;
-      UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        return new OnAfterSubDamageEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetIntRelayVar(),
+                    context.GetTargetOrSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetMove()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

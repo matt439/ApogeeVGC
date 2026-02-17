@@ -11,24 +11,47 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyModifyDamagePhase1EventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAnyModifyDamagePhase1EventInfo(
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
-int? priority = null,
-bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.ModifyDamagePhase1;
-Prefix = EventPrefix.Any;
-        Handler = handler;
-Priority = priority;
+        Prefix = EventPrefix.Any;
+        ContextHandler = contextHandler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(DoubleVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAnyModifyDamagePhase1EventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAnyModifyDamagePhase1EventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetIntRelayVar(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    VoidDoubleVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

@@ -13,23 +13,40 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 public sealed record BeforeMoveCallbackEventInfo : EventHandlerInfo
 {
     public BeforeMoveCallbackEventInfo(
-        Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.BeforeMoveCallback;
         Prefix = EventPrefix.None;
-        Handler = handler;
-    Priority = priority;
+        ContextHandler = contextHandler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+
+    public static BeforeMoveCallbackEventInfo Create(
+        Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new BeforeMoveCallbackEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetTargetOrSourcePokemon(),
+                    context.SourcePokemon,
+                    context.GetMove()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

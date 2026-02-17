@@ -18,27 +18,6 @@ public sealed record OnStartEventInfo : EventHandlerInfo
     /// <summary>
     /// Creates event handler using legacy strongly-typed pattern.
     /// </summary>
-    public OnStartEventInfo(
-        Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Prefix = EventPrefix.None;
-        Handler = handler;
-      Priority = priority;
-   UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-          [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-        
-        // Nullability: All parameters non-nullable by default (adjust as needed)
- ParameterNullability = new[] { false, false, false, false };
-     ReturnTypeNullable = false;
-    
-   // Validate configuration
-        ValidateConfiguration();
-    }
-    
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, TargetPokemon, SourcePokemon, SourceEffect
@@ -48,6 +27,7 @@ public sealed record OnStartEventInfo : EventHandlerInfo
         int? priority = null,
         bool usesSpeed = true)
     {
+        Id = EventId.Start;
         Prefix = EventPrefix.None;
         ContextHandler = contextHandler;
      Priority = priority;
@@ -66,8 +46,8 @@ public sealed record OnStartEventInfo : EventHandlerInfo
     return new OnStartEventInfo(
             context => handler(
       context.Battle,
-                context.GetTargetPokemon(),
-         context.GetSourcePokemon(),
+                context.GetTargetOrSourcePokemon(),
+         context.GetSourceOrTargetPokemon(),
       context.GetSourceEffect<IEffect>()
   ),
         priority,

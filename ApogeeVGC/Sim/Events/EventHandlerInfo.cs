@@ -25,8 +25,8 @@ public abstract record EventHandlerInfo
     public EventId Id { get; init; }
 
     /// <summary>
-    /// The actual delegate handler for this event (can be null if not implemented).
-    /// This is the legacy delegate that takes specific parameters.
+    /// Legacy delegate handler property. No longer set by any constructor.
+    /// Retained for structural compatibility with UnionEventHandlerInfo.
     /// </summary>
     [JsonIgnore]
     public Delegate? Handler { get; init; }
@@ -156,7 +156,7 @@ public abstract record EventHandlerInfo
     {
         if (Handler is null)
         {
-            throw new InvalidOperationException("Hander is null.");
+            throw new InvalidOperationException("Handler is null.");
         }
         return Handler;
     }

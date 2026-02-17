@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
@@ -40,7 +40,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.GastroAcid,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Poison,
-                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Check if ability can't be suppressed
                     if (target.GetAbility().Flags.CantSuppress == true)
@@ -220,7 +220,7 @@ public partial record Moves
                 Num = 447,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int bp;
@@ -278,7 +278,7 @@ public partial record Moves
                 Num = 520,
                 Accuracy = 100,
                 BasePower = 80,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, _, move) =>
                 {
                     // Check if this is being called as part of a pledge combo
                     if (move.SourceEffect is MoveEffectStateId
@@ -310,9 +310,9 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
                 {
-                    // Check the battle queue for ally Pokémon using Water Pledge or Fire Pledge
+                    // Check the battle queue for ally Pok�mon using Water Pledge or Fire Pledge
                     if (battle.Queue.List != null)
                     {
                         foreach (IAction action in battle.Queue.List)
@@ -342,7 +342,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) =>
                 {
                     // Check if this move is being modified by a pledge combo
                     if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.WaterPledge })
@@ -382,7 +382,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                OnModifyPriority = new OnModifyPriorityEventInfo((battle, priority, source, _, _) =>
+                OnModifyPriority = OnModifyPriorityEventInfo.Create((battle, priority, source, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, source) &&
                         (source.IsGrounded() ?? false))
@@ -438,7 +438,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, _) =>
                 {
                     if (battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
                     {
@@ -516,7 +516,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, pokemon, _) =>
                 {
                     // In sun, boost to +2/+2 instead of +1/+1
                     ConditionId weather = pokemon.EffectiveWeather();
@@ -544,7 +544,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     int newDef = (target.StoredStats.Def + source.StoredStats.Def) / 2;
                     target.StoredStats.Def = newDef;
@@ -576,7 +576,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     // Swap def and spd boosts
                     int targetDef = target.Boosts.Def;
@@ -663,7 +663,7 @@ public partial record Moves
                 Num = 360,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, pokemon, target, _) =>
                 {
                     int targetSpeed = target.GetStat(StatIdExceptHp.Spe);
                     int userSpeed = pokemon.GetStat(StatIdExceptHp.Spe);
@@ -730,7 +730,7 @@ public partial record Moves
                 BasePp = 30,
                 Priority = 0,
                 Flags = new MoveFlags { Metronome = true },
-                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, _, _) =>
                 {
                     battle.Add("-activate", target, "move: Happy Hour");
                     return new VoidReturn();
@@ -759,7 +759,7 @@ public partial record Moves
                 Num = 912,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, target, _) =>
                 {
                     int hp = target.Hp;
                     int maxHp = target.MaxHp;
@@ -804,7 +804,7 @@ public partial record Moves
                 Flags = new MoveFlags { BypassSub = true, Metronome = true },
                 Target = MoveTarget.All,
                 Type = MoveType.Ice,
-                OnHitField = new OnHitFieldEventInfo((battle, _, _, _) =>
+                OnHitField = OnHitFieldEventInfo.Create((battle, _, _, _) =>
                 {
                     battle.Add("-clearallboost");
                     foreach (Pokemon pokemon in battle.GetAllActive())
@@ -898,7 +898,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.AllyTeam,
                 Type = MoveType.Normal,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     battle.Add("-activate", source, "move: Heal Bell");
                     var success = false;
@@ -951,7 +951,7 @@ public partial record Moves
                 SlotCondition = ConditionId.HealingWish,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
-                OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, _, source, _) =>
                 {
                     if (battle.CanSwitch(source.Side) == 0)
                     {
@@ -985,7 +985,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Any,
                 Type = MoveType.Psychic,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     int healAmount;
                     if (source.HasAbility(AbilityId.MegaLauncher))
@@ -1031,7 +1031,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     // Store both Pokemon's boosts
                     SparseBoostsTable targetBoosts = new()
@@ -1068,7 +1068,7 @@ public partial record Moves
                 Num = 535,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, pokemon, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int pokemonWeight = pokemon.GetWeight();
@@ -1143,7 +1143,7 @@ public partial record Moves
                 Num = 484,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, pokemon, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int pokemonWeight = pokemon.GetWeight();
@@ -1207,7 +1207,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.HelpingHand,
                 Target = MoveTarget.AdjacentAlly,
                 Type = MoveType.Normal,
-                OnTryHit = new OnTryHitEventInfo((battle, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Fails if target already moved or won't move this turn
                     if (!target.NewlySwitched && battle.Queue.WillMove(target) == null)
@@ -1224,7 +1224,7 @@ public partial record Moves
                 Num = 506,
                 Accuracy = 100,
                 BasePower = 65,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, target, move) =>
                 {
                     if (target.Status != ConditionId.None || target.HasAbility(AbilityId.Comatose))
                     {
@@ -1283,7 +1283,7 @@ public partial record Moves
                 HasCrashDamage = true,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-                OnMoveFail = new OnMoveFailEventInfo((battle, _, source, move) =>
+                OnMoveFail = OnMoveFailEventInfo.Create((battle, _, source, move) =>
                 {
                     battle.Damage(source.BaseMaxHp / 2, source, source,
                         BattleDamageEffect.FromIEffect(move));
@@ -1386,7 +1386,7 @@ public partial record Moves
                     Wind = true,
                     Metronome = true,
                 },
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, target) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, target) =>
                 {
                     if (target != null)
                     {
@@ -1517,7 +1517,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
-                OnTry = new OnTryEventInfo((battle, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((battle, _, source, _) =>
                 {
                     if (source.Species.Name == "Hoopa-Unbound")
                     {
@@ -1635,7 +1635,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already charged (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
@@ -1747,7 +1747,7 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
-                OnAfterHit = new OnAfterHitEventInfo((battle, _, source, _) =>
+                OnAfterHit = OnAfterHitEventInfo.Create((battle, _, source, _) =>
                 {
                     if (source.Hp > 0)
                     {
@@ -1756,7 +1756,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnAfterSubDamage = new OnAfterSubDamageEventInfo((battle, _, _, source, _) =>
+                OnAfterSubDamage = OnAfterSubDamageEventInfo.Create((battle, _, _, source, _) =>
                 {
                     if (source.Hp > 0)
                     {
@@ -1852,7 +1852,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Fire,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     Item item = target.GetItem();
                     if ((item.IsBerry || item.IsGem) &&
@@ -1870,7 +1870,7 @@ public partial record Moves
                 Num = 844,
                 Accuracy = 100,
                 BasePower = 60,
-                BasePowerCallback = new BasePowerCallbackEventInfo((_, _, target, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((_, _, target, move) =>
                 {
                     if (target.Status != ConditionId.None || target.HasAbility(AbilityId.Comatose))
                     {
@@ -1959,7 +1959,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     // Check if target has a last move
                     if (target.LastMove == null)
@@ -2071,7 +2071,7 @@ public partial record Moves
                 CritRatio = 2,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, _, move) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, _, move) =>
                 {
                     if (move.Type != MoveType.Grass)
                     {
@@ -2080,7 +2080,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((_, move, pokemon, _) =>
                 {
                     switch (pokemon.Species.Name)
                     {

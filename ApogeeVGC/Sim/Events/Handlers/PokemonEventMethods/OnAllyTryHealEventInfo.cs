@@ -16,43 +16,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
 {
-    /// <summary>
-    /// Creates a new OnAllyTryHeal event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate with multiple possible signatures or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    public OnAllyTryHealEventInfo(
-        OnTryHeal unionValue,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.TryHeal;
-      Prefix = EventPrefix.Ally;
-   UnionValue = unionValue;
-        Handler = ExtractDelegate();
-    Priority = priority;
-        UsesSpeed = usesSpeed;
-        // Don't set ExpectedParameterTypes/ExpectedReturnType here
-        // because OnTryHeal has 2 different delegate signatures
-        // Validation will determine which signature is used and validate without setting properties
-        ExpectedParameterTypes = null;
-   ExpectedReturnType = null;
-   
-        // Nullability info varies by signature - will be checked in custom Validate()
-    // Signature 1: (Battle, int, Pokemon, Pokemon, IEffect) - all non-nullable
-  // Signature 2: (Battle, Pokemon) - all non-nullable  
-   // Return type: nullable for both signatures
-  ParameterNullability = null; // Handled in custom validation
-  ReturnTypeNullable = true; // Both signatures return nullable types
-    
-  // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
-        // Custom validation happens in Validate() method
-    }
-
-    /// <summary>
-    /// Custom validation for OnAllyTryHeal which supports multiple delegate signatures.
-    /// </summary>
     public new void Validate()
     {
       if (UnionValue == null) return;
@@ -139,5 +102,59 @@ Type? expectedRetType;
       $"Expected: {expectedRetType.Name} (or nullable variant), " +
  $"Got: {actualReturnType.Name}");
         }
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnAllyTryHealEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.TryHeal;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler (5-param signature).
+    /// </summary>
+    public static OnAllyTryHealEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon, IEffect, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyTryHealEventInfo(
+            context => handler(
+                context.Battle,
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetSourceEffect<IEffect>()
+            ),
+            priority,
+            usesSpeed
+        );
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler (2-param signature).
+    /// </summary>
+    public static OnAllyTryHealEventInfo Create(
+        Func<Battle, Pokemon, RelayVar?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyTryHealEventInfo(
+            context => handler(
+                context.Battle,
+                context.GetTargetOrSourcePokemon()
+            ),
+            priority,
+            usesSpeed
+        );
     }
 }

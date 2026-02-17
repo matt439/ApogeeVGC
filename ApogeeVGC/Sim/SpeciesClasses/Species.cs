@@ -209,12 +209,14 @@ public record Species : IEffect, ICopyable<Species>
     /// <summary>
     /// Gets event handler information for the specified event.
     /// Species doesn't have event handlers, so always returns null.
-  /// </summary>
-    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null)
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
         // Species doesn't have any event handlers
         return null;
     }
+
+    public bool HasAnyEventHandlers => false;
 }
 
 public enum SpeciesAbilityType

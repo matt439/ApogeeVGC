@@ -553,30 +553,29 @@ public static class EventHandlerInfoMapper
 
     /// <summary>
     /// Gets the EventHandlerInfo for a given EventId from an IEffect.
-    /// Uses static dictionaries for O(1) lookups without reflection.
+    /// Uses EffectType enum dispatch to avoid multiple interface casts per call.
     /// </summary>
-    /// <param name="effect">The effect to query</param>
-    /// <param name="id">The base EventId (without prefix/suffix)</param>
-    /// <param name="prefix">Optional event prefix (Foe, Source, Any, Ally)</param>
-    /// <param name="suffix">Optional event suffix</param>
-    /// <returns>The EventHandlerInfo if found, null otherwise</returns>
     public static EventHandlerInfo? GetEventHandlerInfo(
         IEffect effect,
         EventId id,
         EventPrefix? prefix = null,
         EventSuffix? suffix = null)
     {
-        // Try move-specific events first (if applicable)
-        if (effect is IMoveEventMethods moveMethods &&
-            MoveEventMethodsMap.TryGetValue(id, out var moveAccessor))
-        {
-            EventHandlerInfo? info = moveAccessor(moveMethods);
-            if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
-                return info;
-        }
+        // Species never has event handlers
+        if (effect.EffectType == EffectType.Specie)
+            return null;
 
-        // Try ability-specific events first (if applicable)
-        if (effect is IAbilityEventMethodsV2 abilityMethods &&
+        // Move only has move-specific events (doesn't implement IEventMethods)
+        if (effect.EffectType == EffectType.Move)
+            return GetMoveHandlerInfo((IMoveEventMethods)effect, id, prefix, suffix);
+
+        // For types implementing IEventMethods (Ability, Item, Condition, Format, etc.)
+        if (effect is not IEventMethods eventMethods)
+            return null;
+
+        // Ability has additional ability-specific events (Start, End, CheckShow)
+        if (effect.EffectType == EffectType.Ability &&
+            effect is IAbilityEventMethodsV2 abilityMethods &&
             AbilityEventMethodsMap.TryGetValue(id, out var abilityAccessor))
         {
             EventHandlerInfo? info = abilityAccessor(abilityMethods);
@@ -584,8 +583,35 @@ public static class EventHandlerInfoMapper
                 return info;
         }
 
+        return GetEventMethodsHandlerInfo(eventMethods, id, prefix, suffix,
+                   effect is IPokemonEventMethods pm ? pm : null);
+    }
+
+    private static EventHandlerInfo? GetMoveHandlerInfo(
+        IMoveEventMethods moveMethods,
+        EventId id,
+        EventPrefix? prefix,
+        EventSuffix? suffix)
+    {
+        if (MoveEventMethodsMap.TryGetValue(id, out var moveAccessor))
+        {
+            EventHandlerInfo? info = moveAccessor(moveMethods);
+            if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
+                return info;
+        }
+
+        return null;
+    }
+
+    private static EventHandlerInfo? GetEventMethodsHandlerInfo(
+        IEventMethods eventMethods,
+        EventId id,
+        EventPrefix? prefix,
+        EventSuffix? suffix,
+        IPokemonEventMethods? pokemonMethods)
+    {
         // Handle prefixed events
-        if (prefix.HasValue && effect is IEventMethods eventMethods)
+        if (prefix.HasValue)
         {
             EventHandlerInfo? info = prefix.Value switch
             {
@@ -595,7 +621,7 @@ public static class EventHandlerInfoMapper
                     accessor(eventMethods),
                 EventPrefix.Any when AnyEventMethodsMap.TryGetValue(id, out var accessor) =>
                     accessor(eventMethods),
-                EventPrefix.Ally when effect is IPokemonEventMethods pokemonMethods &&
+                EventPrefix.Ally when pokemonMethods != null &&
                                       AllyEventMethodsMap.TryGetValue(id, out var allyAccessor) =>
                     allyAccessor(pokemonMethods),
                 _ => null,
@@ -606,10 +632,9 @@ public static class EventHandlerInfoMapper
         }
 
         // Handle base events (no prefix)
-        if (effect is IEventMethods baseMethods &&
-            EventMethodsMap.TryGetValue(id, out var baseAccessor))
+        if (EventMethodsMap.TryGetValue(id, out var baseAccessor))
         {
-            EventHandlerInfo? info = baseAccessor(baseMethods);
+            EventHandlerInfo? info = baseAccessor(eventMethods);
             if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
                 return info;
         }
@@ -630,5 +655,91 @@ public static class EventHandlerInfoMapper
             return false;
 
         return true;
+    }
+
+    /// <summary>
+    /// Builds a pre-computed handler cache for an effect by scanning all EventId × EventPrefix × EventSuffix
+    /// combinations. Only non-null results are stored, yielding a compact lookup table.
+    /// For Ability/Item/innate effects, pre-computes the SwitchIn→OnStart fallback so the
+    /// runtime conditional in GetHandlerInfo is eliminated.
+    /// </summary>
+    public static FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
+        BuildHandlerCache(IEffect effect)
+    {
+        var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
+
+        foreach (EventId id in Enum.GetValues<EventId>())
+        {
+            foreach (EventPrefix prefix in Enum.GetValues<EventPrefix>())
+            {
+                foreach (EventSuffix suffix in Enum.GetValues<EventSuffix>())
+                {
+                    EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
+                    EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
+
+                    EventHandlerInfo? info = GetEventHandlerInfo(effect, id, p, s);
+                    if (info != null)
+                        cache[(id, prefix, suffix)] = info;
+                }
+            }
+        }
+
+        // Pre-compute SwitchIn→OnStart fallback for Ability, Item, and innate effects.
+        // In Gen 5+, if an ability/item has OnStart but not OnSwitchIn and not OnAnySwitchIn,
+        // the OnStart handler is used for SwitchIn events. Gen is always 9 in this codebase.
+        if (IsSwitchInFallbackCandidate(effect) &&
+            cache.TryGetValue((EventId.Start, EventPrefix.None, EventSuffix.None), out EventHandlerInfo startHandler) &&
+            !cache.ContainsKey((EventId.SwitchIn, EventPrefix.None, EventSuffix.None)) &&
+            !cache.ContainsKey((EventId.AnySwitchIn, EventPrefix.None, EventSuffix.None)))
+        {
+            cache[(EventId.SwitchIn, EventPrefix.None, EventSuffix.None)] =
+                startHandler with { Id = EventId.SwitchIn };
+        }
+
+        return cache.ToFrozenDictionary();
+    }
+
+    /// <summary>
+    /// Checks whether an effect qualifies for the SwitchIn→OnStart fallback pre-computation.
+    /// Matches the runtime check: IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect).
+    /// </summary>
+    private static bool IsSwitchInFallbackCandidate(IEffect effect)
+    {
+        if (effect.EffectType is EffectType.Ability or EffectType.Item)
+            return true;
+
+        // Innate ability/item: a Condition with EffectType.Status that has an associated ability or item
+        if (effect.EffectType == EffectType.Status && effect is Condition condition)
+            return condition.AssociatedItem is not null || condition.AssociatedAbility is not null;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Builds a pre-computed handler cache for a move effect by scanning all EventId × EventPrefix × EventSuffix
+    /// combinations against the MoveEventMethodsMap.
+    /// </summary>
+    public static FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
+        BuildMoveHandlerCache(IMoveEventMethods moveMethods)
+    {
+        var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
+
+        foreach (EventId id in Enum.GetValues<EventId>())
+        {
+            foreach (EventPrefix prefix in Enum.GetValues<EventPrefix>())
+            {
+                foreach (EventSuffix suffix in Enum.GetValues<EventSuffix>())
+                {
+                    EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
+                    EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
+
+                    EventHandlerInfo? info = GetMoveHandlerInfo(moveMethods, id, p, s);
+                    if (info != null)
+                        cache[(id, prefix, suffix)] = info;
+                }
+            }
+        }
+
+        return cache.ToFrozenDictionary();
     }
 }

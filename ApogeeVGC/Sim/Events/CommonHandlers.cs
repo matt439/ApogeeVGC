@@ -39,3 +39,6 @@ public delegate void VoidSourceEffectHandler(Battle battle, Pokemon source, Poke
 // Note: The name "VoidSourceMoveHandler" might be a bit misleading since it returns a BoolVoidUnion.
 // This was changed due to Paralysis' OnBeforeMove event needing to return a bool value.
 public delegate BoolVoidUnion VoidSourceMoveHandler(Battle battle, Pokemon source, Pokemon target, ActiveMove move);
+
+// Handler for FractionalPriority event - modifies move priority (no target parameter)
+public delegate DoubleVoidUnion FractionalPriorityHandler(Battle battle, int priority, Pokemon pokemon, ActiveMove move);

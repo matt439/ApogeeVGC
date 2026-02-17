@@ -7,28 +7,43 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 /// <summary>
 /// Event handler info for OnModifyMove event (move-specific).
 /// Triggered to modify a move.
-/// Signature: Action<Battle, ActiveMove, Pokemon, Pokemon?>
+/// Signature: Action&lt;Battle, ActiveMove, Pokemon, Pokemon?&gt;
 /// </summary>
 public sealed record OnModifyMoveEventInfo : EventHandlerInfo
 {
-public OnModifyMoveEventInfo(
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnModifyMoveEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifyMove;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnModifyMoveEventInfo Create(
         Action<Battle, ActiveMove, Pokemon, Pokemon?> handler,
         int? priority = null,
-   bool usesSpeed = true)
+        bool usesSpeed = true)
     {
-    Id = EventId.ModifyMove;
-        Prefix = EventPrefix.None;
-        Handler = handler;
-        Priority = priority;
-      UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(ActiveMove), typeof(Pokemon), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        return new OnModifyMoveEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetMove(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.TargetPokemon
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -139,9 +140,12 @@ public partial class Side
         {
             int lockedMoveTargetLoc = pokemon.LastMoveTargetLoc ?? 0;
 
-            // Note: In the original TS code, it checks pokemon.volatiles[lockedMoveID]?.targetLoc
-            // but EffectState doesn't have a targetLoc property in our C# implementation
-            // This would need to be added to EffectState if this functionality is needed
+            // Check if the TwoTurnMove volatile has a stored target location
+            if (pokemon.Volatiles.TryGetValue(ConditionId.TwoTurnMove, out EffectState? twoTurnVolatile) &&
+                twoTurnVolatile is { TargetLoc: not null })
+            {
+                lockedMoveTargetLoc = twoTurnVolatile.TargetLoc.Value;
+            }
 
             if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;
 

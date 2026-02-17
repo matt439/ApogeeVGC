@@ -1,5 +1,11 @@
+using ApogeeVGC.Data;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Sim.Generators;
+using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -350,6 +356,12 @@ public partial class Driver
             new ConcurrentBag<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
                 Exception)>();
 
+        // Coverage tracking dictionaries (thread-safe)
+        var speciesCoverage = new ConcurrentDictionary<SpecieId, int>();
+        var moveCoverage = new ConcurrentDictionary<MoveId, int>();
+        var abilityCoverage = new ConcurrentDictionary<AbilityId, int>();
+        var itemCoverage = new ConcurrentDictionary<ItemId, int>();
+
         // Run simulations in parallel with specified number of threads
         var parallelOptions = new ParallelOptions
         {
@@ -358,22 +370,51 @@ public partial class Driver
 
         Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
         {
-            // Calculate unique seeds for this battle using atomic operations
-            int offset1 = Interlocked.Increment(ref seedCounter);
-            int offset2 = Interlocked.Increment(ref seedCounter);
-            int offset3 = Interlocked.Increment(ref seedCounter);
-            int offset4 = Interlocked.Increment(ref seedCounter);
-            int offset5 = Interlocked.Increment(ref seedCounter);
+            // Batch seed allocation: single atomic add instead of 5 separate increments
+            int baseOffset = Interlocked.Add(ref seedCounter, 5) - 4;
 
-            int localTeam1Seed = Team1EvalSeed + offset1;
-            int localTeam2Seed = Team2EvalSeed + offset2;
-            int localPlayer1Seed = PlayerRandom1EvalSeed + offset3;
-            int localPlayer2Seed = PlayerRandom2EvalSeed + offset4;
-            int localBattleSeed = BattleEvalSeed + offset5;
+            int localTeam1Seed = Team1EvalSeed + baseOffset;
+            int localTeam2Seed = Team2EvalSeed + baseOffset + 1;
+            int localPlayer1Seed = PlayerRandom1EvalSeed + baseOffset + 2;
+            int localPlayer2Seed = PlayerRandom2EvalSeed + baseOffset + 3;
+            int localBattleSeed = BattleEvalSeed + baseOffset + 4;
 
             try
             {
-                (SimulatorResult result, int turn) = RunBattleWithRandomTeamsAndTimeout(
+                // Generate teams externally so we can track coverage
+                var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam1Seed);
+                var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam2Seed);
+
+                var team1 = team1Generator.GenerateTeam();
+                var team2 = team2Generator.GenerateTeam();
+
+                // Track coverage for both teams (no Concat allocation)
+                foreach (var set in team1)
+                {
+                    speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
+                    abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
+                    itemCoverage.AddOrUpdate(set.Item, 1, static (_, count) => count + 1);
+                    foreach (var move in set.Moves)
+                    {
+                        moveCoverage.AddOrUpdate(move, 1, static (_, count) => count + 1);
+                    }
+                }
+
+                foreach (var set in team2)
+                {
+                    speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
+                    abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
+                    itemCoverage.AddOrUpdate(set.Item, 1, static (_, count) => count + 1);
+                    foreach (var move in set.Moves)
+                    {
+                        moveCoverage.AddOrUpdate(move, 1, static (_, count) => count + 1);
+                    }
+                }
+
+                // Run directly on Parallel.For thread — no Task.Run + Wait overhead
+                (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
+                    team1,
+                    team2,
                     localTeam1Seed,
                     localTeam2Seed,
                     localPlayer1Seed,
@@ -503,7 +544,81 @@ public partial class Driver
         sb.AppendLine($"Maximum Turns: {maxTurns}");
         Console.WriteLine(sb.ToString());
 
+        // --- Coverage Report ---
+        // Build the legal pools from a reference generator (seed is irrelevant for pool queries)
+        var refGenerator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, seed: 0);
+
+        // Derive reachable abilities and moves from legal species
+        var legalAbilities = new HashSet<AbilityId>();
+        var legalMoves = new HashSet<MoveId>();
+        foreach (var specieId in refGenerator.LegalSpecies)
+        {
+            var species = Library.Species[specieId];
+            if (species.Abilities.Slot0 != AbilityId.None) legalAbilities.Add(species.Abilities.Slot0);
+            if (species.Abilities.Slot1 is { } s1 && s1 != AbilityId.None) legalAbilities.Add(s1);
+            if (species.Abilities.Hidden is { } h && h != AbilityId.None) legalAbilities.Add(h);
+
+            if (Library.Learnsets.TryGetValue(specieId, out var learnset) && learnset.LearnsetData != null)
+            {
+                foreach (var (moveId, sources) in learnset.LearnsetData)
+                {
+                    if (sources.Any(s => s.Generation == 9))
+                    {
+                        legalMoves.Add(moveId);
+                    }
+                }
+            }
+        }
+
+        var coverageSb = new StringBuilder();
+        coverageSb.AppendLine("===========================================================");
+        coverageSb.AppendLine("COVERAGE REPORT");
+        coverageSb.AppendLine("===========================================================");
+        coverageSb.AppendLine();
+
+        AppendCoverageSection(coverageSb, "Species", speciesCoverage, refGenerator.LegalSpecies);
+        AppendCoverageSection(coverageSb, "Items", itemCoverage, refGenerator.UsableItems);
+        AppendCoverageSection(coverageSb, "Abilities", abilityCoverage, legalAbilities);
+        AppendCoverageSection(coverageSb, "Moves", moveCoverage, legalMoves);
+
+        Console.WriteLine(coverageSb.ToString());
+
         Console.WriteLine("Press Enter key to exit...");
         Console.ReadLine();
+    }
+
+    /// <summary>
+    /// Appends a coverage section for a single category to the report.
+    /// Lists overall stats and any entries from the legal pool that were never selected.
+    /// </summary>
+    private static void AppendCoverageSection<TId>(
+        StringBuilder sb,
+        string label,
+        ConcurrentDictionary<TId, int> observed,
+        IEnumerable<TId> legalPool) where TId : notnull
+    {
+        var legalSet = legalPool as IReadOnlyCollection<TId> ?? legalPool.ToList();
+        int totalLegal = legalSet.Count;
+        var neverSelected = legalSet.Where(id => !observed.ContainsKey(id)).OrderBy(id => id).ToList();
+        int selectedCount = totalLegal - neverSelected.Count;
+
+        var counts = observed.Values.ToList();
+        int minCount = counts.Count > 0 ? counts.Min() : 0;
+        int maxCount = counts.Count > 0 ? counts.Max() : 0;
+        double meanCount = counts.Count > 0 ? counts.Average() : 0;
+
+        sb.AppendLine($"{label} Coverage: {selectedCount}/{totalLegal} ({(double)selectedCount / totalLegal:P2})");
+        sb.AppendLine($"  Selection counts — Min: {minCount}, Max: {maxCount}, Mean: {meanCount:F1}");
+
+        if (neverSelected.Count > 0)
+        {
+            sb.AppendLine($"  Never selected ({neverSelected.Count}):");
+            foreach (var id in neverSelected)
+            {
+                sb.AppendLine($"    - {id}");
+            }
+        }
+
+        sb.AppendLine();
     }
 }

@@ -12,24 +12,47 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyEffectivenessEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAllyEffectivenessEventInfo(
-        Func<Battle, int, Pokemon?, PokemonType, ActiveMove, IntVoidUnion> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.Effectiveness;
         Prefix = EventPrefix.Ally;
-        Handler = handler;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(PokemonType), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(IntVoidUnion);
-
-        // Nullability: Battle (non-null), int (non-null), Pokemon (nullable), PokemonType (non-null), ActiveMove (non-null)
-        ParameterNullability = new[] { false, false, true, false, false };
-        ReturnTypeNullable = false; // IntVoidUnion is a struct
-
-        // Validate configuration
-        ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAllyEffectivenessEventInfo Create(
+        Func<Battle, int, Pokemon?, PokemonType, ActiveMove, IntVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyEffectivenessEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.SourceType!.Value,
+                context.GetMove()
+                );
+                return result switch
+                {
+                    IntIntVoidUnion i => new IntRelayVar(i.Value),
+                    VoidIntVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

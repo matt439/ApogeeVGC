@@ -12,31 +12,38 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnSourceFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFractionalPriority>
 {
-    /// <summary>
-    /// Creates a new OnSourceFractionalPriority event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or double constant)</param>
-  /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnSourceFractionalPriorityEventInfo(
-      OnFractionalPriority unionValue,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.FractionalPriority;
         Prefix = EventPrefix.Source;
-        UnionValue = unionValue;
-        Handler = ExtractDelegate();
+        ContextHandler = contextHandler;
         Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(double);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceFractionalPriorityEventInfo Create(
+        Func<Battle, int, Pokemon, ActiveMove, double> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceFractionalPriorityEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetMove()
+                );
+                return new DecimalRelayVar((decimal)result);
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

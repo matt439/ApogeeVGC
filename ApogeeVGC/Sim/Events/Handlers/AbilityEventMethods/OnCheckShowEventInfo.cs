@@ -10,30 +10,34 @@ namespace ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 /// </summary>
 public sealed record OnCheckShowEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnCheckShow event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnCheckShowEventInfo(
-        Action<Battle, Pokemon> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.CheckShow;
         Prefix = EventPrefix.None;
-        Handler = handler;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+
+    public static OnCheckShowEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnCheckShowEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

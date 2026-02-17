@@ -10,24 +10,41 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyPseudoWeatherChangeEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAnyPseudoWeatherChangeEventInfo(
-        Action<Battle, Pokemon, Pokemon, Condition> handler,
-int? priority = null,
-bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.PseudoWeatherChange;
-Prefix = EventPrefix.Any;
-        Handler = handler;
-Priority = priority;
+        Prefix = EventPrefix.Any;
+        ContextHandler = contextHandler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(Condition)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAnyPseudoWeatherChangeEventInfo Create(
+        Action<Battle, Pokemon, Pokemon, Condition> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAnyPseudoWeatherChangeEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetSourceEffect<Condition>()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

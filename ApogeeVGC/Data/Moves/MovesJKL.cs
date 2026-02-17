@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
@@ -32,7 +32,7 @@ public partial record Moves
                     Metronome = true,
                     Bite = true,
                 },
-                OnHit = new OnHitEventInfo((_, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((_, target, source, move) =>
                 {
                     source.AddVolatile(ConditionId.Trapped, target, move, ConditionId.Trapper);
                     target.AddVolatile(ConditionId.Trapped, source, move, ConditionId.Trapper);
@@ -79,7 +79,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((_, move, pokemon, _) =>
                 {
                     if (pokemon.IgnoringItem()) return;
                     Item item = pokemon.GetItem();
@@ -108,7 +108,7 @@ public partial record Moves
                     BypassSub = true,
                     AllyAnim = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
                     IntFalseUnion healResult = battle.Heal(healAmount, target);
@@ -137,7 +137,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, target, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, target, move) =>
                 {
                     Item item = target.GetItem();
                     // Check if item can be taken (TakeItem event check)
@@ -152,7 +152,7 @@ public partial record Moves
 
                     return basePower;
                 }),
-                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, _) =>
+                OnAfterHit = OnAfterHitEventInfo.Create((battle, target, source, _) =>
                 {
                     if (source.Hp > 0)
                     {
@@ -204,7 +204,7 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, source, _, _) =>
                 {
                     if (source.StatsLoweredThisTurn)
                     {
@@ -236,7 +236,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, _, source, _) =>
                 {
                     // Last Resort fails unless the user knows at least 2 moves
                     if (source.MoveSlots.Count < 2) return false;
@@ -275,7 +275,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, _) =>
                 {
                     int bp = 50 + 50 * source.Side.TotalFainted;
                     battle.Debug($"BP: {bp}");
@@ -407,7 +407,7 @@ public partial record Moves
                 },
                 VolatileStatus = ConditionId.LeechSeed,
                 Condition = _library.Conditions[ConditionId.LeechSeed],
-                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
+                OnTryImmunity = OnTryImmunityEventInfo.Create((_, target, _, _) =>
                     !target.HasType(PokemonType.Grass)),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -532,7 +532,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((_, _, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, _, source, _) =>
                 {
                     // Fails if source already has lockon volatile
                     if (source.Volatiles.ContainsKey(ConditionId.LockOn))
@@ -542,7 +542,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     source.AddVolatile(ConditionId.LockOn, target);
                     battle.Add("-activate", source, "move: Lock-On", $"[of] {target}");
@@ -559,7 +559,7 @@ public partial record Moves
                 Num = 67,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int bp = targetWeight switch
@@ -677,7 +677,7 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
                     IntFalseUnion healResult = battle.Heal(healAmount, target);
@@ -706,7 +706,7 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Fails if user cannot switch
                     if (battle.CanSwitch(source.Side) == 0)
