@@ -385,9 +385,9 @@
 
 ^ review items EarthPlate to ElectricSeed
 
-@ review items EnigmaBerry to FistPlate
+^ review items EnigmaBerry to FistPlate
 
-review items FlameOrb to FriendBall
+@ review items FlameOrb to FriendBall
 
 ## ItemsGHI
 
