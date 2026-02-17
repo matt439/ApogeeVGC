@@ -417,9 +417,9 @@
 
 ## ItemsPQR
 
-@ review items PasshoBerry to PoisonBarb
+^ review items PasshoBerry to PoisonBarb
 
-review items PokeBall to ProtectivePads
+@ review items PokeBall to ProtectivePads
 
 review items PsychicSeed to RazorClaw
 
