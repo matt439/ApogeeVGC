@@ -82,6 +82,7 @@ public partial record Items
                 Num = 300,
                 Gen = 4,
             },
+            // Skip Zeraorite - mega stone (isNonstandard: "Future")
             [ItemId.ZoomLens] = new()
             {
                 Id = ItemId.ZoomLens,

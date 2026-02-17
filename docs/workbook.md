@@ -443,11 +443,11 @@
 
 ^ review items WacanBerry to WhiteHerb
 
-@ review items WideLens to WiseGlasses
+^ review items WideLens to WiseGlasses
 
 ## ItemsYZ
 
-review items YacheBerry to ZoomLens
+^ review items YacheBerry to ZoomLens
 
 # Conditions
 
