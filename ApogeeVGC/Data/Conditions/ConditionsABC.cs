@@ -521,7 +521,7 @@ public partial record Conditions
                     // The move should already be locked by OnModifyMove
                     // Check if attempting to use a different move
                     var lockedMove = pokemon.Volatiles[ConditionId.ChoiceLock].Move;
-                    if (lockedMove != null && move.Id != lockedMove && move.Id != MoveId.Struggle)
+                    if (move.Id != (lockedMove ?? default) && move.Id != MoveId.Struggle)
                     {
                         // Move is blocked by choice lock
                         battle.Debug(
@@ -556,7 +556,7 @@ public partial record Conditions
 
                     // Check if Pokemon still has a choice item and the locked move
                     if (!(pokemon.GetItem().IsChoice ?? false) ||
-                        (effectState.Move != null && !pokemon.HasMove((MoveId)effectState.Move)))
+                        (effectState.Move == null || !pokemon.HasMove((MoveId)effectState.Move)))
                     {
                         battle.Debug(
                             $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Removing volatile");

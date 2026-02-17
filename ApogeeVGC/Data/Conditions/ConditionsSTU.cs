@@ -1539,7 +1539,7 @@ public partial record Conditions
                         if (Enum.TryParse(moveId.ToString(), out ConditionId conditionId) &&
                             _library.Conditions.ContainsKey(conditionId))
                         {
-                            target.DeleteVolatile(conditionId);
+                            target.RemoveVolatile(_library.Conditions[conditionId]);
                         }
                     }
                 }),
