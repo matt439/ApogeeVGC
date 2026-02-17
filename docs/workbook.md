@@ -409,9 +409,9 @@
 
 ^ review items MachoBrace to MeadowPlate
 
-@ review items MentalHerb to MiracleSeed
+^ review items MentalHerb to MiracleSeed
 
-review items MirrorHerb to NeverMeltIce
+@ review items MirrorHerb to NeverMeltIce
 
 review items None to OvalStone
 
