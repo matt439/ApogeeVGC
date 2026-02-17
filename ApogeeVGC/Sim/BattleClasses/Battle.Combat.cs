@@ -446,7 +446,8 @@ public partial class Battle
             source = eventSource.Pokemon;
         }
 
-        effect ??= Event.Effect;
+        // PS: effect ||= this.effect; (handler's owning effect, NOT this.event.sourceEffect)
+        effect ??= Effect;
 
         // Validate target has HP
         if (target?.Hp <= 0) return new ZeroBoolZeroUnion();

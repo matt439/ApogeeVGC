@@ -224,261 +224,261 @@
 
 ^ review moves WildCharge to WorkUp
 
-review moves WorrySeed to XScissor
+^ review moves WorrySeed to XScissor
 
 ## MovesYZ
 
-review moves Yawn to ZingZap
+^ review moves Yawn to ZingZap
 
 
 # Abilities
 
 ## AbilitiesABC
 
-review abilities Adaptability to AngerPoint
+^ review abilities Adaptability to AngerPoint
 
-review abilities AngerShell to ArmorTail
+^ review abilities AngerShell to ArmorTail
 
-review abilities AromaVeil to AuraBreak
+^ review abilities AromaVeil to AuraBreak
 
-review abilities BadDreams to BeastBoost
+^ review abilities BadDreams to BeastBoost
 
-review abilities Berserk to ChillingNeigh
+^ review abilities Berserk to ChillingNeigh
 
-review abilities Chlorophyll to Comatose
+^ review abilities Chlorophyll to Comatose
 
-review abilities Commander to Costar
+^ review abilities Commander to Costar
 
-review abilities CottonDown to CuteCharm
+^ review abilities CottonDown to CuteCharm
 
 
 ## AbilitiesDEF
 
-review abilities Damp to Defiant
+^ review abilities Damp to Defiant
 
-review abilities DeltaStream to Download
+^ review abilities DeltaStream to Download
 
-review abilities DragonsMaw to Electromorphosis
+^ review abilities DragonsMaw to Electromorphosis
 
-review abilities EmbodyAspectCornerstone to FlameBody
+^ review abilities EmbodyAspectCornerstone to FlameBody
 
-review abilities FlareBoost to FlowerGift
+^ review abilities FlareBoost to FlowerGift
 
-review abilities FlowerVeil to Forecast
+^ review abilities FlowerVeil to Forecast
 
-review abilities Forewarn to FurCoat
+^ review abilities Forewarn to FurCoat
 
 ## AbilitiesGHI
 
-review abilities GaleWings to GorillaTactics
+^ review abilities GaleWings to GorillaTactics
 
-review abilities GrassPelt to Guts
+^ review abilities GrassPelt to Guts
 
-review abilities HadronEngine to HoneyGather
+^ review abilities HadronEngine to HoneyGather
 
-review abilities Hospitality to HyperCutter
+^ review abilities Hospitality to HyperCutter
 
-review abilities IceBody to IceScales
+^ review abilities IceBody to IceScales
 
-review abilities Illuminate to Imposter
+^ review abilities Illuminate to Imposter
 
-review abilities Infiltrator to IronFist
+^ review abilities Infiltrator to IronFist
 
 ## AbilitiesJKL
 
-review abilities Justified to LightMetal
+^ review abilities Justified to LightMetal
 
-review abilities LightningRod to LongReach
+^ review abilities LightningRod to LongReach
 
 ## AbilitiesMNO
 
-review abilities MagicBounce to MegaLauncher
+^ review abilities MagicBounce to MegaLauncher
 
-review abilities Merciless to MirrorArmor
+^ review abilities Merciless to MirrorArmor
 
-review abilities MistySurge to Multiscale
+^ review abilities MistySurge to Multiscale
 
-review abilities Multitype to NaturalCure
+^ review abilities Multitype to NaturalCure
 
-review abilities Neuroforce to Normalize
+^ review abilities Neuroforce to Normalize
 
-review abilities Oblivious to Opportunist
+^ review abilities Oblivious to Opportunist
 
-review abilities OrichalcumPulse to OwnTempo
+^ review abilities OrichalcumPulse to OwnTempo
 
 ## AbilitiesPQR
 
-review abilities ParentalBond to Pickup
+^ review abilities ParentalBond to Pickup
 
-review abilities Pixilate to PowerOfAlchemy
+^ review abilities Pixilate to PowerOfAlchemy
 
-review abilities PowerSpot to Protean
+^ review abilities PowerSpot to Protean
 
-review abilities Protosynthesis to PurifyingSalt
+^ review abilities Protosynthesis to PurifyingSalt
 
-review abilities QuarkDrive to Receiver
+^ review abilities QuarkDrive to Receiver
 
-review abilities Reckless to RksSystem
+^ review abilities Reckless to RksSystem
 
-review abilities RockHead to RunAway
+^ review abilities RockHead to RunAway
 
 ## AbilitiesSTU
 
-review abilities SandForce to SapSipper
+^ review abilities SandForce to SapSipper
 
-review abilities Schooling to ShadowShield
+^ review abilities Schooling to ShadowShield
 
-review abilities ShadowTag to ShieldDust
+^ review abilities ShadowTag to ShieldDust
 
-review abilities ShieldsDown to Sniper
+^ review abilities ShieldsDown to Sniper
 
-review abilities SnowCloak to Stall
+^ review abilities SnowCloak to Stall
 
-review abilities Stalwart to Stench
+^ review abilities Stalwart to Stench
 
-review abilities StickyHold to SupersweetSyrup
+^ review abilities StickyHold to SupersweetSyrup
 
-review abilities SupremeOverlord to SwordOfRuin
+^ review abilities SupremeOverlord to SwordOfRuin
 
-review abilities Symbiosis to TeraformZero
+^ review abilities Symbiosis to TeraformZero
 
-review abilities TeraShell to ToughClaws
+^ review abilities TeraShell to ToughClaws
 
-review abilities ToxicBoost to Turboblaze
+^ review abilities ToxicBoost to Turboblaze
 
-review abilities Unaware to UnseenFist
+^ review abilities Unaware to UnseenFist
 
 ## AbilitiesVWX
 
-review abilities VesselOfRuin to VoltAbsorb
+^ review abilities VesselOfRuin to VoltAbsorb
 
-review abilities WanderingSpirit to WaterVeil
+^ review abilities WanderingSpirit to WaterVeil
 
-review abilities WeakArmor to WindPower
+^ review abilities WeakArmor to WindPower
 
-review abilities WindRider to WonderSkin
+^ review abilities WindRider to WonderSkin
 
 ## AbilitiesYZ
 
-review abilities ZenMode to ZeroToHero
+^ review abilities ZenMode to ZeroToHero
 
 
 # Items
 
 ## ItemsABC
 
-review items AbilityShield to AguavBerry
+^ review items AbilityShield to AguavBerry
 
-review items AirBalloon to BigNugget
+^ review items AirBalloon to BigNugget
 
-review items BigRoot to BrightPowder
+^ review items BigRoot to BrightPowder
 
-review items CellBattery to ChoiceBand
+^ review items CellBattery to ChoiceBand
 
-review items ChoiceScarf to ClearAmulet
+^ review items ChoiceScarf to ClearAmulet
 
-review items CloverSweet to CustapBerry
+^ review items CloverSweet to CustapBerry
 
 ## ItemsDEF
 
-review items DampRock to DuskStone
+^ review items DampRock to DuskStone
 
-review items EarthPlate to ElectricSeed
+^ review items EarthPlate to ElectricSeed
 
-review items EnigmaBerry to FistPlate
+^ review items EnigmaBerry to FistPlate
 
-review items FlameOrb to FriendBall
+^ review items FlameOrb to FriendBall
 
 ## ItemsGHI
 
-review items GalaricaCuff to GriseousOrb
+^ review items GalaricaCuff to GriseousOrb
 
-review items HabanBerry to HondewBerry
+^ review items HabanBerry to HondewBerry
 
-review items IapapaBerry to IronPlate
+^ review items IapapaBerry to IronPlate
 
 ## ItemsJKL
 
-review items JabocaBerry to LaggingTail
+^ review items JabocaBerry to LaggingTail
 
-review items LansatBerry to LightClay
+^ review items LansatBerry to LightClay
 
-review items LoadedDice to LuxuryBall
+^ review items LoadedDice to LuxuryBall
 
 ## ItemsMNO
 
-review items MachoBrace to MeadowPlate
+^ review items MachoBrace to MeadowPlate
 
-review items MentalHerb to MiracleSeed
+^ review items MentalHerb to MiracleSeed
 
-review items MirrorHerb to NeverMeltIce
+^ review items MirrorHerb to NeverMeltIce
 
-review items None to OvalStone
+^ review items None to OvalStone
 
 ## ItemsPQR
 
-review items PasshoBerry to PoisonBarb
+^ review items PasshoBerry to PoisonBarb
 
-review items PokeBall to ProtectivePads
+^ review items PokeBall to ProtectivePads
 
-review items PsychicSeed to RazorClaw
+^ review items PsychicSeed to RazorClaw
 
-review items RazorFang to RoomService
+^ review items RazorFang to RoomService
 
-review items RoseliBerry to RustedSword
+^ review items RoseliBerry to RustedSword
 
 ## ItemsSTU
 
-review items SafariBall to SilkScarf
+^ review items SafariBall to SilkScarf
 
-review items SilverPowder to SpellTag
+^ review items SilverPowder to SpellTag
 
-review items SplashPlate to StickyBarb
+^ review items SplashPlate to StickyBarb
 
-review items StonePlate to ToxicOrb
+^ review items StonePlate to ToxicOrb
 
-review items ToxicPlate to UtilityUmbrella
+^ review items ToxicPlate to UtilityUmbrella
 
 ## ItemsVWX
 
-review items WacanBerry to WhiteHerb
+^ review items WacanBerry to WhiteHerb
 
-review items WideLens to WiseGlasses
+^ review items WideLens to WiseGlasses
 
 ## ItemsYZ
 
-review items YacheBerry to ZoomLens
+^ review items YacheBerry to ZoomLens
 
 # Conditions
 
-Burn
-Paralysis
-Sleep
-Freeze
-Poison
-Toxic
-Confusion
-Flinch
-Trapped
-Trapper
-PartiallyTrapped
-LockedMove
-TwoTurnMove
-ChoiceLock
-MustRecharge
-FutureMove
-HealReplacement
-Stall
-Gem
-RainDance
-PriomordialSea
-SunnyDay
-DesolateLand
-Sandstorm
-Snowscape
-DeltaStream
-Commanded
-Commanding
-Arceus
-Silvally
-RolloutStorage
+^ Burn
+^ Paralysis
+^ Sleep
+^ Freeze
+^ Poison
+^ Toxic
+^ Confusion
+^ Flinch
+^ Trapped
+^ Trapper
+^ PartiallyTrapped
+^ LockedMove
+^ TwoTurnMove
+^ ChoiceLock
+^ MustRecharge
+^ FutureMove
+^ HealReplacement
+^ Stall
+^ Gem
+^ RainDance
+^ PriomordialSea
+^ SunnyDay
+^ DesolateLand
+^ Sandstorm
+^ Snowscape
+^ DeltaStream
+^ Commanded
+^ Commanding
+^ Arceus
+^ Silvally
+^ RolloutStorage

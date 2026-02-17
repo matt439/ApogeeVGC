@@ -589,17 +589,6 @@ public partial record Items
                 },
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    battle.Debug(
-                        $"FlameOrb OnResidual: Called for {pokemon?.Name ?? "null pokemon"}");
-
-                    if (pokemon == null)
-                    {
-                        battle.Debug("FlameOrb OnResidual: pokemon is null, returning");
-                        return;
-                    }
-
-                    battle.Debug($"FlameOrb OnResidual: Calling TrySetStatus for {pokemon.Name}");
-
                     pokemon.TrySetStatus(ConditionId.Burn, pokemon);
                 }) with
                 {

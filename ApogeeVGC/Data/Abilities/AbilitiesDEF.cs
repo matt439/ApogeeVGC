@@ -327,13 +327,12 @@ public partial record Abilities
                             return new VoidReturn();
                         }
 
-                        bool infiltrates = move is ActiveMove { Infiltrates: true };
                         bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
                                       (move.Flags.BypassSub != true) &&
-                                      !infiltrates;
+                                      move.Infiltrates != true;
                         if (hitSub) return new VoidReturn();
 
-                        if (move is ActiveMove am && !target.RunImmunity(am))
+                        if (!target.RunImmunity(move))
                             return new VoidReturn();
                         return BoolVoidUnion.FromBool(false);
                     })),

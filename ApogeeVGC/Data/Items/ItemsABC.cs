@@ -36,8 +36,7 @@ public partial record Items
                 OnSetAbility = OnSetAbilityEventInfo.Create((battle, _, target, source, effect) =>
                 {
                     // Block ability changes from other abilities (except Trace)
-                    if (effect is { EffectType: EffectType.Ability } &&
-                        effect.Name != "Trace")
+                    if (effect is Ability { Id: not AbilityId.Trace })
                     {
                         battle.Add("-ability", source, effect.Name);
                     }
@@ -137,7 +136,7 @@ public partial record Items
                         return;
                     }
 
-                    if (effect is { Name: "Intimidate" })
+                    if (effect is Ability { Id: AbilityId.Intimidate })
                     {
                         target.UseItem();
                     }
@@ -168,7 +167,8 @@ public partial record Items
                         RelayVar? canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null,
                             battle.Effect,
                             pokemon.BaseMaxHp / 3);
-                        if (canHeal is BoolRelayVar { Value: false })
+                        // TS: !this.runEvent(...) — catches any falsy value (false, null, 0, undefined)
+                        if (canHeal is null or BoolRelayVar { Value: false })
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
@@ -729,13 +729,6 @@ public partial record Items
                 OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceBand.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-                    }
                 }),
                 OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
                 {
@@ -764,13 +757,6 @@ public partial record Items
                 OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceScarf.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-                    }
                 }),
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
@@ -801,16 +787,6 @@ public partial record Items
                 OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-
-                    // Set the locked move immediately after adding the volatile
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-                    }
                 }),
                 //OnModifySpAPriority = 1,
                 OnModifySpA = OnModifySpAEventInfo.Create((battle, spa, _, _, _) =>
@@ -919,8 +895,8 @@ public partial record Items
                         showMsg = true;
                     }
 
-                    // Show message if: stat was lowered, effect is not a move with secondaries,
-                    // and effect is not Octolock (which shows its own message)
+                    // Show message if: stat was lowered and effect is not a move with secondaries
+                    // (TS also checks effect.id !== 'octolock', but Octolock is isNonstandard: "Past")
                     if (showMsg &&
                         !(effect is Move { Secondaries: not null }))
                     {
@@ -1116,7 +1092,8 @@ public partial record Items
         {
             pokemon.AddVolatile(ConditionId.Protosynthesis);
         }
-        else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
+
+        if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
                  !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
                  pokemon.UseItem())
         {

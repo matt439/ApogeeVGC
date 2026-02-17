@@ -636,15 +636,20 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamage = OnDamageEventInfo.Create((battle, _, _, source, effect) =>
                 {
-                    if (effect is { EffectType: EffectType.Move } and Move { MultiHit: null } move &&
-                        !(move.HasSheerForce == true && source != null &&
-                          source.HasAbility(AbilityId.SheerForce)))
+                    if (effect is not ActiveMove move)
                     {
-                        battle.EffectState.CheckedBerserk = false;
+                        battle.EffectState.CheckedBerserk = true;
+                        return new VoidReturn();
+                    }
+
+                    if (move.MultiHit != null ||
+                        (move.HasSheerForce == true && source.HasAbility(AbilityId.SheerForce)))
+                    {
+                        battle.EffectState.CheckedBerserk = true;
                     }
                     else
                     {
-                        battle.EffectState.CheckedBerserk = true;
+                        battle.EffectState.CheckedBerserk = false;
                     }
 
                     return new VoidReturn();
@@ -671,16 +676,15 @@ public partial record Abilities
                     OnAfterMoveSecondaryEventInfo.Create((battle, target, source, move) =>
                     {
                         battle.EffectState.CheckedBerserk = true;
-                        if (source == null || source == target || target.Hp == 0 ||
-                            move.TotalDamage == null) return;
+                        if (source == null || source == target || target.Hp == 0) return;
+                        if (move.TotalDamage is not IntIntFalseUnion totalDamage) return;
 
                         Attacker? lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;
 
                         int damage =
-                            move.MultiHit != null && !(move.SmartTarget ?? false) &&
-                            move.TotalDamage is IntIntFalseUnion totalDmg
-                                ? totalDmg.Value
+                            move.MultiHit != null && !(move.SmartTarget ?? false)
+                                ? totalDamage.Value
                                 : lastAttackedBy.Damage;
                         if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
                         {

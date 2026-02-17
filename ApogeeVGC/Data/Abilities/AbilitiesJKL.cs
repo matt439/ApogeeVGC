@@ -198,7 +198,7 @@ public partial record Abilities
                     OnAnyRedirectTargetEventInfo.Create((battle, target, source, _, move) =>
                     {
                         if (move.Type != MoveType.Electric || move.Flags.PledgeCombo == true)
-                            return target;
+                            return PokemonVoidUnion.FromVoid();
 
                         MoveTarget redirectTarget =
                             move.Target is MoveTarget.RandomNormal or MoveTarget.AdjacentFoe
@@ -223,7 +223,7 @@ public partial record Abilities
                             }
                         }
 
-                        return target;
+                        return PokemonVoidUnion.FromVoid();
                     }),
             },
             [AbilityId.Limber] = new()

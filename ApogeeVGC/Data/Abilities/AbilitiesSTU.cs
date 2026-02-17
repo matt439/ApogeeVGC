@@ -436,8 +436,10 @@ public partial record Abilities
                 {
                     if (move.Secondaries != null)
                     {
+                        move.Secondaries = null;
+                        // Technically not a secondary effect, but it is negated
+                        move.Self = null;
                         move.HasSheerForce = true;
-                        // Note: Secondaries removal is handled in the battle engine
                     }
                 }),
                 // OnBasePowerPriority = 21
@@ -470,6 +472,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnModifySecondaries = OnModifySecondariesEventInfo.Create((_, secondaries, _, _, _) =>
                 {
+                    battle.Debug("Shield Dust prevent secondary");
                     // Filter out secondaries that don't target self (return only self-targeting effects)
                     return secondaries.Where(effect => effect.Self != null).ToArray();
                 }),
@@ -1028,6 +1031,7 @@ public partial record Abilities
                 {
                     if (move.Category != MoveCategory.Status)
                     {
+                        battle.Debug("Adding Stench flinch");
                         // Check if flinch secondary already exists
                         if (move.Secondaries == null ||
                             move.Secondaries.All(s => s.VolatileStatus != ConditionId.Flinch))
@@ -1367,7 +1371,7 @@ public partial record Abilities
             {
                 Id = AbilityId.SwordOfRuin,
                 Name = "Sword of Ruin",
-                Num = 285,
+                Num = 286,
                 Rating = 4.5,
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
@@ -1444,7 +1448,7 @@ public partial record Abilities
             {
                 Id = AbilityId.TabletsOfRuin,
                 Name = "Tablets of Ruin",
-                Num = 284,
+                Num = 285,
                 Rating = 4.5,
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {

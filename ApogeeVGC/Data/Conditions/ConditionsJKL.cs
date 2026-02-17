@@ -64,7 +64,7 @@ public partial record Conditions
                         IntFalseUndefinedUnion damage =
                             battle.Damage(pokemon.BaseMaxHp / 8, pokemon, target);
 
-                        if (damage is IntIntFalseUndefined d)
+                        if (damage is IntIntFalseUndefined { Value: > 0 } d)
                         {
                             // Pass LeechSeed condition as effect so LiquidOoze can detect it
                             var leechSeedCondition = battle.Library.Conditions[ConditionId.LeechSeed];

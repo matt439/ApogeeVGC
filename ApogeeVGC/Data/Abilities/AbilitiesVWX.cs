@@ -24,7 +24,7 @@ public partial record Abilities
             {
                 Id = AbilityId.VesselOfRuin,
                 Name = "Vessel of Ruin",
-                Num = 284,
+                Num = 287,
                 Rating = 4.5,
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
@@ -148,7 +148,7 @@ public partial record Abilities
                         var targetCanBeSet =
                             battle.RunEvent(EventId.SetAbility, target, source, battle.Effect,
                                 sourceAbility);
-                        if (targetCanBeSet is BoolRelayVar { Value: false }) return;
+                        if (targetCanBeSet is BoolRelayVar { Value: false } or null) return;
 
                         var oldAbilityResult =
                             source.SetAbility(AbilityId.WanderingSpirit, target);

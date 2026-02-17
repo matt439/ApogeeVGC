@@ -427,7 +427,7 @@ public partial record Abilities
                 Rating = 4.0,
                 OnModifyPriority = OnModifyPriorityEventInfo.Create((_, priority, _, _, move) =>
                 {
-                    if (move.Category != MoveCategory.Status) return new VoidReturn();
+                    if (move == null || move.Category != MoveCategory.Status) return new VoidReturn();
                     move.PranksterBoosted = true;
                     return priority + 1;
                 }),
@@ -734,17 +734,9 @@ public partial record Abilities
                 }),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
-                    if (pokemon is not PokemonSideFieldPokemon pok)
-                    {
-                        throw new ArgumentException("Expecting a Pokemon here.");
-                    }
-
-                    pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
-
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", pok.Pokemon, "Quark Drive", "[silent]");
-                    }
+                    if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
+                    psfp.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
+                    battle.Add("-end", psfp.Pokemon, "Quark Drive", "[silent]");
                 }),
                 Flags = new AbilityFlags
                 {
