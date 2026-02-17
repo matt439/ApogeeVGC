@@ -537,12 +537,12 @@ public partial record Items
                     {
                         ItemFalseUnion barb = target.TakeItem();
                         if (barb is not ItemItemFalseUnion itemUnion)
-                            return null; // Gen 4 Multitype
+                            return BoolEmptyVoidUnion.FromVoid(); // Gen 4 Multitype - TS returns undefined
                         source.SetItem(itemUnion.Item.Id);
                         // no message for Sticky Barb changing hands
                     }
 
-                    return null;
+                    return BoolEmptyVoidUnion.FromVoid(); // TS returns undefined
                 }),
                 Num = 288,
                 Gen = 4,
