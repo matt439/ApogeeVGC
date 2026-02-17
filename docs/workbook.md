@@ -454,12 +454,12 @@
 ^ Burn
 ^ Paralysis
 ^ Sleep
-@ Freeze
-@ Poison
-@ Toxic
-Confusion
-Flinch
-Trapped
+^ Freeze
+^ Poison
+^ Toxic
+@ Confusion
+@ Flinch
+@ Trapped
 Trapper
 PartiallyTrapped
 LockedMove
