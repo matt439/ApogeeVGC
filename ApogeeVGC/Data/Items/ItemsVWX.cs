@@ -38,20 +38,20 @@ public partial record Items
                             bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
                                           move.Flags.BypassSub != true &&
                                           !(move.Infiltrates == true && battle.Gen >= 6);
-                            if (hitSub) return damage;
+                            if (hitSub) return DoubleVoidUnion.FromVoid();
 
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Wacan Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return DoubleVoidUnion.FromDouble(battle.FinalModify(damage));
                             }
                         }
 
-                        return damage;
+                        return DoubleVoidUnion.FromVoid();
                     }),
-                // OnEat: empty function
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
                 Num = 186,
                 Gen = 4,
             },
@@ -156,6 +156,7 @@ public partial record Items
                 OnStart = new OnStartEventInfo(TryUseWhiteHerb),
                 OnAnySwitchIn = new OnAnySwitchInEventInfo(TryUseWhiteHerb, priority: -2),
                 OnAnyAfterMega = new OnAnyAfterMegaEventInfo(TryUseWhiteHerb),
+                // Not in TS source - Gen 9 addition for Terastallization support
                 OnAnyAfterTerastallization =
                     new OnAnyAfterTerastallizationEventInfo(TryUseWhiteHerb),
                 OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, pokemon, _, _) =>
@@ -170,13 +171,9 @@ public partial record Items
                     if (pokemon.ItemState.Boosts != null)
                     {
                         pokemon.SetBoost(pokemon.ItemState.Boosts);
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-clearnegativeboost", pokemon, "[silent]");
-                        }
+                        battle.Add("-clearnegativeboost", pokemon, "[silent]");
                     }
                 })),
-                OnEnd = new OnEndEventInfo((_, pokemon) => { pokemon.ItemState.Boosts = null; }),
                 Num = 214,
                 Gen = 3,
             },
@@ -285,6 +282,7 @@ public partial record Items
         {
             pokemon.ItemState.Boosts = boosts;
             pokemon.UseItem();
+            pokemon.ItemState.Boosts = null;
         }
     }
 }

@@ -437,11 +437,11 @@
 
 ^ review items StonePlate to ToxicOrb
 
-@ review items ToxicPlate to UtilityUmbrella
+^ review items ToxicPlate to UtilityUmbrella
 
 ## ItemsVWX
 
-review items WacanBerry to WhiteHerb
+@ review items WacanBerry to WhiteHerb
 
 review items WideLens to WiseGlasses
 
