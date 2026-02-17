@@ -472,13 +472,13 @@
 ^ Gem
 ^ RainDance
 ^ PriomordialSea
-@ SunnyDay
-@ DesolateLand
-@ Sandstorm
-Snowscape
-DeltaStream
-Commanded
-Commanding
-Arceus
-Silvally
+^ SunnyDay
+^ DesolateLand
+^ Sandstorm
+^ Snowscape
+^ DeltaStream
+^ Commanded
+@ Commanding
+@ Arceus
+@ Silvally
 RolloutStorage
