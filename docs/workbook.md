@@ -441,9 +441,9 @@
 
 ## ItemsVWX
 
-@ review items WacanBerry to WhiteHerb
+^ review items WacanBerry to WhiteHerb
 
-review items WideLens to WiseGlasses
+@ review items WideLens to WiseGlasses
 
 ## ItemsYZ
 
