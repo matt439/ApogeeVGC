@@ -469,12 +469,12 @@
 ^ FutureMove
 ^ HealReplacement
 ^ Stall
-@ Gem
-@ RainDance
-@ PriomordialSea
-SunnyDay
-DesolateLand
-Sandstorm
+^ Gem
+^ RainDance
+^ PriomordialSea
+@ SunnyDay
+@ DesolateLand
+@ Sandstorm
 Snowscape
 DeltaStream
 Commanded
