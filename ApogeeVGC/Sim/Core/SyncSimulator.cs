@@ -152,6 +152,7 @@ public class SyncSimulator : IBattleController
     /// <summary>
     /// Event handler for when Battle requests a choice from a player.
     /// Synchronously gets the choice and submits it to the battle.
+    /// Falls back to AutoChoose if the player's choice is rejected.
     /// </summary>
     private void OnChoiceRequested(object? sender, BattleChoiceRequestEventArgs e)
     {
@@ -165,11 +166,31 @@ public class SyncSimulator : IBattleController
         if (choice.Actions.Count == 0)
         {
             side.AutoChoose();
-            choice = side.GetChoice();
+            // AutoChoose builds the choice directly on the side. We must NOT
+            // re-submit via Battle.Choose because side.Choose -> ClearChoice()
+            // would recalculate ForcedSwitchesLeft from SwitchFlags that
+            // ChooseSwitch already cleared, causing switch actions to be rejected.
+            if (Battle.AllChoicesDone()) Battle.CommitChoices();
+            return;
         }
 
-        // Submit the choice immediately (synchronous)
-        Battle.Choose(e.SideId, choice);
+        // Submit the choice — if it fails, fall back to AutoChoose.
+        // This handles cases where PlayerRandom picks a hidden-disabled move
+        // (e.g. from Imprison) that appears available in the restricted request
+        // data but is rejected by the battle engine's unrestricted validation,
+        // or when the player submits an incomplete choice (e.g. 1 switch when
+        // 2 are needed in doubles).
+        if (!Battle.Choose(e.SideId, choice))
+        {
+            // Battle.Choose may have partially processed the choice, modifying
+            // Pokemon state (e.g. clearing SwitchFlags via ChooseSwitch).
+            // AutoChoose can complete the remaining actions from this state.
+            // We must NOT call Battle.Choose again after AutoChoose because
+            // ClearChoice() would recalculate ForcedSwitchesLeft from the
+            // now-cleared SwitchFlags, rejecting the switch actions.
+            side.AutoChoose();
+            if (Battle.AllChoicesDone()) Battle.CommitChoices();
+        }
     }
 
     /// <summary>

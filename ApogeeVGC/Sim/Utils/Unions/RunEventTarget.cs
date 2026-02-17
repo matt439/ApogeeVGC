@@ -24,10 +24,13 @@ public abstract record RunEventTarget
     public static RunEventTarget FromBattle(Battle battle) => new BattleRunEventTarget(battle);
     public static RunEventTarget? FromNullablePokemonSideBattleUnion(PokemonSideBattleUnion? target)
     {
-  return target switch
+   return target switch
      {
      null => null,
      PokemonSideBattlePokemon pokemon => new PokemonRunEventTarget(pokemon.Pokemon),
+     PokemonSideBattleNullablePokemon nullablePokemon => nullablePokemon.Pokemon is null 
+         ? null 
+         : new PokemonRunEventTarget(nullablePokemon.Pokemon),
  PokemonSideBattleSide side => new SideRunEventTarget(side.Side),
          PokemonSideBattleBattle battle => new BattleRunEventTarget(battle.Battle),
   _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),

@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -79,14 +80,24 @@ public partial class Side
         var moves = pokemon.GetMoves();
 
         // Step 6: Auto-choose first available move if needed
+        // Check both the restricted request view AND the unrestricted moves list.
+        // Hidden-disabled moves (e.g. from Imprison) appear as not disabled in the request
+        // when isLastActive=true, but ARE disabled in the unrestricted list.
         if (autoChoose)
         {
-            foreach (PokemonMoveData pokemonMoveData in request.Moves)
+            for (int i = 0; i < request.Moves.Count; i++)
             {
-                if (pokemonMoveData.Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion
-                    {
-                        Value: true
-                    })
+                PokemonMoveData pokemonMoveData = request.Moves[i];
+
+                // Skip if disabled in the restricted request view
+                if (pokemonMoveData.Disabled is not null && pokemonMoveData.Disabled.IsTrue())
+                {
+                    continue;
+                }
+
+                // Also skip if disabled in the unrestricted moves list (catches hidden-disabled)
+                if (i < moves.Count && pokemonMoveData.Id == moves[i].Id &&
+                    moves[i].Disabled is not null && moves[i].Disabled.IsTrue())
                 {
                     continue;
                 }
@@ -129,9 +140,12 @@ public partial class Side
         {
             int lockedMoveTargetLoc = pokemon.LastMoveTargetLoc ?? 0;
 
-            // Note: In the original TS code, it checks pokemon.volatiles[lockedMoveID]?.targetLoc
-            // but EffectState doesn't have a targetLoc property in our C# implementation
-            // This would need to be added to EffectState if this functionality is needed
+            // Check if the TwoTurnMove volatile has a stored target location
+            if (pokemon.Volatiles.TryGetValue(ConditionId.TwoTurnMove, out EffectState? twoTurnVolatile) &&
+                twoTurnVolatile is { TargetLoc: not null })
+            {
+                lockedMoveTargetLoc = twoTurnVolatile.TargetLoc.Value;
+            }
 
             if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;
 
@@ -173,20 +187,23 @@ public partial class Side
             return true;
         }
 
+
+
+
         // Step 10: Check for disabled moves
         bool isEnabled = false;
-        string disabledSource = string.Empty;
+        EffectStateId? disabledSource = null;
 
         foreach (PokemonMoveData m in moves.Where(m => m.Id == moveid))
         {
-            if (m.Disabled is null or BoolMoveIdBoolUnion { Value: false })
+            if (m.Disabled is null || !m.Disabled.IsTrue())
             {
                 isEnabled = true;
                 break;
             }
             else if (m.DisabledSource != null)
             {
-                disabledSource = m.DisabledSource.Name;
+                disabledSource = m.DisabledSource;
             }
         }
 
@@ -288,7 +305,10 @@ public partial class Side
             }
 
             // Check for Revival Blessing slot condition
-            if (SlotConditions[pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+            // Use index (from GetChoiceIndex) instead of pokemon.Position to ensure we access
+            // a valid SlotConditions entry. SlotConditions has Active.Count entries (e.g., 2 for doubles),
+            // and index is guaranteed to be < Active.Count, but pokemon.Position may be a team roster index.
+            if (SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
             {
                 // Find first fainted Pokemon
                 slot = 0;
@@ -338,7 +358,7 @@ public partial class Side
                 $"Can't switch: You do not have a Pokémon in slot {slot + 1} to switch to");
         }
         else if (slot < Active.Count &&
-                 !SlotConditions[pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+                 !SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
         {
             return EmitChoiceError("Can't switch: You can't switch to an active Pokémon");
         }
@@ -352,7 +372,7 @@ public partial class Side
         Pokemon targetPokemon = Pokemon[slot];
 
         // Step 7: Handle Revival Blessing special case
-        if (SlotConditions[pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+        if (SlotConditions[index].ContainsKey(ConditionId.RevivalBlessing))
         {
             if (!targetPokemon.Fainted)
             {
@@ -426,7 +446,7 @@ public partial class Side
             }
 
             Choice.ForcedSwitchesLeft--;
-            
+
             // Clear the switch flag so IsChoiceDone() knows this Pokemon's switch has been handled
             pokemon.SwitchFlag = false;
         }
@@ -619,12 +639,12 @@ public partial class Side
         // Step 3.5: For SwitchIn/Switch requests, validate that we have actions (not empty)
         // Empty choices are invalid for switch requests - the battle should have ended if no switches are possible
         if ((RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn) &&
-      input.Actions.Count == 0)
+            input.Actions.Count == 0)
         {
-   Battle.Debug(
-      $"[Side.Choose] Empty choice for {RequestState} request - rejecting!");
+            Battle.Debug(
+                $"[Side.Choose] Empty choice for {RequestState} request - rejecting!");
             return EmitChoiceError(
-              "Can't submit empty choice for switch request. You must switch in a Pokemon or the battle should have ended.");
+                "Can't submit empty choice for switch request. You must switch in a Pokemon or the battle should have ended.");
         }
 
         // Step 4: Validate number of actions doesn't exceed expected count
@@ -642,14 +662,14 @@ public partial class Side
         }
 
         // Debug logging
-Battle.Debug(
-    $"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
-    for (int i = 0; i < input.Actions.Count; i++)
+        Battle.Debug(
+            $"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
+        for (int i = 0; i < input.Actions.Count; i++)
         {
-         var action = input.Actions[i];
-Battle.Debug(
-   $"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
-    }
+            var action = input.Actions[i];
+            Battle.Debug(
+                $"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
+        }
 
         // Step 5: Process each action in the choice
         if (input.Actions.Select((action, index) =>
@@ -666,15 +686,15 @@ Battle.Debug(
                 };
 
                 if (!success)
-       {
- Battle.Debug($"[Side.Choose] Action {index} failed: {Choice.Error}");
-   }
+                {
+                    Battle.Debug($"[Side.Choose] Action {index} failed: {Choice.Error}");
+                }
 
-          return success;
-      }).Any(success => !success))
-   {
-   Battle.Debug($"[Side.Choose] Overall choice failed for {Name}");
-        return false;
+                return success;
+            }).Any(success => !success))
+        {
+            Battle.Debug($"[Side.Choose] Overall choice failed for {Name}");
+            return false;
         }
 
         // Step 6: Apply choice-level settings
@@ -690,7 +710,7 @@ Battle.Debug(
 
         bool result = string.IsNullOrEmpty(Choice.Error);
         Battle.Debug(
-    $"[Side.Choose] Choice processing complete for {Name}: {(result ? "SUCCESS" : $"FAILED - {Choice.Error}")}");
+            $"[Side.Choose] Choice processing complete for {Name}: {(result ? "SUCCESS" : $"FAILED - {Choice.Error}")}");
         return result;
     }
 
@@ -729,38 +749,38 @@ Battle.Debug(
 
     private bool ProcessChosenTeamAction(ChosenAction action)
     {
-    // Handle case where Pokemon is null but TargetLoc/Index is provided
+        // Handle case where Pokemon is null but TargetLoc/Index is provided
         int slot;
         if (action.Pokemon == null)
-     {
-         // Try TargetLoc first (used by console player to specify original Pokemon index)
+        {
+            // Try TargetLoc first (used by console player to specify original Pokemon index)
             // Fall back to Index (used by older code or GUI)
-      int? pokemonIndex = action.TargetLoc ?? action.Index;
-   
+            int? pokemonIndex = action.TargetLoc ?? action.Index;
+
             if (!pokemonIndex.HasValue || pokemonIndex.Value < 0 || pokemonIndex.Value >= Pokemon.Count)
- {
-         return EmitChoiceError("Can't choose for Team Preview: Invalid Pokemon index specified");
-      }
-        
-     slot = pokemonIndex.Value;
+            {
+                return EmitChoiceError("Can't choose for Team Preview: Invalid Pokemon index specified");
+            }
+
+            slot = pokemonIndex.Value;
             // Update the action with the Pokemon reference for proper processing
-         action = action with { Pokemon = Pokemon[slot] };
-    }
+            action = action with { Pokemon = Pokemon[slot] };
+        }
         else
         {
-    slot = action.Pokemon.Position;
-   }
+            slot = action.Pokemon.Position;
+        }
 
         if (!Choice.SwitchIns.Add(slot))
         {
-         return EmitChoiceError(
-         $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
-  );
-      }
+            return EmitChoiceError(
+                $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
+            );
+        }
 
         Choice.Actions = [.. Choice.Actions, action];
         return true;
-  }
+    }
 
     private bool ProcessChosenRevivalBlessingAction(ChosenAction action)
     {
@@ -775,8 +795,16 @@ Battle.Debug(
             return EmitChoiceError("Can't use Revival Blessing: Target must be fainted");
         }
 
+        // Find the Pokemon's index in the Active list
+        // We cannot rely on action.Pokemon.Position directly as it may be a team roster index
+        int activeIndex = Active.IndexOf(action.Pokemon);
+        if (activeIndex < 0 || activeIndex >= SlotConditions.Count)
+        {
+            return EmitChoiceError("Can't use Revival Blessing: Pokemon is not active");
+        }
+
         // Validate that we have a Revival Blessing slot condition
-        if (!SlotConditions[action.Pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+        if (!SlotConditions[activeIndex].ContainsKey(ConditionId.RevivalBlessing))
         {
             return EmitChoiceError("Can't use Revival Blessing: No Revival Blessing active");
         }
@@ -897,9 +925,11 @@ Battle.Debug(
                 // Safety check: if we're being asked to switch but have no available Pokemon, 
                 // the battle should have already ended. This indicates a bug.
                 int availableSwitches = Battle.CanSwitch(this);
-                bool hasRevivalBlessing = Active.Any(p =>
-                    p != null && SlotConditions[p.Position]
-                        .ContainsKey(ConditionId.RevivalBlessing));
+                // Check for Revival Blessing using Active list index, not pokemon.Position
+                bool hasRevivalBlessing = Active
+                    .Select((p, idx) => (p, idx))
+                    .Any(t => t.p != null && t.idx < SlotConditions.Count &&
+                              SlotConditions[t.idx].ContainsKey(ConditionId.RevivalBlessing));
 
                 if (availableSwitches == 0 && !hasRevivalBlessing)
                 {
@@ -1016,50 +1046,41 @@ Battle.Debug(
     public bool IsChoiceDone()
     {
         if (RequestState == RequestState.None) return true;
-        
+
         if (Choice.ForcedSwitchesLeft > 0)
         {
             Battle.Debug($"[IsChoiceDone] {Name}: ForcedSwitchesLeft={Choice.ForcedSwitchesLeft}, returning false");
             return false;
         }
 
-        // For Switch/SwitchIn requests, also check if we have forced passes left
-        // This prevents IsChoiceDone from returning true when we still need to handle passes
-        if ((RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn) &&
-            Choice.ForcedPassesLeft > 0)
-        {
-            Battle.Debug($"[IsChoiceDone] {Name}: ForcedPassesLeft={Choice.ForcedPassesLeft}, returning false");
-            return false;
-        }
-
         if (RequestState == RequestState.TeamPreview)
         {
             bool done = Choice.Actions.Count >= PickedTeamSize();
-            Battle.Debug($"[IsChoiceDone] {Name}: TeamPreview - Actions={Choice.Actions.Count}, PickedTeamSize={PickedTeamSize()}, done={done}");
+            Battle.Debug(
+                $"[IsChoiceDone] {Name}: TeamPreview - Actions={Choice.Actions.Count}, PickedTeamSize={PickedTeamSize()}, done={done}");
             return done;
         }
 
-        // For Switch/SwitchIn requests, only count Pokemon that actually need to switch
-        // In doubles, you might have 2 active Pokemon but only 1 needs to switch
-        if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
-        {
-            int pokemonNeedingSwitch = Active.Count(p => p?.SwitchFlag.IsTrue() == true);
-            GetChoiceIndex();
-            bool done = Choice.Actions.Count >= pokemonNeedingSwitch;
-            Battle.Debug($"[IsChoiceDone] {Name}: Switch request - Actions={Choice.Actions.Count}, PokemonNeedingSwitch={pokemonNeedingSwitch}, done={done}");
-            Battle.Debug($"[IsChoiceDone]   Active Pokemon with SwitchFlag: {string.Join(", ", Active.Where(p => p != null).Select(p => $"{p.Name}:{p.SwitchFlag}"))}");
-            return done;
-        }
-
+        // For move/switch requests, auto-pass Pokemon that don't need actions
+        // (fainted/commanding for moves, non-switching for switch requests)
+        // then check if all active slots have been handled.
+        // Matches TS: this.getChoiceIndex(); return this.choice.actions.length >= this.active.length;
         GetChoiceIndex();
-        bool moveDone = Choice.Actions.Count >= Active.Count;
-        Battle.Debug($"[IsChoiceDone] {Name}: Move request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={moveDone}");
-        return moveDone;
+        bool isDone = Choice.Actions.Count >= Active.Count;
+        Battle.Debug(
+            $"[IsChoiceDone] {Name}: {RequestState} request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={isDone}");
+        return isDone;
     }
 
 
+
+
+
+
+
+
     private BoolVoidUnion UpdateDisabledRequestForMove(Pokemon pokemon, PokemonMoveRequestData req,
-        MoveId moveid, string disabledSource)
+        MoveId moveid, EffectStateId? disabledSource)
     {
         bool updated = UpdateDisabledRequest(pokemon, req);
 
@@ -1069,10 +1090,13 @@ Battle.Debug(
 
             // Check if we need to update the disabled state
             bool needsUpdate = m.Disabled is null or BoolMoveIdBoolUnion { Value: false } ||
-                               m.DisabledSource?.Name != disabledSource;
+                               m.DisabledSource != disabledSource;
 
             if (needsUpdate)
             {
+                // Actually update the disabled state, not just flag that it needs updating
+                m.Disabled = true;
+                m.DisabledSource = disabledSource;
                 updated = true;
             }
 
@@ -1149,11 +1173,27 @@ Battle.Debug(
             throw new InvalidOperationException("Can't update a request without active Pokemon");
         }
 
-        // Find the Pokemon in the request
-        PokemonMoveRequestData? req = moveRequest.Active[pokemon.Position];
+        // Find the Pokemon's index in the Active list
+        // Note: We cannot rely on pokemon.Position directly because it may not match the
+        // Active list index. The Position property is the Pokemon's index in the team roster,
+        // but for active Pokemon it should match their Active slot index. However, during
+        // certain edge cases (e.g., initial switch-in) this invariant may not hold.
+        int activeIndex = Active.IndexOf(pokemon);
+        if (activeIndex < 0 || activeIndex >= moveRequest.Active.Count)
+        {
+            throw new InvalidOperationException(
+                $"Pokemon {pokemon.Name} not found in active list or index out of range " +
+                $"(activeIndex={activeIndex}, moveRequest.Active.Count={moveRequest.Active.Count})");
+        }
+
+        // Find the Pokemon in the request using the Active list index
+        // The entry can be null if the Pokemon is fainted
+        PokemonMoveRequestData? req = moveRequest.Active[activeIndex];
         if (req == null)
         {
-            throw new InvalidOperationException("Pokemon not found in request's active field");
+            throw new InvalidOperationException(
+                $"Pokemon {pokemon.Name} at active index {activeIndex} has no request data " +
+                "(this can happen if the Pokemon is fainted or not active)");
         }
 
         // Apply the update function

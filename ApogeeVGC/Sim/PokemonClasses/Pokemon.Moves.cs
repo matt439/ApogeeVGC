@@ -181,24 +181,8 @@ public partial class Pokemon
             });
         }
 
-        // If no valid moves, return Struggle
-        if (!hasValidMove)
-        {
-            Move struggleMove = Battle.Library.Moves[MoveId.Struggle];
-            return
-            [
-                new PokemonMoveData
-                {
-                    Move = struggleMove,
-                    Target = null,
-                    Disabled = null,
-                    DisabledSource = null,
-                    Pp = struggleMove.BasePp,
-                    MaxPp = struggleMove.BasePp,
-                }
-            ];
-        }
-
+        // If no valid moves, return empty list (matches TypeScript getMoves behavior).
+        // Callers (ChooseMove, GetMoveRequestData) handle empty returns by falling back to Struggle.
         return hasValidMove ? moves : [];
     }
 
@@ -294,7 +278,7 @@ public partial class Pokemon
 
     public void DisableMove(MoveId moveId, bool isHidden = false, IEffect? sourceEffect = null)
     {
-        if (sourceEffect is not null && Battle.Event is not null)
+        if (sourceEffect is null && Battle.Event is not null)
         {
             sourceEffect = Battle.Event.Effect;
         }
@@ -303,8 +287,7 @@ public partial class Pokemon
                      moveSlot.Id == moveId && moveSlot.Disabled != true))
         {
             moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
-            moveSlot.DisabledSource =
-                sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
+            moveSlot.DisabledSource = sourceEffect?.EffectStateId ?? (EffectStateId)moveSlot.Move;
         }
     }
 }

@@ -10,34 +10,36 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAttractEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnAttract event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnAttractEventInfo(
-        Action<Battle, Pokemon, Pokemon> handler,
-  int? priority = null,
-     bool usesSpeed = true)
-  {
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
         Id = EventId.Attract;
-   Handler = handler;
-     Priority = priority;
+        ContextHandler = contextHandler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-    ExpectedParameterTypes =
-  [
-  typeof(Battle),
-            typeof(Pokemon),
-    typeof(Pokemon),
-        ];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAttractEventInfo Create(
+        Action<Battle, Pokemon, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAttractEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

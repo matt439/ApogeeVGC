@@ -11,24 +11,41 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyDragOutEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAllyDragOutEventInfo(
-    Action<Battle, Pokemon, Pokemon?, ActiveMove?> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.DragOut;
-  Prefix = EventPrefix.Ally;
-  Handler = handler;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAllyDragOutEventInfo Create(
+        Action<Battle, Pokemon, Pokemon, ActiveMove> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyDragOutEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetMove()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

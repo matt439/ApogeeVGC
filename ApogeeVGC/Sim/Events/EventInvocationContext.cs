@@ -12,6 +12,7 @@ internal sealed class EventInvocationContext
 {
     public required Battle Battle { get; init; }
     public required EventId EventId { get; init; }
+    public IEffect? Effect { get; init; }
     public SingleEventTarget? Target { get; init; }
     public SingleEventSource? Source { get; init; }
     public IEffect? SourceEffect { get; init; }
@@ -27,6 +28,7 @@ internal sealed class EventInvocationContext
         {
          Battle = Battle,
        EventId = EventId,
+            Effect = Effect,
             TargetPokemon = Target switch
           {
      PokemonSingleEventTarget p => p.Pokemon,
@@ -47,6 +49,11 @@ internal sealed class EventInvocationContext
        {
            PokemonSingleEventSource p => p.Pokemon,
        _ => null
+      },
+  SourceType = Source switch
+      {
+          PokemonTypeSingleEventSource t => t.Type,
+          _ => null
       },
   SourceEffect = SourceEffect,
     Move = SourceEffect as Moves.ActiveMove,

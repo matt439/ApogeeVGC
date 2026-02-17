@@ -25,13 +25,13 @@ public partial record Items
                 IsBerry = true,
                 NaturalGift = (80, "Ice"),
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
+                    OnSourceModifyDamageEventInfo.Create((battle, damage, _, target, move) =>
                     {
                         if (move.Type == MoveType.Ice && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                         move.Flags.BypassSub != true &&
-                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                          move.Flags.BypassSub != true &&
+                                          !(move.Infiltrates == true && battle.Gen >= 6);
                             if (hitSub) return damage;
 
                             if (target.EatItem())
@@ -57,7 +57,7 @@ public partial record Items
                 Name = "Zap Plate",
                 SpriteNum = 572,
                 OnPlate = PokemonType.Electric,
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Type == MoveType.Electric)
                     {
@@ -67,16 +67,16 @@ public partial record Items
 
                     return basePower;
                 }, 15),
-                OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
+                OnTakeItem = OnTakeItemEventInfo.Create(
+                    (
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return BoolVoidUnion.FromBool(false);
+                                return new BoolRelayVar(false);
                             }
 
-                            return BoolVoidUnion.FromBool(true);
+                            return new BoolRelayVar(true);
                         })),
                 ForcedForme = "Arceus-Electric",
                 Num = 300,
@@ -88,17 +88,16 @@ public partial record Items
                 Name = "Zoom Lens",
                 SpriteNum = 574,
                 Fling = new FlingData { BasePower = 10 },
-                OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
+                OnSourceModifyAccuracy = OnSourceModifyAccuracyEventInfo.Create(
                     (battle, accuracy, target, _, _) =>
                     {
                         // TS checks: typeof accuracy === 'number' && !this.queue.willMove(target)
-                        // The handler receives int accuracy (not the int|true union), so we check
-                        // if target will NOT move. The accuracy type check is implicit since we receive int.
-                        if (battle.Queue.WillMove(target) == null)
+                        // accuracy.HasValue = typeof accuracy === 'number'
+                        if (accuracy.HasValue && battle.Queue.WillMove(target) == null)
                         {
                             battle.Debug("Zoom Lens boosting accuracy");
                             battle.ChainModify([4915, 4096]);
-                            var result = battle.FinalModify(accuracy);
+                            int result = battle.FinalModify(accuracy.Value);
                             return DoubleVoidUnion.FromDouble(result);
                         }
 

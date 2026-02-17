@@ -5,24 +5,39 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 public sealed record OnAnyAfterTerastallizationEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAnyAfterTerastallizationEventInfo(
-   Action<Battle, Pokemon> handler,
-   int? priority = null,
-bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
- Id = EventId.AfterTerastallization;
+        Id = EventId.AfterTerastallization;
         Prefix = EventPrefix.Any;
-        Handler = handler;
-  Priority = priority;
-   UsesSpeed = usesSpeed;
-   ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAnyAfterTerastallizationEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAnyAfterTerastallizationEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

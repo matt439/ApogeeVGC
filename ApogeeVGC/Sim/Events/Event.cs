@@ -42,21 +42,6 @@ public class Event
     private Dictionary<EventId, List<EventHandlerData>> RegisteredHandlers { get; } = new();
 
     /// <summary>
-    /// Gets the delegate for a specific event, or null if no handler is registered.
-    /// In TypeScript: this.events[callbackName]
-    /// Returns the first handler's delegate for backward compatibility.
-    /// For full handler list, use GetHandlers().
-    /// </summary>
-    public EffectDelegate? GetDelegate(EventId id)
-    {
-        if (RegisteredHandlers.TryGetValue(id, out var handlers) && handlers.Count > 0)
-        {
-            return handlers[0].Callback;
-        }
-        return null;
-    }
-
-    /// <summary>
     /// Gets all registered handlers for a specific event.
     /// Corresponds to iterating through this.events[callbackName] in TypeScript.
     /// </summary>

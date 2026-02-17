@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Player;
+using ApogeeVGC.Sim.SideClasses;
 using System.Threading.Channels;
 
 namespace ApogeeVGC.Sim.Core;

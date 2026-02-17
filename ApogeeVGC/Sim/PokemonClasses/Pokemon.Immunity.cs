@@ -27,11 +27,12 @@ public partial class Pokemon
                 case BoolMoveDataIgnoreImmunity { Value: true }:
                     return true;
                 case TypeMoveDataIgnoreImmunity typeImmunity:
-                    if (typeImmunity.TypeImmunities.TryGetValue(source.Type.ConvertToPokemonType(),
-                            out bool ignores) && ignores)
-                    {
-                        return true;
-                    }
+                        if (source.Type != MoveType.Unknown &&
+                            typeImmunity.TypeImmunities.TryGetValue(source.Type.ConvertToPokemonType(),
+                                out bool ignores) && ignores)
+                        {
+                            return true;
+                        }
 
                     break;
             }

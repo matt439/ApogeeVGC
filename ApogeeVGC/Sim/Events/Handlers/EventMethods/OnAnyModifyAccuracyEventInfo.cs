@@ -8,41 +8,52 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnAnyModifyAccuracy event.
 /// Modifies accuracy for any move in battle.
-/// Signature: (Battle battle, int relayVar, Pokemon target, Pokemon source, ActiveMove move) => DoubleVoidUnion
+/// Signature: (Battle battle, int? relayVar, Pokemon target, Pokemon source, ActiveMove move) => DoubleVoidUnion
+/// Note: accuracy is nullable because moves with true accuracy (always hit) pass null/true instead of a number
 /// </summary>
 public sealed record OnAnyModifyAccuracyEventInfo : EventHandlerInfo
 {
     /// <summary>
-/// Creates a new OnAnyModifyAccuracy event handler.
+    /// Creates event handler using context-based pattern.
     /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnAnyModifyAccuracyEventInfo(
-Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
-   bool usesSpeed = true)
+        bool usesSpeed = true)
     {
-   Id = EventId.ModifyAccuracy;
-  Prefix = EventPrefix.Any;
- Handler = handler;
-   Priority = priority;
+        Id = EventId.ModifyAccuracy;
+        Prefix = EventPrefix.Any;
+        ContextHandler = contextHandler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-  ExpectedParameterTypes =
-        [
-   typeof(Battle),
-typeof(int),
-   typeof(Pokemon),
-            typeof(Pokemon),
-  typeof(ActiveMove),
-        ];
-     ExpectedReturnType = typeof(DoubleVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAnyModifyAccuracyEventInfo Create(
+        Func<Battle, int?, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAnyModifyAccuracyEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetNullableIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    VoidDoubleVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

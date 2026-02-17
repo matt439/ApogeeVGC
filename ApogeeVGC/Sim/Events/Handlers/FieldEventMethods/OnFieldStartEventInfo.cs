@@ -16,37 +16,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 /// </summary>
 public sealed record OnFieldStartEventInfo : EventHandlerInfo
 {
-    /// <summary>
-  /// Creates a new OnFieldStart event handler using the legacy strongly-typed pattern.
-    /// </summary>
- /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    public OnFieldStartEventInfo(
-        Action<Battle, Field, Pokemon, IEffect> handler,
-  int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.FieldStart;
-        Prefix = EventPrefix.None;
-   Handler = handler;
-        Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Field), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(void);
-        
-        // Nullability: All parameters non-nullable by default (adjust as needed)
-   ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
- ValidateConfiguration();
-    }
-    
-    /// <summary>
-  /// Creates event handler using context-based pattern.
-    /// Context provides: Battle, Field, TargetPokemon, SourceEffect
-    /// </summary>
     public OnFieldStartEventInfo(
         EventHandlerDelegate contextHandler,
   int? priority = null,
@@ -74,7 +43,7 @@ UsesSpeed = usesSpeed;
        handler(
    context.Battle,
   context.Battle.Field,
- context.GetTargetPokemon(),
+ context.GetTargetOrSourcePokemon(),
      context.GetSourceEffect<IEffect>()
      );
       return null;

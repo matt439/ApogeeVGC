@@ -12,24 +12,48 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyAccuracyEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAllyAccuracyEventInfo(
-    Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.Accuracy;
-  Prefix = EventPrefix.Ally;
-  Handler = handler;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(IntBoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAllyAccuracyEventInfo Create(
+        Func<Battle, int?, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyAccuracyEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetNullableIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    IntIntBoolVoidUnion i => new IntRelayVar(i.Value),
+                    BoolIntBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidIntBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

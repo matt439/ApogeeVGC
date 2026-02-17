@@ -112,6 +112,9 @@ public partial class Battle
         // Dragon Darts can target itself if Ally Switch is used afterwards
         if (move.SmartTarget == true)
         {
+            // In TS, getAtLoc(0) returns undefined (JS allows side.active[-1]).
+            // In C#, GetAtLoc(0) throws because Math.Abs(0)-1 = -1. Guard against it.
+            if (targetLoc == 0) return GetRandomTarget(pokemon, move);
             Pokemon curTarget = pokemon.GetAtLoc(targetLoc);
             return curTarget is { Fainted: false } ? curTarget : GetRandomTarget(pokemon, move);
         }
@@ -131,7 +134,10 @@ public partial class Battle
         }
 
         // Check if target location is valid
-        if (move.Target != MoveTarget.RandomNormal && ValidTargetLoc(targetLoc, pokemon, move.Target))
+        // targetLoc == 0 means "no specific target" - skip GetAtLoc and fall through
+        // to GetRandomTarget. In TS, getAtLoc(0) returns undefined (JS allows
+        // side.active[-1]); in C#, GetAtLoc(0) throws ArgumentOutOfRangeException.
+        if (targetLoc != 0 && move.Target != MoveTarget.RandomNormal && ValidTargetLoc(targetLoc, pokemon, move.Target))
         {
             Pokemon target = pokemon.GetAtLoc(targetLoc);
 

@@ -9,24 +9,40 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnSourceSwapEventInfo : EventHandlerInfo
 {
- public OnSourceSwapEventInfo(
-      Action<Battle, Pokemon, Pokemon> handler,
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnSourceSwapEventInfo(
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
-   Id = EventId.Swap;
-   Prefix = EventPrefix.Source;
-        Handler = handler;
-    Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        Id = EventId.Swap;
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceSwapEventInfo Create(
+        Action<Battle, Pokemon, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceSwapEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

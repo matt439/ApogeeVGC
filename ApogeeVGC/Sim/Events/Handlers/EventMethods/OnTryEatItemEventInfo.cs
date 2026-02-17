@@ -12,35 +12,41 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
 {
-    /// <summary>
-    /// Creates a new OnTryEatItem event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnTryEatItemEventInfo(
-        OnTryEatItem unionValue,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
-   Id = EventId.TryEatItem;
-      UnionValue = unionValue;
-        Handler = ExtractDelegate();
+        Id = EventId.TryEatItem;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-[
-     typeof(Battle),
-     typeof(Item),
-         typeof(Pokemon),
-    ];
-   ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnTryEatItemEventInfo Create(
+        Func<Battle, Item, Pokemon, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnTryEatItemEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetEffectParam<Item>(),
+                context.GetTargetOrSourcePokemon()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

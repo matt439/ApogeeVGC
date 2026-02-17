@@ -40,7 +40,7 @@ public class EffectState
     public bool? Ending { get; set; }
     public bool? Resisted { get; set; }
     public bool? IsSlotCondition { get; set; }
-    public PokemonType? TypeWas { get; set; }
+    public PokemonType[]? TypeWas { get; set; }
     public bool? HasDragonType { get; set; }
     public int? ContactHitCount { get; set; }
     public bool? CheckedAngerShell { get; set; }
@@ -67,6 +67,7 @@ public class EffectState
     public int? Multiplier { get; set; } // For Echoed Voice
     public double? DoubleMultiplier { get; set; } // For Helping Hand
     public PokemonSlot? TargetSlot { get; set; } // For Future Sight target tracking
+    public int? TargetLoc { get; set; } // For two-turn move target tracking (relative location)
     public int? EndingTurn { get; set; } // For Future Sight timing
     public int? TrueDuration { get; set; } // For LockedMove (Outrage, etc.)
     public int? Layers { get; set; } // For entry hazards (Spikes, Toxic Spikes)
@@ -79,7 +80,9 @@ public class EffectState
 
     // Counter and Mirror Coat tracking
     public PokemonSlot? Slot { get; set; } // For Counter/Mirror Coat damage source slot
-    public int? TotalDamage { get; set; } // For Counter/Mirror Coat damage tracking
+
+    //public int? TotalDamage { get; set; } // For Counter/Mirror Coat damage tracking
+    public int? Damage { get; set; }
     public Pokemon? LastDamageSource { get; set; } // For Counter/Mirror Coat damage source
 
     public int? GetProperty(EffectStateKey? key)

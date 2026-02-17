@@ -1,16 +1,21 @@
-﻿using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Moves;
+﻿using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils.Unions;
+using System.Text.Json.Serialization;
 
 namespace ApogeeVGC.Sim.Choices;
 
 public record PokemonMoveData
 {
+    [JsonIgnore]
     public required Move Move { get; init; }
+    
+    [JsonPropertyName("move")]
+    public string Name => Move.Name;
+    
     public MoveId Id => Move.Id;
     public MoveTarget? Target { get; init; }
     public MoveIdBoolUnion? Disabled { get; set; }
-    public IEffect? DisabledSource { get; init; }
+    public EffectStateId? DisabledSource { get; set; }
     public int Pp { get; init; }
     public int MaxPp { get; init; }
 }

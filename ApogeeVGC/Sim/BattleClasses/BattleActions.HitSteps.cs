@@ -705,7 +705,6 @@ public partial class BattleActions
             if (move.SmartTarget == true && targets.Count > 1)
             {
                 targetsCopy = [targets[hit - 1]];
-                damage = [damage[hit - 1]];
             }
             else
             {
@@ -906,7 +905,7 @@ public partial class BattleActions
                 int hpBeforeRecoil = pokemon.Hp;
 
                 Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
-                    BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()]),
+                    BattleDamageEffect.FromIEffect(move),
                     true);
 
                 move.MindBlownRecoil = false;

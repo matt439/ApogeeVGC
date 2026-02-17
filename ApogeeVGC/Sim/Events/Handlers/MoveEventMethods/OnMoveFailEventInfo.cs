@@ -11,24 +11,36 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 /// </summary>
 public sealed record OnMoveFailEventInfo : EventHandlerInfo
 {
-public OnMoveFailEventInfo(
+    public OnMoveFailEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.MoveFail;
+        Prefix = EventPrefix.None;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    public static OnMoveFailEventInfo Create(
         Action<Battle, Pokemon, Pokemon, ActiveMove> handler,
         int? priority = null,
-   bool usesSpeed = true)
+        bool usesSpeed = true)
     {
-    Id = EventId.MoveFail;
-        Prefix = EventPrefix.None;
-        Handler = handler;
-        Priority = priority;
-      UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        return new OnMoveFailEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetTargetOrSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetMove()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

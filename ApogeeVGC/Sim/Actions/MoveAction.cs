@@ -32,7 +32,7 @@ public record MoveAction : IAction
             {
                 case IntIntFalseUnion iifu:
                     int i = iifu.Value;
-                    if (i is 3 or 5 or 200 or 201 or 199 or 106)
+                    if (i is 3 or 5 or 200 or 201 or 199 or 106 or 107)
                     {
                         field = i;
                     }
@@ -55,7 +55,7 @@ public record MoveAction : IAction
     public int Speed { get; init; }
     public required Pokemon Pokemon { get; init; }
     public int TargetLoc { get; set; }
-    public required Pokemon OriginalTarget { get; init; }
+    public Pokemon? OriginalTarget { get; init; }
     public MoveId MoveId { get; init; }
     public required Move Move { get; set; }
     public IEffect? SourceEffect { get; init; }

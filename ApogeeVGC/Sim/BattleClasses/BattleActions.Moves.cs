@@ -129,11 +129,10 @@ public partial class BattleActions
         // Execute beforeMoveCallback if present
         if (activeMove.BeforeMoveCallback is not null)
         {
-            var beforeMoveHandler =
-                (Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion>)activeMove
-                    .BeforeMoveCallback.GetDelegateOrThrow();
-            BoolVoidUnion callbackResult = beforeMoveHandler(Battle, pokemon, target, activeMove);
-            if (callbackResult is BoolBoolVoidUnion { Value: true })
+            RelayVar? callbackResult = Battle.SingleEvent(
+                EventId.BeforeMoveCallback, activeMove, null,
+                pokemon, SingleEventSource.FromNullablePokemon(target), activeMove);
+            if (callbackResult is BoolRelayVar { Value: true })
             {
                 ClearActiveMove(true);
                 pokemon.MoveThisTurnResult = false;
@@ -338,6 +337,27 @@ public partial class BattleActions
 
         // Get active move
         var activeMove = move.ToActiveMove();
+
+        // ToActiveMove() only copies base Move properties and drops ActiveMove-specific
+        // fields. Preserve flags that guard against infinite recursion.
+        if (move is ActiveMove incomingActive)
+        {
+            // Without HasBounced, two opposing Magic Bounce holders infinitely re-bounce
+            // reflectable moves, causing a stack overflow.
+            if (incomingActive.HasBounced == true)
+            {
+                activeMove.HasBounced = true;
+            }
+
+            // Without IsExternal, Dancer-copied dance moves lose the external flag after
+            // ToActiveMove(), causing RunMove's Dancer check to re-trigger and creating
+            // infinite Dancer → Dancer recursion between two Dancer holders.
+            if (incomingActive.IsExternal == true)
+            {
+                activeMove.IsExternal = true;
+            }
+        }
+
         pokemon.LastMoveUsed = activeMove;
 
         // Copy priority and prankster boost from active move if it exists

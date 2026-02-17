@@ -12,31 +12,43 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnSourceCriticalHitEventInfo : UnionEventHandlerInfo<OnCriticalHit>
 {
-    /// <summary>
-    /// Creates a new OnSourceCriticalHit event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnSourceCriticalHitEventInfo(
-        OnCriticalHit unionValue,
-     int? priority = null,
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.CriticalHit;
-    Prefix = EventPrefix.Source;
-        UnionValue = unionValue;
-        Handler = ExtractDelegate();
+        Prefix = EventPrefix.Source;
+        ContextHandler = contextHandler;
         Priority = priority;
-    UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnSourceCriticalHitEventInfo Create(
+        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnSourceCriticalHitEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
+                context.GetMove()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

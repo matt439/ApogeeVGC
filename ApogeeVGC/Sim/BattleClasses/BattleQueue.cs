@@ -178,6 +178,8 @@ public class BattleQueue(Battle battle)
         // Only process for regular Move actions, not BeforeTurnMove/PriorityChargeMove to avoid infinite recursion
         if (!midTurn)
         {
+            // Only process pre-turn callbacks for actual Move actions (not BeforeTurnMove, PriorityChargeMove, etc.)
+            // This matches TypeScript: if (action.choice === 'move')
             if (currentAction is MoveAction { Choice: ActionId.Move } ma)
             {
                 // Add BeforeTurnMove action if the move has a beforeTurnCallback (e.g., Focus Punch)
@@ -280,9 +282,13 @@ public class BattleQueue(Battle battle)
             }
 
             // Set the original target based on target location
+            // When targetLoc is 0 (no valid target found by GetRandomTarget), OriginalTarget is null
+            // This matches TS behavior where getAtLoc(0) returns undefined (active[-1])
             currentAction = moveAct with
             {
-                OriginalTarget = moveAct.Pokemon.GetAtLoc(moveAct.TargetLoc),
+                OriginalTarget = moveAct.TargetLoc != 0
+                    ? moveAct.Pokemon.GetAtLoc(moveAct.TargetLoc)
+                    : null,
             };
         }
 

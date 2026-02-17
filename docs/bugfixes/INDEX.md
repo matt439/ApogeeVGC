@@ -10,7 +10,22 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Ability OnStart handlers not executing during switch-in
 - [Trick Room Bug Fix](#trick-room-bug-fix) - Field event handlers not mapped/invoked
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue) - Move event handlers not mapped
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix) - Condition/Item OnStart handlers not mapped causing Sleep to never end
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Int passed to RunEvent instead of IntRelayVar
+- [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix) - ConditionIdRelayVar not converted to PokemonTypeConditionIdUnion
+- [Condition to Ability Cast Fix](#condition-to-ability-cast-fix) - InvalidCastException when trying to cast Condition to Ability
+- [ModifyAccuracy Event Parameter Nullability Fix](#modifyaccuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves
+- [Accuracy Event Parameter Nullability Fix](#accuracy-event-parameter-nullability-fix) - Int accuracy parameter cannot handle always-hit moves (Lock-On)
+- [Effectiveness Event PokemonType Parameter Fix](#effectiveness-event-pokemontype-parameter-fix) - PokemonType parameter not resolved in event context
+- [Ripen Ability Null Effect Fix](#ripen-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnTryHeal handler
+- [Disguise Ability Null Effect Fix](#disguise-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
+- [Adrenaline Orb Null Effect Fix](#adrenaline-orb-null-effect-fix) - NullReferenceException when effect parameter is null in OnAfterBoost handler
+- [Berserk Ability Null Effect Fix](#berserk-ability-null-effect-fix) - NullReferenceException when effect parameter is null in OnDamage handler
+- [Grassy Glide ModifyPriority Source Fix](#grassy-glide-modifypriority-source-fix) - NullReferenceException when source parameter is null in OnModifyPriority handler
+- [Big Root Heal Pulse Null Effect Fix](#big-root-heal-pulse-null-effect-fix) - NullReferenceException when effect parameter is null in Big Root OnTryHeal handler
+- [Covet TakeItem RelayVar Fix](#covet-takeitem-relayvar-fix) - TakeItem event invoked without relayVar parameter causing type mismatch
+- [Wind Power SideCondition Parameter Fix](#wind-power-sidecondition-parameter-fix) - NullReferenceException when sideCondition parameter name matched "side" check instead of Condition type
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix) - EventHandlerInfo validation checking delegate parameter types in wrong direction
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -18,6 +33,10 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix) - VoidReturn causing IntRelayVar type mismatch
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - Multiple stat handlers returning VoidReturn instead of int
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Incorrect nullability constraints on stat modification parameters
+- [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
+- [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix) - VoidVoidFalseUnion cannot be converted to RelayVar
+- [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix) - IntIntBoolUnion cannot be converted to RelayVar
+- [SparseBoostsTableVoidUnion Return Conversion Fix](#sparsebooststablevoidunion-return-conversion-fix) - VoidSparseBoostsTableVoidUnion cannot be converted to RelayVar
 - [Union Type Handling Guide](#union-type-handling-guide) - Comprehensive guide for preventing union type issues
 
 ### Move Mechanics
@@ -26,21 +45,35 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple interconnected issues with self-targeting moves
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Infinite loop in damage calculation for self-stat changes
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Secondary property not converted to Secondaries array
+- [Steel Beam & Mind Blown Recoil Fix](#steel-beam--mind-blown-recoil-fix) - MoveId does not have corresponding ConditionId for recoil damage effect
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix) - HasBounced flag lost during ToActiveMove() conversion causing infinite bounce loop
 
 ### Status Conditions
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Missing Recoil condition dictionary entry
 
+### Type Conversion & Stat System
+- [BoostId To String Evasion/Accuracy Conversion Fix](#boostid-to-string-evasionaccuracy-conversion-fix) - ArgumentOutOfRangeException when converting Evasion/Accuracy BoostId to string
+
 ### UI and Display
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
 - [GUI Team Preview Fix](#gui-team-preview-fix) - No Pokémon displayed during GUI team preview
 
+
 ### Battle Lifecycle
+- [Collection Modified During Enumeration Fix](#collection-modified-during-enumeration-fix) - InvalidOperationException when side.Active is modified during foreach iteration
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Infinite loop when active Pokemon fainted without proper switch handling
 - [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended during request generation
 - [Player 2 Always Wins Bug Fix](#player-2-always-wins-bug-fix) - Winner detection comparing player names against side IDs incorrectly
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player always returning invalid target location 0 for targeting moves in doubles
+
+### Choice System
+- [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position to index into Active-sized arrays
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix) - Infinite loop when update callback detects but doesn't apply changes
+- [Hidden-Disabled Move Endless Loop Fix](#hidden-disabled-move-endless-loop-fix) - Infinite loop when autoChoose picks hidden-disabled move (Imprison) not checked against unrestricted moves list
+- [AutoChoose Hidden-Disabled Struggle Fix](#autochoose-hidden-disabled-struggle-fix) - autoChoose crash when all moves disabled (hidden + PP depletion) due to GetMoves returning [Struggle] instead of []
+- [Adjacent Ally Targeting Crash Fix](#adjacent-ally-targeting-crash-fix) - ArgumentOutOfRangeException when PlayerRandom targets ally-only moves with positive (foe) locations in doubles
 
 ---
 
@@ -86,6 +119,26 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### Status Condition OnStart Handler Mapping Fix
+**File**: `StatusConditionOnStartHandlerMappingFix.md`  
+**Severity**: Critical  
+**Systems Affected**: All status conditions and items with OnStart/OnEnd/Restart handlers, Sleep status never ending
+
+**Problem**: Battle exceeded 1000-turn limit due to Sleep status that never ended, causing every move to be blocked indefinitely. Both Pokémon had Sleep status with `StatusState.Time=null` because the `OnStart` handler never executed despite `SetStatus` being called.
+
+**Root Cause**: `EventId.Start`, `EventId.End`, and `EventId.Restart` were only mapped in `AbilityEventMethodsMap` (for abilities) but completely missing from the base `EventMethodsMap`. When `SingleEvent` tried to find a handler for Condition/Item lifecycle events, `GetEventHandlerInfo` returned `null`, so handlers never executed. Since Sleep's `OnStart` never ran, `Time` stayed `null`, and `null--` stays `null` in C# (lifted nullable arithmetic), so `null <= 0` was always `false` and Sleep never cured itself.
+
+**Solution**: 
+- Added `EventId.Start`, `EventId.End`, `EventId.Restart` mappings to base `EventMethodsMap` in `EventHandlerInfoMapper`
+- Used type-based switching to route to `Condition.OnStart` or `Item.OnStart` properties
+- Abilities unaffected (checked first in separate map)
+
+**Impact**: Affects all status conditions (Sleep, Freeze, Burn, Paralysis), all volatile conditions (Confusion, Disable, LockedMove, TwoTurnMove, etc.), and all items with lifecycle handlers.
+
+**Keywords**: `status condition`, `Sleep`, `Freeze`, `OnStart`, `OnEnd`, `OnRestart`, `EventHandlerInfoMapper`, `event mapping`, `handler not executing`, `null Time`, `endless loop`, `turn limit`, `BattleTurnLimitException`, `Condition`, `Item`, `IEventMethods`, `lifecycle events`
+
+---
+
 ### Protect Bug Fix
 **File**: `ProtectBugFix.md`  
 **Severity**: High  
@@ -121,6 +174,28 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - Added `BoolEmptyVoidUnion` conversion support in `EventHandlerAdapter`
 
 **Keywords**: `stalling`, `Protect`, `consecutive usage`, `move events`, `Stall condition`
+
+---
+
+### Covet TakeItem RelayVar Fix
+**File**: `CovetTakeItemRelayVarFix.md`  
+**Severity**: Medium  
+**Systems Affected**: Item-stealing moves (Covet), TakeItem event handlers
+
+**Problem**: When Covet attempted to steal an item (e.g., Mind Plate) from an opponent, the TakeItem event was invoked without the `relayVar` parameter, causing a type mismatch exception: "Object of type 'ApogeeVGC.Sim.Moves.ActiveMove' cannot be converted to type 'ApogeeVGC.Sim.Items.Item'."
+
+**Root Cause**: The Covet move's `OnAfterHit` handler invoked the TakeItem event without passing the item as the `relayVar` parameter. The `EventHandlerAdapter` uses the `relayVar` to provide type-specific values for parameter resolution. Without it, the adapter couldn't correctly resolve the `Item` parameter for handlers like Mind Plate's `OnTakeItem`.
+
+**Solution**: Added the item as the `relayVar` parameter when invoking the TakeItem event, matching the TypeScript implementation where the item is passed as both `effect` and `relayVar`.
+
+**TypeScript Reference**: 
+```typescript
+this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, yourItem)
+//                           ^^^^^^^^                                              ^^^^^^^^
+//                           effect                                                relayVar
+```
+
+**Keywords**: `TakeItem event`, `item stealing`, `Covet`, `Mind Plate`, `relayVar`, `EventHandlerAdapter`, `parameter resolution`
 
 ---
 
@@ -287,7 +362,110 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
-### Spirit Break Secondary Effect Fix
+### MoveIdVoidUnion Return Conversion Fix
+**File**: `MoveIdVoidUnionReturnConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: Two-turn moves, LockMove event handlers
+
+**Problem**: When a Pokemon used a two-turn move (Fly, Dig, Dive, Skull Bash, Solar Beam, Sky Drop), the battle crashed with `InvalidOperationException: Event LockMove: Unable to convert return value of type 'VoidMoveIdVoidUnion' to RelayVar`.
+
+**Root Cause**: The `TwoTurnMove` condition's `OnLockMove` handler returns `MoveIdVoidUnion`, which can be either `MoveIdMoveIdVoidUnion` (containing a MoveId) or `VoidMoveIdVoidUnion` (containing VoidReturn). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `MoveIdVoidUnion`.
+
+**Solution**: Added conversion cases for both variants of `MoveIdVoidUnion`:
+- `MoveIdMoveIdVoidUnion` ? `MoveIdRelayVar`
+- `VoidMoveIdVoidUnion` ? `VoidReturnRelayVar`
+
+**Pattern**: Event handlers that return union types need explicit conversion cases in `EventHandlerAdapter.ConvertReturnValue` to unwrap the variant and convert it to the appropriate `RelayVar` type.
+
+**Keywords**: `two-turn move`, `LockMove event`, `MoveIdVoidUnion`, `event handler return`, `union type conversion`, `Fly`, `Dig`, `Dive`, `Skull Bash`, `Solar Beam`, `Sky Drop`
+
+---
+
+### VoidFalseUnion Return Conversion Fix
+**File**: `VoidFalseUnionReturnConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: Move-blocking conditions (Throat Chop, Taunt, etc.), ModifyMove event handlers
+
+**Problem**: When a Pokemon with the Throat Chop condition tried to use a sound-based move, the battle crashed with `InvalidOperationException: Event ModifyMove: Unable to convert return value of type 'VoidVoidFalseUnion' to RelayVar`.
+
+**Root Cause**: The `ThroatChop` condition's `OnModifyMove` handler returns `VoidFalseUnion`, which can be either `VoidVoidFalseUnion` (VoidReturn, allow move) or `FalseVoidFalseUnion` (false, block move). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `VoidFalseUnion`.
+
+**Solution**: Added conversion cases for both variants of `VoidFalseUnion`:
+- `VoidVoidFalseUnion` ? `VoidReturnRelayVar` (no effect, allow move)
+- `FalseVoidFalseUnion` ? `BoolRelayVar(false)` (block move)
+
+**Semantic Meaning**: Following copilot instructions - `VoidReturn` = "no effect" (move proceeds), `false` = explicit block signal.
+
+**Keywords**: `Throat Chop`, `sound move`, `move blocking`, `VoidFalseUnion`, `ModifyMove event`, `event handler return`, `union type conversion`, `Taunt`, `Torment`, `Disable`
+
+---
+
+### IntBoolUnion Return Conversion Fix
+**File**: `IntBoolUnionReturnConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: Healing events, berry interactions, Ripen ability
+
+**Problem**: When a Pokemon with the Ripen ability had Berry Juice (or any berry) trigger healing, the battle crashed with `InvalidOperationException: Event TryHeal: Unable to convert return value of type 'IntIntBoolUnion' to RelayVar`.
+
+**Root Cause**: The Ripen ability's `OnTryHeal` handler returns `IntBoolUnion`, which can be either `IntIntBoolUnion` (containing an int heal amount) or `BoolIntBoolUnion` (containing a bool success/failure). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `IntBoolUnion`.
+
+**Solution**: Added conversion cases for both variants of `IntBoolUnion`:
+- `IntIntBoolUnion` ? `IntRelayVar` (preserves the integer heal amount)
+- `BoolIntBoolUnion` ? `BoolRelayVar` (preserves the boolean value)
+
+**Pattern**: Event handlers that return union types need explicit conversion cases in `EventHandlerAdapter.ConvertReturnValue` to unwrap the variant and convert it to the appropriate `RelayVar` type.
+
+**Keywords**: `Ripen`, `IntBoolUnion`, `IntIntBoolUnion`, `BoolIntBoolUnion`, `TryHeal event`, `event handler return`, `union type conversion`, `berry`, `healing`, `Berry Juice`, `Leftovers`
+
+---
+
+### SparseBoostsTableVoidUnion Return Conversion Fix
+**File**: `SparseBoostsTableVoidUnionReturnConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: ModifyBoost events, stat boost modifications, Unaware ability
+
+**Problem**: When a Pokémon with the Unaware ability was switching in, the battle crashed with `InvalidOperationException: Event ModifyBoost adapted handler failed on effect Unaware (Ability)` with inner exception `Unable to convert return value of type 'VoidSparseBoostsTableVoidUnion' to RelayVar`.
+
+**Root Cause**: The Unaware ability's `OnAnyModifyBoost` handler returns `SparseBoostsTableVoidUnion`, which can be either `SparseBoostsTableSparseBoostsTableVoidUnion` (containing a `SparseBoostsTable` with modified boosts) or `VoidSparseBoostsTableVoidUnion` (indicating no modification). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `SparseBoostsTableVoidUnion`.
+
+**Solution**: Added conversion cases for both variants of `SparseBoostsTableVoidUnion`:
+- `SparseBoostsTableSparseBoostsTableVoidUnion` ? `SparseBoostsTableRelayVar` (preserves the modified boost table)
+- `VoidSparseBoostsTableVoidUnion` ? `VoidReturnRelayVar` (indicates no modification)
+
+**Pattern**: Event handlers that return union types need explicit conversion cases in `EventHandlerAdapter.ConvertReturnValue` to unwrap the variant and convert it to the appropriate `RelayVar` type. The `SparseBoostsTableRelayVar` type already existed in the codebase.
+
+**Keywords**: `Unaware`, `SparseBoostsTableVoidUnion`, `SparseBoostsTableSparseBoostsTableVoidUnion`, `VoidSparseBoostsTableVoidUnion`, `ModifyBoost event`, `OnAnyModifyBoost`, `event handler return`, `union type conversion`, `stat boosts`, `EventHandlerAdapter`, `SparseBoostsTableRelayVar`, `switch-in`
+
+---
+
+### Union Type Handling Guide
+**File**: `UnionTypeHandlingGuide.md`  
+**Type**: Reference Guide  
+**Purpose**: Comprehensive guide for preventing recurring union type issues
+
+**Contents**:
+- 6 major issue categories with detection patterns
+- Complete audit checklist for codebase review
+- Code search queries for finding potential issues
+- Prevention guidelines for new code
+- Testing scenarios for verification
+- Quick reference for Union ? RelayVar mapping
+
+**Key Topics**:
+- Missing union type conversions in EventHandlerAdapter
+- Undefined/Empty handling in success checks
+- Event handler return type mismatches
+- Missing null checks before union access
+- Inconsistent NOT_FAIL representation
+
+**Use Cases**:
+- Adding new event handlers
+- Adding new union types
+- Processing event results
+- Determining move/action success
+- Code reviews and audits
+
+**Keywords**: `union types`, `Undefined`, `Empty`, `NOT_FAIL`, `EventHandlerAdapter`, `reference guide`
 **File**: `SpiritBreakSecondaryEffectFix.md`  
 **Severity**: High  
 **Systems Affected**: Moves with secondary effects using `Secondary` property
@@ -389,6 +567,11 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - VoidReturn instead of int in stat handlers
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Null parameter when non-nullable expected
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Primitive int instead of IntRelayVar
+- [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix) - VoidMoveIdVoidUnion cannot be converted to RelayVar
+- [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix) - VoidVoidFalseUnion cannot be converted to RelayVar
+- [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix) - IntIntBoolUnion cannot be converted to RelayVar
+- [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix) - Event validation checking parameter types in wrong direction
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
@@ -407,8 +590,11 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Stack overflow
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple issues including recursion
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Stack overflow from recursive secondary processing
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix) - Sleep never ends causing 1000+ turn battles
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Battle runs for 1000+ turns
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player repeatedly failing move validation in doubles
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix) - Update callback detects but doesn't apply changes
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix) - Intermittent stack overflow from ability bouncing moves indefinitely
 
 ### By Component
 
@@ -416,6 +602,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix)
 - [Trick Room Bug Fix](#trick-room-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix)
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) (partial)
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix)
 
@@ -430,14 +617,20 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Headlong Rush Self-Stat Drops Fix](#headlong-rush-self-stat-drops-fix)
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix)
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix)
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix)
 
 **Status/Conditions**:
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix)
 - [TrySetStatus Logic Error](#trysetstatus-logic-error)
 - [Leech Seed Bug Fix](#leech-seed-bug-fix)
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix)
 
 **UI/Display**:
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
+**Choice/Request System**:
+- [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix)
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix)
 
 ### By File Modified
 
@@ -446,10 +639,25 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Protect Bug Fix](#protect-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
 - [Trick Room Bug Fix](#trick-room-bug-fix)
+- [Immunity Event Parameter Conversion Fix](#immunity-event-parameter-conversion-fix)
+- [MoveIdVoidUnion Return Conversion Fix](#moveidvoidunion-return-conversion-fix)
+- [VoidFalseUnion Return Conversion Fix](#voidfalseunion-return-conversion-fix)
+- [IntBoolUnion Return Conversion Fix](#intboolunion-return-conversion-fix)
+- [SparseBoostsTableVoidUnion Return Conversion Fix](#sparsebooststablevoidunion-return-conversion-fix)
+
+**EventHandlerInfo.cs**:
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix)
+
+**UnionEventHandlerInfo.cs**:
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix)
+
+**OnCriticalHitEventInfo.cs**:
+- [Disguise CriticalHit Parameter Type Fix](#disguise-criticalhit-parameter-type-fix)
 
 **EventHandlerInfoMapper.cs**:
 - [Trick Room Bug Fix](#trick-room-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
+- [Status Condition OnStart Handler Mapping Fix](#status-condition-onstart-handler-mapping-fix)
 
 **BattleActions.Damage.cs**:
 - [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix)
@@ -457,6 +665,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **BattleActions.MoveEffects.cs**:
 - [Volt Switch Damage Type Bug](#volt-switch-damage-type-bug)
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix)
+
+**BattleActions.Moves.cs**:
+- [Magic Bounce Infinite Recursion Fix](#magic-bounce-infinite-recursion-fix)
 
 **BattleActions.MoveHit.cs**:
 - [Headlong Rush Self-Stat Drops Fix](#headlong-rush-self-stat-drops-fix)
@@ -521,6 +732,12 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **Battle.Requests.cs**:
 - [GUI Team Preview Fix](#gui-team-preview-fix)
+
+**PokemonMoveRequestData.cs**:
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix)
+
+**Side.Choices.cs**:
+- [Disabled Source Endless Loop Fix](#disabled-source-endless-loop-fix)
 
 ---
 
@@ -619,6 +836,225 @@ When documenting a new bug fix:
 ## Testing
 [How to verify the fix]
 
+---
+
+### ModifyAccuracy Event Parameter Nullability Fix
+**File**: `ModifyAccuracyEventParameterNullabilityFix.md`  
+**Severity**: High  
+**Systems Affected**: ModifyAccuracy event handlers (abilities like Hustle, Compound Eyes; items like Wide Lens, Zoom Lens)
+
+**Problem**: The `ModifyAccuracy` event handler signature declared the `accuracy` parameter as `int` (non-nullable), but moves with true accuracy (always-hit moves) pass `BoolRelayVar(true)` instead of `IntRelayVar`. This caused parameter resolution to fail when abilities tried to process always-hit moves.
+
+**Root Cause**: TypeScript allows `accuracy: number | true`, but C# signature used `int` (non-nullable). TypeScript handlers check `typeof accuracy === 'number'` before modifying, but C# handlers had no way to distinguish between numeric accuracy and always-hit moves.
+
+**Solution**:
+- Changed all `ModifyAccuracy` event handler signatures to use `int?` (nullable int)
+- Updated `EventHandlerAdapter.TryUnwrapRelayVar` to convert `BoolRelayVar(true)` ? `null` for `int?` parameters
+- Updated all handler implementations (Hustle, Compound Eyes, Sand Veil, Snow Cloak, Tangled Feet, Victory Star, Wide Lens, Zoom Lens, Bright Powder) to check `accuracy.HasValue` before modifying
+
+**Semantic Mapping**:
+- TypeScript `typeof accuracy === 'number'` ? C# `accuracy.HasValue`
+- TypeScript `true` (always hit) ? C# `null`
+
+**Keywords**: `ModifyAccuracy`, `accuracy`, `nullable`, `int?`, `Hustle`, `event parameter`, `type mismatch`, `BoolRelayVar`, `always-hit moves`
+
+---
+
+### Accuracy Event Parameter Nullability Fix
+**File**: `AccuracyEventParameterNullabilityFix.md`  
+**Severity**: High  
+**Systems Affected**: Accuracy event handlers (all prefixes: Base, Source, Foe, Ally, Any)
+
+**Problem**: The `Accuracy` event handler signatures declared the `accuracy` parameter as `int` (non-nullable), but moves with true accuracy (always-hit moves) pass `BoolRelayVar(true)` instead of `IntRelayVar`. This caused the Lock-On condition's `OnSourceAccuracy` handler to crash when triggered for always-hit moves.
+
+**Root Cause**: Identical to ModifyAccuracy issue - TypeScript allows `accuracy: number | true`, but C# signatures used `int` (non-nullable). The `BattleActions.HitStepAccuracy` method passes `RelayVar.FromIntTrueUnion(accuracy)` which can be either `IntRelayVar` or `BoolRelayVar(true)`.
+
+**Solution**:
+- Changed all `Accuracy` event handler signatures (OnAccuracy, OnSourceAccuracy, OnFoeAccuracy, OnAllyAccuracy, OnAnyAccuracy) to use `int?` (nullable int)
+- EventHandlerAdapter already supported `BoolRelayVar(true)` ? `null` conversion from ModifyAccuracy fix
+- Updated handler implementations (Micle Berry, Minimize) to check `accuracy.HasValue` before using `.Value`
+- Lock-On handler unchanged (uses discard parameter `_`)
+
+**Semantic Mapping**:
+- TypeScript `typeof accuracy === 'number'` ? C# `accuracy.HasValue`
+- TypeScript `true` (always hit) ? C# `null`
+
+**Keywords**: `Accuracy`, `accuracy`, `nullable`, `int?`, `Lock-On`, `event parameter`, `type mismatch`, `BoolRelayVar`, `always-hit moves`, `Micle Berry`, `Minimize`
+
+---
+
+### Effectiveness Event PokemonType Parameter Fix
+**File**: `EffectivenessEventPokemonTypeParameterFix.md`  
+**Severity**: High  
+**Systems Affected**: Effectiveness event handlers (items like Iron Ball, abilities that modify type matchups)
+
+**Problem**: When Iron Ball item's Effectiveness event handler was invoked during type effectiveness calculation, the event system crashed with `InvalidOperationException: Event Effectiveness: Parameter 3 (PokemonType _) is non-nullable but no matching value found in context`.
+
+
+**Root Cause**: The Effectiveness event is called from `Pokemon.RunEffectiveness` with a `PokemonType` as the event source to represent the type being checked for effectiveness. While `RunEventSource` and `SingleEventSource` both supported `PokemonType` through their respective type source records (`TypeRunEventSource` and `PokemonTypeSingleEventSource`), the event context system wasn't properly handling it:
+1. `Battle.RunEvent` wasn't converting `TypeRunEventSource` to `PokemonTypeSingleEventSource`
+2. `EventContext` had no field for `SourceType`
+3. `EventInvocationContext.ToEventContext` wasn't extracting `PokemonType` from the source
+4. `EventHandlerAdapter.ResolveParameter` had no logic to resolve `PokemonType` parameters
+
+**Solution**:
+- Added `SourceType` property to `EventContext` to hold `PokemonType` sources
+- Updated `Battle.RunEvent` to convert `TypeRunEventSource` ? `PokemonTypeSingleEventSource`
+- Updated `EventInvocationContext.ToEventContext` to extract `PokemonType` from `PokemonTypeSingleEventSource`
+- Added `PokemonType` resolution logic to `EventHandlerAdapter.ResolveParameter`
+
+**Handler Example** (Iron Ball):
+```csharp
+OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, type, move) =>
+{
+    if (move.Type == MoveType.Ground && target.HasType(PokemonType.Flying))
+        return 0; // Ground moves hit Flying-types holding Iron Ball
+    return typeMod;
+}),
+```
+
+**Impact**: Effectiveness event handlers can now properly receive and use the `PokemonType` parameter to modify type matchup calculations.
+
+**Keywords**: `Effectiveness`, `type effectiveness`, `PokemonType`, `Iron Ball`, `event parameter`, `event source`, `TypeRunEventSource`, `parameter resolution`, `type matchup`
+
+---
+
+### Ripen Ability Null Effect Fix
+**File**: `RipenNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Ripen ability `OnTryHeal` event handler
+
+**Problem**: The Ripen ability crashed with a `NullReferenceException` when trying to access `effect.EffectStateId` in its `OnTryHeal` handler. The error occurred when a Pokémon with Ripen was healed from sources that don't have an associated `IEffect` (e.g., natural regeneration, certain abilities).
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its properties. The TypeScript reference implementation includes an explicit null check (`if (!effect) return;`) that was missing from the C# port.
+
+**Solution**: Added a null guard at the beginning of the `OnTryHeal` handler:
+```csharp
+if (effect == null)
+{
+    return IntBoolUnion.FromInt(damage);
+}
+```
+
+**Impact**: When `effect` is null, the healing proceeds unchanged without activating Ripen's berry-doubling logic, matching the correct TypeScript behavior.
+
+**Keywords**: `ripen`, `ability`, `OnTryHeal`, `null reference`, `effect parameter`, `berry`, `healing`, `item`, `null check`
+
+---
+
+### Disguise Ability Null Effect Fix
+**File**: `DisguiseNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Disguise ability `OnDamage` event handler
+
+**Problem**: The Disguise ability crashed with a `NullReferenceException` when trying to access `effect.EffectType` in its `OnDamage` handler. The error occurred when Mimikyu took damage from sources that don't have an associated `IEffect` (e.g., confusion self-damage, recoil, weather damage, status conditions).
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its properties. The TypeScript reference implementation uses optional chaining (`effect?.effectType`) that was missing from the C# port.
+
+**Solution**: Added a null guard at the beginning of the handler:
+```csharp
+if (effect != null &&
+    effect.EffectType == EffectType.Move &&
+    target.Species.Id is SpecieId.Mimikyu or SpecieId.MimikyuTotem)
+{
+    // Activate Disguise
+}
+```
+
+**Impact**: When `effect` is null, the damage proceeds unchanged without activating Disguise's protection, matching the correct TypeScript behavior where Disguise only protects against direct move attacks.
+
+**Keywords**: `disguise`, `ability`, `OnDamage`, `null reference`, `effect parameter`, `Mimikyu`, `damage`, `null check`, `optional chaining`
+
+---
+
+### Adrenaline Orb Null Effect Fix
+**File**: `AdrenalineOrbNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Adrenaline Orb item `OnAfterBoost` event handler
+
+**Problem**: The Adrenaline Orb item crashed with a `NullReferenceException` when trying to access `effect.EffectStateId` in its `OnAfterBoost` handler. The error occurred when boost events were triggered without an associated effect (e.g., weather effects, terrain effects, field conditions).
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its `EffectStateId` property. Stat boosts can come from various sources that don't have an associated effect. The TypeScript reference directly accesses `effect.name` without a null check, but C# requires explicit null handling.
+
+**Solution**: Added a null guard before checking the effect's identity:
+```csharp
+if (effect != null && effect.EffectStateId == AbilityId.Intimidate)
+{
+    target.UseItem();
+}
+```
+
+**Impact**: When `effect` is null, the Adrenaline Orb doesn't activate, which is correct because the item is designed to only respond to the Intimidate ability. This prevents crashes while maintaining correct game mechanics.
+
+**Keywords**: `adrenaline orb`, `item`, `OnAfterBoost`, `null reference`, `effect parameter`, `intimidate`, `stat boost`, `null check`
+
+---
+
+### Berserk Ability Null Effect Fix
+**File**: `BerserkNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Berserk ability `OnDamage` event handler
+
+**Problem**: The Berserk ability crashed with a `NullReferenceException` when trying to access `effect.EffectType` in its `OnDamage` handler at line 647 of `AbilitiesABC.cs`. The error occurred during random battle testing when a Pokémon with Berserk took damage from sources that don't have an associated `IEffect`.
+
+**Root Cause**: The handler did not check if the `effect` parameter was null before accessing its `EffectType` property. Damage can come from various sources that don't have an associated effect (confusion self-damage, recoil, weather damage, status conditions). The TypeScript reference directly accesses `effect.effectType` without a null check, which works in JavaScript because accessing a property on `undefined` returns `undefined` (no error), but in C# it throws a `NullReferenceException`.
+
+**Solution**: Added a null guard before checking the effect type:
+```csharp
+if (effect != null &&
+    effect.EffectType == EffectType.Move &&
+    effect is Move { MultiHit: null } move &&
+    !(move.HasSheerForce == true && source != null &&
+      source.HasAbility(AbilityId.SheerForce)))
+{
+    battle.EffectState.CheckedBerserk = false;
+}
+else
+{
+    battle.EffectState.CheckedBerserk = true;
+}
+```
+
+**Impact**: When `effect` is null, `CheckedBerserk` is set to `true`, matching the TypeScript behavior where a null/undefined effect causes the condition to fail and fall into the else branch. This prevents crashes while maintaining correct game mechanics where Berserk tracks whether the current damage should allow berry consumption and trigger the Special Attack boost.
+
+**Keywords**: `berserk`, `ability`, `OnDamage`, `null reference`, `effect parameter`, `damage`, `null check`, `TypeScript porting`, `CheckedBerserk`
+
+---
+
+### Collection Modified During Enumeration Fix
+**File**: `CollectionModifiedDuringEnumerationFix.md`  
+**Severity**: High  
+**Systems Affected**: Battle lifecycle, switching mechanics, phazing
+
+**Problem**: During random battle testing, the simulator threw `System.InvalidOperationException: Collection was modified; enumeration operation may not execute.` in the `RunAction` method at line 719. The error occurred when phazing moves (Roar, Dragon Tail, etc.) triggered forced switches.
+
+**Root Cause**: The `RunAction` method had four `foreach` loops that iterated directly over `side.Active`:
+1. Phazing loop (lines 716-729) 
+2. Cancel fainted actions loop (lines 737-747)
+3. Revival Blessing check loop (lines 788-804)
+4. BeforeSwitchOut event loop (lines 821-843)
+
+When `Actions.DragIn()` was called during the phazing loop, it called `BattleActions.SwitchIn()`, which modifies `side.Active[pos]` while the `foreach` loop was still iterating over the collection.
+
+**Solution**: Created snapshot copies of `side.Active` before each foreach loop using C# 12 collection expression syntax `[.. side.Active]`. This ensures that even if the original collection is modified during iteration, the loop continues safely over the snapshot.
+
+**Example Change**:
+```csharp
+// Before (unsafe):
+foreach (Pokemon? pokemon in side.Active) { ... }
+
+// After (safe):
+Pokemon?[] activeSnapshot = [.. side.Active];
+foreach (Pokemon? pokemon in activeSnapshot) { ... }
+```
+
+**Impact**: Prevents concurrent modification exceptions during forced switches, ensuring battle stability during phazing scenarios.
+
+**Keywords**: `collection modified`, `enumeration`, `concurrent modification`, `InvalidOperationException`, `foreach`, `side.Active`, `phazing`, `DragIn`, `SwitchIn`, `Roar`, `Dragon Tail`, `snapshot`, `collection expression`
+
+---
+
+
 ## Keywords
 [Searchable terms]
 ```
@@ -636,6 +1072,7 @@ When documenting a new bug fix:
 - **2025-01-XX**: Added Battle End Condition Null Request Fix (null request passed after battle ends mid-loop)
 - **2025-01-19**: Added Endless Battle Loop Fix (infinite loop when active Pokemon fainted without proper switch handling)
 - **2025-01-19**: Added Sync Simulator Request After Battle End Fix (RequestPlayerChoices called after battle ended during request generation)
+- **2025-01-20**: Added Status Condition OnStart Handler Mapping Fix (Condition/Item OnStart handlers not mapped causing Sleep to never end and 1000+ turn battles)
 
 ### Stat Modification Parameter Nullability and Type Conversion Fix
 **File**: `StatModificationParameterNullabilityFix.md`  
@@ -797,6 +1234,74 @@ When documenting a new bug fix:
 
 ---
 
+### Immunity Event Parameter Conversion Fix
+**File**: `ImmunityEventParameterConversionFix.md`  
+**Severity**: High  
+**Systems Affected**: Weather effects with immunity handlers, condition immunity checks, event parameter resolution
+
+**Problem**: When weather (e.g., Sunny Day) with immunity handlers was active and a move tried to apply a volatile status, the battle crashed with `Event Immunity adapted handler failed on effect SunnyDay (Weather)` and inner exception `Parameter 1 (PokemonTypeConditionIdUnion type) is non-nullable but no matching value found in context`.
+
+**Root Cause**: The `EventHandlerAdapter.ResolveParameter` method didn't know how to convert a `ConditionIdRelayVar` (or `PokemonTypeRelayVar`) into a `PokemonTypeConditionIdUnion` parameter type. When `Pokemon.RunStatusImmunity` called `RunEvent` with a `ConditionId?`, it was implicitly converted to `ConditionIdRelayVar` but the adapter couldn't extract it for the handler's `PokemonTypeConditionIdUnion` parameter.
+
+**Solution**: Added logic to `EventHandlerAdapter.ResolveParameter` to handle the conversion:
+```csharp
+if (paramType == typeof(PokemonTypeConditionIdUnion))
+{
+    if (context.HasRelayVar)
+    {
+        // Handle ConditionIdRelayVar -> PokemonTypeConditionIdUnion
+        if (context.RelayVar is ConditionIdRelayVar conditionIdVar && conditionIdVar.Id.HasValue)
+        {
+            return new PokemonTypeConditionIdUnion(conditionIdVar.Id.Value);
+        }
+        
+        // Handle PokemonTypeRelayVar -> PokemonTypeConditionIdUnion
+        if (context.RelayVar is PokemonTypeRelayVar pokemonTypeVar)
+        {
+            return new PokemonTypeConditionIdUnion(pokemonTypeVar.Type);
+        }
+    }
+}
+```
+
+**Union Type Context**: `PokemonTypeConditionIdUnion` is used for immunity checks because immunity can apply to either type immunity (e.g., Ground moves vs Flying) or condition immunity (e.g., Freeze immunity in Sunny Day). The union allows a single `OnImmunity` handler signature to check both.
+
+**Pattern**: Similar parameter conversion issues may exist for other union types. If you see "Parameter X is non-nullable but no matching value found in context" errors, check if the RelayVar type needs explicit conversion logic in `EventHandlerAdapter.ResolveParameter`.
+
+**Keywords**: `immunity`, `weather`, `SunnyDay`, `OnImmunity`, `PokemonTypeConditionIdUnion`, `ConditionIdRelayVar`, `EventHandlerAdapter`, `parameter conversion`, `union type`, `status immunity`, `RelayVar unwrapping`
+
+---
+
+### Condition to Ability Cast Fix
+**File**: `ConditionToAbilityCastFix.md`  
+**Severity**: High  
+**Systems Affected**: Event system, Mold Breaker ability suppression, all effect types
+
+**Problem**: Random battle simulations would crash with `InvalidCastException: Unable to cast object of type 'ApogeeVGC.Sim.Conditions.Condition' to type 'ApogeeVGC.Sim.Abilities.Ability'` during event processing in `Battle.RunEvent` at line 353.
+
+**Root Cause**: The code checked if `effect.EffectType == EffectType.Ability` but then unconditionally cast the effect to `Ability` without verifying the concrete type. A `Condition` can have multiple `EffectType` values (Condition, Weather, Status, Terrain), so relying solely on `EffectType` is insufficient to determine the concrete type. This created a potential crash when an effect had an `EffectType` that didn't match its concrete class.
+
+**Solution**: Added explicit type check using pattern matching before casting:
+```csharp
+if (effect.EffectType == EffectType.Ability &&
+    effectHolder is PokemonEffectHolder pokemonHolder2 &&
+    effect is Ability ability)  // ? Added type check
+{
+    // Safe to use ability here
+}
+```
+
+**Pattern**: This follows the same defensive pattern used for status condition checking. Always use `is ConcreteType variable` pattern matching when casting interface types to concrete types, even if the `EffectType` check suggests it should be safe.
+
+**Prevention**:
+- Never rely solely on `EffectType` to determine concrete type
+- Always use pattern matching (`is`) before casting
+- Apply defensive checks consistently across all similar code
+
+**Keywords**: `InvalidCastException`, `Condition`, `Ability`, `type safety`, `pattern matching`, `EffectType`, `Mold Breaker`, `event system`, `defensive programming`
+
+---
+
 ### Player Random Doubles Targeting Fix
 **File**: `PlayerRandomDoublesTargetingFix.md`  
 **Severity**: Critical  
@@ -828,6 +1333,240 @@ When documenting a new bug fix:
 
 ---
 
-*Last Updated*: 2025-01-19  
-*Total Bug Fixes Documented*: 24  
+### Pokemon Position Index Mismatch Fix
+**File**: `PokemonPositionIndexMismatchFix.md`  
+**Severity**: High  
+**Systems Affected**: Choice system, switching, trapped Pokemon handling, move request generation
+
+**Problem**: `ArgumentOutOfRangeException` and `InvalidOperationException` when attempting to switch with a trapped Pokemon. The crash occurred in `UpdateRequestForPokemon` when accessing `moveRequest.Active[index]`.
+
+**Root Cause**: Two related issues:
+1. The code assumed `pokemon.Position` always equals the active slot index, but this invariant wasn't always maintained
+2. More critically, `moveRequest.Active` was built using `.Where().Select()` which **filtered out** fainted Pokemon and changed the indices. TypeScript uses `.map()` which **preserves** indices with undefined entries
+
+Example: If `Active[0]` is fainted and `Active[1]` is alive:
+- C# (old): `moveRequest.Active` = [alive_data] (size 1)
+- TypeScript: `moveRequest.Active` = [null, alive_data] (size 2, index preserved)
+
+**Solution**: 
+1. Changed request generation to use `.Select()` preserving indices with null for fainted Pokemon
+2. Made `MoveRequest.Active` property nullable (`IReadOnlyList<PokemonMoveRequestData?>`)
+3. Use `Active.IndexOf(pokemon)` instead of `pokemon.Position` for lookups
+
+**Files Changed**: `MoveRequest.cs`, `Battle.Requests.cs`, `Side.Choices.cs`
+
+**Keywords**: `Position`, `Active`, `SlotConditions`, `ArgumentOutOfRangeException`, `trapped`, `ChooseSwitch`, `UpdateRequestForPokemon`, `index mismatch`, `MoveRequest`, `fainted Pokemon`
+
+---
+
+### Disabled Source Endless Loop Fix
+**File**: `DisabledSourceEndlessLoopFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Choice validation, disabled move handling, request updates, random AI
+
+**Problem**: After refactoring `DisabledSource` from `IEffect?` to `EffectStateId?` (commit 06a1221), battle simulations entered persistent endless loops. Random battles consistently timed out with `BattleTimeoutException` after 3000ms, failing at ~495-499 battles out of 500.
+
+**Root Cause**: `UpdateDisabledRequestForMove` **detected** that an update was needed but **never actually modified** the data:
+```csharp
+if (needsUpdate)
+{
+    updated = true;  // ? Only flagged, never updated m.Disabled or m.DisabledSource!
+}
+```
+
+This created an infinite loop:
+1. Player selects disabled move ? choice rejected
+2. `UpdateDisabledRequestForMove` returns `true` (needs update)
+3. `EmitRequest` serializes **unchanged** stale data
+4. AI receives same incorrect disabled state
+5. AI makes same invalid choice ? repeat forever
+
+The bug existed before the refactor but was masked by string comparisons and `IEffect` references that could coincidentally match. The `EffectStateId` change exposed the flaw by making value comparisons more precise.
+
+**Solution**: 
+1. Changed `PokemonMoveData.DisabledSource` from `init` to `set` accessor (allow modification)
+2. Modified `UpdateDisabledRequestForMove` to actually update the properties:
+   ```csharp
+   if (needsUpdate)
+   {
+       m.Disabled = true;
+       m.DisabledSource = disabledSource;
+       updated = true;
+   }
+   ```
+
+**Key Insight**: Update callbacks must **actually update** the data, not just return `true`. Detecting the need for an update without applying it creates an infinite re-emission loop.
+
+**Files Modified**: `PokemonMoveRequestData.cs`, `Side.Choices.cs`
+
+**Keywords**: `endless loop`, `infinite loop`, `battle timeout`, `BattleTimeoutException`, `disabled move`, `DisabledSource`, `EffectStateId`, `UpdateDisabledRequestForMove`, `EmitChoiceError`, `choice validation`, `request update`, `init accessor`, `set accessor`, `mutable`, `ChoiceLock`, `stale data`, `request re-emission`, `update callback`, `incremental test`
+
+---
+
+### BoostId To String Evasion/Accuracy Conversion Fix
+**File**: `BoostIdToStringEvasionAccuracyFix.md`  
+**Severity**: High  
+**Systems Affected**: Stat boost display system, all moves/abilities/items that modify accuracy or evasion
+
+**Problem**: When attempting to display stat boost changes for Evasion or Accuracy, the application threw an `ArgumentOutOfRangeException`:
+```
+System.ArgumentOutOfRangeException: Cannot convert Evasion to StatId. (Parameter 'stat')
+  at StatIdTools.ConvertToStatId(BoostId stat)
+  at StatIdTools.ConvertToString(BoostId boost, Boolean leadingCapital)
+```
+
+This occurred when any move attempted to modify evasion (e.g., Defog lowering evasion, Double Team raising evasion) or accuracy.
+
+**Root Cause**: The `ConvertToString(BoostId)` extension method incorrectly attempted to convert the `BoostId` to a `StatId` first:
+```csharp
+return boost.ConvertToStatId().ConvertToString();  // ? Wrong!
+```
+
+However:
+- **`BoostId`** includes: Atk, Def, SpA, SpD, Spe, **Accuracy**, **Evasion**
+- **`StatId`** includes: HP, Atk, Def, SpA, SpD, Spe
+
+Accuracy and Evasion are **boost-only values**—they can be modified by stat boosts but are not actual stats that Pokemon possess. They don't appear in `StatId`, so conversion correctly threw an exception.
+
+**Solution**: Rewrote `ConvertToString(BoostId)` to handle all `BoostId` values directly, including Accuracy and Evasion, using a comprehensive switch expression that mirrors the stat conversion logic but includes the two additional boost-only values.
+
+**Affected Moves/Abilities**:
+- Defog (lowers evasion)
+- Double Team (raises evasion)
+- Minimize (raises evasion)
+- Sand Attack, Flash, etc. (lower accuracy)
+- Coil, Hone Claws (raise accuracy)
+- Hustle, Snow Cloak (abilities affecting accuracy)
+
+**Pattern**: When working with Pokemon mechanics, remember that `BoostId` is a superset of `StatId` (minus HP, plus Accuracy/Evasion). Direct conversions between these types are unsafe for the two boost-only values.
+
+**Keywords**: `BoostId`, `StatId`, `Evasion`, `Accuracy`, `ArgumentOutOfRangeException`, `type conversion`, `stat boost display`, `ConvertToString`, `boost-only values`, `Defog`, `Double Team`, `stat modification`
+
+---
+
+### Steel Beam & Mind Blown Recoil Fix
+**File**: `SteelBeamMindBlownRecoilFix.md`  
+**Severity**: High  
+**Systems Affected**: Move recoil mechanics (MindBlownRecoil property)
+
+**Problem**: Moves with the `MindBlownRecoil` property (Steel Beam and Mind Blown) crashed with `ArgumentException: MoveId 'SteelBeam' does not have a corresponding ConditionId` when attempting to apply recoil damage after hitting.
+
+**Root Cause**: The code tried to look up a `ConditionId` for these moves using `Library.Conditions[move.Id.ToConditionId()]` to use as the damage effect. However, Steel Beam and Mind Blown don't have corresponding `ConditionId` entries because they don't create persistent conditions. In TypeScript, `conditions.get(move.id)` can dynamically handle any move as a condition reference for damage tracking.
+
+**Solution**: Pass the move directly as the damage effect since `ActiveMove` implements `IEffect`:
+
+```csharp
+// Changed from:
+BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()])
+// To:
+BattleDamageEffect.FromIEffect(move)
+```
+
+**Pattern**: The `ToConditionId()` method should only be used for moves that have explicit `ConditionId` mappings (e.g., Protect, Trick Room, Leech Seed). For damage tracking purposes, moves can serve as `IEffect` instances directly without needing a separate condition.
+
+**Keywords**: `MindBlownRecoil`, `Steel Beam`, `Mind Blown`, `recoil`, `damage effect`, `ConditionId`, `IEffect`, `move mechanics`, `ArgumentException`, `ToConditionId`
+
+---
+
+
+### Grassy Glide ModifyPriority Source Fix
+**File**: `GrassyGlideModifyPrioritySourceFix.md`  
+**Severity**: Medium  
+**Systems Affected**: Move-specific OnModifyPriority handlers
+
+**Problem**: Grassy Glide's `OnModifyPriority` handler threw `NullReferenceException` when checking if the Pokemon using the move is grounded in Grassy Terrain. The `source` parameter was `null`.
+
+**Root Cause**: In `GetActionSpeed`, `SingleEvent` was called with `source = null`. The handler expected to access the Pokemon using the move via the `source` parameter (following the `ModifierSourceMove` pattern), but C#'s name-based parameter resolution mapped `source` to `SourcePokemon` which was null.
+
+**Solution**: Pass `moveAction.Pokemon` as both `target` and `source` parameters to `SingleEvent`, ensuring handlers using the `ModifierSourceMove` pattern can access the Pokemon via the `source` parameter name.
+
+**Keywords**: `ModifyPriority`, `Grassy Glide`, `SingleEvent`, `source`, `target`, `NullReferenceException`, `EventHandlerAdapter`, `ModifierSourceMove`
+
+---
+
+### Big Root Heal Pulse Null Effect Fix
+**File**: `BigRootHealPulseNullEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Big Root item OnTryHeal event handler
+
+**Problem**: Big Root's `OnTryHeal` handler threw `NullReferenceException` when a Pokémon holding Big Root was healed by Heal Pulse or other moves that don't pass an explicit effect parameter.
+
+**Root Cause**: When Heal Pulse calls `battle.Heal(healAmount, target)` with only damage and target, the `effect` parameter defaults to null. In `Battle.Heal()`, when `effect` is `null`, it tries `Effect as Condition`, but `Effect` is the move itself (not a Condition), so the cast returns null. This null effect is then passed to event handlers, causing the NullReferenceException when Big Root's handler tries to access `effect.EffectStateId`.
+
+**Solution**: Added a null check at the beginning of Big Root's `OnTryHeal` handler. When `effect` is null, return `null` (pass through unchanged), since the healing is not from one of the sources Big Root boosts (drain moves, Leech Seed, etc.).
+
+**Keywords**: `big root`, `item`, `OnTryHeal`, `null reference`, `effect parameter`, `heal pulse`, `healing`, `drain`, `NullReferenceException`
+
+---
+
+### Wind Power SideCondition Parameter Fix
+**File**: `WindPowerSideConditionParameterFix.md`  
+**Severity**: High  
+**Systems Affected**: EventHandlerAdapter parameter resolution for Condition-typed parameters with names containing "side"
+
+**Problem**: Wind Power's `OnSideConditionStart` handler threw `NullReferenceException` when accessing `sideCondition.Id` because the `sideCondition` parameter was resolved as `null`.
+
+**Root Cause**: In `ResolveParameter`, the name-based check `paramName.Contains("side")` matched the parameter name `sideCondition` and returned `context.TargetSide` (which was null) instead of allowing the type-based `Condition` check to correctly resolve it from `context.SourceEffect`.
+
+**Solution**: Added a type guard to the name-based "side" check so it only matches when the parameter type is actually `Side`. Also extended the `Condition` type check to also search `context.SourceEffect` (not just `context.Effect`).
+
+**Keywords**: `Wind Power`, `Tailwind`, `OnSideConditionStart`, `ResolveParameter`, `name-based matching`, `NullReferenceException`, `parameter resolution`, `sideCondition`
+
+---
+
+### Disguise CriticalHit Parameter Type Fix
+**File**: `DisguiseCriticalHitParameterTypeFix.md`  
+**Severity**: High  
+**Systems Affected**: Event system validation, delegate type checking, all event handlers with base-type parameters
+
+**Problem**: When Shadow Claw targeted Mimikyu (with Disguise ability), the battle crashed with `EventHandlerInfo validation failed for event CriticalHit on effect Disguise (Ability): Event CriticalHit: Parameter 2 (_) type mismatch. Expected: Pokemon, Got: Object`.
+
+**Root Cause**: The `Validate()` method in `EventHandlerInfo` (and `UnionEventHandlerInfo`) was checking delegate parameter type compatibility in the wrong direction. It used `expectedBase.IsAssignableFrom(actualBase)` which checks if `Pokemon` can accept `object` (false), but delegate parameter contravariance requires checking if `object` can accept `Pokemon` (true).
+
+**Solution**: Fixed the parameter type validation direction in both `EventHandlerInfo.Validate()` and `UnionEventHandlerInfo.Validate()`:
+- Changed from: `if (!expectedBase.IsAssignableFrom(actualBase))`
+- Changed to: `if (!actualBase.IsAssignableFrom(expectedBase))`
+- Also updated `OnCriticalHitEventInfo` to mark source Pokemon parameter as nullable
+
+**Key Concept**: For delegate parameters, **contravariance** applies - a delegate with a more general parameter type (like `object`) can safely accept more specific arguments (like `Pokemon`).
+
+**Impact**: This fix applies to all event handlers where the delegate uses a base/interface type for a parameter but `ExpectedParameterTypes` declares a derived/concrete type.
+
+**Keywords**: `EventHandlerInfo`, `UnionEventHandlerInfo`, `Validate`, `delegate contravariance`, `parameter type`, `IsAssignableFrom`, `Disguise`, `OnCriticalHit`, `object`, `Pokemon`, `type mismatch`, `validation`, `Shadow Claw`, `Mimikyu`
+
+---
+
+### Magic Bounce Infinite Recursion Fix
+**File**: `MagicBounceInfiniteRecursionFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Move execution pipeline, ability event handlers, parallel battle simulation
+
+**Problem**: When running large-scale parallel battle simulations with 32 threads, intermittent `System.InvalidOperationException: Stack overflow` exceptions occurred. The stack trace showed infinite recursion through the Magic Bounce ability handler. The bug was intermittent and not reproducible in single-battle debug mode with the same seeds.
+
+**Root Cause**: Two opposing Pokémon with Magic Bounce abilities would bounce a reflectable move back and forth indefinitely. When Magic Bounce's `OnTryHit` handler created a new `ActiveMove` and set `HasBounced = true` to prevent re-bouncing, this flag was lost when `UseMoveInner` called `move.ToActiveMove()`. The `ToActiveMove()` method creates a fresh `ActiveMove` from base `Move` properties only, not preserving `ActiveMove`-specific properties like `HasBounced`. Without the guard flag, the second Magic Bounce holder would bounce the move again, creating infinite recursion.
+
+**Why Intermittent**: Only triggered when both Pokémon had Magic Bounce (rare), one used a reflectable move, and recursion depth exceeded stack limits before natural battle termination (faint, PP depletion). Thread pool threads have 1 MB stacks vs. 4-8 MB main thread stacks, so the bug manifested in parallel execution but not single debug runs.
+
+**Solution**: Modified `UseMoveInner` in `BattleActions.Moves.cs` to preserve the `HasBounced` flag when converting an incoming `ActiveMove`:
+
+```csharp
+var activeMove = move.ToActiveMove();
+
+// Preserve HasBounced from the incoming move (e.g. set by Magic Bounce)
+if (move is ActiveMove { HasBounced: true })
+{
+    activeMove.HasBounced = true;
+}
+```
+
+This ensures the second Magic Bounce holder sees `HasBounced == true` and skips bouncing, breaking the recursion after 1-2 levels instead of 500+.
+
+**Pattern**: When using `ToActiveMove()`, consider whether any `ActiveMove`-specific properties need preservation across re-invocations. This establishes a pattern for preserving state during type conversions.
+
+**Keywords**: `Magic Bounce`, `infinite recursion`, `stack overflow`, `HasBounced`, `ToActiveMove`, `UseMoveInner`, `ActiveMove`, `thread stack size`, `parallel battles`, `intermittent bug`, `reflectable moves`, `bounce mechanics`, `property preservation`, `type conversion`, `Espeon`, `Xatu`, `Taunt`
+
+---
+
+*Last Updated*: 2025-01-20  
+*Total Bug Fixes Documented*: 33  
 *Reference Guides*: 1

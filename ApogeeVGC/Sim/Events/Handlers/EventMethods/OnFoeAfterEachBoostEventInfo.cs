@@ -3,6 +3,8 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 
+using ApogeeVGC.Sim.Utils.Unions;
+
 namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
@@ -12,36 +14,38 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeAfterEachBoostEventInfo : EventHandlerInfo
 {
-  /// <summary>
-    /// Creates a new OnFoeAfterEachBoost event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnFoeAfterEachBoostEventInfo(
-        Action<Battle, SparseBoostsTable, Pokemon, Pokemon> handler,
-  int? priority = null,
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
         bool usesSpeed = true)
     {
-   Id = EventId.AfterEachBoost;
+        Id = EventId.AfterEachBoost;
         Prefix = EventPrefix.Foe;
-Handler = handler;
-  Priority = priority;
- UsesSpeed = usesSpeed;
- ExpectedParameterTypes =
-   [
-  typeof(Battle),
-            typeof(SparseBoostsTable),
-  typeof(Pokemon),
-     typeof(Pokemon),
-        ];
-  ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeAfterEachBoostEventInfo Create(
+        Action<Battle, SparseBoostsTable, Pokemon, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeAfterEachBoostEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetRelayVar<SparseBoostsTableRelayVar>().Table,
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

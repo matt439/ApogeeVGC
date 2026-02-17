@@ -11,24 +11,45 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyTypeEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAllyTypeEventInfo(
-    Func<Battle, PokemonType[], Pokemon, TypesVoidUnion> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.Type;
-  Prefix = EventPrefix.Ally;
-  Handler = handler;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(PokemonType[]), typeof(Pokemon)];
-        ExpectedReturnType = typeof(TypesVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAllyTypeEventInfo Create(
+        Func<Battle, PokemonType[], Pokemon, TypesVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyTypeEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetRelayVar<TypesRelayVar>().Types.ToArray(),
+                context.GetSourceOrTargetPokemon()
+                );
+                return result switch
+                {
+                    TypesTypesVoidUnion t => new TypesRelayVar(t.Types.ToList()),
+                    VoidTypesVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

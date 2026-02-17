@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
@@ -32,7 +32,7 @@ public partial record Moves
                     Metronome = true,
                     Bite = true,
                 },
-                OnHit = new OnHitEventInfo((_, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((_, target, source, move) =>
                 {
                     source.AddVolatile(ConditionId.Trapped, target, move, ConditionId.Trapper);
                     target.AddVolatile(ConditionId.Trapped, source, move, ConditionId.Trapper);
@@ -79,10 +79,10 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnModifyType = new OnModifyTypeEventInfo((_, move, pokemon, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((_, move, pokemon, _) =>
                 {
                     if (pokemon.IgnoringItem()) return;
-                    var item = pokemon.GetItem();
+                    Item item = pokemon.GetItem();
                     if (item.Id != ItemId.None && item.OnPlate != null)
                     {
                         move.Type = (MoveType)item.OnPlate.Value;
@@ -108,12 +108,12 @@ public partial record Moves
                     BypassSub = true,
                     AllyAnim = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
-                    var healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
-                    var healResult = battle.Heal(healAmount, target);
-                    var success = healResult is not FalseIntFalseUnion;
-                    var cured = target.CureStatus();
+                    int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
+                    IntFalseUnion healResult = battle.Heal(healAmount, target);
+                    bool success = healResult is not FalseIntFalseUnion;
+                    bool cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
                 }),
                 Secondary = null,
@@ -137,11 +137,11 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, target, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, target, move) =>
                 {
-                    var item = target.GetItem();
+                    Item item = target.GetItem();
                     // Check if item can be taken (TakeItem event check)
-                    var takeResult = battle.SingleEvent(Sim.Events.EventId.TakeItem, item,
+                    RelayVar? takeResult = battle.SingleEvent(Sim.Events.EventId.TakeItem, item,
                         target.ItemState, target, target, move, item);
                     if (takeResult is BoolRelayVar { Value: false }) return basePower;
                     if (item.Id != ItemId.None)
@@ -152,11 +152,11 @@ public partial record Moves
 
                     return basePower;
                 }),
-                OnAfterHit = new OnAfterHitEventInfo((battle, target, source, _) =>
+                OnAfterHit = OnAfterHitEventInfo.Create((battle, target, source, _) =>
                 {
                     if (source.Hp > 0)
                     {
-                        var takeResult = target.TakeItem();
+                        ItemFalseUnion takeResult = target.TakeItem();
                         if (takeResult is ItemItemFalseUnion takenItem)
                         {
                             battle.Add("-enditem", target, takenItem.Item.Name,
@@ -192,92 +192,32 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
-            [MoveId.LeechSeed] = new()
+            [MoveId.Lashout] = new()
             {
-                Id = MoveId.LeechSeed,
-                Num = 73,
-                Accuracy = 90,
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Leech Seed",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Reflectable = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                VolatileStatus = ConditionId.LeechSeed,
-                Condition = _library.Conditions[ConditionId.LeechSeed],
-                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
-                    !target.HasType(PokemonType.Grass)),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Grass,
-            },
-            [MoveId.LightScreen] = new()
-            {
-                Id = MoveId.LightScreen,
-                Num = 113,
-                Accuracy = IntTrueUnion.FromTrue(),
-                BasePower = 0,
-                Category = MoveCategory.Status,
-                Name = "Light Screen",
-                BasePp = 30,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Snatch = true,
-                    Metronome = true,
-                },
-                SideCondition = ConditionId.LightScreen,
-                Condition = _library.Conditions[ConditionId.LightScreen],
-                Secondary = null,
-                Target = MoveTarget.AllySide,
-                Type = MoveType.Psychic,
-            },
-            [MoveId.LowKick] = new()
-            {
-                Id = MoveId.LowKick,
-                Num = 67,
+                Id = MoveId.Lashout,
+                Num = 808,
                 Accuracy = 100,
-                BasePower = 0,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Lash Out",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, source, _, _) =>
                 {
-                    var targetWeight = target.GetWeight();
-                    var bp = targetWeight switch
+                    if (source.StatsLoweredThisTurn)
                     {
-                        >= 2000 => 120,
-                        >= 1000 => 100,
-                        >= 500 => 80,
-                        >= 250 => 60,
-                        >= 100 => 40,
-                        _ => 20,
-                    };
-                    if (battle.DisplayUi)
-                    {
-                        battle.Debug($"BP: {bp}");
+                        battle.Debug("lashout buff");
+                        battle.ChainModify(2);
+                        return battle.FinalModify(basePower);
                     }
 
-                    return bp;
+                    return basePower;
                 }),
-                Category = MoveCategory.Physical,
-                Name = "Low Kick",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                // OnTryHit only applies to dynamax
                 Secondary = null,
                 Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
+                Type = MoveType.Dark,
             },
             [MoveId.LastResort] = new()
             {
@@ -296,12 +236,12 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, _, source, _) =>
                 {
                     // Last Resort fails unless the user knows at least 2 moves
                     if (source.MoveSlots.Count < 2) return false;
                     var hasLastResort = false;
-                    foreach (var moveSlot in source.MoveSlots)
+                    foreach (MoveSlot moveSlot in source.MoveSlots)
                     {
                         if (moveSlot.Id == MoveId.LastResort)
                         {
@@ -335,9 +275,9 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, _) =>
                 {
-                    var bp = 50 + 50 * source.Side.TotalFainted;
+                    int bp = 50 + 50 * source.Side.TotalFainted;
                     battle.Debug($"BP: {bp}");
                     return bp;
                 }),
@@ -448,6 +388,31 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
             },
+            [MoveId.LeechSeed] = new()
+            {
+                Id = MoveId.LeechSeed,
+                Num = 73,
+                Accuracy = 90,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Leech Seed",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.LeechSeed,
+                Condition = _library.Conditions[ConditionId.LeechSeed],
+                OnTryImmunity = OnTryImmunityEventInfo.Create((_, target, _, _) =>
+                    !target.HasType(PokemonType.Grass)),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
             [MoveId.Leer] = new()
             {
                 Id = MoveId.Leer,
@@ -502,6 +467,27 @@ public partial record Moves
                 Target = MoveTarget.Allies,
                 Type = MoveType.Water,
             },
+            [MoveId.LightScreen] = new()
+            {
+                Id = MoveId.LightScreen,
+                Num = 113,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Light Screen",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SideCondition = ConditionId.LightScreen,
+                Condition = _library.Conditions[ConditionId.LightScreen],
+                Secondary = null,
+                Target = MoveTarget.AllySide,
+                Type = MoveType.Psychic,
+            },
             [MoveId.Liquidation] = new()
             {
                 Id = MoveId.Liquidation,
@@ -546,7 +532,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((_, _, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, _, source, _) =>
                 {
                     // Fails if source already has lockon volatile
                     if (source.Volatiles.ContainsKey(ConditionId.LockOn))
@@ -556,7 +542,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     source.AddVolatile(ConditionId.LockOn, target);
                     battle.Add("-activate", source, "move: Lock-On", $"[of] {target}");
@@ -566,6 +552,67 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+            },
+            [MoveId.LowKick] = new()
+            {
+                Id = MoveId.LowKick,
+                Num = 67,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, target, _) =>
+                {
+                    int targetWeight = target.GetWeight();
+                    int bp = targetWeight switch
+                    {
+                        >= 2000 => 120,
+                        >= 1000 => 100,
+                        >= 500 => 80,
+                        >= 250 => 60,
+                        >= 100 => 40,
+                        _ => 20,
+                    };
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug($"BP: {bp}");
+                    }
+
+                    return bp;
+                }),
+                Category = MoveCategory.Physical,
+                Name = "Low Kick",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // OnTryHit only applies to dynamax
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.LowSweep] = new()
+            {
+                Id = MoveId.LowSweep,
+                Num = 490,
+                Accuracy = 100,
+                BasePower = 65,
+                Category = MoveCategory.Physical,
+                Name = "Low Sweep",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Spe = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
             },
             [MoveId.LuminaCrash] = new()
             {
@@ -594,6 +641,26 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
             },
+            [MoveId.Lunge] = new()
+            {
+                Id = MoveId.Lunge,
+                Num = 679,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Lunge",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Atk = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
+            },
             [MoveId.LunarBlessing] = new()
             {
                 Id = MoveId.LunarBlessing,
@@ -610,12 +677,12 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
-                    var healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
-                    var healResult = battle.Heal(healAmount, target);
-                    var success = healResult is not FalseIntFalseUnion;
-                    var cured = target.CureStatus();
+                    int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
+                    IntFalseUnion healResult = battle.Heal(healAmount, target);
+                    bool success = healResult is not FalseIntFalseUnion;
+                    bool cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
                 }),
                 Secondary = null,
@@ -639,7 +706,7 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                OnTryHit = new OnTryHitEventInfo((battle, _, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Fails if user cannot switch
                     if (battle.CanSwitch(source.Side) == 0)
@@ -657,73 +724,6 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
-            },
-            [MoveId.Lashout] = new()
-            {
-                Id = MoveId.Lashout,
-                Num = 808,
-                Accuracy = 100,
-                BasePower = 75,
-                Category = MoveCategory.Physical,
-                Name = "Lash Out",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, source, _, _) =>
-                {
-                    if (source.StatsLoweredThisTurn)
-                    {
-                        battle.Debug("lashout buff");
-                        battle.ChainModify(2);
-                        return battle.FinalModify(basePower);
-                    }
-
-                    return basePower;
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Dark,
-            },
-            [MoveId.LowSweep] = new()
-            {
-                Id = MoveId.LowSweep,
-                Num = 490,
-                Accuracy = 100,
-                BasePower = 65,
-                Category = MoveCategory.Physical,
-                Name = "Low Sweep",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Spe = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-            },
-            [MoveId.Lunge] = new()
-            {
-                Id = MoveId.Lunge,
-                Num = 679,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Physical,
-                Name = "Lunge",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    Boosts = new SparseBoostsTable { Atk = -1 },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Bug,
             },
             [MoveId.LusterPurge] = new()
             {

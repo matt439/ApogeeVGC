@@ -10,24 +10,39 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyMaybeTrapPokemonEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAllyMaybeTrapPokemonEventInfo(
-    Action<Battle, Pokemon> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.MaybeTrapPokemon;
-  Prefix = EventPrefix.Ally;
-  Handler = handler;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAllyMaybeTrapPokemonEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyMaybeTrapPokemonEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

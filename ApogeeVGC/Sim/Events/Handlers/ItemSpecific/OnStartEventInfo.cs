@@ -9,18 +9,33 @@ namespace ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 /// </summary>
 public sealed record OnStartEventInfo : EventHandlerInfo
 {
-    public OnStartEventInfo(Action<Battle, Pokemon>? handler)
+    public OnStartEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.Start;
-        Handler = handler;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnStartEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnStartEventInfo(
+            context =>
+            {
+                handler(context.Battle, context.GetTargetOrSourcePokemon());
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

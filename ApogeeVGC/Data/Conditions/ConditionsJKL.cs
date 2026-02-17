@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Conditions;
@@ -36,7 +37,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 ImmuneTypes = [PokemonType.Grass],
                 AssociatedMove = MoveId.LeechSeed,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -46,7 +47,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnResidualOrder = 8,
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                     {
                         Pokemon? target =
                             battle.GetAtSlot(pokemon.Volatiles[ConditionId.LeechSeed].SourceSlot);
@@ -65,7 +66,10 @@ public partial record Conditions
 
                         if (damage is IntIntFalseUndefined d)
                         {
-                            battle.Heal(d.Value, target, pokemon);
+                            // Pass LeechSeed condition as effect so LiquidOoze can detect it
+                            var leechSeedCondition = battle.Library.Conditions[ConditionId.LeechSeed];
+                            battle.Heal(d.Value, target, pokemon,
+                                BattleHealEffect.FromIEffect(leechSeedCondition));
                         }
                     },
                     8),
@@ -77,10 +81,10 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.LightScreen,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
-                    source.HasItem(ItemId.LightClay) ? 8 : 5),
+                DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
+                    source?.HasItem(ItemId.LightClay) == true ? 8 : 5),
                 OnAnyModifyDamage =
-                    new OnAnyModifyDamageEventInfo((battle, _, source, target, move) =>
+                    OnAnyModifyDamageEventInfo.Create((battle, damage, source, target, move) =>
                     {
                         if (target != source &&
                             battle.EffectState.Target is SideEffectStateTarget side &&
@@ -94,15 +98,22 @@ public partial record Conditions
                                     battle.Debug("Light Screen weaken");
                                 }
 
-                                return battle.ActivePerHalf > 1
-                                    ? battle.ChainModify([2732, 4096])
-                                    : battle.ChainModify(0.5);
+                                if (battle.ActivePerHalf > 1)
+                                {
+                                    battle.ChainModify([2732, 4096]);
+                                }
+                                else
+                                {
+                                    battle.ChainModify(0.5);
+                                }
+
+                                return battle.FinalModify(damage);
                             }
                         }
 
                         return new VoidReturn();
                     }),
-                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, side, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -111,18 +122,75 @@ public partial record Conditions
                 }),
                 //OnSideResidualOrder = 26,
                 //OnSideResidualSubOrder = 2,
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 26,
                     SubOrder = 2,
                 },
-                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sideend", side, "move: Light Screen");
                     }
                 }),
+            },
+            [ConditionId.LockedMove] = new()
+            {
+                Id = ConditionId.LockedMove,
+                Name = "Locked Move",
+                EffectType = EffectType.Condition,
+                // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
+                Duration = 2,
+                OnResidual = OnResidualEventInfo.Create((battle, target, _, _) =>
+                {
+                    if (target.Status == ConditionId.Sleep)
+                    {
+                        // Don't lock, and bypass confusion for calming
+                        target.DeleteVolatile(ConditionId.LockedMove);
+                    }
+
+                    // Decrement trueDuration unconditionally (matches TS: this.effectState.trueDuration--)
+                    battle.EffectState.TrueDuration = (battle.EffectState.TrueDuration ?? 0) - 1;
+                }),
+                OnStart = OnStartEventInfo.Create((battle, _, _, effect) =>
+                {
+                    battle.EffectState.TrueDuration = battle.Random(2, 4);
+                    battle.EffectState.Move = effect is Move move ? move.Id : null;
+                    return null;
+                }),
+                OnRestart = OnRestartEventInfo.Create((battle, _, _, _) =>
+                {
+                    if ((battle.EffectState.TrueDuration ?? 0) >= 2)
+                    {
+                        battle.EffectState.Duration = 2;
+                    }
+
+                    return null;
+                }),
+                OnAfterMove = OnAfterMoveEventInfo.Create((battle, source, _, _) =>
+                {
+                    if ((battle.EffectState.Duration ?? 0) == 1)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+                }),
+                OnEnd = OnEndEventInfo.Create((battle, target) =>
+                {
+                    if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
+                    target.AddVolatile(ConditionId.Confusion);
+                }),
+                OnLockMove = OnLockMoveEventInfo.Create(
+                    (Func<Battle, Pokemon, MoveIdVoidUnion>)((battle, _) =>
+                    {
+                        // TS: return this.effectState.move
+                        if (battle.EffectState.Move.HasValue)
+                        {
+                            return battle.EffectState.Move.Value;
+                        }
+
+                        return MoveIdVoidUnion.FromVoid();
+                    })),
             },
             [ConditionId.LockOn] = new()
             {
@@ -132,9 +200,9 @@ public partial record Conditions
                 AssociatedMove = MoveId.LockOn,
                 NoCopy = true, // doesn't get copied by Baton Pass
                 Duration = 2,
-                // If the move user is the Lock-On user and target is the locked Pokemon, 
+                // If the move user is the Lock-On user and target is the locked Pokemon,
                 // bypass invulnerability (return 0 means not invulnerable)
-                OnSourceInvulnerability = new OnSourceInvulnerabilityEventInfo(
+                OnSourceInvulnerability = OnSourceInvulnerabilityEventInfo.Create(
                     (battle, target, source, move) =>
                     {
                         // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
@@ -150,7 +218,7 @@ public partial record Conditions
                 // If the move user is the Lock-On user and target is the locked Pokemon,
                 // bypass accuracy checks (return true)
                 OnSourceAccuracy =
-                    new OnSourceAccuracyEventInfo((battle, _, target, source, move) =>
+                    OnSourceAccuracyEventInfo.Create((battle, _, target, source, move) =>
                     {
                         // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
                         if (move != null &&
@@ -169,13 +237,13 @@ public partial record Conditions
                 Name = "Lunar Dance",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.LunarDance,
-                OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
+                OnSwitchIn = OnSwitchInEventInfo.Create((battle, target) =>
                 {
                     battle.SingleEvent(EventId.Swap,
                         battle.Library.Conditions[ConditionId.LunarDance],
                         battle.EffectState, new PokemonSingleEventTarget(target));
                 }),
-                OnSwap = new OnSwapEventInfo((battle, target, _) =>
+                OnSwap = OnSwapEventInfo.Create((battle, target, _) =>
                 {
                     // Check if target needs healing, status cure, or PP restoration
                     bool needsPpRestore = target.MoveSlots.Any(ms => ms.Pp < ms.MaxPp);
@@ -201,67 +269,6 @@ public partial record Conditions
                             _library.Conditions[ConditionId.LunarDance]);
                     }
                 }),
-            },
-            [ConditionId.LockedMove] = new()
-            {
-                Id = ConditionId.LockedMove,
-                Name = "Locked Move",
-                EffectType = EffectType.Condition,
-                // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
-                Duration = 2,
-                OnResidual = new OnResidualEventInfo((_, target, _, _) =>
-                {
-                    if (target.Status == ConditionId.Sleep)
-                    {
-                        // Don't lock, and bypass confusion for calming
-                        target.DeleteVolatile(ConditionId.LockedMove);
-                    }
-
-                    if (target.Volatiles.TryGetValue(ConditionId.LockedMove,
-                            out EffectState? state))
-                    {
-                        state.TrueDuration = (state.TrueDuration ?? 0) - 1;
-                    }
-                }),
-                OnStart = new OnStartEventInfo((battle, _, _, effect) =>
-                {
-                    battle.EffectState.TrueDuration = battle.Random(2, 4);
-                    battle.EffectState.Move = effect is Move move ? move.Id : null;
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnRestart = new OnRestartEventInfo((battle, _, _, _) =>
-                {
-                    if ((battle.EffectState.TrueDuration ?? 0) >= 2)
-                    {
-                        battle.EffectState.Duration = 2;
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnAfterMove = new OnAfterMoveEventInfo((battle, source, _, _) =>
-                {
-                    if ((battle.EffectState.Duration ?? 0) == 1)
-                    {
-                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
-                    }
-                }),
-                OnEnd = new OnEndEventInfo((battle, target) =>
-                {
-                    if ((battle.EffectState.TrueDuration ?? 0) > 1) return;
-                    target.AddVolatile(ConditionId.Confusion);
-                }),
-                OnLockMove = new OnLockMoveEventInfo(
-                    (Func<Battle, Pokemon, MoveIdVoidUnion>)((_, pokemon) =>
-                    {
-                        if (pokemon.Volatiles.TryGetValue(ConditionId.LockedMove,
-                                out EffectState? state) &&
-                            state.Move.HasValue)
-                        {
-                            return state.Move.Value;
-                        }
-
-                        return MoveIdVoidUnion.FromVoid();
-                    })),
             },
         };
     }

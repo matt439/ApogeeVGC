@@ -11,6 +11,7 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
+// ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 namespace ApogeeVGC.Data.Abilities;
@@ -28,7 +29,7 @@ public partial record Abilities
                 Num = 177,
                 Rating = 1.5,
                 OnModifyPriority =
-                    new OnModifyPriorityEventInfo((_, priority, pokemon, _, move) =>
+                    OnModifyPriorityEventInfo.Create((_, priority, pokemon, _, move) =>
                     {
                         if (move.Type == MoveType.Flying && pokemon.Hp == pokemon.MaxHp)
                         {
@@ -45,7 +46,7 @@ public partial record Abilities
                 Num = 206,
                 Rating = 4.0,
                 // OnModifyTypePriority = -1
-                OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
+                OnModifyType = OnModifyTypeEventInfo.Create((battle, move, pokemon, _) =>
                 {
                     // Moves that should not have their type changed
                     var noModifyType = new[]
@@ -55,7 +56,7 @@ public partial record Abilities
                         // Note: MultiAttack, NaturalGift, and TechnoBlast are not in Gen 9 VGC
                     };
 
-                    if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status &&
+                    if (move.Type == MoveType.Normal &&
                         !noModifyType.Contains(move.Id) &&
                         !(move.Id == MoveId.TeraBlast && pokemon.Terastallized != null))
                     {
@@ -64,7 +65,7 @@ public partial record Abilities
                     }
                 }, -1),
                 // OnBasePowerPriority = 23
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.TypeChangerBoosted == battle.Effect)
                     {
@@ -81,8 +82,8 @@ public partial record Abilities
                 Name = "Gluttony",
                 Num = 82,
                 Rating = 1.5,
-                OnStart = new OnStartEventInfo((_, pokemon) => { pokemon.AbilityState.Gluttony = true; }),
-                OnDamage = new OnDamageEventInfo((_, _, target, _, _) =>
+                OnStart = OnStartEventInfo.Create((_, pokemon) => { pokemon.AbilityState.Gluttony = true; }),
+                OnDamage = OnDamageEventInfo.Create((_, _, target, _, _) =>
                 {
                     target.AbilityState.Gluttony = true;
                     return new VoidReturn();
@@ -95,7 +96,7 @@ public partial record Abilities
                 Num = 283,
                 Rating = 5.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (move.Category == MoveCategory.Status && target != source)
                     {
@@ -112,7 +113,7 @@ public partial record Abilities
                 Name = "Gooey",
                 Num = 183,
                 Rating = 2.0,
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, source, move) =>
                 {
                     if (battle.CheckMoveMakesContact(move, source, target, true))
                     {
@@ -128,8 +129,8 @@ public partial record Abilities
                 Name = "Gorilla Tactics",
                 Num = 255,
                 Rating = 4.5,
-                OnStart = new OnStartEventInfo((_, pokemon) => { pokemon.AbilityState.ChoiceLock = null; }),
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                OnStart = OnStartEventInfo.Create((_, pokemon) => { pokemon.AbilityState.ChoiceLock = null; }),
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, move) =>
                 {
                     if (move.Id == MoveId.Struggle) return new VoidReturn();
                     var choiceLock = pokemon.AbilityState.ChoiceLock;
@@ -146,24 +147,24 @@ public partial record Abilities
 
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, pokemon, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, pokemon, _) =>
                 {
                     if (pokemon.AbilityState.ChoiceLock != null || move.Id == MoveId.Struggle)
                         return;
                     pokemon.AbilityState.ChoiceLock = move.Id;
                 }),
                 // OnModifyAtkPriority = 1
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, _) =>
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
                 {
                     battle.Debug("Gorilla Tactics Atk Boost");
                     battle.ChainModify(1.5);
                     return battle.FinalModify(atk);
                 }, 1),
-                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                OnDisableMove = OnDisableMoveEventInfo.Create((battle, pokemon) =>
                 {
                     var choiceLock = pokemon.AbilityState.ChoiceLock;
                     if (choiceLock == null) return;
-                    foreach (var moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
                     {
                         if (moveSlot.Id != choiceLock)
                         {
@@ -172,7 +173,7 @@ public partial record Abilities
                         }
                     }
                 }),
-                OnEnd = new OnEndEventInfo((_, pokemonUnion) =>
+                OnEnd = OnEndEventInfo.Create((_, pokemonUnion) =>
                 {
                     if (pokemonUnion is PokemonSideFieldPokemon psfp)
                     {
@@ -188,7 +189,7 @@ public partial record Abilities
                 Rating = 0.5,
                 Flags = new AbilityFlags { Breakable = true },
                 // OnModifyDefPriority = 6
-                OnModifyDef = new OnModifyDefEventInfo((battle, def, _, _, _) =>
+                OnModifyDef = OnModifyDefEventInfo.Create((battle, def, _, _, _) =>
                 {
                     if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, null))
                     {
@@ -205,7 +206,7 @@ public partial record Abilities
                 Name = "Grassy Surge",
                 Num = 229,
                 Rating = 4.0,
-                OnStart = new OnStartEventInfo((battle, _) =>
+                OnStart = OnStartEventInfo.Create((battle, _) =>
                 {
                     battle.Field.SetTerrain(_library.Conditions[ConditionId.GrassyTerrain]);
                 }),
@@ -217,7 +218,7 @@ public partial record Abilities
                 Num = 265,
                 Rating = 3.0,
                 OnSourceAfterFaint =
-                    new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
+                    OnSourceAfterFaintEventInfo.Create((battle, length, _, source, effect) =>
                     {
                         if (effect is ActiveMove)
                         {
@@ -233,15 +234,15 @@ public partial record Abilities
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
                 // OnDragOutPriority = 1
-                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                OnDragOut = OnDragOutEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     battle.Add("-activate", pokemon, "ability: Guard Dog");
                     return null; // Prevent drag-out
                 }, 1),
                 // OnTryBoostPriority = 2
-                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
+                OnTryBoost = OnTryBoostEventInfo.Create((battle, boost, target, _, effect) =>
                 {
-                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
+                    if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null; // Delete the atk boost
                         battle.Boost(new SparseBoostsTable { Atk = 1 }, target, target, null, false,
@@ -256,11 +257,11 @@ public partial record Abilities
                 Num = 241,
                 Rating = 2.5,
                 Flags = new AbilityFlags { CantSuppress = true, NoTransform = true },
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, source, move) =>
                 {
                     if (source.Hp == 0 || !source.IsActive || target.IsSemiInvulnerable()) return;
 
-                    var specieId = target.Species.Id;
+                    SpecieId specieId = target.Species.Id;
                     if (specieId is SpecieId.CramorantGulping or SpecieId.CramorantGorging)
                     {
                         battle.Damage(source.BaseMaxHp / 4, source, target);
@@ -278,12 +279,12 @@ public partial record Abilities
                     }
                 }),
                 OnSourceTryPrimaryHit =
-                    new OnSourceTryPrimaryHitEventInfo((_, _, source, move) =>
+                    OnSourceTryPrimaryHitEventInfo.Create((_, _, source, move) =>
                     {
                         if (move.Id == MoveId.Surf && source.HasAbility(AbilityId.GulpMissile) &&
                             source.Species.Id == SpecieId.Cramorant)
                         {
-                            var forme = source.Hp <= source.MaxHp / 2
+                            SpecieId forme = source.Hp <= source.MaxHp / 2
                                 ? SpecieId.CramorantGorging
                                 : SpecieId.CramorantGulping;
                             source.FormeChange(forme, move);
@@ -299,7 +300,7 @@ public partial record Abilities
                 Num = 62,
                 Rating = 3.5,
                 //OnModifyAtkPriority = 5,
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, pokemon, _, _) =>
                 {
                     if (pokemon.Status != ConditionId.None)
                     {
@@ -316,9 +317,9 @@ public partial record Abilities
                 Name = "Hadron Engine",
                 Num = 289,
                 Rating = 4.5,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
-                    var terrainSet = battle.Field.SetTerrain(
+                    bool terrainSet = battle.Field.SetTerrain(
                         _library.Conditions[ConditionId.ElectricTerrain]);
 
                     if (!terrainSet &&
@@ -331,7 +332,7 @@ public partial record Abilities
                     }
                 }),
                 //OnModifySpAPriority = 5,
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, _) =>
+                OnModifySpA = OnModifySpAEventInfo.Create((battle, spa, _, _, _) =>
                     {
                         if (!battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                             return spa;
@@ -348,18 +349,18 @@ public partial record Abilities
                 Num = 139,
                 Rating = 2.5,
                 // OnResidualOrder = 28, OnResidualSubOrder = 2
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     // 50% chance normally, 100% in sun
-                    var canHarvest =
+                    bool canHarvest =
                         battle.Field.IsWeather([ConditionId.SunnyDay, ConditionId.DesolateLand]) ||
                         battle.RandomChance(1, 2);
 
                     if (!canHarvest) return;
                     if (pokemon.Hp == 0) return;
-                    if (pokemon.Item == ItemId.None) return;
+                    if (pokemon.Item != ItemId.None) return; // Already has an item, can't harvest
 
-                    var lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
+                    Item? lastItem = battle.Library.Items.GetValueOrDefault(pokemon.LastItem);
                     if (lastItem is not { IsBerry: true }) return;
 
                     pokemon.SetItem(lastItem.Id);
@@ -374,9 +375,9 @@ public partial record Abilities
                 Num = 131,
                 Rating = 0.0,
                 // OnResidualOrder = 5, OnResidualSubOrder = 3
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    foreach (var allyActive in pokemon.AdjacentAllies())
+                    foreach (Pokemon allyActive in pokemon.AdjacentAllies())
                     {
                         if (allyActive.Status != ConditionId.None && battle.RandomChance(3, 10))
                         {
@@ -394,7 +395,7 @@ public partial record Abilities
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
                 // OnSourceModifyAtkPriority = 6
-                OnSourceModifyAtk = new OnSourceModifyAtkEventInfo((battle, atk, _, _, move) =>
+                OnSourceModifyAtk = OnSourceModifyAtkEventInfo.Create((battle, atk, _, _, move) =>
                 {
                     if (move.Type == MoveType.Fire)
                     {
@@ -406,7 +407,7 @@ public partial record Abilities
                     return atk;
                 }, 6),
                 // OnSourceModifySpAPriority = 5
-                OnSourceModifySpA = new OnSourceModifySpAEventInfo((battle, spa, _, _, move) =>
+                OnSourceModifySpA = OnSourceModifySpAEventInfo.Create((battle, spa, _, _, move) =>
                 {
                     if (move.Type == MoveType.Fire)
                     {
@@ -417,7 +418,7 @@ public partial record Abilities
 
                     return spa;
                 }, 5),
-                OnDamage = new OnDamageEventInfo((_, damage, _, _, effect) =>
+                OnDamage = OnDamageEventInfo.Create((_, damage, _, _, effect) =>
                 {
                     if (effect is Condition { Id: ConditionId.Burn })
                     {
@@ -435,7 +436,7 @@ public partial record Abilities
                 Rating = 0.0,
                 Flags = new AbilityFlags { Breakable = true },
                 // OnModifyWeightPriority = 1
-                OnModifyWeight = new OnModifyWeightEventInfo((_, weighthg, _) => weighthg * 2, 1),
+                OnModifyWeight = OnModifyWeightEventInfo.Create((_, weighthg, _) => weighthg * 2, 1),
             },
             [AbilityId.HoneyGather] = new()
             {
@@ -452,10 +453,10 @@ public partial record Abilities
                 Num = 299,
                 Rating = 0.0,
                 // OnSwitchInPriority = -2
-                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
-                    foreach (var ally in pokemon.AdjacentAllies())
+                    foreach (Pokemon ally in pokemon.AdjacentAllies())
                     {
                         battle.Heal(ally.BaseMaxHp / 4, ally, pokemon);
                     }
@@ -468,7 +469,7 @@ public partial record Abilities
                 Num = 37,
                 Rating = 5.0,
                 // OnModifyAtkPriority = 5
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, _) =>
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
                 {
                     battle.ChainModify(2);
                     return battle.FinalModify(atk);
@@ -490,12 +491,12 @@ public partial record Abilities
                     NoTransform = true,
                 },
                 // OnResidualOrder = 29
-                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((_, pokemon, _, _) =>
                 {
                     if (pokemon.Species.BaseSpecies != SpecieId.Morpeko) return;
                     if (pokemon.Terastallized != null) return;
 
-                    var targetForme = pokemon.Species.Id == SpecieId.Morpeko
+                    SpecieId targetForme = pokemon.Species.Id == SpecieId.Morpeko
                         ? SpecieId.MorpekoHangry
                         : SpecieId.Morpeko;
                     pokemon.FormeChange(targetForme);
@@ -509,18 +510,19 @@ public partial record Abilities
                 Rating = 3.5,
                 // OnModifyAtkPriority = 5
                 // Note: In TS this uses this.modify() directly instead of chainModify
-                OnModifyAtk = new OnModifyAtkEventInfo((_, atk, _, _, _) => (int)(atk * 1.5), 5),
+                OnModifyAtk = OnModifyAtkEventInfo.Create((_, atk, _, _, _) => (int)(atk * 1.5), 5),
                 // OnSourceModifyAccuracyPriority = -1
-                OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
+                OnSourceModifyAccuracy = OnSourceModifyAccuracyEventInfo.Create(
                     (battle, accuracy, _, _, move) =>
                     {
-                        if (move.Category == MoveCategory.Physical)
+                        // Only modify accuracy for physical moves with numeric accuracy
+                        // (TypeScript checks: move.category === 'Physical' && typeof accuracy === 'number')
+                        if (move.Category == MoveCategory.Physical && accuracy.HasValue)
                         {
-                            battle.ChainModify([3277, 4096]);
-                            return battle.FinalModify(accuracy);
+                            return battle.ChainModify([3277, 4096]);
                         }
 
-                        return accuracy;
+                        return new VoidReturn();
                     }, -1),
             },
             [AbilityId.Hydration] = new()
@@ -530,7 +532,7 @@ public partial record Abilities
                 Num = 93,
                 Rating = 1.5,
                 // OnResidualOrder = 5, OnResidualSubOrder = 3
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (pokemon.Status != ConditionId.None &&
                         pokemon.EffectiveWeather() is ConditionId.RainDance
@@ -549,7 +551,7 @@ public partial record Abilities
                 Num = 52,
                 Rating = 1.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                OnTryBoost = OnTryBoostEventInfo.Create((battle, boost, target, source, effect) =>
                 {
                     if (source != null && target == source) return;
                     if (boost.Atk is < 0)
@@ -570,22 +572,15 @@ public partial record Abilities
                 Name = "Ice Body",
                 Num = 115,
                 Rating = 1.0,
-                OnWeather = new OnWeatherEventInfo((battle, target, _, effect) =>
+                OnWeather = OnWeatherEventInfo.Create((battle, target, _, effect) =>
                 {
                     if (effect.Id is ConditionId.Snowscape)
                     {
                         battle.Heal(target.BaseMaxHp / 16);
                     }
                 }),
-                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
-                {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Snowscape })
-                    {
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
+                // Note: TS has onImmunity for hail damage, but hail doesn't exist in Gen 9
+                // and Snowscape doesn't deal residual damage, so the handler is omitted.
             },
             [AbilityId.IceFace] = new()
             {
@@ -605,8 +600,8 @@ public partial record Abilities
                     NoTransform = true,
                 },
                 // OnSwitchInPriority = -2
-                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.Field.IsWeather([ConditionId.Snowscape]) &&
                         pokemon.Species.Id == SpecieId.EiscueNoice)
@@ -617,7 +612,7 @@ public partial record Abilities
                     }
                 }),
                 // OnDamagePriority = 1
-                OnDamage = new OnDamageEventInfo((battle, _, target, _, effect) =>
+                OnDamage = OnDamageEventInfo.Create((battle, _, target, _, effect) =>
                 {
                     if (effect is ActiveMove { Category: MoveCategory.Physical } &&
                         target.Species.Id == SpecieId.Eiscue)
@@ -629,29 +624,32 @@ public partial record Abilities
 
                     return new VoidReturn();
                 }, 1),
-                OnCriticalHit = new OnCriticalHitEventInfo(
+                OnCriticalHit = OnCriticalHitEventInfo.Create(
                     (Func<Battle, Pokemon, object?, Move, BoolVoidUnion>)((_, target, _, move) =>
                     {
                         if (target is null) return new VoidReturn();
                         if (move.Category != MoveCategory.Physical ||
                             target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
-                        if (target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                            (move.Flags.BypassSub != true)) return new VoidReturn();
+                        // Check if the move hits the substitute (not the Pokemon directly)
+                        bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                      move.Flags.BypassSub != true &&
+                                      (move is not ActiveMove am || am.Infiltrates != true);
+                        if (hitSub) return new VoidReturn();
                         if (move is ActiveMove activeMove && !target.RunImmunity(activeMove))
                             return new VoidReturn();
                         return BoolVoidUnion.FromBool(false);
                     })),
-                OnEffectiveness = new OnEffectivenessEventInfo((_, _, target, _, move) =>
+                OnEffectiveness = OnEffectivenessEventInfo.Create((_, _, target, _, move) =>
                 {
                     if (target is null || move.Category != MoveCategory.Physical ||
                         target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
-                    var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                 (move.Flags.BypassSub != true) && move.Infiltrates != true;
+                    bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                  (move.Flags.BypassSub != true) && move.Infiltrates != true;
                     if (hitSub) return new VoidReturn();
                     if (!target.RunImmunity(move)) return new VoidReturn();
                     return 0;
                 }),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Species.Id == SpecieId.Eiscue &&
                         (battle.EffectState.Busted ?? false))
@@ -659,7 +657,7 @@ public partial record Abilities
                         pokemon.FormeChange(SpecieId.EiscueNoice, battle.Effect, true);
                     }
                 }),
-                OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, sourceEffect) =>
+                OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, sourceEffect) =>
                 {
                     // Snow/hail resuming because Cloud Nine/Air Lock ended does not trigger Ice Face
                     if (sourceEffect is Ability { SuppressWeather: true }) return;
@@ -681,7 +679,7 @@ public partial record Abilities
                 Rating = 4.0,
                 Flags = new AbilityFlags { Breakable = true },
                 OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
+                    OnSourceModifyDamageEventInfo.Create((battle, damage, _, _, move) =>
                     {
                         if (move.Category == MoveCategory.Special)
                         {
@@ -699,7 +697,7 @@ public partial record Abilities
                 Num = 35,
                 Rating = 0.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                OnTryBoost = OnTryBoostEventInfo.Create((battle, boost, target, source, effect) =>
                 {
                     if (source != null && target == source) return;
                     if (boost.Accuracy is < 0)
@@ -712,7 +710,7 @@ public partial record Abilities
                         }
                     }
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) => { move.IgnoreEvasion = true; }),
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) => { move.IgnoreEvasion = true; }),
             },
             [AbilityId.Illusion] = new()
             {
@@ -728,13 +726,13 @@ public partial record Abilities
                     NoTrace = true,
                     FailSkillSwap = true,
                 },
-                OnBeforeSwitchIn = new OnBeforeSwitchInEventInfo((_, pokemon) =>
+                OnBeforeSwitchIn = OnBeforeSwitchInEventInfo.Create((_, pokemon) =>
                 {
                     pokemon.Illusion = null;
                     // Find a non-fainted Pokemon to the right of this Pokemon to use as illusion
-                    for (var i = pokemon.Side.Pokemon.Count - 1; i > pokemon.Position; i--)
+                    for (int i = pokemon.Side.Pokemon.Count - 1; i > pokemon.Position; i--)
                     {
-                        var possibleTarget = pokemon.Side.Pokemon[i];
+                        Pokemon possibleTarget = pokemon.Side.Pokemon[i];
                         if (!possibleTarget.Fainted)
                         {
                             // If Ogerpon/Terapagos is in the last slot while the Illusion Pokemon is Terastallized
@@ -750,7 +748,7 @@ public partial record Abilities
                         }
                     }
                 }),
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, source, move) =>
                 {
                     if (target.Illusion != null)
                     {
@@ -759,20 +757,20 @@ public partial record Abilities
                             target.AbilityState, target, source, move);
                     }
                 }),
-                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemonUnion) =>
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                    var pokemon = psfp.Pokemon;
+                    Pokemon pokemon = psfp.Pokemon;
                     if (pokemon.Illusion != null)
                     {
                         battle.Debug("illusion cleared");
                         pokemon.Illusion = null;
-                        var details = pokemon.GetUpdatedDetails();
+                        Pokemon.PokemonDetails details = pokemon.GetUpdatedDetails();
                         battle.Add("replace", pokemon, details.ToString());
                         battle.Add("-end", pokemon, "Illusion");
                     }
                 }),
-                OnFaint = new OnFaintEventInfo((_, pokemon, _, _) => { pokemon.Illusion = null; }),
+                OnFaint = OnFaintEventInfo.Create((_, pokemon, _, _) => { pokemon.Illusion = null; }),
             },
             [AbilityId.Immunity] = new()
             {
@@ -781,7 +779,7 @@ public partial record Abilities
                 Num = 17,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Status is ConditionId.Poison or ConditionId.Toxic)
                     {
@@ -789,7 +787,7 @@ public partial record Abilities
                         pokemon.CureStatus();
                     }
                 }),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
                         return new VoidReturn();
@@ -814,13 +812,13 @@ public partial record Abilities
                     NoEntrain = true,
                     NoTrace = true,
                 },
-                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                OnSwitchIn = OnSwitchInEventInfo.Create((battle, pokemon) =>
                 {
                     // Imposter copies the Pokemon across from it
-                    var targetIndex = pokemon.Side.Foe.Active.Count - 1 - pokemon.Position;
+                    int targetIndex = pokemon.Side.Foe.Active.Count - 1 - pokemon.Position;
                     if (targetIndex >= 0 && targetIndex < pokemon.Side.Foe.Active.Count)
                     {
-                        var target = pokemon.Side.Foe.Active[targetIndex];
+                        Pokemon? target = pokemon.Side.Foe.Active[targetIndex];
                         if (target != null)
                         {
                             pokemon.TransformInto(target,
@@ -835,7 +833,7 @@ public partial record Abilities
                 Name = "Infiltrator",
                 Num = 151,
                 Rating = 2.5,
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) => { move.Infiltrates = true; }),
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) => { move.Infiltrates = true; }),
             },
             [AbilityId.InnardsOut] = new()
             {
@@ -844,7 +842,7 @@ public partial record Abilities
                 Num = 215,
                 Rating = 4.0,
                 // OnDamagingHitOrder = 1
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, _) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, damage, target, source, _) =>
                 {
                     if (target.Hp == 0)
                     {
@@ -859,14 +857,14 @@ public partial record Abilities
                 Num = 39,
                 Rating = 1.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
+                OnTryAddVolatile = OnTryAddVolatileEventInfo.Create((_, status, _, _, _) =>
                 {
                     if (status.Id == ConditionId.Flinch) return null;
                     return new VoidReturn();
                 }),
-                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
+                OnTryBoost = OnTryBoostEventInfo.Create((battle, boost, target, _, effect) =>
                 {
-                    if (effect.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
+                    if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
                         battle.Add("-fail", target, "unboost", "Attack",
@@ -881,7 +879,7 @@ public partial record Abilities
                 Num = 15,
                 Rating = 1.5,
                 Flags = new AbilityFlags { Breakable = true },
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.Status == ConditionId.Sleep)
                     {
@@ -889,7 +887,7 @@ public partial record Abilities
                         pokemon.CureStatus();
                     }
                 }),
-                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Sleep) return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
@@ -899,7 +897,7 @@ public partial record Abilities
 
                     return false;
                 }),
-                OnTryAddVolatile = new OnTryAddVolatileEventInfo((battle, status, target, _, _) =>
+                OnTryAddVolatile = OnTryAddVolatileEventInfo.Create((battle, status, target, _, _) =>
                 {
                     if (status.Id == ConditionId.Yawn)
                     {
@@ -916,10 +914,10 @@ public partial record Abilities
                 Name = "Intimidate",
                 Num = 22,
                 Rating = 3.5,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     var activated = false;
-                    foreach (var target in pokemon.AdjacentFoes())
+                    foreach (Pokemon target in pokemon.AdjacentFoes())
                     {
                         if (!activated)
                         {
@@ -945,7 +943,7 @@ public partial record Abilities
                 Name = "Intrepid Sword",
                 Num = 234,
                 Rating = 4.0,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.SwordBoost) return;
                     pokemon.SwordBoost = true;
@@ -959,7 +957,7 @@ public partial record Abilities
                 Num = 160,
                 Rating = 2.5,
                 // OnDamagingHitOrder = 1
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, source, move) =>
                 {
                     if (battle.CheckMoveMakesContact(move, source, target, true))
                     {
@@ -974,7 +972,7 @@ public partial record Abilities
                 Num = 89,
                 Rating = 3.0,
                 // OnBasePowerPriority = 23
-                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, _, move) =>
                 {
                     if (move.Flags.Punch == true)
                     {

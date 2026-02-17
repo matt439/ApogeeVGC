@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -31,7 +31,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 VolatileStatus = ConditionId.Yawn,
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, _, _) =>
                 {
                     // Fail if target already has a status or is immune to sleep
                     if (target.Status != ConditionId.None ||

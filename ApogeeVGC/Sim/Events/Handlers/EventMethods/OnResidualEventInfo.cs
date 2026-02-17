@@ -2,6 +2,8 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 
+using ApogeeVGC.Sim.Utils.Unions;
+
 namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
@@ -17,36 +19,6 @@ public sealed record OnResidualEventInfo : EventHandlerInfo
     /// <summary>
     /// Creates event handler using legacy strongly-typed pattern.
     /// </summary>
-    public OnResidualEventInfo(
-        Action<Battle, Pokemon, Pokemon, IEffect> handler,
-        int? priority = null,
-        int? order = null,
-        int? subOrder = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.Residual;
-        Handler = handler;
-        Priority = priority;
-        Order = order;
-        SubOrder = subOrder;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-            typeof(Pokemon),
-            typeof(Pokemon),
-            typeof(IEffect),
-        ];
-        ExpectedReturnType = typeof(void);
-
-        // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-    
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, TargetPokemon, SourcePokemon, SourceEffect
@@ -82,8 +54,8 @@ context =>
             {
            handler(
        context.Battle,
-       context.GetTargetPokemon(),
-context.GetSourcePokemon(),
+       context.GetTargetOrSourcePokemon(),
+context.GetSourceOrTargetPokemon(),
       context.GetSourceEffect<IEffect>()
     );
        return null; // void return

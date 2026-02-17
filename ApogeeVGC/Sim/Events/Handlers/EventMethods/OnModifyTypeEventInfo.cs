@@ -11,35 +11,38 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnModifyTypeEventInfo : EventHandlerInfo
 {
-    /// <summary>
-  /// Creates a new OnModifyType event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnModifyTypeEventInfo(
-  Action<Battle, ActiveMove, Pokemon, Pokemon> handler,
-  int? priority = null,
-      bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
-   Id = EventId.ModifyType;
-      Handler = handler;
-    Priority = priority;
+        Id = EventId.ModifyType;
+        ContextHandler = contextHandler;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-  typeof(Battle),
-  typeof(ActiveMove),
-            typeof(Pokemon),
-   typeof(Pokemon),
-        ];
-  ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnModifyTypeEventInfo Create(
+        Action<Battle, ActiveMove, Pokemon, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnModifyTypeEventInfo(
+            context =>
+            {
+                handler(
+                    context.Battle,
+                    context.GetMove(),
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

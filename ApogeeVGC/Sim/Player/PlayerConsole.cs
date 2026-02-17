@@ -552,7 +552,19 @@ public class PlayerConsole : IPlayer
         // Handle each active Pokemon
         for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
         {
-            PokemonMoveRequestData pokemonRequest = request.Active[pokemonIndex];
+            PokemonMoveRequestData? pokemonRequest = request.Active[pokemonIndex];
+
+            // Null entries represent fainted Pokemon or empty slots - add a pass action
+            if (pokemonRequest == null)
+            {
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Pass,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
+                });
+                continue;
+            }
 
             // Display which Pokemon is making the choice (for doubles)
             if (request.Active.Count > 1)

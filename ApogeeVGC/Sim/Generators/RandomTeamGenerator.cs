@@ -38,6 +38,21 @@ public class RandomTeamGenerator
     // Cache of usable items (exclude balls, fossils, evolution items, etc.)
     private readonly List<ItemId> _usableItems;
 
+    /// <summary>
+    /// All species legal in this format (includes restricted if allowed).
+    /// </summary>
+    public IReadOnlyList<SpecieId> LegalSpecies => _legalSpecies;
+
+    /// <summary>
+    /// Restricted legendary species eligible in this format.
+    /// </summary>
+    public IReadOnlyList<SpecieId> RestrictedSpecies => _restrictedSpecies;
+
+    /// <summary>
+    /// Items eligible for random selection in this format.
+    /// </summary>
+    public IReadOnlyList<ItemId> UsableItems => _usableItems;
+
     // All tera types except Stellar and Unknown
     private static readonly MoveType[] TeraTypes =
     [

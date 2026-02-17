@@ -17,27 +17,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 public sealed record OnSideResidualEventInfo : EventHandlerInfo
 {
     public OnSideResidualEventInfo(
-        Action<Battle, Side, Pokemon, IEffect> handler,
-        int? priority = null,
-   int? order = null,
-   int? subOrder = null,
-      bool usesSpeed = true)
-    {
- Id = EventId.SideResidual;
-        Prefix = EventPrefix.None;
-        Handler = handler;
-  Priority = priority;
-     Order = order;
-        SubOrder = subOrder;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Side), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(void);
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-  ValidateConfiguration();
-  }
-    
-    public OnSideResidualEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,
         int? order = null,
@@ -66,7 +45,7 @@ public sealed record OnSideResidualEventInfo : EventHandlerInfo
        handler(
     context.Battle,
           context.GetTargetSide(),
-       context.GetTargetPokemon(),
+       context.GetTargetOrSourcePokemon(),
            context.GetSourceEffect<IEffect>()
         );
           return null;

@@ -1,5 +1,7 @@
 ﻿namespace ApogeeVGC.Sim.Abilities;
 
+// ReSharper disable IdentifierTypo
+
 public enum AbilityId
 {
     Adaptability,
@@ -116,8 +118,8 @@ public enum AbilityId
     Immunity,
     Imposter,
     Infiltrator,
-    InnerFocus,
     InnardsOut,
+    InnerFocus,
     Insomnia,
     Intimidate,
     IntrepidSword,
@@ -217,8 +219,8 @@ public enum AbilityId
     SandVeil,
     SapSipper,
     Schooling,
-    ScreenCleaner,
     Scrappy,
+    ScreenCleaner,
     SeedSower,
     SereneGrace,
     ShadowShield,
@@ -249,8 +251,8 @@ public enum AbilityId
     Static,
     Steadfast,
     SteamEngine,
-    SteelySpirit,
     Steelworker,
+    SteelySpirit,
     Stench,
     StickyHold,
     StormDrain,
@@ -272,9 +274,9 @@ public enum AbilityId
     TanglingHair,
     Technician,
     Telepathy,
+    TeraformZero,
     TeraShell,
     TeraShift,
-    TeraformZero,
     Teravolt,
     ThermalExchange,
     ThickFat,

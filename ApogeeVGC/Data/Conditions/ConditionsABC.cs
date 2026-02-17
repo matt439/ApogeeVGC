@@ -29,7 +29,12 @@ public partial record Conditions
                 Name = "Ally Switch",
                 AssociatedMove = MoveId.AllySwitch,
                 Duration = 2,
-                OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((_, pokemon, _, _) =>
+                {
+                    pokemon.Volatiles[ConditionId.AllySwitch].Counter = 3;
+                    return new VoidReturn();
+                }),
+                OnRestart = OnRestartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     int counter = pokemon.Volatiles[ConditionId.AllySwitch].Counter ?? 1;
                     battle.Debug($"Ally Switch success chance: {Math.Round(100.0 / counter)}%");
@@ -46,7 +51,7 @@ public partial record Conditions
                     }
 
                     pokemon.Volatiles[ConditionId.AllySwitch].Duration = 2;
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
             },
             [ConditionId.AquaRing] = new()
@@ -54,13 +59,39 @@ public partial record Conditions
                 Id = ConditionId.AquaRing,
                 Name = "Aqua Ring",
                 AssociatedMove = MoveId.AquaRing,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     battle.Add("-start", pokemon, "Aqua Ring");
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnResidual = new OnResidualEventInfo(
+                OnResidual = OnResidualEventInfo.Create(
                     (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon); }, 6),
+            },
+            [ConditionId.Arceus] = new()
+            {
+                Id = ConditionId.Arceus,
+                Name = "Arceus",
+                EffectType = EffectType.Condition,
+                //OnTypePriority = 1,
+                OnType = OnTypeEventInfo.Create((battle, types, pokemon) =>
+                    {
+                        AbilityId abilityId = pokemon.Ability;
+                        if (pokemon.Transformed ||
+                            (abilityId != AbilityId.Multitype && battle.Gen >= 8))
+                        {
+                            return types;
+                        }
+
+                        var type = PokemonType.Normal;
+                        if (abilityId == AbilityId.Multitype)
+                        {
+                            Item item = pokemon.GetItem();
+                            type = item.OnPlate ?? PokemonType.Normal;
+                        }
+
+                        return new[] { type };
+                    },
+                    1),
             },
             [ConditionId.Attract] = new()
             {
@@ -68,21 +99,21 @@ public partial record Conditions
                 Name = "Attract",
                 AssociatedMove = MoveId.Attract,
                 NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, source, effect) =>
                 {
-                    if (source == null) return BoolVoidUnion.FromVoid();
+                    if (source == null) return new BoolRelayVar(false);
                     if (!((pokemon.Gender == GenderId.M && source.Gender == GenderId.F) ||
                           (pokemon.Gender == GenderId.F && source.Gender == GenderId.M)))
                     {
                         battle.Debug("incompatible gender");
-                        return BoolVoidUnion.FromBool(false);
+                        return new BoolRelayVar(false);
                     }
 
                     RelayVar? runEventResult = battle.RunEvent(EventId.Attract, pokemon, source);
                     if (runEventResult is BoolRelayVar { Value: false })
                     {
                         battle.Debug("Attract event failed");
-                        return BoolVoidUnion.FromBool(false);
+                        return new BoolRelayVar(false);
                     }
 
                     if (effect?.Name == "Cute Charm")
@@ -100,30 +131,30 @@ public partial record Conditions
                         battle.Add("-start", pokemon, "Attract");
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                OnUpdate = OnUpdateEventInfo.Create((battle, pokemon) =>
                 {
-                    if (pokemon.Volatiles[ConditionId.Attract].Source is { IsActive: false } &&
+                    if (battle.EffectState.Source is { IsActive: false } &&
                         pokemon.Volatiles.ContainsKey(ConditionId.Attract))
                     {
                         battle.Debug($"Removing Attract volatile on {pokemon}");
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Attract]);
                     }
                 }),
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     battle.Add("-activate", pokemon, "move: Attract",
                         $"[of] {pokemon.Volatiles[ConditionId.Attract].Source}");
                     if (battle.RandomChance(1, 2))
                     {
                         battle.Add("cant", pokemon, "Attract");
-                        return BoolVoidUnion.FromBool(false);
+                        return new BoolRelayVar(false);
                     }
 
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }, 2),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     battle.Add("-end", pokemon, "Attract", "[silent]");
                 }),
@@ -134,7 +165,7 @@ public partial record Conditions
                 Name = "Aurora Veil",
                 AssociatedMove = MoveId.AuroraVeil,
                 Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
+                DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
                 {
                     if (source != null && source.HasItem(ItemId.LightClay))
                     {
@@ -144,11 +175,12 @@ public partial record Conditions
                     return 5;
                 }),
                 OnAnyModifyDamage =
-                    new OnAnyModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    OnAnyModifyDamageEventInfo.Create((battle, damage, source, target, move) =>
                     {
                         if (target != source &&
                             target.Side.GetSideCondition(ConditionId.AuroraVeil) != null)
                         {
+                            // Don't stack with Reflect or Light Screen
                             if ((target.Side.GetSideCondition(ConditionId.Reflect) != null &&
                                  move.Category == MoveCategory.Physical) ||
                                 (target.Side.GetSideCondition(ConditionId.LightScreen) != null &&
@@ -163,28 +195,126 @@ public partial record Conditions
                                 if (battle.ActivePerHalf > 1)
                                 {
                                     battle.ChainModify(2732, 4096);
-                                    return damage;
+                                }
+                                else
+                                {
+                                    battle.ChainModify(0.5);
                                 }
 
-                                battle.ChainModify(0.5);
-                                return damage;
+                                return battle.FinalModify(damage);
                             }
                         }
 
                         return damage;
                     }),
-                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, side, _, _) =>
                 {
                     battle.Add("-sidestart", side, "move: Aurora Veil");
                 }),
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Handled by duration
                 }, 26, 10),
-                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
                     battle.Add("-sideend", side, "move: Aurora Veil");
                 }),
+            },
+            [ConditionId.BanefulBunker] = new()
+            {
+                Id = ConditionId.BanefulBunker,
+                Name = "Baneful Bunker",
+                AssociatedMove = MoveId.BanefulBunker,
+                Duration = 1,
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
+                {
+                    battle.Add("-singleturn", target, "move: Protect");
+                    return null;
+                }),
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false))
+                    {
+                        // Z-Moves and Max Moves can break through, but we don't track zBrokeProtect here
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+
+                    // Reset Outrage counter if locked
+                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                    if (lockedMove is not null &&
+                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+
+                    // Poison on contact
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Poison, target);
+                    }
+
+                    return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
+                }, 3),
+                // TS onHit only triggers for Z/Max moves (move.isZOrMaxPowered), which don't exist
+                // in Gen 9. This handler is a no-op for Gen 9.
+                OnHit = OnHitEventInfo.Create((_, _, _, _) => null),
+            },
+            [ConditionId.Block] = new()
+            {
+                Id = ConditionId.Block,
+                Name = "Block",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Block,
+                // Block just adds the 'trapped' volatile with 'trapper' marker
+                // The actual implementation is in the Trapped condition
+                // This is a marker condition
+            },
+            // CantUseTwice volatile condition placeholder - tracks that Blood Moon was used last turn
+            [ConditionId.BloodMoon] = new()
+            {
+                Id = ConditionId.BloodMoon,
+                Name = "Blood Moon",
+                AssociatedMove = MoveId.BloodMoon,
+                EffectType = EffectType.Condition,
+                // No handlers needed - this is just a volatile marker for cantUseTwice tracking
+            },
+            [ConditionId.Bounce] = new()
+            {
+                Id = ConditionId.Bounce,
+                Name = "Bounce",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.Bounce,
+                Duration = 2,
+                OnInvulnerability = OnInvulnerabilityEventInfo.Create((_, _, _, move) =>
+                {
+                    // SkyUppercut and ThousandArrows are isNonstandard: "Past" in Gen 9
+                    if (move.Id is MoveId.Gust or MoveId.Twister
+                        or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown)
+                    {
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    return BoolIntEmptyVoidUnion.FromBool(false);
+                }),
+                OnSourceBasePower =
+                    OnSourceBasePowerEventInfo.Create((battle, _, _, _, move) =>
+                    {
+                        if (move.Id is MoveId.Gust or MoveId.Twister)
+                        {
+                            return battle.ChainModify(2);
+                        }
+
+                        return DoubleVoidUnion.FromVoid();
+                    }),
             },
             [ConditionId.Burn] = new()
             {
@@ -192,7 +322,7 @@ public partial record Conditions
                 Name = "Burn",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Fire],
-                OnStart = new OnStartEventInfo((battle, target, source, sourceEffect) =>
+                OnStart = OnStartEventInfo.Create((battle, target, source, sourceEffect) =>
                 {
                     if (!battle.DisplayUi) return new VoidReturn();
 
@@ -213,35 +343,175 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnResidualOrder = 10,
-                OnResidual = new OnResidualEventInfo(
+                OnResidual = OnResidualEventInfo.Create(
                     (battle, pokemon, _, _) => { battle.Damage(pokemon.BaseMaxHp / 16); },
                     10),
+            },
+            [ConditionId.BurningBulwark] = new()
+            {
+                Id = ConditionId.BurningBulwark,
+                Name = "Burning Bulwark",
+                AssociatedMove = MoveId.BurningBulwark,
+                Duration = 1,
+                OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
+                {
+                    battle.Add("-singleturn", target, "move: Protect");
+                    return null;
+                }),
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
+                {
+                    // BurningBulwark only blocks damaging moves with protect flag (not Status)
+                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
+                    {
+                        // Z-Moves and Max Moves can break through, but we don't track zBrokeProtect here
+                        return BoolIntEmptyVoidUnion.FromVoid();
+                    }
+
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Protect");
+                    }
+
+                    // Reset Outrage counter if locked
+                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                    if (lockedMove is not null &&
+                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                    {
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                    }
+
+                    // Burn on contact
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Burn, target);
+                    }
+
+                    return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
+                }, 3),
+                OnHit = OnHitEventInfo.Create((_, _, _, _) => null),
+            },
+            [ConditionId.Charge] = new()
+            {
+                Id = ConditionId.Charge,
+                Name = "Charge",
+                AssociatedMove = MoveId.Charge,
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, effect) =>
+                {
+                    if (effect is Ability { Id: AbilityId.Electromorphosis or AbilityId.WindPower })
+                    {
+                        battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
+                            $"[from] ability: {effect.Name}");
+                    }
+                    else
+                    {
+                        battle.Add("-start", pokemon, "Charge");
+                    }
+
+                    return null;
+                }),
+                OnRestart = OnRestartEventInfo.Create((battle, pokemon, _, effect) =>
+                {
+                    if (effect is Ability { Id: AbilityId.Electromorphosis or AbilityId.WindPower })
+                    {
+                        battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
+                            $"[from] ability: {effect.Name}");
+                    }
+                    else
+                    {
+                        battle.Add("-start", pokemon, "Charge");
+                    }
+
+                    return null;
+                }),
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) => { battle.Add("-end", pokemon, "Charge", "[silent]"); }),
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, move) =>
+                {
+                    if (move.Type == MoveType.Electric)
+                    {
+                        battle.Debug("charge boost");
+                        return battle.ChainModify(2);
+                    }
+
+                    return DoubleVoidUnion.FromVoid();
+                }, 9),
+                OnMoveAborted = OnMoveAbortedEventInfo.Create((_, pokemon, _, move) =>
+                {
+                    if (move.Type == MoveType.Electric && move.Id != MoveId.Charge)
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Charge]);
+                    }
+                }),
+                OnAfterMove = OnAfterMoveEventInfo.Create((_, pokemon, _, move) =>
+                {
+                    if (move.Type == MoveType.Electric && move.Id != MoveId.Charge)
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Charge]);
+                    }
+                }),
+            },
+            [ConditionId.ChillyReception] = new()
+            {
+                Id = ConditionId.ChillyReception,
+                Name = "Chilly Reception",
+                AssociatedMove = MoveId.ChillyReception,
+                Duration = 1,
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, source, _, move) =>
+                {
+                    // Only show preparation animation for Chilly Reception move
+                    if (move.Id != MoveId.ChillyReception) return null;
+
+                    battle.Add("-prepare", source, "Chilly Reception", "[premajor]");
+                    return null;
+                }, 100),
             },
             [ConditionId.ChoiceLock] = new()
             {
                 Id = ConditionId.ChoiceLock,
                 NoCopy = true,
                 EffectType = EffectType.Condition,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    // Don't set the move here - it will be set in OnModifyMove
-                    // This handler is called when the volatile is added, which happens
-                    // during the Choice item's OnModifyMove
-                    battle.Debug(
-                        $"[ChoiceLock.OnStart] {pokemon.Name}: Volatile added, move will be set by ChoiceLock.OnModifyMove");
-                    return new VoidReturn();
-                }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
-                {
-                    // Set the locked move if it hasn't been set yet
-                    if (pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+                    // TS: if (!this.activeMove) throw new Error("Battle.activeMove is null");
+                    if (battle.ActiveMove == null)
+                    {
+                        battle.Debug($"[ChoiceLock.OnStart] {pokemon.Name}: ActiveMove is null, rejecting volatile");
+                        return new BoolRelayVar(false);
+                    }
+
+                    // TS: if (!this.activeMove.id || this.activeMove.hasBounced || this.activeMove.sourceEffect === 'snatch') return false;
+                    // Note: Snatch check omitted - Snatch is isNonstandard: "Past" (removed in Gen 8)
+                    bool hasBounced = battle.ActiveMove.HasBounced ?? false;
+
+                    if (battle.ActiveMove.Id == default || hasBounced)
                     {
                         battle.Debug(
-                            $"[ChoiceLock.OnModifyMove] {pokemon.Name}: Locking to {move.Id}");
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
+                            $"[ChoiceLock.OnStart] {pokemon.Name}: Rejecting volatile (id={battle.ActiveMove.Id}, hasBounced={hasBounced})");
+                        return new BoolRelayVar(false);
+                    }
+
+                    // TS: this.effectState.move = this.activeMove.id;
+                    battle.EffectState.Move = battle.ActiveMove.Id;
+                    battle.Debug(
+                        $"[ChoiceLock.OnStart] {pokemon.Name}: Volatile added, locked to {battle.ActiveMove.Id}");
+                    return new VoidReturn();
+                }),
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
+                {
+                    // Fallback: Set the locked move if it hasn't been set yet
+                    // (OnStart should have set it, but this provides defense in depth)
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.ChoiceLock, out EffectState? effectState) &&
+                        effectState.Move == null)
+                    {
+                        battle.Debug(
+                            $"[ChoiceLock.OnModifyMove] {pokemon.Name}: Locking to {move.Id} (fallback)");
+                        effectState.Move = move.Id;
                     }
                 }),
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, move) =>
                 {
                     battle.Debug(
                         $"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Attempting {move.Id}, Locked={pokemon.Volatiles[ConditionId.ChoiceLock].Move}, HasItem={pokemon.GetItem().IsChoice}");
@@ -282,7 +552,7 @@ public partial record Conditions
                     battle.Debug($"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Move allowed");
                     return new VoidReturn();
                 }),
-                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                OnDisableMove = OnDisableMoveEventInfo.Create((battle, pokemon) =>
                 {
                     // Check if the volatile exists first
                     if (!pokemon.Volatiles.TryGetValue(ConditionId.ChoiceLock,
@@ -320,57 +590,60 @@ public partial record Conditions
                         $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Disabling all except {effectState.Move}");
 
                     // Disable all moves except the locked move
+                    // TS: for (const moveSlot of pokemon.moveSlots) { if (moveSlot.id !== this.effectState.move) ... }
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
-                                 moveSlot.Move != effectState.Move))
+                                 moveSlot.Id != effectState.Move))
                     {
                         pokemon.DisableMove(moveSlot.Id, false,
                             effectState.SourceEffect);
                     }
                 }),
             },
-            [ConditionId.Counter] = new()
+            [ConditionId.Commanded] = new()
             {
-                Id = ConditionId.Counter,
-                Name = "Counter",
-                Duration = 1,
+                Id = ConditionId.Commanded,
+                Name = "Commanded",
+                EffectType = EffectType.Condition,
                 NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, _, _, _) =>
+                AssociatedAbility = AbilityId.Commander,
+                // This is applied to Dondozo when Tatsugiri uses Commander
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    battle.EffectState.Slot = null;
-                    battle.EffectState.TotalDamage = 0;
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnRedirectTarget = new OnRedirectTargetEventInfo(
-                    (battle, target, source, _, move) =>
+                    // Boost all stats by 2 stages
+                    battle.Boost(new SparseBoostsTable
                     {
-                        if (move.Id != MoveId.Counter) return PokemonVoidUnion.FromVoid();
-
-                        EffectState? effectState =
-                            source.Volatiles.GetValueOrDefault(ConditionId.Counter);
-                        if (source != target || effectState?.Slot == null)
-                        {
-                            return PokemonVoidUnion.FromVoid();
-                        }
-
-                        Pokemon? redirectTarget = battle.GetAtSlot(effectState.Slot);
-                        if (redirectTarget != null)
-                        {
-                            return redirectTarget;
-                        }
-
-                        return PokemonVoidUnion.FromVoid();
-                    }, -1),
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                        Atk = 2,
+                        Def = 2,
+                        SpA = 2,
+                        SpD = 2,
+                        Spe = 2
+                    }, pokemon);
+                    return null;
+                }),
+                OnDragOut = OnDragOutEventInfo.Create((_, _, _, _) => false, 2),
+                OnTrapPokemon =
+                    OnTrapPokemonEventInfo.Create(
+                        (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),
+            },
+            [ConditionId.Commanding] = new()
+            {
+                Id = ConditionId.Commanding,
+                Name = "Commanding",
+                EffectType = EffectType.Condition,
+                NoCopy = true,
+                AssociatedAbility = AbilityId.Commander,
+                // This is applied to Tatsugiri when it uses Commander (hides inside Dondozo)
+                OnDragOut = OnDragOutEventInfo.Create((_, _, _, _) => false, 2),
+                OnTrapPokemon =
+                    OnTrapPokemonEventInfo.Create(
+                        (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),
+                // TS uses a static false value, not a handler function
+                OnInvulnerability = OnInvulnerabilityEventInfo.Create((_, _, _, _) =>
+                    BoolIntEmptyVoidUnion.FromBool(false)),
+                OnBeforeTurn = OnBeforeTurnEventInfo.Create((battle, pokemon) =>
                 {
-                    if (source.IsAlly(target)) return;
-                    if (battle.GetCategory(move) != MoveCategory.Physical) return;
-
-                    if (!target.Volatiles.TryGetValue(ConditionId.Counter,
-                            out EffectState? effectState))
-                        return;
-
-                    effectState.Slot = source.GetSlot();
-                    effectState.TotalDamage = 2 * damage;
+                    // Cancel Tatsugiri's action since it's hiding
+                    battle.Queue.CancelAction(pokemon);
                 }),
             },
             [ConditionId.Confusion] = new()
@@ -378,7 +651,7 @@ public partial record Conditions
                 Id = ConditionId.Confusion,
                 Name = "Confusion",
                 EffectType = EffectType.Condition,
-                OnStart = new OnStartEventInfo((battle, target, source, sourceEffect) =>
+                OnStart = OnStartEventInfo.Create((battle, target, source, sourceEffect) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -403,10 +676,11 @@ public partial record Conditions
                         min = 3;
                     }
 
-                    battle.EffectState.Time = battle.Random(min, 6);
+                    // Set Time on the pokemon's volatile state, not battle.EffectState
+                    target.Volatiles[ConditionId.Confusion].Time = battle.Random(min, 6);
                     return new VoidReturn();
                 }),
-                OnEnd = new OnEndEventInfo((battle, target) =>
+                OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -414,7 +688,7 @@ public partial record Conditions
                     }
                 }),
                 //OnBeforeMovePriority = 3,
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, _) =>
                     {
                         pokemon.Volatiles[ConditionId.Confusion].Time--;
                         if (pokemon.Volatiles[ConditionId.Confusion].Time < 1)
@@ -442,7 +716,7 @@ public partial record Conditions
                             Id = MoveId.Confused,
                             Accuracy = IntTrueUnion.FromTrue(),
                             Num = 100200,
-                            Type = MoveType.Normal,
+                            Type = MoveType.Unknown, // TS uses type: '???' (typeless)
                             MoveSlot = new MoveSlot(),
                         };
                         battle.Damage(damage, pokemon, pokemon,
@@ -451,334 +725,66 @@ public partial record Conditions
                     },
                     3),
             },
-            [ConditionId.Arceus] = new()
+            [ConditionId.Counter] = new()
             {
-                Id = ConditionId.Arceus,
-                Name = "Arceus",
-                EffectType = EffectType.Condition,
-                //OnTypePriority = 1,
-                OnType = new OnTypeEventInfo((battle, types, pokemon) =>
+                Id = ConditionId.Counter,
+                Name = "Counter",
+                Duration = 1,
+                NoCopy = true,
+                OnStart = OnStartEventInfo.Create((_, pokemon, _, _) =>
+                {
+                    // Initialize the volatile's state on the pokemon that has the Counter volatile
+                    pokemon.Volatiles[ConditionId.Counter].Slot = null;
+                    pokemon.Volatiles[ConditionId.Counter].Damage = 0;
+                    return null;
+                }),
+                OnRedirectTarget = OnRedirectTargetEventInfo.Create(
+                    (battle, _, source, _, move) =>
                     {
-                        AbilityId abilityId = pokemon.Ability;
-                        if (pokemon.Transformed ||
-                            (abilityId != AbilityId.Multitype && battle.Gen >= 8))
+                        if (move.Id != MoveId.Counter) return PokemonVoidUnion.FromVoid();
+
+                        // source is the pokemon using Counter - check if it has the Counter volatile
+                        if (!source.Volatiles.TryGetValue(ConditionId.Counter, out var effectState) ||
+                            effectState.Slot == null)
                         {
-                            return types;
+                            return PokemonVoidUnion.FromVoid();
                         }
 
-                        var type = PokemonType.Normal;
-                        if (abilityId == AbilityId.Multitype)
+                        Pokemon? redirectTarget = battle.GetAtSlot(effectState.Slot);
+                        if (redirectTarget != null)
                         {
-                            Item item = pokemon.GetItem();
-                            type = item.OnPlate ?? PokemonType.Normal;
+                            return redirectTarget;
                         }
 
-                        return new[] { type };
-                    },
-                    1),
-            },
-            [ConditionId.BanefulBunker] = new()
-            {
-                Id = ConditionId.BanefulBunker,
-                Name = "Baneful Bunker",
-                AssociatedMove = MoveId.BanefulBunker,
-                Duration = 1,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                        return PokemonVoidUnion.FromVoid();
+                    }, -1),
+                OnDamagingHit = OnDamagingHitEventInfo.Create((battle, damage, target, source, move) =>
                 {
-                    battle.Add("-singleturn", target, "move: Protect");
-                    return BoolVoidUnion.FromVoid();
+                    if (source.IsAlly(target)) return;
+                    if (battle.GetCategory(move) != MoveCategory.Physical) return;
+
+                    if (!target.Volatiles.TryGetValue(ConditionId.Counter,
+                            out EffectState? effectState))
+                        return;
+
+                    effectState.Slot = source.GetSlot();
+                    effectState.Damage = 2 * damage;
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                {
-                    if (!(move.Flags.Protect ?? false))
-                    {
-                        // Z-Moves and Max Moves can break through, but we don't track zBrokeProtect here
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    if (move.SmartTarget ?? false)
-                    {
-                        move.SmartTarget = false;
-                    }
-                    else if (battle.DisplayUi)
-                    {
-                        battle.Add("-activate", target, "move: Protect");
-                    }
-
-                    // Reset Outrage counter if locked
-                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
-                    if (lockedMove is not null &&
-                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
-                    {
-                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
-                    }
-
-                    // Poison on contact
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        source.TrySetStatus(ConditionId.Poison, target);
-                    }
-
-                    return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
-                }, 3),
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                {
-                    // Handle Z-Moves/Max Moves that break through but still make contact
-                    // Note: IsZOrMaxPowered property would need to be checked if available
-                    // For now, this handles the case where the move hits through protect
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        source.TrySetStatus(ConditionId.Poison, target);
-                    }
-
-                    return BoolEmptyVoidUnion.FromVoid();
-                }),
-            },
-            [ConditionId.Block] = new()
-            {
-                Id = ConditionId.Block,
-                Name = "Block",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.Block,
-                // Block just adds the 'trapped' volatile with 'trapper' marker
-                // The actual implementation is in the Trapped condition
-                // This is a marker condition
-            },
-            [ConditionId.Bounce] = new()
-            {
-                Id = ConditionId.Bounce,
-                Name = "Bounce",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.Bounce,
-                Duration = 2,
-                OnImmunity = new OnImmunityEventInfo((_, _, _) => new VoidReturn()),
-                OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, move) =>
-                {
-                    // SkyUppercut and ThousandArrows are isNonstandard: "Past" in Gen 9
-                    if (move.Id is MoveId.Gust or MoveId.Twister
-                        or MoveId.Thunder or MoveId.Hurricane or MoveId.SmackDown)
-                    {
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    return BoolIntEmptyVoidUnion.FromBool(false);
-                }),
-                OnSourceModifyDamage =
-                    new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
-                    {
-                        if (move.Id is MoveId.Gust or MoveId.Twister)
-                        {
-                            return battle.ChainModify(2);
-                        }
-
-                        return damage;
-                    }),
-            },
-            [ConditionId.BurningBulwark] = new()
-            {
-                Id = ConditionId.BurningBulwark,
-                Name = "Burning Bulwark",
-                AssociatedMove = MoveId.BurningBulwark,
-                Duration = 1,
-                OnStart = new OnStartEventInfo((battle, target, _, _) =>
-                {
-                    battle.Add("-singleturn", target, "move: Protect");
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
-                {
-                    // BurningBulwark only blocks damaging moves with protect flag (not Status)
-                    if (!(move.Flags.Protect ?? false) || move.Category == MoveCategory.Status)
-                    {
-                        // Z-Moves and Max Moves can break through, but we don't track zBrokeProtect here
-                        return BoolIntEmptyVoidUnion.FromVoid();
-                    }
-
-                    if (move.SmartTarget ?? false)
-                    {
-                        move.SmartTarget = false;
-                    }
-                    else if (battle.DisplayUi)
-                    {
-                        battle.Add("-activate", target, "move: Protect");
-                    }
-
-                    // Reset Outrage counter if locked
-                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
-                    if (lockedMove is not null &&
-                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
-                    {
-                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
-                    }
-
-                    // Burn on contact
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        source.TrySetStatus(ConditionId.Burn, target);
-                    }
-
-                    return new Empty(); // NOT_FAIL - move is blocked but doesn't "fail"
-                }, 3),
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                {
-                    // Handle Z-Moves/Max Moves that break through but still make contact
-                    if (battle.CheckMoveMakesContact(move, source, target))
-                    {
-                        source.TrySetStatus(ConditionId.Burn, target);
-                    }
-
-                    return BoolEmptyVoidUnion.FromVoid();
-                }),
-            },
-            [ConditionId.Charge] = new()
-            {
-                Id = ConditionId.Charge,
-                Name = "Charge",
-                AssociatedMove = MoveId.Charge,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, effect) =>
-                {
-                    if (effect is { Name: "Electromorphosis" or "Wind Power" })
-                    {
-                        battle.Add("-start", pokemon, "Charge", $"[from] ability: {effect.Name}");
-                    }
-                    else
-                    {
-                        battle.Add("-start", pokemon, "Charge");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnRestart = new OnRestartEventInfo((battle, pokemon, _, effect) =>
-                {
-                    if (effect is { Name: "Electromorphosis" or "Wind Power" })
-                    {
-                        battle.Add("-start", pokemon, "Charge", $"[from] ability: {effect.Name}");
-                    }
-                    else
-                    {
-                        battle.Add("-start", pokemon, "Charge");
-                    }
-
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnEnd = new OnEndEventInfo((battle, pokemon) => { battle.Add("-end", pokemon, "Charge", "[silent]"); }),
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, move) =>
-                {
-                    if (move.Type == MoveType.Electric)
-                    {
-                        battle.Debug("charge boost");
-                        return battle.ChainModify(2);
-                    }
-
-                    return DoubleVoidUnion.FromVoid();
-                }, 9),
-                OnMoveAborted = new OnMoveAbortedEventInfo((_, pokemon, _, move) =>
-                {
-                    if (move.Type == MoveType.Electric && move.Id != MoveId.Charge)
-                    {
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Charge]);
-                    }
-                }),
-                OnAfterMove = new OnAfterMoveEventInfo((_, pokemon, _, move) =>
-                {
-                    if (move.Type == MoveType.Electric && move.Id != MoveId.Charge)
-                    {
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Charge]);
-                    }
-                }),
-            },
-            [ConditionId.ChillyReception] = new()
-            {
-                Id = ConditionId.ChillyReception,
-                Name = "Chilly Reception",
-                AssociatedMove = MoveId.ChillyReception,
-                Duration = 1,
-                OnBeforeMove = new OnBeforeMoveEventInfo((battle, source, _, move) =>
-                {
-                    // Only show preparation animation for Chilly Reception move
-                    if (move.Id != MoveId.ChillyReception) return BoolVoidUnion.FromVoid();
-
-                    battle.Add("-prepare", source, "Chilly Reception", "[premajor]");
-                    return BoolVoidUnion.FromVoid();
-                }, 100),
             },
             [ConditionId.Curse] = new()
             {
                 Id = ConditionId.Curse,
                 Name = "Curse",
                 AssociatedMove = MoveId.Curse,
-                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                OnStart = OnStartEventInfo.Create((battle, pokemon, source, _) =>
                 {
                     battle.Add("-start", pokemon, "Curse", $"[of] {source}");
-                    return BoolVoidUnion.FromVoid();
+                    return null;
                 }),
-                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    battle.Damage(pokemon.BaseMaxHp / 4, pokemon, pokemon,
-                        BattleDamageEffect.FromIEffect(_library.Conditions[ConditionId.Curse]));
+                    battle.Damage(pokemon.BaseMaxHp / 4);
                 }, 12),
-            },
-            [ConditionId.Commanded] = new()
-            {
-                Id = ConditionId.Commanded,
-                Name = "Commanded",
-                EffectType = EffectType.Condition,
-                NoCopy = true,
-                AssociatedAbility = AbilityId.Commander,
-                // This is applied to Dondozo when Tatsugiri uses Commander
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    // Boost all stats by 2 stages
-                    battle.Boost(new SparseBoostsTable
-                    {
-                        Atk = 2,
-                        Def = 2,
-                        SpA = 2,
-                        SpD = 2,
-                        Spe = 2
-                    }, pokemon);
-                    return BoolVoidUnion.FromVoid();
-                }),
-                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-block", pokemon, "Commanded");
-                    }
-
-                    return null; // Prevent drag-out
-                }, 2),
-                OnTrapPokemon =
-                    new OnTrapPokemonEventInfo(
-                        (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),
-            },
-            [ConditionId.Commanding] = new()
-            {
-                Id = ConditionId.Commanding,
-                Name = "Commanding",
-                EffectType = EffectType.Condition,
-                NoCopy = true,
-                AssociatedAbility = AbilityId.Commander,
-                // This is applied to Tatsugiri when it uses Commander (hides inside Dondozo)
-                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-block", pokemon, "Commanding");
-                    }
-
-                    return null; // Prevent drag-out
-                }, 2),
-                OnTrapPokemon =
-                    new OnTrapPokemonEventInfo(
-                        (_, pokemon) => { pokemon.Trapped = PokemonTrapped.True; }, -11),
-                OnInvulnerability = new OnInvulnerabilityEventInfo((_, _, _, _) =>
-                    BoolIntEmptyVoidUnion.FromBool(false)),
-                OnBeforeTurn = new OnBeforeTurnEventInfo((battle, pokemon) =>
-                {
-                    // Cancel Tatsugiri's action since it's hiding
-                    battle.Queue.CancelAction(pokemon);
-                }),
             },
         };
     }

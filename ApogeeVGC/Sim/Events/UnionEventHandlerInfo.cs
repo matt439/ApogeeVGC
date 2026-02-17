@@ -87,8 +87,10 @@ public abstract record UnionEventHandlerInfo<TUnion> : EventHandlerInfo
                 // For reference types, check if either is nullable reference type
                 if (!expectedBase.IsValueType && !actualBase.IsValueType)
                 {
-                    // Reference type comparison - check base types
-                    if (!expectedBase.IsAssignableFrom(actualBase))
+                    // Reference type comparison - delegate parameter contravariance:
+                    // The actual delegate parameter type must be assignable from the expected type
+                    // (e.g., delegate taking 'object' can accept 'Pokemon' arguments)
+                    if (!actualBase.IsAssignableFrom(expectedBase))
                     {
                         throw new InvalidOperationException(
                             $"Event {Id}: Parameter {i} ({actualParams[i].Name}) type mismatch. " +

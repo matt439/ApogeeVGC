@@ -7,29 +7,51 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnFoeFractionalPriority event.
-/// Signature: Func<Battle, int, Pokemon, ActiveMove, double> | decimal constant
+/// Signature: (Battle, int, Pokemon, Pokemon?, ActiveMove) => double | decimal constant
 /// </summary>
 public sealed record OnFoeFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFractionalPriority>
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnFoeFractionalPriorityEventInfo(
-       OnFractionalPriority unionValue,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
-bool usesSpeed = true)
+        bool usesSpeed = true)
     {
         Id = EventId.FractionalPriority;
-  Prefix = EventPrefix.Foe;
-     UnionValue = unionValue;
-   Handler = ExtractDelegate();
- Priority = priority;
-UsesSpeed = usesSpeed;
- ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(ActiveMove)];
-  ExpectedReturnType = typeof(double);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeFractionalPriorityEventInfo Create(
+        Func<Battle, int, Pokemon, Pokemon?, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeFractionalPriorityEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetIntRelayVar(),
+                context.GetTargetOrSourcePokemon(),
+                context.SourcePokemon,
+                context.GetMove()
+                );
+                return result switch
+                {
+                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    VoidDoubleVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

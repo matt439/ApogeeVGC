@@ -10,24 +10,40 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyImmunityEventInfo : EventHandlerInfo
 {
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
     public OnAllyImmunityEventInfo(
-    Action<Battle, PokemonType, Pokemon> handler,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.Immunity;
-  Prefix = EventPrefix.Ally;
-  Handler = handler;
+        Prefix = EventPrefix.Ally;
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(PokemonType), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnAllyImmunityEventInfo Create(
+        Action<Battle, PokemonType, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnAllyImmunityEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.SourceType!.Value,
+                context.GetSourceOrTargetPokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
+    }
 }

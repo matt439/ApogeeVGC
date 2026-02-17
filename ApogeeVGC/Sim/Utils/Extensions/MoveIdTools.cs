@@ -24,6 +24,8 @@ public static class MoveIdTools
             MoveId.LightScreen => ConditionId.LightScreen,
             MoveId.Yawn => ConditionId.Yawn,
             MoveId.RevivalBlessing => ConditionId.RevivalBlessing,
+            MoveId.GigatonHammer => ConditionId.GigatonHammer,
+            MoveId.BloodMoon => ConditionId.BloodMoon,
             _ => throw new ArgumentException($"MoveId '{moveId}' does not have a corresponding ConditionId.",
                 nameof(moveId)),
         };

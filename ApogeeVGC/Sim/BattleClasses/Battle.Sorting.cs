@@ -196,12 +196,14 @@ public partial class Battle
 
             // Run ModifyPriority events to allow effects to change priority
             // SingleEvent: for move-specific priority changes (e.g., Grassy Glide in Grassy Terrain)
+            // Note: We pass moveAction.Pokemon as both target and source because move handlers
+            // using ModifierSourceMove pattern expect the Pokemon using the move as 'source'
             RelayVar? singleEventResult = SingleEvent(
                 EventId.ModifyPriority,
                 move,
                 null,
                 moveAction.Pokemon,
-                null,
+                moveAction.Pokemon,
                 null,
                 priority
             );

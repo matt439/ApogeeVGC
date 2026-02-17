@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils;
@@ -183,16 +184,24 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             throw new InvalidOperationException("MoveRequest.Side cannot be null");
         }
 
+
         var actions = new List<ChosenAction>();
 
         // Handle each active Pokemon
         for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
         {
-            PokemonMoveRequestData pokemonRequest = request.Active[pokemonIndex];
+            PokemonMoveRequestData? pokemonRequest = request.Active[pokemonIndex];
 
+            // Null entries represent fainted Pokemon or empty slots - add a pass action
             if (pokemonRequest == null)
             {
-                throw new InvalidOperationException($"Active Pokemon request data at index {pokemonIndex} cannot be null");
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Pass,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
+                });
+                continue;
             }
 
             // Build list of all available choices (moves with and without tera, plus switch option)
@@ -224,22 +233,41 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                 }
             }
 
-            // Add switch option (checking if any switches are available)
+            // Add switch option only if:
+            // 1. The Pokemon is not trapped
+            // 2. There are bench Pokemon available to switch in
+            bool isTrapped = pokemonRequest.Trapped == true;
             var availableSwitches = request.Side.Pokemon
                 .Select((p, index) => new { PokemonData = p, Index = index })
                 .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
                 .ToList();
 
-            bool canSwitch = availableSwitches.Count > 0;
+            bool canSwitch = !isTrapped && availableSwitches.Count > 0;
             if (canSwitch)
             {
                 availableChoices.Add((false, -1, false)); // Switch option
             }
 
-            // Pick a random choice
+            // If no choices available (all moves disabled and can't switch), 
+            // use the first move anyway - the battle engine will force Struggle
             if (availableChoices.Count == 0)
             {
-                throw new InvalidOperationException($"No available choices for random player at Pokemon index {pokemonIndex}");
+                if (pokemonRequest.Moves.Count > 0)
+                {
+                    // Use the first move (likely Struggle or will be converted to Struggle)
+                    availableChoices.Add((true, 0, false));
+                }
+                else
+                {
+                    // No moves at all - this shouldn't happen, but add a pass just in case
+                    actions.Add(new ChosenAction
+                    {
+                        Choice = ChoiceType.Pass,
+                        Pokemon = null,
+                        MoveId = MoveId.None,
+                    });
+                    continue;
+                }
             }
 
             int randomIndex = _random.Random(0, availableChoices.Count);
@@ -300,46 +328,41 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     /// <summary>
     /// Gets a random target location for a move.
     /// Returns 0 for most moves (auto-targeting), or a specific slot for targeting moves in doubles.
+    /// Positive values target foes, negative values target allies.
     /// </summary>
     private int GetRandomTargetLocation(MoveTarget targetType)
     {
-        // In singles, always use auto-targeting
-        // In doubles, moves that require explicit targeting (Normal, Any, AdjacentFoe, etc.)
-        // need a non-zero target location
-        
         // Check if this move type requires explicit targeting
-        var requiresExplicitTarget = targetType is MoveTarget.Normal 
-            or MoveTarget.Any 
-            or MoveTarget.AdjacentAlly 
-            or MoveTarget.AdjacentAllyOrSelf 
-            or MoveTarget.AdjacentFoe;
-
-        if (!requiresExplicitTarget)
+        // Positive locations = foe side, Negative locations = ally side
+        return targetType switch
         {
-            // Moves like AllAdjacent, AllAdjacentFoes, etc. use auto-targeting (0)
-            return 0;
-        }
+            // Foe-targeting moves: pick a random opponent slot (1 or 2)
+            MoveTarget.Normal or MoveTarget.Any or MoveTarget.AdjacentFoe =>
+                _random.Random(1, 3),
 
-        // For moves requiring explicit targets, pick a random opponent slot (1 or 2)
-        // In doubles: 1 = left opponent, 2 = right opponent
-        // Random player will pick between the two opponent slots
-        return _random.Random(1, 3); // Returns 1 or 2
+            // Ally-targeting moves: pick a random ally slot (-1 or -2)
+            MoveTarget.AdjacentAlly =>
+                -_random.Random(1, 3),
+
+            // Ally-or-self moves: pick a random ally slot (-1 or -2)
+            MoveTarget.AdjacentAllyOrSelf =>
+                -_random.Random(1, 3),
+
+            // All other moves (AllAdjacent, AllAdjacentFoes, Self, etc.) use auto-targeting
+            _ => 0,
+        };
     }
 
-    private bool IsDisabled(MoveIdBoolUnion disabled)
+    private static bool IsDisabled(MoveIdBoolUnion? disabled)
     {
-        return disabled switch
-        {
-            BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
-            _ => false
-        };
+        return disabled is not null && disabled.IsTrue();
     }
 
     private bool IsPokemonFainted(PokemonSwitchRequestData pokemon)
     {
-        // The Reviving flag indicates a Pokemon being revived by Revival Blessing
-        // Treat these as fainted/unavailable for normal switching
-        return pokemon.Reviving;
+        // Check if the Pokemon is fainted (Condition == Fainted)
+        // or being revived by Revival Blessing (Reviving flag)
+        return pokemon.Condition == ConditionId.Fainted || pokemon.Reviving;
     }
 
     private Choice GetRandomSwitchChoice(SwitchRequest request)
@@ -349,39 +372,51 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             Console.WriteLine($"[PlayerRandom] Generating random switch choice for {SideId}");
         }
 
-        // Build list of available Pokemon (excluding active and fainted)
-        var availablePokemonWithIndex = request.Side.Pokemon
-            .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
-            .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
-            .ToList();
+        var actions = new List<ChosenAction>();
+        var usedSlots = new HashSet<int>();
 
-        if (availablePokemonWithIndex.Count == 0)
+        // Generate a switch action for each active slot that needs to switch
+        for (int i = 0; i < request.ForceSwitch.Count; i++)
         {
-            throw new InvalidOperationException("No Pokemon available to switch");
-        }
-
-        // Pick a random Pokemon
-        int randomIndex = _random.Random(0, availablePokemonWithIndex.Count);
-        var selectedItem = availablePokemonWithIndex[randomIndex];
-
-        if (PrintDebug)
-        {
-            Console.WriteLine(
-                $"[PlayerRandom] Selected switch to: {selectedItem.PokemonData.Details}");
-        }
-
-        return new Choice
-        {
-            Actions = new List<ChosenAction>
+            if (!request.ForceSwitch[i])
             {
-                new()
-                {
-                    Choice = ChoiceType.Switch,
-                    Pokemon = null,
-                    MoveId = MoveId.None,
-                    Index = selectedItem.OriginalIndex,
-                },
-            },
-        };
+                continue;
+            }
+
+            // Build list of available Pokemon (excluding active, fainted, and already-picked)
+            var availablePokemonWithIndex = request.Side.Pokemon
+                .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
+                .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData)
+                             && !usedSlots.Contains(x.OriginalIndex))
+                .ToList();
+
+            if (availablePokemonWithIndex.Count == 0)
+            {
+                // No more Pokemon available to switch in — pass for this slot
+                actions.Add(new ChosenAction { Choice = ChoiceType.Pass, MoveId = MoveId.None });
+                continue;
+            }
+
+            // Pick a random Pokemon
+            int randomIndex = _random.Random(0, availablePokemonWithIndex.Count);
+            var selectedItem = availablePokemonWithIndex[randomIndex];
+            usedSlots.Add(selectedItem.OriginalIndex);
+
+            if (PrintDebug)
+            {
+                Console.WriteLine(
+                    $"[PlayerRandom] Selected switch to: {selectedItem.PokemonData.Details}");
+            }
+
+            actions.Add(new ChosenAction
+            {
+                Choice = ChoiceType.Switch,
+                Pokemon = null,
+                MoveId = MoveId.None,
+                Index = selectedItem.OriginalIndex,
+            });
+        }
+
+        return new Choice { Actions = actions };
     }
 }

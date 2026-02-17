@@ -1,10 +1,12 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -30,19 +32,19 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.WaterPledge,
                 Duration = 4,
-                OnSideStart = new OnSideStartEventInfo((battle, targetSide, _, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, targetSide, _, _) =>
                 {
                     if (battle.DisplayUi)
                     {
                         battle.Add("-sidestart", targetSide, "Water Pledge");
                     }
                 }),
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 26,
                     SubOrder = 7,
                 },
-                OnSideEnd = new OnSideEndEventInfo((battle, targetSide) =>
+                OnSideEnd = OnSideEndEventInfo.Create((battle, targetSide) =>
                 {
                     if (battle.DisplayUi)
                     {
@@ -52,7 +54,7 @@ public partial record Conditions
                 // Double secondary effect chances for moves
                 // Note: Secret Power exception is omitted since it's not a Gen 9 move (isNonstandard: "Past")
                 // Skip Serene Grace + Flinch interaction
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
                 {
                     if (move.Secondaries != null)
                     {
@@ -87,7 +89,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 1,
                 AssociatedMove = MoveId.WideGuard,
-                OnSideStart = new OnSideStartEventInfo((battle, _, source, _) =>
+                OnSideStart = OnSideStartEventInfo.Create((battle, _, source, _) =>
                 {
                     if (battle.DisplayUi && source != null)
                     {
@@ -95,14 +97,15 @@ public partial record Conditions
                     }
                 }),
                 // OnTryHitPriority = 4
-                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     // Wide Guard blocks all spread moves (allAdjacent, allAdjacentFoes)
                     // Note: Does NOT check for protect flag - blocks ALL spread moves
                     if (move.Target != MoveTarget.AllAdjacent &&
                         move.Target != MoveTarget.AllAdjacentFoes)
                     {
-                        return BoolIntEmptyVoidUnion.FromVoid();
+                        // TypeScript: return; (undefined) - don't interfere, let other handlers run
+                        return new VoidReturn();
                     }
 
                     if (battle.DisplayUi)
@@ -123,17 +126,60 @@ public partial record Conditions
 
                     return new Empty(); // Equivalent to Battle.NOT_FAIL
                 }, 4),
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) =>
+                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                })
+                }) with
                 {
                     Order = 26,
                     SubOrder = 3,
                 },
-                OnSideEnd = new OnSideEndEventInfo((_, _) =>
+                OnSideEnd = OnSideEndEventInfo.Create((_, _) =>
                 {
                     // Silent end - Wide Guard doesn't announce when it ends
+                }),
+            },
+            [ConditionId.Wish] = new()
+            {
+                Id = ConditionId.Wish,
+                Name = "Wish",
+                EffectType = EffectType.Condition,
+                // This is a slot condition
+                OnStart = OnStartEventInfo.Create((battle, pokemon, source, _) =>
+                {
+                    battle.EffectState.Hp = source != null ? source.MaxHp / 2 : pokemon.MaxHp / 2;
+                    battle.EffectState.StartingTurn = battle.GetOverflowedTurnCount();
+                    if (battle.EffectState.StartingTurn == 255)
+                    {
+                        battle.Hint($"In Gen 8+, Wish will never resolve when used on the {battle.Turn}th turn.");
+                    }
+
+                    return null;
+                }),
+                OnResidual = OnResidualEventInfo.Create((battle, target, _, _) =>
+                {
+                    // Use GetOverflowedTurnCount for proper Gen 8+ turn overflow handling
+                    if (battle.GetOverflowedTurnCount() <= battle.EffectState.StartingTurn) return;
+                    Pokemon? slotTarget = battle.GetAtSlot(battle.EffectState.SourceSlot);
+                    if (slotTarget != null)
+                    {
+                        target.Side.RemoveSlotCondition(slotTarget,
+                            _library.Conditions[ConditionId.Wish]);
+                    }
+                }, 4),
+                OnEnd = OnEndEventInfo.Create((battle, target) =>
+                {
+                    if (target is { Fainted: false })
+                    {
+                        int healAmount = battle.EffectState.Hp ?? 0;
+                        IntFalseUnion damage = battle.Heal(healAmount, target, target);
+                        if (damage is IntIntFalseUnion { Value: > 0 })
+                        {
+                            string wisherName = battle.EffectState.Source?.Name ?? "unknown";
+                            battle.Add("-heal", target, target.GetHealth,
+                                "[from] move: Wish", $"[wisher] {wisherName}");
+                        }
+                    }
                 }),
             },
             [ConditionId.WonderRoom] = new()
@@ -148,7 +194,7 @@ public partial record Conditions
                 // BEFORE any calculations. This affects all damage calculations.
                 //
                 // OnModifyMove swaps overrideOffensiveStat for moves like Body Press.
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, _, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, _, _) =>
                 {
                     // This code is for moves that use defensive stats as the attacking stat
                     // (e.g. Body Press uses Def instead of Atk)
@@ -172,24 +218,24 @@ public partial record Conditions
                             $"{move.Name} uses {statName}Def boosts when Wonder Room is active.");
                     }
                 }),
-                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, _) =>
+                OnFieldStart = OnFieldStartEventInfo.Create((battle, _, source, _) =>
                 {
                     if (battle.DisplayUi && source != null)
                     {
                         battle.Add("-fieldstart", "move: Wonder Room", $"[of] {source}");
                     }
                 }),
-                OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>
+                OnFieldRestart = OnFieldRestartEventInfo.Create((battle, _, _, _) =>
                 {
                     battle.Field.RemovePseudoWeather(ConditionId.WonderRoom);
                 }),
                 // Swapping defenses partially implemented in sim/pokemon.js:Pokemon#calculateStat and Pokemon#getStat
-                OnFieldResidual = new OnFieldResidualEventInfo((_, _, _, _) => { })
+                OnFieldResidual = OnFieldResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 27,
                     SubOrder = 5,
                 },
-                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
                     {

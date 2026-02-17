@@ -1,12 +1,15 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
@@ -20,25 +23,6 @@ public partial record Moves
     {
         return new Dictionary<MoveId, Move>
         {
-            [MoveId.DazzlingGleam] = new()
-            {
-                Id = MoveId.DazzlingGleam,
-                Num = 605,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Special,
-                Name = "Dazzling Gleam",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                Target = MoveTarget.AllAdjacentFoes,
-                Type = MoveType.Fairy,
-            },
             [MoveId.DarkestLariat] = new()
             {
                 Id = MoveId.DarkestLariat,
@@ -93,7 +77,7 @@ public partial record Moves
                 Status = ConditionId.Sleep,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dark,
-                OnTry = new OnTryEventInfo((battle, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((battle, _, source, move) =>
                 {
                     // Only Darkrai can use Dark Void (or if the move has bounced)
                     if (source.Species.BaseSpecies == SpecieId.Darkrai || (move.HasBounced ?? false))
@@ -109,6 +93,25 @@ public partial record Moves
 
                     return null;
                 }),
+            },
+            [MoveId.DazzlingGleam] = new()
+            {
+                Id = MoveId.DazzlingGleam,
+                Num = 605,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Dazzling Gleam",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Fairy,
             },
             [MoveId.Decorate] = new()
             {
@@ -153,6 +156,7 @@ public partial record Moves
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
                 Boosts = new SparseBoostsTable { Def = 1 },
                 VolatileStatus = ConditionId.DefenseCurl,
+                Condition = _library.Conditions[ConditionId.DefenseCurl],
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -173,7 +177,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Flying,
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     var success = false;
 
@@ -181,7 +185,7 @@ public partial record Moves
                     if (!target.Volatiles.ContainsKey(ConditionId.Substitute) ||
                         (move.Infiltrates ?? false))
                     {
-                        var boostResult = battle.Boost(
+                        BoolZeroUnion? boostResult = battle.Boost(
                             new SparseBoostsTable { Evasion = -1 },
                             target, source, move);
                         if (boostResult?.IsTruthy() == true) success = true;
@@ -204,19 +208,18 @@ public partial record Moves
                     ];
 
                     // Remove conditions from target's side
-                    foreach (var condition in removeFromTarget)
+                    foreach (ConditionId condition in removeFromTarget)
                     {
                         if (target.Side.RemoveSideCondition(condition))
                         {
-                            // Only show message for hazards (screens have their own end messages)
-                            if (hazards.Contains(condition))
+                            // Only show message and set success for hazards (screens have their own end messages)
+                            if (!hazards.Contains(condition)) continue;
+
+                            Condition conditionData = battle.Library.Conditions[condition];
+                            if (battle.DisplayUi)
                             {
-                                var conditionData = battle.Library.Conditions[condition];
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Add("-sideend", target.Side, conditionData.Name,
-                                        "[from] move: Defog", $"[of] {source}");
-                                }
+                                battle.Add("-sideend", target.Side, conditionData.Name,
+                                    "[from] move: Defog", $"[of] {source}");
                             }
 
                             success = true;
@@ -224,11 +227,11 @@ public partial record Moves
                     }
 
                     // Remove hazards from source's side
-                    foreach (var condition in hazards)
+                    foreach (ConditionId condition in hazards)
                     {
                         if (source.Side.RemoveSideCondition(condition))
                         {
-                            var conditionData = battle.Library.Conditions[condition];
+                            Condition conditionData = battle.Library.Conditions[condition];
                             if (battle.DisplayUi)
                             {
                                 battle.Add("-sideend", source.Side, conditionData.Name,
@@ -257,9 +260,10 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags { BypassSub = true, NoAssist = true, FailCopycat = true },
                 VolatileStatus = ConditionId.DestinyBond,
+                Condition = _library.Conditions[ConditionId.DestinyBond],
                 Target = MoveTarget.Self,
                 Type = MoveType.Ghost,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                     !source.RemoveVolatile(
                         battle.Library.Conditions[ConditionId.DestinyBond])),
             },
@@ -278,16 +282,16 @@ public partial record Moves
                 VolatileStatus = ConditionId.Protect,
                 Target = MoveTarget.Self,
                 Type = MoveType.Fighting,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Check if queue will act and run StallMove event
-                    var willAct = battle.Queue.WillAct() is not null;
-                    var stallResult = battle.RunEvent(EventId.StallMove, source);
-                    var stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    var result = willAct && stallSuccess;
+                    bool willAct = battle.Queue.WillAct() is not null;
+                    RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
+                    bool stallSuccess = stallResult is BoolRelayVar { Value: true };
+                    bool result = willAct && stallSuccess;
                     return result ? true : (BoolEmptyVoidUnion)false;
                 }),
-                OnHit = new OnHitEventInfo((_, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
                     // Add Stall volatile to track consecutive uses
                     source.AddVolatile(ConditionId.Stall);
@@ -335,7 +339,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
                 Condition = _library.Conditions[ConditionId.Dig],
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already underground (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Dig]))
@@ -346,7 +350,7 @@ public partial record Moves
                     // Starting the charge turn - show prepare message
                     battle.Add("-prepare", attacker, move.Name);
                     // Run ChargeMove event (for Power Herb, etc.)
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -358,6 +362,44 @@ public partial record Moves
                     attacker.AddVolatile(ConditionId.Dig);
                     return null; // Return null to skip the attack this turn
                 }),
+            },
+            [MoveId.DireClaw] = new()
+            {
+                Id = MoveId.DireClaw,
+                Num = 827,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Dire Claw",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 50,
+                    OnHit = (battle, target, source, _) =>
+                    {
+                        // Randomly inflict poison, paralysis, or sleep
+                        int result = battle.Random(3);
+                        if (result == 0)
+                        {
+                            target.TrySetStatus(ConditionId.Poison, source);
+                        }
+                        else if (result == 1)
+                        {
+                            target.TrySetStatus(ConditionId.Paralysis, source);
+                        }
+                        else
+                        {
+                            target.TrySetStatus(ConditionId.Sleep, source);
+                        }
+
+                        return new VoidReturn();
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Poison,
             },
             [MoveId.Disable] = new()
             {
@@ -375,9 +417,10 @@ public partial record Moves
                     Metronome = true,
                 },
                 VolatileStatus = ConditionId.Disable,
+                Condition = _library.Conditions[ConditionId.Disable],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnTryHit = new OnTryHitEventInfo((_, target, _, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, _, _) =>
                 {
                     // Fails if target has no last move, or if last move is a Z-move, Max move, or Struggle
                     if (target.LastMove == null || target.LastMove.Id == MoveId.Struggle)
@@ -426,44 +469,6 @@ public partial record Moves
                 Target = MoveTarget.AllAdjacent,
                 Type = MoveType.Electric,
             },
-            [MoveId.DireClaw] = new()
-            {
-                Id = MoveId.DireClaw,
-                Num = 827,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Physical,
-                Name = "Dire Claw",
-                BasePp = 15,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 50,
-                    OnHit = (battle, target, source, _) =>
-                    {
-                        // Randomly inflict poison, paralysis, or sleep
-                        var result = battle.Random(3);
-                        if (result == 0)
-                        {
-                            target.TrySetStatus(ConditionId.Poison, source);
-                        }
-                        else if (result == 1)
-                        {
-                            target.TrySetStatus(ConditionId.Paralysis, source);
-                        }
-                        else
-                        {
-                            target.TrySetStatus(ConditionId.Sleep, source);
-                        }
-
-                        return new VoidReturn();
-                    },
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Poison,
-            },
             [MoveId.Dive] = new()
             {
                 Id = MoveId.Dive,
@@ -483,7 +488,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
                 Condition = _library.Conditions[ConditionId.Dive],
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already underwater (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Dive]))
@@ -491,11 +496,21 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    // Note: Cramorant Gulp Missile forme change is handled by the ability, not the move
+                    // Gulp Missile forme change for Cramorant
+                    if (attacker.HasAbility(AbilityId.GulpMissile) &&
+                        attacker.Species.Id == SpecieId.Cramorant &&
+                        !attacker.Transformed)
+                    {
+                        SpecieId forme = attacker.Hp <= attacker.MaxHp / 2
+                            ? SpecieId.CramorantGorging
+                            : SpecieId.CramorantGulping;
+                        attacker.FormeChange(forme, move);
+                    }
+
                     // Starting the charge turn - show prepare message
                     battle.Add("-prepare", attacker, move.Name);
                     // Run ChargeMove event (for Power Herb, etc.)
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -521,24 +536,26 @@ public partial record Moves
                 Flags = new MoveFlags(),
                 Target = MoveTarget.AdjacentFoe,
                 Type = MoveType.Normal,
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
                 {
                     bool? success = false;
-                    var targetAbility = target.GetAbility();
+                    Ability targetAbility = target.GetAbility();
 
                     // Check if target's ability can be role-played
                     if (targetAbility.Flags.FailRolePlay != true)
                     {
                         // Try to copy ability to user and all allies
-                        foreach (var pokemon in source.AlliesAndSelf())
+                        foreach (Pokemon pokemon in source.AlliesAndSelf())
                         {
                             // Skip if already has the same ability or ability can't be suppressed
                             if (pokemon.Ability == target.Ability) continue;
                             if (pokemon.GetAbility().Flags.CantSuppress == true) continue;
 
-                            var oldAbility =
+                            AbilityIdFalseUnion? oldAbility =
                                 pokemon.SetAbility(target.Ability, null, move);
-                            if (oldAbility is AbilityIdAbilityIdFalseUnion)
+                            // Check if ability was successfully changed (truthy check in TS)
+                            // oldAbility returns the old AbilityId if successful, false if failed, null if something else
+                            if (oldAbility is not (FalseAbilityIdFalseUnion or null))
                             {
                                 success = true;
                             }
@@ -576,13 +593,13 @@ public partial record Moves
                 Flags = new MoveFlags { Metronome = true, FutureMove = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
-                OnTry = new OnTryEventInfo((battle, source, target, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, target, _) =>
                 {
                     if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
                         return false;
 
                     // Store move data in slot condition state
-                    var slotCondition =
+                    EffectState slotCondition =
                         target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.DoomDesire;
                     slotCondition.Source = source;
@@ -664,8 +681,8 @@ public partial record Moves
 
                         if (battle.DisplayUi)
                         {
-                            var typeString = string.Join("/",
-                                source.GetTypes().Select(t => t.ToString()));
+                            string typeString = string.Join("/",
+                                source.GetTypes().Select(t => t.ConvertToString()));
                             battle.Add("-start", source, "typechange", typeString,
                                 "[from] move: Double Shock");
                         }
@@ -675,7 +692,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                OnTryMove = new OnTryMoveEventInfo((battle, _, source, _) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, source, _, _) =>
                 {
                     // Only works if user has Electric type
                     if (source.HasType(PokemonType.Electric))
@@ -837,10 +854,10 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dragon,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    var bp = move.BasePower * source.Hp / source.MaxHp;
+                    int bp = move.BasePower * source.Hp / source.MaxHp;
                     battle.Debug($"[Dragon Energy] BP: {bp}");
                     return bp;
                 }),
@@ -968,7 +985,7 @@ public partial record Moves
                 Drain = (1, 2),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
+                OnTryImmunity = OnTryImmunityEventInfo.Create((_, target, _, _) =>
                     target.Status == ConditionId.Sleep ||
                     target.HasAbility(AbilityId.Comatose)),
             },
@@ -1054,7 +1071,7 @@ public partial record Moves
                 Flags = new MoveFlags
                 {
                     Protect = true, FailEncore = true, NoSleepTalk = true, FailCopycat = true,
-                    FailMimic = true, FailInstruct = true,
+                    FailMimic = true, FailInstruct = true, NoParentalBond = true,
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
@@ -1080,104 +1097,6 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-            },
-            [MoveId.ElectroDrift] = new()
-            {
-                Id = MoveId.ElectroDrift,
-                Num = 879,
-                Accuracy = 100,
-                BasePower = 100,
-                Category = MoveCategory.Special,
-                Name = "Electro Drift",
-                BasePp = 5,
-                Priority = 0,
-                Flags = new MoveFlags()
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
-                {
-                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
-                    // Only apply buff when super effective (> 0)
-                    battle.Debug("electro drift super effective buff");
-                    return battle.ChainModify([5461, 4096]);
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Electric,
-            },
-            [MoveId.Facade] = new()
-            {
-                Id = MoveId.Facade,
-                Num = 263,
-                Accuracy = 100,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Facade",
-                BasePp = 20,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
-                {
-                    if (pokemon.Status is not ConditionId.None &&
-                        pokemon.Status != ConditionId.Sleep)
-                    {
-                        battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
-                        battle.ChainModify(2);
-                    }
-
-                    return new VoidReturn();
-                }),
-                Secondary = null,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-            },
-            [MoveId.FakeOut] = new()
-            {
-                Id = MoveId.FakeOut,
-                Num = 252,
-                Accuracy = 100,
-                BasePower = 40,
-                Category = MoveCategory.Physical,
-                Name = "Fake Out",
-                BasePp = 10,
-                Priority = 3,
-                Flags = new MoveFlags
-                {
-                    Contact = true,
-                    Protect = true,
-                    Mirror = true,
-                    Metronome = true,
-                },
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
-                {
-                    if (source.ActiveMoveActions > 1)
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Hint("Fake Out only works on your first turn out.");
-                        }
-
-                        return false;
-                    }
-
-                    return new VoidReturn();
-                }),
-                Secondary = new SecondaryEffect
-                {
-                    Chance = 100,
-                    VolatileStatus = ConditionId.Flinch,
-                },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
             },
             [MoveId.EarthPower] = new()
             {
@@ -1230,25 +1149,25 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnTryMove = new OnTryMoveEventInfo((battle, _, _, _) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, _, _, _) =>
                 {
                     // Add the pseudo-weather to track consecutive uses
                     battle.Field.AddPseudoWeather(ConditionId.EchoedVoice);
                     return new VoidReturn();
                 }),
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, _, move) =>
                 {
-                    var bp = move.BasePower;
-                    var echoedVoiceState =
+                    int bp = move.BasePower;
+                    EffectState? echoedVoiceState =
                         battle.Field.PseudoWeather.GetValueOrDefault(ConditionId.EchoedVoice);
                     if (echoedVoiceState != null)
                     {
                         // Multiplier is stored in the pseudo-weather state
-                        var multiplier = echoedVoiceState.Multiplier ?? 1;
+                        int multiplier = echoedVoiceState.Multiplier ?? 1;
                         bp = move.BasePower * multiplier;
                     }
 
-                    battle.Debug($"BP: {bp}");
+                    battle.Debug($"BP: {move.BasePower}");
                     return bp;
                 }),
             },
@@ -1291,12 +1210,11 @@ public partial record Moves
                         if (target.Hp <= 0) return new VoidReturn();
 
                         // Get target's last move
-                        var lastMove = target.LastMove;
-                        if (lastMove == null || lastMove.Id == MoveId.Struggle)
-                            return new VoidReturn();
+                        Move? lastMove = target.LastMove;
+                        if (lastMove == null) return new VoidReturn();
 
                         // Deduct 3 PP from the last move
-                        var ppDeducted = target.DeductPp(lastMove.Id, 3);
+                        int ppDeducted = target.DeductPp(lastMove.Id, 3);
 
                         if (ppDeducted > 0 && battle.DisplayUi)
                         {
@@ -1309,45 +1227,6 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-            },
-            [MoveId.ElectroBall] = new()
-            {
-                Id = MoveId.ElectroBall,
-                Num = 486,
-                Accuracy = 100,
-                BasePower = 0,
-                Category = MoveCategory.Special,
-                Name = "Electro Ball",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                    { Protect = true, Mirror = true, Metronome = true, Bullet = true },
-                Target = MoveTarget.Normal,
-                Type = MoveType.Electric,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, target, _) =>
-                {
-                    // Base power varies based on speed ratio
-                    var targetSpeed = target.GetStat(StatIdExceptHp.Spe);
-                    var ratio = targetSpeed > 0
-                        ? source.GetStat(StatIdExceptHp.Spe) / targetSpeed
-                        : 0;
-
-                    // Clamp ratio to max of 4
-                    if (ratio > 4) ratio = 4;
-
-                    // BP values: [40, 60, 80, 120, 150] for ratios [0, 1, 2, 3, 4+]
-                    var bp = ratio switch
-                    {
-                        0 => 40,
-                        1 => 60,
-                        2 => 80,
-                        3 => 120,
-                        _ => 150,
-                    };
-
-                    battle.Debug($"[Electro Ball] BP: {bp}");
-                    return bp;
-                }),
             },
             [MoveId.ElectricTerrain] = new()
             {
@@ -1365,6 +1244,72 @@ public partial record Moves
                 Target = MoveTarget.All,
                 Type = MoveType.Electric,
             },
+            [MoveId.ElectroBall] = new()
+            {
+                Id = MoveId.ElectroBall,
+                Num = 486,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Special,
+                Name = "Electro Ball",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                    { Protect = true, Mirror = true, Metronome = true, Bullet = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, target, _) =>
+                {
+                    // Base power varies based on speed ratio
+                    int targetSpeed = target.GetStat(StatIdExceptHp.Spe);
+                    int ratio = targetSpeed > 0
+                        ? source.GetStat(StatIdExceptHp.Spe) / targetSpeed
+                        : 0;
+
+                    // Clamp ratio to max of 4
+                    if (ratio > 4) ratio = 4;
+
+                    // BP values: [40, 60, 80, 120, 150] for ratios [0, 1, 2, 3, 4+]
+                    int bp = ratio switch
+                    {
+                        0 => 40,
+                        1 => 60,
+                        2 => 80,
+                        3 => 120,
+                        _ => 150,
+                    };
+
+                    battle.Debug($"[Electro Ball] BP: {bp}");
+                    return bp;
+                }),
+            },
+            [MoveId.ElectroDrift] = new()
+            {
+                Id = MoveId.ElectroDrift,
+                Num = 879,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Special,
+                Name = "Electro Drift",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags()
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                },
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, target, move) =>
+                {
+                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
+                    // Only apply buff when super effective (> 0)
+                    battle.Debug("electro drift super effective buff");
+                    return battle.ChainModify([5461, 4096]);
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
             [MoveId.ElectroShot] = new()
             {
                 Id = MoveId.ElectroShot,
@@ -1380,7 +1325,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
                 HasSheerForce = true,
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already charged (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.ElectroShot]))
@@ -1393,7 +1338,7 @@ public partial record Moves
                     // Boost SpA by 1 during charge
                     battle.Boost(new SparseBoostsTable { SpA = 1 }, attacker, attacker, move);
                     // Check if rain allows skipping the charge turn
-                    var weather = attacker.EffectiveWeather();
+                    ConditionId weather = attacker.EffectiveWeather();
                     if (weather == ConditionId.RainDance || weather == ConditionId.PrimordialSea)
                     {
                         // Skip charge turn in rain - execute immediately
@@ -1404,7 +1349,7 @@ public partial record Moves
                     }
 
                     // Run ChargeMove event (for Power Herb, etc.)
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -1492,9 +1437,9 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
                 DamageCallback =
-                    new DamageCallbackEventInfo((_, source, target, _) => target.Hp - source.Hp),
+                    DamageCallbackEventInfo.Create((_, source, target, _) => target.Hp - source.Hp),
                 OnTryImmunity =
-                    new OnTryImmunityEventInfo((_, target, source, _) => source.Hp < target.Hp),
+                    OnTryImmunityEventInfo.Create((_, target, source, _) => source.Hp < target.Hp),
             },
             [MoveId.Endure] = new()
             {
@@ -1511,16 +1456,16 @@ public partial record Moves
                 VolatileStatus = ConditionId.Endure,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // Check if queue will act and run StallMove event
-                    var willAct = battle.Queue.WillAct() is not null;
-                    var stallResult = battle.RunEvent(EventId.StallMove, source);
-                    var stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    var result = willAct && stallSuccess;
+                    bool willAct = battle.Queue.WillAct() is not null;
+                    RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
+                    bool stallSuccess = stallResult is BoolRelayVar { Value: true };
+                    bool result = willAct && stallSuccess;
                     return result ? true : (BoolEmptyVoidUnion)false;
                 }),
-                OnHit = new OnHitEventInfo((_, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
                     // Add Stall volatile to track consecutive uses
                     source.AddVolatile(ConditionId.Stall);
@@ -1564,7 +1509,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnTryHit = new OnTryHitEventInfo((_, target, source, _) =>
+                OnTryHit = OnTryHitEventInfo.Create((_, target, source, _) =>
                 {
                     // Fails if targeting self (Dynamax check skipped - not in Gen 9 VGC)
                     if (target == source) return false;
@@ -1573,7 +1518,7 @@ public partial record Moves
                     if (target.Ability == source.Ability) return false;
 
                     // Fails if target's ability can't be suppressed or is Truant
-                    var targetAbility = target.GetAbility();
+                    Ability targetAbility = target.GetAbility();
                     if (targetAbility.Flags.CantSuppress == true ||
                         target.Ability == AbilityId.Truant)
                     {
@@ -1581,16 +1526,19 @@ public partial record Moves
                     }
 
                     // Fails if source's ability can't be entrained
-                    var sourceAbility = source.GetAbility();
+                    Ability sourceAbility = source.GetAbility();
                     if (sourceAbility.Flags.NoEntrain == true) return false;
 
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((_, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, target, source, _) =>
                 {
                     // Set target's ability to source's ability
-                    var oldAbility = target.SetAbility(source.Ability, source);
-                    if (oldAbility is FalseAbilityIdFalseUnion or null) return false;
+                    AbilityIdFalseUnion? oldAbility = target.SetAbility(source.Ability, source);
+                    // TS: if (!oldAbility) return oldAbility as false | null;
+                    // Preserve the distinction: false = fail, null = silent fail
+                    if (oldAbility is null) return null;
+                    if (oldAbility is FalseAbilityIdFalseUnion) return false;
 
                     // Mark staleness if targeting opponent
                     if (!target.IsAlly(source))
@@ -1614,10 +1562,10 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Fire,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    var bp = move.BasePower * source.Hp / source.MaxHp;
+                    int bp = move.BasePower * source.Hp / source.MaxHp;
                     battle.Debug($"[Eruption] BP: {bp}");
                     return bp;
                 }),
@@ -1658,7 +1606,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, source, _, _) =>
                 {
                     // 1.5x base power in Psychic Terrain if user is grounded
                     if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, source) &&
@@ -1670,7 +1618,7 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, source, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, source, _) =>
                 {
                     // Change target to hit all adjacent foes in Psychic Terrain if user is grounded
                     if (battle.Field.IsTerrain(ConditionId.PsychicTerrain, source) &&
@@ -1727,6 +1675,77 @@ public partial record Moves
                 Priority = 2,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Facade] = new()
+            {
+                Id = MoveId.Facade,
+                Num = 263,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Facade",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, pokemon, _, _) =>
+                {
+                    if (pokemon.Status is not ConditionId.None &&
+                        pokemon.Status != ConditionId.Sleep)
+                    {
+                        battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
+                        return battle.ChainModify(2);
+                    }
+
+                    return new VoidReturn();
+                }),
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.FakeOut] = new()
+            {
+                Id = MoveId.FakeOut,
+                Num = 252,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "Fake Out",
+                BasePp = 10,
+                Priority = 3,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnTry = OnTryEventInfo.Create((battle, source, _, _) =>
+                {
+                    if (source.ActiveMoveActions > 1)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Hint("Fake Out only works on your first turn out.");
+                        }
+
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    VolatileStatus = ConditionId.Flinch,
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -1807,7 +1826,7 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                OnDamage = new OnDamageEventInfo((_, damage, target, _, _) =>
+                OnDamage = OnDamageEventInfo.Create((_, damage, target, _, _) =>
                 {
                     // Prevent KO - always leave target with at least 1 HP
                     if (damage >= target.Hp)
@@ -1868,7 +1887,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
                 OnAfterMoveSecondarySelf =
-                    new OnAfterMoveSecondarySelfEventInfo((battle, source, target, move) =>
+                    OnAfterMoveSecondarySelfEventInfo.Create((battle, source, target, move) =>
                     {
                         if (target == null || target.Fainted || target.Hp <= 0)
                         {
@@ -1891,7 +1910,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, pokemon, _, _) =>
                 {
                     // 30% chance to double base power
                     if (battle.RandomChance(3, 10))
@@ -1964,7 +1983,7 @@ public partial record Moves
                 Boosts = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
-                OnTry = new OnTryEventInfo((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, source, _, _) =>
                 {
                     // Fail if HP is less than or equal to half of max HP, or if max HP is 1
                     if (source.Hp <= source.MaxHp / 2 || source.MaxHp == 1)
@@ -1974,13 +1993,13 @@ public partial record Moves
 
                     return new VoidReturn();
                 }),
-                OnTryHit = new OnTryHitEventInfo((battle, _, _, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, _, _, move) =>
                 {
                     // TS uses ! to assert non-null Boosts. Check here to avoid exception.
                     if (move.Boosts is null) throw new ArgumentNullException(nameof(move.Boosts));
 
                     // Try to apply boosts; if boost fails, return null (silent fail)
-                    var result = battle.Boost(move.Boosts);
+                    BoolZeroUnion? result = battle.Boost(move.Boosts);
                     if (result?.IsTruthy() != true)
                     {
                         return null;
@@ -1990,7 +2009,7 @@ public partial record Moves
                     move.Boosts = null;
                     return new VoidReturn();
                 }),
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Deal direct damage equal to half of max HP
                     battle.DirectDamage(target.MaxHp / 2, target);
@@ -2011,7 +2030,12 @@ public partial record Moves
                 SelfDestruct = MoveSelfDestruct.FromIfHit(),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-                DamageCallback = new DamageCallbackEventInfo((_, source, _, _) => source.Hp),
+                DamageCallback = DamageCallbackEventInfo.Create((_, source, _, _) =>
+                {
+                    int damage = source.Hp;
+                    source.Faint();
+                    return damage;
+                }),
             },
             [MoveId.FireBlast] = new()
             {
@@ -2074,6 +2098,97 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
+            [MoveId.FirePledge] = new()
+            {
+                Id = MoveId.FirePledge,
+                Num = 519,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Fire Pledge",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true, Mirror = true, NonSky = true, Metronome = true,
+                    PledgeCombo = true,
+                },
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, _, _, move) =>
+                {
+                    // Check if this is being called as part of a pledge combo
+                    if (move.SourceEffect is MoveEffectStateId
+                        {
+                            MoveId: MoveId.GrassPledge or MoveId.WaterPledge
+                        })
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-combine");
+                        }
+
+                        return 150;
+                    }
+
+                    return move.BasePower;
+                }),
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
+                {
+                    // Check the battle queue for ally Pok�mon using Grass Pledge or Water Pledge
+                    if (battle.Queue.List != null)
+                    {
+                        foreach (IAction action in battle.Queue.List)
+                        {
+                            if (action is not MoveAction moveAction ||
+                                moveAction.Move == null ||
+                                moveAction.Pokemon?.IsActive != true ||
+                                moveAction.Pokemon.Fainted)
+                            {
+                                continue;
+                            }
+
+                            // Check if it's an ally using Grass Pledge or Water Pledge
+                            if (moveAction.Pokemon.IsAlly(source) &&
+                                moveAction.Move.Id is MoveId.GrassPledge or MoveId.WaterPledge)
+                            {
+                                battle.Queue.PrioritizeAction(moveAction, move);
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-waiting", source, moveAction.Pokemon);
+                                }
+
+                                return null;
+                            }
+                        }
+                    }
+
+                    return new VoidReturn();
+                }),
+                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) =>
+                {
+                    // Check if this move is being modified by a pledge combo
+                    if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.WaterPledge })
+                    {
+                        // Water Pledge + Fire Pledge = Water-type move with Water Pledge side condition (rainbow)
+                        // Rainbow applies to USER's side (doubles secondary effect chances)
+                        move.Type = MoveType.Water;
+                        move.ForceStab = true;
+                        move.Self = new SecondaryEffect
+                        {
+                            SideCondition = ConditionId.WaterPledge, // Applies to user side via Self
+                        };
+                    }
+                    else if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.GrassPledge })
+                    {
+                        // Grass Pledge + Fire Pledge = Fire-type move with Fire Pledge side condition (sea of fire)
+                        // Sea of fire applies to target's side (damages non-Fire types)
+                        move.Type = MoveType.Fire;
+                        move.ForceStab = true;
+                        move.SideCondition = ConditionId.FirePledge; // Applies to target side
+                    }
+                }),
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
             [MoveId.FirePunch] = new()
             {
                 Id = MoveId.FirePunch,
@@ -2111,97 +2226,6 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
-            [MoveId.FirePledge] = new()
-            {
-                Id = MoveId.FirePledge,
-                Num = 519,
-                Accuracy = 100,
-                BasePower = 80,
-                Category = MoveCategory.Special,
-                Name = "Fire Pledge",
-                BasePp = 10,
-                Priority = 0,
-                Flags = new MoveFlags
-                {
-                    Protect = true, Mirror = true, NonSky = true, Metronome = true,
-                    PledgeCombo = true,
-                },
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, _, move) =>
-                {
-                    // Check if this is being called as part of a pledge combo
-                    if (move.SourceEffect is MoveEffectStateId
-                        {
-                            MoveId: MoveId.GrassPledge or MoveId.WaterPledge
-                        })
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-combine");
-                        }
-
-                        return 150;
-                    }
-
-                    return move.BasePower;
-                }),
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, move) =>
-                {
-                    // Check the battle queue for ally Pokémon using Grass Pledge or Water Pledge
-                    if (battle.Queue.List != null)
-                    {
-                        foreach (var action in battle.Queue.List)
-                        {
-                            if (action is not MoveAction moveAction ||
-                                moveAction.Move == null ||
-                                moveAction.Pokemon?.IsActive != true ||
-                                moveAction.Pokemon.Fainted)
-                            {
-                                continue;
-                            }
-
-                            // Check if it's an ally using Grass Pledge or Water Pledge
-                            if (moveAction.Pokemon.IsAlly(source) &&
-                                moveAction.Move.Id is MoveId.GrassPledge or MoveId.WaterPledge)
-                            {
-                                battle.Queue.PrioritizeAction(moveAction, move);
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Add("-waiting", source, moveAction.Pokemon);
-                                }
-
-                                return null;
-                            }
-                        }
-                    }
-
-                    return new VoidReturn();
-                }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
-                {
-                    // Check if this move is being modified by a pledge combo
-                    if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.WaterPledge })
-                    {
-                        // Water Pledge + Fire Pledge = Water-type move with Water Pledge side condition (rainbow)
-                        // Rainbow applies to USER's side (doubles secondary effect chances)
-                        move.Type = MoveType.Water;
-                        move.ForceStab = true;
-                        move.Self = new SecondaryEffect
-                        {
-                            SideCondition = ConditionId.WaterPledge, // Applies to user side via Self
-                        };
-                    }
-                    else if (move.SourceEffect is MoveEffectStateId { MoveId: MoveId.GrassPledge })
-                    {
-                        // Grass Pledge + Fire Pledge = Fire-type move with Fire Pledge side condition (sea of fire)
-                        // Sea of fire applies to target's side (damages non-Fire types)
-                        move.Type = MoveType.Fire;
-                        move.ForceStab = true;
-                        move.SideCondition = ConditionId.FirePledge; // Applies to target side
-                    }
-                }),
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fire,
-            },
             [MoveId.FirstImpression] = new()
             {
                 Id = MoveId.FirstImpression,
@@ -2216,7 +2240,7 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
-                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, _) =>
                 {
                     if (source.ActiveMoveActions > 1)
                     {
@@ -2261,9 +2285,9 @@ public partial record Moves
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, source, _, _) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, _) =>
                 {
-                    var ratio = Math.Max(source.Hp * 48 / source.MaxHp, 1);
+                    int ratio = Math.Max(source.Hp * 48 / source.MaxHp, 1);
                     int bp;
                     if (ratio < 2)
                     {
@@ -2455,6 +2479,95 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
+                Condition = _library.Conditions[ConditionId.Fling],
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
+                {
+                    // Fail if source is ignoring items (e.g., Klutz, Magic Room, Embargo)
+                    if (source.IgnoringItem(true)) return false;
+
+                    Item item = source.GetItem();
+
+                    // Run TakeItem event to check if item can be taken
+                    RelayVar? takeItemResult = battle.SingleEvent(EventId.TakeItem, item, source.ItemState,
+                        source, source, move, item);
+                    if (takeItemResult is BoolRelayVar { Value: false }) return false;
+
+                    // Check if item has fling data
+                    if (item.Fling == null) return false;
+
+                    // Set base power from item
+                    move.BasePower = item.Fling.BasePower;
+                    battle.Debug($"BP: {move.BasePower}");
+
+                    // Handle berry items
+                    if (item.IsBerry)
+                    {
+                        // Trigger Cud Chew ability if source has it
+                        if (source.HasAbility(AbilityId.CudChew))
+                        {
+                            battle.SingleEvent(EventId.EatItem, source.GetAbility(),
+                                source.AbilityState, source, source, move, item);
+                        }
+
+                        // Set OnHit to make target eat the berry
+                        move.OnHit = OnHitEventInfo.Create((innerBattle, foe, innerSource, innerMove) =>
+                        {
+                            RelayVar? eatResult = innerBattle.SingleEvent(EventId.Eat, item,
+                                innerSource.ItemState, foe, innerSource, innerMove);
+                            if (eatResult is not BoolRelayVar { Value: false })
+                            {
+                                innerBattle.RunEvent(EventId.EatItem, foe, innerSource, innerMove, item);
+                                // Leppa Berry marks external staleness
+                                if (item.Id == ItemId.LeppaBerry)
+                                {
+                                    foe.Staleness = StalenessId.External;
+                                }
+                            }
+
+                            // Mark that berry was eaten if item has OnEat
+                            if (item.OnEat != null)
+                            {
+                                foe.AteBerry = true;
+                            }
+
+                            return new VoidReturn();
+                        });
+                    }
+                    // Handle items with custom fling effects
+                    else if (item.Fling.Effect != null)
+                    {
+                        // Wrap the ResultMoveHandler in OnHitEventInfo
+                        ResultMoveHandler? effectHandler = item.Fling.Effect;
+                        move.OnHit = OnHitEventInfo.Create((b, t, s, m) => effectHandler(b, t, s, m));
+                    }
+                    // Handle items with status/volatile status effects
+                    else
+                    {
+                        // Initialize secondaries array if needed
+                        move.Secondaries ??= [];
+
+                        // Add status effect if specified
+                        if (item.Fling.Status != null)
+                        {
+                            var secondaries = move.Secondaries.ToList();
+                            secondaries.Add(new SecondaryEffect { Status = item.Fling.Status.Value });
+                            move.Secondaries = [.. secondaries];
+                        }
+                        // Add volatile status effect if specified
+                        else if (item.Fling.VolatileStatus != null)
+                        {
+                            var secondaries = move.Secondaries.ToList();
+                            secondaries.Add(new SecondaryEffect
+                                { VolatileStatus = item.Fling.VolatileStatus.Value });
+                            move.Secondaries = [.. secondaries];
+                        }
+                    }
+
+                    // Add Fling volatile to trigger item removal in condition
+                    source.AddVolatile(ConditionId.Fling);
+
+                    return new VoidReturn();
+                }),
             },
             [MoveId.FlipTurn] = new()
             {
@@ -2489,7 +2602,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
-                OnHit = new OnHitEventInfo((battle, target, source, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     int healAmount;
                     // Check if Grassy Terrain is active
@@ -2504,7 +2617,7 @@ public partial record Moves
                         healAmount = (int)Math.Ceiling(target.BaseMaxHp * 0.5);
                     }
 
-                    var result = battle.Heal(healAmount, target);
+                    IntFalseUnion result = battle.Heal(healAmount, target);
 
                     // Mark as externally influenced if healing opponent
                     if (result is not FalseIntFalseUnion && !target.IsAlly(source))
@@ -2520,7 +2633,7 @@ public partial record Moves
                             battle.Add("-fail", target, "heal");
                         }
 
-                        return false;
+                        return new Empty(); // NOT_FAIL
                     }
 
                     return new VoidReturn();
@@ -2560,7 +2673,7 @@ public partial record Moves
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
                 Condition = _library.Conditions[ConditionId.Fly],
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already in the air (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.Fly]))
@@ -2571,7 +2684,7 @@ public partial record Moves
                     // Starting the charge turn - show prepare message
                     battle.Add("-prepare", attacker, move.Name);
                     // Run ChargeMove event (for Power Herb, etc.)
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -2603,7 +2716,7 @@ public partial record Moves
                 Type = MoveType.Fighting,
                 // Flying Press deals Fighting + Flying type damage
                 // GetEffectiveness returns MoveEffectiveness enum which converts to int
-                OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, _, type, _) =>
+                OnEffectiveness = OnEffectivenessEventInfo.Create((battle, typeMod, _, type, _) =>
                     typeMod + (int)battle.Dex.GetEffectiveness(MoveType.Flying, type)),
             },
             [MoveId.FocusBlast] = new()
@@ -2659,13 +2772,13 @@ public partial record Moves
                 Condition = _library.Conditions[ConditionId.FocusPunch],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-                PriorityChargeCallback = new PriorityChargeCallbackEventInfo((_, pokemon) =>
+                PriorityChargeCallback = PriorityChargeCallbackEventInfo.Create((_, pokemon) =>
                 {
                     pokemon.AddVolatile(ConditionId.FocusPunch);
                 }),
-                BeforeMoveCallback = new BeforeMoveCallbackEventInfo((battle, pokemon, _, _) =>
+                BeforeMoveCallback = BeforeMoveCallbackEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.FocusPunch, out var state) &&
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.FocusPunch, out EffectState? state) &&
                         state.LostFocus == true)
                     {
                         if (battle.DisplayUi)
@@ -2694,7 +2807,7 @@ public partial record Moves
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
                 // Follow Me fails in singles (only works in doubles/triples)
-                OnTry = new OnTryEventInfo((battle, _, _, _) => battle.ActivePerHalf > 1 ? new VoidReturn() : false),
+                OnTry = OnTryEventInfo.Create((battle, _, _, _) => battle.ActivePerHalf > 1 ? new VoidReturn() : false),
             },
             [MoveId.ForcePalm] = new()
             {
@@ -2733,7 +2846,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
-                OnHit = new OnHitEventInfo((battle, target, _, _) =>
+                OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     // Fail if target already has Grass type
                     if (target.HasType(PokemonType.Grass)) return false;
@@ -2760,7 +2873,6 @@ public partial record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                     { Contact = true, Protect = true, Mirror = true, Metronome = true },
-                OverrideOffensiveStat = StatIdExceptHp.Atk,
                 OverrideOffensivePokemon = MoveOverridePokemon.Target,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
@@ -2783,7 +2895,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
-                OnEffectiveness = new OnEffectivenessEventInfo((_, _, _, type, _) =>
+                OnEffectiveness = OnEffectivenessEventInfo.Create((_, _, _, type, _) =>
                 {
                     // Freeze-Dry is super effective against Water types
                     if (type == PokemonType.Water) return 1;
@@ -2812,7 +2924,8 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
-                OnTryMove = new OnTryMoveEventInfo((battle, attacker, defender, move) =>
+                Condition = _library.Conditions[ConditionId.FreezeShock],
+                OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
                     // If already charged (volatile exists), remove it and execute the attack
                     if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.FreezeShock]))
@@ -2823,7 +2936,7 @@ public partial record Moves
                     // Starting the charge turn - show prepare message
                     battle.Add("-prepare", attacker, move.Name);
                     // Run ChargeMove event (for Power Herb, etc.)
-                    var chargeResult =
+                    RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
                     if (chargeResult is BoolRelayVar { Value: false })
                     {
@@ -2924,7 +3037,7 @@ public partial record Moves
                 Condition = _library.Conditions[ConditionId.FuryCutter],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
-                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, _, move) =>
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, pokemon, _, move) =>
                 {
                     // Add volatile on first hit or if volatile doesn't exist
                     if (!pokemon.Volatiles.ContainsKey(ConditionId.FuryCutter) || move.Hit == 1)
@@ -2934,13 +3047,13 @@ public partial record Moves
 
                     // Get multiplier from volatile state (defaults to 1)
                     var multiplier = 1;
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.FuryCutter, out var state))
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.FuryCutter, out EffectState? state))
                     {
                         multiplier = state.Multiplier ?? 1;
                     }
 
                     // Calculate BP, clamped between 1 and 160
-                    var bp = Math.Clamp(move.BasePower * multiplier, 1, 160);
+                    int bp = Math.Clamp(move.BasePower * multiplier, 1, 160);
                     battle.Debug($"BP: {bp}");
                     return bp;
                 }),
@@ -2974,7 +3087,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, _) =>
                 {
                     // Double base power if Fusion Flare was used successfully this turn
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionFlare)
@@ -2999,7 +3112,7 @@ public partial record Moves
                 Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true, Metronome = true },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
-                OnBasePower = new OnBasePowerEventInfo((battle, _, _, _, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, _) =>
                 {
                     // Double base power if Fusion Bolt was used successfully this turn
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionBolt)
@@ -3025,19 +3138,23 @@ public partial record Moves
                 IgnoreImmunity = true, // For setup phase - actual hit respects immunity
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
-                OnTry = new OnTryEventInfo((battle, source, target, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, target, _) =>
                 {
                     if (!target.Side.AddSlotCondition(target, ConditionId.FutureMove))
                         return false;
 
                     // Store move data in slot condition state
-                    var slotCondition =
+                    // Note: Store with IgnoreImmunity = false to match TS (actual hit respects immunity)
+                    EffectState slotCondition =
                         target.Side.SlotConditions[target.Position][ConditionId.FutureMove];
                     slotCondition.Move = MoveId.FutureSight;
                     slotCondition.Source = source;
-                    slotCondition.MoveData = battle.Library.Moves[MoveId.FutureSight];
+                    slotCondition.MoveData = battle.Library.Moves[MoveId.FutureSight] with
+                    {
+                        IgnoreImmunity = false,
+                    };
 
-                    battle.Add("-start", source, "Future Sight");
+                    battle.Add("-start", source, "move: Future Sight");
                     return new Empty();
                 }),
             },

@@ -9,24 +9,39 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeResidualEventInfo : EventHandlerInfo
 {
- public OnFoeResidualEventInfo(
-      Action<Battle, Pokemon> handler,
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// </summary>
+    public OnFoeResidualEventInfo(
+        EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
-   Id = EventId.Residual;
-   Prefix = EventPrefix.Foe;
-        Handler = handler;
-    Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+        Id = EventId.Residual;
+        Prefix = EventPrefix.Foe;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFoeResidualEventInfo Create(
+        Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFoeResidualEventInfo(
+                        context =>
+            {
+                handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon()
+                );
+                return null;
+            },
+            priority,
+            usesSpeed
+        );
     }
 }

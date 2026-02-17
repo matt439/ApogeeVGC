@@ -568,8 +568,7 @@ public partial class Battle
                     btmAction.Move.BeforeTurnCallback,
                     this,
                     btmAction.Pokemon,
-                    target,
-                    btmAction.Move.ToActiveMove());
+                    target);
                 break;
             }
 
@@ -717,7 +716,10 @@ public partial class Battle
         // Phazing (Roar, etc)
         foreach (Side side in Sides)
         {
-            foreach (Pokemon? pokemon in side.Active)
+            // Create snapshot to avoid collection modification during enumeration
+            // (DragIn can modify side.Active by calling SwitchIn)
+            Pokemon?[] activeSnapshot = [.. side.Active];
+            foreach (Pokemon? pokemon in activeSnapshot)
             {
                 if (pokemon == null) continue;
 
@@ -738,7 +740,9 @@ public partial class Battle
         // Cancel queued actions for all fainted Pokemon
         foreach (Side side in Sides)
         {
-            foreach (Pokemon? pokemon in side.Active)
+            // Create snapshot to avoid collection modification during enumeration
+            Pokemon?[] activeSnapshot = [.. side.Active];
+            foreach (Pokemon? pokemon in activeSnapshot)
             {
                 if (pokemon?.Fainted == true)
                 {
@@ -789,7 +793,9 @@ public partial class Battle
             bool reviveSwitch = false;
             if (switches[i] && CanSwitch(Sides[i]) == 0)
             {
-                foreach (Pokemon? pokemon in Sides[i].Active)
+                // Create snapshot to avoid collection modification during enumeration
+                Pokemon?[] activeSnapshot = [.. Sides[i].Active];
+                foreach (Pokemon? pokemon in activeSnapshot)
                 {
                     if (pokemon == null) continue;
 
@@ -821,7 +827,9 @@ public partial class Battle
             }
             else if (switches[i])
             {
-                foreach (Pokemon? pokemon in Sides[i].Active)
+                // Create snapshot to avoid collection modification during enumeration
+                Pokemon?[] activeSnapshot = [.. Sides[i].Active];
+                foreach (Pokemon? pokemon in activeSnapshot)
                 {
                     if (pokemon == null) continue;
 

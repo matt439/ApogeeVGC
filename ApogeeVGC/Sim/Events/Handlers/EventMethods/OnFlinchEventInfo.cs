@@ -11,34 +11,40 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
 {
-    /// <summary>
-    /// Creates a new OnFlinch event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnFlinchEventInfo(
-        OnFlinch unionValue,
+        EventHandlerDelegate contextHandler,
         int? priority = null,
-     bool usesSpeed = true)
+        bool usesSpeed = true)
     {
         Id = EventId.Flinch;
-        UnionValue = unionValue;
-        Handler = ExtractDelegate();
+        ContextHandler = contextHandler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-   ExpectedParameterTypes =
- [
-      typeof(Battle),
-  typeof(Pokemon),
-     ];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+    }
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// </summary>
+    public static OnFlinchEventInfo Create(
+        Func<Battle, Pokemon, BoolVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        return new OnFlinchEventInfo(
+                        context =>
+            {
+                var result = handler(
+                    context.Battle,
+                context.GetTargetOrSourcePokemon()
+                );
+                return result switch
+                {
+                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    VoidBoolVoidUnion => null,
+                    _ => null
+                };
+            },
+            priority,
+            usesSpeed
+        );
     }
 }
