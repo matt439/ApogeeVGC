@@ -423,9 +423,9 @@
 
 ^ review items PsychicSeed to RazorClaw
 
-@ review items RazorFang to RoomService
+^ review items RazorFang to RoomService
 
-review items RoseliBerry to RustedSword
+^ review items RoseliBerry to RustedSword
 
 ## ItemsSTU
 
