@@ -19,6 +19,7 @@ public sealed record OnResidualEventInfo : EventHandlerInfo
     /// <summary>
     /// Creates event handler using legacy strongly-typed pattern.
     /// </summary>
+    [Obsolete("Use Create factory method instead.")]
     public OnResidualEventInfo(
         Action<Battle, Pokemon, Pokemon, IEffect> handler,
         int? priority = null,
@@ -27,7 +28,9 @@ public sealed record OnResidualEventInfo : EventHandlerInfo
         bool usesSpeed = true)
     {
         Id = EventId.Residual;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Priority = priority;
         Order = order;
         SubOrder = subOrder;

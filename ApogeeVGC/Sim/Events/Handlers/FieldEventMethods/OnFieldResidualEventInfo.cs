@@ -20,6 +20,7 @@ public sealed record OnFieldResidualEventInfo : EventHandlerInfo
     /// <param name="order">Execution order value</param>
     /// <param name="subOrder">Execution sub-order value</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnFieldResidualEventInfo(
      Action<Battle, Field, Pokemon, IEffect> handler,
  int? priority = null,
@@ -29,7 +30,9 @@ public sealed record OnFieldResidualEventInfo : EventHandlerInfo
     {
    Id = EventId.FieldResidual;
         Prefix = EventPrefix.None;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
   Priority = priority;
         Order = order;
         SubOrder = subOrder;

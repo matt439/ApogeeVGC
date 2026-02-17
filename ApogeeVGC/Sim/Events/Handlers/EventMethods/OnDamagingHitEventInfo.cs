@@ -21,13 +21,16 @@ public sealed record OnDamagingHitEventInfo : EventHandlerInfo
     /// <param name="handler">The event handler delegate</param>
     /// <param name="order">Execution order (lower executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnDamagingHitEventInfo(
         Action<Battle, int, Pokemon, Pokemon, ActiveMove> handler,
         int? order = null,
         bool usesSpeed = true)
     {
         Id = EventId.DamagingHit;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Order = order;
     UsesSpeed = usesSpeed;
         ExpectedParameterTypes =

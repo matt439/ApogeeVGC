@@ -12,6 +12,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 /// </summary>
 public sealed record BeforeMoveCallbackEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public BeforeMoveCallbackEventInfo(
         Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion> handler,
         int? priority = null,
@@ -19,7 +20,9 @@ public sealed record BeforeMoveCallbackEventInfo : EventHandlerInfo
     {
         Id = EventId.BeforeMoveCallback;
         Prefix = EventPrefix.None;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
     Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];

@@ -11,6 +11,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeTryPrimaryHitEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnFoeTryPrimaryHitEventInfo(
         Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
         int? priority = null,
@@ -18,7 +19,9 @@ public sealed record OnFoeTryPrimaryHitEventInfo : EventHandlerInfo
     {
         Id = EventId.TryPrimaryHit;
         Prefix = EventPrefix.Foe;
+   #pragma warning disable CS0618
    Handler = handler;
+   #pragma warning restore CS0618
         Priority = priority;
     UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];

@@ -853,7 +853,9 @@ public partial class BattleActions
                 SpreadMoveTargets.FromPokemonList(targetsCopy),
                 pokemon,
                 move,
+#pragma warning disable CS0618 // Handler is obsolete but still needed for HitEffect legacy path
                 new HitEffect { OnHit = move.OnHit?.Handler as ResultMoveHandler });
+#pragma warning restore CS0618
 
             // When Dragon Darts targets two different pokemon, targetsCopy is a length 1 array each hit
             // so spreadMoveHit returns a length 1 damage array

@@ -5,6 +5,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 public sealed record OnAnyAfterTerastallizationEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnAnyAfterTerastallizationEventInfo(
    Action<Battle, Pokemon> handler,
    int? priority = null,
@@ -12,7 +13,9 @@ bool usesSpeed = true)
     {
  Id = EventId.AfterTerastallization;
         Prefix = EventPrefix.Any;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
   Priority = priority;
    UsesSpeed = usesSpeed;
    ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];

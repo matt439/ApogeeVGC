@@ -17,6 +17,7 @@ public sealed record OnAnyNegateImmunityEventInfo : UnionEventHandlerInfo<OnNega
  /// <param name="unionValue">The union value (delegate or bool constant)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnAnyNegateImmunityEventInfo(
         OnNegateImmunity unionValue,
         int? priority = null,
@@ -25,7 +26,9 @@ public sealed record OnAnyNegateImmunityEventInfo : UnionEventHandlerInfo<OnNega
      Id = EventId.NegateImmunity;
         Prefix = EventPrefix.Any;
   UnionValue = unionValue;
+        #pragma warning disable CS0618
         Handler = ExtractDelegate();
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(PokemonType)];

@@ -11,6 +11,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyDeductPpEventInfo : EventHandlerInfo
 {
+ [Obsolete("Use Create factory method instead.")]
  public OnAnyDeductPpEventInfo(
       Func<Battle, Pokemon, Pokemon, int> handler,
         int? priority = null,
@@ -18,7 +19,9 @@ public sealed record OnAnyDeductPpEventInfo : EventHandlerInfo
     {
    Id = EventId.DeductPp;
    Prefix = EventPrefix.Any;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
     Priority = priority;
   UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon)];

@@ -520,7 +520,9 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
+#pragma warning disable CS0618 // Constant-value union constructor
                 OnLockMove = new OnLockMoveEventInfo(MoveId.Recharge),
+#pragma warning restore CS0618
             },
             [ConditionId.NoRetreat] = new()
             {

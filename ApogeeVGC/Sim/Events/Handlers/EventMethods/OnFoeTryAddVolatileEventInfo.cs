@@ -12,6 +12,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeTryAddVolatileEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnFoeTryAddVolatileEventInfo(
         Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
         int? priority = null,
@@ -19,7 +20,9 @@ public sealed record OnFoeTryAddVolatileEventInfo : EventHandlerInfo
     {
         Id = EventId.TryAddVolatile;
         Prefix = EventPrefix.Foe;
+   #pragma warning disable CS0618
    Handler = handler;
+   #pragma warning restore CS0618
         Priority = priority;
     UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Condition), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];

@@ -18,6 +18,7 @@ public sealed record OnStartEventInfo : EventHandlerInfo
     /// <summary>
     /// Creates event handler using legacy strongly-typed pattern.
     /// </summary>
+    [Obsolete("Use Create factory method instead.")]
     public OnStartEventInfo(
         Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
         int? priority = null,
@@ -25,7 +26,9 @@ public sealed record OnStartEventInfo : EventHandlerInfo
     {
         Id = EventId.Start;
         Prefix = EventPrefix.None;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
       Priority = priority;
    UsesSpeed = usesSpeed;
         ExpectedParameterTypes =

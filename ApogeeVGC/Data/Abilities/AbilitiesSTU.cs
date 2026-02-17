@@ -459,7 +459,9 @@ public partial record Abilities
                 Num = 75,
                 Rating = 1.0,
                 Flags = new AbilityFlags { Breakable = true },
+#pragma warning disable CS0618 // Constant-value union constructor
                 OnCriticalHit = new OnCriticalHitEventInfo(false),
+#pragma warning restore CS0618
             },
             [AbilityId.ShieldDust] = new()
             {

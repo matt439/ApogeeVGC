@@ -26,6 +26,7 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
     /// <param name="handler">The event handler delegate (void return)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnModifyMoveEventInfo(
         Action<Battle, ActiveMove, Pokemon, Pokemon?> handler,
         int? priority = null,
@@ -40,7 +41,9 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
             return null;
         }
 
+        #pragma warning disable CS0618
         Handler = (Func<Battle, ActiveMove, Pokemon, Pokemon?, VoidFalseUnion?>)WrappedHandler;
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes =
@@ -66,13 +69,16 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
     /// <param name="handler">The event handler delegate</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnModifyMoveEventInfo(
         Func<Battle, ActiveMove, Pokemon, Pokemon?, VoidFalseUnion?> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.ModifyMove;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes =

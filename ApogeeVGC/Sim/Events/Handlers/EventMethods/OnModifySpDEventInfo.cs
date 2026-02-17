@@ -21,13 +21,16 @@ public sealed record OnModifySpDEventInfo : EventHandlerInfo
     /// <param name="handler">The event handler delegate</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnModifySpDEventInfo(
   Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
         int? priority = null,
   bool usesSpeed = true)
     {
         Id = EventId.ModifySpD;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Priority = priority;
  UsesSpeed = usesSpeed;
         ExpectedParameterTypes =

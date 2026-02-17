@@ -13,6 +13,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 /// </summary>
 public sealed record OnTryHitSideEventInfo : EventHandlerInfo
 {
+[Obsolete("Use Create factory method instead.")]
 public OnTryHitSideEventInfo(
         Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyVoidUnion?> handler,
         int? priority = null,
@@ -20,7 +21,9 @@ public OnTryHitSideEventInfo(
     {
     Id = EventId.TryHitSide;
         Prefix = EventPrefix.None;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Priority = priority;
       UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Side), typeof(Pokemon), typeof(ActiveMove)];

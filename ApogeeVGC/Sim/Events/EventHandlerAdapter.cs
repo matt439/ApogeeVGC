@@ -21,6 +21,7 @@ internal static class EventHandlerAdapter
     /// Converts a legacy delegate handler to a context-based handler.
     /// Uses reflection to map EventContext properties to delegate parameters.
     /// </summary>
+    [Obsolete("Legacy adapter. All handlers should use the static Create factory pattern.")]
     public static EventHandlerDelegate AdaptLegacyHandler(
         Delegate legacyHandler,
         EventHandlerInfo handlerInfo)

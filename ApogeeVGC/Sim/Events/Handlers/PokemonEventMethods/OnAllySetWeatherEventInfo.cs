@@ -12,6 +12,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllySetWeatherEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnAllySetWeatherEventInfo(
     Func<Battle, Pokemon, Pokemon, Condition, PokemonVoidUnion> handler,
         int? priority = null,
@@ -19,7 +20,9 @@ public sealed record OnAllySetWeatherEventInfo : EventHandlerInfo
     {
         Id = EventId.SetWeather;
   Prefix = EventPrefix.Ally;
+  #pragma warning disable CS0618
   Handler = handler;
+  #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(Condition)];

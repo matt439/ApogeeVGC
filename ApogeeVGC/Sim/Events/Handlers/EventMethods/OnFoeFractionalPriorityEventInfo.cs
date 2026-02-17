@@ -11,6 +11,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFractionalPriority>
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnFoeFractionalPriorityEventInfo(
         OnFractionalPriority unionValue,
         int? priority = null,
@@ -19,7 +20,9 @@ public sealed record OnFoeFractionalPriorityEventInfo : UnionEventHandlerInfo<On
         Id = EventId.FractionalPriority;
         Prefix = EventPrefix.Foe;
         UnionValue = unionValue;
+        #pragma warning disable CS0618
         Handler = ExtractDelegate();
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];

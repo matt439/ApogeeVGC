@@ -20,6 +20,7 @@ public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
     /// <param name="unionValue">The union value (delegate or bool constant)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnTakeItemEventInfo(
         OnTakeItem unionValue,
         int? priority = null,
@@ -27,7 +28,9 @@ public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
     {
         Id = EventId.TakeItem;
         UnionValue = unionValue;
+        #pragma warning disable CS0618
         Handler = ExtractDelegate();
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes =

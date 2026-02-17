@@ -14,6 +14,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 /// </summary>
 public sealed record OnEndEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnEndEventInfo(
         Action<Battle, Pokemon> handler,
     int? priority = null,
@@ -21,7 +22,9 @@ public sealed record OnEndEventInfo : EventHandlerInfo
     {
    Id = EventId.End;
         Prefix = EventPrefix.None;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];

@@ -12,6 +12,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyAfterFaintEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnAnyAfterFaintEventInfo(
         Action<Battle, int, Pokemon, Pokemon, IEffect> handler,
 int? priority = null,
@@ -19,7 +20,9 @@ bool usesSpeed = true)
     {
         Id = EventId.AfterFaint;
 Prefix = EventPrefix.Any;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
 Priority = priority;
         UsesSpeed = usesSpeed;
       ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];

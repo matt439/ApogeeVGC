@@ -10,6 +10,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeModifyTypeEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnFoeModifyTypeEventInfo(
         Action<Battle, ActiveMove, Pokemon, Pokemon> handler,
         int? priority = null,
@@ -17,7 +18,9 @@ public sealed record OnFoeModifyTypeEventInfo : EventHandlerInfo
     {
         Id = EventId.ModifyType;
         Prefix = EventPrefix.Foe;
+   #pragma warning disable CS0618
    Handler = handler;
+   #pragma warning restore CS0618
         Priority = priority;
     UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(ActiveMove), typeof(Pokemon), typeof(Pokemon)];

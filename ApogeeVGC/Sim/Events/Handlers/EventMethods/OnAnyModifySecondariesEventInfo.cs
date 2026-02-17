@@ -13,6 +13,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyModifySecondariesEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnAnyModifySecondariesEventInfo(
         Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove> handler,
 int? priority = null,
@@ -20,7 +21,9 @@ bool usesSpeed = true)
     {
         Id = EventId.ModifySecondaries;
 Prefix = EventPrefix.Any;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
 Priority = priority;
         UsesSpeed = usesSpeed;
       ExpectedParameterTypes = [typeof(Battle), typeof(List<SecondaryEffect>), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];

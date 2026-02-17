@@ -724,7 +724,9 @@ public partial record Items
                 Name = "Ring Target",
                 SpriteNum = 410,
                 Fling = new FlingData { BasePower = 10 },
+#pragma warning disable CS0618 // Constant-value union constructor
                 OnNegateImmunity = new OnNegateImmunityEventInfo(false),
+#pragma warning restore CS0618
                 Num = 543,
                 Gen = 5,
             },

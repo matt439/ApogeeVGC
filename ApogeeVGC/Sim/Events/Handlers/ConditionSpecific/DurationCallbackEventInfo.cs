@@ -15,6 +15,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 /// </summary>
 public sealed record DurationCallbackEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public DurationCallbackEventInfo(
         Func<Battle, Pokemon, Pokemon, IEffect?, int> handler,
         int? priority = null,
@@ -22,7 +23,9 @@ public sealed record DurationCallbackEventInfo : EventHandlerInfo
     {
         Id = EventId.DurationCallback;
         Prefix = EventPrefix.None;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];

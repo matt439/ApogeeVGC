@@ -11,6 +11,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnSourceModifyBoostEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnSourceModifyBoostEventInfo(
         Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion> handler,
     int? priority = null,
@@ -18,7 +19,9 @@ public sealed record OnSourceModifyBoostEventInfo : EventHandlerInfo
     {
    Id = EventId.ModifyBoost;
         Prefix = EventPrefix.Source;
+ #pragma warning disable CS0618
  Handler = handler;
+ #pragma warning restore CS0618
  Priority = priority;
 UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(SparseBoostsTable), typeof(Pokemon)];

@@ -1000,6 +1000,7 @@ public partial class Battle
         }
 
         // Fall back to legacy handler
+#pragma warning disable CS0618 // Handler and AdaptLegacyHandler are obsolete but retained as fallback
         Delegate? handler = handlerInfo.Handler;
         if (handler == null) return relayVar;
 
@@ -1020,6 +1021,7 @@ public partial class Battle
         // Use adapter to convert legacy handler to context-based
         EventHandlerDelegate adaptedHandler =
             EventHandlerAdapter.AdaptLegacyHandler(handler, handlerInfo);
+#pragma warning restore CS0618
         EventContext context = invocationContext.ToEventContext();
 
         try
@@ -1071,6 +1073,7 @@ public partial class Battle
     /// <returns>The result of the invocation, or default(TResult) if handler is null</returns>
     public TResult? InvokeCallback<TResult>(EventHandlerInfo? handlerInfo, params object?[] args)
     {
+#pragma warning disable CS0618 // Handler is obsolete but still needed for callback invocation
         if (handlerInfo?.Handler == null)
         {
             return default;
@@ -1084,6 +1087,7 @@ public partial class Battle
 
         // Invoke the delegate
         object? result = handlerInfo.Handler.DynamicInvoke(args);
+#pragma warning restore CS0618
 
         // Handle null return values
         if (result == null)

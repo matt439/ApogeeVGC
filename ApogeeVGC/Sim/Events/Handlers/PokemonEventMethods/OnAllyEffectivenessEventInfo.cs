@@ -12,6 +12,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyEffectivenessEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnAllyEffectivenessEventInfo(
         Func<Battle, int, Pokemon?, PokemonType, ActiveMove, IntVoidUnion> handler,
         int? priority = null,
@@ -19,7 +20,9 @@ public sealed record OnAllyEffectivenessEventInfo : EventHandlerInfo
     {
         Id = EventId.Effectiveness;
         Prefix = EventPrefix.Ally;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(PokemonType), typeof(ActiveMove)];

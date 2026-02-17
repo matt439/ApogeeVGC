@@ -11,6 +11,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeCriticalHitEventInfo : UnionEventHandlerInfo<OnCriticalHit>
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnFoeCriticalHitEventInfo(
     OnCriticalHit unionValue,
 int? priority = null,
@@ -19,7 +20,9 @@ int? priority = null,
         Id = EventId.CriticalHit;
         Prefix = EventPrefix.Foe;
      UnionValue = unionValue;
+    #pragma warning disable CS0618
     Handler = ExtractDelegate();
+    #pragma warning restore CS0618
      Priority = priority;
         UsesSpeed = usesSpeed;
   ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];

@@ -15,12 +15,15 @@ public sealed record OnEmergencyExitEventInfo : EventHandlerInfo
     /// </summary>
     /// <param name="handler">The event handler delegate</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnEmergencyExitEventInfo(
         Action<Battle, Pokemon> handler,
         bool usesSpeed = true)
   {
    Id = EventId.EmergencyExit;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
         UsesSpeed = usesSpeed;
      ExpectedParameterTypes =
      [

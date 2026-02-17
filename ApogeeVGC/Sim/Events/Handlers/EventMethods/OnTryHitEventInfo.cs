@@ -18,13 +18,16 @@ public sealed record OnTryHitEventInfo : EventHandlerInfo
     /// <param name="handler">The event handler delegate</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnTryHitEventInfo(
         Func<Battle, Pokemon, Pokemon, ActiveMove, BoolIntEmptyVoidUnion?> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.TryHit;
+        #pragma warning disable CS0618
         Handler = handler;
+        #pragma warning restore CS0618
   Priority = priority;
         UsesSpeed = usesSpeed;
       ExpectedParameterTypes =

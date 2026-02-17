@@ -22,6 +22,7 @@ public sealed record OnTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
     /// <param name="unionValue">The union value (delegate with multiple possible signatures or bool constant)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    [Obsolete("Use Create factory method instead.")]
     public OnTryHealEventInfo(
   OnTryHeal unionValue,
      int? priority = null,
@@ -29,7 +30,9 @@ bool usesSpeed = true)
     {
         Id = EventId.TryHeal;
    UnionValue = unionValue;
+     #pragma warning disable CS0618
      Handler = ExtractDelegate();
+     #pragma warning restore CS0618
         Priority = priority;
       UsesSpeed = usesSpeed;
  // Don't set ExpectedParameterTypes/ExpectedReturnType here

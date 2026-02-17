@@ -16,6 +16,7 @@ public sealed record OnAnySwitchInEventInfo : EventHandlerInfo
     /// <param name="handler">The event handler delegate</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+ [Obsolete("Use Create factory method instead.")]
  public OnAnySwitchInEventInfo(
 Action<Battle, Pokemon> handler,
         int? priority = null,
@@ -23,7 +24,9 @@ Action<Battle, Pokemon> handler,
   {
 Id = EventId.SwitchIn;
         Prefix = EventPrefix.Any;
+#pragma warning disable CS0618
 Handler = handler;
+#pragma warning restore CS0618
 Priority = priority;
   UsesSpeed = usesSpeed;
 ExpectedParameterTypes =

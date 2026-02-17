@@ -9,6 +9,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeBeforeSwitchOutEventInfo : EventHandlerInfo
 {
+    [Obsolete("Use Create factory method instead.")]
     public OnFoeBeforeSwitchOutEventInfo(
         Action<Battle, Pokemon> handler,
         int? priority = null,
@@ -16,7 +17,9 @@ public sealed record OnFoeBeforeSwitchOutEventInfo : EventHandlerInfo
     {
         Id = EventId.BeforeSwitchOut;
         Prefix = EventPrefix.Foe;
+   #pragma warning disable CS0618
    Handler = handler;
+   #pragma warning restore CS0618
         Priority = priority;
     UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
