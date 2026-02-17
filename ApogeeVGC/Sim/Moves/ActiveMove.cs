@@ -19,6 +19,7 @@ public record ActiveMove : Move, IEffect
     /// <summary>
     /// Hides Move.OnHit to invalidate the handler cache when a move handler is mutated at runtime
     /// (e.g. Curse's non-Ghost branch nulls OnHit in OnTryHit).
+    /// Instead of a full rebuild, derives a new cache from the shared Move cache minus the stale key.
     /// </summary>
     public new OnHitEventInfo? OnHit
     {
@@ -26,7 +27,21 @@ public record ActiveMove : Move, IEffect
         set
         {
             base.OnHit = value;
-            _handlerCache = null;
+            var current = _handlerCache;
+            if (current is null) return;
+
+            if (value is null)
+            {
+                // Remove all Hit-event entries from the shared cache (cheap: filters ~1-3 keys out of ~5-30)
+                _handlerCache = current
+                    .Where(kvp => kvp.Key.Item1 != EventId.Hit)
+                    .ToFrozenDictionary();
+            }
+            else
+            {
+                // Handler replaced — full rebuild required
+                _handlerCache = null;
+            }
         }
     }
 
