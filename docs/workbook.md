@@ -433,9 +433,9 @@
 
 ^ review items SilverPowder to SpellTag
 
-@ review items SplashPlate to StickyBarb
+^ review items SplashPlate to StickyBarb
 
-review items StonePlate to ToxicOrb
+@ review items StonePlate to ToxicOrb
 
 review items ToxicPlate to UtilityUmbrella
 
