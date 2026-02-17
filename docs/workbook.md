@@ -451,9 +451,9 @@
 
 # Conditions
 
-Burn
-Paralysis
-Sleep
+@ Burn
+@ Paralysis
+@ Sleep
 Freeze
 Poison
 Toxic
