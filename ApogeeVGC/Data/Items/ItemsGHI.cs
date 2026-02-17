@@ -146,7 +146,7 @@ public partial record Items
                     return basePower;
                 }, 15),
                 OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
                             // Giratina (species number 487) can't have this item removed

@@ -387,11 +387,11 @@
 
 ^ review items EnigmaBerry to FistPlate
 
-@ review items FlameOrb to FriendBall
+^ review items FlameOrb to FriendBall
 
 ## ItemsGHI
 
-review items GalaricaCuff to GriseousOrb
+@ review items GalaricaCuff to GriseousOrb
 
 review items HabanBerry to HondewBerry
 
