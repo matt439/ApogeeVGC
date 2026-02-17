@@ -413,11 +413,11 @@
 
 ^ review items MirrorHerb to NeverMeltIce
 
-@ review items None to OvalStone
+^ review items None to OvalStone
 
 ## ItemsPQR
 
-review items PasshoBerry to PoisonBarb
+@ review items PasshoBerry to PoisonBarb
 
 review items PokeBall to ProtectivePads
 
