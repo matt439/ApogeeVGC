@@ -260,9 +260,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities DragonsMaw to Electromorphosis
 
-@ review abilities EmbodyAspectCornerstone to FlameBody
+^ review abilities EmbodyAspectCornerstone to FlameBody
 
-review abilities FlareBoost to FlowerGift
+@ review abilities FlareBoost to FlowerGift
 
 review abilities FlowerVeil to Forecast
 

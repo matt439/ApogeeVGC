@@ -803,11 +803,7 @@ public partial record Conditions
                 {
                     if (move.Type == MoveType.Fire && attacker.HasAbility(AbilityId.FlashFire))
                     {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Debug("Flash Fire boost");
-                        }
-
+                        battle.Debug("Flash Fire boost");
                         battle.ChainModify(1.5);
                         return battle.FinalModify(atk);
                     }
@@ -819,11 +815,7 @@ public partial record Conditions
                 {
                     if (move.Type == MoveType.Fire && attacker.HasAbility(AbilityId.FlashFire))
                     {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Debug("Flash Fire boost");
-                        }
-
+                        battle.Debug("Flash Fire boost");
                         battle.ChainModify(1.5);
                         return battle.FinalModify(spa);
                     }
