@@ -499,18 +499,6 @@ public partial record Conditions
                         $"[ChoiceLock.OnStart] {pokemon.Name}: Volatile added, locked to {battle.ActiveMove.Id}");
                     return new VoidReturn();
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
-                {
-                    // Fallback: Set the locked move if it hasn't been set yet
-                    // (OnStart should have set it, but this provides defense in depth)
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.ChoiceLock, out EffectState? effectState) &&
-                        effectState.Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceLock.OnModifyMove] {pokemon.Name}: Locking to {move.Id} (fallback)");
-                        effectState.Move = move.Id;
-                    }
-                }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
                 {
                     battle.Debug(

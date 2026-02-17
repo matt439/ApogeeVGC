@@ -732,16 +732,9 @@ public partial record Items
 
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, _, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceBand.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-                    }
                 }),
                 OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, _) =>
                 {
@@ -767,16 +760,9 @@ public partial record Items
 
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, _, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceScarf.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-                    }
                 }),
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
                 {
@@ -804,19 +790,9 @@ public partial record Items
 
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, _, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-
-                    // Set the locked move immediately after adding the volatile
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-                    }
                 }),
                 //OnModifySpAPriority = 1,
                 OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, _) =>
