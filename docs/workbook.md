@@ -399,9 +399,9 @@
 
 ## ItemsJKL
 
-@ review items JabocaBerry to LaggingTail
+^ review items JabocaBerry to LaggingTail
 
-review items LansatBerry to LightClay
+@ review items LansatBerry to LightClay
 
 review items LoadedDice to LuxuryBall
 
