@@ -481,4 +481,4 @@
 ^ Commanding
 ^ Arceus
 ^ Silvally
-RolloutStorage
+^ RolloutStorage
