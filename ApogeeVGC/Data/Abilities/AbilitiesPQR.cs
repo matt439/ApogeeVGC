@@ -734,7 +734,7 @@ public partial record Abilities
                 }),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
-                    if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
+                    if (pokemon is not PokemonSideFieldPokemon psfp) return;
                     psfp.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
                     battle.Add("-end", psfp.Pokemon, "Quark Drive", "[silent]");
                 }),

@@ -470,7 +470,7 @@ public partial record Abilities
                 Num = 19,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnModifySecondaries = OnModifySecondariesEventInfo.Create((_, secondaries, _, _, _) =>
+                OnModifySecondaries = OnModifySecondariesEventInfo.Create((battle, secondaries, _, _, _) =>
                 {
                     battle.Debug("Shield Dust prevent secondary");
                     // Filter out secondaries that don't target self (return only self-targeting effects)
@@ -1027,7 +1027,7 @@ public partial record Abilities
                 Num = 1,
                 Rating = 0.5,
                 // OnModifyMovePriority = -1
-                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, _, _) =>
                 {
                     if (move.Category != MoveCategory.Status)
                     {

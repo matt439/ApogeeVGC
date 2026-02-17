@@ -137,7 +137,7 @@ public partial record Abilities
                     if (choiceLock != null && choiceLock != move.Id)
                     {
                         // Fails unless ability is being ignored
-                        battle.AddMove("move", pokemon, move.Name);
+                        battle.Add("move", pokemon, move.Name);
                         battle.AttrLastMove("[still]");
                         battle.Debug("Disabled by Gorilla Tactics");
                         battle.Add("-fail", pokemon);
