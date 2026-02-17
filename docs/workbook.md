@@ -243,9 +243,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities BadDreams to BeastBoost
 
-@ review abilities Berserk to ChillingNeigh
+^ review abilities Berserk to ChillingNeigh
 
-review abilities Chlorophyll to Comatose
+@ review abilities Chlorophyll to Comatose
 
 review abilities Commander to Costar
 
