@@ -1,5 +1,7 @@
+using System.Collections.Frozen;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
@@ -290,6 +292,9 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
             OnTryMove = OnTryMove,
             OnUseMoveMessage = OnUseMoveMessage,
 
+            // Share pre-built handler cache from base Move
+            _handlerCache = MoveHandlerCache,
+
             // Set ActiveMove-specific required property
             MoveSlot = new MoveSlot
             {
@@ -350,6 +355,23 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     //// Moves do not define event sub-orders
     //public int? GetSubOrder(EventId id) => null;
 
+
+    /// <summary>
+    /// Pre-computed move handler cache, shared by all ActiveMove instances created from this Move.
+    /// Built lazily on first access; thread-safe via Volatile.Read/CompareExchange.
+    /// </summary>
+    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _moveHandlerCache;
+    internal FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> MoveHandlerCache
+    {
+        get
+        {
+            var cache = Volatile.Read(ref _moveHandlerCache);
+            if (cache is not null) return cache;
+
+            var newCache = EventHandlerInfoMapper.BuildMoveHandlerCache(this);
+            return Interlocked.CompareExchange(ref _moveHandlerCache, newCache, null) ?? newCache;
+        }
+    }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

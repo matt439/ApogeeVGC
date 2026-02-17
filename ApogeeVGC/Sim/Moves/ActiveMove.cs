@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -14,6 +15,20 @@ public record ActiveMove : Move, IEffect
     public required MoveSlot MoveSlot { get; init; }
 
     public EffectType EffectType => EffectType.Move;
+
+    /// <summary>
+    /// Hides Move.OnHit to invalidate the handler cache when a move handler is mutated at runtime
+    /// (e.g. Curse's non-Ghost branch nulls OnHit in OnTryHit).
+    /// </summary>
+    public new OnHitEventInfo? OnHit
+    {
+        get => base.OnHit;
+        set
+        {
+            base.OnHit = value;
+            _handlerCache = null;
+        }
+    }
 
     public ConditionId? Weather { get; set; }
 
@@ -102,7 +117,7 @@ public record ActiveMove : Move, IEffect
     /// </summary>
     public HitEffect? HitEffect { get; set; }
 
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
+    internal FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache { get; set; }
     private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
         _handlerCache ??= EventHandlerInfoMapper.BuildMoveHandlerCache(this);
 
