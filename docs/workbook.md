@@ -395,11 +395,11 @@
 
 ^ review items HabanBerry to HondewBerry
 
-@ review items IapapaBerry to IronPlate
+^ review items IapapaBerry to IronPlate
 
 ## ItemsJKL
 
-review items JabocaBerry to LaggingTail
+@ review items JabocaBerry to LaggingTail
 
 review items LansatBerry to LightClay
 
