@@ -235,9 +235,9 @@ review moves Yawn to ZingZap
 
 ## AbilitiesABC
 
-@ review abilities Adaptability to AngerPoint
+^ review abilities Adaptability to AngerPoint
 
-review abilities AngerShell to ArmorTail
+@ review abilities AngerShell to ArmorTail
 
 review abilities AromaVeil to AuraBreak
 
