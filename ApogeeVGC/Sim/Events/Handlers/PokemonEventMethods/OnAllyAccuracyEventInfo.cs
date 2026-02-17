@@ -12,30 +12,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllyAccuracyEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnAllyAccuracyEventInfo(
-    Func<Battle, int?, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.Accuracy;
-  Prefix = EventPrefix.Ally;
-  #pragma warning disable CS0618
-  Handler = handler;
-  #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(int?), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(IntBoolVoidUnion);
-        
-    // Nullability: accuracy can be null for always-hit moves (TypeScript: number | true)
-        ParameterNullability = new[] { false, true, false, false, false };
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
-
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// </summary>

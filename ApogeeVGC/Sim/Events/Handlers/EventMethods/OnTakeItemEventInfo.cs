@@ -14,47 +14,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
 {
-    /// <summary>
-    /// Creates a new OnTakeItem event handler using the legacy union pattern.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnTakeItemEventInfo(
-        OnTakeItem unionValue,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.TakeItem;
-        UnionValue = unionValue;
-        #pragma warning disable CS0618
-        Handler = ExtractDelegate();
-        #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-            typeof(Item),
-            typeof(Pokemon),
-            typeof(Pokemon),
-            typeof(Move),
-        ];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-
-        // Nullability: All parameters non-nullable except Move which is optional
-        ParameterNullability = [false, false, false, false, true];
-        ReturnTypeNullable = false;
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// Context provides: Battle, Effect (Item), TargetPokemon, SourcePokemon, Move
-    /// </summary>
     public OnTakeItemEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

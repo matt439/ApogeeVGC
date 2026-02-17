@@ -16,30 +16,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 /// </summary>
 public sealed record OnSideResidualEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnSideResidualEventInfo(
-        Action<Battle, Side, Pokemon, IEffect> handler,
-        int? priority = null,
-   int? order = null,
-   int? subOrder = null,
-      bool usesSpeed = true)
-    {
- Id = EventId.SideResidual;
-        Prefix = EventPrefix.None;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-  Priority = priority;
-     Order = order;
-        SubOrder = subOrder;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Side), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(void);
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-  ValidateConfiguration();
-  }
-    
     public OnSideResidualEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

@@ -12,40 +12,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnSourceFractionalPriorityEventInfo : UnionEventHandlerInfo<OnFractionalPriority>
 {
-    /// <summary>
-    /// Creates a new OnSourceFractionalPriority event handler.
-    /// </summary>
-    /// <param name="unionValue">The union value (delegate or double constant)</param>
-  /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnSourceFractionalPriorityEventInfo(
-      OnFractionalPriority unionValue,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.FractionalPriority;
-        Prefix = EventPrefix.Source;
-        UnionValue = unionValue;
-        #pragma warning disable CS0618
-        Handler = ExtractDelegate();
-        #pragma warning restore CS0618
-        Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(double);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// </summary>
     public OnSourceFractionalPriorityEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

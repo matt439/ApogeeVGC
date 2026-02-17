@@ -15,30 +15,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 /// </summary>
 public sealed record DurationCallbackEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public DurationCallbackEventInfo(
-        Func<Battle, Pokemon, Pokemon, IEffect?, int> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.DurationCallback;
-        Prefix = EventPrefix.None;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(int);
-        
-        // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false };
-        ReturnTypeNullable = false;
-    
-        // Validate configuration
-        ValidateConfiguration();
-    }
-    
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, TargetPokemon, SourcePokemon, SourceEffect
@@ -81,27 +57,26 @@ public sealed record DurationCallbackEventInfo : EventHandlerInfo
     }
 
     /// <summary>
-    /// Invokes the duration callback, handling both legacy and context-based handlers.
+    /// Invokes the duration callback via the context-based handler.
     /// </summary>
     public int InvokeDuration(Battle battle, Pokemon target, Pokemon source, IEffect? sourceEffect)
     {
-        if (ContextHandler is not null)
+        if (ContextHandler is null)
         {
-            var context = new EventContext
-            {
-                Battle = battle,
-                EventId = EventId.DurationCallback,
-                TargetPokemon = target,
-                SourcePokemon = source,
-                SourceEffect = sourceEffect
-            };
-            var result = ContextHandler(context);
-            return result is IntRelayVar irv
-                ? irv.Value
-                : throw new InvalidOperationException("DurationCallback ContextHandler did not return IntRelayVar.");
+            throw new InvalidOperationException("DurationCallback has no ContextHandler set.");
         }
 
-        var handler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)GetDelegateOrThrow();
-        return handler(battle, target, source, sourceEffect);
+        var context = new EventContext
+        {
+            Battle = battle,
+            EventId = EventId.DurationCallback,
+            TargetPokemon = target,
+            SourcePokemon = source,
+            SourceEffect = sourceEffect
+        };
+        var result = ContextHandler(context);
+        return result is IntRelayVar irv
+            ? irv.Value
+            : throw new InvalidOperationException("DurationCallback ContextHandler did not return IntRelayVar.");
     }
 }

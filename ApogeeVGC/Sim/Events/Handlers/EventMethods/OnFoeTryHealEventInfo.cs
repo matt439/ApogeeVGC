@@ -16,43 +16,8 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
 {
-    /// <summary>
-    /// Creates a new OnFoeTryHeal event handler.
- /// </summary>
-  /// <param name="unionValue">The union value (delegate with multiple possible signatures or bool constant)</param>
 /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnFoeTryHealEventInfo(
-    OnTryHeal unionValue,
-        int? priority = null,
-   bool usesSpeed = true)
-    {
-  Id = EventId.TryHeal;
-   Prefix = EventPrefix.Foe;
-        UnionValue = unionValue;
-        #pragma warning disable CS0618
-        Handler = ExtractDelegate();
-        #pragma warning restore CS0618
-     Priority = priority;
-      UsesSpeed = usesSpeed;
-        // Don't set ExpectedParameterTypes/ExpectedReturnType here
-        // because OnTryHeal has 2 different delegate signatures
-// Validation will determine which signature is used and validate without setting properties
-   ExpectedParameterTypes = null;
-     ExpectedReturnType = null;
-     
-   // Nullability info varies by signature - will be checked in custom Validate()
-        // Signature 1: (Battle, int, Pokemon, Pokemon, IEffect) - all non-nullable
- // Signature 2: (Battle, Pokemon) - all non-nullable  
-   // Return type: nullable for both signatures
-  ParameterNullability = null; // Handled in custom validation
-      ReturnTypeNullable = true; // Both signatures return nullable types
-    
-     // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
-   // Custom validation happens in Validate() method
-     }
-
      /// <summary>
      /// Creates event handler using context-based pattern.
      /// </summary>

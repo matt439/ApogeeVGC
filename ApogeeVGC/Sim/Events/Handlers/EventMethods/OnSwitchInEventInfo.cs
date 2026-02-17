@@ -14,43 +14,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnSwitchInEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnSwitchIn event handler using the legacy strongly-typed pattern.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnSwitchInEventInfo(
-     Action<Battle, Pokemon> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.SwitchIn;
-    #pragma warning disable CS0618
-    Handler = handler;
-    #pragma warning restore CS0618
-        Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
- [
-            typeof(Battle),
-            typeof(Pokemon),
-        ];
-        ExpectedReturnType = typeof(void);
-
-        // Nullability: Battle (non-null), Pokemon (non-null)
-        ParameterNullability = [false, false];
-  ReturnTypeNullable = false; // void
-
-        // Validate configuration
-    ValidateConfiguration();
-    }
-    
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// Context provides: Battle, TargetPokemon
-    /// </summary>
     public OnSwitchInEventInfo(
      EventHandlerDelegate contextHandler,
     int? priority = null,

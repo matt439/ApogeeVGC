@@ -14,10 +14,4 @@ public record EventListenerWithoutPriority
     public EffectDelegate? End { get; init; }
     public List<object>? EndCallArgs { get; init; }
     public required EffectHolder EffectHolder { get; init; }
-    
-    // Backward compatibility: extract callback from HandlerInfo
-    [Obsolete("Use HandlerInfo instead")]
-    public EffectDelegate? Callback => HandlerInfo?.Handler != null 
-     ? EffectDelegate.FromNullableDelegate(HandlerInfo.Handler) 
-        : null;
 }

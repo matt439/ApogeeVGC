@@ -15,46 +15,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnDamagingHitEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnDamagingHit event handler using the legacy strongly-typed pattern.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="order">Execution order (lower executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnDamagingHitEventInfo(
-        Action<Battle, int, Pokemon, Pokemon, ActiveMove> handler,
-        int? order = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.DamagingHit;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        Order = order;
-    UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle), 
-            typeof(int), 
-            typeof(Pokemon), 
-  typeof(Pokemon), 
-            typeof(ActiveMove),
-  ];
-  ExpectedReturnType = typeof(void);
-        
-     // Nullability: All parameters are non-nullable
-        ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false; // void
-   
- // Validate configuration
-ValidateConfiguration();
-    }
-    
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// Context provides: Battle, RelayVar (int damage), TargetPokemon, SourcePokemon, Move
-    /// </summary>
     public OnDamagingHitEventInfo(
         EventHandlerDelegate contextHandler,
  int? order = null,

@@ -13,30 +13,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyTryBoostEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnAnyTryBoostEventInfo(
-        Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect> handler,
-        int? priority = null,
-     bool usesSpeed = true)
-    {
-        Id = EventId.TryBoost;
-Prefix = EventPrefix.Any;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(SparseBoostsTable), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(void);
-
-        // Nullability: All parameters non-nullable
-        ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false; // void
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// </summary>

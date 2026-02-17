@@ -10,30 +10,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnAnyTypeEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnAnyTypeEventInfo(
-        Func<Battle, PokemonType[], Pokemon, TypesVoidUnion> handler,
-int? priority = null,
-bool usesSpeed = true)
-    {
-        Id = EventId.Type;
-Prefix = EventPrefix.Any;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-Priority = priority;
-        UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(PokemonType[]), typeof(Pokemon)];
-        ExpectedReturnType = typeof(TypesVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-    }
-
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// </summary>

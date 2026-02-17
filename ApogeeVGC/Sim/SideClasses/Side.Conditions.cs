@@ -164,9 +164,7 @@ public partial class Side
             {
                 throw new InvalidOperationException("Side.Active has no non-null Pokemon.");
             }
-            var durationHandler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.
-                GetDelegateOrThrow();
-            conditionState.Duration = durationHandler(Battle, firstActive, source, sourceEffect);
+            conditionState.Duration = status.DurationCallback.InvokeDuration(Battle, firstActive, source, sourceEffect);
         }
 
         SlotConditions[targetSlot][status.Id] = conditionState;

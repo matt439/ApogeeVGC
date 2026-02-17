@@ -11,43 +11,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnModifyWeightEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnModifyWeight event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnModifyWeightEventInfo(
-        Func<Battle, int, Pokemon, IntVoidUnion> handler,
-  int? priority = null,
-        bool usesSpeed = true)
-    {
-Id = EventId.ModifyWeight;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        Priority = priority;
-     UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-   typeof(Battle),
-            typeof(int),
-  typeof(Pokemon),
-     ];
- ExpectedReturnType = typeof(IntVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// </summary>
     public OnModifyWeightEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

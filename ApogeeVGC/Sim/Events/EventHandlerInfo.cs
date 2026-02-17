@@ -25,12 +25,10 @@ public abstract record EventHandlerInfo
     public EventId Id { get; init; }
 
     /// <summary>
-    /// The actual delegate handler for this event (can be null if not implemented).
-    /// This is the legacy delegate that takes specific parameters.
-    /// Use <see cref="ContextHandler"/> and the static Create factory method instead.
+    /// Legacy delegate handler property. No longer set by any constructor.
+    /// Retained for structural compatibility with UnionEventHandlerInfo.
     /// </summary>
     [JsonIgnore]
-    [Obsolete("Use ContextHandler with the static Create factory method instead.")]
     public Delegate? Handler { get; init; }
     
     /// <summary>
@@ -154,22 +152,19 @@ public abstract record EventHandlerInfo
         }
     }
 
-    #pragma warning disable CS0618 // Handler is obsolete but still needed for legacy fallback
     public Delegate GetDelegateOrThrow()
     {
         if (Handler is null)
         {
-            throw new InvalidOperationException("Hander is null.");
+            throw new InvalidOperationException("Handler is null.");
         }
         return Handler;
     }
-#pragma warning restore CS0618
 
     /// <summary>
     /// Validates that the handler matches the expected signature.
     /// Throws InvalidOperationException if validation fails.
     /// </summary>
-#pragma warning disable CS0618 // Handler is obsolete but still needed for legacy validation
     public void Validate()
     {
         if (Handler == null) return;
@@ -244,7 +239,6 @@ public abstract record EventHandlerInfo
             }
         }
     }
-#pragma warning restore CS0618
 
     /// <summary>
     /// Gets a friendly description of the expected signature including nullability

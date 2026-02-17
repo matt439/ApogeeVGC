@@ -16,44 +16,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnDragOutEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnDragOut event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnDragOutEventInfo(
-        Func<Battle, Pokemon, Pokemon?, ActiveMove?, BoolVoidUnion?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.DragOut;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-            typeof(Pokemon),
-            typeof(Pokemon),
-            typeof(ActiveMove),
-        ];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-
-        // Nullability: source and move are nullable
-        ParameterNullability = [false, false, true, true];
-        ReturnTypeNullable = true;
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// </summary>
     public OnDragOutEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

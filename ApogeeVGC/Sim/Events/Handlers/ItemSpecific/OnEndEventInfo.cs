@@ -9,24 +9,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 /// </summary>
 public sealed record OnEndEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnEndEventInfo(Action<Battle, Pokemon>? handler)
-    {
-        Id = EventId.End;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false };
-        ReturnTypeNullable = false;
-
-    // Validate configuration
-        ValidateConfiguration();
-    }
-
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, TargetPokemon

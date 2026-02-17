@@ -12,31 +12,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnFoeTakeItemEventInfo(
-  OnTakeItem unionValue,
-     int? priority = null,
-        bool usesSpeed = true)
-    {
-Id = EventId.TakeItem;
-  Prefix = EventPrefix.Foe;
-  UnionValue = unionValue;
-#pragma warning disable CS0618
-Handler = ExtractDelegate();
-#pragma warning restore CS0618
-Priority = priority;
-      UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon), typeof(Pokemon), typeof(Move)];
-   ExpectedReturnType = typeof(PokemonVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-    }
-
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// </summary>

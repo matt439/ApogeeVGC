@@ -17,44 +17,19 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnTryHealEventInfo : UnionEventHandlerInfo<OnTryHeal>
 {
     /// <summary>
-    /// Creates a new OnTryHeal event handler.
+    /// Creates a constant-value or delegate-based handler via union type.
     /// </summary>
-    /// <param name="unionValue">The union value (delegate with multiple possible signatures or bool constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
     public OnTryHealEventInfo(
-  OnTryHeal unionValue,
-     int? priority = null,
-bool usesSpeed = true)
+        OnTryHeal unionValue,
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.TryHeal;
-   UnionValue = unionValue;
-     #pragma warning disable CS0618
-     Handler = ExtractDelegate();
-     #pragma warning restore CS0618
+        UnionValue = unionValue;
         Priority = priority;
-      UsesSpeed = usesSpeed;
- // Don't set ExpectedParameterTypes/ExpectedReturnType here
-  // because OnTryHeal has 2 different delegate signatures
-        // Validation will determine which signature is used and validate without setting properties
-  ExpectedParameterTypes = null;
-  ExpectedReturnType = null;
-   
-        // Nullability info varies by signature - will be checked in custom Validate()
-  // Signature 1: (Battle, int, Pokemon, Pokemon, IEffect) - all non-nullable
-        // Signature 2: (Battle, Pokemon) - all non-nullable  
-   // Return type: nullable for both signatures
-        ParameterNullability = null; // Handled in custom validation
-        ReturnTypeNullable = true; // Both signatures return nullable types
-    
-          // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
-          // Custom validation happens in Validate() method
-      }
+        UsesSpeed = usesSpeed;
+    }
 
-      /// <summary>
-      /// Creates event handler using context-based pattern.
-      /// </summary>
       public OnTryHealEventInfo(
           EventHandlerDelegate contextHandler,
           int? priority = null,

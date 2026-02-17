@@ -593,9 +593,7 @@ public partial record Conditions
                         battle.Add("-end", pokemon, "move: Heal Block");
                     }
                 }),
-#pragma warning disable CS0618 // Constant-value union constructor
                 OnTryHeal = new OnTryHealEventInfo(false),
-#pragma warning restore CS0618
             },
             [ConditionId.PsychicTerrain] = new()
             {
@@ -1114,9 +1112,7 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Rollout,
                 Duration = 1,
-#pragma warning disable CS0618 // Constant-value union constructor
                 OnLockMove = new OnLockMoveEventInfo(MoveId.Rollout),
-#pragma warning restore CS0618
                 OnStart = OnStartEventInfo.Create((battle, _, _, _) =>
                 {
                     battle.EffectState.HitCount = 0;

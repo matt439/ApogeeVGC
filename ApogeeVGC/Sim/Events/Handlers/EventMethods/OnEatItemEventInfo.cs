@@ -13,45 +13,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnEatItemEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnEatItem event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnEatItemEventInfo(
-        Action<Battle, Item, Pokemon, Pokemon?, IEffect?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.EatItem;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-            typeof(Item),
-            typeof(Pokemon),
-            typeof(Pokemon),
-            typeof(IEffect),
-        ];
-        ExpectedReturnType = typeof(void);
-
-        // Nullability: source and effect are optional (nullable)
-        ParameterNullability = [false, false, false, true, true];
-        ReturnTypeNullable = false;
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// </summary>
     public OnEatItemEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

@@ -20,48 +20,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnBeforeMove event handler using the legacy strongly-typed pattern.
-    /// </summary>
-    /// <param name="handler">The event handler delegate with explicit parameters</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnBeforeMoveEventInfo(
-        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.BeforeMove;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle), 
-            typeof(Pokemon), // target
-            typeof(Pokemon), // source
-            typeof(ActiveMove),
-        ];
-        ExpectedReturnType = typeof(BoolVoidUnion);
-
-        // Nullability: Battle (non-null), target (non-null), source (non-null), move (non-null)
-        ParameterNullability = [false, false, false, false];
-        ReturnTypeNullable = true; // Handler can return null to prevent move
-
-        // Validate configuration
-        ValidateConfiguration();
-    }
-  
-    /// <summary>
-    /// Creates a new OnBeforeMove event handler using the context-based pattern.
-    /// Context provides: Battle, TargetPokemon, SourcePokemon, Move
-    /// </summary>
-    /// <param name="contextHandler">The context-based handler</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnBeforeMoveEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

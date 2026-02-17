@@ -12,12 +12,8 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 public sealed record OnLockMoveEventInfo : UnionEventHandlerInfo<OnLockMove>
 {
     /// <summary>
-    /// Creates a new OnLockMove event handler.
+    /// Creates a constant-value or delegate-based handler via union type.
     /// </summary>
-    /// <param name="unionValue">The union value (delegate or MoveId constant)</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
     public OnLockMoveEventInfo(
         OnLockMove unionValue,
         int? priority = null,
@@ -25,29 +21,10 @@ public sealed record OnLockMoveEventInfo : UnionEventHandlerInfo<OnLockMove>
     {
         Id = EventId.LockMove;
         UnionValue = unionValue;
-        #pragma warning disable CS0618
-        Handler = ExtractDelegate();
-        #pragma warning restore CS0618
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-            typeof(Pokemon),
-        ];
-        ExpectedReturnType = typeof(MoveIdVoidUnion);
-
-        // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
-        ReturnTypeNullable = false;
-
-        // Validate configuration
-        ValidateConfiguration();
     }
 
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// </summary>
     public OnLockMoveEventInfo(
         EventHandlerDelegate contextHandler,
         int? priority = null,

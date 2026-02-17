@@ -13,30 +13,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 /// </summary>
 public sealed record OnAllySetStatusEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnAllySetStatusEventInfo(
-    Func<Battle, Condition, Pokemon, Pokemon, IEffect, PokemonFalseVoidUnion?> handler,
-        int? priority = null,
-        bool usesSpeed = true)
-    {
-        Id = EventId.SetStatus;
-  Prefix = EventPrefix.Ally;
-  #pragma warning disable CS0618
-  Handler = handler;
-  #pragma warning restore CS0618
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Condition), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
-        ExpectedReturnType = typeof(PokemonFalseVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = new[] { false, false, false, false, false };
-        ReturnTypeNullable = true;
-    
-    // Validate configuration
-        ValidateConfiguration();
-  }
-
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// </summary>

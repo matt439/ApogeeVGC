@@ -10,39 +10,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnEmergencyExitEventInfo : EventHandlerInfo
 {
-    /// <summary>
-    /// Creates a new OnEmergencyExit event handler.
-    /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
-    [Obsolete("Use Create factory method instead.")]
-    public OnEmergencyExitEventInfo(
-        Action<Battle, Pokemon> handler,
-        bool usesSpeed = true)
-  {
-   Id = EventId.EmergencyExit;
-        #pragma warning disable CS0618
-        Handler = handler;
-        #pragma warning restore CS0618
-        UsesSpeed = usesSpeed;
-     ExpectedParameterTypes =
-     [
-         typeof(Battle), 
-         typeof(Pokemon),
-     ];
-        ExpectedReturnType = typeof(void);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-   ParameterNullability = [false, false];
-    ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
-    }
-
-    /// <summary>
-    /// Creates event handler using context-based pattern.
-    /// </summary>
     public OnEmergencyExitEventInfo(
         EventHandlerDelegate contextHandler,
         bool usesSpeed = true)

@@ -11,30 +11,6 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeAfterMoveEventInfo : EventHandlerInfo
 {
-    [Obsolete("Use Create factory method instead.")]
-    public OnFoeAfterMoveEventInfo(
-     Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
-  int? priority = null,
-    bool usesSpeed = true)
-    {
-      Id = EventId.AfterMove;
-     Prefix = EventPrefix.Foe;
-  #pragma warning disable CS0618
-  Handler = handler;
-  #pragma warning restore CS0618
-    Priority = priority;
-        UsesSpeed = usesSpeed;
- ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-     ExpectedReturnType = typeof(BoolVoidUnion);
-        
-     // Nullability: All parameters non-nullable
-    ParameterNullability = [false, false, false, false];
-  ReturnTypeNullable = false; // BoolVoidUnion is a struct
-        
-   // Validate configuration
-  ValidateConfiguration();
-    }
-
     /// <summary>
     /// Creates event handler using context-based pattern.
     /// </summary>
