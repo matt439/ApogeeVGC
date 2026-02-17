@@ -369,9 +369,9 @@
 
 ^ review items AbilityShield to AguavBerry
 
-@ review items AirBalloon to BigNugget
+^ review items AirBalloon to BigNugget
 
-review items BigRoot to BrightPowder
+@ review items BigRoot to BrightPowder
 
 review items CellBattery to ChoiceBand
 

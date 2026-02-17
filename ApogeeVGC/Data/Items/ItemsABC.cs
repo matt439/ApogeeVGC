@@ -1122,7 +1122,8 @@ public partial record Items
         {
             pokemon.AddVolatile(ConditionId.Protosynthesis);
         }
-        else if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
+
+        if (pokemon.HasAbility(AbilityId.QuarkDrive) &&
                  !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) &&
                  pokemon.UseItem())
         {
