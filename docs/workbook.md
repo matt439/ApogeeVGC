@@ -429,7 +429,7 @@
 
 ## ItemsSTU
 
-review items SafariBall to SilkScarf
+@ review items SafariBall to SilkScarf
 
 review items SilverPowder to SpellTag
 
