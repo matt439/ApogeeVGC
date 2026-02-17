@@ -386,7 +386,7 @@ public partial record Items
                     return basePower;
                 }, 15),
                 OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
@@ -426,7 +426,7 @@ public partial record Items
                     return basePower;
                 }, 15),
                 OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
@@ -484,7 +484,7 @@ public partial record Items
                     return basePower;
                 }, 15),
                 OnTakeItem = new OnTakeItemEventInfo(
-                    (Func<Battle, Item, Pokemon, Pokemon, Move?, BoolVoidUnion>)(
+                    (Func<Battle, Item, Pokemon, Pokemon?, Move?, BoolVoidUnion>)(
                         (_, _, pokemon, source, _) =>
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
