@@ -411,9 +411,9 @@
 
 ^ review items MentalHerb to MiracleSeed
 
-@ review items MirrorHerb to NeverMeltIce
+^ review items MirrorHerb to NeverMeltIce
 
-review items None to OvalStone
+@ review items None to OvalStone
 
 ## ItemsPQR
 
