@@ -457,12 +457,12 @@
 ^ Freeze
 ^ Poison
 ^ Toxic
-@ Confusion
-@ Flinch
-@ Trapped
-Trapper
-PartiallyTrapped
-LockedMove
+^ Confusion
+^ Flinch
+^ Trapped
+@ Trapper
+@ PartiallyTrapped
+@ LockedMove
 TwoTurnMove
 ChoiceLock
 MustRecharge
