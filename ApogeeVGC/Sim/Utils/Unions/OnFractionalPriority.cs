@@ -6,11 +6,12 @@ using ApogeeVGC.Sim.PokemonClasses;
 namespace ApogeeVGC.Sim.Utils.Unions;
 
 /// <summary>
-/// CommonHandlers['ModifierSourceMove'] | -0.1
+/// FractionalPriorityHandler | -0.1
+/// Handler signature: (Battle battle, int priority, Pokemon pokemon, ActiveMove move) => double
 /// </summary>
 public abstract record OnFractionalPriority : IUnionEventHandler
 {
-    public static implicit operator OnFractionalPriority(ModifierSourceMoveHandler function) =>
+    public static implicit operator OnFractionalPriority(FractionalPriorityHandler function) =>
    new OnFractionalPriorityFunc(function);
 
     private static readonly decimal PriorityValue = new(-0.1);
@@ -25,7 +26,7 @@ public abstract record OnFractionalPriority : IUnionEventHandler
     public abstract object? GetConstantValue();
 }
 
-public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority
+public record OnFractionalPriorityFunc(FractionalPriorityHandler Function) : OnFractionalPriority
 {
     public override Delegate GetDelegate() => Function;
     public override bool IsConstant() => false;
