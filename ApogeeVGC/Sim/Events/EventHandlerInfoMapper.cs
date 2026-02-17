@@ -11,6 +11,11 @@ namespace ApogeeVGC.Sim.Events;
 /// </summary>
 public static class EventHandlerInfoMapper
 {
+    // Cached enum values to avoid repeated Enum.GetValues<T>() allocations (reflection + array alloc per call)
+    private static readonly EventId[] CachedEventIds = Enum.GetValues<EventId>();
+    private static readonly EventPrefix[] CachedEventPrefixes = Enum.GetValues<EventPrefix>();
+    private static readonly EventSuffix[] CachedEventSuffixes = Enum.GetValues<EventSuffix>();
+
     /// <summary>
     /// Maps EventId to property accessor functions for IEventMethodsV2.
     /// Each function takes an IEventMethodsV2 and returns the corresponding EventHandlerInfo.
@@ -668,11 +673,11 @@ public static class EventHandlerInfoMapper
     {
         var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
 
-        foreach (EventId id in Enum.GetValues<EventId>())
+        foreach (EventId id in CachedEventIds)
         {
-            foreach (EventPrefix prefix in Enum.GetValues<EventPrefix>())
+            foreach (EventPrefix prefix in CachedEventPrefixes)
             {
-                foreach (EventSuffix suffix in Enum.GetValues<EventSuffix>())
+                foreach (EventSuffix suffix in CachedEventSuffixes)
                 {
                     EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
                     EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
@@ -724,11 +729,11 @@ public static class EventHandlerInfoMapper
     {
         var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
 
-        foreach (EventId id in Enum.GetValues<EventId>())
+        foreach (EventId id in CachedEventIds)
         {
-            foreach (EventPrefix prefix in Enum.GetValues<EventPrefix>())
+            foreach (EventPrefix prefix in CachedEventPrefixes)
             {
-                foreach (EventSuffix suffix in Enum.GetValues<EventSuffix>())
+                foreach (EventSuffix suffix in CachedEventSuffixes)
                 {
                     EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
                     EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
