@@ -451,12 +451,12 @@
 
 # Conditions
 
-@ Burn
-@ Paralysis
-@ Sleep
-Freeze
-Poison
-Toxic
+^ Burn
+^ Paralysis
+^ Sleep
+@ Freeze
+@ Poison
+@ Toxic
 Confusion
 Flinch
 Trapped
