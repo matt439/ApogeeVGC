@@ -478,7 +478,7 @@
 ^ Snowscape
 ^ DeltaStream
 ^ Commanded
-@ Commanding
-@ Arceus
-@ Silvally
+^ Commanding
+^ Arceus
+^ Silvally
 RolloutStorage
