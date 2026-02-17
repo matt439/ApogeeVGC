@@ -381,9 +381,9 @@
 
 ## ItemsDEF
 
-@ review items DampRock to DuskStone
+^ review items DampRock to DuskStone
 
-review items EarthPlate to ElectricSeed
+@ review items EarthPlate to ElectricSeed
 
 review items EnigmaBerry to FistPlate
 
