@@ -373,9 +373,9 @@
 
 ^ review items BigRoot to BrightPowder
 
-@ review items CellBattery to ChoiceBand
+^ review items CellBattery to ChoiceBand
 
-review items ChoiceScarf to ClearAmulet
+@ review items ChoiceScarf to ClearAmulet
 
 review items CloverSweet to CustapBerry
 

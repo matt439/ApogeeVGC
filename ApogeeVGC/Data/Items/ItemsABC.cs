@@ -901,8 +901,8 @@ public partial record Items
                         showMsg = true;
                     }
 
-                    // Show message if: stat was lowered, effect is not a move with secondaries,
-                    // and effect is not Octolock (which shows its own message)
+                    // Show message if: stat was lowered and effect is not a move with secondaries
+                    // (TS also checks effect.id !== 'octolock', but Octolock is isNonstandard: "Past")
                     if (showMsg &&
                         !(effect is Move { Secondaries: not null }))
                     {
