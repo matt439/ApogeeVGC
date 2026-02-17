@@ -403,11 +403,11 @@
 
 ^ review items LansatBerry to LightClay
 
-@ review items LoadedDice to LuxuryBall
+^ review items LoadedDice to LuxuryBall
 
 ## ItemsMNO
 
-review items MachoBrace to MeadowPlate
+@ review items MachoBrace to MeadowPlate
 
 review items MentalHerb to MiracleSeed
 
