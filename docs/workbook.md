@@ -274,9 +274,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities GrassPelt to Guts
 
-@ review abilities HadronEngine to HoneyGather
+^ review abilities HadronEngine to HoneyGather
 
-review abilities Hospitality to HyperCutter
+@ review abilities Hospitality to HyperCutter
 
 review abilities IceBody to IceScales
 
