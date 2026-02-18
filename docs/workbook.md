@@ -266,11 +266,11 @@ review moves Yawn to ZingZap
 
 ^ review abilities FlowerVeil to Forecast
 
-@ review abilities Forewarn to FurCoat
+^ review abilities Forewarn to FurCoat
 
 ## AbilitiesGHI
 
-review abilities GaleWings to GorillaTactics
+@ review abilities GaleWings to GorillaTactics
 
 review abilities GrassPelt to Guts
 

@@ -31,7 +31,7 @@ public partial record Abilities
                 OnModifyPriority =
                     OnModifyPriorityEventInfo.Create((_, priority, pokemon, _, move) =>
                     {
-                        if (move.Type == MoveType.Flying && pokemon.Hp == pokemon.MaxHp)
+                        if (move?.Type == MoveType.Flying && pokemon.Hp == pokemon.MaxHp)
                         {
                             return priority + 1;
                         }
@@ -137,7 +137,7 @@ public partial record Abilities
                     if (choiceLock != null && choiceLock != move.Id)
                     {
                         // Fails unless ability is being ignored
-                        battle.Add("move", pokemon, move.Name);
+                        battle.AddMove("move", pokemon, move.Name);
                         battle.AttrLastMove("[still]");
                         battle.Debug("Disabled by Gorilla Tactics");
                         battle.Add("-fail", pokemon);
