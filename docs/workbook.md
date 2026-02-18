@@ -304,11 +304,11 @@ review moves Yawn to ZingZap
 
 ^ review abilities Oblivious to Opportunist
 
-@ review abilities OrichalcumPulse to OwnTempo
+^ review abilities OrichalcumPulse to OwnTempo
 
 ## AbilitiesPQR
 
-review abilities ParentalBond to Pickup
+@ review abilities ParentalBond to Pickup
 
 review abilities Pixilate to PowerOfAlchemy
 
