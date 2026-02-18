@@ -292,9 +292,9 @@ review moves Yawn to ZingZap
 
 ## AbilitiesMNO
 
-@ review abilities MagicBounce to MegaLauncher
+^ review abilities MagicBounce to MegaLauncher
 
-review abilities Merciless to MirrorArmor
+^ review abilities Merciless to MirrorArmor
 
 review abilities MistySurge to Multiscale
 
