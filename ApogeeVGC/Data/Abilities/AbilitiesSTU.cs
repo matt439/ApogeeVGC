@@ -786,7 +786,7 @@ public partial record Abilities
                 Num = 43,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, source, target, move) =>
                 {
                     if (target != source && move.Flags.Sound == true)
                     {

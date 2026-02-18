@@ -330,9 +330,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities ShadowTag to ShieldDust
 
-@ review abilities ShieldsDown to Sniper
+^ review abilities ShieldsDown to Sniper
 
-review abilities SnowCloak to Stall
+@ review abilities SnowCloak to Stall
 
 review abilities Stalwart to Stench
 
