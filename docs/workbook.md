@@ -280,9 +280,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities IceBody to IceScales
 
-@ review abilities Illuminate to Imposter
+^ review abilities Illuminate to Imposter
 
-review abilities Infiltrator to IronFist
+@ review abilities Infiltrator to IronFist
 
 ## AbilitiesJKL
 
