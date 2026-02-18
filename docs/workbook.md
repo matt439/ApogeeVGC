@@ -312,9 +312,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities Pixilate to PowerOfAlchemy
 
-@ review abilities PowerSpot to Protean
+^ review abilities PowerSpot to Protean
 
-review abilities Protosynthesis to PurifyingSalt
+@ review abilities Protosynthesis to PurifyingSalt
 
 review abilities QuarkDrive to Receiver
 
