@@ -324,7 +324,7 @@ review moves Yawn to ZingZap
 
 ## AbilitiesSTU
 
-review abilities SandForce to SapSipper
+@ review abilities SandForce to SapSipper
 
 review abilities Schooling to ShadowShield
 
@@ -356,7 +356,7 @@ review abilities Unaware to UnseenFist
 
 ^ review abilities WeakArmor to WindPower
 
-@ review abilities WindRider to WonderSkin
+^ review abilities WindRider to WonderSkin
 
 ## AbilitiesYZ
 

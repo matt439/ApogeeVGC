@@ -141,7 +141,9 @@ public partial record Abilities
                 Num = 157,
                 Rating = 3.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
+                // OnTryHitEventInfo.Create passes (source/attacker, target/defender, move).
+                // TS signature is onTryHit(target, source, move) = (defender, attacker, move).
+                OnTryHit = OnTryHitEventInfo.Create((battle, source, target, move) =>
                 {
                     if (target != source && move.Type == MoveType.Grass)
                     {
