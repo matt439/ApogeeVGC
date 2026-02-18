@@ -336,9 +336,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities Stalwart to Stench
 
-@ review abilities StickyHold to SupersweetSyrup
+^ review abilities StickyHold to SupersweetSyrup
 
-review abilities SupremeOverlord to SwordOfRuin
+^ review abilities SupremeOverlord to SwordOfRuin
 
 review abilities Symbiosis to TeraformZero
 
