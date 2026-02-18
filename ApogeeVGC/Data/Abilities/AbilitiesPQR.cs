@@ -1074,7 +1074,9 @@ public partial record Abilities
                     {
                         if (battle.ActiveMove == null)
                             throw new InvalidOperationException("Battle.ActiveMove is null");
-                        if (battle.ActiveMove.Id != MoveId.Struggle) return null;
+                        // TS returns null (silent failure) to prevent recoil damage, except for Struggle
+                        // In C# engine, null from handler is ignored; use false to prevent damage
+                        if (battle.ActiveMove.Id != MoveId.Struggle) return false;
                     }
 
                     return new VoidReturn();
