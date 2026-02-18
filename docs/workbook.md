@@ -302,9 +302,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities Neuroforce to Normalize
 
-@ review abilities Oblivious to Opportunist
+^ review abilities Oblivious to Opportunist
 
-review abilities OrichalcumPulse to OwnTempo
+@ review abilities OrichalcumPulse to OwnTempo
 
 ## AbilitiesPQR
 
