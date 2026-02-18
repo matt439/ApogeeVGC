@@ -227,6 +227,13 @@ public partial class Battle
     }
 
     /// <summary>
+    /// Cached EffectDelegate for slot condition removal (non-capturing lambda, shared across all calls).
+    /// </summary>
+    private static readonly EffectDelegate SlotConditionRemoveEndDelegate =
+        EffectDelegate.FromNullableDelegate(
+            new Action<Side, Pokemon, ConditionId>((s, _, id) => s.RemoveSideCondition(id)))!;
+
+    /// <summary>
     /// Finds all event handlers for a Pokemon by checking its status, volatiles, ability, item, species, and slot conditions.
     /// This collects all effects that might respond to a specific event for this Pokemon.
     /// </summary>
@@ -254,21 +261,21 @@ public partial class Battle
 
         Side side = pokemon.Side;
 
+        bool hasCustomHolder = customHolder != null;
+        EffectHolder effectHolder = customHolder ?? pokemon;
+
         // Check status condition (paralysis, burn, etc.)
         EventHandlerInfo? handlerInfo = GetHandlerInfo(pokemon, status, callbackName, prefix);
         if (handlerInfo != null || (getKey != null && statusState.GetProperty(getKey) != null))
         {
-            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            handlers.Add(ResolvePriority(new EventListener
             {
                 Effect = status,
                 HandlerInfo = handlerInfo,
                 State = statusState,
-                End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(new Action<bool>(_ =>
-                        pokemon.ClearStatus()))
-                    : null,
-                EndCallArgs = customHolder == null ? [false] : null,
-                EffectHolder = customHolder ?? pokemon,
+                End = hasCustomHolder ? null : pokemon.ClearStatusEndDelegate,
+                EndCallArgs = hasCustomHolder ? null : Pokemon.ClearStatusEndCallArgs,
+                EffectHolder = effectHolder,
             }, callbackName));
         }
 
@@ -280,17 +287,14 @@ public partial class Battle
             if (handlerInfo != null ||
                 (getKey != null && volatileState.GetProperty(getKey) != null))
             {
-                handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+                handlers.Add(ResolvePriority(new EventListener
                 {
                     Effect = volatileCondition,
                     HandlerInfo = handlerInfo,
                     State = volatileState,
-                    End = customHolder == null
-                        ? EffectDelegate.FromNullableDelegate(
-                            (Func<Condition, bool>)pokemon.RemoveVolatile)
-                        : null,
-                    EndCallArgs = customHolder == null ? [volatileCondition] : null,
-                    EffectHolder = customHolder ?? pokemon,
+                    End = hasCustomHolder ? null : pokemon.RemoveVolatileEndDelegate,
+                    EndCallArgs = hasCustomHolder ? null : [volatileCondition],
+                    EffectHolder = effectHolder,
                 }, callbackName));
             }
         }
@@ -303,15 +307,13 @@ public partial class Battle
         }
         if (handlerInfo != null || (getKey != null && abilityState.GetProperty(getKey) != null))
         {
-            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            handlers.Add(ResolvePriority(new EventListener
             {
                 Effect = ability,
                 HandlerInfo = handlerInfo,
                 State = abilityState,
-                End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(pokemon.ClearAbility)
-                    : null,
-                EffectHolder = customHolder ?? pokemon,
+                End = hasCustomHolder ? null : pokemon.ClearAbilityEndDelegate,
+                EffectHolder = effectHolder,
             }, callbackName));
         }
 
@@ -319,15 +321,13 @@ public partial class Battle
         handlerInfo = GetHandlerInfo(pokemon, item, callbackName, prefix);
         if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
         {
-            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            handlers.Add(ResolvePriority(new EventListener
             {
                 Effect = item,
                 HandlerInfo = handlerInfo,
                 State = itemState,
-                End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(pokemon.ClearItem)
-                    : null,
-                EffectHolder = customHolder ?? pokemon,
+                End = hasCustomHolder ? null : pokemon.ClearItemEndDelegate,
+                EffectHolder = effectHolder,
             }, callbackName));
         }
 
@@ -335,13 +335,13 @@ public partial class Battle
         handlerInfo = GetHandlerInfo(pokemon, species, callbackName, prefix);
         if (handlerInfo != null)
         {
-            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            handlers.Add(ResolvePriority(new EventListener
             {
                 Effect = species,
                 HandlerInfo = handlerInfo,
                 State = speciesState,
                 End = null, // Species can't be removed
-                EffectHolder = customHolder ?? pokemon,
+                EffectHolder = effectHolder,
             }, callbackName));
         }
 
@@ -356,18 +356,14 @@ public partial class Battle
                 if (handlerInfo != null ||
                     (getKey != null && slotConditionState.GetProperty(getKey) != null))
                 {
-                    handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+                    handlers.Add(ResolvePriority(new EventListener
                     {
                         Effect = slotCondition,
                         HandlerInfo = handlerInfo,
                         State = slotConditionState,
-                        End = customHolder == null
-                            ? EffectDelegate.FromNullableDelegate(
-                                new Action<Side, Pokemon, ConditionId>((s, _, id) =>
-                                    s.RemoveSideCondition(id)))
-                            : null,
+                        End = hasCustomHolder ? null : SlotConditionRemoveEndDelegate,
                         EndCallArgs = [side, pokemon, conditionId],
-                        EffectHolder = customHolder ?? pokemon,
+                        EffectHolder = effectHolder,
                     }, callbackName));
                 }
             }
@@ -384,7 +380,7 @@ public partial class Battle
 
         if (handlerInfo != null || (getKey != null && FormatData.GetProperty(getKey) != null))
         {
-            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            handlers.Add(ResolvePriority(new EventListener
             {
                 Effect = Format,
                 HandlerInfo = handlerInfo,
@@ -440,14 +436,13 @@ public partial class Battle
             if (handlerInfo != null ||
                 (getKey != null && pseudoWeatherState.GetProperty(getKey) != null))
             {
-                handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+                handlers.Add(ResolvePriority(new EventListener
                 {
                     Effect = pseudoWeather,
                     HandlerInfo = handlerInfo,
                     State = pseudoWeatherState,
                     End = customHolder == null
-                        ? EffectDelegate.FromNullableDelegate(
-                            (Func<ConditionId, bool>)field.RemovePseudoWeather)
+                        ? field.RemovePseudoWeatherEndDelegate
                         : null,
                     EndCallArgs = customHolder == null ? [id] : null,
                     EffectHolder = customHolder is null ? field : customHolder,
@@ -461,13 +456,13 @@ public partial class Battle
         if (weatherHandlerInfo != null ||
             (getKey != null && Field.WeatherState.GetProperty(getKey) != null))
         {
-            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            handlers.Add(ResolvePriority(new EventListener
             {
                 Effect = weather,
                 HandlerInfo = weatherHandlerInfo,
                 State = Field.WeatherState,
                 End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(field.ClearWeather)
+                    ? field.ClearWeatherEndDelegate
                     : null,
                 EffectHolder = customHolder is null ? field : customHolder,
             }, callbackName));
@@ -479,13 +474,13 @@ public partial class Battle
         if (terrainHandlerInfo != null ||
             (getKey != null && field.TerrainState.GetProperty(getKey) != null))
         {
-            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            handlers.Add(ResolvePriority(new EventListener
             {
                 Effect = terrain,
                 HandlerInfo = terrainHandlerInfo,
                 State = field.TerrainState,
                 End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(field.ClearTerrain)
+                    ? field.ClearTerrainEndDelegate
                     : null,
                 EffectHolder = customHolder is null ? field : customHolder,
             }, callbackName));
@@ -504,14 +499,13 @@ public partial class Battle
             if (handlerInfo != null ||
                 (getKey != null && sideConditionData.GetProperty(getKey) != null))
             {
-                handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+                handlers.Add(ResolvePriority(new EventListener
                 {
                     Effect = sideCondition,
                     HandlerInfo = handlerInfo,
                     State = sideConditionData,
                     End = customHolder == null
-                        ? EffectDelegate.FromNullableDelegate(
-                            (Func<ConditionId, bool>)side.RemoveSideCondition)
+                        ? side.RemoveSideConditionEndDelegate
                         : null,
                     EndCallArgs = customHolder == null ? [id] : null,
                     EffectHolder = customHolder is null ? side : customHolder,

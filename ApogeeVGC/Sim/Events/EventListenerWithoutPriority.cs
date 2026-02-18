@@ -4,14 +4,14 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events;
 
-public record EventListenerWithoutPriority
+public class EventListenerWithoutPriority
 {
-    public required IEffect Effect { get; init; }
+    public required IEffect Effect { get; set; }
     public Pokemon? Target { get; set; }
     public int? Index { get; set; }
-    public EventHandlerInfo? HandlerInfo { get; init; }
-    public EffectState? State { get; init; }
-    public EffectDelegate? End { get; init; }
-    public List<object>? EndCallArgs { get; init; }
-    public required EffectHolder EffectHolder { get; init; }
+    public EventHandlerInfo? HandlerInfo { get; set; }
+    public EffectState? State { get; set; }
+    public EffectDelegate? End { get; set; }
+    public List<object>? EndCallArgs { get; set; }
+    public required EffectHolder EffectHolder { get; set; }
 }

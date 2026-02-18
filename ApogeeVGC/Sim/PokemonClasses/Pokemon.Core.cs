@@ -162,6 +162,34 @@ public partial class Pokemon : IPriorityComparison
 
     public PokemonDetails Details { get; set; }
 
+    #region Cached End delegates for event handler discovery (avoids per-call allocations)
+
+    private EffectDelegate? _clearStatusEndDelegate;
+    private EffectDelegate? _removeVolatileEndDelegate;
+    private EffectDelegate? _clearAbilityEndDelegate;
+    private EffectDelegate? _clearItemEndDelegate;
+
+    internal EffectDelegate ClearStatusEndDelegate =>
+        _clearStatusEndDelegate ??=
+            EffectDelegate.FromNullableDelegate(new Action<bool>(_ => ClearStatus()))!;
+
+    internal EffectDelegate RemoveVolatileEndDelegate =>
+        _removeVolatileEndDelegate ??=
+            EffectDelegate.FromNullableDelegate((Func<Condition, bool>)RemoveVolatile)!;
+
+    internal EffectDelegate ClearAbilityEndDelegate =>
+        _clearAbilityEndDelegate ??=
+            EffectDelegate.FromNullableDelegate(
+                (Func<AbilityIdFalseUnion?>)ClearAbility)!;
+
+    internal EffectDelegate ClearItemEndDelegate =>
+        _clearItemEndDelegate ??=
+            EffectDelegate.FromNullableDelegate((Func<bool>)ClearItem)!;
+
+    internal static readonly List<object> ClearStatusEndCallArgs = [false];
+
+    #endregion
+
     /// <summary>
     /// Gets the list of move IDs for the Pokemon's current move slots.
     /// </summary>

@@ -24,6 +24,26 @@ public class Field
         TerrainState = Battle.InitEffectState();
     }
 
+    #region Cached End delegates for event handler discovery (avoids per-call allocations)
+
+    private EffectDelegate? _clearWeatherEndDelegate;
+    private EffectDelegate? _clearTerrainEndDelegate;
+    private EffectDelegate? _removePseudoWeatherEndDelegate;
+
+    internal EffectDelegate ClearWeatherEndDelegate =>
+        _clearWeatherEndDelegate ??=
+            EffectDelegate.FromNullableDelegate((Func<bool>)ClearWeather)!;
+
+    internal EffectDelegate ClearTerrainEndDelegate =>
+        _clearTerrainEndDelegate ??=
+            EffectDelegate.FromNullableDelegate((Func<bool>)ClearTerrain)!;
+
+    internal EffectDelegate RemovePseudoWeatherEndDelegate =>
+        _removePseudoWeatherEndDelegate ??=
+            EffectDelegate.FromNullableDelegate((Func<ConditionId, bool>)RemovePseudoWeather)!;
+
+    #endregion
+
     public bool SetWeather(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
         Condition condition = Battle.Library.Conditions[status];
