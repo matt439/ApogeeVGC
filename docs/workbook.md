@@ -264,9 +264,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities FlareBoost to FlowerGift
 
-@ review abilities FlowerVeil to Forecast
+^ review abilities FlowerVeil to Forecast
 
-review abilities Forewarn to FurCoat
+@ review abilities Forewarn to FurCoat
 
 ## AbilitiesGHI
 
