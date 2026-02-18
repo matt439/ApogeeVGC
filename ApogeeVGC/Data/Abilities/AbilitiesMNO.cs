@@ -778,8 +778,13 @@ public partial record Abilities
                                 target, pokemon, ngAbility);
                         }
 
-                        // Note: Slow Start is handled via ability state counter, not a volatile
-                        // Gen 9 VGC doesn't include Regigigas, so this check is omitted
+                        // Slow Start is handled via ability state counter, not a volatile
+                        if (target.GetAbility().Id == AbilityId.SlowStart &&
+                            target.AbilityState.Counter != null)
+                        {
+                            target.AbilityState.Counter = null;
+                            battle.Add("-end", target, "Slow Start", "[silent]");
+                        }
 
                         if (Array.Exists(strongWeathers, w => w == target.GetAbility().Id))
                         {
