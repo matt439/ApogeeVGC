@@ -298,9 +298,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities MistySurge to Multiscale
 
-@ review abilities Multitype to NaturalCure
+^ review abilities Multitype to NaturalCure
 
-review abilities Neuroforce to Normalize
+@ review abilities Neuroforce to Normalize
 
 review abilities Oblivious to Opportunist
 
