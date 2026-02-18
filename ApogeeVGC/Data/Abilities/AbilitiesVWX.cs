@@ -24,7 +24,7 @@ public partial record Abilities
             {
                 Id = AbilityId.VesselOfRuin,
                 Name = "Vessel of Ruin",
-                Num = 287,
+                Num = 284,
                 Rating = 4.5,
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {

@@ -320,7 +320,7 @@ review moves Yawn to ZingZap
 
 ^ review abilities Reckless to RksSystem
 
-@ review abilities RockHead to RunAway
+^ review abilities RockHead to RunAway
 
 ## AbilitiesSTU
 
@@ -350,7 +350,7 @@ review abilities Unaware to UnseenFist
 
 ## AbilitiesVWX
 
-review abilities VesselOfRuin to VoltAbsorb
+@ review abilities VesselOfRuin to VoltAbsorb
 
 review abilities WanderingSpirit to WaterVeil
 
