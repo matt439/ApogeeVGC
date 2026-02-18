@@ -126,18 +126,6 @@ public partial record Conditions
 
                     return new Empty(); // Equivalent to Battle.NOT_FAIL
                 }, 4),
-                OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
-                {
-                    // Duration handled automatically
-                }) with
-                {
-                    Order = 26,
-                    SubOrder = 3,
-                },
-                OnSideEnd = OnSideEndEventInfo.Create((_, _) =>
-                {
-                    // Silent end - Wide Guard doesn't announce when it ends
-                }),
             },
             [ConditionId.Wish] = new()
             {
