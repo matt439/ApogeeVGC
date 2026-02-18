@@ -352,9 +352,9 @@ review abilities Unaware to UnseenFist
 
 ^ review abilities VesselOfRuin to VoltAbsorb
 
-@ review abilities WanderingSpirit to WaterVeil
+^ review abilities WanderingSpirit to WaterVeil
 
-review abilities WeakArmor to WindPower
+@ review abilities WeakArmor to WindPower
 
 review abilities WindRider to WonderSkin
 
