@@ -308,9 +308,9 @@ review moves Yawn to ZingZap
 
 ## AbilitiesPQR
 
-@ review abilities ParentalBond to Pickup
+^ review abilities ParentalBond to Pickup
 
-review abilities Pixilate to PowerOfAlchemy
+@ review abilities Pixilate to PowerOfAlchemy
 
 review abilities PowerSpot to Protean
 
