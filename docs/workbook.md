@@ -326,9 +326,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities SandForce to SapSipper
 
-@ review abilities Schooling to ShadowShield
+^ review abilities Schooling to ShadowShield
 
-review abilities ShadowTag to ShieldDust
+@ review abilities ShadowTag to ShieldDust
 
 review abilities ShieldsDown to Sniper
 

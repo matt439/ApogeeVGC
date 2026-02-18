@@ -795,7 +795,7 @@ public partial record Abilities
                     }
 
                     return new VoidReturn();
-                }, 1),
+                }),
                 OnAllyTryHitSide = OnAllyTryHitSideEventInfo.Create((battle, _, _, move) =>
                 {
                     if (move.Flags.Sound == true)
@@ -865,7 +865,7 @@ public partial record Abilities
                 Num = 100,
                 Rating = -1.0,
                 OnFractionalPriority = OnFractionalPriorityEventInfo.Create(
-                    (_, _, _, _, _) => -0.1, -1),
+                    (_, _, _, _, _) => -0.1),
             },
             [AbilityId.Stalwart] = new()
             {
@@ -1156,7 +1156,7 @@ public partial record Abilities
                     }
 
                     return new VoidReturn();
-                }, 1),
+                }),
                 // OnDamagePriority = -30
                 OnDamage = OnDamageEventInfo.Create((battle, damage, target, _, effect) =>
                 {
