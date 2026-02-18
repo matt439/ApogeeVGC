@@ -1093,7 +1093,7 @@ public partial record Abilities
                     }
 
                     return new VoidReturn();
-                }, 1),
+                }),
 
                 OnAnyRedirectTarget =
                     OnAnyRedirectTargetEventInfo.Create((battle, target, source, _, move) =>

@@ -332,9 +332,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities ShieldsDown to Sniper
 
-@ review abilities SnowCloak to Stall
+^ review abilities SnowCloak to Stall
 
-review abilities Stalwart to Stench
+@ review abilities Stalwart to Stench
 
 review abilities StickyHold to SupersweetSyrup
 
