@@ -731,11 +731,7 @@ public partial record Conditions
                             return atk;
                         }
 
-                        if (battle.DisplayUi)
-                        {
-                            battle.Debug("Quark Drive atk boost");
-                        }
-
+                        battle.Debug("Quark Drive atk boost");
                         battle.ChainModify([5325, 4096]);
                         return battle.FinalModify(atk);
                     },
@@ -749,11 +745,7 @@ public partial record Conditions
                             return def;
                         }
 
-                        if (battle.DisplayUi)
-                        {
-                            battle.Debug("Quark Drive def boost");
-                        }
-
+                        battle.Debug("Quark Drive def boost");
                         battle.ChainModify([5325, 4096]);
                         return battle.FinalModify(def);
                     },
@@ -767,11 +759,7 @@ public partial record Conditions
                             return spa;
                         }
 
-                        if (battle.DisplayUi)
-                        {
-                            battle.Debug("Quark Drive spa boost");
-                        }
-
+                        battle.Debug("Quark Drive spa boost");
                         battle.ChainModify([5325, 4096]);
                         return battle.FinalModify(spa);
                     },
@@ -785,11 +773,7 @@ public partial record Conditions
                             return spd;
                         }
 
-                        if (battle.DisplayUi)
-                        {
-                            battle.Debug("Quark Drive spd boost");
-                        }
-
+                        battle.Debug("Quark Drive spd boost");
                         battle.ChainModify([5325, 4096]);
                         return battle.FinalModify(spd);
                     },
@@ -800,11 +784,6 @@ public partial record Conditions
                         pokemon.IgnoringAbility())
                     {
                         return spe;
-                    }
-
-                    if (battle.DisplayUi)
-                    {
-                        battle.Debug("Quark Drive spe boost");
                     }
 
                     battle.ChainModify(1.5);

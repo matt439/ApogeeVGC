@@ -852,8 +852,9 @@ public partial record Abilities
                 }),
                 OnAfterBoost = OnAfterBoostEventInfo.Create((battle, boost, _, _, effect) =>
                 {
-                    // TS checks effect?.name === 'Intimidate' - using Id enum instead
-                    if (effect is Ability { Id: AbilityId.Intimidate } && boost.Atk != null)
+                    // TS: effect?.name === 'Intimidate' && boost.atk
+                    // boost.atk is falsy if 0 (e.g. blocked by Hyper Cutter), so check != 0 too
+                    if (effect is Ability { Id: AbilityId.Intimidate } && boost.Atk is not null and not 0)
                     {
                         battle.Boost(new SparseBoostsTable { Spe = 1 });
                     }
