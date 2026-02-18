@@ -137,6 +137,7 @@ public record ActiveMove : Move, IEffect
         _handlerCache ??= EventHandlerInfoMapper.BuildMoveHandlerCache(this);
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;
+    public bool HasPrefixedHandlers => false; // Moves don't have prefixed handlers
 
     /// <summary>
     /// Gets event handler information for the specified event.

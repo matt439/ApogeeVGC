@@ -217,6 +217,7 @@ public record Species : IEffect, ICopyable<Species>
     }
 
     public bool HasAnyEventHandlers => false;
+    public bool HasPrefixedHandlers => false;
 }
 
 public enum SpeciesAbilityType

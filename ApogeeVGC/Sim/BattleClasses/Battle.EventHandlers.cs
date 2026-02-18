@@ -130,28 +130,24 @@ public partial class Battle
 
                 if (prefixedHandlers)
                 {
-                    // Check allies (including self) for Ally and Any prefixed events
+                    // Check allies (including self) for Ally and Any prefixed events — batched
                     foreach (Pokemon allyActive in pokemon.AlliesAndSelf())
                     {
                         // Guard against null allies (defensive)
                         if (allyActive is null) continue;
 
-                        FindPokemonEventHandlers(handlers, allyActive, eventName,
-                            EventPrefix.Ally);
-                        FindPokemonEventHandlers(handlers, allyActive, eventName,
-                            EventPrefix.Any);
+                        FindPokemonEventHandlersPrefixed(handlers, allyActive, eventName,
+                            EventPrefix.Ally, EventPrefix.Any);
                     }
 
-                    // Check foes for Foe and Any prefixed events
+                    // Check foes for Foe and Any prefixed events — batched
                     foreach (Pokemon foeActive in pokemon.Foes())
                     {
                         // Guard against null foes (defensive)
                         if (foeActive is null) continue;
 
-                        FindPokemonEventHandlers(handlers, foeActive, eventName,
-                            EventPrefix.Foe);
-                        FindPokemonEventHandlers(handlers, foeActive, eventName,
-                            EventPrefix.Any);
+                        FindPokemonEventHandlersPrefixed(handlers, foeActive, eventName,
+                            EventPrefix.Foe, EventPrefix.Any);
                     }
                 }
 
@@ -181,17 +177,16 @@ public partial class Battle
                         if (side == targetSide)
                         {
                             FindPokemonEventHandlers(handlers, active, eventName);
+                            if (prefixedHandlers)
+                            {
+                                FindPokemonEventHandlers(handlers, active, eventName,
+                                    EventPrefix.Any);
+                            }
                         }
                         else if (prefixedHandlers)
                         {
-                            FindPokemonEventHandlers(handlers, active, eventName,
-                                EventPrefix.Foe);
-                        }
-
-                        if (prefixedHandlers)
-                        {
-                            FindPokemonEventHandlers(handlers, active, eventName,
-                                EventPrefix.Any);
+                            FindPokemonEventHandlersPrefixed(handlers, active, eventName,
+                                EventPrefix.Foe, EventPrefix.Any);
                         }
                     }
                 }
@@ -362,6 +357,195 @@ public partial class Battle
                         HandlerInfo = handlerInfo,
                         State = slotConditionState,
                         End = hasCustomHolder ? null : SlotConditionRemoveEndDelegate,
+                        EndCallArgs = [side, pokemon, conditionId],
+                        EffectHolder = effectHolder,
+                    }, callbackName));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Finds event handlers for a Pokemon checking two prefixes in a single pass over effects.
+    /// Skips effects that have no prefixed handlers for efficient batch lookups.
+    /// Only used for non-None prefix pairs from <see cref="FindEventHandlers"/> (Ally+Any, Foe+Any).
+    /// </summary>
+    private void FindPokemonEventHandlersPrefixed(List<EventListener> handlers, Pokemon pokemon,
+        EventId callbackName, EventPrefix prefix1, EventPrefix prefix2)
+    {
+        Condition status = pokemon.GetStatus();
+        EffectState statusState = pokemon.StatusState;
+
+        Ability ability = pokemon.GetAbility();
+        EffectState abilityState = pokemon.AbilityState;
+
+        Item item = pokemon.GetItem();
+        EffectState itemState = pokemon.ItemState;
+
+        Side side = pokemon.Side;
+        EffectHolder effectHolder = pokemon;
+
+        // Check status condition — skip if it has no prefixed handlers
+        if (status.HasPrefixedHandlers)
+        {
+            EventHandlerInfo? handlerInfo = status.GetEventHandlerInfo(callbackName, prefix1);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = status,
+                    HandlerInfo = handlerInfo,
+                    State = statusState,
+                    End = pokemon.ClearStatusEndDelegate,
+                    EndCallArgs = Pokemon.ClearStatusEndCallArgs,
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+
+            handlerInfo = status.GetEventHandlerInfo(callbackName, prefix2);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = status,
+                    HandlerInfo = handlerInfo,
+                    State = statusState,
+                    End = pokemon.ClearStatusEndDelegate,
+                    EndCallArgs = Pokemon.ClearStatusEndCallArgs,
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+        }
+
+        // Check volatile conditions — iterate once for both prefixes
+        foreach ((ConditionId volatileId, EffectState volatileState) in pokemon.Volatiles)
+        {
+            Condition volatileCondition = Library.Conditions[volatileId];
+            if (!volatileCondition.HasPrefixedHandlers) continue;
+
+            EventHandlerInfo? handlerInfo = volatileCondition.GetEventHandlerInfo(callbackName, prefix1);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = volatileCondition,
+                    HandlerInfo = handlerInfo,
+                    State = volatileState,
+                    End = pokemon.RemoveVolatileEndDelegate,
+                    EndCallArgs = [volatileCondition],
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+
+            handlerInfo = volatileCondition.GetEventHandlerInfo(callbackName, prefix2);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = volatileCondition,
+                    HandlerInfo = handlerInfo,
+                    State = volatileState,
+                    End = pokemon.RemoveVolatileEndDelegate,
+                    EndCallArgs = [volatileCondition],
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+        }
+
+        // Check ability
+        if (ability.HasPrefixedHandlers)
+        {
+            EventHandlerInfo? handlerInfo = ability.GetEventHandlerInfo(callbackName, prefix1);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = ability,
+                    HandlerInfo = handlerInfo,
+                    State = abilityState,
+                    End = pokemon.ClearAbilityEndDelegate,
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+
+            handlerInfo = ability.GetEventHandlerInfo(callbackName, prefix2);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = ability,
+                    HandlerInfo = handlerInfo,
+                    State = abilityState,
+                    End = pokemon.ClearAbilityEndDelegate,
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+        }
+
+        // Check held item
+        if (item.HasPrefixedHandlers)
+        {
+            EventHandlerInfo? handlerInfo = item.GetEventHandlerInfo(callbackName, prefix1);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = item,
+                    HandlerInfo = handlerInfo,
+                    State = itemState,
+                    End = pokemon.ClearItemEndDelegate,
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+
+            handlerInfo = item.GetEventHandlerInfo(callbackName, prefix2);
+            if (handlerInfo != null)
+            {
+                handlers.Add(ResolvePriority(new EventListener
+                {
+                    Effect = item,
+                    HandlerInfo = handlerInfo,
+                    State = itemState,
+                    End = pokemon.ClearItemEndDelegate,
+                    EffectHolder = effectHolder,
+                }, callbackName));
+            }
+        }
+
+        // Species never has prefixed handlers — skip
+
+        // Check slot conditions
+        if (pokemon.Position < side.SlotConditions.Count)
+        {
+            foreach ((ConditionId conditionId, EffectState slotConditionState) in
+                side.SlotConditions[pokemon.Position])
+            {
+                Condition slotCondition = Library.Conditions[conditionId];
+                if (!slotCondition.HasPrefixedHandlers) continue;
+
+                EventHandlerInfo? handlerInfo = slotCondition.GetEventHandlerInfo(callbackName, prefix1);
+                if (handlerInfo != null)
+                {
+                    handlers.Add(ResolvePriority(new EventListener
+                    {
+                        Effect = slotCondition,
+                        HandlerInfo = handlerInfo,
+                        State = slotConditionState,
+                        End = SlotConditionRemoveEndDelegate,
+                        EndCallArgs = [side, pokemon, conditionId],
+                        EffectHolder = effectHolder,
+                    }, callbackName));
+                }
+
+                handlerInfo = slotCondition.GetEventHandlerInfo(callbackName, prefix2);
+                if (handlerInfo != null)
+                {
+                    handlers.Add(ResolvePriority(new EventListener
+                    {
+                        Effect = slotCondition,
+                        HandlerInfo = handlerInfo,
+                        State = slotConditionState,
+                        End = SlotConditionRemoveEndDelegate,
                         EndCallArgs = [side, pokemon, conditionId],
                         EffectHolder = effectHolder,
                     }, callbackName));

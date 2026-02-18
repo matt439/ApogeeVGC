@@ -345,6 +345,10 @@ public partial record Format : IEffect, IBasicEffect, ICopyable<Format>
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;
 
+    private bool? _hasPrefixedHandlers;
+    public bool HasPrefixedHandlers =>
+        _hasPrefixedHandlers ??= EventHandlerInfoMapper.CacheHasPrefixedHandlers(HandlerCache);
+
     /// <summary>
     /// Gets event handler information for the specified event.
     /// Uses a pre-computed cache for O(1) lookups.
