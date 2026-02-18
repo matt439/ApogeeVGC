@@ -1147,11 +1147,11 @@ public partial record Abilities
                 Num = 5,
                 Rating = 3.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = OnTryHitEventInfo.Create((battle, pokemon, _, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, _, target, move) =>
                 {
                     if (move.Ohko != null)
                     {
-                        battle.Add("-immune", pokemon, "[from] ability: Sturdy");
+                        battle.Add("-immune", target, "[from] ability: Sturdy");
                         return null;
                     }
 

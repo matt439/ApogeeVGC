@@ -334,9 +334,9 @@ review moves Yawn to ZingZap
 
 ^ review abilities SnowCloak to Stall
 
-@ review abilities Stalwart to Stench
+^ review abilities Stalwart to Stench
 
-review abilities StickyHold to SupersweetSyrup
+@ review abilities StickyHold to SupersweetSyrup
 
 review abilities SupremeOverlord to SwordOfRuin
 
