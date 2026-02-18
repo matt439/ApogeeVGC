@@ -286,9 +286,9 @@ review moves Yawn to ZingZap
 
 ## AbilitiesJKL
 
-@ review abilities Justified to LightMetal
+^ review abilities Justified to LightMetal
 
-review abilities LightningRod to LongReach
+^ review abilities LightningRod to LongReach
 
 ## AbilitiesMNO
 

@@ -301,7 +301,7 @@ public partial record Abilities
                             return null;
                         }
 
-                        battle.Debug($"Heal is occurring: {target} <- {source} :: {effect.Name}");
+                        battle.Debug($"Heal is occurring: {target} <- {source} :: {effect.EffectStateId}");
 
                         // Check if this healing effect should trigger Liquid Ooze damage
                         // TypeScript: const canOoze = ['drain', 'leechseed', 'strengthsap'];
