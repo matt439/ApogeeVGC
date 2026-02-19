@@ -377,13 +377,13 @@ review moves Yawn to ZingZap
 
 ^ review items ChoiceScarf to ClearAmulet
 
-@ review items CloverSweet to CustapBerry
+^ review items CloverSweet to CustapBerry
 
 ## ItemsDEF
 
-review items DampRock to DuskStone
+^ review items DampRock to DuskStone
 
-review items EarthPlate to ElectricSeed
+^ review items EarthPlate to ElectricSeed
 
 review items EnigmaBerry to FistPlate
 
