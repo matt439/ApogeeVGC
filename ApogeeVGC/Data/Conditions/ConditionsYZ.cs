@@ -34,7 +34,7 @@ public partial record Conditions
                 OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Yawn resolves at the end of the turn after it was applied
-                }, 23),
+                }, order: 23),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     // TS always adds the message (no DisplayUi check)

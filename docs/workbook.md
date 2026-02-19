@@ -340,13 +340,13 @@ review moves Yawn to ZingZap
 
 ^ review abilities SupremeOverlord to SwordOfRuin
 
-review abilities Symbiosis to TeraformZero
+^ review abilities Symbiosis to TeraformZero
 
-review abilities TeraShell to ToughClaws
+^ review abilities TeraShell to ToughClaws
 
-review abilities ToxicBoost to Turboblaze
+^ review abilities ToxicBoost to Turboblaze
 
-review abilities Unaware to UnseenFist
+^ review abilities Unaware to UnseenFist
 
 ## AbilitiesVWX
 
@@ -447,7 +447,7 @@ review items WideLens to WiseGlasses
 
 ## ItemsYZ
 
-review items YacheBerry to ZoomLens
+^ review items YacheBerry to ZoomLens
 
 # Conditions
 
