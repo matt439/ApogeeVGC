@@ -478,8 +478,7 @@ public partial record Conditions
                     // TS: if (!this.activeMove) throw new Error("Battle.activeMove is null");
                     if (battle.ActiveMove == null)
                     {
-                        battle.Debug($"[ChoiceLock.OnStart] {pokemon.Name}: ActiveMove is null, rejecting volatile");
-                        return new BoolRelayVar(false);
+                        throw new InvalidOperationException("Battle.ActiveMove is null");
                     }
 
                     // TS: if (!this.activeMove.id || this.activeMove.hasBounced || this.activeMove.sourceEffect === 'snatch') return false;
@@ -494,22 +493,10 @@ public partial record Conditions
                     }
 
                     // TS: this.effectState.move = this.activeMove.id;
-                    battle.EffectState.Move = battle.ActiveMove.Id;
+                    pokemon.Volatiles[ConditionId.ChoiceLock].Move = battle.ActiveMove.Id;
                     battle.Debug(
                         $"[ChoiceLock.OnStart] {pokemon.Name}: Volatile added, locked to {battle.ActiveMove.Id}");
                     return new VoidReturn();
-                }),
-                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
-                {
-                    // Fallback: Set the locked move if it hasn't been set yet
-                    // (OnStart should have set it, but this provides defense in depth)
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.ChoiceLock, out EffectState? effectState) &&
-                        effectState.Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceLock.OnModifyMove] {pokemon.Name}: Locking to {move.Id} (fallback)");
-                        effectState.Move = move.Id;
-                    }
                 }),
                 OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, move) =>
                 {
@@ -530,16 +517,13 @@ public partial record Conditions
                         return new VoidReturn();
                     }
 
-                    // The move should already be locked by OnModifyMove
-                    // Check if attempting to use a different move
+                    // Check if attempting to use a different move than the locked one
                     var lockedMove = pokemon.Volatiles[ConditionId.ChoiceLock].Move;
                     if (move.Id != (lockedMove ?? default) && move.Id != MoveId.Struggle)
                     {
                         // Move is blocked by choice lock
                         battle.Debug(
                             $"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Move {move.Id} BLOCKED!");
-
-                        if (!battle.DisplayUi) return false;
 
                         battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon),
                             move.Name);

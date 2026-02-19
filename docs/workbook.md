@@ -367,15 +367,15 @@ review moves Yawn to ZingZap
 
 ## ItemsABC
 
-review items AbilityShield to AguavBerry
+^ review items AbilityShield to AguavBerry
 
-review items AirBalloon to BigNugget
+^ review items AirBalloon to BigNugget
 
-review items BigRoot to BrightPowder
+^ review items BigRoot to BrightPowder
 
-review items CellBattery to ChoiceBand
+^ review items CellBattery to ChoiceBand
 
-review items ChoiceScarf to ClearAmulet
+@ review items ChoiceScarf to ClearAmulet
 
 review items CloverSweet to CustapBerry
 
