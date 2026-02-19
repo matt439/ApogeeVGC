@@ -1072,7 +1072,7 @@ public partial record Items
 
                         return DoubleVoidUnion.FromVoid();
                     }), -2),
-                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                OnEat = OnEatEventInfo.Create((Action<Battle, Pokemon>)((_, _) => { })),
                 Num = 210,
                 Gen = 4,
             },
