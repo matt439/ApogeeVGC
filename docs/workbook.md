@@ -385,7 +385,7 @@ review moves Yawn to ZingZap
 
 ^ review items EarthPlate to ElectricSeed
 
-review items EnigmaBerry to FistPlate
+@ review items EnigmaBerry to FistPlate
 
 review items FlameOrb to FriendBall
 

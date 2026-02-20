@@ -396,7 +396,7 @@ public partial record Items
                         }
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnTryEatItem = OnTryEatItemEventInfo.Create((battle, _, pokemon) =>
                     {
