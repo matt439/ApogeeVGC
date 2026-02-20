@@ -22,22 +22,7 @@ public partial record Items
         return new Dictionary<ItemId, Item>
         {
             // M items
-            [ItemId.MachoBrace] = new()
-            {
-                Id = ItemId.MachoBrace,
-                Name = "Macho Brace",
-                SpriteNum = 269,
-                IgnoreKlutz = true,
-                Fling = new FlingData { BasePower = 60 },
-                OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
-                {
-                    battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
-                }),
-                Num = 215,
-                Gen = 3,
-                // IsNonstandard = "Past", // Used for EV training, may not be in Gen 9
-            },
+            // MachoBrace removed - isNonstandard: "Past"
             [ItemId.Magmarizer] = new()
             {
                 Id = ItemId.Magmarizer,
