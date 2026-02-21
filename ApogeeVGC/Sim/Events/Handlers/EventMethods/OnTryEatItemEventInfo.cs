@@ -8,7 +8,10 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnTryEatItem event.
 /// Triggered when a Pokemon tries to eat an item (like a berry).
-/// Signature: (Battle battle, Item item, Pokemon pokemon) => BoolVoidUnion | bool
+/// Item parameter is nullable because in RunEvent handler chains, earlier handlers
+/// may replace the relay var (from EffectRelayVar to BoolRelayVar), making the
+/// original item unresolvable for later handlers.
+/// Signature: (Battle battle, Item? item, Pokemon pokemon) => BoolVoidUnion | bool
 /// </summary>
 public sealed record OnTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
 {
@@ -26,7 +29,7 @@ public sealed record OnTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
     /// Creates strongly-typed context-based handler.
     /// </summary>
     public static OnTryEatItemEventInfo Create(
-        Func<Battle, Item, Pokemon, BoolVoidUnion> handler,
+        Func<Battle, Item?, Pokemon, BoolVoidUnion> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
@@ -35,7 +38,7 @@ public sealed record OnTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
             {
                 var result = handler(
                     context.Battle,
-                context.GetEffectParam<Item>(),
+                context.TryGetEffectParam<Item>(),
                 context.GetTargetOrSourcePokemon()
                 );
                 return result switch

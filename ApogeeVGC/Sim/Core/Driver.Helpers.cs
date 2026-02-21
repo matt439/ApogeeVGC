@@ -413,6 +413,7 @@ public partial class Driver
         if (ex is not BattleTimeoutException and not BattleTurnLimitException)
         {
             Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
+            LogInnerExceptions(ex);
         }
 
         Console.WriteLine("-----------------------------------------------------------");
@@ -472,10 +473,30 @@ public partial class Driver
         if (ex is not BattleTimeoutException and not BattleTurnLimitException)
         {
             Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
+            LogInnerExceptions(ex);
         }
 
         Console.WriteLine("-----------------------------------------------------------");
         Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Logs the full inner exception chain for debugging.
+    /// </summary>
+    private static void LogInnerExceptions(Exception ex)
+    {
+        Exception? inner = ex.InnerException;
+        int depth = 1;
+        while (inner != null)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"--- Inner Exception (depth {depth}) ---");
+            Console.WriteLine($"Type: {inner.GetType().Name}");
+            Console.WriteLine($"Message: {inner.Message}");
+            Console.WriteLine($"Stack Trace:\n{inner.StackTrace}");
+            inner = inner.InnerException;
+            depth++;
+        }
     }
 
     /// <summary>

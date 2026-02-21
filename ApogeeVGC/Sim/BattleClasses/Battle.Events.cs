@@ -287,6 +287,8 @@ public partial class Battle
         };
         EventDepth++;
 
+        try
+        {
         // Handle array targets
         List<RelayVar>? targetRelayVars = null;
         if (target is PokemonArrayRunEventTarget arrayTarget)
@@ -423,34 +425,39 @@ public partial class Battle
             IEffect parentEffect = Effect;
             EffectState parentEffectState = EffectState;
 
-            // Set up handler's effect context
-            Effect = handler.Effect;
-            EffectState = handler.State ?? InitEffectState();
-            EffectState.Target = effectHolder switch
+            try
             {
-                PokemonEffectHolder pokemonEh => new PokemonEffectStateTarget(pokemonEh.Pokemon),
-                SideEffectHolder sideEh => new SideEffectStateTarget(sideEh.Side),
-                FieldEffectHolder fieldEh => new FieldEffectStateTarget(fieldEh.Field),
-                BattleEffectHolder battleEh => EffectStateTarget.FromBattle(battleEh.Battle),
-                _ => null,
-            };
+                // Set up handler's effect context
+                Effect = handler.Effect;
+                EffectState = handler.State ?? InitEffectState();
+                EffectState.Target = effectHolder switch
+                {
+                    PokemonEffectHolder pokemonEh => new PokemonEffectStateTarget(pokemonEh.Pokemon),
+                    SideEffectHolder sideEh => new SideEffectStateTarget(sideEh.Side),
+                    FieldEffectHolder fieldEh => new FieldEffectStateTarget(fieldEh.Field),
+                    BattleEffectHolder battleEh => EffectStateTarget.FromBattle(battleEh.Battle),
+                    _ => null,
+                };
 
-            // Invoke the handler if present
-            if (handler.HandlerInfo != null)
-            {
-                returnVal = InvokeEventHandlerInfo(
-                    handler.HandlerInfo,
-                    hasRelayVar,
-                    relayVar,
-                    Event.Target,
-                    Event.Source,
-                    sourceEffect
-                );
+                // Invoke the handler if present
+                if (handler.HandlerInfo != null)
+                {
+                    returnVal = InvokeEventHandlerInfo(
+                        handler.HandlerInfo,
+                        hasRelayVar,
+                        relayVar,
+                        Event.Target,
+                        Event.Source,
+                        sourceEffect
+                    );
+                }
             }
-
-            // Restore parent effect context
-            Effect = parentEffect;
-            EffectState = parentEffectState;
+            finally
+            {
+                // Restore parent effect context (always, even on exception)
+                Effect = parentEffect;
+                EffectState = parentEffectState;
+            }
 
             // Process return value
             if (returnVal != null)
@@ -483,21 +490,23 @@ public partial class Battle
             }
         }
 
-        // Restore event depth and parent event
-        EventDepth--;
-
         // Apply event modifier to numeric relay vars
         if (relayVar is IntRelayVar intRelay && intRelay.Value == Math.Abs(intRelay.Value))
         {
             relayVar = new IntRelayVar(FinalModify(intRelay.Value));
         }
 
-        Event = parentEvent;
-
         // Return appropriate result
         return target is PokemonArrayRunEventTarget
             ? new ArrayRelayVar([.. targetRelayVars ?? []])
             : relayVar;
+        }
+        finally
+        {
+            // Restore event depth and parent event (always, even on exception)
+            EventDepth--;
+            Event = parentEvent;
+        }
     }
 
     /// <summary>
@@ -987,6 +996,10 @@ public partial class Battle
         {
             EventContext eventContext = invocationContext.ToEventContext();
 
+            // Capture effect name before execution since nested events may change Effect
+            string effectName = Effect?.Name ?? "unknown";
+            EffectType? effectType = Effect?.EffectType;
+
             try
             {
                 return handlerInfo.ContextHandler!(eventContext);
@@ -994,7 +1007,7 @@ public partial class Battle
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    $"Event {handlerInfo.Id} context handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
+                    $"Event {handlerInfo.Id} context handler failed on effect {effectName} ({effectType})",
                     ex);
             }
         }

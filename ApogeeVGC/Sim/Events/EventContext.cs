@@ -208,6 +208,25 @@ public sealed class EventContext
     }
 
     /// <summary>
+    /// Tries to get an effect parameter, returning null if not found.
+    /// Uses the same resolution order as <see cref="GetEffectParam{TEffect}"/>.
+    /// In RunEvent handler chains, earlier handlers may replace the relay var
+    /// (e.g., from EffectRelayVar to BoolRelayVar), making the original effect
+    /// unresolvable. This mirrors TypeScript's dynamic typing where handlers
+    /// receive the current relay var regardless of its type.
+    /// </summary>
+    public TEffect? TryGetEffectParam<TEffect>() where TEffect : class, IEffect
+    {
+        if (RelayVar is EffectRelayVar erv && erv.Effect is TEffect fromRelay)
+            return fromRelay;
+        if (Effect is TEffect fromEffect)
+            return fromEffect;
+        if (SourceEffect is TEffect fromSource)
+            return fromSource;
+        return null;
+    }
+
+    /// <summary>
     /// Gets a SparseBoostsTable from the relay var, handling both SparseBoostsTableRelayVar
     /// and BoostsTableRelayVar (with conversion). Matches legacy adapter TryUnwrapRelayVar behavior.
     /// </summary>
