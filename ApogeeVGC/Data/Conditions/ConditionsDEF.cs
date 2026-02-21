@@ -1215,7 +1215,6 @@ public partial record Conditions
                     {
                         MoveSlot = dummySlot,
                         Flags = moveData.Flags with { FutureMove = true },
-                        IgnoreImmunity = false, // Future move hits respect type immunity
                     };
 
                     // Apply Infiltrator ability if source has it (Gen 6+)

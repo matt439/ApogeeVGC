@@ -463,12 +463,12 @@ review moves Yawn to ZingZap
 ^ Trapper
 ^ PartiallyTrapped
 ^ LockedMove
-@ TwoTurnMove
-@ ChoiceLock
-@ MustRecharge
-FutureMove
-HealReplacement
-Stall
+^ TwoTurnMove
+^ ChoiceLock
+^ MustRecharge
+@FutureMove
+@HealReplacement
+@Stall
 Gem
 RainDance
 PriomordialSea
