@@ -204,7 +204,17 @@ public partial class Battle
         };
 
         // Find all handlers for this event
-        var handlers = FindEventHandlers(target, eventId, effectSource);
+        List<EventListener> handlers;
+        if (_handlerListPool.Count > 0)
+        {
+            handlers = _handlerListPool.Pop();
+            handlers.Clear();
+        }
+        else
+        {
+            handlers = [];
+        }
+        FindEventHandlers(handlers, target, eventId, effectSource);
 
         // Debug logging for handler count - commented out for reduced verbosity
 
@@ -503,6 +513,10 @@ public partial class Battle
         }
         finally
         {
+            // Return handler list to pool for reuse
+            handlers.Clear();
+            _handlerListPool.Push(handlers);
+
             // Restore event depth and parent event (always, even on exception)
             EventDepth--;
             Event = parentEvent;

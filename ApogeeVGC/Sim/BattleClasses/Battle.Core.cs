@@ -115,6 +115,13 @@ public partial class Battle
     public bool QuickClawRoll { get; set; }
     public List<int> SpeedOrder { get; set; } = [];
 
+    /// <summary>
+    /// Pool of reusable <see cref="List{EventListener}"/> instances to eliminate
+    /// per-call allocations inside <see cref="FindEventHandlers"/>.
+    /// Lists are rented at the start of <see cref="RunEvent"/> and returned at the end.
+    /// </summary>
+    private readonly Stack<List<EventListener>> _handlerListPool = new();
+
     // Note: TeamGenerator is not implemented as we only support constructed teams, not random battles.
     // Random battle team generation would require implementing the full Pokemon Showdown team generator.
     // TeamGenerator teamGenerator = null;

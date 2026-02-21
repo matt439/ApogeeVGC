@@ -38,8 +38,10 @@ public class Event
     /// Storage for dynamically registered event handlers.
     /// Maps event IDs to lists of handlers with their priority/order metadata.
     /// Corresponds to this.events in TypeScript.
+    /// Lazy-initialized to avoid allocating the dictionary for the vast majority of
+    /// Event instances that never register handlers.
     /// </summary>
-    private Dictionary<EventId, List<EventHandlerData>> RegisteredHandlers { get; } = new();
+    private Dictionary<EventId, List<EventHandlerData>>? _registeredHandlers;
 
     /// <summary>
     /// Gets all registered handlers for a specific event.
@@ -47,7 +49,7 @@ public class Event
     /// </summary>
     public List<EventHandlerData> GetHandlers(EventId id)
     {
-        return RegisteredHandlers.TryGetValue(id, out var handlers)
+        return _registeredHandlers != null && _registeredHandlers.TryGetValue(id, out var handlers)
             ? handlers
             : [];
     }
@@ -58,11 +60,12 @@ public class Event
     /// </summary>
     public void RegisterHandler(EventId eventId, EventHandlerData handler)
     {
-        if (!RegisteredHandlers.ContainsKey(eventId))
+        _registeredHandlers ??= new();
+        if (!_registeredHandlers.ContainsKey(eventId))
         {
-            RegisteredHandlers[eventId] = [];
+            _registeredHandlers[eventId] = [];
         }
-        RegisteredHandlers[eventId].Add(handler);
+        _registeredHandlers[eventId].Add(handler);
     }
 
     /// <summary>
@@ -70,6 +73,8 @@ public class Event
     /// </summary>
     public bool HasHandlers(EventId id)
     {
-        return RegisteredHandlers.ContainsKey(id) && RegisteredHandlers[id].Count > 0;
+        return _registeredHandlers != null &&
+               _registeredHandlers.TryGetValue(id, out var handlers) &&
+               handlers.Count > 0;
     }
 }

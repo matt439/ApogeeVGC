@@ -67,39 +67,37 @@ public partial class Battle
     /// This is the entry point for event handler discovery and corresponds to
     /// the TypeScript findEventHandlers method in battle.ts.
     /// </summary>
+    /// <param name="handlers">The list to populate with discovered event listeners</param>
     /// <param name="target">The primary target of the event</param>
     /// <param name="eventName">The event to find handlers for</param>
     /// <param name="source">Optional source Pokemon (triggers Source-prefixed events)</param>
-    /// <returns>List of all event listeners that should be invoked for this event</returns>
-    private List<EventListener> FindEventHandlers(RunEventTarget target, EventId eventName,
+    private void FindEventHandlers(List<EventListener> handlers, RunEventTarget target, EventId eventName,
         Pokemon? source = null)
     {
-        List<EventListener> handlers = [];
-
         // Handle array of Pokemon
         if (target is PokemonArrayRunEventTarget arrayTarget)
         {
             for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
             {
                 Pokemon pokemon = arrayTarget.PokemonList[i];
-                // Recursively find handlers for each Pokemon
-                var curHandlers = FindEventHandlers(
+                // Record start index so we can tag only the newly added handlers
+                int startIdx = handlers.Count;
+                FindEventHandlers(
+                    handlers,
                     new PokemonRunEventTarget(pokemon),
                     eventName,
                     source
                 );
 
-                // Set the target and index for each handler
-                foreach (EventListener handler in curHandlers)
+                // Set the target and index for each newly added handler
+                for (int j = startIdx; j < handlers.Count; j++)
                 {
-                    handler.Target = pokemon; // Original "effectHolder"
-                    handler.Index = i;
+                    handlers[j].Target = pokemon; // Original "effectHolder"
+                    handlers[j].Index = i;
                 }
-
-                handlers.AddRange(curHandlers);
             }
 
-            return handlers;
+            return;
         }
 
         // Events that target a Pokemon normally bubble up to the Side
@@ -130,7 +128,7 @@ public partial class Battle
             // Guard against null pokemon (can occur despite non-nullable declaration)
             if (pokemon is null)
             {
-                return handlers;
+                return;
             }
 
             if (pokemon.IsActive || (source?.IsActive ?? false))
@@ -140,20 +138,20 @@ public partial class Battle
                 if (prefixedHandlers)
                 {
                     // Check allies (including self) for Ally and Any prefixed events — batched
-                    foreach (Pokemon allyActive in pokemon.AlliesAndSelf())
+                    // Iterate Side.Active directly to avoid List<Pokemon> allocation from AlliesAndSelf()
+                    foreach (Pokemon? allyActive in pokemon.Side.Active)
                     {
-                        // Guard against null allies (defensive)
-                        if (allyActive is null) continue;
+                        if (allyActive is null || allyActive.Hp <= 0) continue;
 
                         FindPokemonEventHandlersPrefixed(handlers, allyActive, eventName,
                             EventPrefix.Ally, EventPrefix.Any);
                     }
 
                     // Check foes for Foe and Any prefixed events — batched
-                    foreach (Pokemon foeActive in pokemon.Foes())
+                    // Iterate Side.Foe.Active directly to avoid List<Pokemon> allocation from Foes()
+                    foreach (Pokemon? foeActive in pokemon.Side.Foe.Active)
                     {
-                        // Guard against null foes (defensive)
-                        if (foeActive is null) continue;
+                        if (foeActive is null || foeActive.Hp <= 0) continue;
 
                         FindPokemonEventHandlersPrefixed(handlers, foeActive, eventName,
                             EventPrefix.Foe, EventPrefix.Any);
@@ -179,8 +177,9 @@ public partial class Battle
                 // Handle bubble down from Side to active Pokemon
                 if (shouldBubbleDown)
                 {
-                    foreach (Pokemon active in side.Active.OfType<Pokemon>())
+                    foreach (Pokemon? activeSlot in side.Active)
                     {
+                        if (activeSlot is not Pokemon active) continue;
                         if (side == targetSide)
                         {
                             FindPokemonEventHandlers(handlers, active, eventName);
@@ -221,8 +220,6 @@ public partial class Battle
         // Always check Field and Battle handlers
         FindFieldEventHandlers(handlers, Field, eventName);
         FindBattleEventHandlers(handlers, eventName);
-
-        return handlers;
     }
 
     /// <summary>
