@@ -429,13 +429,13 @@ review moves Yawn to ZingZap
 
 ## ItemsSTU
 
-@ review items SafariBall to SilkScarf
+^ review items SafariBall to SilkScarf
 
-review items SilverPowder to SpellTag
+^ review items SilverPowder to SpellTag
 
-review items SplashPlate to StickyBarb
+^ review items SplashPlate to StickyBarb
 
-review items StonePlate to ToxicOrb
+@ review items StonePlate to ToxicOrb
 
 review items ToxicPlate to UtilityUmbrella
 
