@@ -472,13 +472,13 @@ review moves Yawn to ZingZap
 ^ Gem
 ^ RainDance
 ^ PriomordialSea
-SunnyDay
-DesolateLand
-Sandstorm
-Snowscape
-DeltaStream
-Commanded
-Commanding
-Arceus
-Silvally
-RolloutStorage
+^ SunnyDay
+^ DesolateLand
+^ Sandstorm
+^ Snowscape
+^ DeltaStream
+^ Commanded
+^ Commanding
+^ Arceus
+^ Silvally
+^ RolloutStorage
