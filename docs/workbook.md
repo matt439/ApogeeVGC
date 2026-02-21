@@ -460,12 +460,12 @@ review moves Yawn to ZingZap
 ^ Confusion
 ^ Flinch
 ^ Trapped
-@ Trapper
-@ PartiallyTrapped
-@ LockedMove
-TwoTurnMove
-ChoiceLock
-MustRecharge
+^ Trapper
+^ PartiallyTrapped
+^ LockedMove
+@ TwoTurnMove
+@ ChoiceLock
+@ MustRecharge
 FutureMove
 HealReplacement
 Stall

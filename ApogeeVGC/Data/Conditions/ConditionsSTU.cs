@@ -1488,14 +1488,14 @@ public partial record Conditions
                                 Pokemon targetPokemon = defender;
                                 if (defender.Fainted)
                                 {
-                                    // Get opponent Pokemon for random selection
-                                    var foes = attacker.Side.Foe.Active
-                                        .Where(p => p is { Fainted: false })
-                                        .ToList();
+                                    // TS: defender = this.sample(attacker.foes(true));
+                                    // foes(true) includes ALL foes (even fainted) because
+                                    // we're targeting a slot, not a specific alive Pokemon.
+                                    var foes = attacker.Foes(all: true);
 
                                     if (foes.Count == 0)
                                     {
-                                        // All opponents fainted — skip target tracking.
+                                        // All slots empty - skip target tracking.
                                         // The move will resolve its target on turn 2.
                                         targetPokemon = null;
                                     }

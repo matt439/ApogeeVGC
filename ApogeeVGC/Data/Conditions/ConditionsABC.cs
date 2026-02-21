@@ -562,14 +562,6 @@ public partial record Conditions
 
                     if (pokemon.IgnoringItem()) return;
 
-                    // Only disable moves if a move has been locked
-                    if (effectState.Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceLock.OnDisableMove] {pokemon.Name}: No move locked yet");
-                        return;
-                    }
-
                     battle.Debug(
                         $"[ChoiceLock.OnDisableMove] {pokemon.Name}: Disabling all except {effectState.Move}");
 
