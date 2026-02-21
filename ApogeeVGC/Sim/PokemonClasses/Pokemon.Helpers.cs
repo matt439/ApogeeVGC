@@ -12,43 +12,71 @@ public partial class Pokemon
         public int Level { get; init; }
         public GenderId Gender { get; init; }
         public bool Shiny { get; init; }
-        public MoveType? TeraType { get; set; }
+
+        private MoveType? _teraType;
+        public MoveType? TeraType
+        {
+            get => _teraType;
+            set
+            {
+                _teraType = value;
+                _cachedString = null; // invalidate cache when TeraType changes
+            }
+        }
 
         /// <summary>
-        /// Converts PokemonDetails to the string format used by battle protocol.
-        /// Format: "SpeciesName, L##, Gender, shiny, tera:Type"
+        /// Cached base string (everything except tera suffix). Built once since Id, Level, Gender, Shiny are init-only.
         /// </summary>
-        public override string ToString()
-        {
-            var parts = new List<string> {
-                // Add species name
-                Id.ToString() };
+        private string? _cachedBaseString;
 
-            // Add level (omit L100 as it's the default)
+        /// <summary>
+        /// Cached full ToString result. Invalidated when TeraType changes.
+        /// </summary>
+        private string? _cachedString;
+
+        /// <summary>
+        /// Builds the base string from init-only properties (Id, Level, Gender, Shiny).
+        /// Called once and cached for the lifetime of this instance.
+        /// </summary>
+        private string GetBaseString()
+        {
+            if (_cachedBaseString is not null) return _cachedBaseString;
+
+            var parts = new List<string> { Id.ToString() };
+
             if (Level != 100)
             {
                 parts.Add($"L{Level}");
             }
 
-            // Add gender (omit if genderless/unknown)
             if (Gender != GenderId.N)
             {
                 parts.Add(Gender.ToString());
             }
 
-            // Add shiny indicator
             if (Shiny)
             {
                 parts.Add("shiny");
             }
 
-            // Add Tera type if present
-            if (TeraType != null)
-            {
-                parts.Add($"tera:{TeraType}");
-            }
+            _cachedBaseString = string.Join(", ", parts);
+            return _cachedBaseString;
+        }
 
-            return string.Join(", ", parts);
+        /// <summary>
+        /// Converts PokemonDetails to the string format used by battle protocol.
+        /// Format: "SpeciesName, L##, Gender, shiny, tera:Type"
+        /// Caches the result to avoid repeated Enum.ToString() reflection calls.
+        /// </summary>
+        public override string ToString()
+        {
+            if (_cachedString is not null) return _cachedString;
+
+            string baseStr = GetBaseString();
+            _cachedString = _teraType != null
+                ? $"{baseStr}, tera:{_teraType}"
+                : baseStr;
+            return _cachedString;
         }
     }
 

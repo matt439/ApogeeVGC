@@ -37,20 +37,22 @@ public partial class Battle
     private EventHandlerInfo? GetHandlerInfo(Pokemon pokemon, IEffect effect, EventId callbackName,
         EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new PokemonRunEventTarget(pokemon), effect, callbackName, prefix,
-            suffix);
+        if (!effect.HasAnyEventHandlers) return null;
+        return effect.GetEventHandlerInfo(callbackName, prefix, suffix);
     }
 
     private EventHandlerInfo? GetHandlerInfo(Field field, IEffect effect, EventId callbackName,
         EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new FieldRunEventTarget(field), effect, callbackName, prefix, suffix);
+        if (!effect.HasAnyEventHandlers) return null;
+        return effect.GetEventHandlerInfo(callbackName, prefix, suffix);
     }
 
     private EventHandlerInfo? GetHandlerInfo(Side side, IEffect effect, EventId callbackName,
         EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new SideRunEventTarget(side), effect, callbackName, prefix, suffix);
+        if (!effect.HasAnyEventHandlers) return null;
+        return effect.GetEventHandlerInfo(callbackName, prefix, suffix);
     }
 
     /// <summary>
@@ -113,6 +115,13 @@ public partial class Battle
             EventId.TerrainChange
             );
 
+        // Determine Side target: either from original SideRunEventTarget or bubbled up from Pokemon
+        Side? targetSide = null;
+        if (target is SideRunEventTarget sideTarget)
+        {
+            targetSide = sideTarget.Side;
+        }
+
         // Handle Pokemon target
         if (target is PokemonRunEventTarget pokemonTarget)
         {
@@ -151,8 +160,8 @@ public partial class Battle
                     }
                 }
 
-                // Bubble up to the Side
-                target = new SideRunEventTarget(pokemon.Side);
+                // Bubble up to the Side (no allocation — just set the local variable)
+                targetSide = pokemon.Side;
             }
         }
 
@@ -163,10 +172,8 @@ public partial class Battle
         }
 
         // Handle Side target
-        if (target is SideRunEventTarget sideTarget)
+        if (targetSide != null)
         {
-            Side targetSide = sideTarget.Side;
-
             foreach (Side side in Sides)
             {
                 // Handle bubble down from Side to active Pokemon
@@ -192,9 +199,6 @@ public partial class Battle
                 }
 
                 // Handle Side conditions (but not for ally sides in multi battles)
-                // In TypeScript: if (side.n < 2 || !side.allySide)
-                // Since AllySide is not implemented (singles/doubles only), we just check side.N < 2
-                // In full multi-battle implementation, this would prevent duplicate processing of shared side conditions
                 if (side.N < 2)
                 {
                     if (side == targetSide)
@@ -559,8 +563,9 @@ public partial class Battle
         Pokemon? customHolder = null)
     {
         // Check format (ruleset) for handlers
-        EventHandlerInfo? handlerInfo =
-            GetHandlerInfo(RunEventTarget.FromBattle(this), Format, callbackName);
+        EventHandlerInfo? handlerInfo = !Format.HasAnyEventHandlers
+            ? null
+            : Format.GetEventHandlerInfo(callbackName);
 
         if (handlerInfo != null || (getKey != null && FormatData.GetProperty(getKey) != null))
         {
