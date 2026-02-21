@@ -14,17 +14,17 @@
 
 ^ review moves BeatUp to BitterMalice
 
-@ review moves BlastBurn to BodySlam
+^ review moves BlastBurn to BodySlam
 
-review moves BoltStrike to BrickBreak
+^ review moves BoltStrike to BrickBreak
 
-review moves Brine to BulletSeed
+^ review moves Brine to BulletSeed
 
-review moves BurningBulwark to Charm
+^ review moves BurningBulwark to Charm
 
-review moves ChillingWater to CloseCombat
+^ review moves ChillingWater to CloseCombat
 
-review moves Coaching to Conversion
+^ review moves Coaching to Conversion
 
 review moves Conversion2 to Counter
 

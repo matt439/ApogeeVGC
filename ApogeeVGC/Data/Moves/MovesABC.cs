@@ -2067,7 +2067,7 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 0,
                 Flags = new MoveFlags { Snatch = true, Metronome = true },
-                SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, Accuracy = 1 },
+                Boosts = new SparseBoostsTable { Atk = 1, Def = 1, Accuracy = 1 },
                 Target = MoveTarget.Self,
                 Type = MoveType.Poison,
             },
