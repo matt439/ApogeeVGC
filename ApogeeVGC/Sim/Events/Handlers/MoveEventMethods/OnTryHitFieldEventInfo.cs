@@ -38,13 +38,13 @@ public sealed record OnTryHitFieldEventInfo : EventHandlerInfo
                     context.GetSourceOrTargetPokemon(),
                     context.GetMove()
                 );
-                if (result == null) return null;
+                if (result == null) return new NullRelayVar();
                 return result switch
                 {
                     BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),
-                    EmptyBoolEmptyVoidUnion => null,
-                    VoidUnionBoolEmptyVoidUnion => null,
-                    _ => null
+                    EmptyBoolEmptyVoidUnion => new NullRelayVar(),
+                    VoidUnionBoolEmptyVoidUnion => new VoidReturnRelayVar(),
+                    _ => new VoidReturnRelayVar()
                 };
             },
             priority,

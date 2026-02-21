@@ -73,3 +73,10 @@ public record BoolIntUndefinedUnionRelayVar(BoolIntUndefinedUnion Value) : Relay
 public record SecondaryEffectArrayRelayVar(SecondaryEffect[] Effects) : RelayVar;
 public record UndefinedRelayVar : RelayVar;
 public record VoidReturnRelayVar : RelayVar;
+
+/// <summary>
+/// Represents a TS 'null' return value from an event handler, meaning "fail silently".
+/// Distinct from C# null (which means "no handler opinion / use default") and
+/// BoolRelayVar(false) (which means "fail with message").
+/// </summary>
+public record NullRelayVar : RelayVar;

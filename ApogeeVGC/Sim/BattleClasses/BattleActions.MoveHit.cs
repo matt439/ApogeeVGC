@@ -271,9 +271,9 @@ if (tryResult is BoolRelayVar { Value: false } ||
             RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
-            if (hitResult is BoolRelayVar { Value: false })
+            if (!Battle.IsRelayVarTruthy(hitResult))
             {
-                if (Battle.DisplayUi)
+                if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
                 {
                     Battle.Add("-fail", pokemon);
                     Battle.AttrLastMove("[still]");
@@ -288,9 +288,9 @@ if (tryResult is BoolRelayVar { Value: false } ||
             RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
-            if (hitResult is BoolRelayVar { Value: false })
+            if (!Battle.IsRelayVarTruthy(hitResult))
             {
-                if (Battle.DisplayUi)
+                if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
                 {
                     Battle.Add("-fail", pokemon);
                     Battle.AttrLastMove("[still]");
@@ -305,9 +305,9 @@ if (tryResult is BoolRelayVar { Value: false } ||
             RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, Battle.InitEffectState(),
                 target, pokemon, move);
 
-            if (hitResult is BoolRelayVar { Value: false })
+            if (!Battle.IsRelayVarTruthy(hitResult))
             {
-                if (Battle.DisplayUi)
+                if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
                 {
                     Battle.Add("-fail", pokemon);
                     Battle.AttrLastMove("[still]");

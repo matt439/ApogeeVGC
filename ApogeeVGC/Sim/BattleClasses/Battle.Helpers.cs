@@ -25,11 +25,12 @@ public partial class Battle
     /// <summary>
     /// Checks if a relay variable is truthy (non-null, non-false, non-zero string).
     /// </summary>
-    private static bool IsRelayVarTruthy(RelayVar? relayVar)
+    internal static bool IsRelayVarTruthy(RelayVar? relayVar)
     {
         return relayVar switch
         {
             null => false,
+            NullRelayVar => false,
             BoolRelayVar boolVar => boolVar.Value,
             IntRelayVar intVar => intVar.Value != 0,
             StringRelayVar strVar => !string.IsNullOrEmpty(strVar.Value),
