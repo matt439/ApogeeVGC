@@ -21,15 +21,6 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
-            [ConditionId.IceBall] = new()
-            {
-                Id = ConditionId.IceBall,
-                Name = "Ice Ball",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.IceBall,
-                // Ice Ball uses LockedMove for the locking behavior and RolloutStorage for damage scaling
-                // This is just a marker condition
-            },
             [ConditionId.LeechSeed] = new()
             {
                 Id = ConditionId.LeechSeed,

@@ -218,7 +218,6 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 13,
                 Color = "Black",
-                RequiredItem = Sim.Items.ItemId.Banettite,
             },
             [SpecieId.Duskull] = new()
             {
@@ -373,7 +372,6 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 49,
                 Color = "White",
-                RequiredItem = Sim.Items.ItemId.Absolite,
             },
             [SpecieId.Wynaut] = new()
             {
@@ -479,7 +477,6 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 350.2,
                 Color = "Gray",
-                RequiredItem = Sim.Items.ItemId.Glalitite,
             },
             [SpecieId.Spheal] = new()
             {
@@ -792,7 +789,6 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 112.6,
                 Color = "Blue",
-                RequiredItem = Sim.Items.ItemId.Salamencite,
             },
             [SpecieId.Beldum] = new()
             {
@@ -897,7 +893,6 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 942.9,
                 Color = "Blue",
-                RequiredItem = Sim.Items.ItemId.Metagrossite,
             },
             [SpecieId.Regirock] = new()
             {
@@ -1024,7 +1019,6 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 52,
                 Color = "Purple",
-                RequiredItem = Sim.Items.ItemId.Latiasite,
             },
             [SpecieId.Latios] = new()
             {
@@ -1076,7 +1070,6 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 70,
                 Color = "Purple",
-                RequiredItem = Sim.Items.ItemId.Latiosite,
             },
             [SpecieId.Kyogre] = new()
             {
@@ -1128,7 +1121,6 @@ public partial record SpeciesData
                 HeightM = 9.8,
                 WeightKg = 430,
                 Color = "Blue",
-                RequiredItem = Sim.Items.ItemId.BlueOrb,
             },
             [SpecieId.Groudon] = new()
             {
@@ -1180,7 +1172,6 @@ public partial record SpeciesData
                 HeightM = 5,
                 WeightKg = 999.7,
                 Color = "Red",
-                RequiredItem = Sim.Items.ItemId.RedOrb,
             },
             [SpecieId.Rayquaza] = new()
             {

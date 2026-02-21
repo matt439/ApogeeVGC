@@ -689,7 +689,7 @@ public partial record Conditions
                         ActiveMove activeMove = new()
                         {
                             Name = "Confused",
-                            Id = MoveId.Confused,
+                            Id = MoveId.None,
                             Accuracy = IntTrueUnion.FromTrue(),
                             Num = 100200,
                             Type = MoveType.Unknown, // TS uses type: '???' (typeless)

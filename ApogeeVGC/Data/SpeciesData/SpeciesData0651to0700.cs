@@ -95,7 +95,6 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 90,
                 Color = "Green",
-                RequiredItem = ItemId.Chesnaughtite,
             },
 
             // 653 - Fennekin
@@ -208,7 +207,6 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 39,
                 Color = "Red",
-                RequiredItem = ItemId.Delphoxite,
             },
 
             // 656 - Froakie
@@ -379,7 +377,6 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 40,
                 Color = "Blue",
-                RequiredItem = ItemId.Greninjite,
             },
 
             // 659 - Bunnelby
@@ -753,10 +750,9 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 93.3,
                 Color = "Brown",
-                RequiredItem = ItemId.Pyroarite,
             },
 
-            // 669 - Flabébé
+            // 669 - Flab
             [SpecieId.Flabebe] = new()
             {
                 Id = SpecieId.Flabebe,
@@ -867,7 +863,6 @@ public partial record SpeciesData
                 HeightM = 0.2,
                 WeightKg = 100.8,
                 Color = "White",
-                RequiredItem = ItemId.Floettite,
                 BattleOnly = FormeId.Eternal,
             },
 
@@ -1430,7 +1425,6 @@ public partial record SpeciesData
                 HeightM = 2.9,
                 WeightKg = 69.8,
                 Color = "Blue",
-                RequiredItem = ItemId.Malamarite,
             },
 
             // 688 - Binacle
@@ -1518,7 +1512,6 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 100,
                 Color = "Brown",
-                RequiredItem = ItemId.Barbaracite,
             },
 
             // 690 - Skrelp
@@ -1606,7 +1599,6 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 100.3,
                 Color = "Brown",
-                RequiredItem = ItemId.Dragalgite,
             },
 
             // 692 - Clauncher

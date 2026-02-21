@@ -99,7 +99,6 @@ public enum MoveId
     CollisionCourse,
     Comeuppance,
     Confide,
-    Confused, // The move pokemon use to hit themselves in confusion
     Confuseray,
     Confusion,
     Conversion,
@@ -296,7 +295,6 @@ public enum MoveId
     HyperspaceHole,
     HyperVoice,
     Hypnosis,
-    IceBall,
     IceBeam,
     IceBurn,
     IceFang,

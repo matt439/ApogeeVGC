@@ -209,7 +209,6 @@ public partial record Abilities
                     [
                         ItemId.AguavBerry, ItemId.EnigmaBerry, ItemId.FigyBerry, ItemId.IapapaBerry,
                         ItemId.MagoBerry, ItemId.SitrusBerry, ItemId.WikiBerry, ItemId.OranBerry,
-                        ItemId.BerryJuice,
                     ];
 
                     return healingItems.Contains(item.Id)
@@ -663,7 +662,6 @@ public partial record Abilities
                     {
                         ItemId.AguavBerry, ItemId.EnigmaBerry, ItemId.FigyBerry, ItemId.IapapaBerry,
                         ItemId.MagoBerry, ItemId.SitrusBerry, ItemId.WikiBerry, ItemId.OranBerry,
-                        ItemId.BerryJuice,
                     };
                     if (healingItems.Contains(item.Id))
                     {

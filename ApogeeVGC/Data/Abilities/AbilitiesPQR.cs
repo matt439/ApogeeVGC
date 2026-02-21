@@ -957,8 +957,7 @@ public partial record Abilities
                             return new IntRelayVar(damage);
                         }
 
-                        if (effect.EffectStateId == ItemId.BerryJuice ||
-                            effect.EffectStateId == ItemId.Leftovers)
+                        if (effect.EffectStateId == ItemId.Leftovers)
                         {
                             battle.Add("-activate", target, "ability: Ripen");
                         }

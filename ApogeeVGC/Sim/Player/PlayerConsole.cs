@@ -877,7 +877,6 @@ public class PlayerConsole : IPlayer
             ConditionId.DragonCheer => "DragonCheer",
             ConditionId.Rest => "Rest",
             ConditionId.Wish => "Wish",
-            ConditionId.IceBall => "IceBall",
             ConditionId.Rollout => "Rollout",
             ConditionId.Fly => "Fly",
             ConditionId.Bounce => "Bounce",

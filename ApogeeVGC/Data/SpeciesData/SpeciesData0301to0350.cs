@@ -115,7 +115,6 @@ public partial record SpeciesData
                 HeightM = 0.5,
                 WeightKg = 161,
                 Color = "Purple",
-                RequiredItem = Sim.Items.ItemId.Sablenite,
             },
             [SpecieId.Mawile] = new()
             {
@@ -169,7 +168,6 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 23.5,
                 Color = "Black",
-                RequiredItem = Sim.Items.ItemId.Mawilite,
             },
             [SpecieId.Aron] = new()
             {
@@ -277,7 +275,6 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 395,
                 Color = "Gray",
-                RequiredItem = Sim.Items.ItemId.Aggronite,
             },
             [SpecieId.Meditite] = new()
             {
@@ -356,7 +353,6 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 31.5,
                 Color = "Red",
-                RequiredItem = Sim.Items.ItemId.Medichamite,
             },
             [SpecieId.Electrike] = new()
             {
@@ -437,7 +433,6 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 44,
                 Color = "Yellow",
-                RequiredItem = Sim.Items.ItemId.Manectite,
             },
             [SpecieId.Plusle] = new()
             {
@@ -697,7 +692,6 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 130.3,
                 Color = "Blue",
-                RequiredItem = Sim.Items.ItemId.Sharpedonite,
             },
             [SpecieId.Wailmer] = new()
             {
@@ -831,7 +825,6 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 320.5,
                 Color = "Red",
-                RequiredItem = Sim.Items.ItemId.Cameruptite,
             },
             [SpecieId.Torkoal] = new()
             {
@@ -1142,7 +1135,6 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 20.6,
                 Color = "Blue",
-                RequiredItem = Sim.Items.ItemId.Altarianite,
             },
             [SpecieId.Zangoose] = new()
             {

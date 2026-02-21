@@ -126,7 +126,6 @@ public partial class Battle
         if ((move.Target is MoveTarget.AdjacentAlly or MoveTarget.Any or MoveTarget.Normal) &&
             targetLoc == selfLoc &&
             !pokemon.Volatiles.ContainsKey(ConditionId.LockedMove) && // Two-turn move (e.g., Fly, Dig)
-            !pokemon.Volatiles.ContainsKey(ConditionId.IceBall) &&
             !pokemon.Volatiles.ContainsKey(ConditionId.Rollout))
         {
             // Future moves can target the user
