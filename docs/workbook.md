@@ -228,7 +228,7 @@ review moves WorrySeed to XScissor
 
 ## MovesYZ
 
-review moves Yawn to ZingZap
+^ review moves Yawn to ZingZap
 
 
 # Abilities
@@ -472,13 +472,13 @@ review moves Yawn to ZingZap
 ^ Gem
 ^ RainDance
 ^ PriomordialSea
-SunnyDay
-DesolateLand
-Sandstorm
-Snowscape
-DeltaStream
-Commanded
-Commanding
-Arceus
-Silvally
-RolloutStorage
+^ SunnyDay
+^ DesolateLand
+^ Sandstorm
+^ Snowscape
+^ DeltaStream
+^ Commanded
+^ Commanding
+^ Arceus
+^ Silvally
+^ RolloutStorage

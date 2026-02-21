@@ -1,16 +1,16 @@
 ﻿using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
-using System.Collections.ObjectModel;
+using System.Collections.Frozen;
 
 namespace ApogeeVGC.Data;
 
 public record Natures
 {
-    public IReadOnlyDictionary<NatureId, Nature> NatureData { get; }
+    public FrozenDictionary<NatureId, Nature> NatureData { get; }
 
     public Natures()
     {
-        NatureData = new ReadOnlyDictionary<NatureId, Nature>(_natureData);
+        NatureData = _natureData.ToFrozenDictionary();
     }
 
     private readonly Dictionary<NatureId, Nature> _natureData = new()

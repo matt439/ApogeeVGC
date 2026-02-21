@@ -226,7 +226,7 @@ public partial class Battle
                 }
 
                 // Add the effect's handler as the first handler
-                handlers.Insert(0, ResolvePriority(new EventListenerWithoutPriority
+                handlers.Insert(0, ResolvePriority(new EventListener
                 {
                     Effect = sourceEffect,
                     HandlerInfo = handlerInfo,
