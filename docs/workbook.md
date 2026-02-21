@@ -409,7 +409,7 @@ review moves Yawn to ZingZap
 
 ^ review items MachoBrace to MeadowPlate
 
-review items MentalHerb to MiracleSeed
+@ review items MentalHerb to MiracleSeed
 
 review items MirrorHerb to NeverMeltIce
 

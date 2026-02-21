@@ -184,7 +184,7 @@ public partial record Items
                         var conditions = new[]
                         {
                             ConditionId.Attract, ConditionId.Taunt, ConditionId.Encore,
-                            ConditionId.Torment, ConditionId.Disable
+                            ConditionId.Torment, ConditionId.Disable, ConditionId.PsychicNoise
                         };
                         foreach (ConditionId firstCondition in conditions)
                         {
@@ -213,7 +213,7 @@ public partial record Items
                     var conditions = new[]
                     {
                         ConditionId.Attract, ConditionId.Taunt, ConditionId.Encore,
-                        ConditionId.Torment, ConditionId.Disable
+                        ConditionId.Torment, ConditionId.Disable, ConditionId.PsychicNoise
                     };
                     foreach (ConditionId firstCondition in conditions)
                     {
@@ -265,26 +265,7 @@ public partial record Items
                 Num = 233,
                 Gen = 2,
             },
-            [ItemId.MetalPowder] = new()
-            {
-                Id = ItemId.MetalPowder,
-                Name = "Metal Powder",
-                SpriteNum = 287,
-                Fling = new FlingData { BasePower = 10 },
-                OnModifyDef = OnModifyDefEventInfo.Create((battle, def, pokemon, _, _) =>
-                {
-                    // Ditto has species number 132
-                    if (pokemon.Species.Id == SpecieId.Ditto && !pokemon.Transformed)
-                    {
-                        battle.ChainModify(2);
-                        return battle.FinalModify(def);
-                    }
-
-                    return def;
-                }, 2),
-                Num = 257,
-                Gen = 2,
-            },
+            // MetalPowder removed - isNonstandard: "Past"
             [ItemId.Metronome] = new()
             {
                 Id = ItemId.Metronome,
