@@ -107,7 +107,7 @@ public static class ValidateItems
             "PunchingGlove",
             
             // Q items
-            "QualotBerry", "QuickBall", "QuickClaw", "QuickPowder",
+            "QualotBerry", "QuickBall", "QuickClaw",
             
             // R items
             "RareBone", "RawstBerry", "RazorClaw", "RazorFang", "ReaperCloth", "RedCard",

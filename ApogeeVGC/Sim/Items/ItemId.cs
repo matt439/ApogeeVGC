@@ -207,8 +207,6 @@ public enum ItemId
     QualotBerry,
     QuickBall,
     QuickClaw,
-    QuickPowder,
-    RabutaBerry,
     RareBone,
     RawstBerry,
     RazorClaw,

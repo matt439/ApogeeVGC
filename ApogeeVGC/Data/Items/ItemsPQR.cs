@@ -501,40 +501,10 @@ public partial record Items
                 Num = 217,
                 Gen = 2,
             },
-            [ItemId.QuickPowder] = new()
-            {
-                Id = ItemId.QuickPowder,
-                Name = "Quick Powder",
-                SpriteNum = 374,
-                Fling = new FlingData { BasePower = 10 },
-                OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, pokemon) =>
-                {
-                    if (pokemon.Species.Id == SpecieId.Ditto && !pokemon.Transformed)
-                    {
-                        battle.ChainModify(2);
-                        return IntVoidUnion.FromInt(battle.FinalModify(spe));
-                    }
-
-                    return IntVoidUnion.FromInt(spe);
-                }),
-                Num = 274,
-                Gen = 4,
-                // IsNonstandard = "Past",
-            },
+            // Skip quickpowder - isNonstandard: Past
+            // Skip rabutaberry - isNonstandard: Past
 
             // R items
-            [ItemId.RabutaBerry] = new()
-            {
-                Id = ItemId.RabutaBerry,
-                Name = "Rabuta Berry",
-                SpriteNum = 375,
-                IsBerry = true,
-                NaturalGift = (90, "Ghost"),
-                // onEat: false - used for Poffin/Pokeblock creation, not relevant in Gen 9 battles
-                Num = 177,
-                Gen = 3,
-                // IsNonstandard = "Past",
-            },
             [ItemId.RareBone] = new()
             {
                 Id = ItemId.RareBone,
