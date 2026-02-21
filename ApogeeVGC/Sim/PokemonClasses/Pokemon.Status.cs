@@ -388,7 +388,16 @@ public partial class Pokemon
             {
                 // Source doesn't have the linked status - add it
                 source.AddVolatile(linkedStatus.Value, this, sourceEffect);
-                linkedState = source.Volatiles[linkedStatus.Value];
+
+                // AddVolatile may fail (e.g. TryAddVolatile event blocks it).
+                // In TypeScript, accessing a missing key returns undefined silently;
+                // in C# we must guard against KeyNotFoundException.
+                if (!source.Volatiles.TryGetValue(linkedStatus.Value, out linkedState))
+                {
+                    // Linked volatile could not be added - skip linking
+                    return new BoolRelayVar(true);
+                }
+
                 linkedState.LinkedPokemon = [this];
                 linkedState.LinkedStatus = condition;
             }

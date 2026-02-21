@@ -64,6 +64,9 @@ i am debugging my pokemon simulator by running battles between two random player
 
 i am debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is #method:'ApogeeVGC.Sim.Core.Driver.RunSingleBattleDebugVgcRegI':8484-11553 . see #file:'C:\VSProjects\ApogeeVGC\docs\bugfixes\INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. an error has occured with a particular set of random seeds. debug output:
 
+
+
+
 ## Incremental Debugging
 
 i am incrementally debugging my pokemon simulator by running battles between two random players, each with random teams. entry point is  #method:'ApogeeVGC.Sim.Core.Driver.RunIncrementalDebugTest':27313-34906 . see '/docs/bugfixes/INDEX.md' for a summary of previous bug fixes which may be relevant for this one. the solution folder 'pokemon-showdown' contains the TS source code which can be used to help debug. the exception occured when testing the move 'Crabhammer'. debug output:

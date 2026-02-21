@@ -201,11 +201,11 @@ public partial class Driver
     {
         // !! EDIT THESE VALUES TO DEBUG SPECIFIC BATTLES !!
         // Copy the 5 seeds from the RndVsRndVgcRegIEvaluation exception output.
-        const int debugTeam1Seed = 102902;
-        const int debugTeam2Seed = 116472;
-        const int debugPlayer1Seed = 60928;
-        const int debugPlayer2Seed = 50402;
-        const int debugBattleSeed = 58461;
+        const int debugTeam1Seed = 57307;
+        const int debugTeam2Seed = 70877;
+        const int debugPlayer1Seed = 15333;
+        const int debugPlayer2Seed = 4807;
+        const int debugBattleSeed = 12866;
         const bool debug = true;
 
         Console.WriteLine("[Driver] Starting Single Battle Debug (VGC Reg I)");
