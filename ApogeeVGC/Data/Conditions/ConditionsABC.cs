@@ -32,7 +32,7 @@ public partial record Conditions
                 OnStart = OnStartEventInfo.Create((_, pokemon, _, _) =>
                 {
                     pokemon.Volatiles[ConditionId.AllySwitch].Counter = 3;
-                    return new VoidReturn();
+                    return null;
                 }),
                 OnRestart = OnRestartEventInfo.Create((battle, pokemon, _, _) =>
                 {
