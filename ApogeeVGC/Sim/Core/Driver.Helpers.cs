@@ -319,8 +319,15 @@ public partial class Driver
         int battleSeed,
         bool debug)
     {
-        var seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
-        CurrentBattleSeeds = seeds;
+        // Only allocate BattleSeedContext and set thread-static when debugging;
+        // in the hot evaluation path (debug=false) this avoids a heap allocation per battle.
+        BattleSeedContext? seeds = null;
+        if (debug)
+        {
+            seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
+            CurrentBattleSeeds = seeds;
+        }
+
         try
         {
             PlayerOptions player1Options = new()
@@ -356,13 +363,13 @@ public partial class Driver
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
-        catch (Exception ex) when (EnrichExceptionWithSeeds(ex, seeds))
+        catch (Exception ex) when (seeds is not null && EnrichExceptionWithSeeds(ex, seeds))
         {
             throw;
         }
         finally
         {
-            CurrentBattleSeeds = null;
+            if (debug) CurrentBattleSeeds = null;
         }
     }
 

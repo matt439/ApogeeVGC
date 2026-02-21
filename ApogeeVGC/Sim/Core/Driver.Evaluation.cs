@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Generators;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -339,6 +340,22 @@ public partial class Driver
         Console.ReadLine();
     }
 
+    /// <summary>
+    /// Thread-local accumulator for parallel battle evaluation.
+    /// Eliminates contention on shared ConcurrentBag/ConcurrentDictionary by collecting
+    /// results per-thread and merging once after the parallel loop completes.
+    /// </summary>
+    private sealed class EvaluationLocalState
+    {
+        public readonly List<SimulatorResult> Results = [];
+        public readonly List<int> Turns = [];
+        public readonly List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> Exceptions = [];
+        public readonly Dictionary<SpecieId, int> SpeciesCoverage = [];
+        public readonly Dictionary<MoveId, int> MoveCoverage = [];
+        public readonly Dictionary<AbilityId, int> AbilityCoverage = [];
+        public readonly Dictionary<ItemId, int> ItemCoverage = [];
+    }
+
     private void RunRndVsRndVgcRegIEvaluation()
     {
         Console.WriteLine("[Driver] Starting Random Team vs Random Team VGC Reg I Evaluation");
@@ -346,115 +363,119 @@ public partial class Driver
 
         const bool debug = false;
 
-        var simResults = new ConcurrentBag<SimulatorResult>();
         var stopwatch = Stopwatch.StartNew();
 
         var seedCounter = 0;
         var completedBattles = 0;
-        var turnOnBattleEnd = new ConcurrentBag<int>();
-        var exceptions =
-            new ConcurrentBag<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
-                Exception)>();
 
-        // Coverage tracking dictionaries (thread-safe)
+        // Merged results collected from thread-local state after parallel loop
+        var allResults = new List<SimulatorResult>();
+        var allTurns = new List<int>();
+        var allExceptions = new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>();
         var speciesCoverage = new ConcurrentDictionary<SpecieId, int>();
         var moveCoverage = new ConcurrentDictionary<MoveId, int>();
         var abilityCoverage = new ConcurrentDictionary<AbilityId, int>();
         var itemCoverage = new ConcurrentDictionary<ItemId, int>();
 
-        // Run simulations in parallel with specified number of threads
+        // Run simulations in parallel with thread-local state to eliminate contention
         var parallelOptions = new ParallelOptions
         {
             MaxDegreeOfParallelism = NumThreads,
         };
 
-        Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
-        {
-            // Batch seed allocation: single atomic add instead of 5 separate increments
-            int baseOffset = Interlocked.Add(ref seedCounter, 5) - 4;
-
-            int localTeam1Seed = Team1EvalSeed + baseOffset;
-            int localTeam2Seed = Team2EvalSeed + baseOffset + 1;
-            int localPlayer1Seed = PlayerRandom1EvalSeed + baseOffset + 2;
-            int localPlayer2Seed = PlayerRandom2EvalSeed + baseOffset + 3;
-            int localBattleSeed = BattleEvalSeed + baseOffset + 4;
-
-            try
+        Parallel.For(0, RandomEvaluationNumTest, parallelOptions,
+            // localInit: create a fresh accumulator per thread
+            static () => new EvaluationLocalState(),
+            // body: run battle and accumulate into thread-local state (no shared writes)
+            (i, _, localState) =>
             {
-                // Generate teams externally so we can track coverage
-                var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam1Seed);
-                var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam2Seed);
+                // Batch seed allocation: single atomic add instead of 5 separate increments
+                int baseOffset = Interlocked.Add(ref seedCounter, 5) - 4;
 
-                var team1 = team1Generator.GenerateTeam();
-                var team2 = team2Generator.GenerateTeam();
+                int localTeam1Seed = Team1EvalSeed + baseOffset;
+                int localTeam2Seed = Team2EvalSeed + baseOffset + 1;
+                int localPlayer1Seed = PlayerRandom1EvalSeed + baseOffset + 2;
+                int localPlayer2Seed = PlayerRandom2EvalSeed + baseOffset + 3;
+                int localBattleSeed = BattleEvalSeed + baseOffset + 4;
 
-                // Track coverage for both teams (no Concat allocation)
-                foreach (var set in team1)
+                try
                 {
-                    speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
-                    abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
-                    itemCoverage.AddOrUpdate(set.Item, 1, static (_, count) => count + 1);
-                    foreach (var move in set.Moves)
+                    // Generate teams externally so we can track coverage
+                    var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam1Seed);
+                    var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam2Seed);
+
+                    var team1 = team1Generator.GenerateTeam();
+                    var team2 = team2Generator.GenerateTeam();
+
+                    // Track coverage into thread-local dictionaries (zero contention)
+                    TrackTeamCoverage(team1, localState);
+                    TrackTeamCoverage(team2, localState);
+
+                    // Run directly on Parallel.For thread — no Task.Run + Wait overhead
+                    (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
+                        team1,
+                        team2,
+                        localTeam1Seed,
+                        localTeam2Seed,
+                        localPlayer1Seed,
+                        localPlayer2Seed,
+                        localBattleSeed,
+                        debug);
+
+                    localState.Results.Add(result);
+                    localState.Turns.Add(turn);
+
+                    int completed = Interlocked.Increment(ref completedBattles);
+                    if (completed % 100 == 0)
                     {
-                        moveCoverage.AddOrUpdate(move, 1, static (_, count) => count + 1);
+                        Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
                     }
                 }
-
-                foreach (var set in team2)
+                catch (Exception ex)
                 {
-                    speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
-                    abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
-                    itemCoverage.AddOrUpdate(set.Item, 1, static (_, count) => count + 1);
-                    foreach (var move in set.Moves)
-                    {
-                        moveCoverage.AddOrUpdate(move, 1, static (_, count) => count + 1);
-                    }
+                    // Store exception with all seed information for debugging
+                    localState.Exceptions.Add(
+                        (localTeam1Seed, localTeam2Seed, localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
+
+                    // Log immediately to console
+                    LogExceptionWithAllSeeds(
+                        localTeam1Seed,
+                        localTeam2Seed,
+                        localPlayer1Seed,
+                        localPlayer2Seed,
+                        localBattleSeed,
+                        ex,
+                        "RndVsRndVgcRegIEvaluation");
                 }
 
-                // Run directly on Parallel.For thread — no Task.Run + Wait overhead
-                (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
-                    team1,
-                    team2,
-                    localTeam1Seed,
-                    localTeam2Seed,
-                    localPlayer1Seed,
-                    localPlayer2Seed,
-                    localBattleSeed,
-                    debug);
-
-                simResults.Add(result);
-                turnOnBattleEnd.Add(turn);
-
-                int completed = Interlocked.Increment(ref completedBattles);
-                if (completed % 100 == 0)
-                {
-                    Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
-                }
-            }
-            catch (Exception ex)
+                return localState;
+            },
+            // localFinally: merge thread-local state into shared collections (runs once per thread)
+            localState =>
             {
-                // Store exception with all seed information for debugging
-                exceptions.Add(
-                    (localTeam1Seed, localTeam2Seed, localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
+                lock (allResults)
+                {
+                    allResults.AddRange(localState.Results);
+                    allTurns.AddRange(localState.Turns);
+                    allExceptions.AddRange(localState.Exceptions);
+                }
 
-                // Log immediately to console
-                LogExceptionWithAllSeeds(
-                    localTeam1Seed,
-                    localTeam2Seed,
-                    localPlayer1Seed,
-                    localPlayer2Seed,
-                    localBattleSeed,
-                    ex,
-                    "RndVsRndVgcRegIEvaluation");
-            }
-        });
+                // Merge coverage dictionaries into the shared ConcurrentDictionary
+                foreach (var (key, count) in localState.SpeciesCoverage)
+                    speciesCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
+                foreach (var (key, count) in localState.MoveCoverage)
+                    moveCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
+                foreach (var (key, count) in localState.AbilityCoverage)
+                    abilityCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
+                foreach (var (key, count) in localState.ItemCoverage)
+                    itemCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
+            });
 
         stopwatch.Stop();
 
-        // Convert to list for counting (now from ConcurrentBag)
-        var resultsList = simResults.ToList();
-        var turnsList = turnOnBattleEnd.ToList();
-        var exceptionsList = exceptions.ToList();
+        var resultsList = allResults;
+        var turnsList = allTurns;
+        var exceptionsList = allExceptions;
 
         int successfulBattles = resultsList.Count;
         int failedBattles = exceptionsList.Count;
@@ -585,6 +606,30 @@ public partial class Driver
 
         Console.WriteLine("Press Enter key to exit...");
         Console.ReadLine();
+    }
+
+    /// <summary>
+    /// Tracks species, ability, item, and move coverage from a team into thread-local dictionaries.
+    /// No contention — only the owning thread writes to these dictionaries.
+    /// </summary>
+    private static void TrackTeamCoverage(List<PokemonSet> team, EvaluationLocalState state)
+    {
+        foreach (var set in team)
+        {
+            IncrementCount(state.SpeciesCoverage, set.Species);
+            IncrementCount(state.AbilityCoverage, set.Ability);
+            IncrementCount(state.ItemCoverage, set.Item);
+            foreach (var move in set.Moves)
+            {
+                IncrementCount(state.MoveCoverage, move);
+            }
+        }
+
+        static void IncrementCount<TKey>(Dictionary<TKey, int> dict, TKey key) where TKey : notnull
+        {
+            ref int slot = ref System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out _);
+            slot++;
+        }
     }
 
     /// <summary>
