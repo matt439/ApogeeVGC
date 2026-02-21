@@ -156,8 +156,6 @@ public partial record Items
                 OnStart = OnStartEventInfo.Create(TryUseWhiteHerb),
                 OnAnySwitchIn = OnAnySwitchInEventInfo.Create(TryUseWhiteHerb, priority: -2),
                 OnAnyAfterMega = OnAnyAfterMegaEventInfo.Create(TryUseWhiteHerb),
-                OnAnyAfterTerastallization =
-                    OnAnyAfterTerastallizationEventInfo.Create(TryUseWhiteHerb),
                 OnAnyAfterMove = OnAnyAfterMoveEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     TryUseWhiteHerb(battle, pokemon);
@@ -175,7 +173,6 @@ public partial record Items
 
                     return BoolVoidUnion.FromVoid();
                 }),
-                OnEnd = OnEndEventInfo.Create((_, pokemon) => { pokemon.ItemState.Boosts = null; }),
                 Num = 214,
                 Gen = 3,
             },

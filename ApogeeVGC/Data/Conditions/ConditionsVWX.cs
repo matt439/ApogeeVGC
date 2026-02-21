@@ -154,7 +154,7 @@ public partial record Conditions
                         target.Side.RemoveSlotCondition(slotTarget,
                             _library.Conditions[ConditionId.Wish]);
                     }
-                }, 4),
+                }, order: 4),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (target is { Fainted: false })

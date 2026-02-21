@@ -435,13 +435,13 @@ review moves Yawn to ZingZap
 
 ^ review items SplashPlate to StickyBarb
 
-@ review items StonePlate to ToxicOrb
+^ review items StonePlate to ToxicOrb
 
-review items ToxicPlate to UtilityUmbrella
+^ review items ToxicPlate to UtilityUmbrella
 
 ## ItemsVWX
 
-review items WacanBerry to WhiteHerb
+@ review items WacanBerry to WhiteHerb
 
 review items WideLens to WiseGlasses
 
