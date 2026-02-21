@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Frozen;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 
@@ -6,11 +6,11 @@ namespace ApogeeVGC.Data;
 
 public record SpeciesFormats
 {
-    public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData { get; }
+    public FrozenDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData { get; }
 
     public SpeciesFormats()
     {
-        SpeciesFormatsData = new ReadOnlyDictionary<SpecieId, SpeciesFormat>(_speciesFormatsData);
+        SpeciesFormatsData = _speciesFormatsData.ToFrozenDictionary();
 
     }
 

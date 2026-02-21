@@ -1,17 +1,17 @@
-using System.Collections.ObjectModel;
+using System.Collections.Frozen;
 using ApogeeVGC.Sim.Conditions;
 
 namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
 {
-    public IReadOnlyDictionary<ConditionId, Condition> ConditionsData { get; }
+    public FrozenDictionary<ConditionId, Condition> ConditionsData { get; }
     private readonly Library _library;
 
     public Conditions(Library library)
     {
         _library = library;
-        ConditionsData = new ReadOnlyDictionary<ConditionId, Condition>(CreateConditions());
+        ConditionsData = CreateConditions().ToFrozenDictionary();
     }
 
     private Dictionary<ConditionId, Condition> CreateConditions()

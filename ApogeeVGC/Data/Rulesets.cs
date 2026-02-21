@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Frozen;
 using ApogeeVGC.Sim.FormatClasses;
 
 namespace ApogeeVGC.Data;
@@ -9,11 +9,11 @@ namespace ApogeeVGC.Data;
 /// </summary>
 public record Rulesets
 {
-    public IReadOnlyDictionary<RuleId, Format> RulesetData { get; }
+    public FrozenDictionary<RuleId, Format> RulesetData { get; }
 
     public Rulesets()
     {
-        RulesetData = new ReadOnlyDictionary<RuleId, Format>(_rulesetData);
+        RulesetData = _rulesetData.ToFrozenDictionary();
     }
 
     private readonly Dictionary<RuleId, Format> _rulesetData = new()

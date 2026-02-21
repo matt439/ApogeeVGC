@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Frozen;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
@@ -19,11 +19,11 @@ public enum MoveEffectiveness
 
 public record TypeChart
 {
-    public IReadOnlyDictionary<PokemonType, TypeData> TypeData { get; }
+    public FrozenDictionary<PokemonType, TypeData> TypeData { get; }
 
     public TypeChart()
     {
-        TypeData = new ReadOnlyDictionary<PokemonType, TypeData>(_typeData);
+        TypeData = _typeData.ToFrozenDictionary();
     }
 
     public MoveEffectiveness GetMoveEffectiveness(PokemonType pokemon, MoveType moveType)

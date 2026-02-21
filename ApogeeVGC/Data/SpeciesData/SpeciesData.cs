@@ -1,11 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Frozen;
 using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Data.SpeciesData;
 
 public partial record SpeciesData
 {
-    public IReadOnlyDictionary<SpecieId, Species> SpeciesDataDictionary { get; }
+    public FrozenDictionary<SpecieId, Species> SpeciesDataDictionary { get; }
 
     public SpeciesData()
     {
@@ -117,6 +117,6 @@ public partial record SpeciesData
             combinedSpecies[kvp.Key] = kvp.Value;
         }
 
-        SpeciesDataDictionary = new ReadOnlyDictionary<SpecieId, Species>(combinedSpecies);
+        SpeciesDataDictionary = combinedSpecies.ToFrozenDictionary();
     }
 }
