@@ -103,6 +103,16 @@ public partial class Side
         return true;
     }
 
+    #region Cached End delegates for event handler discovery (avoids per-call allocations)
+
+    private EffectDelegate? _removeSideConditionEndDelegate;
+
+    internal EffectDelegate RemoveSideConditionEndDelegate =>
+        _removeSideConditionEndDelegate ??=
+            EffectDelegate.FromNullableDelegate((Func<ConditionId, bool>)RemoveSideCondition)!;
+
+    #endregion
+
     public bool RemoveSideCondition(Condition status)
     {
         return RemoveSideCondition(status.Id);

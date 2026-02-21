@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Moves;
+﻿using System.Collections.Frozen;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Conditions;
@@ -23,38 +24,38 @@ public record Library
     private readonly SpeciesFormats _speciesFormats = new();
     private readonly Tags _tags = new();
 
-    private IReadOnlyDictionary<AbilityId, Ability> AbilitiesData => _abilities.AbilitiesData;
-    private IReadOnlyDictionary<ConditionId, Condition> ConditionsData => _conditions.ConditionsData;
-    private IReadOnlyDictionary<FormatId, Format> FormatsData => _formats.FormatData;
-    private IReadOnlyDictionary<ItemId, Item> ItemsData => _items.ItemsData;
-    private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.Value.LearnsetsData;
-    private IReadOnlyDictionary<MoveId, Move> MovesData => _moves.MovesData;
-    private IReadOnlyDictionary<NatureId, Nature> NaturesData => _natures.NatureData;
-    private IReadOnlyDictionary<RuleId, Format> RulesetsData => _rulesets.RulesetData;
-    private IReadOnlyDictionary<SpecieId, Species> SpeciesData => _speciesData.SpeciesDataDictionary;
-    private IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData => _speciesFormats.SpeciesFormatsData;
+    private FrozenDictionary<AbilityId, Ability> AbilitiesData => _abilities.AbilitiesData;
+    private FrozenDictionary<ConditionId, Condition> ConditionsData => _conditions.ConditionsData;
+    private FrozenDictionary<FormatId, Format> FormatsData => _formats.FormatData;
+    private FrozenDictionary<ItemId, Item> ItemsData => _items.ItemsData;
+    private FrozenDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.Value.LearnsetsData;
+    private FrozenDictionary<MoveId, Move> MovesData => _moves.MovesData;
+    private FrozenDictionary<NatureId, Nature> NaturesData => _natures.NatureData;
+    private FrozenDictionary<RuleId, Format> RulesetsData => _rulesets.RulesetData;
+    private FrozenDictionary<SpecieId, Species> SpeciesData => _speciesData.SpeciesDataDictionary;
+    private FrozenDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData => _speciesFormats.SpeciesFormatsData;
 
-    public IReadOnlyDictionary<AbilityId, Ability> Abilities => AbilitiesData;
-    
-    public IReadOnlyDictionary<ConditionId, Condition> Conditions => ConditionsData;
+    public FrozenDictionary<AbilityId, Ability> Abilities => AbilitiesData;
 
-    public IReadOnlyDictionary<FormatId, Format> Formats => FormatsData;
+    public FrozenDictionary<ConditionId, Condition> Conditions => ConditionsData;
 
-    public IReadOnlyDictionary<ItemId, Item> Items => ItemsData;
-    
-    public IReadOnlyDictionary<SpecieId, Learnset> Learnsets => LearnsetsData;
-    
-    public IReadOnlyDictionary<MoveId, Move> Moves => MovesData;
+    public FrozenDictionary<FormatId, Format> Formats => FormatsData;
 
-    public IReadOnlyDictionary<NatureId, Nature> Natures => NaturesData;
+    public FrozenDictionary<ItemId, Item> Items => ItemsData;
 
-    public IReadOnlyDictionary<RuleId, Format> Rulesets => RulesetsData;
+    public FrozenDictionary<SpecieId, Learnset> Learnsets => LearnsetsData;
 
-    public IReadOnlyDictionary<SpecieId, Species> Species => SpeciesData;
-    
-    public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormats => SpeciesFormatsData;
-    
-    public IReadOnlyDictionary<PokemonType, TypeData> TypeData => TypeChart.TypeData;
+    public FrozenDictionary<MoveId, Move> Moves => MovesData;
+
+    public FrozenDictionary<NatureId, Nature> Natures => NaturesData;
+
+    public FrozenDictionary<RuleId, Format> Rulesets => RulesetsData;
+
+    public FrozenDictionary<SpecieId, Species> Species => SpeciesData;
+
+    public FrozenDictionary<SpecieId, SpeciesFormat> SpeciesFormats => SpeciesFormatsData;
+
+    public FrozenDictionary<PokemonType, TypeData> TypeData => TypeChart.TypeData;
     public TypeChart TypeChart { get; } = new();
 
     public Library()

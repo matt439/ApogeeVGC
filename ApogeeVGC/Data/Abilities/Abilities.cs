@@ -1,18 +1,18 @@
-using System.Collections.ObjectModel;
+using System.Collections.Frozen;
 using ApogeeVGC.Sim.Abilities;
 
 namespace ApogeeVGC.Data.Abilities;
 
 public partial record Abilities
 {
-    public IReadOnlyDictionary<AbilityId, Ability> AbilitiesData { get; }
+    public FrozenDictionary<AbilityId, Ability> AbilitiesData { get; }
     private readonly Library _library;
 
     public Abilities(Library library)
     {
 
         _library = library;
-        AbilitiesData = new ReadOnlyDictionary<AbilityId, Ability>(CreateAbilities());
+        AbilitiesData = CreateAbilities().ToFrozenDictionary();
     }
 
     private Dictionary<AbilityId, Ability> CreateAbilities()

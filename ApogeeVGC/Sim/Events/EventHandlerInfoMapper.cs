@@ -721,6 +721,21 @@ public static class EventHandlerInfoMapper
     }
 
     /// <summary>
+    /// Checks whether a handler cache contains any entries with a non-None prefix.
+    /// Used to compute <see cref="IEffect.HasPrefixedHandlers"/>.
+    /// </summary>
+    public static bool CacheHasPrefixedHandlers(
+        FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> cache)
+    {
+        foreach ((EventId _, EventPrefix prefix, EventSuffix _) in cache.Keys)
+        {
+            if (prefix != EventPrefix.None)
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>
     /// Builds a pre-computed handler cache for a move effect by scanning all EventId × EventPrefix × EventSuffix
     /// combinations against the MoveEventMethodsMap.
     /// </summary>

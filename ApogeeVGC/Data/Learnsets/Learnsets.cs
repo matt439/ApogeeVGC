@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Frozen;
 using System.Text.Json;
 using ApogeeVGC.Data.Json;
 using ApogeeVGC.Sim.Abilities;
@@ -23,14 +23,14 @@ public record Learnsets
         PropertyNameCaseInsensitive = true
     };
 
-    public IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData { get; }
+    public FrozenDictionary<SpecieId, Learnset> LearnsetsData { get; }
 
     public Learnsets()
     {
         LearnsetsData = LoadFromJson();
     }
 
-    private static IReadOnlyDictionary<SpecieId, Learnset> LoadFromJson()
+    private static FrozenDictionary<SpecieId, Learnset> LoadFromJson()
     {
         var jsonPath = GetJsonFilePath();
 
@@ -59,7 +59,7 @@ public record Learnsets
             result[specieId] = learnset;
         }
 
-        return new ReadOnlyDictionary<SpecieId, Learnset>(result);
+        return result.ToFrozenDictionary();
     }
 
     private static string GetJsonFilePath()

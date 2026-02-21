@@ -1,17 +1,17 @@
-using System.Collections.ObjectModel;
+using System.Collections.Frozen;
 using ApogeeVGC.Sim.Items;
 
 namespace ApogeeVGC.Data.Items;
 
 public partial record Items
 {
-    public IReadOnlyDictionary<ItemId, Item> ItemsData { get; }
+    public FrozenDictionary<ItemId, Item> ItemsData { get; }
     private readonly Library _library;
 
     public Items(Library library)
     {
         _library = library;
-        ItemsData = new ReadOnlyDictionary<ItemId, Item>(CreateItems());
+        ItemsData = CreateItems().ToFrozenDictionary();
     }
 
     private Dictionary<ItemId, Item> CreateItems()

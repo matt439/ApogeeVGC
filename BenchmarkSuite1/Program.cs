@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Running;
+using ApogeeVGC.Benchmarks;
 
 namespace BenchmarkSuite1
 {
@@ -6,7 +7,7 @@ namespace BenchmarkSuite1
     {
         static void Main(string[] args)
         {
-            var _ = BenchmarkRunner.Run(typeof(Program).Assembly);
+            BenchmarkSwitcher.FromAssembly(typeof(BattleSimulationBenchmark).Assembly).Run(args);
         }
     }
 }

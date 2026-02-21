@@ -17,6 +17,12 @@ public interface IEffect
     bool HasAnyEventHandlers { get; }
 
     /// <summary>
+    /// Whether this effect has any event handlers with a non-None prefix (Ally, Foe, Source, Any).
+    /// Used to skip effects entirely during prefixed event handler discovery passes.
+    /// </summary>
+    bool HasPrefixedHandlers { get; }
+
+    /// <summary>
     /// Gets comprehensive event handler information including delegate, metadata, and type signature.
     /// Returns null if the event is not implemented by this effect.
     /// Uses a pre-computed cache for O(1) lookups.

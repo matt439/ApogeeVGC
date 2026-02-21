@@ -84,7 +84,11 @@ public partial class Battle
         }
     }
 
-    public EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
+    /// <summary>
+    /// Populates priority fields on an EventListener in-place and returns it.
+    /// Accepts EventListener directly to avoid intermediate EventListenerWithoutPriority allocation.
+    /// </summary>
+    public EventListener ResolvePriority(EventListener h, EventId callbackName)
     {
         // Extract metadata from EventHandlerInfo if available
         IntFalseUnion order = IntFalseUnion.FromFalse();
@@ -165,22 +169,13 @@ public partial class Battle
             }
         }
 
-        return new EventListener
-        {
-            Effect = h.Effect,
-            Target = h.Target,
-            Index = h.Index,
-            HandlerInfo = h.HandlerInfo,
-            State = h.State,
-            End = h.End,
-            EndCallArgs = h.EndCallArgs,
-            EffectHolder = h.EffectHolder,
-            Order = order,
-            Priority = priority,
-            Speed = speed,
-            SubOrder = subOrder,
-            EffectOrder = effectOrder,
-        };
+        h.Order = order;
+        h.Priority = priority;
+        h.Speed = speed;
+        h.SubOrder = subOrder;
+        h.EffectOrder = effectOrder;
+
+        return h;
     }
 
     public IAction GetActionSpeed(IAction action)

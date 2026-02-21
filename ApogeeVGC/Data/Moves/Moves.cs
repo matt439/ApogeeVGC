@@ -1,17 +1,17 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Frozen;
 using ApogeeVGC.Sim.Moves;
 
 namespace ApogeeVGC.Data.Moves;
 
 public partial record Moves
 {
-    public IReadOnlyDictionary<MoveId, Move> MovesData { get; }
+    public FrozenDictionary<MoveId, Move> MovesData { get; }
     private readonly Library _library;
 
     public Moves(Library library)
     {
         _library = library;
-        MovesData = new ReadOnlyDictionary<MoveId, Move>(CreateMoves());
+        MovesData = CreateMoves().ToFrozenDictionary();
     }
 
     private Dictionary<MoveId, Move> CreateMoves()
