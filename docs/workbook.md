@@ -466,12 +466,12 @@ review moves Yawn to ZingZap
 ^ TwoTurnMove
 ^ ChoiceLock
 ^ MustRecharge
-@FutureMove
-@HealReplacement
-@Stall
-Gem
-RainDance
-PriomordialSea
+^ FutureMove
+^ HealReplacement
+^ Stall
+^ Gem
+^ RainDance
+^ PriomordialSea
 SunnyDay
 DesolateLand
 Sandstorm
