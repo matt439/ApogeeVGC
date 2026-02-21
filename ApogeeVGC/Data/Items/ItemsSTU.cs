@@ -183,7 +183,7 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Shuca Berry", "[weaken]");
+                                battle.Add("-enditem", target, "Shuca Berry", "[weaken]");
                                 battle.ChainModify(0.5);
                                 return battle.FinalModify(damage);
                             }

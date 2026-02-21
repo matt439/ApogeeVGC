@@ -423,13 +423,13 @@ review moves Yawn to ZingZap
 
 ^ review items PsychicSeed to RazorClaw
 
-review items RazorFang to RoomService
+^ review items RazorFang to RoomService
 
-review items RoseliBerry to RustedSword
+^ review items RoseliBerry to RustedSword
 
 ## ItemsSTU
 
-review items SafariBall to SilkScarf
+@ review items SafariBall to SilkScarf
 
 review items SilverPowder to SpellTag
 
