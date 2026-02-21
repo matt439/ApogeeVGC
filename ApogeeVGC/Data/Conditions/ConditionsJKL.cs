@@ -157,7 +157,7 @@ public partial record Conditions
                 {
                     battle.EffectState.TrueDuration = battle.Random(2, 4);
                     battle.EffectState.Move = effect is Move move ? move.Id : null;
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnRestart = OnRestartEventInfo.Create((battle, _, _, _) =>
                 {

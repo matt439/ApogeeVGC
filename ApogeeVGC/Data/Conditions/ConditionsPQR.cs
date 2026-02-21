@@ -96,7 +96,7 @@ public partial record Conditions
 
                     battle.EffectState.BoundDivisor =
                         (source != null && source.HasItem(ItemId.BindingBand)) ? 6 : 8;
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {

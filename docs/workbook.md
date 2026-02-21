@@ -441,9 +441,9 @@ review moves Yawn to ZingZap
 
 ## ItemsVWX
 
-@ review items WacanBerry to WhiteHerb
+^ review items WacanBerry to WhiteHerb
 
-review items WideLens to WiseGlasses
+^ review items WideLens to WiseGlasses
 
 ## ItemsYZ
 
@@ -451,18 +451,18 @@ review items WideLens to WiseGlasses
 
 # Conditions
 
-Burn
-Paralysis
-Sleep
-Freeze
-Poison
-Toxic
-Confusion
-Flinch
-Trapped
-Trapper
-PartiallyTrapped
-LockedMove
+^ Burn
+^ Paralysis
+^ Sleep
+^ Freeze
+^ Poison
+^ Toxic
+^ Confusion
+^ Flinch
+^ Trapped
+@ Trapper
+@ PartiallyTrapped
+@ LockedMove
 TwoTurnMove
 ChoiceLock
 MustRecharge
