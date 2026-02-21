@@ -249,11 +249,13 @@ public partial record Conditions
                     }
 
                     // Reset Outrage counter if locked
+                    // Uses DeleteVolatile (not RemoveVolatile) to match TS `delete` — bypasses OnEnd
+                    // so confusion is NOT applied when protect breaks the lock
                     EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
                     if (lockedMove is not null &&
                         source.Volatiles[ConditionId.LockedMove].Duration == 2)
                     {
-                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                        source.DeleteVolatile(ConditionId.LockedMove);
                     }
 
                     // Poison on contact
@@ -377,11 +379,13 @@ public partial record Conditions
                     }
 
                     // Reset Outrage counter if locked
+                    // Uses DeleteVolatile (not RemoveVolatile) to match TS `delete` — bypasses OnEnd
+                    // so confusion is NOT applied when protect breaks the lock
                     EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
                     if (lockedMove is not null &&
                         source.Volatiles[ConditionId.LockedMove].Duration == 2)
                     {
-                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                        source.DeleteVolatile(ConditionId.LockedMove);
                     }
 
                     // Burn on contact
