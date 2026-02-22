@@ -49,11 +49,12 @@ EventHandlerDelegate contextHandler,
    context.GetSourceOrTargetPokemon(),
     context.GetMove()
     );
-     if (result == null) return null;
+     // null = TS null (silent fail), VoidReturn = TS undefined (passthrough)
+     if (result == null) return new NullRelayVar();
    return result switch
   {
     BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),
- EmptyBoolEmptyVoidUnion => null,
+ EmptyBoolEmptyVoidUnion => new NullRelayVar(),
       VoidUnionBoolEmptyVoidUnion => null,
    _ => null
     };

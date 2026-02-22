@@ -494,9 +494,9 @@ public partial record Conditions
                         (target.IsGrounded() ?? false) &&
                         !target.IsSemiInvulnerable())
                     {
-                        if (battle.DisplayUi && effect is Condition { Id: ConditionId.Yawn } or
-                                Move { Id: MoveId.Yawn } or
-                                Move { Secondaries: null })
+                        if (battle.DisplayUi && (
+                                effect is Condition { Id: ConditionId.Yawn } or Move { Id: MoveId.Yawn } ||
+                                effect is Move m && m.Secondaries == null && m.Secondary == null))
                         {
                             battle.Add("-activate", target, "move: Electric Terrain");
                         }
@@ -529,11 +529,7 @@ public partial record Conditions
                             (attacker.IsGrounded() ?? false) &&
                             !attacker.IsSemiInvulnerable())
                         {
-                            if (battle.DisplayUi)
-                            {
-                                battle.Debug("electric terrain boost");
-                            }
-
+                            battle.Debug("electric terrain boost");
                             return battle.ChainModify([5325, 4096]);
                         }
 

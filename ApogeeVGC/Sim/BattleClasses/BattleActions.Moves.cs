@@ -510,10 +510,10 @@ public partial class BattleActions
         // Run TryMove events
         bool tryMoveResult = Battle.SingleEvent(EventId.TryMove, activeMove, null, pokemon,
                                      SingleEventSource.FromNullablePokemon(target), activeMove)
-                                 is not BoolRelayVar { Value: false }
+                                 is not BoolRelayVar { Value: false } and not NullRelayVar
                              && Battle.RunEvent(EventId.TryMove, pokemon,
                                      RunEventSource.FromNullablePokemon(target), activeMove)
-                                 is not BoolRelayVar { Value: false };
+                                 is not BoolRelayVar { Value: false } and not NullRelayVar;
 
         if (!tryMoveResult)
         {

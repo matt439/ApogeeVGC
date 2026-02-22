@@ -223,7 +223,7 @@ public partial class BattleActions
             }
             // Run TryImmunity event (abilities like Wonder Guard, Flash Fire, Volt Absorb, etc.)
             else if (Battle.SingleEvent(EventId.TryImmunity, move, null, target, pokemon,
-                         move) is BoolRelayVar { Value: false })
+                         move) is BoolRelayVar { Value: false } or NullRelayVar)
             {
                 if (Battle.DisplayUi)
                 {
