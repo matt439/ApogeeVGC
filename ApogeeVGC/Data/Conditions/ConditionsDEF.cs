@@ -353,7 +353,7 @@ public partial record Conditions
                         return false;
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }, 7),
                 OnDisableMove = OnDisableMoveEventInfo.Create((battle, pokemon) =>
                 {
