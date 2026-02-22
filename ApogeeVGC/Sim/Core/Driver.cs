@@ -24,15 +24,6 @@ public partial class Driver
     private const int NumThreads = 16;
     private const int BattleTimeoutMilliseconds = 10000; // 3 seconds timeout per battle
 
-    private const int IncrementalDebugMaxIterations = 500;
-
-    // Format configuration - change this to use different VGC regulations
-    // Available: Gen9VgcRegulationA through Gen9VgcRegulationI, CustomSingles, CustomDoubles
-    //private const FormatId DefaultVgcFormat = FormatId.Gen9VgcRegulationG;
-    //private const FormatId DefaultSinglesFormat = FormatId.CustomSingles;
-    //private const FormatId DefaultDoublesFormat = FormatId.CustomDoubles;
-
-
     public void Start(DriverMode mode)
     {
         switch (mode)

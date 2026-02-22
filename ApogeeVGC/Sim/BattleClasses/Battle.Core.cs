@@ -159,7 +159,7 @@ public partial class Battle
         Format = options.Format ?? Library.Formats[options.Id];
         RuleTable = Format.RuleTable ?? new RuleTable();
         DebugMode = options.Debug;
-        DisplayUi = true; // Always display UI for battle streams
+        DisplayUi = options.DisplayUi ?? !options.Sync;
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
 

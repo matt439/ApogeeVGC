@@ -160,7 +160,7 @@ public class SyncSimulator : IBattleController
         Side side = Battle!.Sides.First(s => s.Id == e.SideId);
 
         // Get choice synchronously
-        Choice choice = player.GetChoiceSync(e.Request, e.RequestType, e.Perspective);
+        Choice choice = player.GetChoiceSync(e.Request, e.RequestType, () => e.Perspective);
 
         // If the choice is empty, use AutoChoose
         if (choice.Actions.Count == 0)

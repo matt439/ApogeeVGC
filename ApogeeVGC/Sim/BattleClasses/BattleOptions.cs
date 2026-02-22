@@ -27,4 +27,11 @@ public record BattleOptions
     /// Default is 1000 turns.
     /// </summary>
     public int? MaxTurns { get; init; } = 1000;
+
+    /// <summary>
+    /// Whether to capture UI perspectives for each battle event.
+    /// When null, auto-derived: false in Sync mode (AI/fast simulations), true otherwise.
+    /// Set explicitly to override the default.
+    /// </summary>
+    public bool? DisplayUi { get; init; }
 }

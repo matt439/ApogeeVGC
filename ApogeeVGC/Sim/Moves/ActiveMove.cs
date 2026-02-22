@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Diagnostics.CodeAnalysis;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
@@ -13,6 +14,39 @@ public record ActiveMove : Move, IEffect
 {
     /// <summary>The MoveSlot this move occupies in a Pokemon's moveset.</summary>
     public required MoveSlot MoveSlot { get; init; }
+
+    /// <summary>
+    /// Creates an ActiveMove from a base Move, leveraging the record copy constructor
+    /// to efficiently copy all Move properties instead of manual property-by-property assignment.
+    /// </summary>
+    [SetsRequiredMembers]
+    public ActiveMove(Move source) : base(source)
+    {
+        // Handle secondaries wrapping (match TypeScript behavior)
+        Secondaries ??= Secondary != null ? [Secondary] : null;
+
+        // Share pre-built handler cache from base Move
+        _handlerCache = source.MoveHandlerCache;
+
+        // Set ActiveMove-specific required property
+        MoveSlot = new MoveSlot
+        {
+            Move = Id,
+            Id = Id,
+            Pp = NoPpBoosts ? BasePp : BasePp * 8 / 5,
+            MaxPp = NoPpBoosts ? BasePp : BasePp * 8 / 5,
+            Target = Target,
+            Disabled = false,
+            DisabledSource = null,
+            Used = false,
+        };
+    }
+
+    /// <summary>
+    /// Parameterless constructor for direct object-initializer construction.
+    /// Required members (Name, Accuracy, MoveSlot) must be set in the initializer.
+    /// </summary>
+    public ActiveMove() { }
 
     public EffectType EffectType => EffectType.Move;
 

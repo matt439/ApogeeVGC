@@ -335,28 +335,11 @@ public partial class BattleActions
             sourceEffect = null;
         }
 
-        // Get active move
-        var activeMove = move.ToActiveMove();
-
-        // ToActiveMove() only copies base Move properties and drops ActiveMove-specific
-        // fields. Preserve flags that guard against infinite recursion.
-        if (move is ActiveMove incomingActive)
-        {
-            // Without HasBounced, two opposing Magic Bounce holders infinitely re-bounce
-            // reflectable moves, causing a stack overflow.
-            if (incomingActive.HasBounced == true)
-            {
-                activeMove.HasBounced = true;
-            }
-
-            // Without IsExternal, Dancer-copied dance moves lose the external flag after
-            // ToActiveMove(), causing RunMove's Dancer check to re-trigger and creating
-            // infinite Dancer → Dancer recursion between two Dancer holders.
-            if (incomingActive.IsExternal == true)
-            {
-                activeMove.IsExternal = true;
-            }
-        }
+        // When the incoming move is already an ActiveMove (e.g. from RunMove or Magic Bounce),
+        // reuse it directly instead of creating a redundant copy. Callers that pass an ActiveMove
+        // have already created a fresh instance with the correct flags (HasBounced, IsExternal).
+        // Only create a new ActiveMove when the input is a base Move from the library.
+        var activeMove = move as ActiveMove ?? move.ToActiveMove();
 
         pokemon.LastMoveUsed = activeMove;
 

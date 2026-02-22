@@ -21,7 +21,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     // Synchronous version for MCTS and fast simulations
     public Choice GetChoiceSync(IChoiceRequest choiceRequest, BattleRequestType requestType,
-        BattlePerspective perspective)
+        Func<BattlePerspective> perspectiveFactory)
     {
         if (PrintDebug)
         {

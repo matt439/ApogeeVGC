@@ -70,7 +70,7 @@ public class PlayerGui : IPlayer
         return choice;
     }
 
-    public Choice GetChoiceSync(IChoiceRequest choice, BattleRequestType requestType, BattlePerspective perspective)
+    public Choice GetChoiceSync(IChoiceRequest choice, BattleRequestType requestType, Func<BattlePerspective> perspectiveFactory)
     {
         throw new NotSupportedException("GUI player requires async input and cannot be used in synchronous mode");
     }
