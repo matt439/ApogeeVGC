@@ -74,13 +74,14 @@ public partial class BattleActions
         RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon,
   targets.Count > 0 ? RunEventSource.FromNullablePokemon(targets[0]) : null, move);
 
-    bool hitResult = tryResult is not BoolRelayVar { Value: false } &&
-      prepareHitResult1 is not BoolRelayVar { Value: false } &&
-        prepareHitResult2 is not BoolRelayVar { Value: false };
+    bool hitResult = tryResult is not BoolRelayVar { Value: false } and not NullRelayVar &&
+      prepareHitResult1 is not BoolRelayVar { Value: false } and not NullRelayVar &&
+        prepareHitResult2 is not BoolRelayVar { Value: false } and not NullRelayVar;
 
    if (!hitResult)
      {
-// Move failed preliminary checks
+// Move failed preliminary checks — only show "-fail" for explicit false,
+// not for NullRelayVar (TS null = "failed silently")
 if (tryResult is BoolRelayVar { Value: false } ||
        prepareHitResult1 is BoolRelayVar { Value: false } ||
              prepareHitResult2 is BoolRelayVar { Value: false })
@@ -196,12 +197,13 @@ if (tryResult is BoolRelayVar { Value: false } ||
         RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon,
             RunEventSource.FromNullablePokemon(target), move);
 
-        bool hitResult = tryResult is not BoolRelayVar { Value: false } &&
-                        prepareHitResult1 is not BoolRelayVar { Value: false } &&
-                        prepareHitResult2 is not BoolRelayVar { Value: false };
+        bool hitResult = tryResult is not BoolRelayVar { Value: false } and not NullRelayVar &&
+                        prepareHitResult1 is not BoolRelayVar { Value: false } and not NullRelayVar &&
+                        prepareHitResult2 is not BoolRelayVar { Value: false } and not NullRelayVar;
 
         if (!hitResult)
         {
+            // Only show "-fail" for explicit false, not for NullRelayVar (TS null = "failed silently")
             if (tryResult is BoolRelayVar { Value: false } ||
                 prepareHitResult1 is BoolRelayVar { Value: false } ||
                 prepareHitResult2 is BoolRelayVar { Value: false })

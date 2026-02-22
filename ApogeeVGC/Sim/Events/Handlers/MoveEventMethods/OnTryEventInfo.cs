@@ -49,7 +49,9 @@ Priority = priority;
    context.GetSourceOrTargetPokemon(),
     context.GetMove()
   );
-    if (result == null) return null;
+    // Handler null = TS null ("failed silently") → NullRelayVar so SingleEvent
+    // returns it as-is instead of falling back to relayVar (truthy).
+    if (result == null) return new NullRelayVar();
    return result switch
      {
      BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),

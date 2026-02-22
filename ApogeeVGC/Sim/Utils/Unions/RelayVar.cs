@@ -73,3 +73,10 @@ public record BoolIntUndefinedUnionRelayVar(BoolIntUndefinedUnion Value) : Relay
 public record SecondaryEffectArrayRelayVar(SecondaryEffect[] Effects) : RelayVar;
 public record UndefinedRelayVar : RelayVar;
 public record VoidReturnRelayVar : RelayVar;
+
+/// <summary>
+/// Represents TS null semantics in event handlers: "this action failed silently;
+/// suppress any 'But it failed!' messages". Distinct from C# null (= TS undefined
+/// = passthrough/no opinion) and BoolRelayVar(false) (= TS false = "this action failed").
+/// </summary>
+public record NullRelayVar : RelayVar;

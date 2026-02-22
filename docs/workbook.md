@@ -8,7 +8,7 @@
 
 ^ review moves Amnesia to AromaticMist
 
-review moves Assurance to AuroraVeil
+@ review moves Assurance to AuroraVeil
 
 review moves Avalanche to BatonPass
 
