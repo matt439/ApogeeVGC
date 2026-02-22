@@ -1408,8 +1408,8 @@ public partial record Moves
                     }
 
                     // Add the volatile for airborne state
+                    // TwoTurnMove.OnStart automatically adds ConditionId.Bounce
                     attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
-                    attacker.AddVolatile(ConditionId.Bounce);
                     return null; // Return null to skip the attack this turn
                 }),
             },

@@ -358,8 +358,8 @@ public partial record Moves
                     }
 
                     // Add the volatile for underground state
+                    // TwoTurnMove.OnStart automatically adds ConditionId.Dig
                     attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
-                    attacker.AddVolatile(ConditionId.Dig);
                     return null; // Return null to skip the attack this turn
                 }),
             },
@@ -518,8 +518,8 @@ public partial record Moves
                     }
 
                     // Add the volatile for underwater state
+                    // TwoTurnMove.OnStart automatically adds ConditionId.Dive
                     attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
-                    attacker.AddVolatile(ConditionId.Dive);
                     return null; // Return null to skip the attack this turn
                 }),
             },
@@ -1357,8 +1357,8 @@ public partial record Moves
                     }
 
                     // Add the volatile for charging state
+                    // TwoTurnMove.OnStart automatically adds ConditionId.ElectroShot
                     attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
-                    attacker.AddVolatile(ConditionId.ElectroShot);
                     return null; // Return null to skip the attack this turn
                 }),
             },
@@ -2133,7 +2133,7 @@ public partial record Moves
                 }),
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
                 {
-                    // Check the battle queue for ally Pokémon using Grass Pledge or Water Pledge
+                    // Check the battle queue for ally Pokï¿½mon using Grass Pledge or Water Pledge
                     if (battle.Queue.List != null)
                     {
                         foreach (IAction action in battle.Queue.List)
@@ -2692,8 +2692,8 @@ public partial record Moves
                     }
 
                     // Add the volatile for flying state
+                    // TwoTurnMove.OnStart automatically adds ConditionId.Fly
                     attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
-                    attacker.AddVolatile(ConditionId.Fly);
                     return null; // Return null to skip the attack this turn
                 }),
             },
@@ -2944,8 +2944,8 @@ public partial record Moves
                     }
 
                     // Add the volatile for charging state
+                    // TwoTurnMove.OnStart automatically adds ConditionId.FreezeShock
                     attacker.AddVolatile(ConditionId.TwoTurnMove, defender);
-                    attacker.AddVolatile(ConditionId.FreezeShock);
                     return null; // Return null to skip the attack this turn
                 }),
             },
