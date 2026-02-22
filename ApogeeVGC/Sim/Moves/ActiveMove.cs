@@ -35,7 +35,7 @@ public record ActiveMove : Move, IEffect
                 // Remove all Hit-event entries from the shared cache (cheap: filters ~1-3 keys out of ~5-30)
                 _handlerCache = current
                     .Where(kvp => kvp.Key.Item1 != EventId.Hit)
-                    .ToFrozenDictionary();
+                    .ToDictionary();
             }
             else
             {
@@ -132,8 +132,8 @@ public record ActiveMove : Move, IEffect
     /// </summary>
     public HitEffect? HitEffect { get; set; }
 
-    internal FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache { get; set; }
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
+    internal Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache { get; set; }
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
         _handlerCache ??= EventHandlerInfoMapper.BuildMoveHandlerCache(this);
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;

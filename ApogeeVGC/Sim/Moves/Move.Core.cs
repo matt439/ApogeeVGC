@@ -360,8 +360,8 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     /// Pre-computed move handler cache, shared by all ActiveMove instances created from this Move.
     /// Built lazily on first access; thread-safe via Volatile.Read/CompareExchange.
     /// </summary>
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _moveHandlerCache;
-    internal FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> MoveHandlerCache
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _moveHandlerCache;
+    internal Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> MoveHandlerCache
     {
         get
         {

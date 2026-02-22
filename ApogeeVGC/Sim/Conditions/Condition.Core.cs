@@ -235,8 +235,8 @@ public partial record Condition : ISideEventMethods, IFieldEventMethods, IEffect
     //    };
     //}
 
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
         _handlerCache ??= EventHandlerInfoMapper.BuildHandlerCache(this);
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;
