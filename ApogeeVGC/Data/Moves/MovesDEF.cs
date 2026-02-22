@@ -2606,10 +2606,10 @@ public partial record Moves
                 {
                     int healAmount;
                     // Check if Grassy Terrain is active
-                    if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, target))
+                    if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, null))
                     {
-                        // Heal 2/3 of max HP in Grassy Terrain
-                        healAmount = battle.Modify(target.BaseMaxHp, 2, 3);
+                        // Heal 2/3 of max HP in Grassy Terrain (0.667 matches TS precision)
+                        healAmount = battle.Modify(target.BaseMaxHp, 0.667);
                     }
                     else
                     {
