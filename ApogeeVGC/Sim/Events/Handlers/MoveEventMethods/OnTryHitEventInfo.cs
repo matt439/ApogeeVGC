@@ -49,14 +49,14 @@ context.GetTargetOrSourcePokemon(),
     context.GetSourceOrTargetPokemon(),
      context.GetMove()
   );
-  if (result == null) return null;
+  if (result == null) return new NullRelayVar();
   return result switch
  {
        BoolBoolIntEmptyVoidUnion b => new BoolRelayVar(b.Value),
     IntBoolIntEmptyVoidUnion i => new IntRelayVar(i.Value),
-     EmptyBoolIntEmptyVoidUnion => null,
- VoidUnionBoolIntEmptyVoidUnion => null,
-    _ => null
+     EmptyBoolIntEmptyVoidUnion => new NullRelayVar(),
+ VoidUnionBoolIntEmptyVoidUnion => new VoidReturnRelayVar(),
+    _ => new VoidReturnRelayVar()
    };
    },
    priority,

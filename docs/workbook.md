@@ -8,29 +8,29 @@
 
 ^ review moves Amnesia to AromaticMist
 
-@ review moves Assurance to AuroraVeil
+^ review moves Assurance to AuroraVeil
 
-review moves Avalanche to BatonPass
+^ review moves Avalanche to BatonPass
 
-review moves BeatUp to BitterMalice
+^ review moves BeatUp to BitterMalice
 
-review moves BlastBurn to BodySlam
+^ review moves BlastBurn to BodySlam
 
-review moves BoltStrike to BrickBreak
+^ review moves BoltStrike to BrickBreak
 
-review moves Brine to BulletSeed
+^ review moves Brine to BulletSeed
 
-review moves BurningBulwark to Charm
+^ review moves BurningBulwark to Charm
 
-review moves ChillingWater to CloseCombat
+^ review moves ChillingWater to CloseCombat
 
-review moves Coaching to Conversion
+^ review moves Coaching to Conversion
 
-review moves Conversion2 to Counter
+^ review moves Conversion2 to Counter
 
-review moves CourtChange to CrossPoison
+^ review moves CourtChange to CrossPoison
 
-review moves CrushClaw to Curse
+^ review moves CrushClaw to Curse
 
 ## MovesDEF
 
