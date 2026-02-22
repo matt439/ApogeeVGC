@@ -14,18 +14,6 @@ public enum DriverMode
     RndVsRndVgcRegIEvaluation,
 
     /// <summary>
-    /// Incrementally tests elements (items, moves, abilities, species) to identify bugs.
-    /// Starts with a baseline and adds one element at a time, running verification battles.
-    /// </summary>
-    IncrementalDebug,
-
-    /// <summary>
-    /// Runs a single battle with specific seeds for debugging purposes.
-    /// Useful for reproducing specific timeout or bug scenarios from IncrementalDebugTest.
-    /// </summary>
-    SingleBattleDebug,
-
-    /// <summary>
     /// Runs a single VGC Reg I battle with 5 specific seeds for debugging purposes.
     /// Useful for reproducing failures from RndVsRndVgcRegIEvaluation.
     /// </summary>

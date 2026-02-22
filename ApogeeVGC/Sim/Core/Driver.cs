@@ -58,12 +58,6 @@ public partial class Driver
             case DriverMode.RndVsRndVgcRegIEvaluation:
                 RunRndVsRndVgcRegIEvaluation();
                 break;
-            case DriverMode.IncrementalDebug:
-                RunIncrementalDebugTest();
-                break;
-            case DriverMode.SingleBattleDebug:
-                RunSingleBattleDebug();
-                break;
             case DriverMode.SingleBattleDebugVgcRegI:
                 RunSingleBattleDebugVgcRegI();
                 break;
