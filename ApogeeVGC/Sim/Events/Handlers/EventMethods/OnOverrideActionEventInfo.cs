@@ -8,7 +8,7 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnOverrideAction event.
 /// Overrides the action a Pokemon will take.
-/// Signature: (Battle battle, Pokemon pokemon, Pokemon target, ActiveMove move) => DelegateVoidUnion
+/// TS signature: (this: Battle, pokemon: Pokemon, target: Pokemon, move: ActiveMove) => string | void
 /// </summary>
 public sealed record OnOverrideActionEventInfo : EventHandlerInfo
 {
@@ -22,27 +22,29 @@ public sealed record OnOverrideActionEventInfo : EventHandlerInfo
         Priority = priority;
         UsesSpeed = usesSpeed;
     }
+
     /// <summary>
     /// Creates strongly-typed context-based handler.
+    /// Returns MoveIdVoidUnion: MoveId to override the move, void to keep current move.
     /// </summary>
     public static OnOverrideActionEventInfo Create(
-        Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion> handler,
+        Func<Battle, Pokemon, Pokemon, ActiveMove, MoveIdVoidUnion> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
         return new OnOverrideActionEventInfo(
-                        context =>
+            context =>
             {
                 var result = handler(
                     context.Battle,
-                context.GetSourceOrTargetPokemon(),
-                context.GetTargetOrSourcePokemon(),
-                context.GetMove()
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetTargetOrSourcePokemon(),
+                    context.GetMove()
                 );
                 return result switch
                 {
-                    DelegateDelegateVoidUnion d => throw new NotImplementedException("DelegateVoidUnion delegate return not supported in Create pattern"),
-                    VoidDelegateVoidUnion => null,
+                    MoveIdMoveIdVoidUnion m => new MoveIdRelayVar(m.MoveId),
+                    VoidMoveIdVoidUnion => null,
                     _ => null
                 };
             },

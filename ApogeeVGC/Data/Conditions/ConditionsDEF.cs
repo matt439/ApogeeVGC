@@ -630,19 +630,17 @@ public partial record Conditions
 
                     return null;
                 }),
-                OnLockMove = OnLockMoveEventInfo.Create((battle, _) =>
+                OnOverrideAction = OnOverrideActionEventInfo.Create((battle, _, _, move) =>
+                {
+                    // Override action to the encored move if current move doesn't match
+                    MoveId? encoredMove = battle.EffectState.Move;
+                    if (encoredMove.HasValue && move.Id != encoredMove.Value)
                     {
-                        // Return the encored move ID to force the Pokemon to use it
-                        var encoredMove = battle.EffectState.Move;
-                        if (encoredMove.HasValue)
-                        {
-                            // Use implicit conversion from MoveId to MoveIdVoidUnion
-                            return encoredMove.Value;
-                        }
+                        return encoredMove.Value;
+                    }
 
-
-                        return MoveIdVoidUnion.FromVoid();
-                    }),
+                    return MoveIdVoidUnion.FromVoid();
+                }),
                 OnDisableMove = OnDisableMoveEventInfo.Create((battle, pokemon) =>
                 {
                     var encoredMove = battle.EffectState.Move;
