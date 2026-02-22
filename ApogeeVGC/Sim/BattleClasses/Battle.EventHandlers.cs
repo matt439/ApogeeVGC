@@ -252,16 +252,16 @@ public partial class Battle
         Item item = pokemon.GetItem();
         EffectState itemState = pokemon.ItemState;
 
-        Species species = pokemon.BaseSpecies;
-        EffectState speciesState = pokemon.SpeciesState;
-
         Side side = pokemon.Side;
 
         bool hasCustomHolder = customHolder != null;
         EffectHolder effectHolder = customHolder ?? pokemon;
 
         // Check status condition (paralysis, burn, etc.)
-        EventHandlerInfo? handlerInfo = GetHandlerInfo(pokemon, status, callbackName, prefix);
+        // Inline HasAnyEventHandlers + GetEventHandlerInfo on concrete Condition type to avoid IEffect interface dispatch
+        EventHandlerInfo? handlerInfo = status.HasAnyEventHandlers
+            ? status.GetEventHandlerInfo(callbackName, prefix)
+            : null;
         if (handlerInfo != null || (getKey != null && statusState.GetProperty(getKey) != null))
         {
             handlers.Add(ResolvePriority(new EventListener
@@ -279,7 +279,9 @@ public partial class Battle
         foreach ((ConditionId volatileId, EffectState volatileState) in pokemon.Volatiles)
         {
             Condition volatileCondition = Library.Conditions[volatileId];
-            handlerInfo = GetHandlerInfo(pokemon, volatileCondition, callbackName, prefix);
+            handlerInfo = volatileCondition.HasAnyEventHandlers
+                ? volatileCondition.GetEventHandlerInfo(callbackName, prefix)
+                : null;
             if (handlerInfo != null ||
                 (getKey != null && volatileState.GetProperty(getKey) != null))
             {
@@ -289,14 +291,16 @@ public partial class Battle
                     HandlerInfo = handlerInfo,
                     State = volatileState,
                     End = hasCustomHolder ? null : pokemon.RemoveVolatileEndDelegate,
-                    EndCallArgs = hasCustomHolder ? null : [volatileCondition],
+                    EndCallArgs = hasCustomHolder ? null : volatileCondition.EndCallArgsSelf,
                     EffectHolder = effectHolder,
                 }, callbackName));
             }
         }
 
         // Check ability
-        handlerInfo = GetHandlerInfo(pokemon, ability, callbackName, prefix);
+        handlerInfo = ability.HasAnyEventHandlers
+            ? ability.GetEventHandlerInfo(callbackName, prefix)
+            : null;
         if (DisplayUi && callbackName == EventId.SwitchIn)
         {
             Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Ability: {ability.Name} | Event: {callbackName} | Handler: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
@@ -314,7 +318,9 @@ public partial class Battle
         }
 
         // Check held item
-        handlerInfo = GetHandlerInfo(pokemon, item, callbackName, prefix);
+        handlerInfo = item.HasAnyEventHandlers
+            ? item.GetEventHandlerInfo(callbackName, prefix)
+            : null;
         if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
         {
             handlers.Add(ResolvePriority(new EventListener
@@ -327,19 +333,7 @@ public partial class Battle
             }, callbackName));
         }
 
-        // Check species (for species-specific events)
-        handlerInfo = GetHandlerInfo(pokemon, species, callbackName, prefix);
-        if (handlerInfo != null)
-        {
-            handlers.Add(ResolvePriority(new EventListener
-            {
-                Effect = species,
-                HandlerInfo = handlerInfo,
-                State = speciesState,
-                End = null, // Species can't be removed
-                EffectHolder = effectHolder,
-            }, callbackName));
-        }
+        // Species never has event handlers (HasAnyEventHandlers is always false) — skip entirely
 
         // Check slot conditions (Stealth Rock trap, etc.)
         if (pokemon.Position < side.SlotConditions.Count)
@@ -348,7 +342,9 @@ public partial class Battle
                 side.SlotConditions[pokemon.Position])
             {
                 Condition slotCondition = Library.Conditions[conditionId];
-                handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName, prefix);
+                handlerInfo = slotCondition.HasAnyEventHandlers
+                    ? slotCondition.GetEventHandlerInfo(callbackName, prefix)
+                    : null;
                 if (handlerInfo != null ||
                     (getKey != null && slotConditionState.GetProperty(getKey) != null))
                 {

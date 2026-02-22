@@ -241,6 +241,13 @@ public partial record Condition : ISideEventMethods, IFieldEventMethods, IEffect
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;
 
+    /// <summary>
+    /// Cached EndCallArgs containing this condition, used to avoid List&lt;object&gt; allocation
+    /// in FindPokemonEventHandlers volatile handler discovery.
+    /// </summary>
+    private List<object>? _endCallArgsSelf;
+    internal List<object> EndCallArgsSelf => _endCallArgsSelf ??= [this];
+
     private bool? _hasPrefixedHandlers;
     public bool HasPrefixedHandlers =>
         _hasPrefixedHandlers ??= EventHandlerInfoMapper.CacheHasPrefixedHandlers(HandlerCache);
