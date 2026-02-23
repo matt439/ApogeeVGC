@@ -98,9 +98,9 @@
 
 ^ review moves JawLock to KowtowCleave
 
-@ review moves Lashout to LeechLife
+^ review moves Lashout to LeechLife
 
-review moves LeechSeed to LockOn
+@ review moves LeechSeed to LockOn
 
 review moves LowKick to LusterPurge
 

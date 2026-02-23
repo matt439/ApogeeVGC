@@ -198,7 +198,7 @@ public partial record Conditions
                     {
                         // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
                         if (move != null &&
-                            source == battle.EffectState.Target &&
+                            source == (battle.EffectState.Target as PokemonEffectStateTarget)?.Pokemon &&
                             target == battle.EffectState.Source)
                         {
                             return 0;
@@ -213,7 +213,7 @@ public partial record Conditions
                     {
                         // effectState.Target is the Lock-On user, effectState.Source is the locked Pokemon
                         if (move != null &&
-                            source == battle.EffectState.Target &&
+                            source == (battle.EffectState.Target as PokemonEffectStateTarget)?.Pokemon &&
                             target == battle.EffectState.Source)
                         {
                             return true;
