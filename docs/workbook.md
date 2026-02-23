@@ -102,11 +102,11 @@
 
 ^ review moves LeechSeed to LockOn
 
-@ review moves LowKick to LusterPurge
+^ review moves LowKick to LusterPurge
 
 ## MovesMNO
 
-review moves MachPunch to MagneticFlux
+@ review moves MachPunch to MagneticFlux
 
 review moves MagnetRise to MegaHorn
 
