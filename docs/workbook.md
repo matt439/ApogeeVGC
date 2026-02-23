@@ -106,9 +106,9 @@
 
 ## MovesMNO
 
-@ review moves MachPunch to MagneticFlux
+^ review moves MachPunch to MagneticFlux
 
-review moves MagnetRise to MegaHorn
+@ review moves MagnetRise to MegaHorn
 
 review moves MegaKick to MetalSound
 

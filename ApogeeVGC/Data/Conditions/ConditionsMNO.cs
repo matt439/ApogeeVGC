@@ -284,7 +284,7 @@ public partial record Conditions
                 {
                     battle.EffectState.Slot = null;
                     battle.EffectState.Damage = 0;
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnRedirectTarget = OnRedirectTargetEventInfo.Create(
                     (battle, target, source, _, move) =>
