@@ -61,6 +61,22 @@ public record MoveAction : IAction
     public IEffect? SourceEffect { get; init; }
     public MoveType? Terastallize { get; init; }
 
+    /// <summary>
+    /// Cached <see cref="ActiveMove"/> derived from <see cref="Move"/>.
+    /// Lazily created on first access and shared across record copies produced by <c>with</c>.
+    /// Used by <see cref="Battle.GetActionSpeed"/> and <see cref="BattleQueue.InsertChoice"/>
+    /// to avoid repeated heap allocations for priority / fractional-priority event resolution.
+    /// </summary>
+    private ActiveMove? _cachedActiveMove;
+
+    /// <summary>
+    /// Returns a cached <see cref="ActiveMove"/> for this action's <see cref="Move"/>.
+    /// The instance is created once and reused for transient event resolution (priority, fractional priority).
+    /// </summary>
+    public ActiveMove GetOrCreateActiveMove()
+    {
+        return _cachedActiveMove ??= Move.ToActiveMove();
+    }
 
     // To satisfy IPriorityComparison
     public int SubOrder => 0;

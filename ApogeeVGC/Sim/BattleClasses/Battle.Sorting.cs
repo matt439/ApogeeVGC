@@ -183,7 +183,7 @@ public partial class Battle
         // Only process move actions for priority calculation
         if (action is MoveAction moveAction)
         {
-            var move = moveAction.Move.ToActiveMove();
+            var move = moveAction.GetOrCreateActiveMove();
 
             // Get base priority from the original move data (not the active move)
             // This ensures abilities like Prankster only apply once, not repeatedly

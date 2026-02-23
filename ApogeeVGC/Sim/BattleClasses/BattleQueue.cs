@@ -228,7 +228,7 @@ public class BattleQueue(Battle battle)
                     EventId.FractionalPriority,
                     ma.Pokemon,
                     null,
-                    ma.Move.ToActiveMove(),
+                    ma.GetOrCreateActiveMove(),
                     0
                 );
 
