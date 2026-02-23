@@ -134,9 +134,9 @@
 
 ^ review moves PinMissile to PoisonJab
 
-@ review moves PoisonPowder to Poltergeist
+^ review moves PoisonPowder to Poltergeist
 
-review moves PopulationBomb to PowerSwap
+@ review moves PopulationBomb to PowerSwap
 
 review moves PowerTrick to PrismaticLaser
 

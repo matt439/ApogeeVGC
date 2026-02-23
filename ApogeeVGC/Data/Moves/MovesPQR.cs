@@ -973,8 +973,12 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                BasePowerCallback = BasePowerCallbackEventInfo.Create((_, source, _, _) =>
-                    20 + 20 * source.PositiveBoosts()),
+                BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
+                {
+                    int bp = move.BasePower + 20 * source.PositiveBoosts();
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
