@@ -132,9 +132,9 @@
 
 ^ review moves PerishSong to PhotonGeyser
 
-@ review moves PinMissile to PoisonJab
+^ review moves PinMissile to PoisonJab
 
-review moves PoisonPowder to Poltergeist
+@ review moves PoisonPowder to Poltergeist
 
 review moves PopulationBomb to PowerSwap
 
