@@ -138,9 +138,9 @@
 
 ^ review moves PopulationBomb to PowerSwap
 
-@ review moves PowerTrick to PrismaticLaser
+^ review moves PowerTrick to PrismaticLaser
 
-review moves Protect to PsychicNoise
+@ review moves Protect to PsychicNoise
 
 review moves PsychicTerrain to Psystrike
 
