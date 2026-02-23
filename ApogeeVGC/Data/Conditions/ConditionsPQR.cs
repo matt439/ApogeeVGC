@@ -661,7 +661,7 @@ public partial record Conditions
                         return battle.ChainModify([5325, 4096]);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }, 6),
                 OnFieldStart = OnFieldStartEventInfo.Create((battle, _, source, effect) =>
                 {
