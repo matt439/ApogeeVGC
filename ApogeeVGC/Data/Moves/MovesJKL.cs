@@ -571,11 +571,7 @@ public partial record Moves
                         >= 100 => 40,
                         _ => 20,
                     };
-                    if (battle.DisplayUi)
-                    {
-                        battle.Debug($"BP: {bp}");
-                    }
-
+                    battle.Debug($"BP: {bp}");
                     return bp;
                 }),
                 Category = MoveCategory.Physical,
