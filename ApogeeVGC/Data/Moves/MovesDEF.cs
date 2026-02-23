@@ -2619,14 +2619,17 @@ public partial record Moves
 
                     IntFalseUnion result = battle.Heal(healAmount, target);
 
+                    // TS: success = !!this.heal(...) — 0 and false are both falsy
+                    bool success = result is IntIntFalseUnion { Value: > 0 };
+
                     // Mark as externally influenced if healing opponent
-                    if (result is not FalseIntFalseUnion && !target.IsAlly(source))
+                    if (success && !target.IsAlly(source))
                     {
                         target.Staleness = StalenessId.External;
                     }
 
                     // Show fail message if healing failed
-                    if (result is FalseIntFalseUnion)
+                    if (!success)
                     {
                         if (battle.DisplayUi)
                         {
@@ -2636,7 +2639,7 @@ public partial record Moves
                         return new Empty(); // NOT_FAIL
                     }
 
-                    return new VoidReturn();
+                    return true;
                 }),
             },
             [MoveId.FlowerTrick] = new()

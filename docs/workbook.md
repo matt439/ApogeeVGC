@@ -54,15 +54,15 @@
 
 ^ review moves EsperWing to FairyLock
 
-review moves FairyWind to FieryDance
+^ review moves FairyWind to FieryDance
 
-review moves FieryWrath to FireLash
+^ review moves FieryWrath to FireLash
 
-review moves FirePledge to Fissure
+^ review moves FirePledge to Fissure
 
-review moves Flail to FleurCannon
+^ review moves Flail to FleurCannon
 
-review moves Fling to FlowerTrick
+^ review moves Fling to FlowerTrick
 
 review moves Fly to ForcePalm
 
