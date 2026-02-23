@@ -270,6 +270,32 @@ public partial record Conditions
                 // in Gen 9. This handler is a no-op for Gen 9.
                 OnHit = OnHitEventInfo.Create((_, _, _, _) => null),
             },
+            [ConditionId.BeakBlast] = new()
+            {
+                Id = ConditionId.BeakBlast,
+                Name = "Beak Blast",
+                AssociatedMove = MoveId.BeakBlast,
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", pokemon, "move: Beak Blast");
+                    }
+
+                    return null;
+                }),
+                OnHit = OnHitEventInfo.Create((battle, target, source, move) =>
+                {
+                    if (battle.CheckMoveMakesContact(move, source, target))
+                    {
+                        source.TrySetStatus(ConditionId.Burn, target);
+                    }
+
+                    return null;
+                }),
+            },
             [ConditionId.Block] = new()
             {
                 Id = ConditionId.Block,

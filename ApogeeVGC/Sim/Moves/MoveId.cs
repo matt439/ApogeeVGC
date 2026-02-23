@@ -43,6 +43,7 @@ public enum MoveId
     BanefulBunker,
     BarbBarrage,
     BatonPass,
+    BeakBlast,
     BeatUp,
     BehemothBash,
     BehemothBlade,

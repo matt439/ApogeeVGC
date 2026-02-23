@@ -1976,6 +1976,7 @@ public partial record Moves
                     if ((lastMove.Flags.FailInstruct ?? false) ||
                         (lastMove.Flags.Charge ?? false) ||
                         (lastMove.Flags.Recharge ?? false) ||
+                        target.Volatiles.ContainsKey(ConditionId.BeakBlast) ||
                         target.Volatiles.ContainsKey(ConditionId.FocusPunch) ||
                         moveSlot is { Pp: <= 0 })
                     {

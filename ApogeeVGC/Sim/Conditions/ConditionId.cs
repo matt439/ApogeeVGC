@@ -11,6 +11,7 @@ public enum ConditionId
     Attract,
     AuroraVeil,
     BanefulBunker,
+    BeakBlast,
     BloodMoon,
     Block,
     Bounce,

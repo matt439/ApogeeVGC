@@ -953,6 +953,34 @@ public partial record Moves
                     return bp;
                 }),
             },
+            [MoveId.BeakBlast] = new()
+            {
+                Id = MoveId.BeakBlast,
+                Num = 690,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Physical,
+                Name = "Beak Blast",
+                BasePp = 15,
+                Priority = -3,
+                Flags = new MoveFlags
+                {
+                    Protect = true, FailMeFirst = true, NoSleepTalk = true,
+                    NoAssist = true, FailCopycat = true, FailInstruct = true, Bullet = true,
+                },
+                Condition = _library.Conditions[ConditionId.BeakBlast],
+                Target = MoveTarget.Normal,
+                Type = MoveType.Flying,
+                PriorityChargeCallback = PriorityChargeCallbackEventInfo.Create((_, pokemon) =>
+                {
+                    pokemon.AddVolatile(ConditionId.BeakBlast);
+                }),
+                OnAfterMove = OnAfterMoveEventInfo.Create((_, pokemon, _, _) =>
+                {
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.BeakBlast]);
+                    return BoolVoidUnion.FromVoid();
+                }),
+            },
             [MoveId.BehemothBash] = new()
             {
                 Id = MoveId.BehemothBash,

@@ -477,9 +477,9 @@ public partial record Conditions
                         if (battle.DisplayUi)
                         {
                             battle.Add("cant", attacker, "move: Imprison", move.Name);
-                            }
+                        }
 
-                            return BoolVoidUnion.FromBool(false);
+                        return BoolVoidUnion.FromBool(false);
                     }
 
                     return null;
