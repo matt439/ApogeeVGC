@@ -312,7 +312,7 @@ public partial record Moves
                 Type = MoveType.Grass,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, move) =>
                 {
-                    // Check the battle queue for ally Pokémon using Water Pledge or Fire Pledge
+                    // Check the battle queue for ally Pokï¿½mon using Water Pledge or Fire Pledge
                     if (battle.Queue.List != null)
                     {
                         foreach (IAction action in battle.Queue.List)
@@ -957,7 +957,7 @@ public partial record Moves
                     {
                         battle.AttrLastMove("[still]");
                         battle.Add("-fail", source);
-                        return null; // NOT_FAIL equivalent
+                        return new Empty(); // NOT_FAIL
                     }
 
                     return new VoidReturn();
@@ -1008,7 +1008,7 @@ public partial record Moves
                     if (!success)
                     {
                         battle.Add("-fail", target, "heal");
-                        return null; // NOT_FAIL equivalent
+                        return new Empty(); // NOT_FAIL
                     }
 
                     return new VoidReturn();
