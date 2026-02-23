@@ -77,4 +77,26 @@ public class Event
                _registeredHandlers.TryGetValue(id, out var handlers) &&
                handlers.Count > 0;
     }
+
+    /// <summary>
+    /// Resets all fields so the instance can be returned to an object pool.
+    /// Clears references to avoid holding onto objects beyond their lifetime.
+    /// </summary>
+    public void Reset()
+    {
+        Id = default;
+        Source = null;
+        Target = null;
+        Effect = null;
+        Modifier = null;
+
+        if (_registeredHandlers != null)
+        {
+            foreach (var list in _registeredHandlers.Values)
+            {
+                list.Clear();
+            }
+            _registeredHandlers.Clear();
+        }
+    }
 }

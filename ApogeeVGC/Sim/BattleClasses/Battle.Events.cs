@@ -132,13 +132,12 @@ public partial class Battle
         // Set up new event context
         Effect = effect;
         EffectState = state ?? InitEffectState();
-        Event = new Event
-        {
-            Id = eventId,
-            Target = target,
-            Source = source,
-            Effect = sourceEffect,
-        };
+        Event rentedEvent = _eventPool.Count > 0 ? _eventPool.Pop() : new Event();
+        rentedEvent.Id = eventId;
+        rentedEvent.Target = target;
+        rentedEvent.Source = source;
+        rentedEvent.Effect = sourceEffect;
+        Event = rentedEvent;
         EventDepth++;
 
         // Invoke the handler with appropriate parameters
@@ -162,10 +161,12 @@ public partial class Battle
         }
         finally
         {
-            // Restore parent context
+            // Restore parent context and return event to pool
             EventDepth--;
             Effect = parentEffect;
             EffectState = parentEffectState;
+            rentedEvent.Reset();
+            _eventPool.Push(rentedEvent);
             Event = parentEvent;
         }
 
@@ -276,25 +277,24 @@ public partial class Battle
 
         // Save parent context
         Event parentEvent = Event;
-        Event = new Event
+        Event rentedEvent = _eventPool.Count > 0 ? _eventPool.Pop() : new Event();
+        rentedEvent.Id = eventId;
+        rentedEvent.Target = target switch
         {
-            Id = eventId,
-            Target = target switch
-            {
-                PokemonRunEventTarget pokemonTarget => new PokemonSingleEventTarget(pokemonTarget
-                    .Pokemon),
-                _ => null,
-            },
-            Source = source switch
-            {
-                PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource
-                    .Pokemon),
-                TypeRunEventSource typeSource => new PokemonTypeSingleEventSource(typeSource.Type),
-                _ => null,
-            },
-            Effect = sourceEffect,
-            Modifier = 1.0,
+            PokemonRunEventTarget pokemonTarget => new PokemonSingleEventTarget(pokemonTarget
+                .Pokemon),
+            _ => null,
         };
+        rentedEvent.Source = source switch
+        {
+            PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource
+                .Pokemon),
+            TypeRunEventSource typeSource => new PokemonTypeSingleEventSource(typeSource.Type),
+            _ => null,
+        };
+        rentedEvent.Effect = sourceEffect;
+        rentedEvent.Modifier = 1.0;
+        Event = rentedEvent;
         EventDepth++;
 
         try
@@ -517,8 +517,10 @@ public partial class Battle
             handlers.Clear();
             _handlerListPool.Push(handlers);
 
-            // Restore event depth and parent event (always, even on exception)
+            // Return event to pool and restore parent event (always, even on exception)
             EventDepth--;
+            rentedEvent.Reset();
+            _eventPool.Push(rentedEvent);
             Event = parentEvent;
         }
     }

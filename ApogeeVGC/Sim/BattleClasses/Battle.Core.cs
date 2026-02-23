@@ -122,6 +122,13 @@ public partial class Battle
     /// </summary>
     private readonly Stack<List<EventListener>> _handlerListPool = new();
 
+    /// <summary>
+    /// Pool of reusable <see cref="Event"/> instances to eliminate per-call
+    /// allocations inside <see cref="RunEvent"/> and <see cref="SingleEvent"/>.
+    /// Events are rented at entry, populated with context, and returned in the finally block.
+    /// </summary>
+    private readonly Stack<Event> _eventPool = new();
+
     // Note: TeamGenerator is not implemented as we only support constructed teams, not random battles.
     // Random battle team generation would require implementing the full Pokemon Showdown team generator.
     // TeamGenerator teamGenerator = null;
