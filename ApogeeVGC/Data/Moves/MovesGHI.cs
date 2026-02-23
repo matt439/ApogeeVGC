@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -1519,7 +1520,7 @@ public partial record Moves
                 Type = MoveType.Dark,
                 OnTry = OnTryEventInfo.Create((battle, _, source, _) =>
                 {
-                    if (source.Species.Name == "Hoopa-Unbound")
+                    if (source.Species.Id == SpecieId.HoopaUnbound)
                     {
                         return new VoidReturn();
                     }
@@ -1528,7 +1529,7 @@ public partial record Moves
                     {
                         battle.Hint(
                             "Only a Pokemon whose form is Hoopa Unbound can use this move.");
-                        if (source.Species.Name == "Hoopa")
+                        if (source.Species.Id == SpecieId.Hoopa)
                         {
                             battle.AttrLastMove("[still]");
                             battle.Add("-fail", source, "move: Hyperspace Fury", "[forme]");
@@ -2082,18 +2083,18 @@ public partial record Moves
                 }),
                 OnModifyType = OnModifyTypeEventInfo.Create((_, move, pokemon, _) =>
                 {
-                    switch (pokemon.Species.Name)
+                    switch (pokemon.Species.Id)
                     {
-                        case "Ogerpon-Wellspring":
-                        case "Ogerpon-Wellspring-Tera":
+                        case SpecieId.OgerponWellspring:
+                        case SpecieId.OgerponWellspringTera:
                             move.Type = MoveType.Water;
                             break;
-                        case "Ogerpon-Hearthflame":
-                        case "Ogerpon-Hearthflame-Tera":
+                        case SpecieId.OgerponHearthflame:
+                        case SpecieId.OgerponHearthflameTera:
                             move.Type = MoveType.Fire;
                             break;
-                        case "Ogerpon-Cornerstone":
-                        case "Ogerpon-Cornerstone-Tera":
+                        case SpecieId.OgerponCornerstone:
+                        case SpecieId.OgerponCornerstoneTera:
                             move.Type = MoveType.Rock;
                             break;
                     }
