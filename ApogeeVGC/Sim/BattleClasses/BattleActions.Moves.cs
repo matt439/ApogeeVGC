@@ -55,7 +55,7 @@ public partial class BattleActions
 
         // Get the target for this move
         Pokemon? target = Battle.GetTarget(pokemon, move, targetLoc, originalTarget);
-        var baseMove = move.ToActiveMove();
+        var baseMove = move as ActiveMove ?? move.ToActiveMove();
         int priority = baseMove.Priority;
         bool pranksterBoosted = baseMove.PranksterBoosted ?? false;
 
