@@ -112,7 +112,7 @@ public partial record Moves
                 {
                     int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
                     IntFalseUnion healResult = battle.Heal(healAmount, target);
-                    bool success = healResult is not FalseIntFalseUnion;
+                    bool success = healResult is IntIntFalseUnion { Value: > 0 };
                     bool cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
                 }),
@@ -681,7 +681,7 @@ public partial record Moves
                 {
                     int healAmount = battle.Modify(target.MaxHp, 1, 4); // 25%
                     IntFalseUnion healResult = battle.Heal(healAmount, target);
-                    bool success = healResult is not FalseIntFalseUnion;
+                    bool success = healResult is IntIntFalseUnion { Value: > 0 };
                     bool cured = target.CureStatus();
                     return (cured || success) ? new VoidReturn() : false;
                 }),
