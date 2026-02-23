@@ -901,7 +901,6 @@ public partial record Conditions
                 Name = "Focus Energy",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.FocusEnergy,
-                NoCopy = true,
                 OnStart = OnStartEventInfo.Create((battle, pokemon, _, effect) =>
                 {
                     // Check for DragonCheer to prevent stacking

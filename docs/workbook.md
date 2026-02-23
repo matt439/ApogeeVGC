@@ -64,7 +64,7 @@
 
 ^ review moves Fling to FlowerTrick
 
-review moves Fly to ForcePalm
+^ review moves Fly to ForcePalm
 
 review moves ForestsCurse to FuryAttack
 
