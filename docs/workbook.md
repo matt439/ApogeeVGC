@@ -110,9 +110,9 @@
 
 ^ review moves MagnetRise to MegaHorn
 
-@ review moves MegaKick to MetalSound
+^ review moves MegaKick to MetalSound
 
-review moves MeteorBeam to MilkDrink
+@ review moves MeteorBeam to MilkDrink
 
 review moves Mimic to MistBall
 
