@@ -96,7 +96,7 @@
 
 ## MovesJKL
 
-review moves JawLock to KowtowCleave
+@ review moves JawLock to KowtowCleave
 
 review moves Lashout to LeechLife
 
