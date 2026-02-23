@@ -118,9 +118,9 @@
 
 ^ review moves MistyExplosion to MorningSun
 
-@ review moves MortalSpin to MudSlap
+^ review moves MortalSpin to MudSlap
 
-review moves MysticalFire to NobleRoar
+@ review moves MysticalFire to NobleRoar
 
 review moves NoRetreat to OriginPulse
 
