@@ -128,9 +128,9 @@
 
 ## MovesPQR
 
-@ review moves PainSplit to Peck
+^ review moves PainSplit to Peck
 
-review moves PerishSong to PhotonGeyser
+@ review moves PerishSong to PhotonGeyser
 
 review moves PinMissile to PoisonJab
 
