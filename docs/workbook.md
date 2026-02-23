@@ -116,9 +116,9 @@
 
 ^ review moves Mimic to MistBall
 
-@ review moves MistyExplosion to MorningSun
+^ review moves MistyExplosion to MorningSun
 
-review moves MortalSpin to MudSlap
+@ review moves MortalSpin to MudSlap
 
 review moves MysticalFire to NobleRoar
 
