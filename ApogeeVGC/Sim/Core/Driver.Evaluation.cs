@@ -1,12 +1,5 @@
-using ApogeeVGC.Data;
-using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
-using ApogeeVGC.Sim.Items;
-using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.SpeciesClasses;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -342,18 +335,17 @@ public partial class Driver
 
     /// <summary>
     /// Thread-local accumulator for parallel battle evaluation.
-    /// Eliminates contention on shared ConcurrentBag/ConcurrentDictionary by collecting
+    /// Eliminates contention on shared collections by collecting
     /// results per-thread and merging once after the parallel loop completes.
     /// </summary>
     private sealed class EvaluationLocalState
     {
         public readonly List<SimulatorResult> Results = [];
         public readonly List<int> Turns = [];
-        public readonly List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> Exceptions = [];
-        public readonly Dictionary<SpecieId, int> SpeciesCoverage = [];
-        public readonly Dictionary<MoveId, int> MoveCoverage = [];
-        public readonly Dictionary<AbilityId, int> AbilityCoverage = [];
-        public readonly Dictionary<ItemId, int> ItemCoverage = [];
+
+        public readonly
+            List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>
+            Exceptions = [];
     }
 
     private void RunRndVsRndVgcRegIEvaluation()
@@ -371,11 +363,9 @@ public partial class Driver
         // Merged results collected from thread-local state after parallel loop
         var allResults = new List<SimulatorResult>();
         var allTurns = new List<int>();
-        var allExceptions = new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>();
-        var speciesCoverage = new ConcurrentDictionary<SpecieId, int>();
-        var moveCoverage = new ConcurrentDictionary<MoveId, int>();
-        var abilityCoverage = new ConcurrentDictionary<AbilityId, int>();
-        var itemCoverage = new ConcurrentDictionary<ItemId, int>();
+        var allExceptions =
+            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
+                Exception)>();
 
         // Run simulations in parallel with thread-local state to eliminate contention
         var parallelOptions = new ParallelOptions
@@ -387,7 +377,7 @@ public partial class Driver
             // localInit: create a fresh accumulator per thread
             static () => new EvaluationLocalState(),
             // body: run battle and accumulate into thread-local state (no shared writes)
-            (i, _, localState) =>
+            (_, _, localState) =>
             {
                 // Batch seed allocation: single atomic add instead of 5 separate increments
                 int baseOffset = Interlocked.Add(ref seedCounter, 5) - 4;
@@ -400,16 +390,11 @@ public partial class Driver
 
                 try
                 {
-                    // Generate teams externally so we can track coverage
                     var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam1Seed);
                     var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam2Seed);
 
                     var team1 = team1Generator.GenerateTeam();
                     var team2 = team2Generator.GenerateTeam();
-
-                    // Track coverage into thread-local dictionaries (zero contention)
-                    TrackTeamCoverage(team1, localState);
-                    TrackTeamCoverage(team2, localState);
 
                     // Run directly on Parallel.For thread — no Task.Run + Wait overhead
                     (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
@@ -459,16 +444,6 @@ public partial class Driver
                     allTurns.AddRange(localState.Turns);
                     allExceptions.AddRange(localState.Exceptions);
                 }
-
-                // Merge coverage dictionaries into the shared ConcurrentDictionary
-                foreach (var (key, count) in localState.SpeciesCoverage)
-                    speciesCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
-                foreach (var (key, count) in localState.MoveCoverage)
-                    moveCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
-                foreach (var (key, count) in localState.AbilityCoverage)
-                    abilityCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
-                foreach (var (key, count) in localState.ItemCoverage)
-                    itemCoverage.AddOrUpdate(key, static (_, arg) => arg, static (_, existing, arg) => existing + arg, count);
             });
 
         stopwatch.Stop();
@@ -565,105 +540,7 @@ public partial class Driver
         sb.AppendLine($"Maximum Turns: {maxTurns}");
         Console.WriteLine(sb.ToString());
 
-        // --- Coverage Report ---
-        // Build the legal pools from a reference generator (seed is irrelevant for pool queries)
-        var refGenerator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, seed: 0);
-
-        // Derive reachable abilities and moves from legal species
-        var legalAbilities = new HashSet<AbilityId>();
-        var legalMoves = new HashSet<MoveId>();
-        foreach (var specieId in refGenerator.LegalSpecies)
-        {
-            var species = Library.Species[specieId];
-            if (species.Abilities.Slot0 != AbilityId.None) legalAbilities.Add(species.Abilities.Slot0);
-            if (species.Abilities.Slot1 is { } s1 && s1 != AbilityId.None) legalAbilities.Add(s1);
-            if (species.Abilities.Hidden is { } h && h != AbilityId.None) legalAbilities.Add(h);
-
-            if (Library.Learnsets.TryGetValue(specieId, out var learnset) && learnset.LearnsetData != null)
-            {
-                foreach (var (moveId, sources) in learnset.LearnsetData)
-                {
-                    if (sources.Any(s => s.Generation == 9))
-                    {
-                        legalMoves.Add(moveId);
-                    }
-                }
-            }
-        }
-
-        var coverageSb = new StringBuilder();
-        coverageSb.AppendLine("===========================================================");
-        coverageSb.AppendLine("COVERAGE REPORT");
-        coverageSb.AppendLine("===========================================================");
-        coverageSb.AppendLine();
-
-        AppendCoverageSection(coverageSb, "Species", speciesCoverage, refGenerator.LegalSpecies);
-        AppendCoverageSection(coverageSb, "Items", itemCoverage, refGenerator.UsableItems);
-        AppendCoverageSection(coverageSb, "Abilities", abilityCoverage, legalAbilities);
-        AppendCoverageSection(coverageSb, "Moves", moveCoverage, legalMoves);
-
-        Console.WriteLine(coverageSb.ToString());
-
         Console.WriteLine("Press Enter key to exit...");
         Console.ReadLine();
-    }
-
-    /// <summary>
-    /// Tracks species, ability, item, and move coverage from a team into thread-local dictionaries.
-    /// No contention — only the owning thread writes to these dictionaries.
-    /// </summary>
-    private static void TrackTeamCoverage(List<PokemonSet> team, EvaluationLocalState state)
-    {
-        foreach (var set in team)
-        {
-            IncrementCount(state.SpeciesCoverage, set.Species);
-            IncrementCount(state.AbilityCoverage, set.Ability);
-            IncrementCount(state.ItemCoverage, set.Item);
-            foreach (var move in set.Moves)
-            {
-                IncrementCount(state.MoveCoverage, move);
-            }
-        }
-
-        static void IncrementCount<TKey>(Dictionary<TKey, int> dict, TKey key) where TKey : notnull
-        {
-            ref int slot = ref System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out _);
-            slot++;
-        }
-    }
-
-    /// <summary>
-    /// Appends a coverage section for a single category to the report.
-    /// Lists overall stats and any entries from the legal pool that were never selected.
-    /// </summary>
-    private static void AppendCoverageSection<TId>(
-        StringBuilder sb,
-        string label,
-        ConcurrentDictionary<TId, int> observed,
-        IEnumerable<TId> legalPool) where TId : notnull
-    {
-        var legalSet = legalPool as IReadOnlyCollection<TId> ?? legalPool.ToList();
-        int totalLegal = legalSet.Count;
-        var neverSelected = legalSet.Where(id => !observed.ContainsKey(id)).OrderBy(id => id).ToList();
-        int selectedCount = totalLegal - neverSelected.Count;
-
-        var counts = observed.Values.ToList();
-        int minCount = counts.Count > 0 ? counts.Min() : 0;
-        int maxCount = counts.Count > 0 ? counts.Max() : 0;
-        double meanCount = counts.Count > 0 ? counts.Average() : 0;
-
-        sb.AppendLine($"{label} Coverage: {selectedCount}/{totalLegal} ({(double)selectedCount / totalLegal:P2})");
-        sb.AppendLine($"  Selection counts — Min: {minCount}, Max: {maxCount}, Mean: {meanCount:F1}");
-
-        if (neverSelected.Count > 0)
-        {
-            sb.AppendLine($"  Never selected ({neverSelected.Count}):");
-            foreach (var id in neverSelected)
-            {
-                sb.AppendLine($"    - {id}");
-            }
-        }
-
-        sb.AppendLine();
     }
 }
