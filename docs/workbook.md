@@ -136,9 +136,9 @@
 
 ^ review moves PoisonPowder to Poltergeist
 
-@ review moves PopulationBomb to PowerSwap
+^ review moves PopulationBomb to PowerSwap
 
-review moves PowerTrick to PrismaticLaser
+@ review moves PowerTrick to PrismaticLaser
 
 review moves Protect to PsychicNoise
 
