@@ -108,9 +108,9 @@
 
 ^ review moves MachPunch to MagneticFlux
 
-@ review moves MagnetRise to MegaHorn
+^ review moves MagnetRise to MegaHorn
 
-review moves MegaKick to MetalSound
+@ review moves MegaKick to MetalSound
 
 review moves MeteorBeam to MilkDrink
 
