@@ -66,7 +66,7 @@
 
 ^ review moves Fly to ForcePalm
 
-review moves ForestsCurse to FuryAttack
+^ review moves ForestsCurse to FuryAttack
 
 review moves FuryCutter to FutureSight
 

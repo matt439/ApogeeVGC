@@ -993,6 +993,8 @@ public partial record Conditions
 
                         if (followMeTarget == null) return PokemonVoidUnion.FromVoid();
 
+                        // Note: TS checks isSkyDropped() here, but Sky Drop is isNonstandard: "Past"
+                        // and not available in Gen 9, so we skip this check.
                         // Check if the Follow Me user is a valid target for this move
                         if (battle.ValidTarget(followMeTarget, source, move.Target))
                         {
@@ -1001,10 +1003,7 @@ public partial record Conditions
                                 move.SmartTarget = false;
                             }
 
-                            if (battle.DisplayUi)
-                            {
-                                battle.Debug("Follow Me redirected target of move");
-                            }
+                            battle.Debug("Follow Me redirected target of move");
 
                             return followMeTarget; // Uses implicit conversion
                         }
