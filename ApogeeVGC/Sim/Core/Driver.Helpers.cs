@@ -39,7 +39,7 @@ public partial class Driver
         ex.Data["Team2Seed"] = seeds.Team2Seed;
         ex.Data["Player1Seed"] = seeds.Player1Seed;
         ex.Data["Player2Seed"] = seeds.Player2Seed;
-        ex.Data["BattleSeed"] = seeds.BattleSeed;
+        ex.Data["BattleRandSeed"] = seeds.BattleSeed;
         return false;
     }
     /// <summary>
@@ -413,7 +413,7 @@ public partial class Driver
         Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
         Console.WriteLine($"  private const int PlayerRandom1Seed = {player1Seed};");
         Console.WriteLine($"  private const int PlayerRandom2Seed = {player2Seed};");
-        Console.WriteLine($"  private const int BattleSeed = {battleSeed};");
+        Console.WriteLine($"  private const int BattleRandSeed = {battleSeed};");
         Console.WriteLine();
         Console.WriteLine($"Then run with DriverMode.{debugMode} to debug.");
 

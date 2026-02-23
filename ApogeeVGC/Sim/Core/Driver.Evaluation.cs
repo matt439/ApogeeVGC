@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -348,6 +349,19 @@ public partial class Driver
             Exceptions = [];
     }
 
+    /// <summary>
+    /// Pre-generated battle input containing teams and seeds for a single evaluation battle.
+    /// Teams are generated before timing begins so the benchmark measures only battle simulation.
+    /// </summary>
+    private readonly record struct EvaluationBattleInput(
+        List<PokemonSet> Team1,
+        List<PokemonSet> Team2,
+        int Team1Seed,
+        int Team2Seed,
+        int Player1Seed,
+        int Player2Seed,
+        int BattleRandSeed);
+
     private void RunRndVsRndVgcRegIEvaluation()
     {
         Console.WriteLine("[Driver] Starting Random Team vs Random Team VGC Reg I Evaluation");
@@ -355,9 +369,30 @@ public partial class Driver
 
         const bool debug = false;
 
+        // Pre-generate all teams before timing so the benchmark measures only battle simulation
+        Console.WriteLine("[Driver] Pre-generating teams...");
+        var battles = new EvaluationBattleInput[RandomEvaluationNumTest];
+        for (var i = 0; i < RandomEvaluationNumTest; i++)
+        {
+            int baseOffset = i * 5 + 1;
+            int team1Seed = Team1EvalSeed + baseOffset;
+            int team2Seed = Team2EvalSeed + baseOffset + 1;
+
+            var team1 = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, team1Seed).GenerateTeam();
+            var team2 = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, team2Seed).GenerateTeam();
+
+            battles[i] = new EvaluationBattleInput(
+                team1, team2,
+                team1Seed, team2Seed,
+                PlayerRandom1EvalSeed + baseOffset + 2,
+                PlayerRandom2EvalSeed + baseOffset + 3,
+                BattleEvalSeed + baseOffset + 4);
+        }
+
+        Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
+
         var stopwatch = Stopwatch.StartNew();
 
-        var seedCounter = 0;
         var completedBattles = 0;
 
         // Merged results collected from thread-local state after parallel loop
@@ -377,34 +412,21 @@ public partial class Driver
             // localInit: create a fresh accumulator per thread
             static () => new EvaluationLocalState(),
             // body: run battle and accumulate into thread-local state (no shared writes)
-            (_, _, localState) =>
+            (i, _, localState) =>
             {
-                // Batch seed allocation: single atomic add instead of 5 separate increments
-                int baseOffset = Interlocked.Add(ref seedCounter, 5) - 4;
-
-                int localTeam1Seed = Team1EvalSeed + baseOffset;
-                int localTeam2Seed = Team2EvalSeed + baseOffset + 1;
-                int localPlayer1Seed = PlayerRandom1EvalSeed + baseOffset + 2;
-                int localPlayer2Seed = PlayerRandom2EvalSeed + baseOffset + 3;
-                int localBattleSeed = BattleEvalSeed + baseOffset + 4;
+                EvaluationBattleInput battle = battles[i];
 
                 try
                 {
-                    var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam1Seed);
-                    var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam2Seed);
-
-                    var team1 = team1Generator.GenerateTeam();
-                    var team2 = team2Generator.GenerateTeam();
-
                     // Run directly on Parallel.For thread — no Task.Run + Wait overhead
                     (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
-                        team1,
-                        team2,
-                        localTeam1Seed,
-                        localTeam2Seed,
-                        localPlayer1Seed,
-                        localPlayer2Seed,
-                        localBattleSeed,
+                        battle.Team1,
+                        battle.Team2,
+                        battle.Team1Seed,
+                        battle.Team2Seed,
+                        battle.Player1Seed,
+                        battle.Player2Seed,
+                        battle.BattleRandSeed,
                         debug);
 
                     localState.Results.Add(result);
@@ -420,15 +442,16 @@ public partial class Driver
                 {
                     // Store exception with all seed information for debugging
                     localState.Exceptions.Add(
-                        (localTeam1Seed, localTeam2Seed, localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
+                        (battle.Team1Seed, battle.Team2Seed, battle.Player1Seed, battle.Player2Seed,
+                            battle.BattleRandSeed, ex));
 
                     // Log immediately to console
                     LogExceptionWithAllSeeds(
-                        localTeam1Seed,
-                        localTeam2Seed,
-                        localPlayer1Seed,
-                        localPlayer2Seed,
-                        localBattleSeed,
+                        battle.Team1Seed,
+                        battle.Team2Seed,
+                        battle.Player1Seed,
+                        battle.Player2Seed,
+                        battle.BattleRandSeed,
                         ex,
                         "RndVsRndVgcRegIEvaluation");
                 }
