@@ -347,7 +347,7 @@ public partial record Conditions
                 {
                     // Trigger the onSwap event
                     battle.SingleEvent(EventId.Swap, _library.Conditions[ConditionId.HealingWish],
-                        battle.EffectState, target, target);
+                        battle.EffectState, target);
                 }),
                 OnSwap = OnSwapEventInfo.Create((battle, target, _) =>
                 {

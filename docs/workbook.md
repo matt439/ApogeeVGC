@@ -68,19 +68,19 @@
 
 ^ review moves ForestsCurse to FuryAttack
 
-review moves FuryCutter to FutureSight
+^ review moves FuryCutter to FutureSight
 
 ## MovesGHI
 
-review moves GastroAcid to Glare
+^ review moves GastroAcid to Glare
 
-review moves GrassKnot to GrassyTerrain
+^ review moves GrassKnot to GrassyTerrain
 
-review moves GravApple to Guillotine
+^ review moves GravApple to Guillotine
 
-review moves GunkShot to HardPress
+^ review moves GunkShot to HardPress
 
-review moves Haze to HealingWish
+^ review moves Haze to HealingWish
 
 review moves HealPulse to Heatwave
 
