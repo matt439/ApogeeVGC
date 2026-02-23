@@ -120,9 +120,9 @@
 
 ^ review moves MortalSpin to MudSlap
 
-@ review moves MysticalFire to NobleRoar
+^ review moves MysticalFire to NobleRoar
 
-review moves NoRetreat to OriginPulse
+@ review moves NoRetreat to OriginPulse
 
 review moves Outrage to Overheat
 
