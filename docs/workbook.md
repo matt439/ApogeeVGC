@@ -122,9 +122,9 @@
 
 ^ review moves MysticalFire to NobleRoar
 
-@ review moves NoRetreat to OriginPulse
+^ review moves NoRetreat to OriginPulse
 
-review moves Outrage to Overheat
+@ review moves Outrage to Overheat
 
 ## MovesPQR
 
