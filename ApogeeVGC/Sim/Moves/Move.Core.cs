@@ -174,62 +174,35 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
 
     public bool AffectsFainted { get; init; }
 
+    /// <summary>
+    /// Returns a fresh <see cref="ActiveMove"/> clone derived from a lazily-cached template.
+    /// The template is built once per <see cref="Move"/> (thread-safe); subsequent calls
+    /// clone it via the record <c>with</c> expression, avoiding per-call MoveSlot allocation,
+    /// Secondaries wrapping, and handler-cache resolution.
+    /// </summary>
     public ActiveMove ToActiveMove()
     {
-        return new ActiveMove(this);
+        var template = Volatile.Read(ref _activeMoveTemplate);
+        if (template is null)
+        {
+            var newTemplate = new ActiveMove(this);
+            template = Interlocked.CompareExchange(ref _activeMoveTemplate, newTemplate, null) ?? newTemplate;
+        }
+
+        return template with { };
     }
-    //{
-    //    return id switch
-    //    {
-    //        EventId.BasePowerCallback => EffectDelegate.FromNullableDelegate(BasePowerCallback),
-    //        EventId.BeforeMoveCallback => EffectDelegate.FromNullableDelegate(BeforeMoveCallback),
-    //        EventId.BeforeTurnCallback => EffectDelegate.FromNullableDelegate(BeforeTurnCallback),
-    //        EventId.DamageCallback => EffectDelegate.FromNullableDelegate(DamageCallback),
-    //        EventId.PriorityChargeCallback => EffectDelegate.FromNullableDelegate(PriorityChargeCallback),
-    //        EventId.DisableMove => EffectDelegate.FromNullableDelegate(OnDisableMove),
-    //        EventId.AfterHit => EffectDelegate.FromNullableDelegate(OnAfterHit),
-    //        EventId.AfterSubDamage => EffectDelegate.FromNullableDelegate(OnAfterSubDamage),
-    //        EventId.AfterMoveSecondarySelf => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondarySelf),
-    //        EventId.AfterMoveSecondary => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondary),
-    //        EventId.AfterMove => EffectDelegate.FromNullableDelegate(OnAfterMove),
-    //        EventId.Damage => EffectDelegate.FromNullableDelegate(OnDamage),
-    //        EventId.BasePower => EffectDelegate.FromNullableDelegate(OnBasePower),
-    //        EventId.Effectiveness => EffectDelegate.FromNullableDelegate(OnEffectiveness),
-    //        EventId.Hit => EffectDelegate.FromNullableDelegate(OnHit),
-    //        EventId.HitField => EffectDelegate.FromNullableDelegate(OnHitField),
-    //        EventId.HitSide => EffectDelegate.FromNullableDelegate(OnHitSide),
-    //        EventId.ModifyMove => EffectDelegate.FromNullableDelegate(OnModifyMove),
-    //        EventId.ModifyPriority => EffectDelegate.FromNullableDelegate(OnModifyPriority),
-    //        EventId.MoveFail => EffectDelegate.FromNullableDelegate(OnMoveFail),
-    //        EventId.ModifyType => EffectDelegate.FromNullableDelegate(OnModifyType),
-    //        EventId.ModifyTarget => EffectDelegate.FromNullableDelegate(OnModifyTarget),
-    //        EventId.PrepareHit => EffectDelegate.FromNullableDelegate(OnPrepareHit),
-    //        EventId.Try => EffectDelegate.FromNullableDelegate(OnTry),
-    //        EventId.TryHit => EffectDelegate.FromNullableDelegate(OnTryHit),
-    //        EventId.TryHitField => EffectDelegate.FromNullableDelegate(OnTryHitField),
-    //        EventId.TryHitSide => EffectDelegate.FromNullableDelegate(OnTryHitSide),
-    //        EventId.TryImmunity => EffectDelegate.FromNullableDelegate(OnTryImmunity),
-    //        EventId.TryMove => EffectDelegate.FromNullableDelegate(OnTryMove),
-    //        EventId.UseMoveMessage => EffectDelegate.FromNullableDelegate(OnUseMoveMessage),
-    //        _ => null,
-    //    };
-    //}
-
-    //// Moves do not define event priorities
-    //public int? GetPriority(EventId id) => null;
-
-    //// Moves do not define event orders
-    //public IntFalseUnion? GetOrder(EventId id) => null;
-
-    //// Moves do not define event sub-orders
-    //public int? GetSubOrder(EventId id) => null;
-
 
     /// <summary>
     /// Pre-computed move handler cache, shared by all ActiveMove instances created from this Move.
     /// Built lazily on first access; thread-safe via Volatile.Read/CompareExchange.
     /// </summary>
     private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _moveHandlerCache;
+
+    /// <summary>
+    /// Cached ActiveMove template. Built once per Move; cloned via record <c>with</c> for each
+    /// <see cref="ToActiveMove"/> call to avoid MoveSlot/Secondaries/handler-cache construction overhead.
+    /// </summary>
+    private ActiveMove? _activeMoveTemplate;
     internal Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> MoveHandlerCache
     {
         get
