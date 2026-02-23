@@ -124,11 +124,11 @@
 
 ^ review moves NoRetreat to OriginPulse
 
-@ review moves Outrage to Overheat
+^ review moves Outrage to Overheat
 
 ## MovesPQR
 
-review moves PainSplit to Peck
+@ review moves PainSplit to Peck
 
 review moves PerishSong to PhotonGeyser
 
