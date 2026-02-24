@@ -373,7 +373,7 @@ public partial record Conditions
 
                         battle.EachEvent(EventId.Weather);
                     },
-                    1),
+                    order: 1),
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -981,7 +981,7 @@ public partial record Conditions
 
                         battle.EachEvent(EventId.Weather);
                     },
-                    1),
+                    order: 1),
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
