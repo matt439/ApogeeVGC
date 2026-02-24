@@ -220,9 +220,9 @@
 
 ^ review moves WaterGun to WaterSpout
 
-@ review moves WaveCrash to WildboltStorm
+^ review moves WaveCrash to WildboltStorm
 
-review moves WildCharge to WorkUp
+@ review moves WildCharge to WorkUp
 
 review moves WorrySeed to XScissor
 
