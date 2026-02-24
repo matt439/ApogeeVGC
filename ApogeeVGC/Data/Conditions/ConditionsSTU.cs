@@ -34,12 +34,12 @@ public partial record Conditions
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, _, target, source, effect) =>
                 {
                     // TS: if (!effect || !source) return; - return undefined = allow
-                    if (effect == null || source == null) return null;
+                    if (effect == null || source == null) return new VoidReturn();
                     // TS: if (effect.id === 'yawn') return; - Yawn is allowed through
-                    if (effect is Condition { Id: ConditionId.Yawn }) return null;
+                    if (effect is Condition { Id: ConditionId.Yawn }) return new VoidReturn();
                     // Check if move has Infiltrates and target is not ally of source - allow through
                     if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
-                        return null;
+                        return new VoidReturn();
                     if (target != source)
                     {
                         if (battle.DisplayUi)
@@ -59,16 +59,16 @@ public partial record Conditions
                     }
 
                     // TS: implicit return undefined when target === source - allow self-inflicted status
-                    return null;
+                    return new VoidReturn();
                 }),
                 OnTryAddVolatile =
                     OnTryAddVolatileEventInfo.Create((battle, status, target, source, effect) =>
                     {
                         // TS: if (!effect || !source) return; - return undefined = allow
-                        if (effect == null || source == null) return null;
+                        if (effect == null || source == null) return new VoidReturn();
                         // Check if move has Infiltrates and target is not ally of source - allow through
                         if (effect is ActiveMove { Infiltrates: true } && !target.IsAlly(source))
-                            return null;
+                            return new VoidReturn();
                         if (status?.Id is ConditionId.Confusion or ConditionId.Yawn &&
                             target != source)
                         {
@@ -85,7 +85,7 @@ public partial record Conditions
                         }
 
                         // TS: implicit return undefined - allow
-                        return null;
+                        return new VoidReturn();
                     }),
                 OnSideStart = OnSideStartEventInfo.Create((battle, side, _, _) =>
                 {
