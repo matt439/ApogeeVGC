@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Moves;
@@ -2123,7 +2124,7 @@ public partial record Moves
                         SpecieId newSpecies = source.Species.Forme == FormeId.Pirouette
                             ? SpecieId.Meloetta // Aria is the base form
                             : SpecieId.MeloettaPirouette;
-                        source.FormeChange(newSpecies, move, message: "[msg]");
+                        source.FormeChange(newSpecies, move, isPermanent: false, message: "[msg]");
 
                         return new VoidReturn();
                     }),
@@ -2233,14 +2234,22 @@ public partial record Moves
                 OnModifyType = OnModifyTypeEventInfo.Create((_, move, source, _) =>
                 {
                     // Change to user's primary type
+                    // TS: if (type === 'Bird') type = '???'; - Bird type doesn't exist in Gen 9
                     var types = source.GetTypes();
-                    PokemonType primaryType = types.Length > 0 ? types[0] : PokemonType.Normal;
-                    if (primaryType == PokemonType.Unknown && types.Length > 1)
+                    PokemonType type = types[0];
+                    if (type == PokemonType.Unknown && types.Length > 1)
                     {
-                        primaryType = types[1];
+                        type = types[1];
                     }
 
-                    move.Type = (MoveType)primaryType;
+                    if (type != PokemonType.Unknown)
+                    {
+                        move.Type = type.ConvertToMoveType();
+                    }
+                    else
+                    {
+                        move.Type = MoveType.Unknown;
+                    }
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,

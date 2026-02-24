@@ -148,9 +148,9 @@
 
 ^ review moves RagingBull to RapidSpin
 
-@ review moves RazorLeaf to ReflectType
+^ review moves RazorLeaf to ReflectType
 
-review moves RelicSong to RevelationDance
+@ review moves RelicSong to RevelationDance
 
 review moves Reversal to RockPolish
 
