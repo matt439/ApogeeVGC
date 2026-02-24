@@ -182,9 +182,9 @@
 
 ^ review moves SparklingAria to SpinOut
 
-@ review moves SpiritBreak to SpringtideStorm
+^ review moves SpiritBreak to SpringtideStorm
 
-review moves StealthRock to Stockpile
+@ review moves StealthRock to Stockpile
 
 review moves Stomp to StrangeSteam
 
