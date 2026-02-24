@@ -2600,9 +2600,7 @@ public partial record Moves
                         target, source, null, false, true);
 
                     // Heal source by target's (pre-boost) attack stat
-                    // Pass the move as effect so LiquidOoze can detect it
-                    IntFalseUnion healResult = battle.Heal(targetAtk, source, target,
-                        BattleHealEffect.FromIEffect(move));
+                    IntFalseUnion healResult = battle.Heal(targetAtk, source, target);
 
                     // Move succeeds if either heal or boost worked
                     bool success = healResult is not FalseIntFalseUnion ||
