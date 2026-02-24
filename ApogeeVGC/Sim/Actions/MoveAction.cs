@@ -75,7 +75,7 @@ public record MoveAction : IAction
     /// </summary>
     public ActiveMove GetOrCreateActiveMove()
     {
-        return _cachedActiveMove ??= Move.ToActiveMove();
+        return _cachedActiveMove ??= Move.AsActiveMove();
     }
 
     // To satisfy IPriorityComparison

@@ -168,7 +168,7 @@ public partial class Battle
                 // Check each move for specific disable conditions
                 foreach (MoveSlot moveSlot in pokemon.MoveSlots)
                 {
-                    var activeMove = Library.Moves[moveSlot.Id].ToActiveMove();
+                    var activeMove = Library.Moves[moveSlot.Id].AsActiveMove();
 
                     // Run DisableMove event on the specific move
                     SingleEvent(EventId.DisableMove, activeMove, null, pokemon);

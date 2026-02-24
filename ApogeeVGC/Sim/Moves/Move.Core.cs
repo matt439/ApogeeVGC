@@ -175,22 +175,26 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     public bool AffectsFainted { get; init; }
 
     /// <summary>
+    /// Returns the shared <see cref="ActiveMove"/> template for read-only event dispatch.
+    /// The returned instance MUST NOT be mutated — it is shared across all callers.
+    /// Use <see cref="ToActiveMove"/> when the caller needs to modify the ActiveMove.
+    /// </summary>
+    public ActiveMove AsActiveMove()
+    {
+        var template = Volatile.Read(ref _activeMoveTemplate);
+        if (template is not null) return template;
+
+        var newTemplate = new ActiveMove(this);
+        return Interlocked.CompareExchange(ref _activeMoveTemplate, newTemplate, null) ?? newTemplate;
+    }
+
+    /// <summary>
     /// Returns a fresh <see cref="ActiveMove"/> clone derived from a lazily-cached template.
     /// The template is built once per <see cref="Move"/> (thread-safe); subsequent calls
     /// clone it via the record <c>with</c> expression, avoiding per-call MoveSlot allocation,
     /// Secondaries wrapping, and handler-cache resolution.
     /// </summary>
-    public ActiveMove ToActiveMove()
-    {
-        var template = Volatile.Read(ref _activeMoveTemplate);
-        if (template is null)
-        {
-            var newTemplate = new ActiveMove(this);
-            template = Interlocked.CompareExchange(ref _activeMoveTemplate, newTemplate, null) ?? newTemplate;
-        }
-
-        return template with { };
-    }
+    public ActiveMove ToActiveMove() => AsActiveMove() with { };
 
     /// <summary>
     /// Pre-computed move handler cache, shared by all ActiveMove instances created from this Move.
