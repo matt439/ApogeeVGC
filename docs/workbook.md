@@ -210,9 +210,9 @@
 
 ^ review moves ToxicThread to TriAttack
 
-@ review moves Trick to TripleDive
+^ review moves Trick to TripleDive
 
-review moves TripleKick to UTurn
+^ review moves TripleKick to UTurn
 
 ## MovesVWX
 
