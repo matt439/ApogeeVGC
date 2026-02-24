@@ -70,7 +70,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Kasib Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Kasib Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -102,7 +105,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Kebia Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Kebia Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -283,8 +289,11 @@ public partial record Items
 
                     moveSlot.Pp += 10;
                     if (moveSlot.Pp > moveSlot.MaxPp) moveSlot.Pp = moveSlot.MaxPp;
-                    battle.Add("-activate", pokemon, "item: Leppa Berry", moveSlot.Move.ToString(),
-                        "[consumed]");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "item: Leppa Berry", moveSlot.Move.ToString(),
+                            "[consumed]");
+                    }
                 })),
                 Num = 154,
                 Gen = 3,

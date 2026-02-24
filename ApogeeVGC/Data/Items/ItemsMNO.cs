@@ -196,8 +196,11 @@ public partial record Items
                                     if (firstCondition == ConditionId.Attract &&
                                         secondCondition == ConditionId.Attract)
                                     {
-                                        battle.Add("-end", target, "move: Attract",
-                                            "[from] item: Mental Herb");
+                                        if (battle.DisplayUi)
+                                        {
+                                            battle.Add("-end", target, "move: Attract",
+                                                "[from] item: Mental Herb");
+                                        }
                                     }
                                 }
 
@@ -226,8 +229,11 @@ public partial record Items
                                 if (firstCondition == ConditionId.Attract &&
                                     secondCondition == ConditionId.Attract)
                                 {
-                                    battle.Add("-end", pokemon, "move: Attract",
-                                        "[from] item: Mental Herb");
+                                    if (battle.DisplayUi)
+                                    {
+                                        battle.Add("-end", pokemon, "move: Attract",
+                                            "[from] item: Mental Herb");
+                                    }
                                 }
                             }
 
@@ -601,7 +607,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Occa Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Occa Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }

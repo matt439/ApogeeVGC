@@ -38,10 +38,16 @@ public partial record Items
                     // Block ability changes from other abilities (except Trace)
                     if (effect is Ability { Id: not AbilityId.Trace })
                     {
-                        battle.Add("-ability", source, effect.Name);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", source, effect.Name);
+                        }
                     }
 
-                    battle.Add("-block", target, "item: Ability Shield");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-block", target, "item: Ability Shield");
+                    }
                     return null; // Return null to block the ability change
                 }),
                 Num = 1881,
@@ -197,13 +203,19 @@ public partial record Items
                     if (!target.IgnoringItem() &&
                         battle.Field.GetPseudoWeather(ConditionId.Gravity) == null)
                     {
-                        battle.Add("-item", target, "Air Balloon");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-item", target, "Air Balloon");
+                        }
                     }
                 }),
                 // Airborneness implemented in Pokemon.IsGrounded()
                 OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, _, _) =>
                 {
-                    battle.Add("-enditem", target, "Air Balloon");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-enditem", target, "Air Balloon");
+                    }
                     target.Item = ItemId.None;
                     EffectState itemState = target.ItemState;
                     battle.ClearEffectState(ref itemState);
@@ -216,7 +228,10 @@ public partial record Items
                         battle.Debug($"effect: {effect.Id}");
                         if (effect.EffectType == EffectType.Move)
                         {
-                            battle.Add("-enditem", target, "Air Balloon");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-enditem", target, "Air Balloon");
+                            }
                             target.Item = ItemId.None;
                             EffectState itemState = target.ItemState;
                             battle.ClearEffectState(ref itemState);
@@ -331,7 +346,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Babiri Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Babiri Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -612,7 +630,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Charti Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Charti Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -690,7 +711,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Chilan Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Chilan Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -819,7 +843,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Chople Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Chople Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -900,8 +927,11 @@ public partial record Items
                     if (showMsg &&
                         !(effect is Move { Secondaries: not null }))
                     {
-                        battle.Add("-fail", target, "unboost", "[from] item: Clear Amulet",
-                            $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "unboost", "[from] item: Clear Amulet",
+                                $"[of] {target}");
+                        }
                     }
 
                     // Return the modified boosts
@@ -945,7 +975,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Coba Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Coba Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -977,7 +1010,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Colbur Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Colbur Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -1065,7 +1101,10 @@ public partial record Items
                         {
                             if (target.EatItem())
                             {
-                                battle.Add("-activate", target, "item: Custap Berry", "[consumed]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-activate", target, "item: Custap Berry", "[consumed]");
+                                }
                                 return DoubleVoidUnion.FromDouble(0.1);
                             }
                         }

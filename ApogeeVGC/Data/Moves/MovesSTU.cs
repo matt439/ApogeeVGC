@@ -847,7 +847,11 @@ public partial record Moves
 
                     if (result is FalseIntFalseUnion)
                     {
-                        battle.Add("-fail", target, "heal");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "heal");
+                        }
+
                         return new Empty(); // NOT_FAIL - move worked but heal failed
                     }
 
@@ -995,7 +999,11 @@ public partial record Moves
                     };
                     source.MoveSlots[sketchIndex] = sketchedMove;
                     source.BaseMoveSlots[sketchIndex] = sketchedMove;
-                    battle.Add("-activate", source, "move: Sketch", move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Sketch", move.Name);
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -1066,13 +1074,19 @@ public partial record Moves
                     Ability sourceAbility = source.GetAbility();
                     if (target.IsAlly(source))
                     {
-                        battle.Add("-activate", source, "move: Skill Swap", "", "",
-                            $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", source, "move: Skill Swap", "", "",
+                                $"[of] {target}");
+                        }
                     }
                     else
                     {
-                        battle.Add("-activate", source, "move: Skill Swap", targetAbility.Name,
-                            sourceAbility.Name, $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", source, "move: Skill Swap", targetAbility.Name,
+                                sourceAbility.Name, $"[of] {target}");
+                        }
                     }
 
                     AbilityIdFalseUnion? oldAbility = source.SetAbility(targetAbility.Id, target);
@@ -1645,15 +1659,23 @@ public partial record Moves
                     }
 
                     // Turn 1: Prepare the move
-                    battle.Add("-prepare", source, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", source, move.Name);
+                    }
+
                     // In sun, skip charge turn
                     ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
-                        battle.AttrLastMove("[still]");
-                        battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(source),
-                            move.Name,
-                            StringNumberDelegateObjectUnion.FromObject(target));
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(source),
+                                move.Name,
+                                StringNumberDelegateObjectUnion.FromObject(target));
+                        }
+
                         return new VoidReturn();
                     }
 
@@ -1717,15 +1739,23 @@ public partial record Moves
                     }
 
                     // Turn 1: Prepare the move
-                    battle.Add("-prepare", source, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", source, move.Name);
+                    }
+
                     // In sun, skip charge turn
                     ConditionId weather = source.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
-                        battle.AttrLastMove("[still]");
-                        battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(source),
-                            move.Name,
-                            StringNumberDelegateObjectUnion.FromObject(target));
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(source),
+                                move.Name,
+                                StringNumberDelegateObjectUnion.FromObject(target));
+                        }
+
                         return new VoidReturn();
                     }
 
@@ -1882,7 +1912,11 @@ public partial record Moves
                 {
                     (target.StoredStats.Spe, source.StoredStats.Spe) = (source.StoredStats.Spe,
                         target.StoredStats.Spe);
-                    battle.Add("-activate", source, "move: Speed Swap", $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Speed Swap", $"[of] {target}");
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -2100,7 +2134,11 @@ public partial record Moves
                     if (move == null) return false;
                     int ppDeducted = target.DeductPp(move.Id, 4);
                     if (ppDeducted == 0) return false;
-                    battle.Add("-activate", target, "move: Spite", move.Name, ppDeducted);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Spite", move.Name, ppDeducted);
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -2126,7 +2164,11 @@ public partial record Moves
                 {
                     if (battle.Field.GetPseudoWeather(ConditionId.Gravity) is not null)
                     {
-                        battle.Add("cant", source, "move: Gravity", move);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", source, "move: Gravity", move);
+                        }
+
                         return null; // Silent failure - message already shown
                     }
 
@@ -2134,7 +2176,11 @@ public partial record Moves
                 }),
                 OnTryHit = OnTryHitEventInfo.Create((battle, _, _, _) =>
                 {
-                    battle.Add("-nothing");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-nothing");
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -2777,13 +2823,21 @@ public partial record Moves
                 {
                     if (source.Volatiles.ContainsKey(ConditionId.Substitute))
                     {
-                        battle.Add("-fail", source, "move: Substitute");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source, "move: Substitute");
+                        }
+
                         return new Empty(); // NOT_FAIL - message already shown
                     }
 
                     if (source.Hp <= source.MaxHp / 4 || source.MaxHp == 1)
                     {
-                        battle.Add("-fail", source, "move: Substitute", "[weak]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source, "move: Substitute", "[weak]");
+                        }
+
                         return new Empty(); // NOT_FAIL - message already shown
                     }
 
@@ -3195,29 +3249,45 @@ public partial record Moves
                         return false;
                     }
 
-                    battle.Add("-activate", source, "move: Trick", $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Trick", $"[of] {target}");
+                    }
+
                     if (myItem is ItemItemFalseUnion myItemUnion)
                     {
                         target.SetItem(myItemUnion.Item.Id);
-                        battle.Add("-item", target, myItemUnion.Item.Name,
-                            "[from] move: Switcheroo");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-item", target, myItemUnion.Item.Name,
+                                "[from] move: Switcheroo");
+                        }
                     }
                     else if (yourItem is ItemItemFalseUnion yourItemForEnditem)
                     {
-                        battle.Add("-enditem", target, yourItemForEnditem.Item.Name, "[silent]",
-                            "[from] move: Switcheroo");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-enditem", target, yourItemForEnditem.Item.Name, "[silent]",
+                                "[from] move: Switcheroo");
+                        }
                     }
 
                     if (yourItem is ItemItemFalseUnion yourItemUnion)
                     {
                         source.SetItem(yourItemUnion.Item.Id);
-                        battle.Add("-item", source, yourItemUnion.Item.Name,
-                            "[from] move: Switcheroo");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-item", source, yourItemUnion.Item.Name,
+                                "[from] move: Switcheroo");
+                        }
                     }
                     else if (myItem is ItemItemFalseUnion myItemForEnditem)
                     {
-                        battle.Add("-enditem", source, myItemForEnditem.Item.Name, "[silent]",
-                            "[from] move: Switcheroo");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-enditem", source, myItemForEnditem.Item.Name, "[silent]",
+                                "[from] move: Switcheroo");
+                        }
                     }
 
                     return new VoidReturn();
@@ -3277,7 +3347,11 @@ public partial record Moves
                         battle.Heal(battle.Modify(target.MaxHp, factor)) is not FalseIntFalseUnion;
                     if (!success)
                     {
-                        battle.Add("-fail", target, "heal");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "heal");
+                        }
+
                         return new Empty(); // NOT_FAIL - heal failed but move itself didn't fail
                     }
 
@@ -3744,7 +3818,10 @@ public partial record Moves
                 {
                     if (source.Terastallized != null)
                     {
-                        battle.AttrLastMove("[anim] Tera Blast " + source.TeraType);
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[anim] Tera Blast " + source.TeraType);
+                        }
                     }
 
                     return new VoidReturn();
@@ -3905,11 +3982,15 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    battle.Add("-enditem", target, yourItemUnion.Item.Name, "[silent]",
-                        "[from] move: Thief",
-                        $"[of] {source}");
-                    battle.Add("-item", source, yourItemUnion.Item.Name, "[from] move: Thief",
-                        $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-enditem", target, yourItemUnion.Item.Name, "[silent]",
+                            "[from] move: Thief",
+                            $"[of] {source}");
+                        battle.Add("-item", source, yourItemUnion.Item.Name, "[from] move: Thief",
+                            $"[of] {target}");
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -4322,7 +4403,11 @@ public partial record Moves
                     }
 
                     if (!success) return false;
-                    battle.Add("-invertboost", target, "[from] move: Topsy-Turvy");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-invertboost", target, "[from] move: Topsy-Turvy");
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -4602,27 +4687,43 @@ public partial record Moves
                         return false;
                     }
 
-                    battle.Add("-activate", source, "move: Trick", $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Trick", $"[of] {target}");
+                    }
+
                     if (myItem is ItemItemFalseUnion myItemUnion)
                     {
                         target.SetItem(myItemUnion.Item.Id);
-                        battle.Add("-item", target, myItemUnion.Item.Name, "[from] move: Trick");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-item", target, myItemUnion.Item.Name, "[from] move: Trick");
+                        }
                     }
                     else if (yourItem is ItemItemFalseUnion yourItemForEnditem)
                     {
-                        battle.Add("-enditem", target, yourItemForEnditem.Item.Name, "[silent]",
-                            "[from] move: Trick");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-enditem", target, yourItemForEnditem.Item.Name, "[silent]",
+                                "[from] move: Trick");
+                        }
                     }
 
                     if (yourItem is ItemItemFalseUnion yourItemUnion)
                     {
                         source.SetItem(yourItemUnion.Item.Id);
-                        battle.Add("-item", source, yourItemUnion.Item.Name, "[from] move: Trick");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-item", source, yourItemUnion.Item.Name, "[from] move: Trick");
+                        }
                     }
                     else if (myItem is ItemItemFalseUnion myItemForEnditem)
                     {
-                        battle.Add("-enditem", source, myItemForEnditem.Item.Name, "[silent]",
-                            "[from] move: Trick");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-enditem", source, myItemForEnditem.Item.Name, "[silent]",
+                                "[from] move: Trick");
+                        }
                     }
 
                     return new VoidReturn();

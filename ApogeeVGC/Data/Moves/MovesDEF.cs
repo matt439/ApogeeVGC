@@ -568,12 +568,14 @@ public partial record Moves
 
                     if (success != true)
                     {
-                        if (success == false && battle.DisplayUi)
+                        if (battle.DisplayUi)
                         {
-                            battle.Add("-fail", source);
+                            if (success == false)
+                            {
+                                battle.Add("-fail", source);
+                            }
+                            battle.AttrLastMove("[still]");
                         }
-
-                        battle.AttrLastMove("[still]");
                         return new Empty(); // NOT_FAIL equivalent
                     }
 
@@ -605,7 +607,10 @@ public partial record Moves
                     slotCondition.Source = source;
                     slotCondition.MoveData = battle.Library.Moves[MoveId.DoomDesire];
 
-                    battle.Add("-start", source, "Doom Desire");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", source, "Doom Desire");
+                    }
                     return new Empty();
                 }),
             },
@@ -1334,7 +1339,10 @@ public partial record Moves
                     }
 
                     // Starting the charge turn - show prepare message
-                    battle.Add("-prepare", attacker, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", attacker, move.Name);
+                    }
                     // Boost SpA by 1 during charge
                     battle.Boost(new SparseBoostsTable { SpA = 1 }, attacker, attacker, move);
                     // Check if rain allows skipping the charge turn
@@ -1342,9 +1350,12 @@ public partial record Moves
                     if (weather == ConditionId.RainDance || weather == ConditionId.PrimordialSea)
                     {
                         // Skip charge turn in rain - execute immediately
-                        battle.AttrLastMove("[still]");
-                        battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(attacker), move.Name,
-                            StringNumberDelegateObjectUnion.FromObject(defender));
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(attacker), move.Name,
+                                StringNumberDelegateObjectUnion.FromObject(defender));
+                        }
                         return new VoidReturn();
                     }
 
@@ -1915,9 +1926,9 @@ public partial record Moves
                     // 30% chance to double base power
                     if (battle.RandomChance(3, 10))
                     {
-                        battle.AttrLastMove("[anim] Fickle Beam All Out");
                         if (battle.DisplayUi)
                         {
+                            battle.AttrLastMove("[anim] Fickle Beam All Out");
                             battle.Add("-activate", pokemon, "move: Fickle Beam");
                         }
 
@@ -2685,7 +2696,10 @@ public partial record Moves
                     }
 
                     // Starting the charge turn - show prepare message
-                    battle.Add("-prepare", attacker, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", attacker, move.Name);
+                    }
                     // Run ChargeMove event (for Power Herb, etc.)
                     RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
@@ -2937,7 +2951,10 @@ public partial record Moves
                     }
 
                     // Starting the charge turn - show prepare message
-                    battle.Add("-prepare", attacker, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", attacker, move.Name);
+                    }
                     // Run ChargeMove event (for Power Herb, etc.)
                     RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
@@ -3157,7 +3174,10 @@ public partial record Moves
                         IgnoreImmunity = false,
                     };
 
-                    battle.Add("-start", source, "move: Future Sight");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", source, "move: Future Sight");
+                    }
                     return new Empty();
                 }),
             },

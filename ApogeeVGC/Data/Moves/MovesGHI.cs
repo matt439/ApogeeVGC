@@ -52,7 +52,11 @@ public partial record Moves
                     // Check for Ability Shield
                     if (target.HasItem(ItemId.AbilityShield))
                     {
-                        battle.Add("-block", target, "item: Ability Shield");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-block", target, "item: Ability Shield");
+                        }
+
                         return null;
                     }
 
@@ -553,7 +557,11 @@ public partial record Moves
                     int newSpD = (target.StoredStats.SpD + source.StoredStats.SpD) / 2;
                     target.StoredStats.SpD = newSpD;
                     source.StoredStats.SpD = newSpD;
-                    battle.Add("-activate", source, "move: Guard Split", $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Guard Split", $"[of] {target}");
+                    }
+
                     return new VoidReturn();
                 }),
             },
@@ -588,7 +596,11 @@ public partial record Moves
                     source.SetBoost(new SparseBoostsTable { Def = targetDef, SpD = targetSpD });
                     target.SetBoost(new SparseBoostsTable { Def = sourceDef, SpD = sourceSpD });
 
-                    battle.Add("-swapboost", source, target, "def, spd", "[from] move: Guard Swap");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-swapboost", source, target, "def, spd", "[from] move: Guard Swap");
+                    }
+
                     return new VoidReturn();
                 }),
             },
@@ -733,7 +745,11 @@ public partial record Moves
                 Flags = new MoveFlags { Metronome = true },
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, _, _) =>
                 {
-                    battle.Add("-activate", target, "move: Happy Hour");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Happy Hour");
+                    }
+
                     return new VoidReturn();
                 }),
                 Target = MoveTarget.AllySide,
@@ -807,7 +823,11 @@ public partial record Moves
                 Type = MoveType.Ice,
                 OnHitField = OnHitFieldEventInfo.Create((battle, _, _, _) =>
                 {
-                    battle.Add("-clearallboost");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-clearallboost");
+                    }
+
                     foreach (Pokemon pokemon in battle.GetAllActive())
                     {
                         pokemon.ClearBoosts();
@@ -901,7 +921,11 @@ public partial record Moves
                 Type = MoveType.Normal,
                 OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
-                    battle.Add("-activate", source, "move: Heal Bell");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Heal Bell");
+                    }
+
                     var success = false;
 
                     // Note: In standard 2v2 VGC, all team Pokemon are on the same Side.Pokemon list
@@ -915,13 +939,21 @@ public partial record Moves
                         {
                             if (ally.HasAbility(AbilityId.Soundproof))
                             {
-                                battle.Add("-immune", ally, "[from] ability: Soundproof");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-immune", ally, "[from] ability: Soundproof");
+                                }
+
                                 continue;
                             }
 
                             if (ally.HasAbility(AbilityId.GoodAsGold))
                             {
-                                battle.Add("-immune", ally, "[from] ability: Good as Gold");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-immune", ally, "[from] ability: Good as Gold");
+                                }
+
                                 continue;
                             }
                         }
@@ -956,8 +988,12 @@ public partial record Moves
                 {
                     if (battle.CanSwitch(source.Side) == 0)
                     {
-                        battle.AttrLastMove("[still]");
-                        battle.Add("-fail", source);
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.Add("-fail", source);
+                        }
+
                         return new Empty(); // NOT_FAIL
                     }
 
@@ -1008,7 +1044,11 @@ public partial record Moves
 
                     if (!success)
                     {
-                        battle.Add("-fail", target, "heal");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "heal");
+                        }
+
                         return new Empty(); // NOT_FAIL
                     }
 
@@ -1059,7 +1099,11 @@ public partial record Moves
                     target.SetBoost(sourceBoosts);
                     source.SetBoost(targetBoosts);
 
-                    battle.Add("-swapboost", source, target, "[from] move: Heart Swap");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-swapboost", source, target, "[from] move: Heart Swap");
+                    }
+
                     return new VoidReturn();
                 }),
             },
@@ -1645,7 +1689,11 @@ public partial record Moves
                     }
 
                     // Starting the charge turn - show prepare message
-                    battle.Add("-prepare", attacker, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", attacker, move.Name);
+                    }
+
                     // Run ChargeMove event (for Power Herb, etc.)
                     RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
@@ -1859,7 +1907,10 @@ public partial record Moves
                     if ((item.IsBerry || item.IsGem) &&
                         target.TakeItem(source) is ItemItemFalseUnion)
                     {
-                        battle.Add("-enditem", target, item.Name, "[from] move: Incinerate");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-enditem", target, item.Name, "[from] move: Incinerate");
+                        }
                     }
 
                     return new VoidReturn();
@@ -1983,7 +2034,10 @@ public partial record Moves
                         return false;
                     }
 
-                    battle.Add("-singleturn", target, "move: Instruct", $"[of] {source}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "move: Instruct", $"[of] {source}");
+                    }
 
                     // Create a move action for the target to use their last move
                     MoveAction instructedAction = new()
@@ -2077,7 +2131,10 @@ public partial record Moves
                 {
                     if (move.Type != MoveType.Grass)
                     {
-                        battle.AttrLastMove($"[anim] Ivy Cudgel {move.Type}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove($"[anim] Ivy Cudgel {move.Type}");
+                        }
                     }
 
                     return new VoidReturn();

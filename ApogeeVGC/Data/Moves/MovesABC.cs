@@ -232,7 +232,10 @@ public partial record Moves
                     if (action is not null)
                     {
                         battle.Queue.PrioritizeAction(action);
-                        battle.Add("-activate", target, "move: After You");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: After You");
+                        }
                         return new VoidReturn();
                     }
 
@@ -361,8 +364,11 @@ public partial record Moves
 
                     if (!success)
                     {
-                        battle.Add("-fail", pokemon, "move: Ally Switch");
-                        battle.AttrLastMove("[still]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", pokemon, "move: Ally Switch");
+                            battle.AttrLastMove("[still]");
+                        }
                         return new Empty(); // NOT_FAIL
                     }
 
@@ -704,9 +710,12 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    battle.AttrLastMove("[still]");
-                    battle.Add("-fail", source, "move: Aura Wheel");
-                    battle.Hint("Only a Pokemon whose form is Morpeko or Morpeko-Hangry can use this move.");
+                    if (battle.DisplayUi)
+                    {
+                        battle.AttrLastMove("[still]");
+                        battle.Add("-fail", source, "move: Aura Wheel");
+                        battle.Hint("Only a Pokemon whose form is Morpeko or Morpeko-Hangry can use this move.");
+                    }
                     return null;
                 }),
                 OnModifyType = OnModifyTypeEventInfo.Create((_, move, pokemon, _) =>
@@ -897,8 +906,11 @@ public partial record Moves
                     if (battle.CanSwitch(target.Side) == 0 ||
                         target.Volatiles.ContainsKey(ConditionId.Commanded))
                     {
-                        battle.AttrLastMove("[still]");
-                        battle.Add("-fail", target);
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.Add("-fail", target);
+                        }
                         return new Empty(); // NOT_FAIL
                     }
 
@@ -1426,7 +1438,10 @@ public partial record Moves
                     }
 
                     // Starting the charge turn - show prepare message
-                    battle.Add("-prepare", attacker, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", attacker, move.Name);
+                    }
                     // Run ChargeMove event (for Power Herb, etc.)
                     RelayVar? chargeResult =
                         battle.RunEvent(EventId.ChargeMove, attacker, defender, move);
@@ -1593,8 +1608,11 @@ public partial record Moves
                         ItemFalseUnion takeResult = target.TakeItem(source);
                         if (takeResult is ItemItemFalseUnion takenItem)
                         {
-                            battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
-                                "[move] Bug Bite", $"[of] {source}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
+                                    "[move] Bug Bite", $"[of] {source}");
+                            }
                             // Trigger the Eat event on the item for the source
                             // Only run EatItem and set staleness if singleEvent returns truthy
                             RelayVar? eatResult = battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
@@ -1831,7 +1849,10 @@ public partial record Moves
                 Type = MoveType.Normal,
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, _, _) =>
                 {
-                    battle.Add("-activate", target, "move: Celebrate");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Celebrate");
+                    }
                     return new VoidReturn();
                 }),
             },
@@ -2046,7 +2067,10 @@ public partial record Moves
                 OnHit = OnHitEventInfo.Create((battle, target, _, _) =>
                 {
                     target.ClearBoosts();
-                    battle.Add("-clearboost", target);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-clearboost", target);
+                    }
                     return new VoidReturn();
                 }),
             },
@@ -2248,7 +2272,10 @@ public partial record Moves
                         return false;
                     }
 
-                    battle.Add("-start", target, "typechange", firstMove.Type.ConvertToString());
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "typechange", firstMove.Type.ConvertToString());
+                    }
                     return new VoidReturn();
                 }),
             },
@@ -2307,7 +2334,10 @@ public partial record Moves
                         return false;
                     }
 
-                    battle.Add("-start", source, "typechange", randomType.ConvertToString());
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", source, "typechange", randomType.ConvertToString());
+                    }
                     return new VoidReturn();
                 }),
             },
@@ -2507,8 +2537,11 @@ public partial record Moves
                     }
 
                     if (!success) return false;
-                    battle.Add("-swapsideconditions");
-                    battle.Add("-activate", source, "move: Court Change");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-swapsideconditions");
+                        battle.Add("-activate", source, "move: Court Change");
+                    }
                     return new VoidReturn();
                 }),
             },
@@ -2553,8 +2586,11 @@ public partial record Moves
                         return new VoidReturn();
                     }
 
-                    battle.Add("-item", source, yourItem.Name, "[from] move: Covet",
-                        $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-item", source, yourItem.Name, "[from] move: Covet",
+                            $"[of] {target}");
+                    }
                     return new VoidReturn();
                 }),
             },

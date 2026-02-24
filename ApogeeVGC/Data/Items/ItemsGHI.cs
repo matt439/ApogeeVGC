@@ -205,7 +205,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Haban Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Haban Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }

@@ -43,7 +43,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Wacan Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Wacan Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -147,7 +150,10 @@ public partial record Items
                         if (activate)
                         {
                             target.SetBoost(boosts);
-                            battle.Add("-clearnegativeboost", target, "[silent]");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-clearnegativeboost", target, "[silent]");
+                            }
                         }
 
                         return null;
@@ -168,7 +174,10 @@ public partial record Items
                     if (pokemon.ItemState.Boosts != null)
                     {
                         pokemon.SetBoost(pokemon.ItemState.Boosts);
-                        battle.Add("-clearnegativeboost", pokemon, "[silent]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-clearnegativeboost", pokemon, "[silent]");
+                        }
                     }
 
                     return BoolVoidUnion.FromVoid();

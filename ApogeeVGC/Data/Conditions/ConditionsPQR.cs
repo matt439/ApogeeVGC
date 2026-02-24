@@ -264,7 +264,10 @@ public partial record Conditions
                         // Damage 1/4 of max HP, minimum 1
                         var damage = Math.Max(1, (int)Math.Round(pokemon.MaxHp / 4.0));
                         battle.Damage(damage);
-                        battle.AttrLastMove("[still]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                        }
                         return new BoolRelayVar(false);
                     }
 

@@ -149,7 +149,10 @@ public partial record Abilities
                     {
                         if (!(battle.Boost(new SparseBoostsTable { Atk = 1 })?.IsTruthy() ?? false))
                         {
-                            battle.Add("-immune", target, "[from] ability: Sap Sipper");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target, "[from] ability: Sap Sipper");
+                            }
                         }
 
                         return null;
@@ -262,8 +265,11 @@ public partial record Abilities
                     if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
-                        battle.Add("-fail", target, "unboost", "Attack", "[from] ability: Scrappy",
-                            $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "unboost", "Attack", "[from] ability: Scrappy",
+                                $"[of] {target}");
+                        }
                     }
                 }),
             },
@@ -287,7 +293,10 @@ public partial record Abilities
                             {
                                 if (!activated)
                                 {
-                                    battle.Add("-activate", pokemon, "ability: Screen Cleaner");
+                                    if (battle.DisplayUi)
+                                    {
+                                        battle.Add("-activate", pokemon, "ability: Screen Cleaner");
+                                    }
                                     activated = true;
                                 }
 
@@ -423,7 +432,10 @@ public partial record Abilities
                         battle.RandomChance(33, 100))
                     {
                         battle.Debug("shed skin");
-                        battle.Add("-activate", pokemon, "ability: Shed Skin");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Shed Skin");
+                        }
                         pokemon.CureStatus();
                     }
                 }, order: 5, subOrder: 3),
@@ -544,7 +556,10 @@ public partial record Abilities
                         return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
                     {
-                        battle.Add("-immune", target, "[from] ability: Shields Down");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Shields Down");
+                        }
                     }
 
                     return false;
@@ -556,7 +571,10 @@ public partial record Abilities
                         if (target.Species.Id != SpecieId.MiniorMeteor || target.Transformed)
                             return new VoidReturn();
                         if (status.Id != ConditionId.Yawn) return new VoidReturn();
-                        battle.Add("-immune", target, "[from] ability: Shields Down");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Shields Down");
+                        }
                         return null;
                     }),
             },
@@ -606,7 +624,10 @@ public partial record Abilities
                 Rating = -1.0,
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
-                    battle.Add("-start", pokemon, "ability: Slow Start");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "ability: Slow Start");
+                    }
                     battle.EffectState.Counter = 5;
                 }),
                 // OnResidualOrder = 28, OnResidualSubOrder = 2
@@ -617,7 +638,10 @@ public partial record Abilities
                         battle.EffectState.Counter--;
                         if (battle.EffectState.Counter <= 0)
                         {
-                            battle.Add("-end", pokemon, "Slow Start");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-end", pokemon, "Slow Start");
+                            }
                             battle.EffectState.Counter = null;
                         }
                     }
@@ -790,7 +814,10 @@ public partial record Abilities
                 {
                     if (target != source && move.Flags.Sound == true)
                     {
-                        battle.Add("-immune", target, "[from] ability: Soundproof");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Soundproof");
+                        }
                         return null;
                     }
 
@@ -805,7 +832,10 @@ public partial record Abilities
                                 Pokemon: var abilityHolder,
                             })
                         {
-                            battle.Add("-immune", abilityHolder, "[from] ability: Soundproof");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", abilityHolder, "[from] ability: Soundproof");
+                            }
                         }
                     }
 
@@ -1066,7 +1096,10 @@ public partial record Abilities
                         if ((source != null && source != pokemon) ||
                             battle.ActiveMove?.Id == MoveId.KnockOff)
                         {
-                            battle.Add("-activate", pokemon, "ability: Sticky Hold");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", pokemon, "ability: Sticky Hold");
+                            }
                             return new BoolRelayVar(false); // Return false to prevent item removal
                         }
 
@@ -1086,7 +1119,10 @@ public partial record Abilities
                     {
                         if (!(battle.Boost(new SparseBoostsTable { SpA = 1 })?.IsTruthy() ?? false))
                         {
-                            battle.Add("-immune", target, "[from] ability: Storm Drain");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target, "[from] ability: Storm Drain");
+                            }
                         }
 
                         return null;
@@ -1113,7 +1149,10 @@ public partial record Abilities
                             if (move.SmartTarget == true) move.SmartTarget = false;
                             if (abilityHolder != target)
                             {
-                                battle.Add("-activate", abilityHolder, "ability: Storm Drain");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-activate", abilityHolder, "ability: Storm Drain");
+                                }
                             }
 
                             return abilityHolder;
@@ -1151,7 +1190,10 @@ public partial record Abilities
                 {
                     if (move.Ohko != null)
                     {
-                        battle.Add("-immune", target, "[from] ability: Sturdy");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Sturdy");
+                        }
                         return null;
                     }
 
@@ -1162,7 +1204,10 @@ public partial record Abilities
                 {
                     if (target.Hp == target.MaxHp && damage >= target.Hp && effect is ActiveMove)
                     {
-                        battle.Add("-ability", target, "Sturdy");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", target, "Sturdy");
+                        }
                         return target.Hp - 1;
                     }
 
@@ -1179,7 +1224,10 @@ public partial record Abilities
                 // OnDragOutPriority = 1
                 OnDragOut = OnDragOutEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    battle.Add("-activate", pokemon, "ability: Suction Cups");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Suction Cups");
+                    }
                     return null; // Prevent drag-out silently
                 }, 1),
             },
@@ -1202,12 +1250,18 @@ public partial record Abilities
                 {
                     if (pokemon.SyrupTriggered) return;
                     pokemon.SyrupTriggered = true;
-                    battle.Add("-ability", pokemon, "Supersweet Syrup");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Supersweet Syrup");
+                    }
                     foreach (Pokemon target in pokemon.AdjacentFoes())
                     {
                         if (target.Volatiles.ContainsKey(ConditionId.Substitute))
                         {
-                            battle.Add("-immune", target);
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target);
+                            }
                         }
                         else
                         {
@@ -1227,9 +1281,15 @@ public partial record Abilities
                 {
                     if (pokemon.Side.TotalFainted > 0)
                     {
-                        battle.Add("-activate", pokemon, "ability: Supreme Overlord");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Supreme Overlord");
+                        }
                         int fallen = Math.Min(pokemon.Side.TotalFainted, 5);
-                        battle.Add("-start", pokemon, $"fallen{fallen}", "[silent]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, $"fallen{fallen}", "[silent]");
+                        }
                         battle.EffectState.Counter = fallen;
                     }
                 }),
@@ -1238,7 +1298,10 @@ public partial record Abilities
                     if (battle.EffectState.Counter != null &&
                         pokemonUnion is PokemonSideFieldPokemon { Pokemon: var pokemon })
                     {
-                        battle.Add("-end", pokemon, $"fallen{battle.EffectState.Counter}", "[silent]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, $"fallen{battle.EffectState.Counter}", "[silent]");
+                        }
                     }
                 }),
                 // OnBasePowerPriority = 21
@@ -1320,8 +1383,11 @@ public partial record Abilities
                                 Pokemon: var effectHolder,
                             })
                         {
-                            battle.Add("-block", target, "ability: Sweet Veil",
-                                $"[of] {effectHolder}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-block", target, "ability: Sweet Veil",
+                                    $"[of] {effectHolder}");
+                            }
                         }
 
                         return null;
@@ -1340,8 +1406,11 @@ public partial record Abilities
                                     Pokemon: var effectHolder,
                                 })
                             {
-                                battle.Add("-block", target, "ability: Sweet Veil",
-                                    $"[of] {effectHolder}");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-block", target, "ability: Sweet Veil",
+                                        $"[of] {effectHolder}");
+                                }
                             }
 
                             return null;
@@ -1378,7 +1447,10 @@ public partial record Abilities
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.SuppressingAbility(pokemon)) return;
-                    battle.Add("-ability", pokemon, "Sword of Ruin");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Sword of Ruin");
+                    }
                 }),
                 OnAnyModifyDef = OnAnyModifyDefEventInfo.Create((battle, def, target, _, move) =>
                 {
@@ -1422,8 +1494,11 @@ public partial record Abilities
                         return;
                     }
 
-                    battle.Add("-activate", source, "ability: Symbiosis", myItem.Name,
-                        $"[of] {pokemon}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "ability: Symbiosis", myItem.Name,
+                            $"[of] {pokemon}");
+                    }
                 }),
             },
             [AbilityId.Synchronize] = new()
@@ -1438,7 +1513,10 @@ public partial record Abilities
                         if (source == null || source == target) return;
                         if (effect is Condition { Id: ConditionId.ToxicSpikes }) return;
                         if (status.Id is ConditionId.Sleep or ConditionId.Freeze) return;
-                        battle.Add("-activate", target, "ability: Synchronize");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "ability: Synchronize");
+                        }
                         // TS uses a hack { status: status.id, id: 'synchronize' } to make status-prevention
                         // abilities think Synchronize is a status move. We pass the ability as the effect.
                         source.TrySetStatus(status.Id, target, sourceEffect: _library.Abilities[target.Ability]);
@@ -1455,7 +1533,10 @@ public partial record Abilities
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.SuppressingAbility(pokemon)) return;
-                    battle.Add("-ability", pokemon, "Tablets of Ruin");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Tablets of Ruin");
+                    }
                 }),
                 OnAnyModifyAtk = OnAnyModifyAtkEventInfo.Create((battle, atk, source, _, move) =>
                 {
@@ -1503,7 +1584,10 @@ public partial record Abilities
                 {
                     if (battle.CheckMoveMakesContact(move, source, target, true))
                     {
-                        battle.Add("-ability", target, "Tangling Hair");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", target, "Tangling Hair");
+                        }
                         battle.Boost(new SparseBoostsTable { Spe = -1 }, source, target, null,
                             true);
                     }
@@ -1545,7 +1629,10 @@ public partial record Abilities
                     if (target != source && target.IsAlly(source) &&
                         move.Category != MoveCategory.Status)
                     {
-                        battle.Add("-activate", target, "ability: Telepathy");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "ability: Telepathy");
+                        }
                         return null;
                     }
 
@@ -1572,7 +1659,10 @@ public partial record Abilities
                     if (battle.Field.Weather != ConditionId.None ||
                         battle.Field.Terrain != ConditionId.None)
                     {
-                        battle.Add("-ability", pokemon, "Teraform Zero");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", pokemon, "Teraform Zero");
+                        }
                         battle.Field.ClearWeather();
                         battle.Field.ClearTerrain();
                     }
@@ -1628,7 +1718,10 @@ public partial record Abilities
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Terapagos) return;
                     if (pokemon.Species.Id != SpecieId.TerapagosTerastal)
                     {
-                        battle.Add("-activate", pokemon, "ability: Tera Shift");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Tera Shift");
+                        }
                         pokemon.FormeChange(SpecieId.TerapagosTerastal, battle.Effect, true);
                     }
                 }, 2),
@@ -1639,7 +1732,13 @@ public partial record Abilities
                 Name = "Teravolt",
                 Num = 164,
                 Rating = 3.0,
-                OnStart = OnStartEventInfo.Create((battle, pokemon) => { battle.Add("-ability", pokemon, "Teravolt"); }),
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Teravolt");
+                    }
+                }),
                 OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) => { move.IgnoreAbility = true; }),
             },
             [AbilityId.ThermalExchange] = new()
@@ -1660,7 +1759,10 @@ public partial record Abilities
                 {
                     if (pokemon.Status == ConditionId.Burn)
                     {
-                        battle.Add("-activate", pokemon, "ability: Thermal Exchange");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Thermal Exchange");
+                        }
                         pokemon.CureStatus();
                     }
                 }),
@@ -1669,7 +1771,10 @@ public partial record Abilities
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
                     {
-                        battle.Add("-immune", target, "[from] ability: Thermal Exchange");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Thermal Exchange");
+                        }
                     }
 
                     return false;
@@ -1826,7 +1931,10 @@ public partial record Abilities
                     if (move.Category == MoveCategory.Physical && (toxicSpikesData == null ||
                                                                    (toxicSpikesData.Layers ?? 0) < 2))
                     {
-                        battle.Add("-activate", target, "ability: Toxic Debris");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "ability: Toxic Debris");
+                        }
                         side.AddSideCondition(_library.Conditions[ConditionId.ToxicSpikes], target);
                     }
                 }),
@@ -1855,7 +1963,10 @@ public partial record Abilities
 
                     if (pokemon.HasItem(ItemId.AbilityShield))
                     {
-                        battle.Add("-block", pokemon, "item: Ability Shield");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-block", pokemon, "item: Ability Shield");
+                        }
                         battle.EffectState.Seek = false;
                     }
 
@@ -1952,7 +2063,10 @@ public partial record Abilities
                 {
                     if (pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Truant]))
                     {
-                        battle.Add("cant", pokemon, "ability: Truant");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "ability: Truant");
+                        }
                         return false;
                     }
 
@@ -1966,7 +2080,13 @@ public partial record Abilities
                 Name = "Turboblaze",
                 Num = 163,
                 Rating = 3.0,
-                OnStart = OnStartEventInfo.Create((battle, pokemon) => { battle.Add("-ability", pokemon, "Turboblaze"); }),
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Turboblaze");
+                    }
+                }),
                 OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) => { move.IgnoreAbility = true; }),
             },
 
@@ -2048,7 +2168,10 @@ public partial record Abilities
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.EffectState.Unnerved ?? false) return;
-                    battle.Add("-ability", pokemon, "Unnerve");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Unnerve");
+                    }
                     battle.EffectState.Unnerved = true;
                 }),
                 OnEnd = OnEndEventInfo.Create((battle, _) => { battle.EffectState.Unnerved = false; }),

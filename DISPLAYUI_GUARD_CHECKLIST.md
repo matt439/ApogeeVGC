@@ -80,83 +80,83 @@ private void SomeLoggingMethod(...)
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.Combat.cs` (13 calls)
 
-- [ ] L278 `Add`
-- [ ] L283 `Add`
-- [ ] L288 `Add`
-- [ ] L295 `Add`
-- [ ] L522 `Add`
-- [ ] L531 `Add`
-- [ ] L535 `Add`
-- [ ] L542 `Add`
-- [ ] L547 `Add`
-- [ ] L562 `Add`
-- [ ] L569 `Add`
-- [ ] L620 `Add`
-- [ ] L621 `Add`
+- [x] L278 `Add`
+- [x] L283 `Add`
+- [x] L288 `Add`
+- [x] L295 `Add`
+- [x] L522 `Add`
+- [x] L531 `Add`
+- [x] L535 `Add`
+- [x] L542 `Add`
+- [x] L547 `Add`
+- [x] L562 `Add`
+- [x] L569 `Add`
+- [x] L620 `Add`
+- [x] L621 `Add`
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.EndlessBattle.cs` (4 calls, **2 interp**)
 
-- [ ] L23 `Add` `[interp]`
-- [ ] L41 `Add` `[interp]`
-- [ ] L118 `Add`
-- [ ] L129 `Add`
+- [x] L23 `Add` `[interp]`
+- [x] L41 `Add` `[interp]`
+- [x] L118 `Add`
+- [x] L129 `Add`
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.Events.cs` (10 calls, **6 interp**)
 
-- [ ] L33 `Add`
-- [ ] L34 `Add` `[interp]`
-- [ ] L35 `Add` `[interp]`
-- [ ] L46 `Add`
-- [ ] L47 `Add` `[interp]`
-- [ ] L48 `Add` `[interp]`
-- [ ] L188 `Add`
-- [ ] L189 `Add`
-- [ ] L190 `Add` `[interp]`
-- [ ] L191 `Add` `[interp]`
+- [x] L33 `Add`
+- [x] L34 `Add` `[interp]`
+- [x] L35 `Add` `[interp]`
+- [x] L46 `Add`
+- [x] L47 `Add` `[interp]`
+- [x] L48 `Add` `[interp]`
+- [x] L188 `Add`
+- [x] L189 `Add`
+- [x] L190 `Add` `[interp]`
+- [x] L191 `Add` `[interp]`
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.Fainting.cs` (9 calls)
 
-- [ ] L94 `Add`
-- [ ] L153 `Add`
-- [ ] L235 `Add`
-- [ ] L249 `Add`
-- [ ] L272 `Add`
-- [ ] L295 `Add`
-- [ ] L354 `Add`
-- [ ] L362 `Add`
-- [ ] L367 `Add`
+- [x] L94 `Add`
+- [x] L153 `Add`
+- [x] L235 `Add`
+- [x] L249 `Add`
+- [x] L272 `Add`
+- [x] L295 `Add`
+- [x] L354 `Add`
+- [x] L362 `Add`
+- [x] L367 `Add`
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.FieldControl.cs` (2 calls)
 
-- [ ] L43 `Add`
-- [ ] L47 `Add`
+- [x] L43 `Add`
+- [x] L47 `Add`
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.Lifecycle.cs` (13 calls)
 
-- [ ] L47 `Add`
-- [ ] L50 `Add`
-- [ ] L56 `Add`
-- [ ] L221 `Add`
-- [ ] L231 `Add`
-- [ ] L317 `Add`
-- [ ] L342 `Add`
-- [ ] L344 `Add`
-- [ ] L418 `Add`
-- [ ] L424 `Add`
-- [ ] L668 `Add`
-- [ ] L700 `Add`
-- [ ] L716 `Add`
+- [x] L47 `Add`
+- [x] L50 `Add`
+- [x] L56 `Add`
+- [x] L221 `Add`
+- [x] L231 `Add`
+- [x] L317 `Add`
+- [x] L342 `Add`
+- [x] L344 `Add`
+- [x] L418 `Add`
+- [x] L424 `Add`
+- [x] L668 `Add`
+- [x] L700 `Add`
+- [x] L716 `Add`
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.Requests.cs` (3 calls)
 
-- [ ] L41 `Add`
-- [ ] L151 `Add`
-- [ ] L155 `Add`
+- [x] L41 `Add`
+- [x] L151 `Add`
+- [x] L155 `Add`
 
 #### `ApogeeVGC\Sim\BattleClasses\Battle.Validation.cs` (2 calls)
 
-- [ ] L83 `Add`
-- [ ] L157 `Add`
+- [x] L83 `Add`
+- [x] L157 `Add`
 
 #### `ApogeeVGC\Sim\BattleClasses\BattleActions.Damage.cs` (3 calls)
 
@@ -675,79 +675,79 @@ private void SomeLoggingMethod(...)
 
 #### `ApogeeVGC\Data\Conditions\ConditionsSTU.cs` (73 calls, **3 interp**)
 
-- [ ] L54 `Add`
-- [ ] L80 `Add`
-- [ ] L94 `Add`
-- [ ] L106 `Add`
-- [ ] L121 `Add`
-- [ ] L138 `Add`
-- [ ] L170 `Add`
-- [ ] L175 `Add`
-- [ ] L183 `Add`
-- [ ] L197 `Add`
-- [ ] L230 `Add`
-- [ ] L250 `Add`
-- [ ] L318 `Add`
-- [ ] L322 `Add`
-- [ ] L326 `Add`
-- [ ] L354 `Add`
-- [ ] L402 `Add`
-- [ ] L416 `Add`
-- [ ] L450 `Add`
-- [ ] L455 `Add`
-- [ ] L463 `Add`
-- [ ] L476 `Add`
-- [ ] L499 `Add`
-- [ ] L509 `Add`
-- [ ] L535 `Add`
-- [ ] L555 `Add`
-- [ ] L652 `Add`
-- [ ] L685 `Add`
-- [ ] L694 `Add`
-- [ ] L717 `Add` `[interp]`
-- [ ] L739 `Add` `[interp]`
-- [ ] L769 `Add`
-- [ ] L789 `Add`
-- [ ] L796 `Add`
-- [ ] L810 `Add`
-- [ ] L838 `Add`
-- [ ] L841 `AttrLastMove`
-- [ ] L868 `Add`
-- [ ] L880 `Add`
-- [ ] L928 `Add`
-- [ ] L971 `Add`
-- [ ] L976 `Add`
-- [ ] L990 `Add`
-- [ ] L1000 `Add`
-- [ ] L1020 `Add`
-- [ ] L1041 `Add`
-- [ ] L1057 `Add`
-- [ ] L1078 `Add`
-- [ ] L1097 `Add`
-- [ ] L1144 `Add`
-- [ ] L1157 `Add`
-- [ ] L1176 `Add`
-- [ ] L1195 `Add`
-- [ ] L1218 `Add`
-- [ ] L1233 `Add`
-- [ ] L1246 `Add`
-- [ ] L1262 `Add`
-- [ ] L1271 `Add`
-- [ ] L1296 `Add`
-- [ ] L1299 `Add`
-- [ ] L1304 `Add`
-- [ ] L1334 `Add`
-- [ ] L1344 `Add`
-- [ ] L1357 `Add`
-- [ ] L1390 `Add`
-- [ ] L1414 `Add` `[interp]`
-- [ ] L1438 `Add`
-- [ ] L1531 `AttrLastMove`
-- [ ] L1596 `Add`
-- [ ] L1619 `Add`
-- [ ] L1626 `Add`
-- [ ] L1642 `Add`
-- [ ] L1646 `Add`
+- [x] L54 `Add`
+- [x] L80 `Add`
+- [x] L94 `Add`
+- [x] L106 `Add`
+- [x] L121 `Add`
+- [x] L138 `Add`
+- [x] L170 `Add`
+- [x] L175 `Add`
+- [x] L183 `Add`
+- [x] L197 `Add`
+- [x] L230 `Add`
+- [x] L250 `Add`
+- [x] L318 `Add`
+- [x] L322 `Add`
+- [x] L326 `Add`
+- [x] L354 `Add`
+- [x] L402 `Add`
+- [x] L416 `Add`
+- [x] L450 `Add`
+- [x] L455 `Add`
+- [x] L463 `Add`
+- [x] L476 `Add`
+- [x] L499 `Add`
+- [x] L509 `Add`
+- [x] L535 `Add`
+- [x] L555 `Add`
+- [x] L652 `Add`
+- [x] L685 `Add`
+- [x] L694 `Add`
+- [x] L717 `Add` `[interp]`
+- [x] L739 `Add` `[interp]`
+- [x] L769 `Add`
+- [x] L789 `Add`
+- [x] L796 `Add`
+- [x] L810 `Add`
+- [x] L838 `Add`
+- [x] L841 `AttrLastMove`
+- [x] L868 `Add`
+- [x] L880 `Add`
+- [x] L928 `Add`
+- [x] L971 `Add`
+- [x] L976 `Add`
+- [x] L990 `Add`
+- [x] L1000 `Add`
+- [x] L1020 `Add`
+- [x] L1041 `Add`
+- [x] L1057 `Add`
+- [x] L1078 `Add`
+- [x] L1097 `Add`
+- [x] L1144 `Add`
+- [x] L1157 `Add`
+- [x] L1176 `Add`
+- [x] L1195 `Add`
+- [x] L1218 `Add`
+- [x] L1233 `Add`
+- [x] L1246 `Add`
+- [x] L1262 `Add`
+- [x] L1271 `Add`
+- [x] L1296 `Add`
+- [x] L1299 `Add`
+- [x] L1304 `Add`
+- [x] L1334 `Add`
+- [x] L1344 `Add`
+- [x] L1357 `Add`
+- [x] L1390 `Add`
+- [x] L1414 `Add` `[interp]`
+- [x] L1438 `Add`
+- [x] L1531 `AttrLastMove`
+- [x] L1596 `Add`
+- [x] L1619 `Add`
+- [x] L1626 `Add`
+- [x] L1642 `Add`
+- [x] L1646 `Add`
 
 #### `ApogeeVGC\Data\Conditions\ConditionsVWX.cs` (7 calls, **1 interp**)
 

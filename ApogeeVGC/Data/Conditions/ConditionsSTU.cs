@@ -836,9 +836,9 @@ public partial record Conditions
                         if (battle.DisplayUi)
                         {
                             battle.Add("-fail", source);
+                            battle.AttrLastMove("[still]");
                         }
 
-                        battle.AttrLastMove("[still]");
                         return null; // return null to suppress additional failure messages
                     }
 
@@ -1387,7 +1387,11 @@ public partial record Conditions
                 OnTrapPokemon = OnTrapPokemonEventInfo.Create((_, pokemon) => { pokemon.TryTrap(); }),
                 OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
-                    battle.Add("-activate", target, "trapped");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "trapped");
+                    }
+
                     return new VoidReturn();
                 }),
             },
@@ -1528,7 +1532,10 @@ public partial record Conditions
                     }
 
                     // Add [still] attribute to suppress move animation
-                    battle.AttrLastMove("[still]");
+                    if (battle.DisplayUi)
+                    {
+                        battle.AttrLastMove("[still]");
+                    }
 
                     // Run side-effects normally associated with hitting (e.g., Protean, Libero)
                     battle.RunEvent(EventId.PrepareHit, attacker, defender, effect);

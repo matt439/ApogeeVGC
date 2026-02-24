@@ -54,8 +54,11 @@ public partial record Abilities
                         boost.Accuracy = null;
                         if (effect is not ActiveMove { Secondaries: not null })
                         {
-                            battle.Add("-fail", target, "unboost", "accuracy",
-                                "[from] ability: Keen Eye", $"[of] {target}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-fail", target, "unboost", "accuracy",
+                                    "[from] ability: Keen Eye", $"[of] {target}");
+                            }
                         }
                     }
                 }),
@@ -93,7 +96,10 @@ public partial record Abilities
                     {
                         if (effect is ActiveMove { Status: not ConditionId.None })
                         {
-                            battle.Add("-immune", target, "[from] ability: Leaf Guard");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target, "[from] ability: Leaf Guard");
+                            }
                         }
 
                         return false;
@@ -108,7 +114,10 @@ public partial record Abilities
                         ConditionId weather = target.EffectiveWeather();
                         if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                         {
-                            battle.Add("-immune", target, "[from] ability: Leaf Guard");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target, "[from] ability: Leaf Guard");
+                            }
                             return null;
                         }
                     }
@@ -154,8 +163,11 @@ public partial record Abilities
                     {
                         if (!source.SetType(pokemonType)) return new VoidReturn();
                         battle.EffectState.Libero = true;
-                        battle.Add("-start", source, "typechange", type.ToString(),
-                            "[from] ability: Libero");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", source, "typechange", type.ToString(),
+                                "[from] ability: Libero");
+                        }
                     }
 
                     return new VoidReturn();
@@ -186,7 +198,10 @@ public partial record Abilities
                             battle.Boost(new SparseBoostsTable { SpA = 1 });
                         if (boostResult is not BoolBoolZeroUnion { Value: true })
                         {
-                            battle.Add("-immune", target, "[from] ability: Lightning Rod");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target, "[from] ability: Lightning Rod");
+                            }
                         }
 
                         return null;
@@ -215,8 +230,11 @@ public partial record Abilities
                                 if (move.SmartTarget == true) move.SmartTarget = false;
                                 if (abilityHolder != target)
                                 {
-                                    battle.Add("-activate", abilityHolder,
-                                        "ability: Lightning Rod");
+                                    if (battle.DisplayUi)
+                                    {
+                                        battle.Add("-activate", abilityHolder,
+                                            "ability: Lightning Rod");
+                                    }
                                 }
 
                                 return abilityHolder;
@@ -237,7 +255,10 @@ public partial record Abilities
                 {
                     if (pokemon.Status == ConditionId.Paralysis)
                     {
-                        battle.Add("-activate", pokemon, "ability: Limber");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Limber");
+                        }
                         pokemon.CureStatus();
                     }
                 }),
@@ -246,7 +267,10 @@ public partial record Abilities
                     if (status.Id != ConditionId.Paralysis) return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
                     {
-                        battle.Add("-immune", target, "[from] ability: Limber");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Limber");
+                        }
                     }
 
                     return false;
@@ -276,13 +300,16 @@ public partial record Abilities
                                 AbilityId: var oldAbilityId,
                             })
                         {
-                            string oldAbilityName =
-                                battle.Library.Abilities.TryGetValue(oldAbilityId,
-                                    out Ability? oldAbilityData)
-                                    ? oldAbilityData.Name
-                                    : oldAbilityId.ToString();
-                            battle.Add("-activate", target, "ability: Lingering Aroma",
-                                oldAbilityName, $"[of] {source}");
+                            if (battle.DisplayUi)
+                            {
+                                string oldAbilityName =
+                                    battle.Library.Abilities.TryGetValue(oldAbilityId,
+                                        out Ability? oldAbilityData)
+                                        ? oldAbilityData.Name
+                                        : oldAbilityId.ToString();
+                                battle.Add("-activate", target, "ability: Lingering Aroma",
+                                    oldAbilityName, $"[of] {source}");
+                            }
                         }
                     }
                 }),

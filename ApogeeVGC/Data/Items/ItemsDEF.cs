@@ -661,7 +661,10 @@ public partial record Items
                     if (battle.RandomChance(1, 10) && damage >= target.Hp &&
                         effect is { EffectType: EffectType.Move })
                     {
-                        battle.Add("-activate", target, "item: Focus Band");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "item: Focus Band");
+                        }
                         return target.Hp - 1;
                     }
 

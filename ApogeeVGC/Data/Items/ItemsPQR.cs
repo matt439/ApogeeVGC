@@ -44,7 +44,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Passho Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Passho Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -77,7 +80,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Payapa Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Payapa Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -311,11 +317,14 @@ public partial record Items
                     if (pokemon.UseItem())
                     {
                         battle.Debug($"power herb - remove charge turn for {move.Id}");
-                        battle.AttrLastMove("[still]");
-                        battle.AddMove("-anim",
-                            StringNumberDelegateObjectUnion.FromObject(pokemon),
-                            move.Name,
-                            StringNumberDelegateObjectUnion.FromObject(target));
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.AddMove("-anim",
+                                StringNumberDelegateObjectUnion.FromObject(pokemon),
+                                move.Name,
+                                StringNumberDelegateObjectUnion.FromObject(target));
+                        }
                         return BoolVoidUnion.FromBool(false); // skip charge turn
                     }
 
@@ -492,7 +501,10 @@ public partial record Items
                             return DoubleVoidUnion.FromVoid();
                         if (priority <= 0 && battle.RandomChance(1, 5))
                         {
-                            battle.Add("-activate", pokemon, "item: Quick Claw");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", pokemon, "item: Quick Claw");
+                            }
                             return DoubleVoidUnion.FromDouble(0.1);
                         }
 
@@ -676,7 +688,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Rindo Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Rindo Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -765,7 +780,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "item: Roseli Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "item: Roseli Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }

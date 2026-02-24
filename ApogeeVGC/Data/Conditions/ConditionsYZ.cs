@@ -27,8 +27,12 @@ public partial record Conditions
                 Duration = 2,
                 OnStart = OnStartEventInfo.Create((battle, target, source, _) =>
                 {
-                    // TS always adds the message (no DisplayUi check)
-                    battle.Add("-start", target, "move: Yawn", $"[of] {source}");
+                    if (battle.DisplayUi)
+                    {
+                        // TS always adds the message (no DisplayUi check)
+                        battle.Add("-start", target, "move: Yawn", $"[of] {source}");
+                    }
+
                     return null;
                 }),
                 OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
@@ -37,8 +41,12 @@ public partial record Conditions
                 }, order: 23),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
-                    // TS always adds the message (no DisplayUi check)
-                    battle.Add("-end", target, "move: Yawn", "[silent]");
+                    if (battle.DisplayUi)
+                    {
+                        // TS always adds the message (no DisplayUi check)
+                        battle.Add("-end", target, "move: Yawn", "[silent]");
+                    }
+
                     // Try to set sleep status
                     target.TrySetStatus(ConditionId.Sleep, battle.EffectState.Source);
                 }),

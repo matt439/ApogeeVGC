@@ -381,7 +381,10 @@ public partial record Abilities
                             boost.ClearBoost(b); // Delete this boost entry
                             if (source.Hp > 0)
                             {
-                                battle.Add("-ability", target, "Mirror Armor");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-ability", target, "Mirror Armor");
+                                }
                                 battle.Boost(negativeBoost, source, target, null, true);
                             }
                         }
@@ -407,7 +410,10 @@ public partial record Abilities
                 Rating = 3.0,
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
-                    battle.Add("-ability", pokemon, "Mold Breaker");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Mold Breaker");
+                    }
                 }),
                 OnModifyMove = OnModifyMoveEventInfo.Create((_, move, _, _) => { move.IgnoreAbility = true; }),
             },
@@ -478,7 +484,10 @@ public partial record Abilities
                             battle.Boost(new SparseBoostsTable { Spe = 1 });
                         if (boostResult is not BoolBoolZeroUnion { Value: true })
                         {
-                            battle.Add("-immune", target, "[from] ability: Motor Drive");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target, "[from] ability: Motor Drive");
+                            }
                         }
 
                         return null;
@@ -568,8 +577,11 @@ public partial record Abilities
                                     out Ability? oldAbilityData)
                                     ? oldAbilityData.Name
                                     : oldAbilityId.ToString();
-                            battle.Add("-activate", target, "ability: Mummy", oldAbilityName,
-                                $"[of] {source}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", target, "ability: Mummy", oldAbilityName,
+                                    $"[of] {source}");
+                            }
                         }
                     }
                 }),
@@ -681,8 +693,11 @@ public partial record Abilities
                         // It's not possible to know what pokemon were cured
                         // Unlike a -hint, this is real information that battlers need, so we use a -message
                         string plural = cureList.Count == 1 ? "was" : "were";
-                        battle.Add("-message",
-                            $"({cureList.Count} of {pokemon.Side.Name}'s pokemon {plural} cured by Natural Cure.)");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-message",
+                                $"({cureList.Count} of {pokemon.Side.Name}'s pokemon {plural} cured by Natural Cure.)");
+                        }
 
                         foreach (Pokemon pkmn in cureList)
                         {
@@ -699,8 +714,11 @@ public partial record Abilities
 
                     if (pokemon.ShowCure == true)
                     {
-                        battle.Add("-curestatus", pokemon, pokemon.Status.ToString(),
-                            "[from] ability: Natural Cure");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-curestatus", pokemon, pokemon.Status.ToString(),
+                                "[from] ability: Natural Cure");
+                        }
                     }
 
                     pokemon.ClearStatus();
@@ -745,7 +763,10 @@ public partial record Abilities
                 // OnSwitchInPriority = 2
                 OnSwitchIn = OnSwitchInEventInfo.Create((battle, pokemon) =>
                 {
-                    battle.Add("-ability", pokemon, "Neutralizing Gas");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Neutralizing Gas");
+                    }
                     pokemon.AbilityState.Ending = false;
                     // The actual suppression is handled in Pokemon.IgnoringAbility()
 
@@ -761,7 +782,10 @@ public partial record Abilities
                     {
                         if (target.HasItem(ItemId.AbilityShield))
                         {
-                            battle.Add("-block", target, "item: Ability Shield");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-block", target, "item: Ability Shield");
+                            }
                             continue;
                         }
 
@@ -783,7 +807,10 @@ public partial record Abilities
                             target.AbilityState.Counter != null)
                         {
                             target.AbilityState.Counter = null;
-                            battle.Add("-end", target, "Slow Start", "[silent]");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-end", target, "Slow Start", "[silent]");
+                            }
                         }
 
                         if (Array.Exists(strongWeathers, w => w == target.GetAbility().Id))
@@ -808,7 +835,10 @@ public partial record Abilities
                         }
                     }
 
-                    battle.Add("-end", source, "ability: Neutralizing Gas");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", source, "ability: Neutralizing Gas");
+                    }
 
                     // Mark this pokemon's ability as ending so Pokemon.IgnoringAbility skips it
                     if (source.AbilityState.Ending == true) return;
@@ -921,14 +951,23 @@ public partial record Abilities
                 {
                     if (pokemon.Volatiles.ContainsKey(ConditionId.Attract))
                     {
-                        battle.Add("-activate", pokemon, "ability: Oblivious");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Oblivious");
+                        }
                         pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Attract]);
-                        battle.Add("-end", pokemon, "move: Attract", "[from] ability: Oblivious");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, "move: Attract", "[from] ability: Oblivious");
+                        }
                     }
 
                     if (pokemon.Volatiles.ContainsKey(ConditionId.Taunt))
                     {
-                        battle.Add("-activate", pokemon, "ability: Oblivious");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Oblivious");
+                        }
                         pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Taunt]);
                         // Taunt's volatile already sends the -end message when removed
                     }
@@ -939,7 +978,10 @@ public partial record Abilities
                     // Note: Captivate was removed from Gen 8+, so not included here
                     if (move.Id is MoveId.Attract or MoveId.Taunt)
                     {
-                        battle.Add("-immune", pokemon, "[from] ability: Oblivious");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", pokemon, "[from] ability: Oblivious");
+                        }
                         return null;
                     }
 
@@ -950,8 +992,11 @@ public partial record Abilities
                     if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
-                        battle.Add("-fail", target, "unboost", "Attack",
-                            "[from] ability: Oblivious", $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "unboost", "Attack",
+                                "[from] ability: Oblivious", $"[of] {target}");
+                        }
                     }
                 }),
             },
@@ -1046,11 +1091,17 @@ public partial record Abilities
                 {
                     if (battle.Field.SetWeather(_library.Conditions[ConditionId.SunnyDay]))
                     {
-                        battle.Add("-activate", pokemon, "Orichalcum Pulse", "[source]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "Orichalcum Pulse", "[source]");
+                        }
                     }
                     else if (battle.Field.IsWeather(ConditionId.SunnyDay))
                     {
-                        battle.Add("-activate", pokemon, "ability: Orichalcum Pulse");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Orichalcum Pulse");
+                        }
                     }
                 }),
                 // OnModifyAtkPriority = 5
@@ -1083,7 +1134,10 @@ public partial record Abilities
                     if (move.Flags.Powder == true && target != source &&
                         !target.HasType(PokemonType.Grass))
                     {
-                        battle.Add("-immune", target, "[from] ability: Overcoat");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Overcoat");
+                        }
                         return null;
                     }
 
@@ -1132,7 +1186,10 @@ public partial record Abilities
                 {
                     if (pokemon.Volatiles.ContainsKey(ConditionId.Confusion))
                     {
-                        battle.Add("-activate", pokemon, "ability: Own Tempo");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Own Tempo");
+                        }
                         pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Confusion]);
                     }
                 }),
@@ -1149,7 +1206,10 @@ public partial record Abilities
                 {
                     if (move.VolatileStatus == ConditionId.Confusion)
                     {
-                        battle.Add("-immune", target, "confusion", "[from] ability: Own Tempo");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "confusion", "[from] ability: Own Tempo");
+                        }
                     }
 
                     return new VoidReturn();
@@ -1159,8 +1219,11 @@ public partial record Abilities
                     if (effect?.EffectStateId == AbilityId.Intimidate && boost.Atk != null)
                     {
                         boost.Atk = null;
-                        battle.Add("-fail", target, "unboost", "Attack",
-                            "[from] ability: Own Tempo", $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "unboost", "Attack",
+                                "[from] ability: Own Tempo", $"[of] {target}");
+                        }
                     }
                 }),
             },

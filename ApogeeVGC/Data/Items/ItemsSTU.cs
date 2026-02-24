@@ -52,7 +52,10 @@ public partial record Items
                     if (move.Flags.Powder == true && target != source &&
                         battle.Dex.GetImmunity(ConditionId.Powder, target.Types))
                     {
-                        battle.Add("-activate", target, "item: Safety Goggles", move.Name);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "item: Safety Goggles", move.Name);
+                        }
                         return null;
                     }
 
@@ -183,7 +186,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "Shuca Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "Shuca Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }
@@ -647,7 +653,10 @@ public partial record Items
                             if (target.EatItem())
                             {
                                 battle.Debug("-50% reduction");
-                                battle.Add("-enditem", target, "Tanga Berry", "[weaken]");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-enditem", target, "Tanga Berry", "[weaken]");
+                                }
                                 battle.ChainModify(0.5);
                                 return new VoidReturn();
                             }

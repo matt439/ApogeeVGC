@@ -153,8 +153,11 @@ public partial class Battle
             }
 
             // Send the sanitized team data to the client
-            string packedTeam = Teams.Pack(team);
-            Add("showteam", side.Id.ToString(), packedTeam);
+            if (DisplayUi)
+            {
+                string packedTeam = Teams.Pack(team);
+                Add("showteam", side.Id.ToString(), packedTeam);
+            }
         }
     }
 

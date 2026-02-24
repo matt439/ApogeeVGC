@@ -265,7 +265,10 @@ public partial record Abilities
                                       move.Ohko != null
                                 select move).Any()))
                     {
-                        battle.Add("-ability", pokemon, "Anticipation");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", pokemon, "Anticipation");
+                        }
                     }
                 }),
             },
@@ -335,9 +338,12 @@ public partial record Abilities
                     if ((source.IsAlly(armorTailHolder) || move.Target == MoveTarget.All) &&
                         move.Priority > 0.1)
                     {
-                        battle.AttrLastMove("[still]");
-                        battle.Add("cant", armorTailHolder, "ability: Armor Tail", move.Name,
-                            $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.Add("cant", armorTailHolder, "ability: Armor Tail", move.Name,
+                                $"[of] {target}");
+                        }
                         return false;
                     }
 
@@ -372,8 +378,11 @@ public partial record Abilities
                                         Pokemon: var effectHolder,
                                     })
                                 {
-                                    battle.Add("-block", target, "ability: Aroma Veil",
-                                        $"[of] {effectHolder}");
+                                    if (battle.DisplayUi)
+                                    {
+                                        battle.Add("-block", target, "ability: Aroma Veil",
+                                            $"[of] {effectHolder}");
+                                    }
                                 }
                             }
 
@@ -397,8 +406,11 @@ public partial record Abilities
                     (battle, pokemon) =>
                     {
                         if (battle.EffectState.Unnerved is true) return;
-                        battle.Add("-ability", pokemon, "As One");
-                        battle.Add("-ability", pokemon, "Unnerve");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", pokemon, "As One");
+                            battle.Add("-ability", pokemon, "Unnerve");
+                        }
                         battle.EffectState.Unnerved = true;
                     },
                     1
@@ -438,8 +450,11 @@ public partial record Abilities
                     (battle, pokemon) =>
                     {
                         if (battle.EffectState.Unnerved is true) return;
-                        battle.Add("-ability", pokemon, "As One");
-                        battle.Add("-ability", pokemon, "Unnerve");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", pokemon, "As One");
+                            battle.Add("-ability", pokemon, "Unnerve");
+                        }
                         battle.EffectState.Unnerved = true;
                     },
                     1
@@ -472,7 +487,13 @@ public partial record Abilities
                 Num = 188,
                 Rating = 1.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnStart = OnStartEventInfo.Create((battle, pokemon) => { battle.Add("-ability", pokemon, "Aura Break"); }),
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Aura Break");
+                    }
+                }),
                 OnAnyTryPrimaryHit = OnAnyTryPrimaryHitEventInfo.Create((_, target, source, move) =>
                 {
                     if (target == source || move.Category == MoveCategory.Status)
@@ -560,7 +581,10 @@ public partial record Abilities
                         {
                             battle.Boost(new SparseBoostsTable { Atk = 1, SpA = 1, Spe = 1 },
                                 source, source, battle.Effect);
-                            battle.Add("-activate", source, "ability: Battle Bond");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", source, "ability: Battle Bond");
+                            }
                             source.BondTriggered = true;
                         }
                     }),
@@ -593,7 +617,10 @@ public partial record Abilities
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.SuppressingAbility(pokemon)) return;
-                    battle.Add("-ability", pokemon, "Beads of Ruin");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Beads of Ruin");
+                    }
                 }),
                 OnAnyModifySpD = OnAnyModifySpDEventInfo.Create((battle, spd, target, _, move) =>
                 {
@@ -705,8 +732,11 @@ public partial record Abilities
                         boost.Def = null;
                         if (effect is not ActiveMove { Secondaries: not null })
                         {
-                            battle.Add("-fail", target, "unboost", "Defense",
-                                "[from] ability: Big Pecks", $"[of] {target}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-fail", target, "unboost", "Defense",
+                                    "[from] ability: Big Pecks", $"[of] {target}");
+                            }
                         }
                     }
                 }),
@@ -753,7 +783,10 @@ public partial record Abilities
                 {
                     if (move.Flags.Bullet == true)
                     {
-                        battle.Add("-immune", pokemon, "[from] ability: Bulletproof");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", pokemon, "[from] ability: Bulletproof");
+                        }
                         return null;
                     }
 
@@ -859,8 +892,11 @@ public partial record Abilities
 
                     if (showMsg && effect is not ActiveMove { Secondaries: not null })
                     {
-                        battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
-                            $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "unboost", "[from] ability: Clear Body",
+                                $"[of] {target}");
+                        }
                     }
                 }),
             },
@@ -874,7 +910,10 @@ public partial record Abilities
                 OnSwitchIn = OnSwitchInEventInfo.Create((battle, pokemon) =>
                 {
                     // Cloud Nine does not activate when Skill Swapped or when Neutralizing Gas leaves the field
-                    battle.Add("-ability", pokemon, "Cloud Nine");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Cloud Nine");
+                    }
                     // Call onStart
                     battle.SingleEvent(EventId.Start, battle.Effect, battle.EffectState, pokemon);
                 }),
@@ -908,8 +947,11 @@ public partial record Abilities
                             !target.HasType(type.ConvertToPokemonType()))
                         {
                             if (!target.SetType(type.ConvertToPokemonType())) return;
-                            battle.Add("-start", target, "typechange", type.ToString(),
-                                "[from] ability: Color Change");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-start", target, "typechange", type.ToString(),
+                                    "[from] ability: Color Change");
+                            }
 
                             // Curse Glitch for doubles (when in position 1)
                             if (target.Side.Active.Count == 2 && target.Position == 1)
@@ -938,12 +980,21 @@ public partial record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                OnStart = OnStartEventInfo.Create((battle, pokemon) => { battle.Add("-ability", pokemon, "Comatose"); }),
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Comatose");
+                    }
+                }),
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, _, target, _, effect) =>
                 {
                     if (effect is ActiveMove { Status: not null })
                     {
-                        battle.Add("-immune", target, "[from] ability: Comatose");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Comatose");
+                        }
                     }
 
                     return false;
@@ -1097,7 +1148,10 @@ public partial record Abilities
                         }
                     }
 
-                    battle.Add("-copyboost", pokemon, ally, "[from] ability: Costar");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-copyboost", pokemon, ally, "[from] ability: Costar");
+                    }
                 }, -2),
             },
             [AbilityId.CottonDown] = new()
@@ -1114,7 +1168,10 @@ public partial record Abilities
                         if (pokemon == target || pokemon.Fainted) continue;
                         if (!activated)
                         {
-                            battle.Add("-ability", target, "Cotton Down");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-ability", target, "Cotton Down");
+                            }
                             activated = true;
                         }
 
@@ -1154,8 +1211,11 @@ public partial record Abilities
                     if (battle.EffectState.Counter <= 0)
                     {
                         Item? item = battle.EffectState.Berry;
-                        battle.Add("-activate", pokemon, "ability: Cud Chew");
-                        battle.Add("-enditem", pokemon, item.Name, "[eat]");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Cud Chew");
+                            battle.Add("-enditem", pokemon, item.Name, "[eat]");
+                        }
 
                         // Trigger berry eat effects
                         // In TS: if (this.singleEvent('Eat', item, null, pokemon, null, null)) - truthy check
@@ -1187,8 +1247,11 @@ public partial record Abilities
                     foreach (Pokemon ally in pokemon.AdjacentAllies())
                     {
                         ally.ClearBoosts();
-                        battle.Add("-clearboost", ally, "[from] ability: Curious Medicine",
-                            $"[of] {pokemon}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-clearboost", ally, "[from] ability: Curious Medicine",
+                                $"[of] {pokemon}");
+                        }
                     }
                 }),
             },
@@ -1277,7 +1340,10 @@ public partial record Abilities
             battle.Queue.CancelAction(pokemon);
 
             // Add volatiles to both pokemon
-            battle.Add("-activate", pokemon, "ability: Commander", $"[of] {ally}");
+            if (battle.DisplayUi)
+            {
+                battle.Add("-activate", pokemon, "ability: Commander", $"[of] {ally}");
+            }
             pokemon.AddVolatile(ConditionId.Commanding);
             ally.AddVolatile(ConditionId.Commanded, pokemon);
             // Continued in conditions.ts in the volatiles

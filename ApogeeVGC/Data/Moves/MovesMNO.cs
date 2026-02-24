@@ -93,7 +93,11 @@ public partial record Moves
                         return false;
                     }
 
-                    battle.Add("-start", target, "typechange", "Psychic");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "typechange", "Psychic");
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -217,7 +221,11 @@ public partial record Moves
                     // Fail if Gravity is active
                     if (battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
                     {
-                        battle.Add("cant", source, "move: Gravity", move);
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", source, "move: Gravity", move);
+                        }
+
                         return null;
                     }
 
@@ -577,7 +585,11 @@ public partial record Moves
                     }
 
                     // Starting the charge turn - show prepare message
-                    battle.Add("-prepare", attacker, move.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", attacker, move.Name);
+                    }
+
                     // Boost SpA by 1 on charge turn
                     battle.Boost(new SparseBoostsTable { SpA = 1 }, attacker, attacker, move);
                     // Run ChargeMove event (for Power Herb, etc.)
@@ -768,7 +780,11 @@ public partial record Moves
                         Virtual = true,
                     };
 
-                    battle.Add("-start", source, "Mimic", lastMove.Name);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", source, "Mimic", lastMove.Name);
+                    }
+
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -1026,7 +1042,11 @@ public partial record Moves
                         battle.Heal(battle.Modify(target.MaxHp, factor), target) is not FalseIntFalseUnion;
                     if (!success)
                     {
-                        battle.Add("-fail", target, "heal");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "heal");
+                        }
+
                         return new Empty(); // NOT_FAIL - move worked but heal failed
                     }
 
@@ -1072,7 +1092,11 @@ public partial record Moves
                         battle.Heal(battle.Modify(target.MaxHp, factor), target) is not FalseIntFalseUnion;
                     if (!success)
                     {
-                        battle.Add("-fail", target, "heal");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", target, "heal");
+                        }
+
                         return new Empty(); // NOT_FAIL - move worked but heal failed
                     }
 
@@ -1107,8 +1131,11 @@ public partial record Moves
                     if (source.Hp > 0 &&
                         source.RemoveVolatile(battle.Library.Conditions[ConditionId.LeechSeed]))
                     {
-                        battle.Add("-end", source, "Leech Seed", "[from] move: Mortal Spin",
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", source, "Leech Seed", "[from] move: Mortal Spin",
+                                $"[of] {source}");
+                        }
                     }
 
                     // Remove hazards from user's side
@@ -1121,9 +1148,12 @@ public partial record Moves
                     {
                         if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
                         {
-                            Condition conditionData = battle.Library.Conditions[hazard];
-                            battle.Add("-sideend", source.Side, conditionData.Name,
-                                "[from] move: Mortal Spin", $"[of] {source}");
+                            if (battle.DisplayUi)
+                            {
+                                Condition conditionData = battle.Library.Conditions[hazard];
+                                battle.Add("-sideend", source.Side, conditionData.Name,
+                                    "[from] move: Mortal Spin", $"[of] {source}");
+                            }
                         }
                     }
 
@@ -1144,8 +1174,11 @@ public partial record Moves
                     if (source.Hp > 0 &&
                         source.RemoveVolatile(battle.Library.Conditions[ConditionId.LeechSeed]))
                     {
-                        battle.Add("-end", source, "Leech Seed", "[from] move: Mortal Spin",
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", source, "Leech Seed", "[from] move: Mortal Spin",
+                                $"[of] {source}");
+                        }
                     }
 
                     // Remove hazards from user's side
@@ -1158,9 +1191,12 @@ public partial record Moves
                     {
                         if (source.Hp > 0 && source.Side.RemoveSideCondition(hazard))
                         {
-                            Condition conditionData = battle.Library.Conditions[hazard];
-                            battle.Add("-sideend", source.Side, conditionData.Name,
-                                "[from] move: Mortal Spin", $"[of] {source}");
+                            if (battle.DisplayUi)
+                            {
+                                Condition conditionData = battle.Library.Conditions[hazard];
+                                battle.Add("-sideend", source.Side, conditionData.Name,
+                                    "[from] move: Mortal Spin", $"[of] {source}");
+                            }
                         }
                     }
 

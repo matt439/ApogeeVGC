@@ -68,7 +68,10 @@ public partial class BattleActions
                     // Add miss attribute for non-spread moves
                     if (move.SpreadHit != true)
                     {
-                        Battle.AttrLastMove("[miss]");
+                        if (Battle.DisplayUi)
+                        {
+                            Battle.AttrLastMove("[miss]");
+                        }
                     }
 
                     // Display miss message
@@ -137,9 +140,9 @@ public partial class BattleActions
                 {
                     Battle.Add("-fail", pokemon);
                 }
-            }
 
-            Battle.AttrLastMove("[still]");
+                Battle.AttrLastMove("[still]");
+            }
         }
 
         // Convert results to BoolIntEmptyUndefinedUnion
@@ -454,7 +457,10 @@ public partial class BattleActions
                 {
                     if (move.SpreadHit != true)
                     {
-                        Battle.AttrLastMove("[miss]");
+                        if (Battle.DisplayUi)
+                        {
+                            Battle.AttrLastMove("[miss]");
+                        }
                     }
 
                     if (Battle.DisplayUi)
@@ -584,10 +590,9 @@ public partial class BattleActions
 
         if (!stolen) return null;
 
-        Battle.AttrLastMove("[still]");
-
         if (Battle.DisplayUi)
         {
+            Battle.AttrLastMove("[still]");
             Battle.Add("-clearpositiveboost", target, pokemon, $"move: {move.Name}");
         }
 

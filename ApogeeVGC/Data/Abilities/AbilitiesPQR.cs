@@ -59,7 +59,10 @@ public partial record Abilities
                     {
                         if (ally.Status is ConditionId.Poison or ConditionId.Toxic)
                         {
-                            battle.Add("-activate", pokemon, "ability: Pastel Veil");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", pokemon, "ability: Pastel Veil");
+                            }
                             ally.CureStatus();
                         }
                     }
@@ -68,7 +71,10 @@ public partial record Abilities
                 {
                     if (pokemon.Status is ConditionId.Poison or ConditionId.Toxic)
                     {
-                        battle.Add("-activate", pokemon, "ability: Pastel Veil");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", pokemon, "ability: Pastel Veil");
+                        }
                         pokemon.CureStatus();
                     }
                 }),
@@ -83,7 +89,10 @@ public partial record Abilities
                     {
                         if (ally.Status is ConditionId.Poison or ConditionId.Toxic)
                         {
-                            battle.Add("-activate", target, "ability: Pastel Veil");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", target, "ability: Pastel Veil");
+                            }
                             ally.CureStatus();
                         }
                     }
@@ -94,7 +103,10 @@ public partial record Abilities
                         return new VoidReturn();
                     if (effect is ActiveMove { Status: not ConditionId.None })
                     {
-                        battle.Add("-immune", target, "[from] ability: Pastel Veil");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-immune", target, "[from] ability: Pastel Veil");
+                        }
                     }
 
                     return false;
@@ -111,8 +123,11 @@ public partial record Abilities
                                     Pokemon: var effectHolder,
                                 })
                             {
-                                battle.Add("-block", target, "ability: Pastel Veil",
-                                    $"[of] {effectHolder}");
+                                if (battle.DisplayUi)
+                                {
+                                    battle.Add("-block", target, "ability: Pastel Veil",
+                                        $"[of] {effectHolder}");
+                                }
                             }
                         }
 
@@ -133,7 +148,10 @@ public partial record Abilities
                         return;
                     }
 
-                    battle.Add("-ability", target, "Perish Body");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", target, "Perish Body");
+                    }
                     source.AddVolatile(ConditionId.PerishSong);
                     target.AddVolatile(ConditionId.PerishSong);
                 }),
@@ -163,10 +181,13 @@ public partial record Abilities
                             return;
                         }
 
-                        battle.Add("-enditem", source, yourItem.Name, "[silent]",
-                            "[from] ability: Pickpocket", $"[of] {source}");
-                        battle.Add("-item", target, yourItem.Name, "[from] ability: Pickpocket",
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-enditem", source, yourItem.Name, "[silent]",
+                                "[from] ability: Pickpocket", $"[of] {source}");
+                            battle.Add("-item", target, yourItem.Name, "[from] ability: Pickpocket",
+                                $"[of] {source}");
+                        }
                     }),
             },
             [AbilityId.Pickup] = new()
@@ -194,7 +215,10 @@ public partial record Abilities
 
                     if (battle.Library.Items.TryGetValue(item, out Item? itemData))
                     {
-                        battle.Add("-item", pokemon, itemData.Name, "[from] ability: Pickup");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-item", pokemon, itemData.Name, "[from] ability: Pickup");
+                        }
                     }
 
                     pokemon.SetItem(item);
@@ -368,7 +392,10 @@ public partial record Abilities
                     if (pokemon.Species.Id == SpecieId.ZygardeComplete ||
                         pokemon.Hp > pokemon.MaxHp / 2) return;
 
-                    battle.Add("-activate", pokemon, "ability: Power Construct");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Power Construct");
+                    }
                     pokemon.FormeChange(SpecieId.ZygardeComplete, battle.Effect, true);
                     // Note: canMegaEvo and formeRegression handled differently in C#
                 }, order: 29),
@@ -438,7 +465,13 @@ public partial record Abilities
                 Name = "Pressure",
                 Num = 46,
                 Rating = 2.5,
-                OnStart = OnStartEventInfo.Create((battle, pokemon) => { battle.Add("-ability", pokemon, "Pressure"); }),
+                OnStart = OnStartEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-ability", pokemon, "Pressure");
+                    }
+                }),
                 OnDeductPp = OnDeductPpEventInfo.Create((_, target, source) =>
                 {
                     if (target.IsAlly(source)) return 0;
@@ -544,8 +577,11 @@ public partial record Abilities
                         {
                             if (!source.SetType([pokemonType])) return new VoidReturn();
                             battle.EffectState.Protean = true;
-                            battle.Add("-start", source, "typechange", type.ToString(),
-                                "[from] ability: Protean");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-start", source, "typechange", type.ToString(),
+                                    "[from] ability: Protean");
+                            }
                         }
                     }
 
@@ -584,7 +620,10 @@ public partial record Abilities
                 {
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
                     psfp.Pokemon.DeleteVolatile(ConditionId.Protosynthesis);
-                    battle.Add("-end", psfp.Pokemon, "Protosynthesis", "[silent]");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", psfp.Pokemon, "Protosynthesis", "[silent]");
+                    }
                 }),
                 Flags = new AbilityFlags
                 {
@@ -736,7 +775,10 @@ public partial record Abilities
                 {
                     if (pokemon is not PokemonSideFieldPokemon psfp) return;
                     psfp.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
-                    battle.Add("-end", psfp.Pokemon, "Quark Drive", "[silent]");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", psfp.Pokemon, "Quark Drive", "[silent]");
+                    }
                 }),
                 Flags = new AbilityFlags
                 {
@@ -775,9 +817,12 @@ public partial record Abilities
                     if ((source.IsAlly(dazzlingHolder) || move.Target == MoveTarget.All) &&
                         move.Priority > 0.1)
                     {
-                        battle.AttrLastMove("[still]");
-                        battle.Add("cant", dazzlingHolder, "ability: Queenly Majesty", move.Name,
-                            $"[of] {target}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.Add("cant", dazzlingHolder, "ability: Queenly Majesty", move.Name,
+                                $"[of] {target}");
+                        }
                         return false;
                     }
 
@@ -796,7 +841,10 @@ public partial record Abilities
                     {
                         if (move.Category != MoveCategory.Status && battle.RandomChance(3, 10))
                         {
-                            battle.Add("-activate", pokemon, "ability: Quick Draw");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", pokemon, "ability: Quick Draw");
+                            }
                             return 0.1;
                         }
 
@@ -959,7 +1007,10 @@ public partial record Abilities
 
                         if (effect.EffectStateId == ItemId.Leftovers)
                         {
-                            battle.Add("-activate", target, "ability: Ripen");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-activate", target, "ability: Ripen");
+                            }
                         }
 
                         if (effect is Item { IsBerry: true })
@@ -997,7 +1048,10 @@ public partial record Abilities
                     }, -1),
                 OnTryEatItem = OnTryEatItemEventInfo.Create((battle, _, pokemon) =>
                 {
-                    battle.Add("-activate", pokemon, "ability: Ripen");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Ripen");
+                    }
                     return BoolVoidUnion.FromVoid();
                 }, -1),
                 OnEatItem = OnEatItemEventInfo.Create((_, item, pokemon, _, _) =>

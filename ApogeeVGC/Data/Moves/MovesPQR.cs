@@ -468,8 +468,11 @@ public partial record Moves
                         ItemFalseUnion takeResult = target.TakeItem(source);
                         if (takeResult is ItemItemFalseUnion takenItem)
                         {
-                            battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
-                                "[move] Pluck", $"[of] {source}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-enditem", target, takenItem.Item.Name, "[from] stealeat",
+                                    "[move] Pluck", $"[of] {source}");
+                            }
                             // Trigger the Eat event on the item for the source
                             // Only run EatItem if singleEvent returns truthy
                             RelayVar? eatResult = battle.SingleEvent(EventId.Eat, takenItem.Item, target.ItemState,
@@ -664,8 +667,11 @@ public partial record Moves
                     if (source.IsAlly(target) &&
                         source.Volatiles.ContainsKey(ConditionId.PsychicNoise))
                     {
-                        battle.AttrLastMove("[still]");
-                        battle.Add("cant", source, "move: Heal Block", move);
+                        if (battle.DisplayUi)
+                        {
+                            battle.AttrLastMove("[still]");
+                            battle.Add("cant", source, "move: Heal Block", move);
+                        }
                         return false;
                     }
 
@@ -694,8 +700,11 @@ public partial record Moves
                         if (target.Volatiles.ContainsKey(ConditionId.PsychicNoise) &&
                             target.Hp != target.MaxHp)
                         {
-                            battle.AttrLastMove("[still]");
-                            battle.Add("cant", source, "move: Heal Block", move);
+                            if (battle.DisplayUi)
+                            {
+                                battle.AttrLastMove("[still]");
+                                battle.Add("cant", source, "move: Heal Block", move);
+                            }
                             return BoolEmptyVoidUnion.FromEmpty(); // NOT_FAIL equivalent
                         }
 
@@ -743,9 +752,12 @@ public partial record Moves
                 }),
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, _, _) =>
                 {
-                    // Display the item being manipulated
-                    Item item = battle.Library.Items[target.Item];
-                    battle.Add("-activate", target, "move: Poltergeist", item.Name);
+                    if (battle.DisplayUi)
+                    {
+                        // Display the item being manipulated
+                        Item item = battle.Library.Items[target.Item];
+                        battle.Add("-activate", target, "move: Poltergeist", item.Name);
+                    }
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -893,7 +905,10 @@ public partial record Moves
                     target.StoredStats[StatIdExceptHp.SpA] = newSpA;
                     source.StoredStats[StatIdExceptHp.SpA] = newSpA;
 
-                    battle.Add("-activate", source, "move: Power Split", $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", source, "move: Power Split", $"[of] {target}");
+                    }
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -929,7 +944,10 @@ public partial record Moves
                     source.SetBoost(new SparseBoostsTable { Atk = targetAtk, SpA = targetSpA });
                     target.SetBoost(new SparseBoostsTable { Atk = sourceAtk, SpA = sourceSpA });
 
-                    battle.Add("-swapboost", source, target, "atk, spa", "[from] move: Power Swap");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-swapboost", source, target, "atk, spa", "[from] move: Power Swap");
+                    }
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -1421,7 +1439,10 @@ public partial record Moves
                         }
                     }
 
-                    battle.Add("-copyboost", source, target, "[from] move: Psych Up");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-copyboost", source, target, "[from] move: Psych Up");
+                    }
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -1567,7 +1588,10 @@ public partial record Moves
                     MoveAction newAction = action with { Order = 201 };
                     battle.Queue.List[index] = newAction;
 
-                    battle.Add("-activate", target, "move: Quash");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", target, "move: Quash");
+                    }
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -1808,8 +1832,11 @@ public partial record Moves
                     if (pokemon.Hp > 0 &&
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.LeechSeed]))
                     {
-                        battle.Add("-end", pokemon, "Leech Seed", "[from] move: Rapid Spin",
-                            $"[of] {pokemon}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, "Leech Seed", "[from] move: Rapid Spin",
+                                $"[of] {pokemon}");
+                        }
                     }
 
                     // Remove hazards from user's side
@@ -1823,9 +1850,12 @@ public partial record Moves
                     {
                         if (pokemon.Hp > 0 && pokemon.Side.RemoveSideCondition(condition))
                         {
-                            battle.Add("-sideend", pokemon.Side,
-                                battle.Library.Conditions[condition].Name,
-                                "[from] move: Rapid Spin", $"[of] {pokemon}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-sideend", pokemon.Side,
+                                    battle.Library.Conditions[condition].Name,
+                                    "[from] move: Rapid Spin", $"[of] {pokemon}");
+                            }
                         }
                     }
 
@@ -1846,8 +1876,11 @@ public partial record Moves
                     if (pokemon.Hp > 0 &&
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.LeechSeed]))
                     {
-                        battle.Add("-end", pokemon, "Leech Seed", "[from] move: Rapid Spin",
-                            $"[of] {pokemon}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, "Leech Seed", "[from] move: Rapid Spin",
+                                $"[of] {pokemon}");
+                        }
                     }
 
                     var sideConditions = new[]
@@ -1859,9 +1892,12 @@ public partial record Moves
                     {
                         if (pokemon.Hp > 0 && pokemon.Side.RemoveSideCondition(condition))
                         {
-                            battle.Add("-sideend", pokemon.Side,
-                                battle.Library.Conditions[condition].Name,
-                                "[from] move: Rapid Spin", $"[of] {pokemon}");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-sideend", pokemon.Side,
+                                    battle.Library.Conditions[condition].Name,
+                                    "[from] move: Rapid Spin", $"[of] {pokemon}");
+                            }
                         }
                     }
 
@@ -1986,8 +2022,11 @@ public partial record Moves
 
                     ItemId item = target.LastItem;
                     target.LastItem = ItemId.None;
-                    battle.Add("-item", target, battle.Library.Items[item].Name,
-                        "[from] move: Recycle");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-item", target, battle.Library.Items[item].Name,
+                            "[from] move: Recycle");
+                    }
                     target.SetItem(item, source, move);
                     return new VoidReturn();
                 }),
@@ -2066,8 +2105,11 @@ public partial record Moves
                         }
                     }
 
-                    battle.Add("-start", source, "typechange", "[from] move: Reflect Type",
-                        $"[of] {target}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", source, "typechange", "[from] move: Reflect Type",
+                            $"[of] {target}");
+                    }
                     source.SetType(newTypes.ToArray());
                     source.AddedType = target.AddedType;
                     source.KnownType = target.IsAlly(source) && target.KnownType;
@@ -2154,22 +2196,31 @@ public partial record Moves
                     // At full HP
                     if (source.Hp == source.MaxHp)
                     {
-                        battle.Add("-fail", source, "heal");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source, "heal");
+                        }
                         return null;
                     }
 
                     // Insomnia and Vital Spirit checks are separate so that the message is accurate
                     if (source.HasAbility(AbilityId.Insomnia))
                     {
-                        battle.Add("-fail", source, "[from] ability: Insomnia",
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source, "[from] ability: Insomnia",
+                                $"[of] {source}");
+                        }
                         return null;
                     }
 
                     if (source.HasAbility(AbilityId.VitalSpirit))
                     {
-                        battle.Add("-fail", source, "[from] ability: Vital Spirit",
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-fail", source, "[from] ability: Vital Spirit",
+                                $"[of] {source}");
+                        }
                         return null;
                     }
 

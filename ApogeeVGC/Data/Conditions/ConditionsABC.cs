@@ -61,7 +61,11 @@ public partial record Conditions
                 AssociatedMove = MoveId.AquaRing,
                 OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    battle.Add("-start", pokemon, "Aqua Ring");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Aqua Ring");
+                    }
+
                     return null;
                 }),
                 OnResidual = OnResidualEventInfo.Create(
@@ -118,17 +122,26 @@ public partial record Conditions
 
                     if (effect is Ability { Id: AbilityId.CuteCharm })
                     {
-                        battle.Add("-start", pokemon, "Attract", "[from] ability: Cute Charm",
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Attract", "[from] ability: Cute Charm",
+                                $"[of] {source}");
+                        }
                     }
                     else if (effect is Item { Id: ItemId.DestinyKnot })
                     {
-                        battle.Add("-start", pokemon, "Attract", "[from] item: Destiny Knot",
-                            $"[of] {source}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Attract", "[from] item: Destiny Knot",
+                                $"[of] {source}");
+                        }
                     }
                     else
                     {
-                        battle.Add("-start", pokemon, "Attract");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Attract");
+                        }
                     }
 
                     return null;
@@ -144,11 +157,19 @@ public partial record Conditions
                 }),
                 OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    battle.Add("-activate", pokemon, "move: Attract",
-                        $"[of] {pokemon.Volatiles[ConditionId.Attract].Source}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-activate", pokemon, "move: Attract",
+                            $"[of] {pokemon.Volatiles[ConditionId.Attract].Source}");
+                    }
+
                     if (battle.RandomChance(1, 2))
                     {
-                        battle.Add("cant", pokemon, "Attract");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("cant", pokemon, "Attract");
+                        }
+
                         return new BoolRelayVar(false);
                     }
 
@@ -156,7 +177,10 @@ public partial record Conditions
                 }, 2),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
-                    battle.Add("-end", pokemon, "Attract", "[silent]");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Attract", "[silent]");
+                    }
                 }),
             },
             [ConditionId.AuroraVeil] = new()
@@ -209,7 +233,10 @@ public partial record Conditions
                     }),
                 OnSideStart = OnSideStartEventInfo.Create((battle, side, _, _) =>
                 {
-                    battle.Add("-sidestart", side, "move: Aurora Veil");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sidestart", side, "move: Aurora Veil");
+                    }
                 }),
                 OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
                 {
@@ -217,7 +244,10 @@ public partial record Conditions
                 }, 26, 10),
                 OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
-                    battle.Add("-sideend", side, "move: Aurora Veil");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-sideend", side, "move: Aurora Veil");
+                    }
                 }),
             },
             [ConditionId.BanefulBunker] = new()
@@ -228,7 +258,11 @@ public partial record Conditions
                 Duration = 1,
                 OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
-                    battle.Add("-singleturn", target, "move: Protect");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "move: Protect");
+                    }
+
                     return null;
                 }),
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
@@ -383,7 +417,11 @@ public partial record Conditions
                 Duration = 1,
                 OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
-                    battle.Add("-singleturn", target, "move: Protect");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-singleturn", target, "move: Protect");
+                    }
+
                     return null;
                 }),
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
@@ -433,12 +471,18 @@ public partial record Conditions
                 {
                     if (effect is Ability { Id: AbilityId.Electromorphosis or AbilityId.WindPower })
                     {
-                        battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
-                            $"[from] ability: {effect.Name}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
+                                $"[from] ability: {effect.Name}");
+                        }
                     }
                     else
                     {
-                        battle.Add("-start", pokemon, "Charge");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Charge");
+                        }
                     }
 
                     return null;
@@ -447,17 +491,29 @@ public partial record Conditions
                 {
                     if (effect is Ability { Id: AbilityId.Electromorphosis or AbilityId.WindPower })
                     {
-                        battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
-                            $"[from] ability: {effect.Name}");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Charge", battle.ActiveMove?.Name ?? "",
+                                $"[from] ability: {effect.Name}");
+                        }
                     }
                     else
                     {
-                        battle.Add("-start", pokemon, "Charge");
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-start", pokemon, "Charge");
+                        }
                     }
 
                     return null;
                 }),
-                OnEnd = OnEndEventInfo.Create((battle, pokemon) => { battle.Add("-end", pokemon, "Charge", "[silent]"); }),
+                OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", pokemon, "Charge", "[silent]");
+                    }
+                }),
                 OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, move) =>
                 {
                     if (move.Type == MoveType.Electric)
@@ -494,7 +550,11 @@ public partial record Conditions
                     // Only show preparation animation for Chilly Reception move
                     if (move.Id != MoveId.ChillyReception) return null;
 
-                    battle.Add("-prepare", source, "Chilly Reception", "[premajor]");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-prepare", source, "Chilly Reception", "[premajor]");
+                    }
+
                     return null;
                 }, 100),
             },
@@ -555,11 +615,14 @@ public partial record Conditions
                         battle.Debug(
                             $"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Move {move.Id} BLOCKED!");
 
-                        battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon),
-                            move.Name);
-                        battle.AttrLastMove("[still]");
-                        battle.Debug("Disabled by Choice item lock");
-                        battle.Add("-fail", pokemon);
+                        if (battle.DisplayUi)
+                        {
+                            battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon),
+                                move.Name);
+                            battle.AttrLastMove("[still]");
+                            battle.Add("-fail", pokemon);
+                        }
+
                         return false;
                     }
 
@@ -784,7 +847,11 @@ public partial record Conditions
                 AssociatedMove = MoveId.Curse,
                 OnStart = OnStartEventInfo.Create((battle, pokemon, source, _) =>
                 {
-                    battle.Add("-start", pokemon, "Curse", $"[of] {source}");
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Curse", $"[of] {source}");
+                    }
+
                     return null;
                 }),
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>

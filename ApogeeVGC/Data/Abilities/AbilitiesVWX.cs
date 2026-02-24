@@ -523,7 +523,10 @@ public partial record Abilities
                         }
                         else
                         {
-                            battle.Add("-immune", target, "[from] ability: Wonder Guard");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-immune", target, "[from] ability: Wonder Guard");
+                            }
                         }
 
                         return null;
