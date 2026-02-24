@@ -184,9 +184,9 @@
 
 ^ review moves SpiritBreak to SpringtideStorm
 
-@ review moves StealthRock to Stockpile
+^ review moves StealthRock to Stockpile
 
-review moves Stomp to StrangeSteam
+@ review moves Stomp to StrangeSteam
 
 review moves Strength to StuffCheeks
 
