@@ -67,6 +67,12 @@ public record MoveAction : IAction
     /// Used by <see cref="Battle.GetActionSpeed"/> and <see cref="BattleQueue.InsertChoice"/>
     /// to avoid repeated heap allocations for priority / fractional-priority event resolution.
     /// </summary>
+    /// <remarks>
+    /// Must use <see cref="Move.ToActiveMove"/> (clone) instead of <see cref="Move.AsActiveMove"/>
+    /// (shared template) because the returned instance is mutated during battle execution
+    /// (e.g., MoveHitData, Priority, PranksterBoosted). Using the shared template caused
+    /// concurrent dictionary corruption when parallel battles used the same move.
+    /// </remarks>
     private ActiveMove? _cachedActiveMove;
 
     /// <summary>
@@ -75,7 +81,7 @@ public record MoveAction : IAction
     /// </summary>
     public ActiveMove GetOrCreateActiveMove()
     {
-        return _cachedActiveMove ??= Move.AsActiveMove();
+        return _cachedActiveMove ??= Move.ToActiveMove();
     }
 
     // To satisfy IPriorityComparison

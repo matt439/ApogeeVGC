@@ -77,8 +77,17 @@ public partial record Ability : IEffect, IAbilityEventMethodsV2, IBasicEffect, I
     #endregion
 
     private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
-    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
-        _handlerCache ??= EventHandlerInfoMapper.BuildHandlerCache(this);
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache
+    {
+        get
+        {
+            var cache = Volatile.Read(ref _handlerCache);
+            if (cache is not null) return cache;
+
+            var newCache = EventHandlerInfoMapper.BuildHandlerCache(this);
+            return Interlocked.CompareExchange(ref _handlerCache, newCache, null) ?? newCache;
+        }
+    }
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;
 
