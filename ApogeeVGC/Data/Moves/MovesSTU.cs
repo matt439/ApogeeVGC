@@ -3897,7 +3897,7 @@ public partial record Moves
                     RelayVar? takeItemResult = battle.SingleEvent(EventId.TakeItem,
                         yourItemUnion.Item, target.ItemState,
                         new PokemonSingleEventTarget(source), target, move, yourItemUnion.Item);
-                    if (takeItemResult is BoolRelayVar { Value: false } ||
+                    if (takeItemResult is null or BoolRelayVar { Value: false } ||
                         !source.SetItem(yourItemUnion.Item.Id))
                     {
                         // Put item back on target (bypass SetItem to avoid breaking choicelock)

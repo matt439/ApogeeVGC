@@ -200,9 +200,9 @@
 
 ^ review moves TarShot to Teleport
 
-@ review moves TemperFlare to TerrainPulse
+^ review moves TemperFlare to TerrainPulse
 
-review moves Thief to ThunderCage
+@ review moves Thief to ThunderCage
 
 review moves Thunderclap to Tickle
 

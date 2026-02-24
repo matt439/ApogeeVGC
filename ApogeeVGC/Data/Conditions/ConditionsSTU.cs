@@ -1221,7 +1221,7 @@ public partial record Conditions
                         return false;
                     }
 
-                    return null;
+                    return new VoidReturn();
                 }, 6),
                 OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
                 {
