@@ -198,9 +198,9 @@
 
 ^ review moves TachyonCutter to TakeHeart
 
-@ review moves TarShot to Teleport
+^ review moves TarShot to Teleport
 
-review moves TemperFlare to TerrainPulse
+@ review moves TemperFlare to TerrainPulse
 
 review moves Thief to ThunderCage
 

@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -3739,7 +3740,7 @@ public partial record Moves
 
                     return move.BasePower;
                 }),
-                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, source, _, _) =>
+                OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     if (source.Terastallized != null)
                     {
@@ -3795,7 +3796,7 @@ public partial record Moves
                 },
                 OnModifyType = OnModifyTypeEventInfo.Create((_, move, source, _) =>
                 {
-                    if (source.Species.Name == "Terapagos-Stellar")
+                    if (source.Species.Id == SpecieId.TerapagosStellar)
                     {
                         move.Type = MoveType.Stellar;
                         if (source.Terastallized != null &&
@@ -3808,7 +3809,7 @@ public partial record Moves
                 }),
                 OnModifyMove = OnModifyMoveEventInfo.Create((_, move, source, _) =>
                 {
-                    if (source.Species.Name == "Terapagos-Stellar")
+                    if (source.Species.Id == SpecieId.TerapagosStellar)
                     {
                         move.Target = MoveTarget.AllAdjacentFoes;
                     }
