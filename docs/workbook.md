@@ -204,9 +204,9 @@
 
 ^ review moves Thief to ThunderCage
 
-@ review moves Thunderclap to Tickle
+^ review moves Thunderclap to Tickle
 
-review moves TidyUp to ToxicSpikes
+@ review moves TidyUp to ToxicSpikes
 
 review moves ToxicThread to TriAttack
 
