@@ -1,11 +1,6 @@
-using ApogeeVGC.Data;
-using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
-using ApogeeVGC.Sim.Items;
-using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -339,6 +334,34 @@ public partial class Driver
         Console.ReadLine();
     }
 
+    /// <summary>
+    /// Thread-local accumulator for parallel battle evaluation.
+    /// Eliminates contention on shared collections by collecting
+    /// results per-thread and merging once after the parallel loop completes.
+    /// </summary>
+    private sealed class EvaluationLocalState
+    {
+        public readonly List<SimulatorResult> Results = [];
+        public readonly List<int> Turns = [];
+
+        public readonly
+            List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>
+            Exceptions = [];
+    }
+
+    /// <summary>
+    /// Pre-generated battle input containing teams and seeds for a single evaluation battle.
+    /// Teams are generated before timing begins so the benchmark measures only battle simulation.
+    /// </summary>
+    private readonly record struct EvaluationBattleInput(
+        List<PokemonSet> Team1,
+        List<PokemonSet> Team2,
+        int Team1Seed,
+        int Team2Seed,
+        int Player1Seed,
+        int Player2Seed,
+        int BattleRandSeed);
+
     private void RunRndVsRndVgcRegIEvaluation()
     {
         Console.WriteLine("[Driver] Starting Random Team vs Random Team VGC Reg I Evaluation");
@@ -346,115 +369,121 @@ public partial class Driver
 
         const bool debug = false;
 
-        var simResults = new ConcurrentBag<SimulatorResult>();
+        // Pre-generate all teams before timing so the benchmark measures only battle simulation
+        Console.WriteLine("[Driver] Pre-generating teams...");
+        var battles = new EvaluationBattleInput[RandomEvaluationNumTest];
+        for (var i = 0; i < RandomEvaluationNumTest; i++)
+        {
+            int baseOffset = i * 5 + 1;
+            int team1Seed = Team1EvalSeed + baseOffset;
+            int team2Seed = Team2EvalSeed + baseOffset + 1;
+
+            var team1 = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, team1Seed).GenerateTeam();
+            var team2 = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, team2Seed).GenerateTeam();
+
+            battles[i] = new EvaluationBattleInput(
+                team1, team2,
+                team1Seed, team2Seed,
+                PlayerRandom1EvalSeed + baseOffset + 2,
+                PlayerRandom2EvalSeed + baseOffset + 3,
+                BattleEvalSeed + baseOffset + 4);
+        }
+
+        Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
+
         var stopwatch = Stopwatch.StartNew();
 
-        var seedCounter = 0;
         var completedBattles = 0;
-        var turnOnBattleEnd = new ConcurrentBag<int>();
-        var exceptions =
-            new ConcurrentBag<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
+
+        // Milestone timestamps for throughput analysis (one entry per 100 battles)
+        int numMilestones = RandomEvaluationNumTest / 100;
+        var milestoneTicks = new long[numMilestones];
+
+        // Merged results collected from thread-local state after parallel loop
+        var allResults = new List<SimulatorResult>();
+        var allTurns = new List<int>();
+        var allExceptions =
+            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
                 Exception)>();
 
-        // Coverage tracking dictionaries (thread-safe)
-        var speciesCoverage = new ConcurrentDictionary<SpecieId, int>();
-        var moveCoverage = new ConcurrentDictionary<MoveId, int>();
-        var abilityCoverage = new ConcurrentDictionary<AbilityId, int>();
-        var itemCoverage = new ConcurrentDictionary<ItemId, int>();
-
-        // Run simulations in parallel with specified number of threads
+        // Run simulations in parallel with thread-local state to eliminate contention
         var parallelOptions = new ParallelOptions
         {
             MaxDegreeOfParallelism = NumThreads,
         };
 
-        Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
-        {
-            // Batch seed allocation: single atomic add instead of 5 separate increments
-            int baseOffset = Interlocked.Add(ref seedCounter, 5) - 4;
-
-            int localTeam1Seed = Team1EvalSeed + baseOffset;
-            int localTeam2Seed = Team2EvalSeed + baseOffset + 1;
-            int localPlayer1Seed = PlayerRandom1EvalSeed + baseOffset + 2;
-            int localPlayer2Seed = PlayerRandom2EvalSeed + baseOffset + 3;
-            int localBattleSeed = BattleEvalSeed + baseOffset + 4;
-
-            try
+        Parallel.For(0, RandomEvaluationNumTest, parallelOptions,
+            // localInit: create a fresh accumulator per thread
+            static () => new EvaluationLocalState(),
+            // body: run battle and accumulate into thread-local state (no shared writes)
+            (i, _, localState) =>
             {
-                // Generate teams externally so we can track coverage
-                var team1Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam1Seed);
-                var team2Generator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, localTeam2Seed);
+                EvaluationBattleInput battle = battles[i];
 
-                var team1 = team1Generator.GenerateTeam();
-                var team2 = team2Generator.GenerateTeam();
-
-                // Track coverage for both teams (no Concat allocation)
-                foreach (var set in team1)
+                try
                 {
-                    speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
-                    abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
-                    itemCoverage.AddOrUpdate(set.Item, 1, static (_, count) => count + 1);
-                    foreach (var move in set.Moves)
+                    // Run directly on Parallel.For thread — no Task.Run + Wait overhead
+                    (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
+                        battle.Team1,
+                        battle.Team2,
+                        battle.Team1Seed,
+                        battle.Team2Seed,
+                        battle.Player1Seed,
+                        battle.Player2Seed,
+                        battle.BattleRandSeed,
+                        debug);
+
+                    localState.Results.Add(result);
+                    localState.Turns.Add(turn);
+
+                    int completed = Interlocked.Increment(ref completedBattles);
+                    if (completed % 100 == 0)
                     {
-                        moveCoverage.AddOrUpdate(move, 1, static (_, count) => count + 1);
+                        int milestoneIndex = completed / 100 - 1;
+                        if (milestoneIndex < milestoneTicks.Length)
+                        {
+                            milestoneTicks[milestoneIndex] = stopwatch.ElapsedTicks;
+                        }
+
+                        Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
                     }
                 }
-
-                foreach (var set in team2)
+                catch (Exception ex)
                 {
-                    speciesCoverage.AddOrUpdate(set.Species, 1, static (_, count) => count + 1);
-                    abilityCoverage.AddOrUpdate(set.Ability, 1, static (_, count) => count + 1);
-                    itemCoverage.AddOrUpdate(set.Item, 1, static (_, count) => count + 1);
-                    foreach (var move in set.Moves)
-                    {
-                        moveCoverage.AddOrUpdate(move, 1, static (_, count) => count + 1);
-                    }
+                    // Store exception with all seed information for debugging
+                    localState.Exceptions.Add(
+                        (battle.Team1Seed, battle.Team2Seed, battle.Player1Seed, battle.Player2Seed,
+                            battle.BattleRandSeed, ex));
+
+                    // Log immediately to console
+                    LogExceptionWithAllSeeds(
+                        battle.Team1Seed,
+                        battle.Team2Seed,
+                        battle.Player1Seed,
+                        battle.Player2Seed,
+                        battle.BattleRandSeed,
+                        ex,
+                        "RndVsRndVgcRegIEvaluation");
                 }
 
-                // Run directly on Parallel.For thread — no Task.Run + Wait overhead
-                (SimulatorResult result, int turn) = RunBattleWithPrebuiltTeamsDirect(
-                    team1,
-                    team2,
-                    localTeam1Seed,
-                    localTeam2Seed,
-                    localPlayer1Seed,
-                    localPlayer2Seed,
-                    localBattleSeed,
-                    debug);
-
-                simResults.Add(result);
-                turnOnBattleEnd.Add(turn);
-
-                int completed = Interlocked.Increment(ref completedBattles);
-                if (completed % 100 == 0)
-                {
-                    Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
-                }
-            }
-            catch (Exception ex)
+                return localState;
+            },
+            // localFinally: merge thread-local state into shared collections (runs once per thread)
+            localState =>
             {
-                // Store exception with all seed information for debugging
-                exceptions.Add(
-                    (localTeam1Seed, localTeam2Seed, localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
-
-                // Log immediately to console
-                LogExceptionWithAllSeeds(
-                    localTeam1Seed,
-                    localTeam2Seed,
-                    localPlayer1Seed,
-                    localPlayer2Seed,
-                    localBattleSeed,
-                    ex,
-                    "RndVsRndVgcRegIEvaluation");
-            }
-        });
+                lock (allResults)
+                {
+                    allResults.AddRange(localState.Results);
+                    allTurns.AddRange(localState.Turns);
+                    allExceptions.AddRange(localState.Exceptions);
+                }
+            });
 
         stopwatch.Stop();
 
-        // Convert to list for counting (now from ConcurrentBag)
-        var resultsList = simResults.ToList();
-        var turnsList = turnOnBattleEnd.ToList();
-        var exceptionsList = exceptions.ToList();
+        var resultsList = allResults;
+        var turnsList = allTurns;
+        var exceptionsList = allExceptions;
 
         int successfulBattles = resultsList.Count;
         int failedBattles = exceptionsList.Count;
@@ -535,6 +564,46 @@ public partial class Driver
         sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
         sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
         sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+
+        // Compute first-half and second-half (steady-state) throughput from milestones
+        if (numMilestones >= 2)
+        {
+            int halfIndex = numMilestones / 2;
+            int firstHalfBattles = (halfIndex + 1) * 100;
+            int secondHalfBattles = numMilestones * 100 - firstHalfBattles;
+
+            double firstHalfSeconds = milestoneTicks[halfIndex] / (double)Stopwatch.Frequency;
+            double secondHalfSeconds = (milestoneTicks[numMilestones - 1] - milestoneTicks[halfIndex])
+                                       / (double)Stopwatch.Frequency;
+
+            if (firstHalfSeconds > 0 && secondHalfSeconds > 0)
+            {
+                double firstHalfRate = firstHalfBattles / firstHalfSeconds;
+                double secondHalfRate = secondHalfBattles / secondHalfSeconds;
+                double speedup = secondHalfRate / firstHalfRate;
+
+                sb.AppendLine();
+                sb.AppendLine("Throughput Breakdown (showing JIT warm-up effect):");
+                sb.AppendLine($"Warm-up Phase    (battles 1-{firstHalfBattles}): {firstHalfRate:F0} sims/sec");
+                sb.AppendLine($"Steady-State     (battles {firstHalfBattles + 1}-{numMilestones * 100}): {secondHalfRate:F0} sims/sec ({speedup:F2}x faster)");
+
+                // If we have enough milestones, show the last quarter as "peak steady-state"
+                if (numMilestones >= 4)
+                {
+                    int threeQuarterIndex = (numMilestones * 3) / 4;
+                    int lastQuarterBattles = numMilestones * 100 - (threeQuarterIndex + 1) * 100;
+                    double lastQuarterSeconds = (milestoneTicks[numMilestones - 1] - milestoneTicks[threeQuarterIndex])
+                                                / (double)Stopwatch.Frequency;
+
+                    if (lastQuarterSeconds > 0)
+                    {
+                        double lastQuarterRate = lastQuarterBattles / lastQuarterSeconds;
+                        sb.AppendLine($"Peak Steady-State (battles {(threeQuarterIndex + 1) * 100 + 1}-{numMilestones * 100}): {lastQuarterRate:F0} sims/sec");
+                    }
+                }
+            }
+        }
+
         sb.AppendLine();
         sb.AppendLine("Turn Statistics:");
         sb.AppendLine($"Mean Turns: {meanTurns:F2}");
@@ -544,81 +613,7 @@ public partial class Driver
         sb.AppendLine($"Maximum Turns: {maxTurns}");
         Console.WriteLine(sb.ToString());
 
-        // --- Coverage Report ---
-        // Build the legal pools from a reference generator (seed is irrelevant for pool queries)
-        var refGenerator = new RandomTeamGenerator(Library, FormatId.Gen9VgcRegulationI, seed: 0);
-
-        // Derive reachable abilities and moves from legal species
-        var legalAbilities = new HashSet<AbilityId>();
-        var legalMoves = new HashSet<MoveId>();
-        foreach (var specieId in refGenerator.LegalSpecies)
-        {
-            var species = Library.Species[specieId];
-            if (species.Abilities.Slot0 != AbilityId.None) legalAbilities.Add(species.Abilities.Slot0);
-            if (species.Abilities.Slot1 is { } s1 && s1 != AbilityId.None) legalAbilities.Add(s1);
-            if (species.Abilities.Hidden is { } h && h != AbilityId.None) legalAbilities.Add(h);
-
-            if (Library.Learnsets.TryGetValue(specieId, out var learnset) && learnset.LearnsetData != null)
-            {
-                foreach (var (moveId, sources) in learnset.LearnsetData)
-                {
-                    if (sources.Any(s => s.Generation == 9))
-                    {
-                        legalMoves.Add(moveId);
-                    }
-                }
-            }
-        }
-
-        var coverageSb = new StringBuilder();
-        coverageSb.AppendLine("===========================================================");
-        coverageSb.AppendLine("COVERAGE REPORT");
-        coverageSb.AppendLine("===========================================================");
-        coverageSb.AppendLine();
-
-        AppendCoverageSection(coverageSb, "Species", speciesCoverage, refGenerator.LegalSpecies);
-        AppendCoverageSection(coverageSb, "Items", itemCoverage, refGenerator.UsableItems);
-        AppendCoverageSection(coverageSb, "Abilities", abilityCoverage, legalAbilities);
-        AppendCoverageSection(coverageSb, "Moves", moveCoverage, legalMoves);
-
-        Console.WriteLine(coverageSb.ToString());
-
         Console.WriteLine("Press Enter key to exit...");
         Console.ReadLine();
-    }
-
-    /// <summary>
-    /// Appends a coverage section for a single category to the report.
-    /// Lists overall stats and any entries from the legal pool that were never selected.
-    /// </summary>
-    private static void AppendCoverageSection<TId>(
-        StringBuilder sb,
-        string label,
-        ConcurrentDictionary<TId, int> observed,
-        IEnumerable<TId> legalPool) where TId : notnull
-    {
-        var legalSet = legalPool as IReadOnlyCollection<TId> ?? legalPool.ToList();
-        int totalLegal = legalSet.Count;
-        var neverSelected = legalSet.Where(id => !observed.ContainsKey(id)).OrderBy(id => id).ToList();
-        int selectedCount = totalLegal - neverSelected.Count;
-
-        var counts = observed.Values.ToList();
-        int minCount = counts.Count > 0 ? counts.Min() : 0;
-        int maxCount = counts.Count > 0 ? counts.Max() : 0;
-        double meanCount = counts.Count > 0 ? counts.Average() : 0;
-
-        sb.AppendLine($"{label} Coverage: {selectedCount}/{totalLegal} ({(double)selectedCount / totalLegal:P2})");
-        sb.AppendLine($"  Selection counts — Min: {minCount}, Max: {maxCount}, Mean: {meanCount:F1}");
-
-        if (neverSelected.Count > 0)
-        {
-            sb.AppendLine($"  Never selected ({neverSelected.Count}):");
-            foreach (var id in neverSelected)
-            {
-                sb.AppendLine($"    - {id}");
-            }
-        }
-
-        sb.AppendLine();
     }
 }

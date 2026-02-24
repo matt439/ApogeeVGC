@@ -39,7 +39,7 @@ public partial class Driver
         ex.Data["Team2Seed"] = seeds.Team2Seed;
         ex.Data["Player1Seed"] = seeds.Player1Seed;
         ex.Data["Player2Seed"] = seeds.Player2Seed;
-        ex.Data["BattleSeed"] = seeds.BattleSeed;
+        ex.Data["BattleRandSeed"] = seeds.BattleSeed;
         return false;
     }
     /// <summary>
@@ -319,8 +319,15 @@ public partial class Driver
         int battleSeed,
         bool debug)
     {
-        var seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
-        CurrentBattleSeeds = seeds;
+        // Only allocate BattleSeedContext and set thread-static when debugging;
+        // in the hot evaluation path (debug=false) this avoids a heap allocation per battle.
+        BattleSeedContext? seeds = null;
+        if (debug)
+        {
+            seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
+            CurrentBattleSeeds = seeds;
+        }
+
         try
         {
             PlayerOptions player1Options = new()
@@ -356,13 +363,13 @@ public partial class Driver
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
-        catch (Exception ex) when (EnrichExceptionWithSeeds(ex, seeds))
+        catch (Exception ex) when (seeds is not null && EnrichExceptionWithSeeds(ex, seeds))
         {
             throw;
         }
         finally
         {
-            CurrentBattleSeeds = null;
+            if (debug) CurrentBattleSeeds = null;
         }
     }
 
@@ -406,13 +413,14 @@ public partial class Driver
         Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
         Console.WriteLine($"  private const int PlayerRandom1Seed = {player1Seed};");
         Console.WriteLine($"  private const int PlayerRandom2Seed = {player2Seed};");
-        Console.WriteLine($"  private const int BattleSeed = {battleSeed};");
+        Console.WriteLine($"  private const int BattleRandSeed = {battleSeed};");
         Console.WriteLine();
         Console.WriteLine($"Then run with DriverMode.{debugMode} to debug.");
 
         if (ex is not BattleTimeoutException and not BattleTurnLimitException)
         {
             Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
+            LogInnerExceptions(ex);
         }
 
         Console.WriteLine("-----------------------------------------------------------");
@@ -472,10 +480,30 @@ public partial class Driver
         if (ex is not BattleTimeoutException and not BattleTurnLimitException)
         {
             Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
+            LogInnerExceptions(ex);
         }
 
         Console.WriteLine("-----------------------------------------------------------");
         Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Logs the full inner exception chain for debugging.
+    /// </summary>
+    private static void LogInnerExceptions(Exception ex)
+    {
+        Exception? inner = ex.InnerException;
+        int depth = 1;
+        while (inner != null)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"--- Inner Exception (depth {depth}) ---");
+            Console.WriteLine($"Type: {inner.GetType().Name}");
+            Console.WriteLine($"Message: {inner.Message}");
+            Console.WriteLine($"Stack Trace:\n{inner.StackTrace}");
+            inner = inner.InnerException;
+            depth++;
+        }
     }
 
     /// <summary>

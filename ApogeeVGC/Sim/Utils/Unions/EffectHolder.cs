@@ -10,7 +10,7 @@ namespace ApogeeVGC.Sim.Utils.Unions;
 /// </summary>
 public abstract record EffectHolder
 {
-    public static implicit operator EffectHolder(Pokemon pokemon) => new PokemonEffectHolder(pokemon);
+    public static implicit operator EffectHolder(Pokemon pokemon) => pokemon.CachedEffectHolder;
     public static implicit operator EffectHolder(Side side) => new SideEffectHolder(side);
     public static implicit operator EffectHolder(Field field) => new FieldEffectHolder(field);
     public static EffectHolder FromBattle(Battle battle) => new BattleEffectHolder(battle);

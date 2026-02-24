@@ -532,7 +532,13 @@ public partial class Battle
                 if (!moveAction.Pokemon.IsActive) return false;
                 if (moveAction.Pokemon.Fainted) return false;
                 Debug($"[RunAction.Move] Calling Actions.RunMove for {moveAction.Move.Name}");
-                Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
+
+                // Reuse the cached ActiveMove from MoveAction to avoid a heap allocation.
+                // This also preserves PranksterBoosted set during GetActionSpeed.
+                var cachedActiveMove = moveAction.GetOrCreateActiveMove();
+                cachedActiveMove.Priority = moveAction.Move.Priority;
+
+                Actions.RunMove(cachedActiveMove, moveAction.Pokemon, moveAction.TargetLoc,
                     new BattleActions.RunMoveOptions
                     {
                         SourceEffect = moveAction.SourceEffect,

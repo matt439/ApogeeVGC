@@ -304,8 +304,8 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     //    };
     //}
 
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
         _handlerCache ??= EventHandlerInfoMapper.BuildHandlerCache(this);
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;

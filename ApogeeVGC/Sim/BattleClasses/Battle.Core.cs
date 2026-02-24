@@ -115,6 +115,20 @@ public partial class Battle
     public bool QuickClawRoll { get; set; }
     public List<int> SpeedOrder { get; set; } = [];
 
+    /// <summary>
+    /// Pool of reusable <see cref="List{EventListener}"/> instances to eliminate
+    /// per-call allocations inside <see cref="FindEventHandlers"/>.
+    /// Lists are rented at the start of <see cref="RunEvent"/> and returned at the end.
+    /// </summary>
+    private readonly Stack<List<EventListener>> _handlerListPool = new();
+
+    /// <summary>
+    /// Pool of reusable <see cref="Event"/> instances to eliminate per-call
+    /// allocations inside <see cref="RunEvent"/> and <see cref="SingleEvent"/>.
+    /// Events are rented at entry, populated with context, and returned in the finally block.
+    /// </summary>
+    private readonly Stack<Event> _eventPool = new();
+
     // Note: TeamGenerator is not implemented as we only support constructed teams, not random battles.
     // Random battle team generation would require implementing the full Pokemon Showdown team generator.
     // TeamGenerator teamGenerator = null;
@@ -152,7 +166,7 @@ public partial class Battle
         Format = options.Format ?? Library.Formats[options.Id];
         RuleTable = Format.RuleTable ?? new RuleTable();
         DebugMode = options.Debug;
-        DisplayUi = true; // Always display UI for battle streams
+        DisplayUi = options.DisplayUi ?? !options.Sync;
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
 

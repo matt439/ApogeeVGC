@@ -42,15 +42,13 @@ public partial class Battle
           RequestState.TeamPreview => BattlePerspectiveType.TeamPreview,
             _ => BattlePerspectiveType.InBattle
      };
-  
-        BattlePerspective perspective = GetPerspectiveForSide(sideId, perspectiveType);
- 
+
       ChoiceRequested?.Invoke(this, new BattleChoiceRequestEventArgs
  {
         SideId = sideId,
       Request = request,
   RequestType = requestType,
-Perspective = perspective
+ PerspectiveFactory = () => GetPerspectiveForSide(sideId, perspectiveType)
  });
     }
 
@@ -97,7 +95,20 @@ public class BattleChoiceRequestEventArgs : EventArgs
     public required SideId SideId { get; init; }
     public required IChoiceRequest Request { get; init; }
     public required BattleRequestType RequestType { get; init; }
-    public required BattlePerspective Perspective { get; init; }
+
+    private BattlePerspective? _perspective;
+
+    /// <summary>
+    /// Lazily-computed battle perspective. Only materialized on first access,
+    /// avoiding costly PokemonPerspective allocations when the consumer doesn't need it
+    /// (e.g. PlayerRandom).
+    /// </summary>
+    public BattlePerspective Perspective => _perspective ??= PerspectiveFactory();
+
+    /// <summary>
+    /// Factory to create the perspective on demand.
+    /// </summary>
+    public required Func<BattlePerspective> PerspectiveFactory { private get; init; }
 }
 
 /// <summary>

@@ -24,7 +24,7 @@ public interface IPlayer
         BattlePerspective perspective, CancellationToken cancellationToken);
 
     // Synchronous choice submission (for AI players like Random, MCTS)
-    Choice GetChoiceSync(IChoiceRequest choice, BattleRequestType requestType, BattlePerspective perspective);
+    Choice GetChoiceSync(IChoiceRequest choice, BattleRequestType requestType, Func<BattlePerspective> perspectiveFactory);
 
     void UpdateUi(BattlePerspective perspective);
     

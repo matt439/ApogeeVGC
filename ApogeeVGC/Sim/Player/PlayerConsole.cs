@@ -85,7 +85,7 @@ public class PlayerConsole : IPlayer
     }
 
     public Choice GetChoiceSync(IChoiceRequest choice, BattleRequestType requestType,
-        BattlePerspective perspective)
+        Func<BattlePerspective> perspectiveFactory)
     {
         throw new NotSupportedException(
             "Console player requires async input and cannot be used in synchronous mode");

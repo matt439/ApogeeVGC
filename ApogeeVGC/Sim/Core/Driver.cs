@@ -20,18 +20,9 @@ public partial class Driver
     private const int Team1EvalSeed = 54321;
     private const int Team2EvalSeed = 67890;
 
-    private const int RandomEvaluationNumTest = 100000;
-    private const int NumThreads = 32;
+    private const int RandomEvaluationNumTest = 50000;
+    private const int NumThreads = 16;
     private const int BattleTimeoutMilliseconds = 10000; // 3 seconds timeout per battle
-
-    private const int IncrementalDebugMaxIterations = 500;
-
-    // Format configuration - change this to use different VGC regulations
-    // Available: Gen9VgcRegulationA through Gen9VgcRegulationI, CustomSingles, CustomDoubles
-    //private const FormatId DefaultVgcFormat = FormatId.Gen9VgcRegulationG;
-    //private const FormatId DefaultSinglesFormat = FormatId.CustomSingles;
-    //private const FormatId DefaultDoublesFormat = FormatId.CustomDoubles;
-
 
     public void Start(DriverMode mode)
     {
@@ -57,12 +48,6 @@ public partial class Driver
                 break;
             case DriverMode.RndVsRndVgcRegIEvaluation:
                 RunRndVsRndVgcRegIEvaluation();
-                break;
-            case DriverMode.IncrementalDebug:
-                RunIncrementalDebugTest();
-                break;
-            case DriverMode.SingleBattleDebug:
-                RunSingleBattleDebug();
                 break;
             case DriverMode.SingleBattleDebugVgcRegI:
                 RunSingleBattleDebugVgcRegI();

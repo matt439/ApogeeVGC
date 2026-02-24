@@ -174,194 +174,36 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
 
     public bool AffectsFainted { get; init; }
 
+    /// <summary>
+    /// Returns a fresh <see cref="ActiveMove"/> clone derived from a lazily-cached template.
+    /// The template is built once per <see cref="Move"/> (thread-safe); subsequent calls
+    /// clone it via the record <c>with</c> expression, avoiding per-call MoveSlot allocation,
+    /// Secondaries wrapping, and handler-cache resolution.
+    /// </summary>
     public ActiveMove ToActiveMove()
     {
-        // Match TypeScript behavior: if secondaries is null but secondary exists,
-        // wrap secondary in an array to populate secondaries
-        SecondaryEffect[]? secondaries = Secondaries ?? (Secondary != null ? [Secondary] : null);
-
-        return new ActiveMove
+        var template = Volatile.Read(ref _activeMoveTemplate);
+        if (template is null)
         {
-            // Copy all base Move properties
-            Id = Id,
-            Name = Name,
-            Num = Num,
-            Condition = Condition,
-            BasePower = BasePower,
-            Accuracy = Accuracy,
-            BasePp = BasePp,
-            NoPpBoosts = NoPpBoosts,
-            Category = Category,
-            Type = Type,
-            Priority = Priority,
-            Target = Target,
-            Flags = Flags,
-            Damage = Damage,
-            Ohko = Ohko,
-            ThawsTarget = ThawsTarget,
-            Heal = Heal,
-            ForceSwitch = ForceSwitch,
-            SelfSwitch = SelfSwitch,
-            SpreadHit = SpreadHit,
-            SelfBoost = SelfBoost,
-            SelfDestruct = SelfDestruct,
-            BreaksProtect = BreaksProtect,
-            Recoil = Recoil,
-            Drain = Drain,
-            MindBlownRecoil = MindBlownRecoil,
-            StealsBoosts = StealsBoosts,
-            StruggleRecoil = StruggleRecoil,
-            Secondary = Secondary,
-            Secondaries = secondaries,
-            Self = Self,
-            HasSheerForce = HasSheerForce,
-            AlwaysHit = AlwaysHit,
-            BaseMoveType = BaseMoveType,
-            BasePowerModifier = BasePowerModifier,
-            CritModifier = CritModifier,
-            CritRatio = CritRatio,
-            OverrideOffensivePokemon = OverrideOffensivePokemon,
-            OverrideOffensiveStat = OverrideOffensiveStat,
-            OverrideDefensivePokemon = OverrideDefensivePokemon,
-            OverrideDefensiveStat = OverrideDefensiveStat,
-            ForceStab = ForceStab,
-            IgnoreAbility = IgnoreAbility,
-            IgnoreAccuracy = IgnoreAccuracy,
-            IgnoreDefensive = IgnoreDefensive,
-            IgnoreEvasion = IgnoreEvasion,
-            IgnoreImmunity = IgnoreImmunity,
-            IgnoreNegativeOffensive = IgnoreNegativeOffensive,
-            IgnoreOffensive = IgnoreOffensive,
-            IgnorePositiveDefensive = IgnorePositiveDefensive,
-            IgnorePositiveEvasion = IgnorePositiveEvasion,
-            MultiAccuracy = MultiAccuracy,
-            MultiHit = MultiHit,
-            MultiHitType = MultiHitType,
-            NoDamageVariance = NoDamageVariance,
-            NonGhostTarget = NonGhostTarget,
-            SpreadModifier = SpreadModifier,
-            SleepUsable = SleepUsable,
-            SmartTarget = SmartTarget,
-            TracksTarget = TracksTarget,
-            WillCrit = WillCrit,
-            CallsMove = CallsMove,
-            HasCrashDamage = HasCrashDamage,
-            IsConfusionSelfHit = IsConfusionSelfHit,
-            StallingMove = StallingMove,
-            BaseMove = BaseMove,
-            PseudoWeather = PseudoWeather,
-            VolatileStatus = VolatileStatus,
-            SideCondition = SideCondition,
-            Status = Status,
-            AffectsFainted = AffectsFainted,
+            var newTemplate = new ActiveMove(this);
+            template = Interlocked.CompareExchange(ref _activeMoveTemplate, newTemplate, null) ?? newTemplate;
+        }
 
-            // Copy HitEffect properties inherited from base
-            Boosts = Boosts,
-            SlotCondition = SlotCondition,
-            Terrain = Terrain,
-
-            // Copy event handlers
-            BasePowerCallback = BasePowerCallback,
-            BeforeMoveCallback = BeforeMoveCallback,
-            BeforeTurnCallback = BeforeTurnCallback,
-            DamageCallback = DamageCallback,
-            PriorityChargeCallback = PriorityChargeCallback,
-            OnDisableMove = OnDisableMove,
-            OnAfterHit = OnAfterHit,
-            OnAfterSubDamage = OnAfterSubDamage,
-            OnAfterMoveSecondarySelf = OnAfterMoveSecondarySelf,
-            OnAfterMoveSecondary = OnAfterMoveSecondary,
-            OnAfterMove = OnAfterMove,
-            OnDamage = OnDamage,
-            OnBasePower = OnBasePower,
-            OnEffectiveness = OnEffectiveness,
-            OnHit = OnHit,
-            OnHitField = OnHitField,
-            OnHitSide = OnHitSide,
-            OnModifyMove = OnModifyMove,
-            OnModifyPriority = OnModifyPriority,
-            OnMoveFail = OnMoveFail,
-            OnModifyType = OnModifyType,
-            OnModifyTarget = OnModifyTarget,
-            OnPrepareHit = OnPrepareHit,
-            OnTry = OnTry,
-            OnTryHit = OnTryHit,
-            OnTryHitField = OnTryHitField,
-            OnTryHitSide = OnTryHitSide,
-            OnTryImmunity = OnTryImmunity,
-            OnTryMove = OnTryMove,
-            OnUseMoveMessage = OnUseMoveMessage,
-
-            // Share pre-built handler cache from base Move
-            _handlerCache = MoveHandlerCache,
-
-            // Set ActiveMove-specific required property
-            MoveSlot = new MoveSlot
-            {
-                Move = Id,
-                Id = Id,
-                Pp = NoPpBoosts ? BasePp : BasePp * 8 / 5,
-                MaxPp = NoPpBoosts ? BasePp : BasePp * 8 / 5,
-                Target = Target,
-                Disabled = false,
-                DisabledSource = null,
-                Used = false,
-            },
-        };
-    } //public EffectDelegate? GetDelegate(EventId id)
-    //{
-    //    return id switch
-    //    {
-    //        EventId.BasePowerCallback => EffectDelegate.FromNullableDelegate(BasePowerCallback),
-    //        EventId.BeforeMoveCallback => EffectDelegate.FromNullableDelegate(BeforeMoveCallback),
-    //        EventId.BeforeTurnCallback => EffectDelegate.FromNullableDelegate(BeforeTurnCallback),
-    //        EventId.DamageCallback => EffectDelegate.FromNullableDelegate(DamageCallback),
-    //        EventId.PriorityChargeCallback => EffectDelegate.FromNullableDelegate(PriorityChargeCallback),
-    //        EventId.DisableMove => EffectDelegate.FromNullableDelegate(OnDisableMove),
-    //        EventId.AfterHit => EffectDelegate.FromNullableDelegate(OnAfterHit),
-    //        EventId.AfterSubDamage => EffectDelegate.FromNullableDelegate(OnAfterSubDamage),
-    //        EventId.AfterMoveSecondarySelf => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondarySelf),
-    //        EventId.AfterMoveSecondary => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondary),
-    //        EventId.AfterMove => EffectDelegate.FromNullableDelegate(OnAfterMove),
-    //        EventId.Damage => EffectDelegate.FromNullableDelegate(OnDamage),
-    //        EventId.BasePower => EffectDelegate.FromNullableDelegate(OnBasePower),
-    //        EventId.Effectiveness => EffectDelegate.FromNullableDelegate(OnEffectiveness),
-    //        EventId.Hit => EffectDelegate.FromNullableDelegate(OnHit),
-    //        EventId.HitField => EffectDelegate.FromNullableDelegate(OnHitField),
-    //        EventId.HitSide => EffectDelegate.FromNullableDelegate(OnHitSide),
-    //        EventId.ModifyMove => EffectDelegate.FromNullableDelegate(OnModifyMove),
-    //        EventId.ModifyPriority => EffectDelegate.FromNullableDelegate(OnModifyPriority),
-    //        EventId.MoveFail => EffectDelegate.FromNullableDelegate(OnMoveFail),
-    //        EventId.ModifyType => EffectDelegate.FromNullableDelegate(OnModifyType),
-    //        EventId.ModifyTarget => EffectDelegate.FromNullableDelegate(OnModifyTarget),
-    //        EventId.PrepareHit => EffectDelegate.FromNullableDelegate(OnPrepareHit),
-    //        EventId.Try => EffectDelegate.FromNullableDelegate(OnTry),
-    //        EventId.TryHit => EffectDelegate.FromNullableDelegate(OnTryHit),
-    //        EventId.TryHitField => EffectDelegate.FromNullableDelegate(OnTryHitField),
-    //        EventId.TryHitSide => EffectDelegate.FromNullableDelegate(OnTryHitSide),
-    //        EventId.TryImmunity => EffectDelegate.FromNullableDelegate(OnTryImmunity),
-    //        EventId.TryMove => EffectDelegate.FromNullableDelegate(OnTryMove),
-    //        EventId.UseMoveMessage => EffectDelegate.FromNullableDelegate(OnUseMoveMessage),
-    //        _ => null,
-    //    };
-    //}
-
-    //// Moves do not define event priorities
-    //public int? GetPriority(EventId id) => null;
-
-    //// Moves do not define event orders
-    //public IntFalseUnion? GetOrder(EventId id) => null;
-
-    //// Moves do not define event sub-orders
-    //public int? GetSubOrder(EventId id) => null;
-
+        return template with { };
+    }
 
     /// <summary>
     /// Pre-computed move handler cache, shared by all ActiveMove instances created from this Move.
     /// Built lazily on first access; thread-safe via Volatile.Read/CompareExchange.
     /// </summary>
-    private FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _moveHandlerCache;
-    internal FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> MoveHandlerCache
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _moveHandlerCache;
+
+    /// <summary>
+    /// Cached ActiveMove template. Built once per Move; cloned via record <c>with</c> for each
+    /// <see cref="ToActiveMove"/> call to avoid MoveSlot/Secondaries/handler-cache construction overhead.
+    /// </summary>
+    private ActiveMove? _activeMoveTemplate;
+    internal Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> MoveHandlerCache
     {
         get
         {

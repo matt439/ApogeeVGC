@@ -37,20 +37,22 @@ public partial class Battle
     private EventHandlerInfo? GetHandlerInfo(Pokemon pokemon, IEffect effect, EventId callbackName,
         EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new PokemonRunEventTarget(pokemon), effect, callbackName, prefix,
-            suffix);
+        if (!effect.HasAnyEventHandlers) return null;
+        return effect.GetEventHandlerInfo(callbackName, prefix, suffix);
     }
 
     private EventHandlerInfo? GetHandlerInfo(Field field, IEffect effect, EventId callbackName,
         EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new FieldRunEventTarget(field), effect, callbackName, prefix, suffix);
+        if (!effect.HasAnyEventHandlers) return null;
+        return effect.GetEventHandlerInfo(callbackName, prefix, suffix);
     }
 
     private EventHandlerInfo? GetHandlerInfo(Side side, IEffect effect, EventId callbackName,
         EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new SideRunEventTarget(side), effect, callbackName, prefix, suffix);
+        if (!effect.HasAnyEventHandlers) return null;
+        return effect.GetEventHandlerInfo(callbackName, prefix, suffix);
     }
 
     /// <summary>
@@ -65,39 +67,37 @@ public partial class Battle
     /// This is the entry point for event handler discovery and corresponds to
     /// the TypeScript findEventHandlers method in battle.ts.
     /// </summary>
+    /// <param name="handlers">The list to populate with discovered event listeners</param>
     /// <param name="target">The primary target of the event</param>
     /// <param name="eventName">The event to find handlers for</param>
     /// <param name="source">Optional source Pokemon (triggers Source-prefixed events)</param>
-    /// <returns>List of all event listeners that should be invoked for this event</returns>
-    private List<EventListener> FindEventHandlers(RunEventTarget target, EventId eventName,
+    private void FindEventHandlers(List<EventListener> handlers, RunEventTarget target, EventId eventName,
         Pokemon? source = null)
     {
-        List<EventListener> handlers = [];
-
         // Handle array of Pokemon
         if (target is PokemonArrayRunEventTarget arrayTarget)
         {
             for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
             {
                 Pokemon pokemon = arrayTarget.PokemonList[i];
-                // Recursively find handlers for each Pokemon
-                var curHandlers = FindEventHandlers(
+                // Record start index so we can tag only the newly added handlers
+                int startIdx = handlers.Count;
+                FindEventHandlers(
+                    handlers,
                     new PokemonRunEventTarget(pokemon),
                     eventName,
                     source
                 );
 
-                // Set the target and index for each handler
-                foreach (EventListener handler in curHandlers)
+                // Set the target and index for each newly added handler
+                for (int j = startIdx; j < handlers.Count; j++)
                 {
-                    handler.Target = pokemon; // Original "effectHolder"
-                    handler.Index = i;
+                    handlers[j].Target = pokemon; // Original "effectHolder"
+                    handlers[j].Index = i;
                 }
-
-                handlers.AddRange(curHandlers);
             }
 
-            return handlers;
+            return;
         }
 
         // Events that target a Pokemon normally bubble up to the Side
@@ -113,6 +113,13 @@ public partial class Battle
             EventId.TerrainChange
             );
 
+        // Determine Side target: either from original SideRunEventTarget or bubbled up from Pokemon
+        Side? targetSide = null;
+        if (target is SideRunEventTarget sideTarget)
+        {
+            targetSide = sideTarget.Side;
+        }
+
         // Handle Pokemon target
         if (target is PokemonRunEventTarget pokemonTarget)
         {
@@ -121,7 +128,7 @@ public partial class Battle
             // Guard against null pokemon (can occur despite non-nullable declaration)
             if (pokemon is null)
             {
-                return handlers;
+                return;
             }
 
             if (pokemon.IsActive || (source?.IsActive ?? false))
@@ -131,28 +138,28 @@ public partial class Battle
                 if (prefixedHandlers)
                 {
                     // Check allies (including self) for Ally and Any prefixed events — batched
-                    foreach (Pokemon allyActive in pokemon.AlliesAndSelf())
+                    // Iterate Side.Active directly to avoid List<Pokemon> allocation from AlliesAndSelf()
+                    foreach (Pokemon? allyActive in pokemon.Side.Active)
                     {
-                        // Guard against null allies (defensive)
-                        if (allyActive is null) continue;
+                        if (allyActive is null || allyActive.Hp <= 0) continue;
 
                         FindPokemonEventHandlersPrefixed(handlers, allyActive, eventName,
                             EventPrefix.Ally, EventPrefix.Any);
                     }
 
                     // Check foes for Foe and Any prefixed events — batched
-                    foreach (Pokemon foeActive in pokemon.Foes())
+                    // Iterate Side.Foe.Active directly to avoid List<Pokemon> allocation from Foes()
+                    foreach (Pokemon? foeActive in pokemon.Side.Foe.Active)
                     {
-                        // Guard against null foes (defensive)
-                        if (foeActive is null) continue;
+                        if (foeActive is null || foeActive.Hp <= 0) continue;
 
                         FindPokemonEventHandlersPrefixed(handlers, foeActive, eventName,
                             EventPrefix.Foe, EventPrefix.Any);
                     }
                 }
 
-                // Bubble up to the Side
-                target = new SideRunEventTarget(pokemon.Side);
+                // Bubble up to the Side (no allocation — just set the local variable)
+                targetSide = pokemon.Side;
             }
         }
 
@@ -163,17 +170,16 @@ public partial class Battle
         }
 
         // Handle Side target
-        if (target is SideRunEventTarget sideTarget)
+        if (targetSide != null)
         {
-            Side targetSide = sideTarget.Side;
-
             foreach (Side side in Sides)
             {
                 // Handle bubble down from Side to active Pokemon
                 if (shouldBubbleDown)
                 {
-                    foreach (Pokemon active in side.Active.OfType<Pokemon>())
+                    foreach (Pokemon? activeSlot in side.Active)
                     {
+                        if (activeSlot is not Pokemon active) continue;
                         if (side == targetSide)
                         {
                             FindPokemonEventHandlers(handlers, active, eventName);
@@ -192,9 +198,6 @@ public partial class Battle
                 }
 
                 // Handle Side conditions (but not for ally sides in multi battles)
-                // In TypeScript: if (side.n < 2 || !side.allySide)
-                // Since AllySide is not implemented (singles/doubles only), we just check side.N < 2
-                // In full multi-battle implementation, this would prevent duplicate processing of shared side conditions
                 if (side.N < 2)
                 {
                     if (side == targetSide)
@@ -217,8 +220,6 @@ public partial class Battle
         // Always check Field and Battle handlers
         FindFieldEventHandlers(handlers, Field, eventName);
         FindBattleEventHandlers(handlers, eventName);
-
-        return handlers;
     }
 
     /// <summary>
@@ -251,16 +252,16 @@ public partial class Battle
         Item item = pokemon.GetItem();
         EffectState itemState = pokemon.ItemState;
 
-        Species species = pokemon.BaseSpecies;
-        EffectState speciesState = pokemon.SpeciesState;
-
         Side side = pokemon.Side;
 
         bool hasCustomHolder = customHolder != null;
         EffectHolder effectHolder = customHolder ?? pokemon;
 
         // Check status condition (paralysis, burn, etc.)
-        EventHandlerInfo? handlerInfo = GetHandlerInfo(pokemon, status, callbackName, prefix);
+        // Inline HasAnyEventHandlers + GetEventHandlerInfo on concrete Condition type to avoid IEffect interface dispatch
+        EventHandlerInfo? handlerInfo = status.HasAnyEventHandlers
+            ? status.GetEventHandlerInfo(callbackName, prefix)
+            : null;
         if (handlerInfo != null || (getKey != null && statusState.GetProperty(getKey) != null))
         {
             handlers.Add(ResolvePriority(new EventListener
@@ -278,7 +279,9 @@ public partial class Battle
         foreach ((ConditionId volatileId, EffectState volatileState) in pokemon.Volatiles)
         {
             Condition volatileCondition = Library.Conditions[volatileId];
-            handlerInfo = GetHandlerInfo(pokemon, volatileCondition, callbackName, prefix);
+            handlerInfo = volatileCondition.HasAnyEventHandlers
+                ? volatileCondition.GetEventHandlerInfo(callbackName, prefix)
+                : null;
             if (handlerInfo != null ||
                 (getKey != null && volatileState.GetProperty(getKey) != null))
             {
@@ -288,14 +291,16 @@ public partial class Battle
                     HandlerInfo = handlerInfo,
                     State = volatileState,
                     End = hasCustomHolder ? null : pokemon.RemoveVolatileEndDelegate,
-                    EndCallArgs = hasCustomHolder ? null : [volatileCondition],
+                    EndCallArgs = hasCustomHolder ? null : volatileCondition.EndCallArgsSelf,
                     EffectHolder = effectHolder,
                 }, callbackName));
             }
         }
 
         // Check ability
-        handlerInfo = GetHandlerInfo(pokemon, ability, callbackName, prefix);
+        handlerInfo = ability.HasAnyEventHandlers
+            ? ability.GetEventHandlerInfo(callbackName, prefix)
+            : null;
         if (DisplayUi && callbackName == EventId.SwitchIn)
         {
             Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Ability: {ability.Name} | Event: {callbackName} | Handler: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
@@ -313,7 +318,9 @@ public partial class Battle
         }
 
         // Check held item
-        handlerInfo = GetHandlerInfo(pokemon, item, callbackName, prefix);
+        handlerInfo = item.HasAnyEventHandlers
+            ? item.GetEventHandlerInfo(callbackName, prefix)
+            : null;
         if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
         {
             handlers.Add(ResolvePriority(new EventListener
@@ -326,19 +333,7 @@ public partial class Battle
             }, callbackName));
         }
 
-        // Check species (for species-specific events)
-        handlerInfo = GetHandlerInfo(pokemon, species, callbackName, prefix);
-        if (handlerInfo != null)
-        {
-            handlers.Add(ResolvePriority(new EventListener
-            {
-                Effect = species,
-                HandlerInfo = handlerInfo,
-                State = speciesState,
-                End = null, // Species can't be removed
-                EffectHolder = effectHolder,
-            }, callbackName));
-        }
+        // Species never has event handlers (HasAnyEventHandlers is always false) — skip entirely
 
         // Check slot conditions (Stealth Rock trap, etc.)
         if (pokemon.Position < side.SlotConditions.Count)
@@ -347,7 +342,9 @@ public partial class Battle
                 side.SlotConditions[pokemon.Position])
             {
                 Condition slotCondition = Library.Conditions[conditionId];
-                handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName, prefix);
+                handlerInfo = slotCondition.HasAnyEventHandlers
+                    ? slotCondition.GetEventHandlerInfo(callbackName, prefix)
+                    : null;
                 if (handlerInfo != null ||
                     (getKey != null && slotConditionState.GetProperty(getKey) != null))
                 {
@@ -559,8 +556,9 @@ public partial class Battle
         Pokemon? customHolder = null)
     {
         // Check format (ruleset) for handlers
-        EventHandlerInfo? handlerInfo =
-            GetHandlerInfo(RunEventTarget.FromBattle(this), Format, callbackName);
+        EventHandlerInfo? handlerInfo = !Format.HasAnyEventHandlers
+            ? null
+            : Format.GetEventHandlerInfo(callbackName);
 
         if (handlerInfo != null || (getKey != null && FormatData.GetProperty(getKey) != null))
         {

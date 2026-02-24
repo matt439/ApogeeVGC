@@ -190,6 +190,15 @@ public partial class Pokemon : IPriorityComparison
 
     #endregion
 
+    #region Cached EffectHolder (avoids per-conversion allocations from implicit operator)
+
+    private PokemonEffectHolder? _cachedEffectHolder;
+
+    internal PokemonEffectHolder CachedEffectHolder =>
+        _cachedEffectHolder ??= new PokemonEffectHolder(this);
+
+    #endregion
+
     /// <summary>
     /// Gets the list of move IDs for the Pokemon's current move slots.
     /// </summary>

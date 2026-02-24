@@ -663,29 +663,52 @@ public static class EventHandlerInfoMapper
     }
 
     /// <summary>
-    /// Builds a pre-computed handler cache for an effect by scanning all EventId × EventPrefix × EventSuffix
+    /// Builds a pre-computed handler cache for an effect by directly iterating over the
+    /// relevant map entries rather than brute-forcing all EventId × EventPrefix × EventSuffix
     /// combinations. Only non-null results are stored, yielding a compact lookup table.
     /// For Ability/Item/innate effects, pre-computes the SwitchIn→OnStart fallback so the
     /// runtime conditional in GetHandlerInfo is eliminated.
     /// </summary>
-    public static FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
+    public static Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
         BuildHandlerCache(IEffect effect)
     {
         var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
 
-        foreach (EventId id in CachedEventIds)
-        {
-            foreach (EventPrefix prefix in CachedEventPrefixes)
-            {
-                foreach (EventSuffix suffix in CachedEventSuffixes)
-                {
-                    EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
-                    EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
+        if (effect.EffectType == EffectType.Specie || effect is not IEventMethods eventMethods)
+            return cache;
 
-                    EventHandlerInfo? info = GetEventHandlerInfo(effect, id, p, s);
-                    if (info != null)
-                        cache[(id, prefix, suffix)] = info;
-                }
+        // Scan base event methods map (no prefix)
+        foreach (var (id, accessor) in EventMethodsMap)
+        {
+            var info = accessor(eventMethods);
+            if (info != null)
+                StoreHandler(cache, id, EventPrefix.None, info);
+        }
+
+        // For abilities, scan ability-specific events (overwrites base map entries for Start, End, CheckShow)
+        if (effect.EffectType == EffectType.Ability && effect is IAbilityEventMethodsV2 abilityMethods)
+        {
+            foreach (var (id, accessor) in AbilityEventMethodsMap)
+            {
+                var info = accessor(abilityMethods);
+                if (info != null)
+                    StoreHandler(cache, id, EventPrefix.None, info);
+            }
+        }
+
+        // Scan prefixed maps
+        ScanPrefixedMap(cache, eventMethods, FoeEventMethodsMap, EventPrefix.Foe);
+        ScanPrefixedMap(cache, eventMethods, SourceEventMethodsMap, EventPrefix.Source);
+        ScanPrefixedMap(cache, eventMethods, AnyEventMethodsMap, EventPrefix.Any);
+
+        // Scan ally map (only for IPokemonEventMethods)
+        if (effect is IPokemonEventMethods pokemonMethods)
+        {
+            foreach (var (id, accessor) in AllyEventMethodsMap)
+            {
+                var info = accessor(pokemonMethods);
+                if (info != null)
+                    StoreHandler(cache, id, EventPrefix.Ally, info);
             }
         }
 
@@ -701,7 +724,39 @@ public static class EventHandlerInfoMapper
                 startHandler with { Id = EventId.SwitchIn };
         }
 
-        return cache.ToFrozenDictionary();
+        return cache;
+    }
+
+    /// <summary>
+    /// Stores a handler in the cache under the appropriate (EventId, EventPrefix, EventSuffix) keys.
+    /// Always stores under EventSuffix.None (matches unfiltered queries).
+    /// If the handler has a specific suffix, also stores under that suffix.
+    /// </summary>
+    private static void StoreHandler(
+        Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> cache,
+        EventId id, EventPrefix prefix, EventHandlerInfo info)
+    {
+        cache[(id, prefix, EventSuffix.None)] = info;
+
+        if (info.Suffix is { } handlerSuffix && handlerSuffix != EventSuffix.None)
+            cache[(id, prefix, handlerSuffix)] = info;
+    }
+
+    /// <summary>
+    /// Scans a prefixed event methods map and stores non-null handlers in the cache.
+    /// </summary>
+    private static void ScanPrefixedMap(
+        Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> cache,
+        IEventMethods eventMethods,
+        FrozenDictionary<EventId, Func<IEventMethods, EventHandlerInfo?>> map,
+        EventPrefix prefix)
+    {
+        foreach (var (id, accessor) in map)
+        {
+            var info = accessor(eventMethods);
+            if (info != null)
+                StoreHandler(cache, id, prefix, info);
+        }
     }
 
     /// <summary>
@@ -725,7 +780,7 @@ public static class EventHandlerInfoMapper
     /// Used to compute <see cref="IEffect.HasPrefixedHandlers"/>.
     /// </summary>
     public static bool CacheHasPrefixedHandlers(
-        FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> cache)
+        Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> cache)
     {
         foreach ((EventId _, EventPrefix prefix, EventSuffix _) in cache.Keys)
         {
@@ -736,30 +791,21 @@ public static class EventHandlerInfoMapper
     }
 
     /// <summary>
-    /// Builds a pre-computed handler cache for a move effect by scanning all EventId × EventPrefix × EventSuffix
-    /// combinations against the MoveEventMethodsMap.
+    /// Builds a pre-computed handler cache for a move effect by directly iterating over
+    /// MoveEventMethodsMap entries rather than brute-forcing all enum combinations.
     /// </summary>
-    public static FrozenDictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
+    public static Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>
         BuildMoveHandlerCache(IMoveEventMethods moveMethods)
     {
         var cache = new Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>();
 
-        foreach (EventId id in CachedEventIds)
+        foreach (var (id, accessor) in MoveEventMethodsMap)
         {
-            foreach (EventPrefix prefix in CachedEventPrefixes)
-            {
-                foreach (EventSuffix suffix in CachedEventSuffixes)
-                {
-                    EventPrefix? p = prefix == EventPrefix.None ? null : prefix;
-                    EventSuffix? s = suffix == EventSuffix.None ? null : suffix;
-
-                    EventHandlerInfo? info = GetMoveHandlerInfo(moveMethods, id, p, s);
-                    if (info != null)
-                        cache[(id, prefix, suffix)] = info;
-                }
-            }
+            var info = accessor(moveMethods);
+            if (info != null)
+                StoreHandler(cache, id, EventPrefix.None, info);
         }
 
-        return cache.ToFrozenDictionary();
+        return cache;
     }
 }
