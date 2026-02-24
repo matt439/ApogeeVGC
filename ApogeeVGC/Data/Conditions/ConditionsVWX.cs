@@ -115,13 +115,14 @@ public partial record Conditions
 
                     // Reset Outrage counter if source has lockedmove volatile
                     // TypeScript: if (source.volatiles['lockedmove'].duration === 2) delete source.volatiles['lockedmove']
-                    if (source.Volatiles.TryGetValue(ConditionId.LockedMove,
-                            out var lockedMoveState))
+                    var lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                    if (lockedMove is not null &&
+                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
                     {
-                        if (lockedMoveState.Duration == 2)
-                        {
-                            source.Volatiles.Remove(ConditionId.LockedMove);
-                        }
+                        // TS uses `delete source.volatiles['lockedmove']` which bypasses OnEnd.
+                        // Use DeleteVolatile (not RemoveVolatile) to avoid triggering
+                        // LockedMove's OnEnd handler (which would cause confusion).
+                        source.DeleteVolatile(ConditionId.LockedMove);
                     }
 
                     return new Empty(); // Equivalent to Battle.NOT_FAIL

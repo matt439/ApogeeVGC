@@ -218,9 +218,9 @@
 
 ^ review moves VacuumWave to Waterfall
 
-@ review moves WaterGun to WaterSpout
+^ review moves WaterGun to WaterSpout
 
-review moves WaveCrash to WildboltStorm
+@ review moves WaveCrash to WildboltStorm
 
 review moves WildCharge to WorkUp
 
