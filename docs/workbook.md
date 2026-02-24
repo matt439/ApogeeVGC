@@ -174,9 +174,9 @@
 
 ^ review moves SkyAttack to SleepTalk
 
-@ review moves Sludge to Snarl
+^ review moves Sludge to Snarl
 
-review moves SnipeShot to SoftBoiled
+@ review moves SnipeShot to SoftBoiled
 
 review moves SolarBeam to Spark
 
