@@ -160,9 +160,9 @@
 
 ## MovesSTU
 
-@ review moves SacredFire to SandTomb
+^ review moves SacredFire to SandTomb
 
-review moves Scald to SeedBomb
+@ review moves Scald to SeedBomb
 
 review moves SeedFlare to ShadowPunch
 
