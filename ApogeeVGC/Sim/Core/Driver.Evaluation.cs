@@ -395,6 +395,10 @@ public partial class Driver
 
         var completedBattles = 0;
 
+        // Milestone timestamps for throughput analysis (one entry per 100 battles)
+        int numMilestones = RandomEvaluationNumTest / 100;
+        var milestoneTicks = new long[numMilestones];
+
         // Merged results collected from thread-local state after parallel loop
         var allResults = new List<SimulatorResult>();
         var allTurns = new List<int>();
@@ -435,6 +439,12 @@ public partial class Driver
                     int completed = Interlocked.Increment(ref completedBattles);
                     if (completed % 100 == 0)
                     {
+                        int milestoneIndex = completed / 100 - 1;
+                        if (milestoneIndex < milestoneTicks.Length)
+                        {
+                            milestoneTicks[milestoneIndex] = stopwatch.ElapsedTicks;
+                        }
+
                         Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
                     }
                 }
@@ -554,6 +564,46 @@ public partial class Driver
         sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
         sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
         sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+
+        // Compute first-half and second-half (steady-state) throughput from milestones
+        if (numMilestones >= 2)
+        {
+            int halfIndex = numMilestones / 2;
+            int firstHalfBattles = (halfIndex + 1) * 100;
+            int secondHalfBattles = numMilestones * 100 - firstHalfBattles;
+
+            double firstHalfSeconds = milestoneTicks[halfIndex] / (double)Stopwatch.Frequency;
+            double secondHalfSeconds = (milestoneTicks[numMilestones - 1] - milestoneTicks[halfIndex])
+                                       / (double)Stopwatch.Frequency;
+
+            if (firstHalfSeconds > 0 && secondHalfSeconds > 0)
+            {
+                double firstHalfRate = firstHalfBattles / firstHalfSeconds;
+                double secondHalfRate = secondHalfBattles / secondHalfSeconds;
+                double speedup = secondHalfRate / firstHalfRate;
+
+                sb.AppendLine();
+                sb.AppendLine("Throughput Breakdown (showing JIT warm-up effect):");
+                sb.AppendLine($"Warm-up Phase    (battles 1-{firstHalfBattles}): {firstHalfRate:F0} sims/sec");
+                sb.AppendLine($"Steady-State     (battles {firstHalfBattles + 1}-{numMilestones * 100}): {secondHalfRate:F0} sims/sec ({speedup:F2}x faster)");
+
+                // If we have enough milestones, show the last quarter as "peak steady-state"
+                if (numMilestones >= 4)
+                {
+                    int threeQuarterIndex = (numMilestones * 3) / 4;
+                    int lastQuarterBattles = numMilestones * 100 - (threeQuarterIndex + 1) * 100;
+                    double lastQuarterSeconds = (milestoneTicks[numMilestones - 1] - milestoneTicks[threeQuarterIndex])
+                                                / (double)Stopwatch.Frequency;
+
+                    if (lastQuarterSeconds > 0)
+                    {
+                        double lastQuarterRate = lastQuarterBattles / lastQuarterSeconds;
+                        sb.AppendLine($"Peak Steady-State (battles {(threeQuarterIndex + 1) * 100 + 1}-{numMilestones * 100}): {lastQuarterRate:F0} sims/sec");
+                    }
+                }
+            }
+        }
+
         sb.AppendLine();
         sb.AppendLine("Turn Statistics:");
         sb.AppendLine($"Mean Turns: {meanTurns:F2}");

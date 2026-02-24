@@ -9,6 +9,16 @@
     <MonoGameContentReference>Content\Content.mgcb</MonoGameContentReference>
   </PropertyGroup>
 
+  <!-- Performance optimization settings for Release builds -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TieredCompilation>true</TieredCompilation>
+    <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+    <TieredCompilationQuickJitForLoops>true</TieredCompilationQuickJitForLoops>
+    <TieredPGO>true</TieredPGO>
+    <DynamicPGO>true</DynamicPGO>
+    <PublishReadyToRun>false</PublishReadyToRun>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Sim\Utils\x.txt" />
   </ItemGroup>
