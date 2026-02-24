@@ -176,9 +176,9 @@
 
 ^ review moves Sludge to Snarl
 
-@ review moves SnipeShot to SoftBoiled
+^ review moves SnipeShot to SoftBoiled
 
-review moves SolarBeam to Spark
+@ review moves SolarBeam to Spark
 
 review moves SparklingAria to SpinOut
 
