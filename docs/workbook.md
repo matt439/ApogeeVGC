@@ -196,9 +196,9 @@
 
 ^ review moves Swift to SyrupBomb
 
-@ review moves TachyonCutter to TakeHeart
+^ review moves TachyonCutter to TakeHeart
 
-review moves TarShot to Teleport
+@ review moves TarShot to Teleport
 
 review moves TemperFlare to TerrainPulse
 
