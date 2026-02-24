@@ -1,0 +1,66 @@
+﻿ApogeeVGC\Sim\BattleClasses\Battle.Logging.cs:102: public void AddWithPerspective(BattlePerspective perspective, params PartFuncUnion[] parts)
+ApogeeVGC\Sim\BattleClasses\Battle.Logging.cs:145: public void AddMove(params StringNumberDelegateObjectUnion[] args)
+ApogeeVGC\Sim\BattleClasses\Battle.Logging.cs:176: public void AttrLastMove(params StringNumberDelegateObjectUnion[] args)
+ApogeeVGC\Sim\BattleClasses\Battle.Logging.cs:261: AddSplit(side.Id, ["-hint", hint]);
+ApogeeVGC\Sim\BattleClasses\Battle.Logging.cs:272: public void AddSplit(SideId side, Part[] secret, Part[]? shared = null)
+ApogeeVGC\Sim\BattleClasses\BattleActions.HitSteps.cs:71: Battle.AttrLastMove("[miss]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.HitSteps.cs:142: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.HitSteps.cs:457: Battle.AttrLastMove("[miss]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.HitSteps.cs:587: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.HitSteps.cs:612: Battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(pokemon), move.Name,
+ApogeeVGC\Sim\BattleClasses\BattleActions.HitSteps.cs:723: Battle.AddMove("-anim",
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveEffects.cs:53: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveEffects.cs:73: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveEffects.cs:285: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveEffects.cs:447: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:92: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:156: Battle.AttrLastMove($"[spread] {string.Join(",", hitSlots)}");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:214: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:242: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:281: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:298: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:315: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.MoveHit.cs:548: Battle.AttrLastMove("[still]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.Moves.cs:444: Battle.AttrLastMove("[notarget]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.Moves.cs:514: Battle.AddMove("move", pokemon.ToString(), activeMove.Name, target?.ToString() ?? pokemon.ToString());
+ApogeeVGC\Sim\BattleClasses\BattleActions.Moves.cs:559: Battle.AttrLastMove("[notarget]");
+ApogeeVGC\Sim\BattleClasses\BattleActions.Switch.cs:180: Battle.AddWithPerspective(preSwitchPerspective, isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails,
+ApogeeVGC\Sim\BattleClasses\BattleActions.Switch.cs:185: Battle.AddWithPerspective(preSwitchPerspective, isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails);
+ApogeeVGC\Sim\PokemonClasses\Pokemon.Status.cs:68: Battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Abilities\AbilitiesABC.cs:338: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Abilities\AbilitiesDEF.cs:43: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Abilities\AbilitiesDEF.cs:148: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Abilities\AbilitiesGHI.cs:140: battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), move.Name);
+ApogeeVGC\Data\Abilities\AbilitiesGHI.cs:141: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Abilities\AbilitiesPQR.cs:778: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Conditions\ConditionsABC.cs:558: battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon),
+ApogeeVGC\Data\Conditions\ConditionsABC.cs:560: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Conditions\ConditionsDEF.cs:104: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Conditions\ConditionsPQR.cs:267: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Conditions\ConditionsPQR.cs:337: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Conditions\ConditionsSTU.cs:841: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Conditions\ConditionsSTU.cs:1531: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Items\ItemsPQR.cs:314: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Items\ItemsPQR.cs:315: battle.AddMove("-anim",
+ApogeeVGC\Data\Moves\MovesABC.cs:365: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesABC.cs:707: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesABC.cs:900: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesDEF.cs:576: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesDEF.cs:706: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesDEF.cs:1345: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesDEF.cs:1346: battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(attacker), move.Name,
+ApogeeVGC\Data\Moves\MovesDEF.cs:1918: battle.AttrLastMove("[anim] Fickle Beam All Out");
+ApogeeVGC\Data\Moves\MovesGHI.cs:959: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesGHI.cs:1534: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesGHI.cs:1539: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesGHI.cs:2080: battle.AttrLastMove($"[anim] Ivy Cudgel {move.Type}");
+ApogeeVGC\Data\Moves\MovesJKL.cs:710: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesPQR.cs:667: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesPQR.cs:697: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesSTU.cs:700: battle.AttrLastMove("[anim] Shell Side Arm " + move.Category);
+ApogeeVGC\Data\Moves\MovesSTU.cs:1653: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesSTU.cs:1654: battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(source),
+ApogeeVGC\Data\Moves\MovesSTU.cs:1725: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesSTU.cs:1726: battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(source),
+ApogeeVGC\Data\Moves\MovesSTU.cs:3623: battle.AttrLastMove("[still]");
+ApogeeVGC\Data\Moves\MovesSTU.cs:3747: battle.AttrLastMove("[anim] Tera Blast " + source.TeraType);
