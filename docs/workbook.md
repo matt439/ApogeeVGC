@@ -178,9 +178,9 @@
 
 ^ review moves SnipeShot to SoftBoiled
 
-@ review moves SolarBeam to Spark
+^ review moves SolarBeam to Spark
 
-review moves SparklingAria to SpinOut
+@ review moves SparklingAria to SpinOut
 
 review moves SpiritBreak to SpringtideStorm
 
