@@ -46,12 +46,16 @@ public partial class Battle
 
     public List<Pokemon> GetAllActive(bool includeFainted = false)
     {
-        List<Pokemon> pokemonList = [];
+        var pokemonList = new List<Pokemon>(Sides.Count * 2);
         foreach (Side side in Sides)
         {
-            pokemonList.AddRange(side.Active
-                .Where(pokemon => pokemon != null && (includeFainted || !pokemon.Fainted))
-                .Select(pokemon => pokemon!));
+            foreach (Pokemon? pokemon in side.Active)
+            {
+                if (pokemon != null && (includeFainted || !pokemon.Fainted))
+                {
+                    pokemonList.Add(pokemon);
+                }
+            }
         }
 
         return pokemonList;

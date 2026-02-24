@@ -32,11 +32,18 @@ public partial class Battle
 
         int sorted = 0;
 
+        // Stack-allocate the index buffer to avoid List<int> heap allocations.
+        // The buffer can never exceed list.Count (all elements tied).
+        Span<int> nextIndexes = list.Count <= 64
+            ? stackalloc int[list.Count]
+            : new int[list.Count];
+
         // Selection Sort with speed tie resolution
         while (sorted + 1 < list.Count)
         {
             // Start with the first unsorted element
-            List<int> nextIndexes = [sorted];
+            int nextCount = 1;
+            nextIndexes[0] = sorted;
 
             // Find all elements that should come next (including ties)
             for (int i = sorted + 1; i < list.Count; i++)
@@ -49,19 +56,20 @@ public partial class Battle
                         // Current element is already better, skip
                         continue;
                     case > 0:
-                        // Found a better element, start new list
-                        nextIndexes = [i];
+                        // Found a better element, reset to just this one
+                        nextCount = 1;
+                        nextIndexes[0] = i;
                         break;
                     // delta == 0
                     default:
-                        // Speed tie - add to list of tied elements
-                        nextIndexes.Add(i);
+                        // Speed tie - add to tied elements
+                        nextIndexes[nextCount++] = i;
                         break;
                 }
             }
 
             // Place the next elements in their sorted positions
-            for (int i = 0; i < nextIndexes.Count; i++)
+            for (int i = 0; i < nextCount; i++)
             {
                 int index = nextIndexes[i];
                 if (index != sorted + i)
@@ -75,12 +83,12 @@ public partial class Battle
 
             // If there are multiple elements with the same priority (speed ties),
             // shuffle them randomly to fairly resolve the tie
-            if (nextIndexes.Count > 1)
+            if (nextCount > 1)
             {
-                Prng.Shuffle(list, sorted, sorted + nextIndexes.Count);
+                Prng.Shuffle(list, sorted, sorted + nextCount);
             }
 
-            sorted += nextIndexes.Count;
+            sorted += nextCount;
         }
     }
 
