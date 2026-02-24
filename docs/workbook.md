@@ -162,9 +162,9 @@
 
 ^ review moves SacredFire to SandTomb
 
-@ review moves Scald to SeedBomb
+^ review moves Scald to SeedBomb
 
-review moves SeedFlare to ShadowPunch
+@ review moves SeedFlare to ShadowPunch
 
 review moves ShadowSneak to Shelter
 
