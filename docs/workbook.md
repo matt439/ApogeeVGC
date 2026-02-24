@@ -164,9 +164,9 @@
 
 ^ review moves Scald to SeedBomb
 
-@ review moves SeedFlare to ShadowPunch
+^ review moves SeedFlare to ShadowPunch
 
-review moves ShadowSneak to Shelter
+@ review moves ShadowSneak to Shelter
 
 review moves ShiftGear to Sing
 
