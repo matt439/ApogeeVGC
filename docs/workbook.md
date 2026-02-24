@@ -170,9 +170,9 @@
 
 ^ review moves ShiftGear to Sing
 
-@ review moves Sketch to SkitterSmack
+^ review moves Sketch to SkitterSmack
 
-review moves SkyAttack to SleepTalk
+@ review moves SkyAttack to SleepTalk
 
 review moves Sludge to Snarl
 
