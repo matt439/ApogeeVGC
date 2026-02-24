@@ -168,9 +168,9 @@
 
 ^ review moves ShadowSneak to Shelter
 
-@ review moves ShiftGear to Sing
+^ review moves ShiftGear to Sing
 
-review moves Sketch to SkitterSmack
+@ review moves Sketch to SkitterSmack
 
 review moves SkyAttack to SleepTalk
 
