@@ -392,7 +392,7 @@ public partial record Moves
                 {
                     // Base power scales with user's HP percentage
                     int bp = move.BasePower * source.Hp / source.MaxHp;
-                    battle.Debug($"[Water Spout] BP: {bp}");
+                    battle.Debug($"BP: {bp}");
                     return bp;
                 }),
                 Secondary = null,
