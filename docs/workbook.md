@@ -216,7 +216,7 @@
 
 ## MovesVWX
 
-review moves VacuumWave to Waterfall
+@ review moves VacuumWave to Waterfall
 
 review moves WaterGun to WaterSpout
 

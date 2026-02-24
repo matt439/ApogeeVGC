@@ -45,7 +45,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Wacan Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return DoubleVoidUnion.FromDouble(battle.FinalModify(damage));
+                                return new VoidReturn();
                             }
                         }
 
@@ -99,7 +99,7 @@ public partial record Items
                         user.BaseSpecies.Id == SpecieId.OgerponWellspringTera)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -190,11 +190,9 @@ public partial record Items
                         if (accuracy.HasValue)
                         {
                             battle.ChainModify([4505, 4096]);
-                            int result = battle.FinalModify(accuracy.Value);
-                            return DoubleVoidUnion.FromDouble(result);
                         }
 
-                        return DoubleVoidUnion.FromVoid();
+                        return new VoidReturn();
                     }, -2),
                 Num = 265,
                 Gen = 4,
@@ -250,7 +248,7 @@ public partial record Items
                     if (move.Category == MoveCategory.Special)
                     {
                         battle.ChainModify([4505, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;

@@ -50,16 +50,15 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, _, target, _) =>
+                OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, target, _) =>
                 {
                     // Double power if target is poisoned or badly poisoned
                     if (target.Status == ConditionId.Poison || target.Status == ConditionId.Toxic)
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(basePower);
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,

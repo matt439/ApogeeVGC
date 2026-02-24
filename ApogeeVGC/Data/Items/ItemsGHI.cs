@@ -140,7 +140,7 @@ public partial record Items
                         move.Type is MoveType.Ghost or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -174,7 +174,7 @@ public partial record Items
                         move.Type is MoveType.Ghost or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -207,7 +207,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Haban Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -228,7 +228,7 @@ public partial record Items
                     if (move.Type == MoveType.Rock)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -256,7 +256,7 @@ public partial record Items
                     if (user.BaseSpecies.Id is SpecieId.OgerponHearthflame or SpecieId.OgerponHearthflameTera)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -379,7 +379,7 @@ public partial record Items
                     if (move.Type == MoveType.Ice)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -419,7 +419,7 @@ public partial record Items
                     if (move.Type == MoveType.Bug)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -461,7 +461,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 Num = 278,
                 Gen = 4,
@@ -477,7 +477,7 @@ public partial record Items
                     if (move.Type == MoveType.Steel)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;

@@ -132,7 +132,7 @@ public partial record Conditions
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.25);
-                    return battle.FinalModify(spe);
+                    return new VoidReturn();
                 }),
                 OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
                 {

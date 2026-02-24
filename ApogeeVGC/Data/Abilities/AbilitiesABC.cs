@@ -77,7 +77,7 @@ public partial record Abilities
                         if (move.TypeChangerBoosted == battle.Effect)
                         {
                             battle.ChainModify([4915, 4096]);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
 
                         return basePower;
@@ -151,7 +151,7 @@ public partial record Abilities
                         {
                             battle.Debug("Analytic boost");
                             battle.ChainModify([5325, 4096]);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
 
                         return basePower;
@@ -528,7 +528,7 @@ public partial record Abilities
                         {
                             battle.Debug("Battery boost");
                             battle.ChainModify([5325, 4096]);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
 
                         return basePower;
@@ -608,7 +608,7 @@ public partial record Abilities
                     if (move.RuinedSpD != abilityHolder) return spd;
                     battle.Debug("Beads of Ruin SpD drop");
                     battle.ChainModify(0.75);
-                    return battle.FinalModify(spd);
+                    return new VoidReturn();
                 }),
             },
             [AbilityId.BeastBoost] = new()
@@ -724,7 +724,7 @@ public partial record Abilities
                     {
                         battle.Debug("Blaze boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -736,7 +736,7 @@ public partial record Abilities
                     {
                         battle.Debug("Blaze boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -796,7 +796,7 @@ public partial record Abilities
                     if (sunnyWeathers.Contains(pokemon.EffectiveWeather()))
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;

@@ -42,7 +42,7 @@ public sealed record OnWeatherModifyDamageEventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
-                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    DoubleDoubleVoidUnion => null,
                     VoidDoubleVoidUnion => null,
                     _ => null
                 };

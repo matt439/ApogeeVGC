@@ -46,7 +46,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Passho Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -79,7 +79,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Payapa Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -175,7 +175,7 @@ public partial record Items
                     if (move.Type == MoveType.Fairy)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -211,7 +211,7 @@ public partial record Items
                     if (move.Type == MoveType.Poison)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -250,7 +250,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 Num = 293,
                 Gen = 4,
@@ -265,7 +265,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 Num = 292,
                 Gen = 4,
@@ -280,7 +280,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 Num = 290,
                 Gen = 4,
@@ -295,7 +295,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 Num = 289,
                 Gen = 4,
@@ -334,7 +334,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 Num = 291,
                 Gen = 4,
@@ -349,7 +349,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(0.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 Num = 294,
                 Gen = 4,
@@ -440,7 +440,7 @@ public partial record Items
                     {
                         battle.Debug("Punching Glove boost");
                         battle.ChainModify([4506, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -678,7 +678,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Rindo Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -767,7 +767,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Roseli Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 

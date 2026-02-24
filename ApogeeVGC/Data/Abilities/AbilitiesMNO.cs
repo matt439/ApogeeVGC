@@ -201,7 +201,7 @@ public partial record Abilities
                     if (pokemon.Status != ConditionId.None)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(def);
+                        return new VoidReturn();
                     }
 
                     return def;
@@ -219,7 +219,7 @@ public partial record Abilities
                     if (move.Flags.Pulse == true)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -348,7 +348,7 @@ public partial record Abilities
                             allyActive.HasAbility(AbilityId.Plus))
                         {
                             battle.ChainModify(1.5);
-                            return battle.FinalModify(spa);
+                            return new VoidReturn();
                         }
                     }
 
@@ -516,7 +516,7 @@ public partial record Abilities
                         {
                             battle.Debug("Multiscale weaken");
                             battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -721,7 +721,7 @@ public partial record Abilities
                     if (target.GetMoveHitData(move).TypeMod > 0)
                     {
                         battle.ChainModify([5120, 4096]);
-                        return battle.FinalModify(damage);
+                        return new VoidReturn();
                     }
 
                     return damage;
@@ -902,7 +902,7 @@ public partial record Abilities
                     if (move.TypeChangerBoosted == battle.Effect)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -1061,7 +1061,7 @@ public partial record Abilities
                     {
                         battle.Debug("Orichalcum boost");
                         battle.ChainModify([5461, 4096]);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -1103,7 +1103,7 @@ public partial record Abilities
                     {
                         battle.Debug("Overgrow boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -1115,7 +1115,7 @@ public partial record Abilities
                     {
                         battle.Debug("Overgrow boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;

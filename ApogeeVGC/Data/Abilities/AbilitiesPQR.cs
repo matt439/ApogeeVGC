@@ -229,7 +229,7 @@ public partial record Abilities
                     if (move.TypeChangerBoosted == battle.Effect)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -250,7 +250,7 @@ public partial record Abilities
                             allyActive.HasAbility(AbilityId.Plus))
                         {
                             battle.ChainModify(1.5);
-                            return battle.FinalModify(spa);
+                            return new VoidReturn();
                         }
                     }
 
@@ -413,7 +413,7 @@ public partial record Abilities
                         {
                             battle.Debug("Power Spot boost");
                             battle.ChainModify([5325, 4096]);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
 
                         return basePower;
@@ -501,7 +501,7 @@ public partial record Abilities
                         {
                             battle.Debug("Prism Armor neutralize");
                             battle.ChainModify(0.75);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -621,7 +621,7 @@ public partial record Abilities
                     {
                         battle.Debug("Punk Rock boost");
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -633,7 +633,7 @@ public partial record Abilities
                         {
                             battle.Debug("Punk Rock weaken");
                             battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -649,7 +649,7 @@ public partial record Abilities
                 OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
                 {
                     battle.ChainModify(2);
-                    return battle.FinalModify(atk);
+                    return new VoidReturn();
                 }, 5),
             },
             [AbilityId.PurifyingSalt] = new()
@@ -685,7 +685,7 @@ public partial record Abilities
                     {
                         battle.Debug("Purifying Salt weaken");
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -697,7 +697,7 @@ public partial record Abilities
                     {
                         battle.Debug("Purifying Salt weaken");
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -814,7 +814,7 @@ public partial record Abilities
                     if (pokemon.Status != ConditionId.None)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;
@@ -894,7 +894,7 @@ public partial record Abilities
                     {
                         battle.Debug("Reckless boost");
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -929,7 +929,7 @@ public partial record Abilities
                     if (move.TypeChangerBoosted == battle.Effect)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -965,7 +965,7 @@ public partial record Abilities
                         if (effect is Item { IsBerry: true })
                         {
                             battle.ChainModify(2);
-                            return new IntRelayVar(battle.FinalModify(damage));
+                            return null;
                         }
 
                         return new IntRelayVar(damage);
@@ -990,7 +990,7 @@ public partial record Abilities
                         {
                             target.AbilityState.BerryWeaken = false;
                             battle.ChainModify(0.5);
-                            return DoubleVoidUnion.FromDouble(battle.FinalModify(damage));
+                            return new VoidReturn();
                         }
 
                         return DoubleVoidUnion.FromVoid();
@@ -1031,13 +1031,13 @@ public partial record Abilities
                         {
                             battle.Debug("Rivalry boost");
                             battle.ChainModify(1.25);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
                         else
                         {
                             battle.Debug("Rivalry weaken");
                             battle.ChainModify(0.75);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
                     }
 
@@ -1094,7 +1094,7 @@ public partial record Abilities
                     {
                         battle.Debug("Rocky Payload boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -1106,7 +1106,7 @@ public partial record Abilities
                     {
                         battle.Debug("Rocky Payload boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;

@@ -42,7 +42,7 @@ public partial record Abilities
                     if (move.RuinedSpA != abilityHolder) return spa;
                     battle.Debug("Vessel of Ruin SpA drop");
                     battle.ChainModify(0.75);
-                    return battle.FinalModify(spa);
+                    return new VoidReturn();
                 }),
             },
             [AbilityId.VictoryStar] = new()
@@ -208,7 +208,7 @@ public partial record Abilities
                     if (move.Type == MoveType.Fire)
                     {
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -219,7 +219,7 @@ public partial record Abilities
                     if (move.Type == MoveType.Fire)
                     {
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -229,7 +229,7 @@ public partial record Abilities
                     if (move.Type == MoveType.Water)
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -239,7 +239,7 @@ public partial record Abilities
                     if (move.Type == MoveType.Water)
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;

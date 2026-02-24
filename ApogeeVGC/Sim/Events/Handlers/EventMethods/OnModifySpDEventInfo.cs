@@ -47,7 +47,7 @@ bool usesSpeed = true)
  );
      return result switch
        {
-    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+    DoubleDoubleVoidUnion => null,
        VoidDoubleVoidUnion => null,
   _ => null
        };

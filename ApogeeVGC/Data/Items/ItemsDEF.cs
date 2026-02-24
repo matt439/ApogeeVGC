@@ -79,7 +79,7 @@ public partial record Items
                     if (move.Type == MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -110,7 +110,7 @@ public partial record Items
                     if (move.Type == MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -138,7 +138,7 @@ public partial record Items
                     if (move.Type == MoveType.Dark)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -207,7 +207,7 @@ public partial record Items
                     if (move.Type == MoveType.Ground)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -427,7 +427,7 @@ public partial record Items
                     if (pokemon.BaseSpecies.Nfe)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(def);
+                        return new VoidReturn();
                     }
 
                     return def;
@@ -437,7 +437,7 @@ public partial record Items
                     if (pokemon.BaseSpecies.Nfe)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spd);
+                        return new VoidReturn();
                     }
 
                     return spd;
@@ -457,7 +457,7 @@ public partial record Items
                         if (move != null && target.GetMoveHitData(move).TypeMod > 0)
                         {
                             battle.ChainModify([4915, 4096]);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -478,7 +478,7 @@ public partial record Items
                     if (move is { Type: MoveType.Fairy })
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -557,7 +557,7 @@ public partial record Items
                     if (move is { Type: MoveType.Fighting })
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -609,7 +609,7 @@ public partial record Items
                     if (move is { Type: MoveType.Fire })
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;

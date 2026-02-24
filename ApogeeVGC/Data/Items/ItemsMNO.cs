@@ -43,7 +43,7 @@ public partial record Items
                     if (move.Type == MoveType.Electric)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -151,7 +151,7 @@ public partial record Items
                     if (move.Type == MoveType.Grass)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -257,7 +257,7 @@ public partial record Items
                     if (move.Type == MoveType.Steel)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -313,7 +313,7 @@ public partial record Items
                     if (move.Type == MoveType.Psychic)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -344,7 +344,7 @@ public partial record Items
                     if (move.Type == MoveType.Grass)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -481,7 +481,7 @@ public partial record Items
                     if (move.Category == MoveCategory.Physical)
                     {
                         battle.ChainModify([4505, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -500,7 +500,7 @@ public partial record Items
                     if (move.Type == MoveType.Water)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -540,7 +540,7 @@ public partial record Items
                     if (move.Type == MoveType.Ice)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -603,7 +603,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Occa Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 

@@ -98,7 +98,7 @@ public partial record Conditions
                                     battle.ChainModify(0.5);
                                 }
 
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 

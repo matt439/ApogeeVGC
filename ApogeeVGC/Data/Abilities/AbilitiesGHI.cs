@@ -70,7 +70,7 @@ public partial record Abilities
                     if (move.TypeChangerBoosted == battle.Effect)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -157,7 +157,7 @@ public partial record Abilities
                 {
                     battle.Debug("Gorilla Tactics Atk Boost");
                     battle.ChainModify(1.5);
-                    return battle.FinalModify(atk);
+                    return new VoidReturn();
                 }, 1),
                 OnDisableMove = OnDisableMoveEventInfo.Create((battle, pokemon) =>
                 {
@@ -193,7 +193,7 @@ public partial record Abilities
                     if (battle.Field.IsTerrain(ConditionId.GrassyTerrain, null))
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(def);
+                        return new VoidReturn();
                     }
 
                     return def;
@@ -304,7 +304,7 @@ public partial record Abilities
                     if (pokemon.Status != ConditionId.None)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -337,7 +337,7 @@ public partial record Abilities
                             return spa;
                         battle.Debug("Hadron Engine boost");
                         battle.ChainModify([5461, 4096]);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     },
                     5),
             },
@@ -400,7 +400,7 @@ public partial record Abilities
                     {
                         battle.Debug("Heatproof Atk weaken");
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -412,7 +412,7 @@ public partial record Abilities
                     {
                         battle.Debug("Heatproof SpA weaken");
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -471,7 +471,7 @@ public partial record Abilities
                 OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
                 {
                     battle.ChainModify(2);
-                    return battle.FinalModify(atk);
+                    return new VoidReturn();
                 }, 5),
             },
             [AbilityId.HungerSwitch] = new()
@@ -683,7 +683,7 @@ public partial record Abilities
                         if (move.Category == MoveCategory.Special)
                         {
                             battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -977,7 +977,7 @@ public partial record Abilities
                     {
                         battle.Debug("Iron Fist boost");
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;

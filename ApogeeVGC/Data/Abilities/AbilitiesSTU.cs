@@ -41,7 +41,7 @@ public partial record Abilities
                         {
                             battle.Debug("Sand Force boost");
                             battle.ChainModify([5325, 4096]);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
                     }
 
@@ -68,7 +68,7 @@ public partial record Abilities
                     if (battle.Field.IsWeather(ConditionId.Sandstorm))
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;
@@ -348,7 +348,7 @@ public partial record Abilities
                         {
                             battle.Debug("Shadow Shield weaken");
                             battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -404,7 +404,7 @@ public partial record Abilities
                     {
                         battle.Debug("Sharpness boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -450,7 +450,7 @@ public partial record Abilities
                     if (move.HasSheerForce == true)
                     {
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -628,7 +628,7 @@ public partial record Abilities
                     if (battle.EffectState.Counter != null)
                     {
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -638,7 +638,7 @@ public partial record Abilities
                     if (battle.EffectState.Counter != null)
                     {
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;
@@ -655,7 +655,7 @@ public partial record Abilities
                     if (battle.Field.IsWeather(ConditionId.Snowscape))
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;
@@ -673,7 +673,7 @@ public partial record Abilities
                     {
                         battle.Debug("Sniper boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(damage);
+                        return new VoidReturn();
                     }
 
                     return damage;
@@ -727,7 +727,7 @@ public partial record Abilities
                     if (effectiveWeather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -755,7 +755,7 @@ public partial record Abilities
                         {
                             battle.Debug("Solid Rock neutralize");
                             battle.ChainModify(0.75);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -840,7 +840,7 @@ public partial record Abilities
                     {
                         battle.Debug("Stakeout boost");
                         battle.ChainModify(2);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -852,7 +852,7 @@ public partial record Abilities
                     {
                         battle.Debug("Stakeout boost");
                         battle.ChainModify(2);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -985,7 +985,7 @@ public partial record Abilities
                     {
                         battle.Debug("Steelworker boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -997,7 +997,7 @@ public partial record Abilities
                     {
                         battle.Debug("Steelworker boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -1016,7 +1016,7 @@ public partial record Abilities
                     {
                         battle.Debug("Steely Spirit boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -1134,7 +1134,7 @@ public partial record Abilities
                     if (move.Flags.Bite == true)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -1249,7 +1249,7 @@ public partial record Abilities
                         int[] powMod = [4096, 4506, 4915, 5325, 5734, 6144];
                         battle.Debug($"Supreme Overlord boost: {powMod[fallen]}/4096");
                         battle.ChainModify([powMod[fallen], 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -1266,7 +1266,7 @@ public partial record Abilities
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;
@@ -1285,7 +1285,7 @@ public partial record Abilities
                     {
                         battle.Debug("Swarm boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -1297,7 +1297,7 @@ public partial record Abilities
                     {
                         battle.Debug("Swarm boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -1363,7 +1363,7 @@ public partial record Abilities
                     if (effectiveWeather is ConditionId.RainDance or ConditionId.PrimordialSea)
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;
@@ -1393,7 +1393,7 @@ public partial record Abilities
                     if (move.RuinedDef != abilityHolder) return def;
                     battle.Debug("Sword of Ruin Def drop");
                     battle.ChainModify(0.75);
-                    return battle.FinalModify(def);
+                    return new VoidReturn();
                 }),
             },
             [AbilityId.Symbiosis] = new()
@@ -1470,7 +1470,7 @@ public partial record Abilities
                     if (move.RuinedAtk != abilityHolder) return atk;
                     battle.Debug("Tablets of Ruin Atk drop");
                     battle.ChainModify(0.75);
-                    return battle.FinalModify(atk);
+                    return new VoidReturn();
                 }),
             },
             [AbilityId.TangledFeet] = new()
@@ -1527,7 +1527,7 @@ public partial record Abilities
                     {
                         battle.Debug("Technician boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -1689,7 +1689,7 @@ public partial record Abilities
                     {
                         battle.Debug("Thick Fat weaken");
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -1701,7 +1701,7 @@ public partial record Abilities
                     {
                         battle.Debug("Thick Fat weaken");
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -1719,7 +1719,7 @@ public partial record Abilities
                     {
                         battle.Debug("Tinted Lens boost");
                         battle.ChainModify(2);
-                        return battle.FinalModify(damage);
+                        return new VoidReturn();
                     }
 
                     return damage;
@@ -1738,7 +1738,7 @@ public partial record Abilities
                     {
                         battle.Debug("Torrent boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -1750,7 +1750,7 @@ public partial record Abilities
                     {
                         battle.Debug("Torrent boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -1768,7 +1768,7 @@ public partial record Abilities
                     if (move.Flags.Contact == true)
                     {
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -1787,7 +1787,7 @@ public partial record Abilities
                         move.Category == MoveCategory.Physical)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -1895,7 +1895,7 @@ public partial record Abilities
                     {
                         battle.Debug("Transistor boost");
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -1907,7 +1907,7 @@ public partial record Abilities
                     {
                         battle.Debug("Transistor boost");
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;

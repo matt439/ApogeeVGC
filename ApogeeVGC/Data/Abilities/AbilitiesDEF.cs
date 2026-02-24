@@ -103,7 +103,7 @@ public partial record Abilities
                         if (move.AuraBooster != abilityHolder) return basePower;
 
                         battle.ChainModify(move.HasAuraBreak == true ? [3072, 4096] : [5448, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }, 20),
             },
             [AbilityId.DauntlessShield] = new()
@@ -166,7 +166,7 @@ public partial record Abilities
                     if (pokemon.Hp <= pokemon.MaxHp / 2)
                     {
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -177,7 +177,7 @@ public partial record Abilities
                     if (pokemon.Hp <= pokemon.MaxHp / 2)
                     {
                         battle.ChainModify(0.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -403,7 +403,7 @@ public partial record Abilities
                     {
                         battle.Debug("Dragon's Maw boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -415,7 +415,7 @@ public partial record Abilities
                     {
                         battle.Debug("Dragon's Maw boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -474,7 +474,7 @@ public partial record Abilities
                         if (move.Type == MoveType.Fire)
                         {
                             battle.ChainModify(1.25);
-                            return battle.FinalModify(basePower);
+                            return new VoidReturn();
                         }
 
                         return basePower;
@@ -732,7 +732,7 @@ public partial record Abilities
                         if (move.AuraBooster != abilityHolder) return basePower;
 
                         battle.ChainModify(move.HasAuraBreak == true ? [3072, 4096] : [5448, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }, 20),
             },
             [AbilityId.Filter] = new()
@@ -749,7 +749,7 @@ public partial record Abilities
                         {
                             battle.Debug("Filter neutralize");
                             battle.ChainModify(0.75);
-                            return battle.FinalModify(damage);
+                            return new VoidReturn();
                         }
 
                         return damage;
@@ -784,7 +784,7 @@ public partial record Abilities
                         move.Category == MoveCategory.Special)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -908,7 +908,7 @@ public partial record Abilities
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -926,7 +926,7 @@ public partial record Abilities
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spd);
+                        return new VoidReturn();
                     }
 
                     return spd;
@@ -1064,7 +1064,7 @@ public partial record Abilities
                         if (move.Type == MoveType.Fire) mod *= 2;
                         if (move.Flags.Contact == true) mod /= 2;
                         battle.ChainModify(mod);
-                        return battle.FinalModify(damage);
+                        return new VoidReturn();
                     }),
             },
             [AbilityId.Forecast] = new()
@@ -1185,7 +1185,7 @@ public partial record Abilities
                     {
                         battle.Debug("Friend Guard weaken");
                         battle.ChainModify(0.75);
-                        return battle.FinalModify(damage);
+                        return new VoidReturn();
                     }
 
                     return damage;
@@ -1279,7 +1279,7 @@ public partial record Abilities
                 OnModifyDef = OnModifyDefEventInfo.Create((battle, def, _, _, _) =>
                 {
                     battle.ChainModify(2);
-                    return battle.FinalModify(def);
+                    return new VoidReturn();
                 }, 6),
             },
         };

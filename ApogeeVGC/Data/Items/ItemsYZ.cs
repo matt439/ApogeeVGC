@@ -39,7 +39,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Yache Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -62,7 +62,7 @@ public partial record Items
                     if (move.Type == MoveType.Electric)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -98,11 +98,9 @@ public partial record Items
                         {
                             battle.Debug("Zoom Lens boosting accuracy");
                             battle.ChainModify([4915, 4096]);
-                            int result = battle.FinalModify(accuracy.Value);
-                            return DoubleVoidUnion.FromDouble(result);
                         }
 
-                        return DoubleVoidUnion.FromVoid();
+                        return new VoidReturn();
                     }, -2),
                 Num = 276,
                 Gen = 4,

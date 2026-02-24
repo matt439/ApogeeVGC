@@ -46,7 +46,7 @@ public sealed record OnModifyDamagePhase2EventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
-                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    DoubleDoubleVoidUnion => null,
                     VoidDoubleVoidUnion => null,
                     _ => null
                 };

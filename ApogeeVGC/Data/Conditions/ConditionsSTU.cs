@@ -1062,7 +1062,7 @@ public partial record Conditions
                     // Tailwind doubles speed using chain modification
                     battle.ChainModify(2);
                     // Apply the accumulated modifier to the speed value
-                    return battle.FinalModify(spe);
+                    return new VoidReturn();
                 }),
                 //OnSideResidualOrder = 26,
                 //OnSideResidualSubOrder = 5,
@@ -1576,7 +1576,7 @@ public partial record Conditions
                     if (pokemon.Item == ItemId.None && !pokemon.IgnoringAbility())
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spe);
+                        return new VoidReturn();
                     }
 
                     return spe;

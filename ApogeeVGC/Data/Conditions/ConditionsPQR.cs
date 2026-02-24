@@ -481,7 +481,7 @@ public partial record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     },
                     5),
                 // OnModifyDefPriority = 6
@@ -499,7 +499,7 @@ public partial record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(def);
+                        return new VoidReturn();
                     },
                     6),
                 // OnModifySpAPriority = 5
@@ -517,7 +517,7 @@ public partial record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     },
                     5),
                 // OnModifySpDPriority = 6
@@ -535,7 +535,7 @@ public partial record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(spd);
+                        return new VoidReturn();
                     },
                     6),
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, pokemon) =>
@@ -552,7 +552,7 @@ public partial record Conditions
                     }
 
                     battle.ChainModify(1.5);
-                    return battle.FinalModify(spe);
+                    return new VoidReturn();
                 }),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
@@ -733,7 +733,7 @@ public partial record Conditions
 
                         battle.Debug("Quark Drive atk boost");
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     },
                     5),
                 //OnModifyDefPriority = 6,
@@ -747,7 +747,7 @@ public partial record Conditions
 
                         battle.Debug("Quark Drive def boost");
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(def);
+                        return new VoidReturn();
                     },
                     6),
                 //OnModifySpAPriority = 5,
@@ -761,7 +761,7 @@ public partial record Conditions
 
                         battle.Debug("Quark Drive spa boost");
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     },
                     5),
                 //OnModifySpDPriority = 6,
@@ -775,7 +775,7 @@ public partial record Conditions
 
                         battle.Debug("Quark Drive spd boost");
                         battle.ChainModify([5325, 4096]);
-                        return battle.FinalModify(spd);
+                        return new VoidReturn();
                     },
                     6),
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, pokemon) =>
@@ -787,7 +787,7 @@ public partial record Conditions
                     }
 
                     battle.ChainModify(1.5);
-                    return battle.FinalModify(spe);
+                    return new VoidReturn();
                 }),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
@@ -1037,7 +1037,7 @@ public partial record Conditions
                                     battle.ChainModify(0.5);
                                 }
 
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 

@@ -72,7 +72,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Kasib Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -104,7 +104,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Kebia Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -332,7 +332,7 @@ public partial record Items
                     OnModifyDamageEventInfo.Create((battle, damage, _, _, _) =>
                     {
                         battle.ChainModify([5324, 4096]);
-                        return battle.FinalModify(damage);
+                        return new VoidReturn();
                     }),
                 OnAfterMoveSecondarySelf =
                     OnAfterMoveSecondarySelfEventInfo.Create((battle, source, target, move) =>
@@ -364,7 +364,7 @@ public partial record Items
                     if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Pikachu)
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -375,7 +375,7 @@ public partial record Items
                     if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Pikachu)
                     {
                         battle.ChainModify(2);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;
@@ -493,7 +493,7 @@ public partial record Items
                         move.Type is MoveType.Water or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -527,7 +527,7 @@ public partial record Items
                         move.Type is MoveType.Water or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;

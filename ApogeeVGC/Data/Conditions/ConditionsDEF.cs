@@ -799,7 +799,7 @@ public partial record Conditions
                     {
                         battle.Debug("Flash Fire boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(atk);
+                        return new VoidReturn();
                     }
 
                     return atk;
@@ -811,7 +811,7 @@ public partial record Conditions
                     {
                         battle.Debug("Flash Fire boost");
                         battle.ChainModify(1.5);
-                        return battle.FinalModify(spa);
+                        return new VoidReturn();
                     }
 
                     return spa;

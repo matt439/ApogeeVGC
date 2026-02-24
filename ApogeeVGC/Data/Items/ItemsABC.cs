@@ -76,7 +76,7 @@ public partial record Items
                         move.Type is MoveType.Steel or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -110,7 +110,7 @@ public partial record Items
                         move.Type is MoveType.Steel or MoveType.Dragon)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -285,7 +285,7 @@ public partial record Items
                 OnModifySpD = OnModifySpDEventInfo.Create((battle, spd, _, _, _) =>
                 {
                     battle.ChainModify(1.5);
-                    return battle.FinalModify(spd);
+                    return new VoidReturn();
                 }, 1),
                 OnDisableMove = OnDisableMoveEventInfo.Create((_, pokemon) =>
                 {
@@ -333,7 +333,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Babiri Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -406,7 +406,7 @@ public partial record Items
                         if (isBigRootHeal)
                         {
                             battle.ChainModify([5324, 4096]);
-                            return new IntRelayVar(battle.FinalModify(damage));
+                            return null;
                         }
 
                         // Return null to match TS undefined - "don't modify, pass through"
@@ -436,7 +436,7 @@ public partial record Items
                     if (move.Type == MoveType.Fighting)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -455,7 +455,7 @@ public partial record Items
                     if (move.Type == MoveType.Dark)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -584,7 +584,7 @@ public partial record Items
                     if (move.Type == MoveType.Fire)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -614,7 +614,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Charti Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -692,7 +692,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Chilan Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -733,7 +733,7 @@ public partial record Items
                 OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
                 {
                     battle.ChainModify(1.5);
-                    return battle.FinalModify(atk);
+                    return new VoidReturn();
                 }, 1),
                 IsChoice = true,
                 Num = 220,
@@ -761,7 +761,7 @@ public partial record Items
                 OnModifySpe = OnModifySpeEventInfo.Create((battle, spe, _) =>
                 {
                     battle.ChainModify(1.5);
-                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                    return new VoidReturn();
                 }),
                 IsChoice = true,
                 Num = 287,
@@ -792,7 +792,7 @@ public partial record Items
                 OnModifySpA = OnModifySpAEventInfo.Create((battle, spa, _, _, _) =>
                 {
                     battle.ChainModify(1.5);
-                    return battle.FinalModify(spa);
+                    return new VoidReturn();
                 }, 1),
                 IsChoice = true,
                 Num = 297,
@@ -821,7 +821,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Chople Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -947,7 +947,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Coba Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -979,7 +979,7 @@ public partial record Items
                                 battle.Debug("-50% reduction");
                                 battle.Add("-enditem", target, "item: Colbur Berry", "[weaken]");
                                 battle.ChainModify(0.5);
-                                return battle.FinalModify(damage);
+                                return new VoidReturn();
                             }
                         }
 
@@ -1002,7 +1002,7 @@ public partial record Items
                         user.BaseSpecies.Id == SpecieId.OgerponCornerstoneTera)
                     {
                         battle.ChainModify([4915, 4096]);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;

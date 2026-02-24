@@ -147,7 +147,7 @@ public partial record Moves
                     if (item.Id != ItemId.None)
                     {
                         battle.ChainModify(3, 2); // 1.5x
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
@@ -210,7 +210,7 @@ public partial record Moves
                     {
                         battle.Debug("lashout buff");
                         battle.ChainModify(2);
-                        return battle.FinalModify(basePower);
+                        return new VoidReturn();
                     }
 
                     return basePower;
