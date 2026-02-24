@@ -47,6 +47,10 @@ public partial class Battle
 
     public void Add(params PartFuncUnion[] parts)
     {
+        LogMessageCount++;
+
+        if (!DisplayUi) return;
+
         // Full observability mode: no secret/shared split needed
         // All information is visible to both sides
 
@@ -72,24 +76,21 @@ public partial class Battle
         string message = $"|{string.Join("|", formattedParts)}";
         Log.Add(message);
 
-        // NEW: Capture perspective immediately when message is added
-        if (DisplayUi)
+        // Capture perspective immediately when message is added
+        BattleMessage? parsed = ParseSingleLogEntry(message);
+        if (parsed != null)
         {
-            BattleMessage? parsed = ParseSingleLogEntry(message);
-            if (parsed != null)
+            BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+                ? BattlePerspectiveType.TeamPreview
+                : BattlePerspectiveType.InBattle;
+
+            BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
+
+            PendingEvents.Add(new BattleEvent
             {
-                BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
-                    ? BattlePerspectiveType.TeamPreview
-                    : BattlePerspectiveType.InBattle;
-
-                BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
-
-                PendingEvents.Add(new BattleEvent
-                {
-                    Message = parsed,
-                    Perspective = perspective // Captured NOW, not later!
-                });
-            }
+                Message = parsed,
+                Perspective = perspective
+            });
         }
     }
 
@@ -100,6 +101,10 @@ public partial class Battle
     /// </summary>
     public void AddWithPerspective(BattlePerspective perspective, params PartFuncUnion[] parts)
     {
+        LogMessageCount++;
+
+        if (!DisplayUi) return;
+
         // Full observability mode: no secret/shared split needed
         // All information is visible to both sides
 
@@ -126,22 +131,23 @@ public partial class Battle
         Log.Add(message);
 
         // Use the provided pre-captured perspective
-        if (DisplayUi)
+        BattleMessage? parsed = ParseSingleLogEntry(message);
+        if (parsed != null)
         {
-            BattleMessage? parsed = ParseSingleLogEntry(message);
-            if (parsed != null)
+            PendingEvents.Add(new BattleEvent
             {
-                PendingEvents.Add(new BattleEvent
-                {
-                    Message = parsed,
-                    Perspective = perspective // Use pre-captured perspective!
-                });
-            }
+                Message = parsed,
+                Perspective = perspective
+            });
         }
     }
 
     public void AddMove(params StringNumberDelegateObjectUnion[] args)
     {
+        LogMessageCount++;
+
+        if (!DisplayUi) return;
+
         // Track this line's position for later attribute additions
         LastMoveLine = Log.Count;
 
@@ -149,31 +155,28 @@ public partial class Battle
         string message = $"|{string.Join("|", args.Select(FormatArg))}";
         Log.Add(message);
 
-        // ALSO parse and create battle event for GUI animations
-        if (DisplayUi)
+        // Parse and create battle event for GUI animations
+        BattleMessage? parsed = ParseSingleLogEntry(message);
+        if (parsed != null)
         {
-            BattleMessage? parsed = ParseSingleLogEntry(message);
-            if (parsed != null)
+            BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+                ? BattlePerspectiveType.TeamPreview
+                : BattlePerspectiveType.InBattle;
+
+            BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
+
+            PendingEvents.Add(new BattleEvent
             {
-                BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
-                    ? BattlePerspectiveType.TeamPreview
-                    : BattlePerspectiveType.InBattle;
-
-                BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
-
-                PendingEvents.Add(new BattleEvent
-                {
-                    Message = parsed,
-                    Perspective = perspective
-                });
-            }
+                Message = parsed,
+                Perspective = perspective
+            });
         }
     }
 
     public void AttrLastMove(params StringNumberDelegateObjectUnion[] args)
     {
-        // No last move to attribute to
-        if (LastMoveLine < 0) return;
+        // No last move to attribute to, or no UI to display
+        if (LastMoveLine < 0 || !DisplayUi) return;
 
         // Special handling for animation lines with [still]
         if (Log[LastMoveLine].StartsWith("|-anim|"))
@@ -268,6 +271,23 @@ public partial class Battle
 
     public void AddSplit(SideId side, Part[] secret, Part[]? shared = null)
     {
+        if (!DisplayUi)
+        {
+            // Add() already increments LogMessageCount for secret/shared parts;
+            // count the split-marker and possible empty-shared line here.
+            LogMessageCount++;
+            Add(secret.Select(p => (PartFuncUnion)p).ToArray());
+            if (shared is { Length: > 0 })
+            {
+                Add(shared.Select(p => (PartFuncUnion)p).ToArray());
+            }
+            else
+            {
+                LogMessageCount++;
+            }
+            return;
+        }
+
         // Add the split marker with the side ID (lowercase)
         Log.Add($"|split|{side.GetSideIdName()}");
 
@@ -288,7 +308,7 @@ public partial class Battle
     public void SendUpdates()
     {
         // Don't send if there are no new log entries
-        if (SentLogPos >= Log.Count) return;
+        if (SentLogPos >= LogMessageCount) return;
 
         // Send requests to players if not already sent
         if (!SentRequests)
@@ -301,7 +321,7 @@ public partial class Battle
         }
 
         // Update the position marker
-        SentLogPos = Log.Count;
+        SentLogPos = LogMessageCount;
 
         // Send end-of-battle summary if battle ended and not already sent
         if (!SentEnd && Ended)

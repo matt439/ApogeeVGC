@@ -39,7 +39,7 @@ public partial class Battle
         }
 
         // Check for infinite loop
-        if (Log.Count - SentLogPos > 5000)
+        if (LogMessageCount - SentLogPos > 5000)
         {
             if (DisplayUi)
             {

@@ -247,8 +247,8 @@ public partial class Battle
     /// <param name="newTarget">The new target Pokémon to display in the move log</param>
     public void RetargetLastMove(Pokemon newTarget)
     {
-        // No last move to retarget
-        if (LastMoveLine < 0) return;
+        // No last move to retarget, or no UI to display
+        if (LastMoveLine < 0 || !DisplayUi) return;
 
         // Parse the log line (format: |move|attacker|moveName|target|...)
         string[] parts = Log[LastMoveLine].Split('|');

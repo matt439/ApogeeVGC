@@ -79,6 +79,13 @@ public partial class Battle
     public List<string> Log { get; set; } = [];
     public List<string> InputLog { get; set; } = [];
 
+    /// <summary>
+    /// Lightweight counter tracking the number of log entries that would have been added.
+    /// Used for safety checks (infinite-loop detection) when DisplayUi is false to avoid
+    /// expensive string formatting.
+    /// </summary>
+    public int LogMessageCount { get; set; }
+
     // Note: MessageLog is commented out as it's not currently used in this implementation.
     // It was part of the original Pokemon Showdown codebase but isn't required for our battle system.
     // Uncomment if you need separate message logging for debugging or replay purposes.

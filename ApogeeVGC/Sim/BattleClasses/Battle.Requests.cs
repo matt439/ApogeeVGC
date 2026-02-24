@@ -550,7 +550,7 @@ public partial class Battle
         }
 
         // Workaround for tests - send updates if log is getting large
-        if (Log.Count - SentLogPos > 500)
+        if (LogMessageCount - SentLogPos > 500)
         {
             SendUpdates();
         }
