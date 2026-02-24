@@ -194,9 +194,9 @@
 
 ^ review moves Superpower to SweetScent
 
-@ review moves Swift to SyrupBomb
+^ review moves Swift to SyrupBomb
 
-review moves TachyonCutter to TakeHeart
+@ review moves TachyonCutter to TakeHeart
 
 review moves TarShot to Teleport
 

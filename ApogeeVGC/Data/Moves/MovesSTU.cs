@@ -3486,11 +3486,10 @@ public partial record Moves
                     // return pokemon.cureStatus() || success;
                     BoolZeroUnion? boostSuccess = battle.Boost(
                         new SparseBoostsTable { SpA = 1, SpD = 1 }, source, source);
+                    bool success = boostSuccess?.IsTruthy() ?? false;
                     bool cured = source.CureStatus();
-                    // Return true if either boost or cureStatus succeeded
-                    return (boostSuccess?.IsTruthy() ?? false) || cured
-                        ? new VoidReturn()
-                        : false;
+                    // TS returns true/false (not undefined), so use bool return
+                    return cured || success;
                 }),
                 Secondary = null,
                 Target = MoveTarget.Self,
