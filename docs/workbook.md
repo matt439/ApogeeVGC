@@ -188,9 +188,9 @@
 
 ^ review moves Stomp to StrangeSteam
 
-@ review moves Strength to StuffCheeks
+^ review moves Strength to StuffCheeks
 
-review moves StunSpore to SuperFang
+@ review moves StunSpore to SuperFang
 
 review moves Superpower to SweetScent
 
