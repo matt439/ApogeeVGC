@@ -172,9 +172,9 @@
 
 ^ review moves Sketch to SkitterSmack
 
-@ review moves SkyAttack to SleepTalk
+^ review moves SkyAttack to SleepTalk
 
-review moves Sludge to Snarl
+@ review moves Sludge to Snarl
 
 review moves SnipeShot to SoftBoiled
 
