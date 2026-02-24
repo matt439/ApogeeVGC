@@ -2060,8 +2060,9 @@ public partial record Moves
                 BasePowerCallback = BasePowerCallbackEventInfo.Create((_, source, _, _) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.StockpileStorage,
-                            out EffectState? vol)) return 0;
-                    return vol.Layers * 100;
+                            out EffectState? vol) || (vol.Layers ?? 0) == 0)
+                        return IntFalseUnion.FromFalse();
+                    return (vol.Layers ?? 0) * 100;
                 }),
                 OnTry = OnTryEventInfo.Create((_, source, _, _) =>
                     source.Volatiles.ContainsKey(ConditionId.StockpileStorage)),
