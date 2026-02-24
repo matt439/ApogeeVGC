@@ -1647,10 +1647,10 @@ public partial record Conditions
                             }
                         }
 
-                        return null;
+                        return null; // TS returns null = prevent status
                     }
 
-                    return null;
+                    return new VoidReturn(); // Non-sleep: passthrough (TS implicit undefined)
                 }),
             },
         };

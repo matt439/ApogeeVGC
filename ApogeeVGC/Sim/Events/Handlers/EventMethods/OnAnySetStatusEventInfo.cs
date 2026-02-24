@@ -44,6 +44,9 @@ public sealed record OnAnySetStatusEventInfo : EventHandlerInfo
                 context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
+                // null from handler = TS null = "silent failure" (block the status)
+                // This must be falsy so RunEvent propagates it as a blocking result
+                if (result == null) return new BoolRelayVar(false);
                 return result switch
                 {
                     BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
