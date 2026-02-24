@@ -202,9 +202,9 @@
 
 ^ review moves TemperFlare to TerrainPulse
 
-@ review moves Thief to ThunderCage
+^ review moves Thief to ThunderCage
 
-review moves Thunderclap to Tickle
+@ review moves Thunderclap to Tickle
 
 review moves TidyUp to ToxicSpikes
 
