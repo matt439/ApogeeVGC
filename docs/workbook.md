@@ -166,9 +166,9 @@
 
 ^ review moves SeedFlare to ShadowPunch
 
-@ review moves ShadowSneak to Shelter
+^ review moves ShadowSneak to Shelter
 
-review moves ShiftGear to Sing
+@ review moves ShiftGear to Sing
 
 review moves Sketch to SkitterSmack
 

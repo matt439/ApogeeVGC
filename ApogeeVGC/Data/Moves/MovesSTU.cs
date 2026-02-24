@@ -846,11 +846,7 @@ public partial record Moves
 
                     if (result is FalseIntFalseUnion)
                     {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-fail", target, "heal");
-                        }
-
+                        battle.Add("-fail", target, "heal");
                         return new Empty(); // NOT_FAIL - move worked but heal failed
                     }
 
