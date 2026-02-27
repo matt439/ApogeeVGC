@@ -18,7 +18,7 @@ namespace ApogeeVGC.Sim.Utils.Unions;
 /// </summary>
 public abstract record RelayVar
 {
-    public static implicit operator RelayVar(bool value) => new BoolRelayVar(value);
+    public static implicit operator RelayVar(bool value) => value ? BoolRelayVar.True : BoolRelayVar.False;
     public static implicit operator RelayVar(int value) => new IntRelayVar(value);
     public static implicit operator RelayVar(Ability ability) => EffectUnionFactory.ToRelayVar(ability);
     public static implicit operator RelayVar(Item item) => EffectUnionFactory.ToRelayVar(item);
@@ -45,7 +45,7 @@ public abstract record RelayVar
     public static RelayVar FromIntTrueUnion(IntTrueUnion union) => union switch
     {
  IntIntTrueUnion intValue => new IntRelayVar(intValue.Value),
-        TrueIntTrueUnion => new BoolRelayVar(true),
+        TrueIntTrueUnion => BoolRelayVar.True,
   _ => throw new InvalidOperationException("Unknown IntTrueUnion type"),
     };
     public static implicit operator RelayVar(BoolIntUndefinedUnion union) => new BoolIntUndefinedUnionRelayVar(union);
@@ -54,7 +54,11 @@ public abstract record RelayVar
   public static RelayVar FromVoid() => new VoidReturnRelayVar();
 }
 
-public record BoolRelayVar(bool Value) : RelayVar;
+public record BoolRelayVar(bool Value) : RelayVar
+{
+    public static readonly BoolRelayVar True = new(true);
+    public static readonly BoolRelayVar False = new(false);
+}
 public record IntRelayVar(int Value) : RelayVar;
 public record EffectRelayVar(IEffect Effect) : RelayVar;
 public record SpecieRelayVar(Species Species) : RelayVar;

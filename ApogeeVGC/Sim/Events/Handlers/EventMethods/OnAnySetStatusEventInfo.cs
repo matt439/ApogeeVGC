@@ -46,10 +46,10 @@ public sealed record OnAnySetStatusEventInfo : EventHandlerInfo
                 );
                 // null from handler = TS null = "silent failure" (block the status)
                 // This must be falsy so RunEvent propagates it as a blocking result
-                if (result == null) return new BoolRelayVar(false);
+                if (result == null) return BoolRelayVar.False;
                 return result switch
                 {
-                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    BoolBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     VoidBoolVoidUnion => null,
                     _ => null
                 };

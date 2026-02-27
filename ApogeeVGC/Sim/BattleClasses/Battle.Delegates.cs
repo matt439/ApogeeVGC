@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Reflection;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -41,46 +41,46 @@ public partial class Battle
         return returnValue switch
         {
             // BoolVoidUnion -> bool or null
-            BoolBoolVoidUnion boolVoid => new BoolRelayVar(boolVoid.Value),
+            BoolBoolVoidUnion boolVoid => (boolVoid.Value ? BoolRelayVar.True : BoolRelayVar.False),
             VoidBoolVoidUnion => null,
 
             // BoolEmptyVoidUnion -> bool or null
-            BoolBoolEmptyVoidUnion boolEmptyVoid => new BoolRelayVar(boolEmptyVoid.Value),
+            BoolBoolEmptyVoidUnion boolEmptyVoid => (boolEmptyVoid.Value ? BoolRelayVar.True : BoolRelayVar.False),
             EmptyBoolEmptyVoidUnion => null,
             VoidUnionBoolEmptyVoidUnion => null,
 
             // IntBoolVoidUnion -> int, bool, or null
             IntIntBoolVoidUnion intBoolVoid => new IntRelayVar(intBoolVoid.Value),
-            BoolIntBoolVoidUnion boolIntVoid => new BoolRelayVar(boolIntVoid.Value),
+            BoolIntBoolVoidUnion boolIntVoid => (boolIntVoid.Value ? BoolRelayVar.True : BoolRelayVar.False),
             VoidIntBoolVoidUnion => null,
 
             // BoolIntEmptyVoidUnion -> bool, int, or null
-            BoolBoolIntEmptyVoidUnion boolIntEmptyVoid => new BoolRelayVar(boolIntEmptyVoid.Value),
+            BoolBoolIntEmptyVoidUnion boolIntEmptyVoid => (boolIntEmptyVoid.Value ? BoolRelayVar.True : BoolRelayVar.False),
             IntBoolIntEmptyVoidUnion intBoolEmptyVoid => new IntRelayVar(intBoolEmptyVoid.Value),
             EmptyBoolIntEmptyVoidUnion => null,
             VoidUnionBoolIntEmptyVoidUnion => null,
 
             // BoolUndefinedUnion -> bool or undefined
-            BoolBoolUndefinedUnion boolUndefined => new BoolRelayVar(boolUndefined.Value),
+            BoolBoolUndefinedUnion boolUndefined => (boolUndefined.Value ? BoolRelayVar.True : BoolRelayVar.False),
             UndefinedBoolUndefinedUnion => new UndefinedRelayVar(),
 
             // BoolIntUndefinedUnion -> bool, int, or undefined
-            BoolBoolIntUndefinedUnion boolIntUndefined => new BoolRelayVar(boolIntUndefined.Value),
+            BoolBoolIntUndefinedUnion boolIntUndefined => (boolIntUndefined.Value ? BoolRelayVar.True : BoolRelayVar.False),
             IntBoolIntUndefinedUnion intIntUndefined => new IntRelayVar(intIntUndefined.Value),
             UndefinedBoolIntUndefinedUnion => new UndefinedRelayVar(),
 
             // IntFalseUndefinedUnion -> int, false, or undefined (used by Damage method)
             IntIntFalseUndefined intFalseUndefined => new IntRelayVar(intFalseUndefined.Value),
-            FalseIntFalseUndefined => new BoolRelayVar(false),
+            FalseIntFalseUndefined => BoolRelayVar.False,
             UndefinedIntFalseUndefined => new UndefinedRelayVar(),
 
             // IntFalseUnion -> int or false (used by Heal method)
             IntIntFalseUnion intFalse => new IntRelayVar(intFalse.Value),
-            FalseIntFalseUnion => new BoolRelayVar(false),
+            FalseIntFalseUnion => BoolRelayVar.False,
 
             // IntBoolUnion -> int or bool
             IntIntBoolUnion intBool => new IntRelayVar(intBool.Value),
-            BoolIntBoolUnion boolBool => new BoolRelayVar(boolBool.Value),
+            BoolIntBoolUnion boolBool => (boolBool.Value ? BoolRelayVar.True : BoolRelayVar.False),
 
 // IntVoidUnion -> int or null
             IntIntVoidUnion intVoid => new IntRelayVar(intVoid.Value),
@@ -99,7 +99,7 @@ public partial class Battle
             VoidPokemonVoidUnion => null,
 
             // Primitive types
-            bool boolValue => new BoolRelayVar(boolValue),
+            bool boolValue => boolValue ? BoolRelayVar.True : BoolRelayVar.False,
             int intValue => new IntRelayVar(intValue),
             decimal decValue => new DecimalRelayVar(decValue),
             double doubleValue => new DecimalRelayVar((decimal)doubleValue),

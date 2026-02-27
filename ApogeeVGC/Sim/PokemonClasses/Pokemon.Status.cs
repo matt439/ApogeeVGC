@@ -1,4 +1,4 @@
-ï»¿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -250,11 +250,11 @@ public partial class Pokemon
 
         // Early exit if Pokemon is fainted and condition doesn't affect fainted Pokemon
         if (Hp <= 0 && condition.AffectsFainted != true)
-            return new BoolRelayVar(false);
+            return BoolRelayVar.False;
 
         // Early exit if linked status and source is fainted
         if (linkedStatus != null && source is { Hp: <= 0 })
-            return new BoolRelayVar(false);
+            return BoolRelayVar.False;
 
         // Resolve source and sourceEffect from battle event if not provided
         if (Battle.Event is not null)
@@ -274,11 +274,11 @@ public partial class Pokemon
         {
             // If no restart callback, fail
             if (condition.OnRestart == null)
-                return new BoolRelayVar(false);
+                return BoolRelayVar.False;
 
             // Try to restart the existing volatile
             return Battle.SingleEvent(EventId.Restart, condition, existingState, this, source,
-                sourceEffect) ?? new BoolRelayVar(false);
+                sourceEffect) ?? BoolRelayVar.False;
         }
 
         // Check status immunity
@@ -298,7 +298,7 @@ public partial class Pokemon
                 }
             }
 
-            return new BoolRelayVar(false);
+            return BoolRelayVar.False;
         }
 
         // Run TryAddVolatile event
@@ -312,7 +312,7 @@ public partial class Pokemon
                 Battle.Debug($"add volatile [{status}] interrupted");
             }
 
-            return tryResult ?? new BoolRelayVar(false);
+            return tryResult ?? BoolRelayVar.False;
         }
 
         // Create the volatile effect state
@@ -378,7 +378,7 @@ public partial class Pokemon
         {
             // Cancel - remove the volatile we just added
             Volatiles.Remove(status);
-            return startResult ?? new BoolRelayVar(false);
+            return startResult ?? BoolRelayVar.False;
         }
 
         // Handle linked status setup
@@ -395,7 +395,7 @@ public partial class Pokemon
                 if (!source.Volatiles.TryGetValue(linkedStatus.Value, out linkedState))
                 {
                     // Linked volatile could not be added - skip linking
-                    return new BoolRelayVar(true);
+                    return BoolRelayVar.True;
                 }
 
                 linkedState.LinkedPokemon = [this];
@@ -413,7 +413,7 @@ public partial class Pokemon
             volatileState.LinkedStatus = Battle.Library.Conditions[linkedStatus.Value];
         }
 
-        return new BoolRelayVar(true);
+        return BoolRelayVar.True;
     }
 
     public EffectState? GetVolatile(ConditionId volatileId)
@@ -480,7 +480,7 @@ public partial class Pokemon
 
     public void CopyVolatileFrom(Pokemon pokemon, ConditionIdBoolUnion? switchCause = null)
     {
-        // Clear this PokÃ©mon's current volatiles
+        // Clear this Pokémon's current volatiles
         ClearVolatile();
 
         // Determine if switchCause is 'shedtail'
@@ -523,27 +523,27 @@ public partial class Pokemon
                 continue;
             }
 
-            // Create a shallow clone of the volatile state with this PokÃ©mon as the target
+            // Create a shallow clone of the volatile state with this Pokémon as the target
             EffectState clonedState = volatileState.ShallowClone();
             clonedState.Target = this;
 
-            // Initialize the effect state for this PokÃ©mon
+            // Initialize the effect state for this Pokémon
             Volatiles[conditionId] = clonedState;
 
-            // Handle linked PokÃ©mon (for moves like Bind, Wrap, etc.)
+            // Handle linked Pokémon (for moves like Bind, Wrap, etc.)
             if (clonedState.LinkedPokemon is null || clonedState.LinkedStatus is null) continue;
             // Clear the source's linked references
             pokemon.Volatiles[conditionId].LinkedPokemon = null;
             pokemon.Volatiles[conditionId].LinkedStatus = null;
 
-            // Update all linked PokÃ©mon to point to this PokÃ©mon instead of the source
+            // Update all linked Pokémon to point to this Pokémon instead of the source
             foreach (Pokemon linkedPoke in clonedState.LinkedPokemon)
             {
-                // Get the linked PokÃ©mon's volatile state for this condition
+                // Get the linked Pokémon's volatile state for this condition
                 if (!linkedPoke.Volatiles.TryGetValue(clonedState.LinkedStatus.Id,
                         out EffectState? linkedState)
                     || linkedState.LinkedPokemon is null) continue;
-                // Find and replace the source PokÃ©mon with this PokÃ©mon
+                // Find and replace the source Pokémon with this Pokémon
                 int sourceIndex = linkedState.LinkedPokemon.IndexOf(pokemon);
                 if (sourceIndex >= 0)
                 {
@@ -552,7 +552,7 @@ public partial class Pokemon
             }
         }
 
-        // Clear the source PokÃ©mon's volatiles after copying
+        // Clear the source Pokémon's volatiles after copying
         pokemon.ClearVolatile();
 
         // Trigger Copy event for each copied volatile

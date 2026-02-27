@@ -42,7 +42,7 @@ public partial record Items
                     if (type == ConditionId.Sandstorm ||
                         type == ConditionId.Powder)
                     {
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     return null;
@@ -296,10 +296,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Flying",
                 Num = 306,
@@ -417,10 +417,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Water",
                 Num = 299,
@@ -448,10 +448,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Ghost",
                 Num = 310,
@@ -574,10 +574,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Rock",
                 Num = 309,
@@ -767,10 +767,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Poison",
                 Num = 304,

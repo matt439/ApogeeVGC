@@ -26,7 +26,7 @@ public static class EventHandlerHelpers
     /// </summary>
     public static EventHandlerDelegate CreateBoolHandler(Func<EventContext, bool> func)
     {
-        return context => new BoolRelayVar(func(context));
+        return context => func(context) ? BoolRelayVar.True : BoolRelayVar.False;
  }
     
     /// <summary>
@@ -53,7 +53,7 @@ public static class EventHandlerHelpers
     return context =>
         {
             bool? result = func(context);
-            return result.HasValue ? new BoolRelayVar(result.Value) : null;
+            return result.HasValue ? (result.Value ? BoolRelayVar.True : BoolRelayVar.False) : null;
         };
     }
     

@@ -53,7 +53,7 @@ public partial class Battle
 
         // Track if relayVar was explicitly provided
         bool hasRelayVar = relayVar != null;
-        relayVar ??= new BoolRelayVar(true);
+        relayVar ??= BoolRelayVar.True;
 
         // Check if status effect has changed
         if (effect.EffectType == EffectType.Status &&
@@ -273,7 +273,7 @@ public partial class Battle
 
         // Track if relayVar was explicitly provided
         bool hasRelayVar = relayVar != null;
-        relayVar ??= new BoolRelayVar(true);
+        relayVar ??= BoolRelayVar.True;
 
         // Save parent context
         Event parentEvent = Event;
@@ -308,7 +308,7 @@ public partial class Battle
                 targetRelayVars = new List<RelayVar>(arrayTarget.PokemonList.Length);
                 for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
                 {
-                    targetRelayVars.Add(new BoolRelayVar(true));
+                    targetRelayVars.Add(BoolRelayVar.True);
                 }
             }
         }
@@ -545,7 +545,7 @@ public partial class Battle
 
             // Convert bool? to RelayVar? for RunEvent
             RelayVar? relayVarConverted =
-                relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
+                relayVar.HasValue ? (relayVar.Value ? BoolRelayVar.True : BoolRelayVar.False) : null;
 
             // Run the event on each Pokémon
             foreach (Pokemon pokemon in actives)
@@ -922,7 +922,7 @@ public partial class Battle
                 try
                 {
                     returnVal = InvokeEventHandlerInfo(handler.HandlerInfo, false,
-                        new BoolRelayVar(true), singleEventTarget, null, null);
+                        BoolRelayVar.True, singleEventTarget, null, null);
 
                     if (DisplayUi)
                     {
@@ -1034,7 +1034,7 @@ public partial class Battle
     {
         return constantValue switch
         {
-            bool boolValue => new BoolRelayVar(boolValue),
+            bool boolValue => boolValue ? BoolRelayVar.True : BoolRelayVar.False,
             int intValue => new IntRelayVar(intValue),
             decimal decimalValue => new DecimalRelayVar(decimalValue),
             string stringValue => new StringRelayVar(stringValue),

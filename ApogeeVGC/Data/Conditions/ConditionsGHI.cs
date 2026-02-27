@@ -33,7 +33,7 @@ public partial record Conditions
                     // Check if pokemon has Ability Shield
                     if (pokemon.HasItem(ItemId.AbilityShield))
                     {
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     if (battle.DisplayUi)
@@ -295,7 +295,7 @@ public partial record Conditions
                             battle.Add("cant", pokemon, "move: Gravity", move.Name);
                         }
 
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     return null;

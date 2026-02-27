@@ -514,10 +514,10 @@ public partial record Items
                             // Palkia (num 484) can't have this item removed
                             if (source?.BaseSpecies.Num == 484 || pokemon.BaseSpecies.Num == 484)
                             {
-                                return new BoolRelayVar(false); // Prevent removal
+                                return BoolRelayVar.False; // Prevent removal
                             }
 
-                            return new BoolRelayVar(true); // Allow removal
+                            return BoolRelayVar.True; // Allow removal
                         })),
                 ForcedForme = "Palkia-Origin",
                 Num = 1778,

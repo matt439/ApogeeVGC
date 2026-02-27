@@ -53,7 +53,7 @@ return new BasePowerCallbackEventInfo(
    return result switch
   {
     IntIntFalseUnion i => new IntRelayVar(i.Value),
-     FalseIntFalseUnion => new BoolRelayVar(false),
+     FalseIntFalseUnion => BoolRelayVar.False,
     _ => null
        };
     },

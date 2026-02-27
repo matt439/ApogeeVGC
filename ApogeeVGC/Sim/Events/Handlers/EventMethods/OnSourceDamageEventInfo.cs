@@ -44,7 +44,7 @@ public sealed record OnSourceDamageEventInfo : EventHandlerInfo
                 return result switch
                 {
                     IntIntBoolVoidUnion i => new IntRelayVar(i.Value),
-                    BoolIntBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    BoolIntBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     VoidIntBoolVoidUnion => null,
                     _ => null
                 };

@@ -62,7 +62,7 @@ public partial class Driver
                 Debug = debug,
                 Sync = true,
                 Seed = new PrngSeed(debugBattleSeed),
-                MaxTurns = 1000,
+                MaxTurns = 2000,
             };
 
             var simulator = new SyncSimulator();

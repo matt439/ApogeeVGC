@@ -115,10 +115,10 @@ public partial record Items
                             // TypeScript only checks the holder (pokemon), not the source
                             if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Ogerpon-Wellspring",
                 // itemUser: ["Ogerpon-Wellspring"],

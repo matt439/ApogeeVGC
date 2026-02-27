@@ -48,8 +48,8 @@ public sealed record OnSourcePrepareHitEventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
-                    BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),
-                    EmptyBoolEmptyVoidUnion => new BoolRelayVar(false),
+                    BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
+                    EmptyBoolEmptyVoidUnion => BoolRelayVar.False,
                     VoidUnionBoolEmptyVoidUnion => null,
                     _ => null
                 };

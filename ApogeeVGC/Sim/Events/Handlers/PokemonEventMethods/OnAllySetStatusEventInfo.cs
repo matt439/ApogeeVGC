@@ -49,7 +49,7 @@ public sealed record OnAllySetStatusEventInfo : EventHandlerInfo
                 return result switch
                 {
                     PokemonPokemonFalseVoidUnion p => new PokemonRelayVar(p.Pokemon),
-                    FalsePokemonFalseVoidUnion => new BoolRelayVar(false),
+                    FalsePokemonFalseVoidUnion => BoolRelayVar.False,
                     VoidPokemonFalseVoidUnion => null,
                     null => null,
                     _ => null

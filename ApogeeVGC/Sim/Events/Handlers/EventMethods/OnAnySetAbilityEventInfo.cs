@@ -46,7 +46,7 @@ public sealed record OnAnySetAbilityEventInfo : EventHandlerInfo
                 context.GetSourceEffect<IEffect>()
                 );
                 if (result == null) return null;
-                return new BoolRelayVar(result.Value);
+                return (result.Value ? BoolRelayVar.True : BoolRelayVar.False);
             },
             priority,
             usesSpeed

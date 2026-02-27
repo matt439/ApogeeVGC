@@ -54,7 +54,7 @@ public sealed record OnNegateImmunityEventInfo : UnionEventHandlerInfo<OnNegateI
                 );
                 return result switch
                 {
-                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    BoolBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     VoidBoolVoidUnion => null,
                     _ => null
                 };

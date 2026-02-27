@@ -76,10 +76,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Electric",
                 Num = 300,

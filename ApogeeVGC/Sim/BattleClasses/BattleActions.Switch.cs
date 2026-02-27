@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Actions;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -18,7 +18,7 @@ public partial class BattleActions
         // Validate the Pokemon exists and is not already active
         if (pokemon.IsActive)
         {
-            Battle.Hint("A switch failed because the Pokémon trying to switch in is already in.");
+            Battle.Hint("A switch failed because the Pok�mon trying to switch in is already in.");
             return false;
         }
 
@@ -226,7 +226,7 @@ public partial class BattleActions
 
         // Pass default relayVar of true so "no handler" = "allow drag-out"
         RelayVar? dragOutResult = Battle.RunEvent(EventId.DragOut, oldActive, null, null,
-            new BoolRelayVar(true));
+            BoolRelayVar.True);
 
         // null = prevent silently (Suction Cups), false = prevent
         if (dragOutResult is null or BoolRelayVar { Value: false })

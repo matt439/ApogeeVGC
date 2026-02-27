@@ -396,7 +396,7 @@ public partial record Conditions
                         pokemon.DeleteVolatile(ConditionId.MagnetRise);
                     }
 
-                    if (!applies) return new BoolRelayVar(false);
+                    if (!applies) return BoolRelayVar.False;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, "Smack Down");
@@ -1089,7 +1089,7 @@ public partial record Conditions
                     // Tar Shot fails if target is Terastallized
                     if (pokemon.Terastallized != null)
                     {
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     if (battle.DisplayUi)

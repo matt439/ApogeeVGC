@@ -192,10 +192,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Fairy",
                 Num = 644,
@@ -639,7 +639,7 @@ public partial record Items
                             {
                                 RelayVar? dragOutResult = battle.RunEvent(EventId.DragOut, source,
                                     target, move,
-                                    new BoolRelayVar(true));
+                                    BoolRelayVar.True);
                                 if (dragOutResult is BoolRelayVar { Value: true })
                                 {
                                     source.ForceSwitchFlag = true;
@@ -832,10 +832,10 @@ public partial record Items
                             // Zamazenta (species num 889) can't have this item removed
                             if (source?.BaseSpecies.Num == 889 || pokemon.BaseSpecies.Num == 889)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 // itemUser: ["Zamazenta-Crowned"],
                 Num = 1104,
@@ -853,10 +853,10 @@ public partial record Items
                             // Zacian (species num 888) can't have this item removed
                             if (source?.BaseSpecies.Num == 888 || pokemon.BaseSpecies.Num == 888)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 // itemUser: ["Zacian-Crowned"],
                 Num = 1103,

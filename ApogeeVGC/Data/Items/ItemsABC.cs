@@ -94,10 +94,10 @@ public partial record Items
                             // Dialga (num 483) can't have this item removed
                             if (source?.BaseSpecies.Num == 483 || pokemon.BaseSpecies.Num == 483)
                             {
-                                return new BoolRelayVar(false); // Prevent removal
+                                return BoolRelayVar.False; // Prevent removal
                             }
 
-                            return new BoolRelayVar(true); // Allow removal
+                            return BoolRelayVar.True; // Allow removal
                         })),
                 ForcedForme = "Dialga-Origin",
                 Num = 1777,
@@ -535,10 +535,10 @@ public partial record Items
                         // Paradox Pokemon can't have this item removed
                         if (pokemon.BaseSpecies.Tags.Any(tag => tag == SpeciesTag.Paradox))
                         {
-                            return new BoolRelayVar(false); // Prevent removal from Paradox Pokemon
+                            return BoolRelayVar.False; // Prevent removal from Paradox Pokemon
                         }
 
-                        return new BoolRelayVar(true); // Allow removal from non-Paradox Pokemon
+                        return BoolRelayVar.True; // Allow removal from non-Paradox Pokemon
                     }),
                 Num = 1880,
                 Gen = 9,
@@ -1050,10 +1050,10 @@ public partial record Items
                             // TS uses (item, source) where source=holder, only checks holder
                             if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Ogerpon-Cornerstone",
                 Num = 2406,

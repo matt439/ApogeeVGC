@@ -303,7 +303,7 @@ public partial record Conditions
                     if (pokemon.LastMove == null)
                     {
                         battle.Debug("Pokemon hasn't moved yet");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     // Check if the last move has PP
@@ -311,7 +311,7 @@ public partial record Conditions
                         .Any(moveSlot => moveSlot.Pp <= 0))
                     {
                         battle.Debug("Move out of PP");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     if (battle.DisplayUi)
@@ -414,7 +414,7 @@ public partial record Conditions
                     // Check for FocusEnergy to prevent stacking
                     if (target.Volatiles.ContainsKey(ConditionId.FocusEnergy))
                     {
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     // Check if this is from copying abilities/moves (Costar, Imposter, Psych Up, Transform)
@@ -587,14 +587,14 @@ public partial record Conditions
                     if (target.LastMove == null)
                     {
                         battle.Debug("Encore failed: no last move");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     // Check if the last move has failencore flag
                     if (target.LastMove.Flags.FailEncore ?? false)
                     {
                         battle.Debug("Encore failed: move has failencore flag");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     // Check if the last move has PP remaining
@@ -611,7 +611,7 @@ public partial record Conditions
                     if (moveSlot == null || moveSlot.Pp <= 0)
                     {
                         battle.Debug("Encore failed: move not found or no PP");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     // Store the encored move
@@ -906,7 +906,7 @@ public partial record Conditions
                     // Check for DragonCheer to prevent stacking
                     if (pokemon.Volatiles.ContainsKey(ConditionId.DragonCheer))
                     {
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     // Check if this is from copying abilities/moves (Costar, Imposter, Psych Up, Transform)

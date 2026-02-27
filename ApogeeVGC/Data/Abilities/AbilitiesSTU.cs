@@ -1100,7 +1100,7 @@ public partial record Abilities
                             {
                                 battle.Add("-activate", pokemon, "ability: Sticky Hold");
                             }
-                            return new BoolRelayVar(false); // Return false to prevent item removal
+                            return BoolRelayVar.False; // Return false to prevent item removal
                         }
 
                         return null;

@@ -42,7 +42,7 @@ public sealed record OnSourceCriticalHitEventInfo : UnionEventHandlerInfo<OnCrit
                 );
                 return result switch
                 {
-                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    BoolBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     VoidBoolVoidUnion => null,
                     _ => null
                 };

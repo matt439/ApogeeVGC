@@ -52,7 +52,7 @@ context.GetTargetOrSourcePokemon(),
   if (result == null) return new NullRelayVar();
   return result switch
  {
-       BoolBoolIntEmptyVoidUnion b => new BoolRelayVar(b.Value),
+       BoolBoolIntEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
     IntBoolIntEmptyVoidUnion i => new IntRelayVar(i.Value),
      EmptyBoolIntEmptyVoidUnion => new NullRelayVar(),
  VoidUnionBoolIntEmptyVoidUnion => new VoidReturnRelayVar(),

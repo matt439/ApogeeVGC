@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -428,7 +428,7 @@ public partial class BattleActions
             {
                 // Pass default relayVar of true so "no handler" = "allow drag-out"
                 RelayVar? hitResult = Battle.RunEvent(EventId.DragOut, target, source, move,
-                    new BoolRelayVar(true));
+                    BoolRelayVar.True);
 
                 switch (hitResult)
                 {

@@ -90,10 +90,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Dragon",
                 Num = 311,
@@ -149,10 +149,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Dark",
                 Num = 312,
@@ -218,10 +218,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Ground",
                 Num = 305,
@@ -568,10 +568,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Fighting",
                 Num = 303,
@@ -620,10 +620,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Fire",
                 Num = 298,

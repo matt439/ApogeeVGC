@@ -268,7 +268,7 @@ public partial record Conditions
                         {
                             battle.AttrLastMove("[still]");
                         }
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     return null;
@@ -1157,7 +1157,7 @@ public partial record Conditions
                         }
 
                         // Return false for ALL Terastallized Pokemon (not just Flying types)
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     if (battle.DisplayUi)

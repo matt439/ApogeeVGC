@@ -47,7 +47,7 @@ public sealed record OnUseEventInfo : UnionEventHandlerInfo<OnItemUse>
                 var result = handler(context.Battle, context.GetTargetOrSourcePokemon());
                 return result switch
                 {
-                    BoolBoolVoidUnion b => new BoolRelayVar(b.Value),
+                    BoolBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     VoidBoolVoidUnion => null,
                     _ => null
                 };

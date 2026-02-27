@@ -152,10 +152,10 @@ public partial record Items
                             // Giratina (species number 487) can't have this item removed
                             if (source?.BaseSpecies.Num == 487 || pokemon.BaseSpecies.Num == 487)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Giratina-Origin",
                 Num = 1779,
@@ -272,10 +272,10 @@ public partial record Items
                             // TypeScript only checks the holder (pokemon), not the source
                             if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Ogerpon-Hearthflame",
                 Num = 2408,
@@ -393,10 +393,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Ice",
                 Num = 302,
@@ -433,10 +433,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Bug",
                 Num = 308,
@@ -491,10 +491,10 @@ public partial record Items
                         {
                             if (source?.BaseSpecies.Num == 493 || pokemon.BaseSpecies.Num == 493)
                             {
-                                return new BoolRelayVar(false);
+                                return BoolRelayVar.False;
                             }
 
-                            return new BoolRelayVar(true);
+                            return BoolRelayVar.True;
                         })),
                 ForcedForme = "Arceus-Steel",
                 Num = 313,

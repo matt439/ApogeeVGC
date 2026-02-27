@@ -105,19 +105,19 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = OnStartEventInfo.Create((battle, pokemon, source, effect) =>
                 {
-                    if (source == null) return new BoolRelayVar(false);
+                    if (source == null) return BoolRelayVar.False;
                     if (!((pokemon.Gender == GenderId.M && source.Gender == GenderId.F) ||
                           (pokemon.Gender == GenderId.F && source.Gender == GenderId.M)))
                     {
                         battle.Debug("incompatible gender");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     RelayVar? runEventResult = battle.RunEvent(EventId.Attract, pokemon, source);
                     if (runEventResult is BoolRelayVar { Value: false })
                     {
                         battle.Debug("Attract event failed");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     if (effect is Ability { Id: AbilityId.CuteCharm })
@@ -170,7 +170,7 @@ public partial record Conditions
                             battle.Add("cant", pokemon, "Attract");
                         }
 
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     return null;
@@ -579,7 +579,7 @@ public partial record Conditions
                     {
                         battle.Debug(
                             $"[ChoiceLock.OnStart] {pokemon.Name}: Rejecting volatile (id={battle.ActiveMove.Id}, hasBounced={hasBounced})");
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     // TS: this.effectState.move = this.activeMove.id;

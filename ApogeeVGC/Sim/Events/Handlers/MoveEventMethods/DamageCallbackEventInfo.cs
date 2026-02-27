@@ -41,7 +41,7 @@ public sealed record DamageCallbackEventInfo : EventHandlerInfo
                 return result switch
                 {
                     IntIntFalseUnion i => new IntRelayVar(i.Value),
-                    FalseIntFalseUnion => new BoolRelayVar(false),
+                    FalseIntFalseUnion => BoolRelayVar.False,
                     _ => null
                 };
             },

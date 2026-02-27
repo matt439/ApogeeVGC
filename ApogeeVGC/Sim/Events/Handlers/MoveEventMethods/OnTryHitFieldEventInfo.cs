@@ -41,7 +41,7 @@ public sealed record OnTryHitFieldEventInfo : EventHandlerInfo
                 if (result == null) return new NullRelayVar();
                 return result switch
                 {
-                    BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),
+                    BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     EmptyBoolEmptyVoidUnion => new NullRelayVar(),
                     VoidUnionBoolEmptyVoidUnion => new VoidReturnRelayVar(),
                     _ => new VoidReturnRelayVar()

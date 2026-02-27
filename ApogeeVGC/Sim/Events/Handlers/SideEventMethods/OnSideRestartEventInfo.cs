@@ -41,7 +41,7 @@ public sealed record OnSideRestartEventInfo : EventHandlerInfo
                 );
                 if (result is FalseVoidFalseUnion)
                 {
-                    return new BoolRelayVar(false);
+                    return BoolRelayVar.False;
                 }
                 return null;
             },

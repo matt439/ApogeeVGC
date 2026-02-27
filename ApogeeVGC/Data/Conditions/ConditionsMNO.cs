@@ -92,7 +92,7 @@ public partial record Conditions
                     // Grant immunity to Ground-type moves
                     if (type is { IsPokemonType: true, AsPokemonType: PokemonType.Ground })
                     {
-                        return new BoolRelayVar(false);
+                        return BoolRelayVar.False;
                     }
 
                     return null;
