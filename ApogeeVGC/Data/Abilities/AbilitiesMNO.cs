@@ -778,7 +778,7 @@ public partial record Abilities
                     ];
 
                     Ability ngAbility = battle.Library.Abilities[AbilityId.NeutralizingGas];
-                    foreach (Pokemon target in battle.GetAllActive())
+                    foreach (Pokemon target in battle.EnumerateAllActive())
                     {
                         if (target.HasItem(ItemId.AbilityShield))
                         {
@@ -827,7 +827,7 @@ public partial record Abilities
                     Pokemon source = psfp.Pokemon;
                     if (source.Transformed) return;
 
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.EnumerateAllActive())
                     {
                         if (pokemon != source && pokemon.HasAbility(AbilityId.NeutralizingGas))
                         {
@@ -844,7 +844,7 @@ public partial record Abilities
                     if (source.AbilityState.Ending == true) return;
                     source.AbilityState.Ending = true;
 
-                    var sortedActive = battle.GetAllActive().ToList();
+                    var sortedActive = battle.GetAllActive();
                     battle.SpeedSort(sortedActive);
                     foreach (Pokemon pokemon in sortedActive)
                     {

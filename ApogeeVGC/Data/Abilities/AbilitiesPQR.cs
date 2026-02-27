@@ -508,7 +508,7 @@ public partial record Abilities
                     if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
                     Pokemon pokemon = psfp.Pokemon;
                     if (battle.Field.WeatherState.Source != pokemon) return;
-                    foreach (Pokemon target in battle.GetAllActive())
+                    foreach (Pokemon target in battle.EnumerateAllActive())
                     {
                         if (target == pokemon) continue;
                         if (target.HasAbility(AbilityId.PrimordialSea))

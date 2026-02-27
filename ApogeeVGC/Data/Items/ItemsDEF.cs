@@ -246,7 +246,7 @@ public partial record Items
                                 target.Volatiles.ContainsKey(ConditionId.Commanded))
                                 return;
 
-                            foreach (Pokemon pokemon in battle.GetAllActive())
+                            foreach (Pokemon pokemon in battle.EnumerateAllActive())
                             {
                                 if (pokemon.SwitchFlag.IsTrue()) return;
                             }
@@ -332,7 +332,7 @@ public partial record Items
                     }
 
                     // Can't eject if another Pokemon already has switch flag set
-                    foreach (Pokemon active in battle.GetAllActive())
+                    foreach (Pokemon active in battle.EnumerateAllActive())
                     {
                         if (active.SwitchFlag.IsTrue()) return BoolVoidUnion.FromBool(false);
                     }

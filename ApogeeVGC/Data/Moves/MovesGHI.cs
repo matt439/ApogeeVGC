@@ -828,7 +828,7 @@ public partial record Moves
                         battle.Add("-clearallboost");
                     }
 
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.EnumerateAllActive())
                     {
                         pokemon.ClearBoosts();
                     }

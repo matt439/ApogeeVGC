@@ -1,4 +1,4 @@
-ï»¿using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -10,10 +10,10 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class Battle
 {
     /// <summary>
-    /// Swaps a PokÃ©mon's position with another PokÃ©mon on the same side.
+    /// Swaps a Pokémon's position with another Pokémon on the same side.
     /// Used for moves like Ally Switch or game mechanics that change field positions.
     /// </summary>
-    /// <param name="pokemon">The PokÃ©mon to swap</param>
+    /// <param name="pokemon">The Pokémon to swap</param>
     /// <param name="newPosition">The target position index (0-based)</param>
     /// <param name="attributes">Optional attributes for the swap event</param>
     /// <returns>True if swap succeeded, false if invalid</returns>
@@ -25,7 +25,7 @@ public partial class Battle
             throw new ArgumentException("Invalid swap position", nameof(newPosition));
         }
 
-        // Get the PokÃ©mon at the target position (may be null)
+        // Get the Pokémon at the target position (may be null)
         Pokemon? target = pokemon.Side.Active[newPosition];
 
         // Special check: position 1 can be swapped even if empty/fainted
@@ -155,7 +155,7 @@ public partial class Battle
 
     public void UpdateSpeed()
     {
-        foreach (Pokemon pokemon in GetAllActive())
+        foreach (Pokemon pokemon in EnumerateAllActive())
         {
             pokemon.UpdateSpeed();
         }

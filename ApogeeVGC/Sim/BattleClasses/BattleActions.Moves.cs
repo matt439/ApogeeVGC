@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -222,7 +222,7 @@ public partial class BattleActions
             !(activeMove.IsExternal ?? false))
         {
             List<Pokemon> dancers = [];
-            foreach (Pokemon currentPoke in Battle.GetAllActive())
+            foreach (Pokemon currentPoke in battle.EnumerateAllActive())
             {
                 if (pokemon == currentPoke) continue;
                 if (currentPoke.HasAbility(AbilityId.Dancer) && !currentPoke.IsSemiInvulnerable())

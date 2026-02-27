@@ -245,7 +245,7 @@ public partial record Conditions
                     }
 
                     // Remove airborne-related volatiles from all active Pokemon
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.EnumerateAllActive())
                     {
                         bool applies = false;
                         if (pokemon.RemoveVolatile(_library.Conditions[ConditionId.Bounce]) ||

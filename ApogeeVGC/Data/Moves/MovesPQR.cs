@@ -211,7 +211,7 @@ public partial record Moves
                 {
                     var result = false;
                     var message = false;
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.EnumerateAllActive())
                     {
                         // Check invulnerability
                         RelayVar? invulnResult = battle.RunEvent(EventId.Invulnerability, pokemon,

@@ -61,6 +61,58 @@ public partial class Battle
         return pokemonList;
     }
 
+    /// <summary>
+    /// Zero-allocation enumeration of all active, non-fainted Pokémon across all sides.
+    /// Use this in <c>foreach</c> loops instead of <see cref="GetAllActive"/> when
+    /// the caller does not need a materialized <see cref="List{T}"/>.
+    /// </summary>
+    public ActivePokemonEnumerable EnumerateAllActive(bool includeFainted = false)
+    {
+        return new ActivePokemonEnumerable(Sides, includeFainted);
+    }
+
+    /// <summary>
+    /// Struct-based enumerable for active Pokémon. Allows duck-typed <c>foreach</c>
+    /// with a <see cref="ActivePokemonEnumerator"/> that never allocates.
+    /// </summary>
+    public readonly struct ActivePokemonEnumerable(List<Side> sides, bool includeFainted)
+    {
+        public ActivePokemonEnumerator GetEnumerator() => new(sides, includeFainted);
+    }
+
+    /// <summary>
+    /// Value-type enumerator over all active (optionally including fainted) Pokémon across sides.
+    /// </summary>
+    public struct ActivePokemonEnumerator(List<Side> sides, bool includeFainted)
+    {
+        private int _sideIndex;
+        private int _activeIndex = -1;
+
+        public Pokemon Current { get; private set; } = null!;
+
+        public bool MoveNext()
+        {
+            while (_sideIndex < sides.Count)
+            {
+                List<Pokemon?> active = sides[_sideIndex].Active;
+                _activeIndex++;
+                while (_activeIndex < active.Count)
+                {
+                    Pokemon? pokemon = active[_activeIndex];
+                    if (pokemon != null && (includeFainted || !pokemon.Fainted))
+                    {
+                        Current = pokemon;
+                        return true;
+                    }
+                    _activeIndex++;
+                }
+                _sideIndex++;
+                _activeIndex = -1;
+            }
+            return false;
+        }
+    }
+
     public int CanSwitch(Side side)
     {
         return PossibleSwitches(side).Count;

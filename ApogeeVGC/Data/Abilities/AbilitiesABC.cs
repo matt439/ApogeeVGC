@@ -137,7 +137,7 @@ public partial record Abilities
                 OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, pokemon, _, _) =>
                     {
                         var boosted = true;
-                        foreach (Pokemon target in battle.GetAllActive())
+                        foreach (Pokemon target in battle.EnumerateAllActive())
                         {
                             if (target == pokemon) continue;
                             if (battle.Queue.WillMove(target) != null)
@@ -1163,7 +1163,7 @@ public partial record Abilities
                 OnDamagingHit = OnDamagingHitEventInfo.Create((battle, _, target, _, _) =>
                 {
                     var activated = false;
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.EnumerateAllActive())
                     {
                         if (pokemon == target || pokemon.Fainted) continue;
                         if (!activated)

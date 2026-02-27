@@ -506,9 +506,16 @@ EffectStateId effectId = effect.EffectStateId;
         if (HasItem(ItemId.AbilityShield) || Ability == AbilityId.NeutralizingGas) return false;
 
         // Check if any active Pokemon have Neutralizing Gas ability
-        return Battle.GetAllActive().Any(pokemon => pokemon.Ability == AbilityId.NeutralizingGas &&
-                                                    !pokemon.Volatiles.ContainsKey(ConditionId.GastroAcid) &&
-                                                    !pokemon.Transformed && pokemon.AbilityState.Ending != true &&
-                                                    !Volatiles.ContainsKey(ConditionId.Commanding));
+        foreach (Pokemon pokemon in Battle.EnumerateAllActive())
+        {
+            if (pokemon.Ability == AbilityId.NeutralizingGas &&
+                !pokemon.Volatiles.ContainsKey(ConditionId.GastroAcid) &&
+                !pokemon.Transformed && pokemon.AbilityState.Ending != true &&
+                !Volatiles.ContainsKey(ConditionId.Commanding))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

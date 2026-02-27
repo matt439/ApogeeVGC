@@ -38,7 +38,7 @@ public partial record Conditions
                     }
 
                     // Trigger item End events for all active Pokemon
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.EnumerateAllActive())
                     {
                         battle.SingleEvent(EventId.End, pokemon.GetItem(), pokemon.ItemState,
                             pokemon);

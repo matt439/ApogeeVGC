@@ -1863,7 +1863,7 @@ public partial record Moves
                     if (source.Fainted || move.HitTargets == null || move.HasSheerForce == true)
                     {
                         // Make sure the volatiles are cleared
-                        foreach (Pokemon pokemon in battle.GetAllActive())
+                        foreach (Pokemon pokemon in battle.EnumerateAllActive())
                         {
                             pokemon.DeleteVolatile(ConditionId.SparklingAria);
                         }
@@ -3657,7 +3657,7 @@ public partial record Moves
                     var targets = new List<Pokemon>();
 
                     // Check each active Pokemon for invulnerability, TryHit events, and if they have a berry
-                    foreach (Pokemon pokemon in battle.GetAllActive())
+                    foreach (Pokemon pokemon in battle.EnumerateAllActive())
                     {
                         // Check invulnerability
                         RelayVar? invulnResult = battle.RunEvent(EventId.Invulnerability, pokemon,
@@ -4327,7 +4327,7 @@ public partial record Moves
                 OnHit = OnHitEventInfo.Create((battle, _, source, _) =>
                 {
                     var success = false;
-                    foreach (Pokemon active in battle.GetAllActive())
+                    foreach (Pokemon active in battle.EnumerateAllActive())
                     {
                         if (active.RemoveVolatile(_library.Conditions[ConditionId.Substitute]))
                             success = true;
