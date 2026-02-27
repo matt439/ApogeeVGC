@@ -365,5 +365,8 @@ FodyWeavers.xsd
 # Claude artifacts
 *.claude
 
+# Replay scraper data
+Tools/ReplayScraper/data/
+
 # Windows reserved device name
 NUL
