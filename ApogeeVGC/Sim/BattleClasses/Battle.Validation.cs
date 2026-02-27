@@ -68,7 +68,7 @@ public partial class Battle
             bool sideLimitedEVs = !side.Pokemon.Any(pokemon =>
             {
                 // Sum all EV values for this Pokémon
-                int totalEvs = pokemon.Set.Evs.Values.Sum();
+                int totalEvs = pokemon.Set.Evs.BaseStatTotal;
                 return totalEvs > 510;
             });
 

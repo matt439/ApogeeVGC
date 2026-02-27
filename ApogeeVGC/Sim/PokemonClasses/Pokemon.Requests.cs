@@ -45,11 +45,11 @@ public partial class Pokemon
         // Build stats dictionary from base stored stats
         var stats = new StatsTable
         {
-            [StatId.Atk] = BaseStoredStats[StatId.Atk],
-            [StatId.Def] = BaseStoredStats[StatId.Def],
-            [StatId.SpA] = BaseStoredStats[StatId.SpA],
-            [StatId.SpD] = BaseStoredStats[StatId.SpD],
-            [StatId.Spe] = BaseStoredStats[StatId.Spe],
+            Atk = BaseStoredStats.Atk,
+            Def = BaseStoredStats.Def,
+            SpA = BaseStoredStats.SpA,
+            SpD = BaseStoredStats.SpD,
+            Spe = BaseStoredStats.Spe,
         };
 
         // Get move list - either base moves (for allies) or current moves

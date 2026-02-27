@@ -165,7 +165,7 @@ public partial class Battle
         StatsTable modStats = new();
 
         // iterate through all stats in baseStats
-        foreach (var statName in baseStats.Keys)
+        foreach (var statName in StatsTable.AllStatIds)
         {
             modStats[statName] = StatModify(baseStats, set, statName, level);
         }

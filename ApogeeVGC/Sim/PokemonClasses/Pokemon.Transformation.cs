@@ -202,9 +202,9 @@ public partial class Pokemon
         // else: isTransform == true, don't change HP values
 
         if (!isTransform) BaseStoredStats = stats;
-        foreach (var statName in StoredStats)
+        foreach (var stat in StatsExceptHpTable.AllStatIds)
         {
-            StoredStats[statName.Key] = stats[statName.Key.ConvertToStatId()];
+            StoredStats[stat] = stats[stat.ConvertToStatId()];
         }
 
         Speed = StoredStats.Spe;

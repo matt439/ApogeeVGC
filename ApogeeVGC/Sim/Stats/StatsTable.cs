@@ -1,109 +1,68 @@
 ﻿namespace ApogeeVGC.Sim.Stats;
 
-public class StatsTable : Dictionary<StatId, int>
+public class StatsTable
 {
-    public StatsTable()
+    public int Hp { get; set; }
+    public int Atk { get; set; }
+    public int Def { get; set; }
+    public int SpA { get; set; }
+    public int SpD { get; set; }
+    public int Spe { get; set; }
+
+    /// <summary>
+    /// All stat IDs for iteration, replacing Dictionary.Keys enumeration.
+    /// </summary>
+    public static ReadOnlySpan<StatId> AllStatIds =>
+        [StatId.Hp, StatId.Atk, StatId.Def, StatId.SpA, StatId.SpD, StatId.Spe];
+
+    public int this[StatId stat]
     {
-        this[StatId.Hp] = 0;
-        this[StatId.Atk] = 0;
-        this[StatId.Def] = 0;
-        this[StatId.SpA] = 0;
-        this[StatId.SpD] = 0;
-        this[StatId.Spe] = 0;
+        get => GetStat(stat);
+        set => SetStat(stat, value);
     }
 
-    public StatsTable(StatsTable other) : this()
+    public int GetStat(StatId stat)
     {
-        foreach (var kvp in other)
+        return stat switch
         {
-            this[kvp.Key] = kvp.Value;
-        }
+            StatId.Hp => Hp,
+            StatId.Atk => Atk,
+            StatId.Def => Def,
+            StatId.SpA => SpA,
+            StatId.SpD => SpD,
+            StatId.Spe => Spe,
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
+        };
     }
 
-    public int Hp
+    public void SetStat(StatId stat, int value)
     {
-        get => this[StatId.Hp];
-        set
+        switch (stat)
         {
-            if (value < 0)
-            {
-                throw new ArgumentException("value must be positive.");
-            }
-            this[StatId.Hp] = value;
-        }
-    }
-
-    public int Atk
-    {
-        get => this[StatId.Atk];
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException("value must be positive.");
-            }
-            this[StatId.Atk] = value;
-        }
-    }
-
-    public int Def
-    {
-        get => this[StatId.Def];
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException("value must be positive.");
-            }
-            this[StatId.Def] = value;
-        }
-    }
-
-    public int SpA
-    {
-        get => this[StatId.SpA];
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException("value must be positive.");
-            }
-            this[StatId.SpA] = value;
-        }
-    }
-
-    public int SpD
-    {
-        get => this[StatId.SpD];
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException("value must be positive.");
-            }
-            this[StatId.SpD] = value;
-        }
-    }
-
-    public int Spe
-    {
-        get => this[StatId.Spe];
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException("value must be positive.");
-            }
-            this[StatId.Spe] = value;
+            case StatId.Hp:
+                Hp = value;
+                break;
+            case StatId.Atk:
+                Atk = value;
+                break;
+            case StatId.Def:
+                Def = value;
+                break;
+            case StatId.SpA:
+                SpA = value;
+                break;
+            case StatId.SpD:
+                SpD = value;
+                break;
+            case StatId.Spe:
+                Spe = value;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
         }
     }
 
     public int BaseStatTotal => Hp + Atk + Def + SpA + SpD + Spe;
-
-    public int GetStat(StatId stat)
-    {
-        return this[stat];
-    }
 
     public static bool IsValidIv(int stat)
     {
@@ -140,6 +99,14 @@ public class StatsTable : Dictionary<StatId, int>
 
     public StatsTable Copy()
     {
-        return new StatsTable(this);
+        return new StatsTable
+        {
+            Hp = Hp,
+            Atk = Atk,
+            Def = Def,
+            SpA = SpA,
+            SpD = SpD,
+            Spe = Spe,
+        };
     }
 }
