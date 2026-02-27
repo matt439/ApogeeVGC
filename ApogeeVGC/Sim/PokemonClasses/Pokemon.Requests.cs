@@ -58,14 +58,10 @@ public partial class Pokemon
         // Extract move IDs from move slots (not full Move objects to avoid serializing handlers)
         var moves = moveSource.Select(moveSlot => moveSlot.Id).ToList();
 
-        // Determine the condition - prioritize Fainted status
-        // When fainted, GetHealth().Secret returns "0 fnt" (a SecretString), not SecretConditionId,
-        // so we need to explicitly check the Fainted property
+        // Determine the condition - use Status directly (Fainted is a separate check)
         ConditionId condition = Fainted
             ? ConditionId.Fainted
-            : (GetHealth().Secret is SecretConditionId secretCondition
-                ? secretCondition.Value
-                : ConditionId.None);
+            : Status;
 
         // Create the base entry
         var entry = new PokemonSwitchRequestData
