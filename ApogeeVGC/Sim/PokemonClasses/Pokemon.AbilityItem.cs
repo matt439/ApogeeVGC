@@ -320,7 +320,7 @@ EffectStateId effectId = effect.EffectStateId;
 
     public Item GetItem()
     {
-        return Battle.Library.Items[Item];
+        return _cachedItem ??= Battle.Library.Items[Item];
     }
 
     /// <summary>
@@ -463,7 +463,7 @@ EffectStateId effectId = effect.EffectStateId;
 
     public Ability GetAbility()
     {
-        return Battle.Library.Abilities[Ability];
+        return _cachedAbility ??= Battle.Library.Abilities[Ability];
     }
 
     public bool HasAbility(AbilityId ability)

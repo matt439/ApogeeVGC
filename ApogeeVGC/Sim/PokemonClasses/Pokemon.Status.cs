@@ -214,7 +214,7 @@ public partial class Pokemon
 
     public Condition GetStatus()
     {
-        return Battle.Library.Conditions[Status];
+        return _cachedStatus ??= Battle.Library.Conditions[Status];
     }
 
     public bool TrySetStatus(ConditionId status, Pokemon? source = null,

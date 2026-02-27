@@ -11,9 +11,35 @@ namespace ApogeeVGC.Sim.FieldClasses;
 public class Field
 {
     public Battle Battle { get; init; }
-    public ConditionId Weather { get; set; }
+
+    private ConditionId _weather;
+    private Condition? _cachedWeather;
+
+    public ConditionId Weather
+    {
+        get => _weather;
+        set
+        {
+            _weather = value;
+            _cachedWeather = null;
+        }
+    }
+
     public EffectState WeatherState { get; set; }
-    public ConditionId Terrain { get; set; }
+
+    private ConditionId _terrain;
+    private Condition? _cachedTerrain;
+
+    public ConditionId Terrain
+    {
+        get => _terrain;
+        set
+        {
+            _terrain = value;
+            _cachedTerrain = null;
+        }
+    }
+
     public EffectState TerrainState { get; set; }
     public Dictionary<ConditionId, EffectState> PseudoWeather { get; init; } = [];
 
@@ -213,7 +239,7 @@ public class Field
 
     public Condition GetWeather()
     {
-        return Battle.Library.Conditions[Weather];
+        return _cachedWeather ??= Battle.Library.Conditions[Weather];
     }
 
     public bool SetTerrain(IEffect status, Pokemon? source = null, IEffect? sourceEffect = null)
@@ -330,7 +356,7 @@ public class Field
 
     public Condition GetTerrain()
     {
-        return Battle.Library.Conditions[Terrain];
+        return _cachedTerrain ??= Battle.Library.Conditions[Terrain];
     }
 
     public bool AddPseudoWeather(ConditionId status, Pokemon? source = null,

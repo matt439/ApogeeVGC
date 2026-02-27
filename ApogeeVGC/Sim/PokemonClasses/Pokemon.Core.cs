@@ -50,7 +50,19 @@ public partial class Pokemon : IPriorityComparison
 
     public EffectState SpeciesState { get; set; }
 
-    public ConditionId Status { get; set; }
+    private ConditionId _status;
+    private Condition? _cachedStatus;
+
+    public ConditionId Status
+    {
+        get => _status;
+        set
+        {
+            _status = value;
+            _cachedStatus = null;
+        }
+    }
+
     public EffectState StatusState { get; set; }
 
     public Dictionary<ConditionId, EffectState> Volatiles { get; set; }
@@ -61,10 +73,35 @@ public partial class Pokemon : IPriorityComparison
     public BoostsTable Boosts { get; set; }
 
     public AbilityId BaseAbility { get; set; }
-    public AbilityId Ability { get; set; }
+
+    private AbilityId _ability;
+    private Ability? _cachedAbility;
+
+    public AbilityId Ability
+    {
+        get => _ability;
+        set
+        {
+            _ability = value;
+            _cachedAbility = null;
+        }
+    }
+
     public EffectState AbilityState { get; set; }
 
-    public ItemId Item { get; set; }
+    private ItemId _item;
+    private Item? _cachedItem;
+
+    public ItemId Item
+    {
+        get => _item;
+        set
+        {
+            _item = value;
+            _cachedItem = null;
+        }
+    }
+
     public EffectState ItemState { get; set; }
     public ItemId LastItem { get; set; }
     public bool UsedItemThisTurn { get; set; }
