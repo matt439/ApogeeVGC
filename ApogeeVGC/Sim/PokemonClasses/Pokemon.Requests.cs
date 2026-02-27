@@ -130,7 +130,8 @@ public partial class Pokemon
     /// </summary>
     public PokemonMoveRequestData GetMoveRequestData()
     {
-        Battle.Debug($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
+        if (Battle.DebugMode)
+            Battle.Debug($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
 
         // Clear disabled states before evaluating them for this turn
         // This ensures disabled states are re-evaluated fresh each turn
@@ -145,10 +146,13 @@ public partial class Pokemon
         // to disable appropriate moves
         Battle.RunEvent(EventId.DisableMove, this);
 
-        Battle.Debug($"[GetMoveRequestData] {Name}: After DisableMove event, move states:");
-        foreach (var moveSlot in MoveSlots)
+        if (Battle.DebugMode)
         {
-            Battle.Debug($"  - {Battle.Library.Moves[moveSlot.Id].Name}: Disabled={moveSlot.Disabled}");
+            Battle.Debug($"[GetMoveRequestData] {Name}: After DisableMove event, move states:");
+            foreach (var moveSlot in MoveSlots)
+            {
+                Battle.Debug($"  - {Battle.Library.Moves[moveSlot.Id].Name}: Disabled={moveSlot.Disabled}");
+            }
         }
 
         // Get locked move if Pokemon is not maybe-locked

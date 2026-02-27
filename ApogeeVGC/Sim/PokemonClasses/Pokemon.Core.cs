@@ -529,8 +529,9 @@ public partial class Pokemon : IPriorityComparison
         // Append status condition if present
         if (Status != ConditionId.None)
         {
-            secretStr += $" {Status}";
-            sharedStr += $" {Status}";
+            string statusSuffix = string.Concat(" ", Status.ToString());
+            secretStr = string.Concat(secretStr, statusSuffix);
+            sharedStr = string.Concat(sharedStr, statusSuffix);
         }
 
         Secret secret = secretStr;
