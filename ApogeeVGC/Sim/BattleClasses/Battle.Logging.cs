@@ -220,6 +220,21 @@ public partial class Battle
     }
 
     /// <summary>
+    /// Logs debug information to the console using a custom interpolated string handler
+    /// that avoids all string allocations when <see cref="DebugMode"/> is false.
+    /// The compiler automatically selects this overload for interpolated string arguments.
+    /// </summary>
+    public void Debug(
+        [System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")]
+        ref DebugInterpolatedStringHandler handler)
+    {
+        if (DebugMode)
+        {
+            Console.WriteLine(handler.ToStringAndClear());
+        }
+    }
+
+    /// <summary>
     /// Extracts and returns all debug messages from the battle log.
     /// In the TypeScript version, this uses extractChannelMessages with channel -1.
     /// </summary>
