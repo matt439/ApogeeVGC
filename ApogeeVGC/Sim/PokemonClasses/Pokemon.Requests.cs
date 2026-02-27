@@ -126,8 +126,7 @@ public partial class Pokemon
     /// </summary>
     public PokemonMoveRequestData GetMoveRequestData()
     {
-        if (Battle.DebugMode)
-            Battle.Debug($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
+        Battle.Debug($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
 
         // Clear disabled states before evaluating them for this turn
         // This ensures disabled states are re-evaluated fresh each turn

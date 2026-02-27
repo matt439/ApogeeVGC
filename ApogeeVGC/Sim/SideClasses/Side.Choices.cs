@@ -685,7 +685,7 @@ public partial class Side
                     _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
                 };
 
-                if (!success && Battle.DebugMode)
+                if (!success)
                 {
                     Battle.Debug($"[Side.Choose] Action {index} failed: {Choice.Error}");
                 }
@@ -693,8 +693,7 @@ public partial class Side
                 return success;
             }).Any(success => !success))
         {
-            if (Battle.DebugMode)
-                Battle.Debug($"[Side.Choose] Overall choice failed for {Name}");
+            Battle.Debug($"[Side.Choose] Overall choice failed for {Name}");
             return false;
         }
 
@@ -1050,17 +1049,15 @@ public partial class Side
 
         if (Choice.ForcedSwitchesLeft > 0)
         {
-            if (Battle.DebugMode)
-                Battle.Debug($"[IsChoiceDone] {Name}: ForcedSwitchesLeft={Choice.ForcedSwitchesLeft}, returning false");
+            Battle.Debug($"[IsChoiceDone] {Name}: ForcedSwitchesLeft={Choice.ForcedSwitchesLeft}, returning false");
             return false;
         }
 
         if (RequestState == RequestState.TeamPreview)
         {
             bool done = Choice.Actions.Count >= PickedTeamSize();
-            if (Battle.DebugMode)
-                Battle.Debug(
-                    $"[IsChoiceDone] {Name}: TeamPreview - Actions={Choice.Actions.Count}, PickedTeamSize={PickedTeamSize()}, done={done}");
+            Battle.Debug(
+                $"[IsChoiceDone] {Name}: TeamPreview - Actions={Choice.Actions.Count}, PickedTeamSize={PickedTeamSize()}, done={done}");
             return done;
         }
 
@@ -1070,9 +1067,8 @@ public partial class Side
         // Matches TS: this.getChoiceIndex(); return this.choice.actions.length >= this.active.length;
         GetChoiceIndex();
         bool isDone = Choice.Actions.Count >= Active.Count;
-        if (Battle.DebugMode)
-            Battle.Debug(
-                $"[IsChoiceDone] {Name}: {RequestState} request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={isDone}");
+        Battle.Debug(
+            $"[IsChoiceDone] {Name}: {RequestState} request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={isDone}");
         return isDone;
     }
 
