@@ -5,52 +5,90 @@ using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Sim.Utils.Unions;
 
-/// <summary>
-/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion? | PokemonSideBattleUnion|  Field | Pokemon?
-/// </summary>
-public abstract record RunEventTarget
+public enum RunEventTargetKind : byte
 {
-    public static implicit operator RunEventTarget(Pokemon pokemon) =>
-    new PokemonRunEventTarget(pokemon);
-    public static RunEventTarget? FromNullablePokemon(Pokemon? pokemon)
-    {
-      return pokemon is null ? null : new PokemonRunEventTarget(pokemon);
-    }
-
-    public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
-  new PokemonArrayRunEventTarget(pokemonList);
-
-    public static implicit operator RunEventTarget(Side side) => new SideRunEventTarget(side);
-    public static RunEventTarget FromBattle(Battle battle) => new BattleRunEventTarget(battle);
-    public static RunEventTarget? FromNullablePokemonSideBattleUnion(PokemonSideBattleUnion? target)
-    {
-   return target switch
-     {
-     null => null,
-     PokemonSideBattlePokemon pokemon => new PokemonRunEventTarget(pokemon.Pokemon),
-     PokemonSideBattleNullablePokemon nullablePokemon => nullablePokemon.Pokemon is null 
-         ? null 
-         : new PokemonRunEventTarget(nullablePokemon.Pokemon),
- PokemonSideBattleSide side => new SideRunEventTarget(side.Side),
-         PokemonSideBattleBattle battle => new BattleRunEventTarget(battle.Battle),
-  _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),
-    };
-    }
-    public static RunEventTarget FromPokemonSideBattleUnion(PokemonSideBattleUnion target)
-    {
-     return target switch
-    {
-     PokemonSideBattlePokemon pokemon => new PokemonRunEventTarget(pokemon.Pokemon),
-       PokemonSideBattleSide side => new SideRunEventTarget(side.Side),
-  PokemonSideBattleBattle battle => new BattleRunEventTarget(battle.Battle),
-    _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),
-   };
-    }
-    public static implicit operator RunEventTarget(Field field) => new FieldRunEventTarget(field);
+    None = 0,
+    Pokemon,
+    PokemonArray,
+    Side,
+    Battle,
+    Field,
 }
 
-public record PokemonRunEventTarget(Pokemon Pokemon) : RunEventTarget;
-public record PokemonArrayRunEventTarget(Pokemon[] PokemonList) : RunEventTarget;
-public record SideRunEventTarget(Side Side) : RunEventTarget;
-public record BattleRunEventTarget(Battle Battle) : RunEventTarget;
-public record FieldRunEventTarget(Field Field) : RunEventTarget;
+/// <summary>
+/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion? | PokemonSideBattleUnion | Field | Pokemon?
+/// Zero-allocation struct-based discriminated union.
+/// </summary>
+public readonly struct RunEventTarget
+{
+    public RunEventTargetKind Kind { get; }
+    private readonly object? _value;
+
+    private RunEventTarget(RunEventTargetKind kind, object? value)
+    {
+        Kind = kind;
+        _value = value;
+    }
+
+    public Pokemon Pokemon => (Pokemon)_value!;
+    public Pokemon[] PokemonList => (Pokemon[])_value!;
+    public Side Side => (Side)_value!;
+    public Battle Battle => (Battle)_value!;
+    public Field Field => (Field)_value!;
+
+    public bool IsNone => Kind == RunEventTargetKind.None;
+
+    public static implicit operator RunEventTarget(Pokemon pokemon) =>
+        new(RunEventTargetKind.Pokemon, pokemon);
+
+    public static RunEventTarget? FromNullablePokemon(Pokemon? pokemon) =>
+        pokemon is null ? null : (RunEventTarget?)new RunEventTarget(RunEventTargetKind.Pokemon, pokemon);
+
+    public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
+        new(RunEventTargetKind.PokemonArray, pokemonList);
+
+    public static implicit operator RunEventTarget(Side side) =>
+        new(RunEventTargetKind.Side, side);
+
+    public static RunEventTarget FromBattle(Battle battle) =>
+        new(RunEventTargetKind.Battle, battle);
+
+    public static RunEventTarget? FromNullablePokemonSideBattleUnion(PokemonSideBattleUnion? target)
+    {
+        return target switch
+        {
+            null => null,
+            PokemonSideBattlePokemon pokemon => (RunEventTarget?)new RunEventTarget(RunEventTargetKind.Pokemon, pokemon.Pokemon),
+            PokemonSideBattleNullablePokemon nullablePokemon => nullablePokemon.Pokemon is null
+                ? null
+                : (RunEventTarget?)new RunEventTarget(RunEventTargetKind.Pokemon, nullablePokemon.Pokemon),
+            PokemonSideBattleSide side => (RunEventTarget?)new RunEventTarget(RunEventTargetKind.Side, side.Side),
+            PokemonSideBattleBattle battle => (RunEventTarget?)new RunEventTarget(RunEventTargetKind.Battle, battle.Battle),
+            _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),
+        };
+    }
+
+    public static RunEventTarget FromPokemonSideBattleUnion(PokemonSideBattleUnion target)
+    {
+        return target switch
+        {
+            PokemonSideBattlePokemon pokemon => new RunEventTarget(RunEventTargetKind.Pokemon, pokemon.Pokemon),
+            PokemonSideBattleSide side => new RunEventTarget(RunEventTargetKind.Side, side.Side),
+            PokemonSideBattleBattle battle => new RunEventTarget(RunEventTargetKind.Battle, battle.Battle),
+            _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),
+        };
+    }
+
+    public static implicit operator RunEventTarget(Field field) =>
+        new(RunEventTargetKind.Field, field);
+
+    /// <summary>
+    /// Converts to a SingleEventTarget if the kind is Pokemon; null otherwise.
+    /// </summary>
+    public SingleEventTarget? ToSingleEventTarget()
+    {
+        return Kind == RunEventTargetKind.Pokemon
+            ? (SingleEventTarget?)Pokemon
+            : null;
+    }
+}

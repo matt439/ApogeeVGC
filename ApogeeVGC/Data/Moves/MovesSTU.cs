@@ -3232,11 +3232,11 @@ public partial record Moves
                     // Check if receiving Pokemon can take the item (TakeItem event)
                     bool myItemFailed = myItem is ItemItemFalseUnion myItemCheck &&
                                         battle.SingleEvent(EventId.TakeItem, myItemCheck.Item, source.ItemState,
-                                                new PokemonSingleEventTarget(target), source, move, myItemCheck.Item)
+                                                (SingleEventTarget)target, source, move, myItemCheck.Item)
                                             is BoolRelayVar { Value: false };
                     bool yourItemFailed = yourItem is ItemItemFalseUnion yourItemCheck &&
                                           battle.SingleEvent(EventId.TakeItem, yourItemCheck.Item, target.ItemState,
-                                                  new PokemonSingleEventTarget(source), target, move,
+                                                  (SingleEventTarget)source, target, move,
                                                   yourItemCheck.Item)
                                               is BoolRelayVar { Value: false };
 
@@ -3973,7 +3973,7 @@ public partial record Moves
                     // Check if source can receive the item (TakeItem event for the receiver)
                     RelayVar? takeItemResult = battle.SingleEvent(EventId.TakeItem,
                         yourItemUnion.Item, target.ItemState,
-                        new PokemonSingleEventTarget(source), target, move, yourItemUnion.Item);
+                        (SingleEventTarget)source, target, move, yourItemUnion.Item);
                     if (takeItemResult is null or BoolRelayVar { Value: false } ||
                         !source.SetItem(yourItemUnion.Item.Id))
                     {
@@ -4670,11 +4670,11 @@ public partial record Moves
                     // Check if receiving Pokemon can take the item (TakeItem event)
                     bool myItemFailed = myItem is ItemItemFalseUnion myItemCheck &&
                                         battle.SingleEvent(EventId.TakeItem, myItemCheck.Item, source.ItemState,
-                                                new PokemonSingleEventTarget(target), source, move, myItemCheck.Item)
+                                                (SingleEventTarget)target, source, move, myItemCheck.Item)
                                             is BoolRelayVar { Value: false };
                     bool yourItemFailed = yourItem is ItemItemFalseUnion yourItemCheck &&
                                           battle.SingleEvent(EventId.TakeItem, yourItemCheck.Item, target.ItemState,
-                                                  new PokemonSingleEventTarget(source), target, move,
+                                                  (SingleEventTarget)source, target, move,
                                                   yourItemCheck.Item)
                                               is BoolRelayVar { Value: false };
 

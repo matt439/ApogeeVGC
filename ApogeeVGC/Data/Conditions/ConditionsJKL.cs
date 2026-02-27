@@ -232,7 +232,7 @@ public partial record Conditions
                 {
                     battle.SingleEvent(EventId.Swap,
                         battle.Library.Conditions[ConditionId.LunarDance],
-                        battle.EffectState, new PokemonSingleEventTarget(target));
+                        battle.EffectState, (SingleEventTarget)target);
                 }),
                 OnSwap = OnSwapEventInfo.Create((battle, target, _) =>
                 {

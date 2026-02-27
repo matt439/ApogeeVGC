@@ -75,16 +75,17 @@ public partial class Battle
         Pokemon? source = null)
     {
         // Handle array of Pokemon
-        if (target is PokemonArrayRunEventTarget arrayTarget)
+        if (target.Kind == RunEventTargetKind.PokemonArray)
         {
-            for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
+            Pokemon[] pokemonArray = target.PokemonList;
+            for (int i = 0; i < pokemonArray.Length; i++)
             {
-                Pokemon pokemon = arrayTarget.PokemonList[i];
+                Pokemon pokemon = pokemonArray[i];
                 // Record start index so we can tag only the newly added handlers
                 int startIdx = handlers.Count;
                 FindEventHandlers(
                     handlers,
-                    new PokemonRunEventTarget(pokemon),
+                    pokemon,
                     eventName,
                     source
                 );
@@ -101,7 +102,7 @@ public partial class Battle
         }
 
         // Events that target a Pokemon normally bubble up to the Side
-        bool shouldBubbleDown = target is SideRunEventTarget;
+        bool shouldBubbleDown = target.Kind == RunEventTargetKind.Side;
 
         // Events usually run through EachEvent should never have any handlers besides the base event
         // so don't check for prefixed variants
@@ -115,15 +116,15 @@ public partial class Battle
 
         // Determine Side target: either from original SideRunEventTarget or bubbled up from Pokemon
         Side? targetSide = null;
-        if (target is SideRunEventTarget sideTarget)
+        if (target.Kind == RunEventTargetKind.Side)
         {
-            targetSide = sideTarget.Side;
+            targetSide = target.Side;
         }
 
         // Handle Pokemon target
-        if (target is PokemonRunEventTarget pokemonTarget)
+        if (target.Kind == RunEventTargetKind.Pokemon)
         {
-            Pokemon pokemon = pokemonTarget.Pokemon;
+            Pokemon pokemon = target.Pokemon;
 
             // Guard against null pokemon (can occur despite non-nullable declaration)
             if (pokemon is null)

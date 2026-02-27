@@ -119,11 +119,11 @@ public partial class Battle
 
                 // End ability state
                 Ability ability = pokemon.GetAbility();
-                SingleEvent(EventId.End, ability, pokemon.AbilityState, new PokemonSingleEventTarget(pokemon));
+                SingleEvent(EventId.End, ability, pokemon.AbilityState, (SingleEventTarget)pokemon);
 
                 // End item state
                 Item item = pokemon.GetItem();
-                SingleEvent(EventId.End, item, pokemon.ItemState, new PokemonSingleEventTarget(pokemon));
+                SingleEvent(EventId.End, item, pokemon.ItemState, (SingleEventTarget)pokemon);
 
                 // Handle forme regression (e.g., Mega Evolution reverting)
                 if (pokemon is { FormeRegression: true, Transformed: false })

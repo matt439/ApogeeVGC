@@ -57,7 +57,7 @@ public partial class Battle
 
         // Check if status effect has changed
         if (effect.EffectType == EffectType.Status &&
-            target is PokemonSingleEventTarget pokemonTarget)
+            target is { Kind: SingleEventTargetKind.Pokemon } pokemonTarget)
         {
             Pokemon targetPokemon = pokemonTarget.Pokemon;
             if (effect is Condition condition && targetPokemon.Status != condition.Id)
@@ -71,7 +71,7 @@ public partial class Battle
         if (eventId == EventId.SwitchIn &&
             effect.EffectType == EffectType.Ability &&
             effect is Ability { Flags.Breakable: true } &&
-            target is PokemonSingleEventTarget moldbreakerTarget &&
+            target is { Kind: SingleEventTargetKind.Pokemon } moldbreakerTarget &&
             SuppressingAbility(moldbreakerTarget.Pokemon))
         {
             Debug($"{eventId} handler suppressed by Mold Breaker");
@@ -82,7 +82,7 @@ public partial class Battle
         if (eventId != EventId.Start &&
             eventId != EventId.TakeItem &&
             effect.EffectType == EffectType.Item &&
-            target is PokemonSingleEventTarget itemTarget &&
+            target is { Kind: SingleEventTargetKind.Pokemon } itemTarget &&
             itemTarget.Pokemon.IgnoringItem())
         {
             Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
@@ -92,7 +92,7 @@ public partial class Battle
         // Check if ability is suppressed by Gastro Acid/Neutralizing Gas
         if (eventId != EventId.End &&
             effect.EffectType == EffectType.Ability &&
-            target is PokemonSingleEventTarget abilityTarget &&
+            target is { Kind: SingleEventTargetKind.Pokemon } abilityTarget &&
             abilityTarget.Pokemon.IgnoringAbility())
         {
             Debug($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
@@ -215,7 +215,7 @@ public partial class Battle
         {
             handlers = [];
         }
-        FindEventHandlers(handlers, target, eventId, effectSource);
+        FindEventHandlers(handlers, target.Value, eventId, effectSource);
 
         // Debug logging for handler count - commented out for reduced verbosity
 
@@ -231,7 +231,7 @@ public partial class Battle
             EventHandlerInfo? handlerInfo = sourceEffect.GetEventHandlerInfo(eventId);
             if (handlerInfo != null)
             {
-                if (target is PokemonArrayRunEventTarget)
+                if (target is { Kind: RunEventTargetKind.PokemonArray })
                 {
                     throw new InvalidOperationException("Cannot use onEffect with array target");
                 }
@@ -245,12 +245,12 @@ public partial class Battle
                     End = null,
                     EffectHolder = target switch
                     {
-                        PokemonRunEventTarget pokemonTarget => pokemonTarget.Pokemon,
-                        SideRunEventTarget sideTarget => sideTarget.Side,
-                        FieldRunEventTarget fieldTarget => fieldTarget.Field,
-                        BattleRunEventTarget => EffectHolder.FromBattle(this),
+                        { Kind: RunEventTargetKind.Pokemon } t => t.Pokemon,
+                        { Kind: RunEventTargetKind.Side } t => t.Side,
+                        { Kind: RunEventTargetKind.Field } t => t.Field,
+                        { Kind: RunEventTargetKind.Battle } => EffectHolder.FromBattle(this),
                         _ => throw new InvalidOperationException(
-                            $"Unknown target type: {target.GetType().Name}"),
+                            $"Unknown target type: {target?.Kind}"),
                     },
                 }, eventId));
             }
@@ -279,12 +279,7 @@ public partial class Battle
         Event parentEvent = Event;
         Event rentedEvent = _eventPool.Count > 0 ? _eventPool.Pop() : new Event();
         rentedEvent.Id = eventId;
-        rentedEvent.Target = target switch
-        {
-            PokemonRunEventTarget pokemonTarget => new PokemonSingleEventTarget(pokemonTarget
-                .Pokemon),
-            _ => null,
-        };
+        rentedEvent.Target = target?.ToSingleEventTarget();
         rentedEvent.Source = source switch
         {
             PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource
@@ -301,7 +296,7 @@ public partial class Battle
         {
         // Handle array targets
         List<RelayVar>? targetRelayVars = null;
-        if (target is PokemonArrayRunEventTarget arrayTarget)
+        if (target is { Kind: RunEventTargetKind.PokemonArray } arrayTarget)
         {
             if (relayVar is ArrayRelayVar arrayRelayVar)
             {
@@ -337,7 +332,7 @@ public partial class Battle
                 // Update event target for this handler
                 if (handler.Target != null)
                 {
-                    Event.Target = new PokemonSingleEventTarget(handler.Target);
+                    Event.Target = SingleEventTarget.FromNullablePokemon(handler.Target);
                 }
 
                 // Use this target's relay var
@@ -507,7 +502,7 @@ public partial class Battle
         }
 
         // Return appropriate result
-        return target is PokemonArrayRunEventTarget
+        return target is { Kind: RunEventTargetKind.PokemonArray }
             ? new ArrayRelayVar([.. targetRelayVars ?? []])
             : relayVar;
         }
@@ -555,7 +550,7 @@ public partial class Battle
             // Run the event on each Pokémon
             foreach (Pokemon pokemon in actives)
             {
-                RunEvent(eventId, new PokemonRunEventTarget(pokemon), null, effect,
+                RunEvent(eventId, (RunEventTarget)pokemon, null, effect,
                     relayVarConverted);
             }
 
@@ -892,10 +887,10 @@ public partial class Battle
                 SingleEventTarget? singleEventTarget = handler.EffectHolder switch
                 {
                     PokemonEffectHolder pokemonEh =>
-                        new PokemonSingleEventTarget(pokemonEh.Pokemon),
-                    SideEffectHolder sideEh => new SideSingleEventTarget(sideEh.Side),
-                    FieldEffectHolder fieldEh => new FieldSingleEventTarget(fieldEh.Field),
-                    BattleEffectHolder battleEh => SingleEventTarget.FromBattle(battleEh.Battle),
+                        (SingleEventTarget?)pokemonEh.Pokemon,
+                    SideEffectHolder sideEh => (SingleEventTarget?)sideEh.Side,
+                    FieldEffectHolder fieldEh => (SingleEventTarget?)fieldEh.Field,
+                    BattleEffectHolder battleEh => (SingleEventTarget?)SingleEventTarget.FromBattle(battleEh.Battle),
                     _ => null,
                 };
 

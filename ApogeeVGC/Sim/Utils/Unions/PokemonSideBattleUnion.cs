@@ -20,12 +20,14 @@ public abstract record PokemonSideBattleUnion
 
     public static PokemonSideBattleUnion? FromNullableSingleEventTarget(SingleEventTarget? target)
     {
-        return target switch
+        if (target is null) return null;
+
+        var t = target.Value;
+        return t.Kind switch
         {
-   null => null,
-     PokemonSingleEventTarget pokemon => new PokemonSideBattlePokemon(pokemon.Pokemon),
-      SideSingleEventTarget side => new PokemonSideBattleSide(side.Side),
-    BattleSingleEventTarget battle => new PokemonSideBattleBattle(battle.Battle),
+            SingleEventTargetKind.Pokemon => new PokemonSideBattlePokemon(t.Pokemon),
+            SingleEventTargetKind.Side => new PokemonSideBattleSide(t.Side),
+            SingleEventTargetKind.Battle => new PokemonSideBattleBattle(t.Battle),
             _ => throw new InvalidOperationException("Cannot convert to PokemonSideBattleUnion"),
         };
     }

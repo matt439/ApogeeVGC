@@ -44,7 +44,7 @@ public partial record Conditions
                     // End the pokemon's current ability
                     Ability ability = pokemon.GetAbility();
                     battle.SingleEvent(EventId.End, ability, pokemon.AbilityState,
-                        new PokemonSingleEventTarget(pokemon),
+                        (SingleEventTarget)pokemon,
                         new PokemonSingleEventSource(pokemon),
                         _library.Conditions[ConditionId.GastroAcid]);
                     return null;

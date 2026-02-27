@@ -18,7 +18,7 @@ public partial class Side
     public bool AddSideCondition(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
         // Step 1: Source resolution
-        if (source == null && Battle is { Event.Target: PokemonSingleEventTarget eventTarget })
+        if (source == null && Battle.Event.Target is { Kind: SingleEventTargetKind.Pokemon } eventTarget)
         {
             source = eventTarget.Pokemon;
         }
@@ -33,7 +33,7 @@ public partial class Side
                 return false;
 
             // Call the restart handler
-            RelayVar? restartResult = Battle.SingleEvent(EventId.SideRestart, status, condition, new SideSingleEventTarget(this), source, sourceEffect);
+            RelayVar? restartResult = Battle.SingleEvent(EventId.SideRestart, status, condition, (SingleEventTarget)this, source, sourceEffect);
             return restartResult is BoolRelayVar { Value: true };
         }
 
@@ -55,7 +55,7 @@ public partial class Side
         SideConditions[status.Id] = effectState;
 
         // Step 6: SideStart event
-        RelayVar? sideStartResult = Battle.SingleEvent(EventId.SideStart, status, effectState, new SideSingleEventTarget(this), source, sourceEffect);
+        RelayVar? sideStartResult = Battle.SingleEvent(EventId.SideStart, status, effectState, (SingleEventTarget)this, source, sourceEffect);
         
         // Only treat explicit false as failure
         // Undefined, null, VoidReturn, and true all mean success (NOT_FAIL)
@@ -98,7 +98,7 @@ public partial class Side
     {
         Condition condition = Battle.Library.Conditions[status];
         if (!SideConditions.TryGetValue(condition.Id, out EffectState? sideCondition)) return false;
-        Battle.SingleEvent(EventId.SideEnd, condition, sideCondition, new SideSingleEventTarget(this));
+        Battle.SingleEvent(EventId.SideEnd, condition, sideCondition, (SingleEventTarget)this);
         SideConditions.Remove(condition.Id);
         return true;
     }
@@ -129,7 +129,7 @@ public partial class Side
         IEffect? sourceEffect = null)
     {
         // Step 1: Source resolution
-        if (source == null && Battle is { Event.Target: PokemonSingleEventTarget eventTarget })
+        if (source == null && Battle.Event.Target is { Kind: SingleEventTargetKind.Pokemon } eventTarget)
         {
             source = eventTarget.Pokemon;
         }
@@ -158,7 +158,7 @@ public partial class Side
                 return false;
 
             // Call the restart handler
-            RelayVar? restartResult = Battle.SingleEvent(EventId.Restart, status, condition, new SideSingleEventTarget(this), source, sourceEffect);
+            RelayVar? restartResult = Battle.SingleEvent(EventId.Restart, status, condition, (SingleEventTarget)this, source, sourceEffect);
             return restartResult is BoolRelayVar { Value: true };
         }
 
@@ -181,7 +181,7 @@ public partial class Side
 
         // Step 7: Start event
      RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, conditionState,
-  new PokemonSingleEventTarget(GetActiveAt(targetSlot)), source, sourceEffect);
+  (SingleEventTarget)GetActiveAt(targetSlot), source, sourceEffect);
 
     // Only treat explicit false as failure
   // Undefined, null, VoidReturn, and true all mean success (NOT_FAIL)
@@ -245,7 +245,7 @@ public partial class Side
             return false;
 
         // Trigger End event
-        Battle.SingleEvent(EventId.End, status, conditionState, new PokemonSingleEventTarget(GetActiveAt(targetSlot)));
+        Battle.SingleEvent(EventId.End, status, conditionState, (SingleEventTarget)GetActiveAt(targetSlot));
 
         // Remove the condition
         SlotConditions[targetSlot].Remove(status.Id);

@@ -13,19 +13,20 @@ public abstract record EventTargetParameter
 {
     public static EventTargetParameter? FromSingleEventTarget(SingleEventTarget? target, Type expectedType)
     {
-        if (target == null) return null;
+        if (target is null) return null;
 
-     return target switch
+        var t = target.Value;
+        return t.Kind switch
         {
-        PokemonSingleEventTarget p when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
-     new PokemonEventTargetParameter(p.Pokemon),
-   SideSingleEventTarget s when expectedType.IsAssignableFrom(typeof(Side)) =>
-         new SideEventTargetParameter(s.Side),
-       FieldSingleEventTarget f when expectedType.IsAssignableFrom(typeof(Field)) =>
-            new FieldEventTargetParameter(f.Field),
-   BattleSingleEventTarget b when expectedType.IsAssignableFrom(typeof(Battle)) =>
-        new BattleEventTargetParameter(b.Battle),
- _ => null,
+            SingleEventTargetKind.Pokemon when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
+                new PokemonEventTargetParameter(t.Pokemon),
+            SingleEventTargetKind.Side when expectedType.IsAssignableFrom(typeof(Side)) =>
+                new SideEventTargetParameter(t.Side),
+            SingleEventTargetKind.Field when expectedType.IsAssignableFrom(typeof(Field)) =>
+                new FieldEventTargetParameter(t.Field),
+            SingleEventTargetKind.Battle when expectedType.IsAssignableFrom(typeof(Battle)) =>
+                new BattleEventTargetParameter(t.Battle),
+            _ => null,
         };
     }
 

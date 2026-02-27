@@ -29,22 +29,14 @@ internal sealed class EventInvocationContext
          Battle = Battle,
        EventId = EventId,
             Effect = Effect,
-            TargetPokemon = Target switch
-          {
-     PokemonSingleEventTarget p => p.Pokemon,
-                _ => null
-          },
+            TargetPokemon = Target is { Kind: SingleEventTargetKind.Pokemon } tp ? tp.Pokemon : null,
    TargetSide = Target switch
  {
-     SideSingleEventTarget s => s.Side,
-              PokemonSingleEventTarget p => p.Pokemon.Side,
-     _ => null
-      },
-     TargetField = Target switch
-  {
-      FieldSingleEventTarget f => f.Field,
-          _ => null
-   },
+      { Kind: SingleEventTargetKind.Side } s => s.Side,
+               { Kind: SingleEventTargetKind.Pokemon } p => p.Pokemon.Side,
+      _ => null
+       },
+     TargetField = Target is { Kind: SingleEventTargetKind.Field } tf ? tf.Field : null,
      SourcePokemon = Source switch
        {
            PokemonSingleEventSource p => p.Pokemon,

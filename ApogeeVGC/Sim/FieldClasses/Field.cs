@@ -82,7 +82,7 @@ public class Field
         sourceEffect ??= Battle.Effect;
 
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
+        if (source == null && Battle.Event.Target is { Kind: SingleEventTargetKind.Pokemon } pset)
         {
             source = pset.Pokemon;
         }
@@ -253,7 +253,7 @@ public class Field
         sourceEffect ??= Battle.Effect;
 
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
+        if (source == null && Battle.Event.Target is { Kind: SingleEventTargetKind.Pokemon } pset)
         {
             source = pset.Pokemon;
         }
@@ -373,7 +373,7 @@ public class Field
         sourceEffect ??= Battle.Effect;
 
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
+        if (source == null && Battle.Event.Target is { Kind: SingleEventTargetKind.Pokemon } pset)
         {
             source = pset.Pokemon;
         }

@@ -32,7 +32,7 @@ public partial class Battle
         BattleDamageEffect? effect = null, bool instafaint = false)
     {
         // Default target to event target if available
-        if (target == null && Event.Target is PokemonSingleEventTarget eventTarget)
+        if (target == null && Event.Target is { Kind: SingleEventTargetKind.Pokemon } eventTarget)
         {
             target = eventTarget.Pokemon;
         }
@@ -238,7 +238,7 @@ public partial class Battle
         IEffect? effect = null)
     {
         // Default target to event target if available
-        if (target == null && Event.Target is PokemonSingleEventTarget eventTarget)
+        if (target == null && Event.Target is { Kind: SingleEventTargetKind.Pokemon } eventTarget)
         {
             target = eventTarget.Pokemon;
         }
@@ -309,7 +309,7 @@ public partial class Battle
         BattleHealEffect? effect = null)
     {
         // Default target to event target if available
-        if (target == null && Event.Target is PokemonSingleEventTarget eventTarget)
+        if (target == null && Event.Target is { Kind: SingleEventTargetKind.Pokemon } eventTarget)
         {
             target = eventTarget.Pokemon;
         }
@@ -436,7 +436,7 @@ public partial class Battle
         Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false)
     {
-        if (target is null && Event.Target is PokemonSingleEventTarget eventTarget)
+        if (target is null && Event.Target is { Kind: SingleEventTargetKind.Pokemon } eventTarget)
         {
             target = eventTarget.Pokemon;
         }
