@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -408,8 +409,163 @@ public partial class Battle
         };
     }
 
+    /// <summary>
+    /// Creates a deep copy of this Battle, including all Sides, Pokemon, Field, and Queue state.
+    /// The copy uses a fresh RNG and skips logs/history/events/pools.
+    /// All internal Pokemon references are properly remapped to the copied instances.
+    /// </summary>
     public Battle Copy()
     {
-        throw new NotImplementedException();
+        var pokemonMap = new Dictionary<Pokemon, Pokemon>();
+        return new Battle(this, pokemonMap);
+    }
+
+    /// <summary>
+    /// Internal copy constructor. Creates a deep copy with proper Pokemon reference remapping.
+    /// </summary>
+    internal Battle(Battle source, Dictionary<Pokemon, Pokemon> pokemonMap)
+    {
+        // Share immutable data
+        Library = source.Library;
+        Dex = source.Dex;
+        Format = source.Format;
+        RuleTable = source.RuleTable;
+        FormatData = source.FormatData;
+        GameType = source.GameType;
+        ActivePerHalf = source.ActivePerHalf;
+        DebugMode = false;
+        DisplayUi = false;
+        MaxTurns = source.MaxTurns;
+        PrngSeed = source.PrngSeed;
+        Send = (_, _) => { };
+
+        // Fresh RNG for simulation
+        Prng = new Prng(null);
+
+        // --- Pass 1: Deep copy Sides (which creates all Pokemon copies) ---
+        var side1 = source.P1.Copy(this, pokemonMap);
+        var side2 = source.P2.Copy(this, pokemonMap);
+        side1.Foe = side2;
+        side2.Foe = side1;
+        Sides = [side1, side2];
+
+        // Deep copy Field
+        Field = source.Field.Copy(this, pokemonMap);
+
+        // --- Pass 2: Remap all Pokemon references ---
+        side1.RemapPokemonReferences(pokemonMap, source.P1);
+        side2.RemapPokemonReferences(pokemonMap, source.P2);
+        Field.RemapPokemonReferences(pokemonMap);
+
+        // Copy BattleQueue with remapped actions
+        Queue = new BattleQueue(this);
+        foreach (var action in source.Queue.List)
+            Queue.List.Add(RemapAction(action, pokemonMap));
+
+        // Fresh BattleActions
+        Actions = new BattleActions(this);
+
+        // Copy battle state
+        Turn = source.Turn;
+        MidTurn = source.MidTurn;
+        Started = source.Started;
+        Ended = source.Ended;
+        Winner = source.Winner;
+        RequestState = source.RequestState;
+        Rated = source.Rated;
+        ReportExactHp = source.ReportExactHp;
+        ReportPercentages = source.ReportPercentages;
+        SupportCancel = source.SupportCancel;
+        LastDamage = source.LastDamage;
+        EffectOrder = source.EffectOrder;
+        QuickClawRoll = source.QuickClawRoll;
+        LastSuccessfulMoveThisTurn = source.LastSuccessfulMoveThisTurn;
+        LastMoveLine = source.LastMoveLine;
+        SpeedOrder = new List<int>(source.SpeedOrder);
+
+        // Effect (library reference, share)
+        Effect = source.Effect;
+        EffectState = source.EffectState.DeepClone();
+        EffectState.RemapPokemonReferences(pokemonMap);
+
+        // Event system (fresh)
+        Event = new Event();
+        Events = null;
+        EventDepth = 0;
+
+        // Remap Pokemon references in battle state
+        ActivePokemon = EffectState.RemapPokemon(source.ActivePokemon, pokemonMap);
+        ActiveTarget = EffectState.RemapPokemon(source.ActiveTarget, pokemonMap);
+        ActiveMove = CopyActiveMove(source.ActiveMove, pokemonMap);
+        LastMove = CopyActiveMove(source.LastMove, pokemonMap);
+
+        // Copy FaintQueue with remapped Pokemon references
+        FaintQueue = source.FaintQueue
+            .Select(fq => new FaintQueue
+            {
+                Target = pokemonMap.TryGetValue(fq.Target, out var t) ? t : fq.Target,
+                Source = fq.Source is not null
+                    ? EffectState.RemapPokemon(fq.Source, pokemonMap)
+                    : null,
+                Effect = fq.Effect,
+            })
+            .ToList();
+
+        // Skipped: Log, InputLog, PendingEvents, History, object pools, Hints
+    }
+
+    /// <summary>
+    /// Remaps an IAction's Pokemon references using the pokemonMap.
+    /// Action types are records, so we use 'with' expressions for clean copying.
+    /// </summary>
+    private static IAction RemapAction(IAction action, Dictionary<Pokemon, Pokemon> pokemonMap)
+    {
+        return action switch
+        {
+            MoveAction ma => ma with
+            {
+                Pokemon = pokemonMap.TryGetValue(ma.Pokemon, out var mp) ? mp : ma.Pokemon,
+                OriginalTarget = ma.OriginalTarget is not null
+                    ? EffectState.RemapPokemon(ma.OriginalTarget, pokemonMap)
+                    : null,
+            },
+            SwitchAction sa => sa with
+            {
+                Pokemon = pokemonMap.TryGetValue(sa.Pokemon, out var sp) ? sp : sa.Pokemon,
+                Target = pokemonMap.TryGetValue(sa.Target, out var st) ? st : sa.Target,
+            },
+            PokemonAction pa => pa with
+            {
+                Pokemon = pokemonMap.TryGetValue(pa.Pokemon, out var pp) ? pp : pa.Pokemon,
+                Dragger = pa.Dragger is not null
+                    ? EffectState.RemapPokemon(pa.Dragger, pokemonMap)
+                    : null,
+            },
+            TeamAction ta => ta with
+            {
+                Pokemon = pokemonMap.TryGetValue(ta.Pokemon, out var tp) ? tp : ta.Pokemon,
+            },
+            _ => action,
+        };
+    }
+
+    /// <summary>
+    /// Creates a copy of an ActiveMove with Pokemon references remapped.
+    /// </summary>
+    private static ActiveMove? CopyActiveMove(ActiveMove? move, Dictionary<Pokemon, Pokemon> pokemonMap)
+    {
+        if (move is null) return null;
+
+        return move with
+        {
+            HitTargets = null,
+            Allies = null,
+            AuraBooster = null,
+            RuinedAtk = null,
+            RuinedDef = null,
+            RuinedSpA = null,
+            RuinedSpD = null,
+            MoveHitData = null,
+        };
     }
 }

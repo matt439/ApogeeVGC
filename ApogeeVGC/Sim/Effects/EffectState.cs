@@ -112,4 +112,107 @@ public class EffectState
             // TODO: Copy any other properties
         };
     }
+
+    /// <summary>
+    /// Creates a complete deep clone of this EffectState.
+    /// Pokemon references (Source, LinkedPokemon, LastDamageSource) are set to null
+    /// and must be remapped via <see cref="RemapPokemonReferences"/> after all Pokemon are copied.
+    /// </summary>
+    public EffectState DeepClone()
+    {
+        return new EffectState
+        {
+            // Core
+            Id = Id,
+            EffectOrder = EffectOrder,
+            Duration = Duration,
+
+            // Shared references (library objects / structs)
+            Target = Target,
+            SourceEffect = SourceEffect,
+            SourceSlot = SourceSlot,
+            LinkedStatus = LinkedStatus,
+            Berry = Berry,
+            MoveData = MoveData,
+
+            // Pokemon references → null (remapped in Pass 2)
+            Source = null,
+            LinkedPokemon = null,
+            LastDamageSource = null,
+
+            // Value-type fields
+            Started = Started,
+            Ending = Ending,
+            FromBooster = FromBooster,
+            BestStat = BestStat,
+            Unnerved = Unnerved,
+            StartTime = StartTime,
+            Time = Time,
+            Stage = Stage,
+            Move = Move,
+            Counter = Counter,
+            KnockedOff = KnockedOff,
+            Resisted = Resisted,
+            IsSlotCondition = IsSlotCondition,
+            HasDragonType = HasDragonType,
+            ContactHitCount = ContactHitCount,
+            CheckedAngerShell = CheckedAngerShell,
+            CheckedBerserk = CheckedBerserk,
+            Embodied = Embodied,
+            Gluttony = Gluttony,
+            ChoiceLock = ChoiceLock,
+            Busted = Busted,
+            Libero = Libero,
+            Protean = Protean,
+            BerryWeaken = BerryWeaken,
+            Seek = Seek,
+            Ready = Ready,
+            LastMove = LastMove,
+            NumConsecutive = NumConsecutive,
+            Eject = Eject,
+            Inactive = Inactive,
+            LostFocus = LostFocus,
+            HitCount = HitCount,
+            Multiplier = Multiplier,
+            DoubleMultiplier = DoubleMultiplier,
+            TargetSlot = TargetSlot,
+            TargetLoc = TargetLoc,
+            EndingTurn = EndingTurn,
+            TrueDuration = TrueDuration,
+            Layers = Layers,
+            Def = Def,
+            Spd = Spd,
+            BoundDivisor = BoundDivisor,
+            Hp = Hp,
+            StartingTurn = StartingTurn,
+            Slot = Slot,
+            Damage = Damage,
+
+            // Deep copy reference types
+            TypeWas = TypeWas?.ToArray(),
+            Boosts = Boosts?.Copy(),
+        };
+    }
+
+    /// <summary>
+    /// Remaps Pokemon references in this EffectState using the provided mapping.
+    /// Called during Pass 2 of deep copy after all Pokemon have been copied.
+    /// </summary>
+    internal void RemapPokemonReferences(Dictionary<Pokemon, Pokemon> pokemonMap)
+    {
+        Source = RemapPokemon(Source, pokemonMap);
+        LastDamageSource = RemapPokemon(LastDamageSource, pokemonMap);
+        if (LinkedPokemon is not null)
+        {
+            for (int i = 0; i < LinkedPokemon.Count; i++)
+            {
+                var remapped = RemapPokemon(LinkedPokemon[i], pokemonMap);
+                if (remapped is not null)
+                    LinkedPokemon[i] = remapped;
+            }
+        }
+    }
+
+    internal static Pokemon? RemapPokemon(Pokemon? pokemon, Dictionary<Pokemon, Pokemon> map)
+        => pokemon is not null && map.TryGetValue(pokemon, out var copy) ? copy : null;
 }

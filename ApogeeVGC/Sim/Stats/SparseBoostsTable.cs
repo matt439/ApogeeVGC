@@ -138,6 +138,17 @@ public class SparseBoostsTable
     /// Only yields boosts that have been explicitly set (non-null).
     /// </summary>
     /// <returns>An enumerable of (BoostId, value) pairs for all non-null boosts</returns>
+    public SparseBoostsTable Copy() => new SparseBoostsTable
+    {
+        Atk = Atk,
+        Def = Def,
+        SpA = SpA,
+        SpD = SpD,
+        Spe = Spe,
+        Accuracy = Accuracy,
+        Evasion = Evasion,
+    };
+
     public IEnumerable<(BoostId BoostId, int Value)> GetNonNullBoosts()
     {
         if (Atk.HasValue)

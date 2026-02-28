@@ -160,9 +160,85 @@ public partial class Side
             "This indicates an invalid battle state where a Pokemon should be present.");
     }
 
-    public Side Copy()
+    /// <summary>
+    /// Internal copy constructor for deep copy. Creates a copy of this Side with all
+    /// Pokemon deep-copied and registered in pokemonMap. Pokemon references in EffectStates
+    /// are deferred to Pass 2 via <see cref="RemapPokemonReferences"/>.
+    /// </summary>
+    internal Side(Battle newBattle, Side source, Dictionary<Pokemon, Pokemon> pokemonMap)
+        : this(newBattle)
     {
-        throw new NotImplementedException();
+        // Override get-only properties set by base constructor
+        Id = source.Id;
+        N = source.N;
+        Name = source.Name;
+        Avatar = source.Avatar;
+
+        // Share team data (immutable PokemonSets)
+        Team = new List<PokemonSet>(source.Team);
+
+        // Deep copy all Pokemon (Pass 1)
+        Pokemon = new List<Pokemon>(source.Pokemon.Count);
+        foreach (var pokemon in source.Pokemon)
+        {
+            Pokemon.Add(pokemon.Copy(this, pokemonMap));
+        }
+
+        // Set Active list by remapping from pokemonMap
+        Active = source.Active
+            .Select(p => p is not null ? pokemonMap[p] : null)
+            .ToList();
+
+        // Copy battle state
+        PokemonLeft = source.PokemonLeft;
+        TotalFainted = source.TotalFainted;
+        Initialised = source.Initialised;
+        RequestState = source.RequestState;
+        LastSelectedMove = source.LastSelectedMove;
+
+        // FaintedLastTurn/ThisTurn are remapped in Pass 2
+        FaintedLastTurn = null;
+        FaintedThisTurn = null;
+
+        // Deep clone side conditions
+        SideConditions = source.SideConditions.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.DeepClone());
+
+        SlotConditions = source.SlotConditions
+            .Select(dict => dict.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.DeepClone()))
+            .ToList();
+
+        // Fresh choice state
+        Choice = CreateDefaultChoice();
+        ActiveRequest = null;
+    }
+
+    public Side Copy(Battle newBattle, Dictionary<Pokemon, Pokemon> pokemonMap)
+    {
+        return new Side(newBattle, this, pokemonMap);
+    }
+
+    /// <summary>
+    /// Pass 2: Remaps all Pokemon references in this Side's conditions and Pokemon.
+    /// </summary>
+    internal void RemapPokemonReferences(Dictionary<Pokemon, Pokemon> pokemonMap, Side source)
+    {
+        FaintedLastTurn = EffectState.RemapPokemon(source.FaintedLastTurn, pokemonMap);
+        FaintedThisTurn = EffectState.RemapPokemon(source.FaintedThisTurn, pokemonMap);
+
+        // Remap EffectStates in SideConditions and SlotConditions
+        foreach (var es in SideConditions.Values)
+            es.RemapPokemonReferences(pokemonMap);
+        foreach (var dict in SlotConditions)
+            foreach (var es in dict.Values)
+                es.RemapPokemonReferences(pokemonMap);
+
+        // Remap each Pokemon's references
+        for (int i = 0; i < Pokemon.Count; i++)
+            Pokemon[i].RemapPokemonReferences(pokemonMap, source.Pokemon[i]);
     }
 
     public override string ToString() => $"{Id}: {Name}";

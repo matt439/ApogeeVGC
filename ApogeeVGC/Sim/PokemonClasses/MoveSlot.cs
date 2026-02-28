@@ -22,4 +22,17 @@ public class MoveSlot
     public EffectStateId? DisabledSource { get; set; }
     public bool Used { get; set; }
     public bool? Virtual { get; set; }
+
+    public MoveSlot Copy() => new MoveSlot
+    {
+        Id = Id,
+        Move = Move,
+        Pp = Pp,
+        MaxPp = MaxPp,
+        Target = Target,
+        Disabled = Disabled,
+        DisabledSource = DisabledSource,
+        Used = Used,
+        Virtual = Virtual,
+    };
 }

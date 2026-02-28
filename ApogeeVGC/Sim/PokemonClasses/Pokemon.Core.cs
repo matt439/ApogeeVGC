@@ -402,6 +402,153 @@ public partial class Pokemon : IPriorityComparison
     }
 
     /// <summary>
+    /// Internal copy constructor for deep copy. Creates a copy of the Pokemon
+    /// with all value-type and stat fields copied. Pokemon references (Illusion,
+    /// AttackedBy sources, EffectState sources) are set to null/empty and must be
+    /// remapped via <see cref="RemapPokemonReferences"/> after all Pokemon are copied.
+    /// </summary>
+    internal Pokemon(Side newSide, Pokemon source)
+    {
+        // Get-only properties
+        Side = newSide;
+        Set = source.Set;
+        BattleLevel = source.BattleLevel;
+
+        // Move slots (get-only BaseMoveSlots, settable MoveSlots)
+        BaseMoveSlots = source.BaseMoveSlots.Select(ms => ms.Copy()).ToList();
+        MoveSlots = source.MoveSlots.Select(ms => ms.Copy()).ToList();
+
+        // Position
+        Position = source.Position;
+
+        // Species (library objects, share references)
+        BaseSpecies = source.BaseSpecies;
+        Species = source.Species;
+
+        // Stats (use existing Copy() methods)
+        BaseStoredStats = source.BaseStoredStats.Copy();
+        StoredStats = source.StoredStats.Copy();
+        Boosts = source.Boosts.Copy();
+
+        // HP
+        MaxHp = source.MaxHp;
+        BaseMaxHp = source.BaseMaxHp;
+        Hp = source.Hp;
+        Fainted = source.Fainted;
+        FaintQueued = source.FaintQueued;
+        SubFainted = source.SubFainted;
+
+        // Status
+        Status = source.Status;
+
+        // Ability / Item (enum values)
+        BaseAbility = source.BaseAbility;
+        Ability = source.Ability;
+        Item = source.Item;
+        LastItem = source.LastItem;
+        UsedItemThisTurn = source.UsedItemThisTurn;
+        AteBerry = source.AteBerry;
+
+        // Trapped
+        Trapped = source.Trapped;
+        MaybeTrapped = source.MaybeTrapped;
+        MaybeDisabled = source.MaybeDisabled;
+        MaybeLocked = source.MaybeLocked;
+
+        // Transformed
+        Transformed = source.Transformed;
+        FormeRegression = source.FormeRegression;
+
+        // Types (copy lists of enums)
+        Types = new List<PokemonType>(source.Types);
+        BaseTypes = new List<PokemonType>(source.BaseTypes);
+        ApparentType = new List<PokemonType>(source.ApparentType);
+        AddedType = source.AddedType;
+        KnownType = source.KnownType;
+
+        // Switch flags
+        SwitchFlag = source.SwitchFlag;
+        ForceSwitchFlag = source.ForceSwitchFlag;
+        SkipBeforeSwitchOutEventFlag = source.SkipBeforeSwitchOutEventFlag;
+        DraggedIn = source.DraggedIn;
+        NewlySwitched = source.NewlySwitched;
+        BeingCalledBack = source.BeingCalledBack;
+
+        // Move history (Move refs are library objects, safe to share)
+        LastMove = source.LastMove;
+        LastMoveEncore = source.LastMoveEncore;
+        LastMoveUsed = source.LastMoveUsed;
+        LastMoveTargetLoc = source.LastMoveTargetLoc;
+        MoveThisTurn = source.MoveThisTurn;
+        MoveLastTurnResult = source.MoveLastTurnResult;
+        MoveThisTurnResult = source.MoveThisTurnResult;
+        StatsRaisedThisTurn = source.StatsRaisedThisTurn;
+        StatsLoweredThisTurn = source.StatsLoweredThisTurn;
+
+        // Damage tracking
+        LastDamage = source.LastDamage;
+        HurtThisTurn = source.HurtThisTurn;
+        TimesAttacked = source.TimesAttacked;
+
+        // Active state
+        IsActive = source.IsActive;
+        ActiveTurns = source.ActiveTurns;
+        ActiveMoveActions = source.ActiveMoveActions;
+        PreviouslySwitchedIn = source.PreviouslySwitchedIn;
+        IsStarted = source.IsStarted;
+        DuringMove = source.DuringMove;
+
+        // Ability flags
+        TruantTurn = source.TruantTurn;
+        BondTriggered = source.BondTriggered;
+        SwordBoost = source.SwordBoost;
+        ShieldBoost = source.ShieldBoost;
+        SyrupTriggered = source.SyrupTriggered;
+        HeroMessageDisplayed = source.HeroMessageDisplayed;
+
+        // Weight / Speed
+        WeightKg = source.WeightKg;
+        WeightHg = source.WeightHg;
+        Speed = source.Speed;
+
+        // Tera
+        CanTerastallize = source.CanTerastallize;
+        TeraType = source.TeraType;
+        Terastallized = source.Terastallized;
+        StellarBoostedTypes = new List<MoveType>(source.StellarBoostedTypes);
+
+        // Staleness
+        Staleness = source.Staleness;
+        PendingStaleness = source.PendingStaleness;
+        VolatileStaleness = source.VolatileStaleness;
+
+        ShowCure = source.ShowCure;
+
+        // Details (has mutable TeraType, so create a copy)
+        Details = new PokemonDetails
+        {
+            Id = source.Details.Id,
+            Level = source.Details.Level,
+            Gender = source.Details.Gender,
+            Shiny = source.Details.Shiny,
+            TeraType = source.Details.TeraType,
+        };
+
+        // EffectStates — deep clone values, Pokemon refs are null (remapped in Pass 2)
+        SpeciesState = source.SpeciesState.DeepClone();
+        StatusState = source.StatusState.DeepClone();
+        AbilityState = source.AbilityState.DeepClone();
+        ItemState = source.ItemState.DeepClone();
+        Volatiles = source.Volatiles.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.DeepClone());
+
+        // Pokemon references — null/empty (remapped in Pass 2)
+        Illusion = null;
+        AttackedBy = [];
+    }
+
+    /// <summary>
     /// Gets the full slot identifier combining side ID and position letter.
     /// Simplified version for standard battle formats.
     /// </summary>

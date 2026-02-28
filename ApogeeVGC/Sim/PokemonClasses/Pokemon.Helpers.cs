@@ -1,5 +1,7 @@
-﻿using ApogeeVGC.Sim.Items;
+﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
@@ -97,8 +99,45 @@ public partial class Pokemon
         ItemId.SitrusBerry,
     ];
 
-    public Pokemon Copy()
+    /// <summary>
+    /// Creates a deep copy of this Pokemon on the given new side, and registers
+    /// the mapping in pokemonMap. Pokemon references are deferred to Pass 2.
+    /// </summary>
+    internal Pokemon Copy(Side newSide, Dictionary<Pokemon, Pokemon> pokemonMap)
     {
-        throw new NotImplementedException();
+        var copy = new Pokemon(newSide, this);
+        pokemonMap[this] = copy;
+        return copy;
+    }
+
+    /// <summary>
+    /// Pass 2: Remaps all Pokemon references in this Pokemon's EffectStates,
+    /// Illusion, and AttackedBy using the completed pokemonMap.
+    /// Must be called after all Pokemon on both sides have been copied.
+    /// </summary>
+    internal void RemapPokemonReferences(Dictionary<Pokemon, Pokemon> pokemonMap, Pokemon source)
+    {
+        // Remap Illusion
+        Illusion = EffectState.RemapPokemon(source.Illusion, pokemonMap);
+
+        // Remap AttackedBy — create new Attacker records with remapped Source
+        AttackedBy = source.AttackedBy
+            .Select(a =>
+            {
+                var remappedSource = EffectState.RemapPokemon(a.Source, pokemonMap);
+                return remappedSource is not null
+                    ? a with { Source = remappedSource }
+                    : null;
+            })
+            .Where(a => a is not null)
+            .ToList()!;
+
+        // Remap EffectState Pokemon references
+        SpeciesState.RemapPokemonReferences(pokemonMap);
+        StatusState.RemapPokemonReferences(pokemonMap);
+        AbilityState.RemapPokemonReferences(pokemonMap);
+        ItemState.RemapPokemonReferences(pokemonMap);
+        foreach (var es in Volatiles.Values)
+            es.RemapPokemonReferences(pokemonMap);
     }
 }

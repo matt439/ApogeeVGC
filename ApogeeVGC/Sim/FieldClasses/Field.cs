@@ -528,9 +528,34 @@ Battle.Debug($"[RemovePseudoWeather] Removed {status.Id}, still exists: {PseudoW
         return RemovePseudoWeather(Battle.Library.Conditions[status]);
     }
 
-    public Field Copy()
+    /// <summary>
+    /// Creates a deep copy of this Field for the given new Battle.
+    /// EffectState Pokemon references are nulled and remapped in Pass 2.
+    /// </summary>
+    public Field Copy(Battle newBattle, Dictionary<Pokemon, Pokemon> pokemonMap)
     {
-        throw new NotImplementedException();
+        var copy = new Field(newBattle)
+        {
+            PseudoWeather = PseudoWeather.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.DeepClone()),
+        };
+        copy.Weather = Weather;
+        copy.WeatherState = WeatherState.DeepClone();
+        copy.Terrain = Terrain;
+        copy.TerrainState = TerrainState.DeepClone();
+        return copy;
+    }
+
+    /// <summary>
+    /// Pass 2: Remaps Pokemon references in Field EffectStates.
+    /// </summary>
+    internal void RemapPokemonReferences(Dictionary<Pokemon, Pokemon> pokemonMap)
+    {
+        WeatherState.RemapPokemonReferences(pokemonMap);
+        TerrainState.RemapPokemonReferences(pokemonMap);
+        foreach (var es in PseudoWeather.Values)
+            es.RemapPokemonReferences(pokemonMap);
     }
 
     public FieldPerspective GetPerspective()
