@@ -200,7 +200,7 @@ public partial class Battle
         // Extract the source Pokemon for handler lookup
         Pokemon? effectSource = source switch
         {
-            PokemonRunEventSource pokemonSource => pokemonSource.Pokemon,
+            { IsPokemon: true } pokemonSource => pokemonSource.Pokemon,
             _ => null,
         };
 
@@ -282,9 +282,9 @@ public partial class Battle
         rentedEvent.Target = target?.ToSingleEventTarget();
         rentedEvent.Source = source switch
         {
-            PokemonRunEventSource pokemonSource => SingleEventSource.FromPokemon(pokemonSource
+            { IsPokemon: true } pokemonSource => SingleEventSource.FromPokemon(pokemonSource
                 .Pokemon),
-            TypeRunEventSource typeSource => SingleEventSource.FromPokemonType(typeSource.Type),
+            { IsType: true } typeSource => SingleEventSource.FromPokemonType(typeSource.Type),
             _ => null as SingleEventSource?,
         };
         rentedEvent.Effect = sourceEffect;
