@@ -22,7 +22,7 @@ public partial class Driver
 
     private const int RandomEvaluationNumTest = 20000;
     private const int NumThreads = 16;
-    private const int BattleTimeoutMilliseconds = 10000; // 3 seconds timeout per battle
+    private const int BattleTimeoutMilliseconds = 10000; // 10 seconds timeout per battle
 
     public void Start(DriverMode mode)
     {
