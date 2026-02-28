@@ -80,14 +80,15 @@ public sealed class StateEncoder
     private static List<PokemonPerspective> GetBenchPokemon(IReadOnlyList<PokemonPerspective> pokemon)
     {
         var bench = new List<PokemonPerspective>(2);
-        for (var i = 0; i < pokemon.Count; i++)
+        foreach (PokemonPerspective t in pokemon)
         {
-            if (!pokemon[i].IsActive)
+            if (!t.IsActive)
             {
-                bench.Add(pokemon[i]);
+                bench.Add(t);
                 if (bench.Count >= 2) break;
             }
         }
+
         return bench;
     }
 
