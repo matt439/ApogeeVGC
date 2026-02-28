@@ -662,13 +662,16 @@ public partial class Side
         }
 
         // Debug logging
-        Battle.Debug(
-            $"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
-        for (int i = 0; i < input.Actions.Count; i++)
+        if (Battle.DebugMode)
         {
-            var action = input.Actions[i];
             Battle.Debug(
-                $"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
+                $"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
+            for (int i = 0; i < input.Actions.Count; i++)
+            {
+                var action = input.Actions[i];
+                Battle.Debug(
+                    $"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
+            }
         }
 
         // Step 5: Process each action in the choice
@@ -1049,16 +1052,12 @@ public partial class Side
 
         if (Choice.ForcedSwitchesLeft > 0)
         {
-            Battle.Debug($"[IsChoiceDone] {Name}: ForcedSwitchesLeft={Choice.ForcedSwitchesLeft}, returning false");
             return false;
         }
 
         if (RequestState == RequestState.TeamPreview)
         {
-            bool done = Choice.Actions.Count >= PickedTeamSize();
-            Battle.Debug(
-                $"[IsChoiceDone] {Name}: TeamPreview - Actions={Choice.Actions.Count}, PickedTeamSize={PickedTeamSize()}, done={done}");
-            return done;
+            return Choice.Actions.Count >= PickedTeamSize();
         }
 
         // For move/switch requests, auto-pass Pokemon that don't need actions
@@ -1066,10 +1065,7 @@ public partial class Side
         // then check if all active slots have been handled.
         // Matches TS: this.getChoiceIndex(); return this.choice.actions.length >= this.active.length;
         GetChoiceIndex();
-        bool isDone = Choice.Actions.Count >= Active.Count;
-        Battle.Debug(
-            $"[IsChoiceDone] {Name}: {RequestState} request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={isDone}");
-        return isDone;
+        return Choice.Actions.Count >= Active.Count;
     }
 
 

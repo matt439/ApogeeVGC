@@ -83,20 +83,26 @@ public partial class BattleActions
         Battle.ActiveTarget = target;
 
         // Run BeforeMove event - can prevent the move from happening
-        Battle.Debug($"[RunMove] About to call BeforeMove event for {pokemon.Name} using {activeMove.Name}");
-        Battle.Debug($"[RunMove] {pokemon.Name} has {pokemon.Volatiles.Count} volatile conditions");
-        foreach (var volatileId in pokemon.Volatiles.Keys)
+        if (Battle.DebugMode)
         {
-            Battle.Debug($"[RunMove]   - {volatileId} (Duration: {pokemon.Volatiles[volatileId].Duration})");
+            Battle.Debug($"[RunMove] About to call BeforeMove event for {pokemon.Name} using {activeMove.Name}");
+            Battle.Debug($"[RunMove] {pokemon.Name} has {pokemon.Volatiles.Count} volatile conditions");
+            foreach (var volatileId in pokemon.Volatiles.Keys)
+            {
+                Battle.Debug($"[RunMove]   - {volatileId} (Duration: {pokemon.Volatiles[volatileId].Duration})");
+            }
         }
-        
+
         RelayVar? willTryMove = Battle.RunEvent(EventId.BeforeMove, pokemon,
             RunEventSource.FromNullablePokemon(target), activeMove);
 
-        Battle.Debug($"[RunMove] BeforeMove event returned: {willTryMove?.GetType().Name ?? "null"}");
-        if (willTryMove is BoolRelayVar brv)
+        if (Battle.DebugMode)
         {
-            Battle.Debug($"[RunMove] BeforeMove returned bool: {brv.Value}");
+            Battle.Debug($"[RunMove] BeforeMove event returned: {willTryMove?.GetType().Name ?? "null"}");
+            if (willTryMove is BoolRelayVar brv)
+            {
+                Battle.Debug($"[RunMove] BeforeMove returned bool: {brv.Value}");
+            }
         }
 
         if (willTryMove is BoolRelayVar { Value: false } or null)

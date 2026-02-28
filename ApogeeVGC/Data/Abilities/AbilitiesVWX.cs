@@ -513,7 +513,7 @@ public partial record Abilities
                         return new VoidReturn();
                     // SkyDrop check would go here if we implemented that move
 
-                    battle.Debug("Wonder Guard immunity: " + move.Id);
+                    battle.Debug($"Wonder Guard immunity: {move.Id}");
                     var effectiveness = target.RunEffectiveness(move);
                     if (effectiveness.ToModifier() <= 0 || target.RunImmunity(move) != true)
                     {

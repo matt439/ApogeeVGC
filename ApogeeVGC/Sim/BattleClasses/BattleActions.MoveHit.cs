@@ -373,22 +373,10 @@ if (tryResult is BoolRelayVar { Value: false } ||
         Pokemon? activeTarget = Battle.ActiveTarget;
 
         // 4. self drops (start checking for targets[i] === false here)
-        Battle.Debug($"[SpreadMoveHit] Step 4: Checking self drops for {move.Name}, move.Self != null: {move.Self != null}, move.SelfDropped: {move.SelfDropped}");
         if (move.Self != null && move.SelfDropped != true)
         {
             Battle.Debug($"[SpreadMoveHit] Calling SelfDrops for {move.Name}");
             SelfDrops(targets, pokemon, move, move, isSecondary);
-        }
-        else
-        {
-            if (move.Self == null)
-            {
-                Battle.Debug($"[SpreadMoveHit] Skipping SelfDrops: move.Self is null");
-            }
-            if (move.SelfDropped == true)
-            {
-                Battle.Debug($"[SpreadMoveHit] Skipping SelfDrops: move.SelfDropped is true");
-            }
         }
 
         // 5. secondary effects
