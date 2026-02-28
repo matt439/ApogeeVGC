@@ -45,7 +45,7 @@ public partial record Conditions
                     Ability ability = pokemon.GetAbility();
                     battle.SingleEvent(EventId.End, ability, pokemon.AbilityState,
                         (SingleEventTarget)pokemon,
-                        new PokemonSingleEventSource(pokemon),
+                        SingleEventSource.FromPokemon(pokemon),
                         _library.Conditions[ConditionId.GastroAcid]);
                     return null;
                 }),

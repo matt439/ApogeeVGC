@@ -282,10 +282,10 @@ public partial class Battle
         rentedEvent.Target = target?.ToSingleEventTarget();
         rentedEvent.Source = source switch
         {
-            PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource
+            PokemonRunEventSource pokemonSource => SingleEventSource.FromPokemon(pokemonSource
                 .Pokemon),
-            TypeRunEventSource typeSource => new PokemonTypeSingleEventSource(typeSource.Type),
-            _ => null,
+            TypeRunEventSource typeSource => SingleEventSource.FromPokemonType(typeSource.Type),
+            _ => null as SingleEventSource?,
         };
         rentedEvent.Effect = sourceEffect;
         rentedEvent.Modifier = 1.0;

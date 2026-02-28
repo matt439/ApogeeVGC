@@ -37,16 +37,16 @@ internal sealed class EventInvocationContext
       _ => null
        },
      TargetField = Target is { Kind: SingleEventTargetKind.Field } tf ? tf.Field : null,
-     SourcePokemon = Source switch
-       {
-           PokemonSingleEventSource p => p.Pokemon,
-       _ => null
-      },
-  SourceType = Source switch
-      {
-          PokemonTypeSingleEventSource t => t.Type,
+         SourcePokemon = Source switch
+          {
+              { IsPokemon: true } s => s.Pokemon,
           _ => null
-      },
+         },
+     SourceType = Source switch
+         {
+             { IsPokemonType: true } s => s.Type,
+             _ => null
+         },
   SourceEffect = SourceEffect,
     Move = SourceEffect as Moves.ActiveMove,
  RelayVar = RelayVar

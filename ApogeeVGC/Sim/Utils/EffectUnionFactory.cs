@@ -11,16 +11,8 @@ namespace ApogeeVGC.Sim.Utils;
 
 public static class EffectUnionFactory
 {
-    public static SingleEventSource ToSingleEventSource(IEffect effect) => effect switch
-    {
-        Ability ability => new EffectSingleEventSource(ability),
-        Item item => new EffectSingleEventSource(item),
-        ActiveMove activeMove => new EffectSingleEventSource(activeMove),
-        Species specie => new EffectSingleEventSource(specie),
-        Condition condition => new EffectSingleEventSource(condition),
-        Format format => new EffectSingleEventSource(format),
-        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource"),
-    };
+    public static SingleEventSource ToSingleEventSource(IEffect effect) =>
+        SingleEventSource.FromEffect(effect);
 
     public static RelayVar ToRelayVar(IEffect effect) => effect switch
     {

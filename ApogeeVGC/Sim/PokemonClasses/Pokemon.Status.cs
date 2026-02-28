@@ -33,7 +33,7 @@ public partial class Pokemon
         if (Battle.Event is not null)
         {
             sourceEffect ??= Battle.Event.Effect;
-            if (source == null && Battle.Event.Source is PokemonSingleEventSource pses)
+            if (source == null && Battle.Event.Source is { IsPokemon: true } pses)
             {
                 source = pses.Pokemon;
             }
@@ -259,7 +259,7 @@ public partial class Pokemon
         // Resolve source and sourceEffect from battle event if not provided
         if (Battle.Event is not null)
         {
-            if (source == null && Battle.Event.Source is PokemonSingleEventSource pses)
+            if (source == null && Battle.Event.Source is { IsPokemon: true } pses)
             {
                 source = pses.Pokemon;
             }

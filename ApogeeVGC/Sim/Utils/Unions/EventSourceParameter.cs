@@ -17,13 +17,13 @@ public abstract record EventSourceParameter
 
         return source switch
   {
-        PokemonSingleEventSource p when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
-      new PokemonEventSourceParameter(p.Pokemon),
-   EffectSingleEventSource e when expectedType.IsAssignableFrom(typeof(IEffect)) =>
-     new EffectEventSourceParameter(e.Effect),
-      PokemonTypeSingleEventSource t when expectedType.IsAssignableFrom(typeof(PokemonType)) =>
-    new PokemonTypeEventSourceParameter(t.Type),
-   FalseSingleEventSource when expectedType == typeof(bool) =>
+        { IsPokemon: true } s when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
+      new PokemonEventSourceParameter(s.Pokemon),
+   { IsEffect: true } s when expectedType.IsAssignableFrom(typeof(IEffect)) =>
+     new EffectEventSourceParameter(s.Effect),
+      { IsPokemonType: true } s when expectedType.IsAssignableFrom(typeof(PokemonType)) =>
+    new PokemonTypeEventSourceParameter(s.Type),
+   { IsFalse: true } when expectedType == typeof(bool) =>
        new BoolEventSourceParameter(false),
        _ => null,
  };

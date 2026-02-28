@@ -38,7 +38,7 @@ public partial class Battle
         }
 
         // Default source to event source if available
-        if (source == null && Event.Source is PokemonSingleEventSource eventSource)
+        if (source == null && Event.Source is { IsPokemon: true } eventSource)
         {
             source = eventSource.Pokemon;
         }
@@ -244,7 +244,7 @@ public partial class Battle
         }
 
         // Default source to event source if available
-        if (source == null && Event.Source is PokemonSingleEventSource eventSource)
+        if (source == null && Event.Source is { IsPokemon: true } eventSource)
         {
             source = eventSource.Pokemon;
         }
@@ -315,7 +315,7 @@ public partial class Battle
         }
 
         // Default source to event source if available
-        if (source == null && Event.Source is PokemonSingleEventSource eventSource)
+        if (source == null && Event.Source is { IsPokemon: true } eventSource)
         {
             source = eventSource.Pokemon;
         }
@@ -441,7 +441,7 @@ public partial class Battle
             target = eventTarget.Pokemon;
         }
 
-        if (source is null && Event.Source is PokemonSingleEventSource eventSource)
+        if (source is null && Event.Source is { IsPokemon: true } eventSource)
         {
             source = eventSource.Pokemon;
         }
