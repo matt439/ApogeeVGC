@@ -1,12 +1,14 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Mcts;
 
 /// <summary>
-/// The MCTS search engine. Currently operates in one-ply evaluation mode
-/// (no forward simulation until Battle.Copy() is implemented).
-/// The PUCT formula still guides action selection across the joint action space.
+/// The MCTS search engine. Clones the battle state for each iteration,
+/// applies the selected action, lets the opponent auto-choose, advances
+/// one turn, and evaluates the resulting state with the neural network.
 /// </summary>
 public sealed class MctsSearch
 {
@@ -25,6 +27,8 @@ public sealed class MctsSearch
     /// Run MCTS from the given state and return the best action pair.
     /// </summary>
     public (LegalAction ActionA, LegalAction? ActionB) Search(
+        Battle battle,
+        SideId sideId,
         IChoiceRequest request,
         BattlePerspective perspective)
     {
@@ -38,7 +42,7 @@ public sealed class MctsSearch
                     legalActions.SlotB.Count > 0 ? legalActions.SlotB[0] : null);
         }
 
-        // Evaluate the current state
+        // Evaluate the current state for policy priors
         var output = _model.Evaluate(perspective);
 
         // Build legal masks and compute softmax priors
@@ -58,12 +62,11 @@ public sealed class MctsSearch
         // Add Dirichlet noise to root priors for exploration
         AddDirichletNoise(root);
 
-        // Run MCTS iterations
-        // In one-ply mode: each iteration selects an edge via PUCT,
-        // uses the model's value as the leaf evaluation, and backpropagates.
+        // Run MCTS iterations with forward simulation
+        SideId opponentId = sideId == SideId.P1 ? SideId.P2 : SideId.P1;
         for (int i = 0; i < _config.NumIterations; i++)
         {
-            RunIteration(root, output.Value);
+            RunIteration(root, battle, sideId, opponentId);
         }
 
         // Select the action pair with the most visits
@@ -143,24 +146,76 @@ public sealed class MctsSearch
     }
 
     /// <summary>
-    /// Run a single MCTS iteration in one-ply mode.
-    /// Select an edge via PUCT, evaluate with the cached model value, backpropagate.
+    /// Run a single MCTS iteration: select an edge via PUCT, clone the battle,
+    /// apply the action, advance one turn, and evaluate the resulting state.
     /// </summary>
-    private void RunIteration(MctsNode root, float modelValue)
+    private void RunIteration(MctsNode root, Battle battle, SideId sideId, SideId opponentId)
     {
         // SELECT: pick the edge with highest PUCT score
         var edge = SelectEdge(root);
         if (edge == null) return;
 
-        // EVALUATE: in one-ply mode, use the model's value output directly.
-        // When Battle.Copy() is available, this will clone the state,
-        // apply the action, and evaluate the resulting state.
-        float leafValue = modelValue;
+        // SIMULATE: clone battle, apply our action, opponent auto-chooses, advance one turn
+        float leafValue;
+        try
+        {
+            leafValue = SimulateEdge(edge, battle, sideId, opponentId);
+        }
+        catch
+        {
+            // If simulation fails (e.g. invalid state in clone), skip this iteration
+            return;
+        }
 
         // BACKPROPAGATE
         edge.VisitCount++;
         edge.TotalValue += leafValue;
         root.VisitCount++;
+    }
+
+    /// <summary>
+    /// Clone the battle, apply the edge's action for our side, auto-choose for the opponent,
+    /// advance one turn, and return the leaf evaluation.
+    /// </summary>
+    private float SimulateEdge(MctsEdge edge, Battle battle, SideId sideId, SideId opponentId)
+    {
+        Battle sim = battle.Copy();
+
+        // Build our choice from the edge's actions
+        Choice ourChoice = _actionMapper.BuildChoice(edge.ActionA, edge.ActionB);
+
+        // Submit choices: our side uses the selected action, opponent auto-chooses
+        Side ourSide = sideId == SideId.P1 ? sim.P1 : sim.P2;
+        Side oppSide = sideId == SideId.P1 ? sim.P2 : sim.P1;
+
+        ourSide.Choose(ourChoice);
+        oppSide.AutoChoose();
+
+        // Advance the turn
+        sim.CommitChoices();
+
+        // Check for terminal state
+        if (sim.Ended)
+        {
+            return GetTerminalValue(sim, sideId);
+        }
+
+        // Evaluate the resulting state with the model
+        var perspective = sim.GetPerspectiveForSide(sideId);
+        var output = _model.Evaluate(perspective);
+        return output.Value;
+    }
+
+    /// <summary>
+    /// Returns 1.0 for a win, 0.0 for a loss, 0.5 for a tie.
+    /// </summary>
+    private static float GetTerminalValue(Battle sim, SideId sideId)
+    {
+        if (string.IsNullOrEmpty(sim.Winner))
+            return 0.5f; // Tie
+
+        string ourName = (sideId == SideId.P1 ? sim.P1 : sim.P2).Name;
+        return sim.Winner.Equals(ourName, StringComparison.OrdinalIgnoreCase) ? 1.0f : 0.0f;
     }
 
     /// <summary>

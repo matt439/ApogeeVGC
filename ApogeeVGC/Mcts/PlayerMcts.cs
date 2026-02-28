@@ -80,8 +80,10 @@ public sealed class PlayerMcts : IPlayer
 
     private Choice GetSearchChoice(IChoiceRequest request, Func<BattlePerspective> perspectiveFactory)
     {
+        var battle = BattleController.Battle
+            ?? throw new InvalidOperationException("Battle is not initialized on the controller");
         var perspective = perspectiveFactory();
-        var (actionA, actionB) = _search.Search(request, perspective);
+        var (actionA, actionB) = _search.Search(battle, SideId, request, perspective);
 
         if (PrintDebug)
         {
