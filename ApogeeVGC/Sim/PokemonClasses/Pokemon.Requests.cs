@@ -55,11 +55,11 @@ public partial class Pokemon
         // Get move list - either base moves (for allies) or current moves
         var moveSource = forAlly ? BaseMoveSlots : MoveSlots;
 
-        // Extract move IDs from move slots directly (avoids LINQ allocation)
-        var moves = new List<MoveId>(moveSource.Count);
-        foreach (var moveSlot in moveSource)
+        // Extract move IDs from move slots directly into an array (avoids List<> wrapper allocation)
+        var moves = new MoveId[moveSource.Count];
+        for (int i = 0; i < moveSource.Count; i++)
         {
-            moves.Add(moveSlot.Id);
+            moves[i] = moveSource[i].Id;
         }
 
         // Determine the condition - use Status directly (Fainted is a separate check)
