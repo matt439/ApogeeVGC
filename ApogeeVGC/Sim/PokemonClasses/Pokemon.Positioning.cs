@@ -239,12 +239,24 @@ public partial class Pokemon
 
     public List<Pokemon> Allies()
     {
-        return Side.Allies().Where(p => p != this).ToList();
+        var allies = new List<Pokemon>(Side.Active.Count);
+        foreach (var p in Side.Active)
+        {
+            if (p != null && p.Hp > 0 && p != this)
+                allies.Add(p);
+        }
+        return allies;
     }
 
     public List<Pokemon> AdjacentAllies()
     {
-        return Side.Allies().Where(IsAdjacent).ToList();
+        var allies = new List<Pokemon>(Side.Active.Count);
+        foreach (var p in Side.Active)
+        {
+            if (p != null && p.Hp > 0 && IsAdjacent(p))
+                allies.Add(p);
+        }
+        return allies;
     }
 
     public List<Pokemon> Foes(bool all = false)
@@ -254,7 +266,16 @@ public partial class Pokemon
 
     public List<Pokemon> AdjacentFoes()
     {
-        return Battle.ActivePerHalf <= 2 ? Side.Foes() : Side.Foes().Where(IsAdjacent).ToList();
+        if (Battle.ActivePerHalf <= 2)
+            return Side.Foes();
+
+        var foes = new List<Pokemon>(Side.Foe.Active.Count);
+        foreach (var p in Side.Foe.Active)
+        {
+            if (p != null && p.Hp > 0 && IsAdjacent(p))
+                foes.Add(p);
+        }
+        return foes;
     }
 
     public bool IsAlly(Pokemon? pokemon = null)
