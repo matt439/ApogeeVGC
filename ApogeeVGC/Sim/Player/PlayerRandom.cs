@@ -185,7 +185,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         }
 
 
-        var actions = new List<ChosenAction>();
+        var actions = new List<ChosenAction>(request.Active.Count);
 
         // Handle each active Pokemon
         for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
@@ -205,7 +205,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             }
 
             // Build list of all available choices (moves with and without tera, plus switch option)
-            var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>();
+            var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>(pokemonRequest.Moves.Count * 2 + 1);
 
             // Check if terastallization is available
             MoveType? teraType = pokemonRequest.CanTerastallize switch
@@ -237,12 +237,15 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             // 1. The Pokemon is not trapped
             // 2. There are bench Pokemon available to switch in
             bool isTrapped = pokemonRequest.Trapped == true;
-            var availableSwitches = request.Side.Pokemon
-                .Select((p, index) => new { PokemonData = p, Index = index })
-                .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
-                .ToList();
+            var sidePokemon = request.Side.Pokemon;
+            int availableSwitchCount = 0;
+            for (int si = 0; si < sidePokemon.Count; si++)
+            {
+                if (!sidePokemon[si].Active && !IsPokemonFainted(sidePokemon[si]))
+                    availableSwitchCount++;
+            }
 
-            bool canSwitch = !isTrapped && availableSwitches.Count > 0;
+            bool canSwitch = !isTrapped && availableSwitchCount > 0;
             if (canSwitch)
             {
                 availableChoices.Add((false, -1, false)); // Switch option
@@ -306,15 +309,28 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                 }
 
                 // Pick a random Pokemon to switch in
-                int randomSwitchIndex = _random.Random(0, availableSwitches.Count);
-                var selectedSwitch = availableSwitches[randomSwitchIndex];
+                int randomSwitchIndex = _random.Random(0, availableSwitchCount);
+                int selectedSwitchIndex = -1;
+                int switchCount = 0;
+                for (int si = 0; si < sidePokemon.Count; si++)
+                {
+                    if (!sidePokemon[si].Active && !IsPokemonFainted(sidePokemon[si]))
+                    {
+                        if (switchCount == randomSwitchIndex)
+                        {
+                            selectedSwitchIndex = si;
+                            break;
+                        }
+                        switchCount++;
+                    }
+                }
 
                 actions.Add(new ChosenAction
                 {
                     Choice = ChoiceType.Switch,
                     Pokemon = null,
                     MoveId = MoveId.None,
-                    Index = selectedSwitch.Index,
+                    Index = selectedSwitchIndex,
                 });
             }
         }
