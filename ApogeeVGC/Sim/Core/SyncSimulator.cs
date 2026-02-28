@@ -321,8 +321,7 @@ public class SyncSimulator : IBattleController
                 "Console player cannot be used in synchronous mode"),
             Player.PlayerType.Gui => throw new NotSupportedException(
                 "GUI player cannot be used in synchronous mode"),
-            Player.PlayerType.Mcts => throw new NotImplementedException(
-                "MCTS player not implemented yet"),
+            Player.PlayerType.Mcts => Mcts.PlayerMcts.Create(sideId, options, this),
             _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
         };
     }
