@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Mcts;
@@ -88,9 +89,9 @@ public sealed class ActionMapper
         };
 
         // Add move actions
-        for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+        for (var i = 0; i < pokemonRequest.Moves.Count; i++)
         {
-            var move = pokemonRequest.Moves[i];
+            PokemonMoveData move = pokemonRequest.Moves[i];
             if (IsDisabled(move.Disabled)) continue;
 
             int vocabIdx = _vocab.GetMoveActionIndex(move.Id);
@@ -128,7 +129,7 @@ public sealed class ActionMapper
         // Fallback: if everything is disabled and can't switch, use first move (Struggle)
         if (actions.Count == 0 && pokemonRequest.Moves.Count > 0)
         {
-            var firstMove = pokemonRequest.Moves[0];
+            PokemonMoveData firstMove = pokemonRequest.Moves[0];
             actions.Add(new LegalAction
             {
                 VocabIndex = _vocab.GetMoveActionIndex(firstMove.Id),
@@ -174,14 +175,14 @@ public sealed class ActionMapper
 
     private void AddSwitchActions(List<LegalAction> actions, SideRequestData sideData, BattlePerspective perspective)
     {
-        for (int i = 0; i < sideData.Pokemon.Count; i++)
+        for (var i = 0; i < sideData.Pokemon.Count; i++)
         {
-            var pokemon = sideData.Pokemon[i];
+            PokemonSwitchRequestData pokemon = sideData.Pokemon[i];
             if (pokemon.Active || pokemon.Condition == ConditionId.Fainted || pokemon.Reviving)
                 continue;
 
             // Get species from the perspective for accurate vocab lookup
-            var specieId = perspective.PlayerSide.Pokemon[i].Species;
+            SpecieId specieId = perspective.PlayerSide.Pokemon[i].Species;
             int switchVocabIdx = _vocab.GetSwitchActionIndex(specieId);
 
             actions.Add(new LegalAction
@@ -200,7 +201,7 @@ public sealed class ActionMapper
     public bool[] BuildLegalMask(IReadOnlyList<LegalAction> actions)
     {
         var mask = new bool[_vocab.NumActions];
-        for (int i = 0; i < actions.Count; i++)
+        for (var i = 0; i < actions.Count; i++)
         {
             mask[actions[i].VocabIndex] = true;
         }

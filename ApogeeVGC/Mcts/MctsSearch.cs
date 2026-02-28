@@ -33,7 +33,7 @@ public sealed class MctsSearch
         BattlePerspective perspective)
     {
         // Get legal actions
-        var legalActions = _actionMapper.GetLegalActions(request, perspective);
+        LegalActionSet legalActions = _actionMapper.GetLegalActions(request, perspective);
 
         // Single action, no search needed
         if (legalActions.SlotA.Count == 1 && legalActions.SlotB.Count <= 1)
@@ -43,28 +43,28 @@ public sealed class MctsSearch
         }
 
         // Evaluate the current state for policy priors
-        var output = _model.Evaluate(perspective);
+        ModelOutput output = _model.Evaluate(perspective);
 
         // Build legal masks and compute softmax priors
-        var maskA = _actionMapper.BuildLegalMask(legalActions.SlotA);
-        var probsA = ModelInference.MaskedSoftmax(output.PolicyA, maskA);
+        bool[] maskA = _actionMapper.BuildLegalMask(legalActions.SlotA);
+        float[] probsA = ModelInference.MaskedSoftmax(output.PolicyA, maskA);
 
         float[]? probsB = null;
         if (legalActions.SlotB.Count > 0)
         {
-            var maskB = _actionMapper.BuildLegalMask(legalActions.SlotB);
+            bool[] maskB = _actionMapper.BuildLegalMask(legalActions.SlotB);
             probsB = ModelInference.MaskedSoftmax(output.PolicyB, maskB);
         }
 
         // Create root node with edges for all legal action combinations
-        var root = CreateRoot(legalActions, probsA, probsB);
+        MctsNode root = CreateRoot(legalActions, probsA, probsB);
 
         // Add Dirichlet noise to root priors for exploration
         AddDirichletNoise(root);
 
         // Run MCTS iterations with forward simulation
         SideId opponentId = sideId == SideId.P1 ? SideId.P2 : SideId.P1;
-        for (int i = 0; i < _config.NumIterations; i++)
+        for (var i = 0; i < _config.NumIterations; i++)
         {
             RunIteration(root, battle, sideId, opponentId);
         }
@@ -80,9 +80,9 @@ public sealed class MctsSearch
         if (legalActions.SlotB.Count == 0)
         {
             // Single-slot decision (e.g., singles or single forced switch)
-            for (int a = 0; a < legalActions.SlotA.Count; a++)
+            for (var a = 0; a < legalActions.SlotA.Count; a++)
             {
-                var actionA = legalActions.SlotA[a];
+                LegalAction actionA = legalActions.SlotA[a];
                 float prior = probsA[actionA.VocabIndex];
 
                 root.Edges.Add(new MctsEdge
@@ -96,14 +96,14 @@ public sealed class MctsSearch
         else
         {
             // Joint action space for doubles
-            for (int a = 0; a < legalActions.SlotA.Count; a++)
+            for (var a = 0; a < legalActions.SlotA.Count; a++)
             {
-                var actionA = legalActions.SlotA[a];
+                LegalAction actionA = legalActions.SlotA[a];
                 float priorA = probsA[actionA.VocabIndex];
 
-                for (int b = 0; b < legalActions.SlotB.Count; b++)
+                for (var b = 0; b < legalActions.SlotB.Count; b++)
                 {
-                    var actionB = legalActions.SlotB[b];
+                    LegalAction actionB = legalActions.SlotB[b];
 
                     // Prevent both slots switching to the same Pokemon
                     if (actionA.ChoiceType == ChoiceType.Switch &&
@@ -134,13 +134,13 @@ public sealed class MctsSearch
 
     private static void NormalizePriors(MctsNode node)
     {
-        float sum = 0f;
-        for (int i = 0; i < node.Edges.Count; i++)
+        var sum = 0f;
+        for (var i = 0; i < node.Edges.Count; i++)
             sum += node.Edges[i].PriorP;
 
         if (sum > 0f)
         {
-            for (int i = 0; i < node.Edges.Count; i++)
+            for (var i = 0; i < node.Edges.Count; i++)
                 node.Edges[i].PriorP /= sum;
         }
     }
@@ -152,7 +152,7 @@ public sealed class MctsSearch
     private void RunIteration(MctsNode root, Battle battle, SideId sideId, SideId opponentId)
     {
         // SELECT: pick the edge with highest PUCT score
-        var edge = SelectEdge(root);
+        MctsEdge? edge = SelectEdge(root);
         if (edge == null) return;
 
         // SIMULATE: clone battle, apply our action, opponent auto-chooses, advance one turn
@@ -201,8 +201,8 @@ public sealed class MctsSearch
         }
 
         // Evaluate the resulting state with the model
-        var perspective = sim.GetPerspectiveForSide(sideId);
-        var output = _model.Evaluate(perspective);
+        BattlePerspective perspective = sim.GetPerspectiveForSide(sideId);
+        ModelOutput output = _model.Evaluate(perspective);
         return output.Value;
     }
 
@@ -229,7 +229,7 @@ public sealed class MctsSearch
         float bestScore = float.NegativeInfinity;
         int parentVisits = node.VisitCount;
 
-        for (int i = 0; i < node.Edges.Count; i++)
+        for (var i = 0; i < node.Edges.Count; i++)
         {
             float score = PuctScore(node.Edges[i], parentVisits);
             if (score > bestScore)
@@ -261,7 +261,7 @@ public sealed class MctsSearch
         MctsEdge? best = null;
         int bestVisits = -1;
 
-        for (int i = 0; i < root.Edges.Count; i++)
+        for (var i = 0; i < root.Edges.Count; i++)
         {
             if (root.Edges[i].VisitCount > bestVisits)
             {
@@ -287,9 +287,9 @@ public sealed class MctsSearch
         if (root.Edges.Count == 0) return;
 
         float epsilon = _config.DirichletEpsilon;
-        var noise = SampleDirichlet(root.Edges.Count, _config.DirichletAlpha);
+        float[] noise = SampleDirichlet(root.Edges.Count, _config.DirichletAlpha);
 
-        for (int i = 0; i < root.Edges.Count; i++)
+        for (var i = 0; i < root.Edges.Count; i++)
         {
             root.Edges[i].PriorP = (1 - epsilon) * root.Edges[i].PriorP + epsilon * noise[i];
         }
@@ -300,11 +300,11 @@ public sealed class MctsSearch
     /// </summary>
     private static float[] SampleDirichlet(int n, float alpha)
     {
-        var rng = Random.Shared;
+        Random rng = Random.Shared;
         var samples = new float[n];
-        float sum = 0f;
+        var sum = 0f;
 
-        for (int i = 0; i < n; i++)
+        for (var i = 0; i < n; i++)
         {
             // Sample Gamma(alpha, 1) using Marsaglia and Tsang's method
             samples[i] = SampleGamma(rng, alpha);
@@ -313,7 +313,7 @@ public sealed class MctsSearch
 
         if (sum > 0f)
         {
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
                 samples[i] /= sum;
         }
 
@@ -331,7 +331,7 @@ public sealed class MctsSearch
         {
             // Boost: sample Gamma(alpha+1, 1) and scale by U^(1/alpha)
             float sample = SampleGamma(rng, alpha + 1f);
-            float u = (float)rng.NextDouble();
+            var u = (float)rng.NextDouble();
             return sample * MathF.Pow(u, 1f / alpha);
         }
 
@@ -349,7 +349,7 @@ public sealed class MctsSearch
             } while (v <= 0f);
 
             v = v * v * v;
-            float u = (float)rng.NextDouble();
+            var u = (float)rng.NextDouble();
 
             if (u < 1f - 0.0331f * (x * x) * (x * x))
                 return d * v;

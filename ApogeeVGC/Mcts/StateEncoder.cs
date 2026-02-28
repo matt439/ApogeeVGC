@@ -27,14 +27,14 @@ public sealed class StateEncoder
         var speciesIds = new long[NumSpeciesSlots];
         var numeric = new float[NumericDim];
 
-        var playerSide = perspective.PlayerSide;
-        var opponentSide = perspective.OpponentSide;
+        SidePlayerPerspective playerSide = perspective.PlayerSide;
+        SideOpponentPerspective opponentSide = perspective.OpponentSide;
 
         // Active Pokemon
-        var myActiveA = playerSide.Active.Count > 0 ? playerSide.Active[0] : null;
-        var myActiveB = playerSide.Active.Count > 1 ? playerSide.Active[1] : null;
-        var oppActiveA = opponentSide.Active.Count > 0 ? opponentSide.Active[0] : null;
-        var oppActiveB = opponentSide.Active.Count > 1 ? opponentSide.Active[1] : null;
+        PokemonPerspective? myActiveA = playerSide.Active.Count > 0 ? playerSide.Active[0] : null;
+        PokemonPerspective? myActiveB = playerSide.Active.Count > 1 ? playerSide.Active[1] : null;
+        PokemonPerspective? oppActiveA = opponentSide.Active.Count > 0 ? opponentSide.Active[0] : null;
+        PokemonPerspective? oppActiveB = opponentSide.Active.Count > 1 ? opponentSide.Active[1] : null;
 
         // Species IDs for active slots
         speciesIds[0] = myActiveA != null ? _vocab.GetSpeciesIndex(myActiveA.Species) : Vocab.PadIndex;
@@ -80,7 +80,7 @@ public sealed class StateEncoder
     private static List<PokemonPerspective> GetBenchPokemon(IReadOnlyList<PokemonPerspective> pokemon)
     {
         var bench = new List<PokemonPerspective>(2);
-        for (int i = 0; i < pokemon.Count; i++)
+        for (var i = 0; i < pokemon.Count; i++)
         {
             if (!pokemon[i].IsActive)
             {

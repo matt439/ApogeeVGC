@@ -42,7 +42,7 @@ public sealed class Vocab
         _specieIdToSwitchIndex = specieIdToSwitchIndex;
 
         _indexToActionKey = new string[numActions];
-        foreach (var (key, idx) in actionKeyToIndex)
+        foreach ((string key, int idx) in actionKeyToIndex)
         {
             _indexToActionKey[idx] = key;
         }
@@ -50,20 +50,20 @@ public sealed class Vocab
 
     public static Vocab Load(string vocabJsonPath, Library library)
     {
-        var json = File.ReadAllText(vocabJsonPath);
-        using var doc = JsonDocument.Parse(json);
-        var root = doc.RootElement;
+        string json = File.ReadAllText(vocabJsonPath);
+        using JsonDocument doc = JsonDocument.Parse(json);
+        JsonElement root = doc.RootElement;
 
         // Parse species map
         var speciesNameToIndex = new Dictionary<string, int>();
-        foreach (var prop in root.GetProperty("species").EnumerateObject())
+        foreach (JsonProperty prop in root.GetProperty("species").EnumerateObject())
         {
             speciesNameToIndex[prop.Name] = prop.Value.GetInt32();
         }
 
         // Parse action map
         var actionKeyToIndex = new Dictionary<string, int>();
-        foreach (var prop in root.GetProperty("actions").EnumerateObject())
+        foreach (JsonProperty prop in root.GetProperty("actions").EnumerateObject())
         {
             actionKeyToIndex[prop.Name] = prop.Value.GetInt32();
         }
@@ -76,9 +76,9 @@ public sealed class Vocab
         var specieIdToVocabIndex = new int[specieIdCount];
         Array.Fill(specieIdToVocabIndex, UnknownSpeciesIndex);
 
-        foreach (var (specieId, species) in library.Species)
+        foreach ((SpecieId specieId, Species species) in library.Species)
         {
-            int enumIndex = (int)specieId;
+            var enumIndex = (int)specieId;
             if (enumIndex >= 0 && enumIndex < specieIdCount)
             {
                 if (speciesNameToIndex.TryGetValue(species.Name, out int vocabIdx))
@@ -93,12 +93,12 @@ public sealed class Vocab
         var moveIdToActionIndex = new int[moveIdCount];
         Array.Fill(moveIdToActionIndex, NoneActionIndex);
 
-        foreach (var (moveId, move) in library.Moves)
+        foreach ((MoveId moveId, Move move) in library.Moves)
         {
-            int enumIndex = (int)moveId;
+            var enumIndex = (int)moveId;
             if (enumIndex >= 0 && enumIndex < moveIdCount)
             {
-                string actionKey = $"move:{move.Name}";
+                var actionKey = $"move:{move.Name}";
                 if (actionKeyToIndex.TryGetValue(actionKey, out int actionIdx))
                 {
                     moveIdToActionIndex[enumIndex] = actionIdx;
@@ -108,9 +108,9 @@ public sealed class Vocab
 
         // Build SpecieId -> switch action index cache
         var specieIdToSwitchIndex = new Dictionary<SpecieId, int>();
-        foreach (var (specieId, species) in library.Species)
+        foreach ((SpecieId specieId, Species species) in library.Species)
         {
-            string switchKey = $"switch:{species.Name}";
+            var switchKey = $"switch:{species.Name}";
             if (actionKeyToIndex.TryGetValue(switchKey, out int switchIdx))
             {
                 specieIdToSwitchIndex[specieId] = switchIdx;
@@ -129,7 +129,7 @@ public sealed class Vocab
 
     public int GetSpeciesIndex(SpecieId id)
     {
-        int enumIndex = (int)id;
+        var enumIndex = (int)id;
         if (enumIndex >= 0 && enumIndex < _specieIdToVocabIndex.Length)
             return _specieIdToVocabIndex[enumIndex];
         return UnknownSpeciesIndex;
@@ -137,7 +137,7 @@ public sealed class Vocab
 
     public int GetMoveActionIndex(MoveId moveId)
     {
-        int enumIndex = (int)moveId;
+        var enumIndex = (int)moveId;
         if (enumIndex >= 0 && enumIndex < _moveIdToActionIndex.Length)
             return _moveIdToActionIndex[enumIndex];
         return NoneActionIndex;
@@ -151,7 +151,7 @@ public sealed class Vocab
     public string GetActionKey(int index)
     {
         if (index >= 0 && index < _indexToActionKey.Length)
-            return _indexToActionKey[index] ?? $"<unknown:{index}>";
+            return _indexToActionKey[index];
         return $"<out-of-range:{index}>";
     }
 

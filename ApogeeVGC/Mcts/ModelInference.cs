@@ -36,7 +36,7 @@ public sealed class ModelInference : IDisposable
     /// </summary>
     public ModelOutput Evaluate(BattlePerspective perspective)
     {
-        var (speciesIds, numeric) = _encoder.Encode(perspective);
+        (long[] speciesIds, float[] numeric) = _encoder.Encode(perspective);
 
         var speciesTensor = new DenseTensor<long>(speciesIds, [1, StateEncoder.NumSpeciesSlots]);
         var numericTensor = new DenseTensor<float>(numeric, [1, StateEncoder.NumericDim]);
@@ -67,7 +67,7 @@ public sealed class ModelInference : IDisposable
 
         // Find max among legal actions for numerical stability
         float max = float.NegativeInfinity;
-        for (int i = 0; i < logits.Length; i++)
+        for (var i = 0; i < logits.Length; i++)
         {
             if (legalMask[i] && logits[i] > max)
                 max = logits[i];
@@ -80,8 +80,8 @@ public sealed class ModelInference : IDisposable
         }
 
         // Compute exp and sum
-        float sum = 0f;
-        for (int i = 0; i < logits.Length; i++)
+        var sum = 0f;
+        for (var i = 0; i < logits.Length; i++)
         {
             if (legalMask[i])
             {
@@ -93,7 +93,7 @@ public sealed class ModelInference : IDisposable
         // Normalize
         if (sum > 0f)
         {
-            for (int i = 0; i < result.Length; i++)
+            for (var i = 0; i < result.Length; i++)
             {
                 result[i] /= sum;
             }

@@ -68,7 +68,7 @@ public sealed class PlayerMcts : IPlayer
     public Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
-        var choice = GetChoiceSync(choiceRequest, requestType, () => perspective);
+        Choice choice = GetChoiceSync(choiceRequest, requestType, () => perspective);
         ChoiceSubmitted?.Invoke(this, choice);
         return Task.FromResult(choice);
     }
@@ -80,10 +80,10 @@ public sealed class PlayerMcts : IPlayer
 
     private Choice GetSearchChoice(IChoiceRequest request, Func<BattlePerspective> perspectiveFactory)
     {
-        var battle = BattleController.Battle
-            ?? throw new InvalidOperationException("Battle is not initialized on the controller");
-        var perspective = perspectiveFactory();
-        var (actionA, actionB) = _search.Search(battle, SideId, request, perspective);
+        Battle battle = BattleController.Battle
+                        ?? throw new InvalidOperationException("Battle is not initialized on the controller");
+        BattlePerspective perspective = perspectiveFactory();
+        (LegalAction actionA, var actionB) = _search.Search(battle, SideId, request, perspective);
 
         if (PrintDebug)
         {
