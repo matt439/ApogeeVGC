@@ -17,7 +17,12 @@ public partial class Pokemon
 
     public bool HasType(PokemonType[] types)
     {
-        return types.Any(t => GetTypes().Contains(t));
+        var myTypes = GetTypes();
+        foreach (var t in types)
+        {
+            if (myTypes.AsSpan().Contains(t)) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -56,7 +61,7 @@ public partial class Pokemon
         }
 
         // Set the new types
-        Types = types.ToList();
+        Types = new List<PokemonType>(types);
 
         // Clear any added type
         AddedType = null;
@@ -65,7 +70,7 @@ public partial class Pokemon
         KnownType = true;
 
         // Update apparent type for display (join types with '/')
-        ApparentType = Types.ToList();
+        ApparentType = new List<PokemonType>(Types);
 
         return true;
     }
@@ -85,34 +90,41 @@ public partial class Pokemon
             return [Terastallized.Value.ConvertToPokemonType()];
         }
 
-        // Run Value event to allow abilities/items/conditions to modify types
+        // Run Type event to allow abilities/items/conditions to modify types
         RelayVar? rv = Battle.RunEvent(EventId.Type, this, null, null, Types);
 
-        List<PokemonType> resultTypes;
-        if (rv is TypesRelayVar typesRelayVar)
+        IList<PokemonType> sourceTypes = rv is TypesRelayVar typesRelayVar
+            ? typesRelayVar.Types
+            : Types;
+
+        bool needsFallback = sourceTypes.Count == 0;
+        bool hasAddedType = excludeAdded != true && AddedType is not null;
+
+        // Compute final size and build result array directly (no intermediate List)
+        int count = needsFallback ? 1 : sourceTypes.Count;
+        if (hasAddedType) count++;
+
+        var result = new PokemonType[count];
+        int idx = 0;
+
+        if (needsFallback)
         {
-            resultTypes = typesRelayVar.Types.ToList();
+            result[idx++] = Battle.Gen >= 5 ? PokemonType.Normal : PokemonType.Unknown;
         }
         else
         {
-            // Fallback to current types if event doesn't return expected type
-            // This matches TypeScript behavior where unexpected event results are ignored
-            resultTypes = Types.ToList();
+            for (int i = 0; i < sourceTypes.Count; i++)
+            {
+                result[idx++] = sourceTypes[i];
+            }
         }
 
-        // Add fallback type if no types exist
-        if (resultTypes.Count == 0)
+        if (hasAddedType)
         {
-            resultTypes.Add(Battle.Gen >= 5 ? PokemonType.Normal : PokemonType.Unknown);
+            result[idx] = AddedType!.Value;
         }
 
-        // Add the added type if it exists and not excluded
-        if (excludeAdded != true && AddedType is not null)
-        {
-            resultTypes.Add(AddedType.Value);
-        }
-
-        return resultTypes.ToArray();
+        return result;
     }
 
 

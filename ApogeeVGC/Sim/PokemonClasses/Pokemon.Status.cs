@@ -577,7 +577,7 @@ public partial class Pokemon
             Evasion = 0,
         };
 
-        MoveSlots = BaseMoveSlots.ToList();
+        MoveSlots = new List<MoveSlot>(BaseMoveSlots);
 
         Transformed = false;
         Ability = BaseAbility;
