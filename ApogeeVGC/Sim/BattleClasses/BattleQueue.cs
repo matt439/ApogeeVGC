@@ -252,7 +252,7 @@ public class BattleQueue(Battle battle)
                         // Set the source effect to the move that caused the switch
                         currentAction = sa with
                         {
-                            SourceEffect = Battle.Library.Moves[moveIdUnion.MoveId].AsActiveMove(),
+                            SourceEffect = Battle.Library.Moves[moveIdUnion.MoveId].ToActiveMove(),
                         };
                     }
 

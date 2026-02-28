@@ -255,11 +255,31 @@ public partial record Condition : ISideEventMethods, IFieldEventMethods, IEffect
     /// in FindPokemonEventHandlers volatile handler discovery.
     /// </summary>
     private List<object>? _endCallArgsSelf;
-    internal List<object> EndCallArgsSelf => _endCallArgsSelf ??= [this];
+    internal List<object> EndCallArgsSelf
+    {
+        get
+        {
+            var cached = Volatile.Read(ref _endCallArgsSelf);
+            if (cached is not null) return cached;
 
-    private bool? _hasPrefixedHandlers;
-    public bool HasPrefixedHandlers =>
-        _hasPrefixedHandlers ??= EventHandlerInfoMapper.CacheHasPrefixedHandlers(HandlerCache);
+            var newList = new List<object> { this };
+            return Interlocked.CompareExchange(ref _endCallArgsSelf, newList, null) ?? newList;
+        }
+    }
+
+    private int _hasPrefixedHandlers = -1; // -1 = unset, 0 = false, 1 = true
+    public bool HasPrefixedHandlers
+    {
+        get
+        {
+            int cached = Volatile.Read(ref _hasPrefixedHandlers);
+            if (cached >= 0) return cached == 1;
+
+            bool result = EventHandlerInfoMapper.CacheHasPrefixedHandlers(HandlerCache);
+            Interlocked.CompareExchange(ref _hasPrefixedHandlers, result ? 1 : 0, -1);
+            return result;
+        }
+    }
 
     /// <summary>
     /// Gets event handler information for the specified event.

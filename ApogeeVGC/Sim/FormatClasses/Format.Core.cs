@@ -340,14 +340,33 @@ public partial record Format : IEffect, IBasicEffect, ICopyable<Format>
     //}
 
     private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
-    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
-        _handlerCache ??= EventHandlerInfoMapper.BuildHandlerCache(this);
+    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache
+    {
+        get
+        {
+            var cache = Volatile.Read(ref _handlerCache);
+            if (cache is not null) return cache;
+
+            var newCache = EventHandlerInfoMapper.BuildHandlerCache(this);
+            return Interlocked.CompareExchange(ref _handlerCache, newCache, null) ?? newCache;
+        }
+    }
 
     public bool HasAnyEventHandlers => HandlerCache.Count > 0;
 
-    private bool? _hasPrefixedHandlers;
-    public bool HasPrefixedHandlers =>
-        _hasPrefixedHandlers ??= EventHandlerInfoMapper.CacheHasPrefixedHandlers(HandlerCache);
+    private int _hasPrefixedHandlers = -1; // -1 = unset, 0 = false, 1 = true
+    public bool HasPrefixedHandlers
+    {
+        get
+        {
+            int cached = Volatile.Read(ref _hasPrefixedHandlers);
+            if (cached >= 0) return cached == 1;
+
+            bool result = EventHandlerInfoMapper.CacheHasPrefixedHandlers(HandlerCache);
+            Interlocked.CompareExchange(ref _hasPrefixedHandlers, result ? 1 : 0, -1);
+            return result;
+        }
+    }
 
     /// <summary>
     /// Gets event handler information for the specified event.
