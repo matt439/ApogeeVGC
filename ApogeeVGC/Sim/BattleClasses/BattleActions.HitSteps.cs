@@ -623,7 +623,7 @@ public partial class BattleActions
         Pokemon pokemon, ActiveMove move)
     {
         // Initialize damage array with 0s for each target
-        var damage = new List<BoolIntEmptyUndefinedUnion>();
+        var damage = new List<BoolIntEmptyUndefinedUnion>(targets.Count);
         for (int i = 0; i < targets.Count; i++)
         {
             damage.Add(BoolIntEmptyUndefinedUnion.FromInt(0));
@@ -675,7 +675,9 @@ public partial class BattleActions
         }
 
         bool nullDamage = true;
-        var moveDamage = new List<BoolIntUndefinedUnion>();
+        List<BoolIntUndefinedUnion> moveDamage = move.SmartTarget == true
+            ? new List<BoolIntUndefinedUnion>()
+            : null!;
 
         // There is no need to recursively check the 'sleepUsable' flag as Sleep Talk can only be used while asleep.
         bool isSleepUsable = move.SleepUsable == true ||
@@ -683,7 +685,7 @@ public partial class BattleActions
                               Library.Moves.TryGetValue(mesi.MoveId, out Move? sourceMove) &&
                               sourceMove.SleepUsable == true);
 
-        var targetsCopy = new List<Pokemon>(targets);
+        var targetsCopy = new List<Pokemon>(targets.Count);
         int hit;
 
         for (hit = 1; hit <= targetHitResult; hit++)
@@ -702,13 +704,14 @@ public partial class BattleActions
             move.Hit = hit;
 
             // Handle smart target moves (Dragon Darts)
+            targetsCopy.Clear();
             if (move.SmartTarget == true && targets.Count > 1)
             {
-                targetsCopy = [targets[hit - 1]];
+                targetsCopy.Add(targets[hit - 1]);
             }
             else
             {
-                targetsCopy = new List<Pokemon>(targets);
+                targetsCopy.AddRange(targets);
             }
 
             // Some relevant-to-single-target-moves-only things are hardcoded
@@ -987,7 +990,8 @@ public partial class BattleActions
         // smartTarget messes up targetsCopy, but smartTarget should in theory ensure that targets will never fail, anyway
         if (move.SmartTarget == true)
         {
-            targetsCopy = new List<Pokemon>(targets);
+            targetsCopy.Clear();
+            targetsCopy.AddRange(targets);
         }
 
         for (int i = 0; i < targetsCopy.Count; i++)
@@ -1030,7 +1034,7 @@ public partial class BattleActions
 
         Battle.EachEvent(EventId.Update);
 
-        AfterMoveSecondaryEvent(targetsCopy.Where(_ => true).ToList(), pokemon, move);
+        AfterMoveSecondaryEvent(new List<Pokemon>(targetsCopy), pokemon, move);
 
         if (!(move.HasSheerForce == true && pokemon.HasAbility(AbilityId.SheerForce)))
         {
