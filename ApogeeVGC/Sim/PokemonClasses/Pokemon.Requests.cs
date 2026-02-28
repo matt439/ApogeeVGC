@@ -63,61 +63,43 @@ public partial class Pokemon
             ? ConditionId.Fainted
             : Status;
 
-        // Create the base entry
-        var entry = new PokemonSwitchRequestData
+        // Gen 7+ includes current ability (always true for Gen 9)
+        var ability = Battle.Gen > 6
+            ? Battle.Library.Abilities[Ability]
+            : Battle.Library.Abilities[BaseAbility];
+
+        // Gen 9+ includes commanding and reviving status
+        bool commanding = false;
+        bool reviving = false;
+        if (Battle.Gen >= 9)
+        {
+            commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
+            reviving = IsActive &&
+                       Position < Side.SlotConditions.Count &&
+                       Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
+        }
+
+        // Gen 9 includes Terastallized status
+        bool terastallized = Battle.Gen == 9 && Terastallized != null;
+
+        // Single construction — no Clone() calls
+        return new PokemonSwitchRequestData
         {
             Ident = Fullname,
             Details = Details.ToString(),
             Condition = condition,
-            Active = IsActive, // Use IsActive property instead of position check
+            Active = IsActive,
             Stats = stats,
             Moves = moves,
             BaseAbility = Battle.Library.Abilities[BaseAbility],
             Item = Battle.Library.Items[Item],
             Pokeball = Pokeball,
-            // Default values for Gen 9+ fields
-            Ability = Battle.Library.Abilities[Ability],
-            Commanding = false,
-            Reviving = false,
+            Ability = ability,
+            Commanding = commanding,
+            Reviving = reviving,
             TeraType = TeraType,
-            Terastallized = false,
+            Terastallized = terastallized,
         };
-
-        // Gen 7+ includes current ability
-        if (Battle.Gen > 6)
-        {
-            entry = entry with { Ability = Battle.Library.Abilities[Ability] };
-        }
-
-        // Gen 9+ includes commanding and reviving status
-        if (Battle.Gen >= 9)
-        {
-            // Commanding: Pokemon has the Commanding volatile and is not fainted
-            bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
-
-            // Reviving: Pokemon is active and has Revival Blessing slot condition at its position
-            bool reviving = IsActive &&
-                            Position < Side.SlotConditions.Count &&
-                            Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
-
-            entry = entry with
-            {
-                Commanding = commanding,
-                Reviving = reviving,
-            };
-        }
-
-        // Gen 9 includes Tera type and Terastallized status
-        if (Battle.Gen == 9)
-        {
-            entry = entry with
-            {
-                TeraType = TeraType,
-                Terastallized = Terastallized != null,
-            };
-        }
-
-        return entry;
     }
 
     /// <summary>
