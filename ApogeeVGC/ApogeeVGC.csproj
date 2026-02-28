@@ -26,6 +26,7 @@
   <ItemGroup>
     <Folder Include="Gui\EventProcessing\" />
     <Folder Include="Gui\State\" />
+    <Folder Include="Mcts\" />
     <Folder Include="Sim\Events\Handlers\PokemonEventMethods\" />
   </ItemGroup>
 

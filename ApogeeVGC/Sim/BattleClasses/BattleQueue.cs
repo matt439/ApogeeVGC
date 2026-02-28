@@ -66,7 +66,7 @@ public class BattleQueue(Battle battle)
         }
 
         // Start with the action itself
-        List<IAction> actions = [];
+        List<IAction> actions = new(1);
 
         // Populate side from pokemon if not already set (matches TS: if (!action.side && action.pokemon) action.side = action.pokemon.side;)
         // Note: In C# we don't have a mutable side property on IAction, so this is handled implicitly through Pokemon.Side
