@@ -50,13 +50,13 @@ public partial class Battle
             VoidUnionBoolEmptyVoidUnion => null,
 
             // IntBoolVoidUnion -> int, bool, or null
-            IntIntBoolVoidUnion intBoolVoid => new IntRelayVar(intBoolVoid.Value),
+            IntIntBoolVoidUnion intBoolVoid => IntRelayVar.Get(intBoolVoid.Value),
             BoolIntBoolVoidUnion boolIntVoid => (boolIntVoid.Value ? BoolRelayVar.True : BoolRelayVar.False),
             VoidIntBoolVoidUnion => null,
 
             // BoolIntEmptyVoidUnion -> bool, int, or null
             BoolBoolIntEmptyVoidUnion boolIntEmptyVoid => (boolIntEmptyVoid.Value ? BoolRelayVar.True : BoolRelayVar.False),
-            IntBoolIntEmptyVoidUnion intBoolEmptyVoid => new IntRelayVar(intBoolEmptyVoid.Value),
+            IntBoolIntEmptyVoidUnion intBoolEmptyVoid => IntRelayVar.Get(intBoolEmptyVoid.Value),
             EmptyBoolIntEmptyVoidUnion => null,
             VoidUnionBoolIntEmptyVoidUnion => null,
 
@@ -66,24 +66,24 @@ public partial class Battle
 
             // BoolIntUndefinedUnion -> bool, int, or undefined
             BoolBoolIntUndefinedUnion boolIntUndefined => (boolIntUndefined.Value ? BoolRelayVar.True : BoolRelayVar.False),
-            IntBoolIntUndefinedUnion intIntUndefined => new IntRelayVar(intIntUndefined.Value),
+            IntBoolIntUndefinedUnion intIntUndefined => IntRelayVar.Get(intIntUndefined.Value),
             UndefinedBoolIntUndefinedUnion => new UndefinedRelayVar(),
 
             // IntFalseUndefinedUnion -> int, false, or undefined (used by Damage method)
-            IntIntFalseUndefined intFalseUndefined => new IntRelayVar(intFalseUndefined.Value),
+            IntIntFalseUndefined intFalseUndefined => IntRelayVar.Get(intFalseUndefined.Value),
             FalseIntFalseUndefined => BoolRelayVar.False,
             UndefinedIntFalseUndefined => new UndefinedRelayVar(),
 
             // IntFalseUnion -> int or false (used by Heal method)
-            IntIntFalseUnion intFalse => new IntRelayVar(intFalse.Value),
+            IntIntFalseUnion intFalse => IntRelayVar.Get(intFalse.Value),
             FalseIntFalseUnion => BoolRelayVar.False,
 
             // IntBoolUnion -> int or bool
-            IntIntBoolUnion intBool => new IntRelayVar(intBool.Value),
+            IntIntBoolUnion intBool => IntRelayVar.Get(intBool.Value),
             BoolIntBoolUnion boolBool => (boolBool.Value ? BoolRelayVar.True : BoolRelayVar.False),
 
 // IntVoidUnion -> int or null
-            IntIntVoidUnion intVoid => new IntRelayVar(intVoid.Value),
+            IntIntVoidUnion intVoid => IntRelayVar.Get(intVoid.Value),
             VoidIntVoidUnion => null,
 
             // DoubleVoidUnion -> double or null
@@ -100,7 +100,7 @@ public partial class Battle
 
             // Primitive types
             bool boolValue => boolValue ? BoolRelayVar.True : BoolRelayVar.False,
-            int intValue => new IntRelayVar(intValue),
+            int intValue => IntRelayVar.Get(intValue),
             decimal decValue => new DecimalRelayVar(decValue),
             double doubleValue => new DecimalRelayVar((decimal)doubleValue),
 

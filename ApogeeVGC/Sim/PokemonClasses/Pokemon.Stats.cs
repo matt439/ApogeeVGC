@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
@@ -125,7 +125,7 @@ public partial class Pokemon
                 StatIdExceptHp.Spe => EventId.ModifySpe,
                 _ => throw new ArgumentOutOfRangeException(nameof(statName), "Invalid stat name."),
             };
-            var relayVar = Battle.RunEvent(eventId, this, null, null, new IntRelayVar(stat));
+            var relayVar = Battle.RunEvent(eventId, this, null, null, IntRelayVar.Get(stat));
             if (relayVar is IntRelayVar irv)
             {
                 stat = irv.Value;

@@ -342,7 +342,7 @@ public partial record Abilities
                         if (shouldOoze)
                         {
                             battle.Damage(damage);
-                            return new IntRelayVar(0);
+                            return IntRelayVar.Get(0);
                         }
 
                         return

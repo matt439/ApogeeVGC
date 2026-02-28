@@ -34,7 +34,7 @@ public static class EventHandlerHelpers
     /// </summary>
     public static EventHandlerDelegate CreateIntHandler(Func<EventContext, int> func)
     {
-        return context => new IntRelayVar(func(context));
+        return context => IntRelayVar.Get(func(context));
  }
     
     /// <summary>

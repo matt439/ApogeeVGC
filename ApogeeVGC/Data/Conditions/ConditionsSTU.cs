@@ -907,7 +907,7 @@ public partial record Conditions
                     if (move.OnAfterSubDamage != null)
                     {
                         battle.SingleEvent(EventId.AfterSubDamage, move, null,
-                            target, source, move, new IntRelayVar(damage));
+                            target, source, move, IntRelayVar.Get(damage));
                     }
 
                     // Trigger AfterSubDamage events for target's ability, item, and volatiles
@@ -915,7 +915,7 @@ public partial record Conditions
                         target, // Implicitly converts to RunEventTarget via operator
                         source, // Implicitly converts to RunEventSource via operator
                         move,
-                        new IntRelayVar(damage));
+                        IntRelayVar.Get(damage));
 
                     // Return HIT_SUBSTITUTE constant (represented as int value 0)
                     // This tells the battle engine that the substitute took the hit

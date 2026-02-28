@@ -19,7 +19,7 @@ namespace ApogeeVGC.Sim.Utils.Unions;
 public abstract record RelayVar
 {
     public static implicit operator RelayVar(bool value) => value ? BoolRelayVar.True : BoolRelayVar.False;
-    public static implicit operator RelayVar(int value) => new IntRelayVar(value);
+    public static implicit operator RelayVar(int value) => IntRelayVar.Get(value);
     public static implicit operator RelayVar(Ability ability) => EffectUnionFactory.ToRelayVar(ability);
     public static implicit operator RelayVar(Item item) => EffectUnionFactory.ToRelayVar(item);
     public static implicit operator RelayVar(ActiveMove activeMove) => EffectUnionFactory.ToRelayVar(activeMove);
@@ -44,7 +44,7 @@ public abstract record RelayVar
 
     public static RelayVar FromIntTrueUnion(IntTrueUnion union) => union switch
     {
- IntIntTrueUnion intValue => new IntRelayVar(intValue.Value),
+ IntIntTrueUnion intValue => IntRelayVar.Get(intValue.Value),
         TrueIntTrueUnion => BoolRelayVar.True,
   _ => throw new InvalidOperationException("Unknown IntTrueUnion type"),
     };
@@ -59,7 +59,32 @@ public record BoolRelayVar(bool Value) : RelayVar
     public static readonly BoolRelayVar True = new(true);
     public static readonly BoolRelayVar False = new(false);
 }
-public record IntRelayVar(int Value) : RelayVar;
+public record IntRelayVar(int Value) : RelayVar
+{
+    private const int CacheMin = -16;
+    private const int CacheMax = 1024;
+    private static readonly IntRelayVar[] Cache = InitCache();
+
+    private static IntRelayVar[] InitCache()
+    {
+        var cache = new IntRelayVar[CacheMax - CacheMin];
+        for (int i = 0; i < cache.Length; i++)
+        {
+            cache[i] = new IntRelayVar(i + CacheMin);
+        }
+        return cache;
+    }
+
+    public static IntRelayVar Get(int value)
+    {
+        int index = value - CacheMin;
+        if ((uint)index < (uint)Cache.Length)
+        {
+            return Cache[index];
+        }
+        return new IntRelayVar(value);
+    }
+}
 public record EffectRelayVar(IEffect Effect) : RelayVar;
 public record SpecieRelayVar(Species Species) : RelayVar;
 public record PokemonTypeRelayVar(PokemonType Type) : RelayVar;

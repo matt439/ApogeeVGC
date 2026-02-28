@@ -1,4 +1,4 @@
-ï»¿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
@@ -120,7 +120,7 @@ public partial class BattleActions
         // Run BasePower event after crit calculation
         Battle.Debug($"[GetDamage] About to call BasePower event with IntRelayVar({basePower.ToInt()})");
         var basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
-            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(basePower.ToInt()), true);
+            RunEventSource.FromNullablePokemon(target), move, IntRelayVar.Get(basePower.ToInt()), true);
         Battle.Debug(
             $"[GetDamage] BasePower event returned: {(basePowerEvent != null ? basePowerEvent.GetType().Name : "null")}");
 
@@ -249,14 +249,14 @@ public partial class BattleActions
         };
 
         var modifyAtkResult = Battle.RunEvent(modifyAtkEvent, source,
-            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(attack));
+            RunEventSource.FromNullablePokemon(target), move, IntRelayVar.Get(attack));
         attack = modifyAtkResult is IntRelayVar atkIrv ? atkIrv.Value : attack;
 
         var modifyDefResult = Battle.RunEvent(modifyDefEvent, target,
-            RunEventSource.FromNullablePokemon(source), move, new IntRelayVar(defense));
+            RunEventSource.FromNullablePokemon(source), move, IntRelayVar.Get(defense));
         defense = modifyDefResult is IntRelayVar defIrv ? defIrv.Value : defense;
 
-        // Calculate base damage using the standard PokÃ©mon damage formula
+        // Calculate base damage using the standard Pokémon damage formula
         // int(int(int(2 * L / 5 + 2) * A * P / D) / 50)
         var baseDamage = Battle.Trunc(
             Battle.Trunc(
@@ -320,7 +320,7 @@ public partial class BattleActions
 
         // Weather modifier
         var weatherModResult = Battle.RunEvent(EventId.WeatherModifyDamage, pokemon,
-            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
+            RunEventSource.FromNullablePokemon(target), move, IntRelayVar.Get(baseDamage));
 
         if (weatherModResult is IntRelayVar weatherMod)
         {
@@ -443,7 +443,7 @@ public partial class BattleActions
 
         // Final modifier - Life Orb, etc.
         var finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
-            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
+            RunEventSource.FromNullablePokemon(target), move, IntRelayVar.Get(baseDamage));
 
         if (finalModResult is IntRelayVar finalMod)
         {
@@ -468,19 +468,19 @@ public partial class BattleActions
     /// context for its damage, unlike the regular damage formula (though this only comes up
     /// for base damage).
     /// </summary>
-    /// <param name="pokemon">The confused PokÃ©mon hitting itself</param>
+    /// <param name="pokemon">The confused Pokémon hitting itself</param>
     /// <param name="basePower">Base power of the confusion damage (typically 40)</param>
     /// <returns>The calculated damage amount (minimum 1)</returns>
     public int GetConfusionDamage(Pokemon pokemon, int basePower)
     {
-        // Get the PokÃ©mon's attack and defense stats with current boosts applied
+        // Get the Pokémon's attack and defense stats with current boosts applied
         var attack =
             pokemon.CalculateStat(StatIdExceptHp.Atk, pokemon.Boosts.GetBoost(BoostId.Atk));
         var defense =
             pokemon.CalculateStat(StatIdExceptHp.Def, pokemon.Boosts.GetBoost(BoostId.Def));
         var level = pokemon.Level;
 
-        // Calculate base damage using the standard PokÃ©mon damage formula
+        // Calculate base damage using the standard Pokémon damage formula
         // Formula: ((2 * level / 5 + 2) * basePower * attack / defense) / 50 + 2
         // Each step is truncated to match game behavior
         var baseDamage = Battle.Trunc(

@@ -49,7 +49,7 @@ public sealed record DurationCallbackEventInfo : EventHandlerInfo
                         context.GetSourceOrTargetPokemon(),
                         context.TryGetSourceEffect<IEffect>()
                         );
-                    return new IntRelayVar(result);
+                    return IntRelayVar.Get(result);
                 },
             priority,
             usesSpeed

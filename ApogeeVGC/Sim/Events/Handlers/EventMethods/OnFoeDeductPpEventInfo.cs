@@ -41,7 +41,7 @@ public sealed record OnFoeDeductPpEventInfo : EventHandlerInfo
                 context.GetTargetOrSourcePokemon(),
                 context.GetSourceOrTargetPokemon()
                 );
-                return new IntRelayVar(result);
+                return IntRelayVar.Get(result);
             },
             priority,
             usesSpeed

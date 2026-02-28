@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -80,7 +80,7 @@ public partial class BattleActions
 
    if (!hitResult)
      {
-// Move failed preliminary checks — only show "-fail" for explicit false,
+// Move failed preliminary checks � only show "-fail" for explicit false,
 // not for NullRelayVar (TS null = "failed silently")
 if (tryResult is BoolRelayVar { Value: false } ||
        prepareHitResult1 is BoolRelayVar { Value: false } ||
@@ -447,7 +447,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         if (damagedDamage.Count > 0 && !isSecondary && !isSelf)
         {
             Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move,
-                new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => new IntRelayVar(d)).ToList()));
+                new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => IntRelayVar.Get(d)).ToList()));
 
             if (move.OnAfterHit != null)
             {

@@ -1002,7 +1002,7 @@ public partial record Abilities
                     {
                         if (effect == null)
                         {
-                            return new IntRelayVar(damage);
+                            return IntRelayVar.Get(damage);
                         }
 
                         if (effect.EffectStateId == ItemId.Leftovers)
@@ -1019,7 +1019,7 @@ public partial record Abilities
                             return null;
                         }
 
-                        return new IntRelayVar(damage);
+                        return IntRelayVar.Get(damage);
                     }),
                 OnChangeBoost = OnChangeBoostEventInfo.Create((_, boost, _, _, effect) =>
                 {

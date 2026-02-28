@@ -1,4 +1,4 @@
-ï»¿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -14,12 +14,12 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class Battle
 {
     /// <summary>
-    /// Applies damage to a single PokÃ©mon.
+    /// Applies damage to a single Pokémon.
     /// This is a convenience wrapper around SpreadDamage for single-target damage.
     /// </summary>
     /// <param name="damage">Amount of damage to deal</param>
-    /// <param name="target">Target PokÃ©mon (defaults to event target)</param>
-    /// <param name="source">Source PokÃ©mon causing the damage (defaults to event source)</param>
+    /// <param name="target">Target Pokémon (defaults to event target)</param>
+    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
     /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
     /// <param name="instafaint">If true, immediately processes fainting instead of queueing it</param>
     /// <returns>
@@ -145,7 +145,7 @@ public partial class Battle
                     target,
                     RunEventSource.FromNullablePokemon(source),
                     effectCondition,
-                    new IntRelayVar(targetDamage)
+                    IntRelayVar.Get(targetDamage)
                 );
 
                 if (damageResult is not IntRelayVar damageInt)
@@ -225,13 +225,13 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Applies damage directly to a PokÃ©mon without triggering the Damage event.
+    /// Applies damage directly to a Pokémon without triggering the Damage event.
     /// Used for recoil damage, struggle damage, confusion damage, and other effects
     /// that should bypass normal damage modification abilities/items.
     /// </summary>
     /// <param name="damage">Amount of damage to deal</param>
-    /// <param name="target">Target PokÃ©mon (defaults to event target)</param>
-    /// <param name="source">Source PokÃ©mon causing the damage (defaults to event source)</param>
+    /// <param name="target">Target Pokémon (defaults to event target)</param>
+    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
     /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
     /// <returns>The actual amount of damage dealt (0 if target has no HP or damage was 0)</returns>
     public int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null,
@@ -345,7 +345,7 @@ public partial class Battle
             RunEventTarget.FromNullablePokemon(target),
             RunEventSource.FromNullablePokemon(source),
             effectCondition,
-            new IntRelayVar(damage)
+            IntRelayVar.Get(damage)
         );
 
         // If event prevented healing, return the result
@@ -381,7 +381,7 @@ public partial class Battle
 
         if (target is null)
         {
-            throw new InvalidOperationException("Target PokÃ©mon is null.");
+            throw new InvalidOperationException("Target Pokémon is null.");
         }
 
         // Apply healing to target
@@ -410,14 +410,14 @@ public partial class Battle
             target,
             RunEventSource.FromNullablePokemon(source),
             effectCondition,
-            new IntRelayVar(finalDamage)
+            IntRelayVar.Get(finalDamage)
         );
 
         return new IntIntFalseUnion(finalDamage);
     }
 
     /// <summary>
-    /// Modifies a PokÃ©mon's stat stages (boosts) during battle.
+    /// Modifies a Pokémon's stat stages (boosts) during battle.
     /// 
     /// Process:
     /// 1. Validates the target has HP and is active

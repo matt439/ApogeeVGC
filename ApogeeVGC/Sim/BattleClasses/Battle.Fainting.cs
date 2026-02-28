@@ -1,4 +1,4 @@
-ï»¿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -23,7 +23,7 @@ public partial class Battle
         foreach (Pokemon pokemon in Sides.SelectMany(side => side.Active.OfType<Pokemon>()
                      .Where(pokemon => pokemon.Fainted)))
         {
-            // Mark that this PokÃ©mon needs to be switched out
+            // Mark that this Pokémon needs to be switched out
             pokemon.SwitchFlag = true;
         }
         
@@ -181,7 +181,7 @@ public partial class Battle
                 faintData.Target,
                 RunEventSource.FromNullablePokemon(faintData.Source),
                 faintData.Effect,
-                new IntRelayVar(length)
+                IntRelayVar.Get(length)
             );
         }
 
@@ -395,13 +395,13 @@ public partial class Battle
         // Can happen if a battle crashes
         if (side is null) return false;
 
-        // Already no PokÃ©mon left
+        // Already no Pokémon left
         if (side.PokemonLeft <= 0) return false;
 
-        // Force the side to lose by setting their PokÃ©mon count to 0
+        // Force the side to lose by setting their Pokémon count to 0
         side.PokemonLeft = 0;
 
-        // Faint the first active PokÃ©mon if present
+        // Faint the first active Pokémon if present
         Pokemon? firstActive = side.Active.FirstOrDefault(p => p != null);
         firstActive?.Faint();
 

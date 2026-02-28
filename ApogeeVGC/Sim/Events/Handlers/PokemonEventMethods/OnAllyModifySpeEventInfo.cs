@@ -43,7 +43,7 @@ public sealed record OnAllyModifySpeEventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
-                    IntIntVoidUnion i => new IntRelayVar(i.Value),
+                    IntIntVoidUnion i => IntRelayVar.Get(i.Value),
                     VoidIntVoidUnion => null,
                     _ => null
                 };

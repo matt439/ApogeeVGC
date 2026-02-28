@@ -44,7 +44,7 @@ public sealed record OnAnyTryPrimaryHitEventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
-                    IntIntBoolVoidUnion i => new IntRelayVar(i.Value),
+                    IntIntBoolVoidUnion i => IntRelayVar.Get(i.Value),
                     BoolIntBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     VoidIntBoolVoidUnion => null,
                     _ => null

@@ -498,7 +498,7 @@ public partial class Battle
         // Apply event modifier to numeric relay vars
         if (relayVar is IntRelayVar intRelay && intRelay.Value == Math.Abs(intRelay.Value))
         {
-            relayVar = new IntRelayVar(FinalModify(intRelay.Value));
+            relayVar = IntRelayVar.Get(FinalModify(intRelay.Value));
         }
 
         // Return appropriate result
@@ -1035,7 +1035,7 @@ public partial class Battle
         return constantValue switch
         {
             bool boolValue => boolValue ? BoolRelayVar.True : BoolRelayVar.False,
-            int intValue => new IntRelayVar(intValue),
+            int intValue => IntRelayVar.Get(intValue),
             decimal decimalValue => new DecimalRelayVar(decimalValue),
             string stringValue => new StringRelayVar(stringValue),
             MoveId moveId => new MoveIdRelayVar(moveId),
