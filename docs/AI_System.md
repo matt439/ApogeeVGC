@@ -223,16 +223,79 @@ The vocab JSON is saved alongside the ONNX file so C# can map species/action nam
 
 **Location:** `ApogeeVGC/Mcts/` (TODO)
 
-### Planned Architecture
+### How DL and MCTS Work Together
 
-The MCTS engine will use the battle model to guide search:
+The DL model is "fast intuition" — given a state it instantly returns a win probability and action suggestions. MCTS is "slow deliberation" — it uses that intuition to systematically search the game tree and find moves that are better than what the network alone would suggest.
 
-- **Value head** evaluates leaf nodes (replaces random rollouts)
-- **Policy head** provides soft priors for UCB exploration (moves rated higher by the model are explored first, but no moves are hard-pruned)
+Each turn, when the MCTS player must choose:
 
-Key challenges for VGC:
-- **Imperfect information**: opponent's moves, items, bench are hidden. Use determinization (sample opponent states from metagame priors, updated via Bayesian inference as info is revealed)
-- **Simultaneous moves**: both players choose at the same time. The tree branches on joint actions.
+```
+1. Observe battle state (our perspective)
+2. Determinize — sample K plausible opponent hidden states
+3. For each determinization, run N iterations of MCTS:
+     a. SELECT  — walk tree using PUCT (UCB + policy prior)
+     b. EXPAND  — at a leaf, generate legal children
+     c. EVALUATE — run the DL model on the leaf state
+     d. BACKPROP — propagate value up the path
+4. Aggregate visit counts across all K determinizations
+5. Return the action pair with the highest visit count
+```
+
+The model is called **once per leaf expansion** and provides both signals:
+
+| Model Output | MCTS Role | Replaces |
+|---|---|---|
+| `value` | Leaf evaluation score | Random rollouts |
+| `policy_a` | Prior on slot A edges | Uniform priors |
+| `policy_b` | Prior on slot B edges | Uniform priors |
+
+### Selection (PUCT)
+
+The standard AlphaZero formula selects which edge to explore:
+
+```
+PUCT(s, a) = Q(s,a) + c_puct * P(s,a) * sqrt(N(s)) / (1 + N(s,a))
+```
+
+- **Q(s,a)** = average value from simulations through this action
+- **P(s,a)** = prior from the policy network (softmaxed over legal actions only)
+- **N(s)** / **N(s,a)** = visit counts for the node / edge
+- **c_puct** = exploration constant (tunable, typically 1.0–2.5)
+
+The policy prior makes search efficient — moves the network thinks are strong get explored first, but nothing is hard-pruned. Given enough iterations, the search can override the network's initial assessment.
+
+### Turn Structure in the Tree
+
+A normal turn is straightforward: we pick `(action_a, action_b)` for our two active slots, the opponent picks theirs, the turn resolves, and we reach the next state. The branching factor for our side is roughly `|legal_a| × |legal_b|` ≈ 100–200 combinations. The policy prior keeps the effective branching much smaller.
+
+The opponent's actions are handled by running the model from the opponent's perspective (the model is trained symmetrically — each turn produces one sample per player). This can be used as a prior to sample likely opponent actions during search.
+
+**Mid-turn forced switches** are the real complication. These occur when:
+- A Pokemon faints → that player must choose a replacement before the turn finishes
+- U-turn / Volt Switch / Flip Turn → the user chooses who to switch in
+- Eject Button, Red Card → items force a switch
+
+These create extra decision points *inside* turn resolution. The simulator already models this (it sends `SwitchRequest` mid-turn), so the tree accommodates them as additional nodes — same PUCT machinery, different legal action set (switches only, no moves).
+
+### Imperfect Information (Determinization)
+
+The opponent's hidden info includes unrevealed moves, items, abilities, bench Pokemon species/sets, and tera type.
+
+1. **Maintain a belief state** — probability distribution over opponent sets, starting from metagame priors (usage stats)
+2. **Update beliefs** — as info is revealed during battle (opponent uses a move, reveals an item, teras), narrow the distribution via Bayesian update
+3. **Sample K determinizations** — draw K complete opponent states from the belief distribution
+4. **Run MCTS independently** on each determinization (each is a perfect-information game)
+5. **Aggregate** — average visit counts across determinizations to choose an action robust across plausible opponent states
+
+K doesn't need to be large — 8–20 determinizations is typical.
+
+### Performance Considerations
+
+Each MCTS iteration calls the model once at leaf expansion. With N iterations × K determinizations, inference count adds up. Mitigations:
+- **Batch inference** — collect multiple leaves before running the model
+- **Cache evaluations** — reuse results for identical states across determinizations
+- **Limit search depth** — most useful signal is in the first 2–3 turns of lookahead
+- **GPU inference** — OnnxRuntime supports CUDA for batched inference
 
 ### Integration with C#
 
@@ -253,3 +316,27 @@ float[] policyA = results[1].AsEnumerable<float>().ToArray();
 ```
 
 The encoding logic in `dataset.py` must be replicated exactly in C# — the numeric feature layout documented above defines the contract between training and inference.
+
+## Evaluation: Player Variants
+
+To measure the contribution of each component, we test several player variants. Each adds exactly one element over the previous, enabling clean ablation.
+
+### Variants (weakest → strongest)
+
+1. **Random** — picks uniformly from legal actions. Baseline floor.
+2. **Policy Network Only** — runs the DL model once per turn, picks the highest-probability legal action per slot. No search. Isolates the value of learned intuition.
+3. **One-ply Greedy (value head)** — enumerates all legal `(action_a, action_b)` pairs, simulates each (with a sampled opponent action), evaluates the resulting state with the value head, picks the pair with the highest win probability. Search depth of 1, no tree.
+4. **MCTS with Uniform Priors** — full tree search but all legal actions get equal prior (no policy network guidance). Isolates the contribution of search itself.
+5. **MCTS with Policy Priors** — the complete system: PUCT with DL-provided priors and value evaluation. Expected to be the strongest.
+
+### What Each Comparison Shows
+
+| Comparison | Question Answered |
+|---|---|
+| 2 vs 1 | Does the model learn anything useful? |
+| 3 vs 2 | Does one-step lookahead improve on raw policy? |
+| 5 vs 4 | Does the policy prior improve search efficiency? |
+| 5 vs 2 | How much does search add on top of the network? |
+| 5 vs 3 | Does deeper search beat greedy? |
+
+Additionally, varying search budget (N iterations) for variants 4 and 5 produces a strength-vs-compute curve.
