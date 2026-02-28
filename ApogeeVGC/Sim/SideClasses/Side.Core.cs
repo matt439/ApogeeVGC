@@ -125,11 +125,17 @@ public partial class Side
 
     public SideRequestData GetRequestData(bool forAlly = false)
     {
+        var pokemonData = new List<PokemonSwitchRequestData>(Pokemon.Count);
+        foreach (var p in Pokemon)
+        {
+            pokemonData.Add(p.GetSwitchRequestData(forAlly));
+        }
+
         SideRequestData data = new()
         {
             Name = Name,
             Id = Id,
-            Pokemon = Pokemon.Select(p => p.GetSwitchRequestData(forAlly)).ToList(),
+            Pokemon = pokemonData,
         };
         return data;
     }

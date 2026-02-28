@@ -181,9 +181,13 @@ public partial class BattleActions
         // Default ignoreImmunity for Status moves if not already set
         move.IgnoreImmunity ??= move.Category == MoveCategory.Status;
 
-        return targets.Select(target =>
-                target.RunImmunity(move, !(move.SmartTarget ?? false)))
-            .Select(BoolIntEmptyUndefinedUnion.FromBool).ToList();
+        var results = new List<BoolIntEmptyUndefinedUnion>(targets.Count);
+        foreach (var target in targets)
+        {
+            bool immune = target.RunImmunity(move, !(move.SmartTarget ?? false));
+            results.Add(BoolIntEmptyUndefinedUnion.FromBool(immune));
+        }
+        return results;
     }
 
     /// <summary>

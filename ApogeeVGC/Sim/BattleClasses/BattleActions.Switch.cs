@@ -257,7 +257,12 @@ public partial class BattleActions
 
         var allActive = Battle.GetAllActive(true);
         Battle.SpeedSort(allActive);
-        Battle.SpeedOrder = allActive.Select(a => a.Side.N * a.Battle.Sides.Count + a.Position).ToList();
+        var speedOrder = new List<int>(allActive.Count);
+        foreach (var a in allActive)
+        {
+            speedOrder.Add(a.Side.N * a.Battle.Sides.Count + a.Position);
+        }
+        Battle.SpeedOrder = speedOrder;
         Battle.FieldEvent(EventId.SwitchIn, switchersIn);
 
         foreach (Pokemon poke in switchersIn.Where(poke => poke.Hp > 0))

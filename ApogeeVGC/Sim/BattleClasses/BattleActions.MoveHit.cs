@@ -137,8 +137,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         // Add spread move attribute to battle log if applicable
         if (Battle.DisplayUi && move.SpreadHit == true)
         {
-            var hitSlots = targets.Select(p => p.Position).ToList();
-            Battle.AttrLastMove($"[spread] {string.Join(",", hitSlots)}");
+            Battle.AttrLastMove($"[spread] {string.Join(",", targets.Select(p => p.Position))}");
         }
 
         return moveResult;
@@ -419,8 +418,14 @@ if (tryResult is BoolRelayVar { Value: false } ||
 
         if (damagedDamage.Count > 0 && !isSecondary && !isSelf)
         {
+            var damageRelayVars = new List<RelayVar>(damagedDamage.Count);
+            foreach (int d in damagedDamage)
+            {
+                damageRelayVars.Add(IntRelayVar.Get(d));
+            }
+
             Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move,
-                new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => IntRelayVar.Get(d)).ToList()));
+                new ArrayRelayVar(damageRelayVars));
 
             if (move.OnAfterHit != null)
             {
