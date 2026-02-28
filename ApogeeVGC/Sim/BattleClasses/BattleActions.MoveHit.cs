@@ -94,21 +94,26 @@ if (tryResult is BoolRelayVar { Value: false } ||
                 continue;
             }
 
-            // Filter targets based on step results
+            // Filter targets in-place based on step results (backward iteration keeps indices stable)
             // Keep targets where result is truthy or is the number 0 (which represents 0 damage but still a hit)
-            var newTargets = new List<Pokemon>();
-            for (int i = 0; i < targets.Count && i < hitResults.Count; i++)
+            int limit = Math.Min(targets.Count, hitResults.Count);
+            for (int i = limit - 1; i >= 0; i--)
             {
-                if (hitResults[i].IsTruthy() || hitResults[i].IsZero())
+                if (!hitResults[i].IsTruthy() && !hitResults[i].IsZero())
                 {
-                    newTargets.Add(targets[i]);
+                    targets.RemoveAt(i);
                 }
             }
-            targets = newTargets;
 
             // Track if any target failed this step
-            atLeastOneFailure = atLeastOneFailure ||
-                hitResults.Any(result => result is BoolBoolIntEmptyUndefinedUnion { Value: false });
+            for (int i = 0; i < hitResults.Count; i++)
+            {
+                if (hitResults[i] is BoolBoolIntEmptyUndefinedUnion { Value: false })
+                {
+                    atLeastOneFailure = true;
+                    break;
+                }
+            }
 
             // Disable smart targeting if there was a failure
             if (move.SmartTarget == true && atLeastOneFailure)
