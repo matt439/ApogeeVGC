@@ -96,7 +96,7 @@ public partial class Side
                 }
 
                 // Also skip if disabled in the unrestricted moves list (catches hidden-disabled)
-                if (i < moves.Count && pokemonMoveData.Id == moves[i].Id &&
+                if (i < moves.Length && pokemonMoveData.Id == moves[i].Id &&
                     moves[i].Disabled is not null && moves[i].Disabled.IsTrue())
                 {
                     continue;
@@ -164,7 +164,7 @@ public partial class Side
         }
 
         // Step 9: Handle Struggle when no moves have PP
-        if (moves.Count == 0)
+        if (moves.Length == 0)
         {
             // Gen 4 and earlier announce Pokemon has no moves left
             if (Battle.Gen <= 4)

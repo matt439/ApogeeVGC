@@ -145,7 +145,7 @@ public partial class Pokemon
         var moves = GetMoves(lockedMove, isLastActive);
 
         // If no moves available, default to Struggle
-        if (moves.Count == 0)
+        if (moves.Length == 0)
         {
             Move struggleMove = Battle.Library.Moves[MoveId.Struggle];
             moves =

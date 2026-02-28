@@ -58,7 +58,7 @@ public partial class Pokemon
     /// <param name="lockedMove">If specified, the Pokemon is locked into using this move</param>
     /// <param name="restrictData">If true, hide certain disabled move information</param>
     /// <returns>List of available moves with their current state</returns>
-    public List<PokemonMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
+    public PokemonMoveData[] GetMoves(MoveId? lockedMove = null, bool restrictData = false)
     {
         // Handle locked move cases
         if (lockedMove is not null)
@@ -116,12 +116,13 @@ public partial class Pokemon
             ];
         }
 
-        // Build list of available moves
-        var moves = new List<PokemonMoveData>();
+        // Build array of available moves (avoids List<> wrapper allocation)
+        var moves = new PokemonMoveData[MoveSlots.Count];
         bool hasValidMove = false;
 
-        foreach (MoveSlot moveSlot in MoveSlots)
+        for (int idx = 0; idx < MoveSlots.Count; idx++)
         {
+            MoveSlot moveSlot = MoveSlots[idx];
             MoveId moveName = moveSlot.Move;
 
             // Special move target modifications
@@ -169,8 +170,7 @@ public partial class Pokemon
             // Get the Move object from the library
             Move moveObject = Battle.Library.Moves[moveName];
 
-            // Add move to list
-            moves.Add(new PokemonMoveData
+            moves[idx] = new PokemonMoveData
             {
                 Move = moveObject,
                 Target = null, // Target is not set in this context
@@ -178,10 +178,10 @@ public partial class Pokemon
                 DisabledSource = moveSlot.DisabledSource,
                 Pp = moveSlot.Pp,
                 MaxPp = moveSlot.MaxPp,
-            });
+            };
         }
 
-        // If no valid moves, return empty list (matches TypeScript getMoves behavior).
+        // If no valid moves, return empty array (matches TypeScript getMoves behavior).
         // Callers (ChooseMove, GetMoveRequestData) handle empty returns by falling back to Struggle.
         return hasValidMove ? moves : [];
     }
