@@ -136,6 +136,29 @@ public partial class Battle
     /// </summary>
     private readonly Stack<Event> _eventPool = new();
 
+    /// <summary>
+    /// Pool of reusable <see cref="List{Pokemon}"/> instances to eliminate per-call
+    /// allocations in methods like <see cref="EachEvent"/> that need a temporary sorted list.
+    /// </summary>
+    private readonly Stack<List<Pokemon>> _pokemonListPool = new();
+
+    internal List<Pokemon> RentPokemonList()
+    {
+        if (_pokemonListPool.Count > 0)
+        {
+            var list = _pokemonListPool.Pop();
+            list.Clear();
+            return list;
+        }
+        return new List<Pokemon>(4);
+    }
+
+    internal void ReturnPokemonList(List<Pokemon> list)
+    {
+        list.Clear();
+        _pokemonListPool.Push(list);
+    }
+
     // Note: TeamGenerator is not implemented as we only support constructed teams, not random battles.
     // Random battle team generation would require implementing the full Pokemon Showdown team generator.
     // TeamGenerator teamGenerator = null;

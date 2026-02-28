@@ -273,7 +273,9 @@ public partial class Pokemon
 
     public bool HasMove(MoveId move)
     {
-        return MoveSlots.Any(ms => ms.Id == move);
+        foreach (var slot in MoveSlots)
+            if (slot.Id == move) return true;
+        return false;
     }
 
     public void DisableMove(MoveId moveId, bool isHidden = false, IEffect? sourceEffect = null)

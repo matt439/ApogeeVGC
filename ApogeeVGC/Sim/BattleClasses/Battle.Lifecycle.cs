@@ -458,7 +458,7 @@ public partial class Battle
                         { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
                     };
 
-                    int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
+                    int ironHeadIndex = pokemon.FindBaseMoveIndex(MoveId.IronHead);
                     if (ironHeadIndex >= 0)
                     {
                         Move move = Library.Moves[behemothMoves[rawSpecies.Id]];

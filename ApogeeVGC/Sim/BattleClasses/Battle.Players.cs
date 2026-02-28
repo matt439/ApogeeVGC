@@ -47,18 +47,27 @@ public partial class Battle
     public List<Pokemon> GetAllActive(bool includeFainted = false)
     {
         var pokemonList = new List<Pokemon>(Sides.Count * 2);
+        FillAllActive(pokemonList, includeFainted);
+        return pokemonList;
+    }
+
+    /// <summary>
+    /// Fills an existing list with all active, non-fainted Pokémon across all sides.
+    /// The list is cleared before filling. Use with <see cref="RentPokemonList"/> to avoid allocations.
+    /// </summary>
+    internal void FillAllActive(List<Pokemon> list, bool includeFainted = false)
+    {
+        list.Clear();
         foreach (Side side in Sides)
         {
             foreach (Pokemon? pokemon in side.Active)
             {
                 if (pokemon != null && (includeFainted || !pokemon.Fainted))
                 {
-                    pokemonList.Add(pokemon);
+                    list.Add(pokemon);
                 }
             }
         }
-
-        return pokemonList;
     }
 
     /// <summary>
@@ -115,7 +124,25 @@ public partial class Battle
 
     public int CanSwitch(Side side)
     {
-        return PossibleSwitches(side).Count;
+        return CountPossibleSwitches(side);
+    }
+
+    /// <summary>
+    /// Counts Pokémon that can be switched in without allocating a list.
+    /// </summary>
+    private static int CountPossibleSwitches(Side side)
+    {
+        if (side.PokemonLeft <= 0) return 0;
+
+        int count = 0;
+        for (int i = side.Active.Count; i < side.Pokemon.Count; i++)
+        {
+            if (!side.Pokemon[i].Fainted)
+            {
+                count++;
+            }
+        }
+        return count;
     }
 
     /// <summary>

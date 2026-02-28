@@ -526,22 +526,19 @@ public partial class Battle
     /// </summary>
     public void EachEvent(EventId eventId, IEffect? effect = null, bool? relayVar = null)
     {
+        var actives = RentPokemonList();
+        try
+        {
         while (true)
         {
-            // Debug logging for event entry - commented out for reduced verbosity
-
             // Get all active Pokémon on the field
-            var actives = GetAllActive();
-
-            // Debug active count - commented out for reduced verbosity
+            FillAllActive(actives);
 
             // Use current battle effect if none provided
             effect ??= Effect;
 
             // Sort by speed (highest to lowest) with proper speed tie resolution
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
-
-            // Debug speed order - commented out for reduced verbosity
 
             // Convert bool? to RelayVar? for RunEvent
             RelayVar? relayVarConverted =
@@ -557,7 +554,6 @@ public partial class Battle
             // Special handling for Weather events in Gen 7+
             if (eventId == EventId.Weather && Gen >= 7)
             {
-                // Debug weather handling - commented out for reduced verbosity
                 eventId = EventId.Update;
                 effect = null;
                 relayVar = null;
@@ -565,6 +561,11 @@ public partial class Battle
             }
 
             break;
+        }
+        }
+        finally
+        {
+            ReturnPokemonList(actives);
         }
     }
 

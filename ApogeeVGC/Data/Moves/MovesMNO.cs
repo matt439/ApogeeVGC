@@ -749,7 +749,7 @@ public partial record Moves
                     Move? lastMove = target.LastMove;
                     if (source.Transformed || lastMove == null ||
                         lastMove.Flags.FailMimic == true ||
-                        source.Moves.Contains(lastMove.Id))
+                        source.HasMove(lastMove.Id))
                     {
                         return false;
                     }

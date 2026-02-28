@@ -8,6 +8,21 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleActions
 {
+    private Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntEmptyUndefinedUnion>?>[]? _moveSteps;
+
+    private Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntEmptyUndefinedUnion>?>[] MoveSteps =>
+        _moveSteps ??=
+        [
+            HitStepInvulnerabilityEvent,
+            HitStepTryEvent,
+            HitStepTypeImmunity,
+            HitStepTryImmunity,
+            HitStepAccuracy,
+            HitStepBreakProtect,
+            HitStepStealBoosts,
+            HitStepMoveHitLoop,
+        ];
+
     /// <summary>
     /// Tries to hit multiple targets with a move. NOTE: includes single-target moves.
     /// This method processes a move through various hit validation steps (invulnerability,
@@ -25,36 +40,6 @@ public partial class BattleActions
         {
             move.SpreadHit = true;
         }
-
-        // Define the sequence of hit validation steps
-        // Each step filters out targets that fail its check
-        var moveSteps = new List<Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntEmptyUndefinedUnion>?>>
-    {
-        // 0. check for semi invulnerability
-        HitStepInvulnerabilityEvent,
-
-        // 1. run the 'TryHit' event (Protect, Magic Bounce, Volt Absorb, etc.) 
-        // (this is step 2 in gens 5 & 6, and step 4 in gen 4)
-        HitStepTryEvent,
-
-        // 2. check for type immunity (this is step 1 in gens 4-6)
-        HitStepTypeImmunity,
-
-        // 3. check for various move-specific immunities
-        HitStepTryImmunity,
-
-        // 4. check accuracy
-        HitStepAccuracy,
-
-        // 5. break protection effects
-        HitStepBreakProtect,
-
-        // 6. steal positive boosts (Spectral Thief)
-        HitStepStealBoosts,
-
-        // 7. loop that processes each hit of the move (has its own steps per iteration)
-        HitStepMoveHitLoop,
-    };
 
         // Set as active move if needed
         if (notActive)
@@ -100,7 +85,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         // Process each hit validation step
         bool atLeastOneFailure = false;
 
-        foreach (var step in moveSteps)
+        foreach (var step in MoveSteps)
         {
             var hitResults = step(targets, pokemon, move);
 

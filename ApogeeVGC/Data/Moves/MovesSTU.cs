@@ -980,11 +980,11 @@ public partial record Moves
                 OnHit = OnHitEventInfo.Create((battle, target, source, _) =>
                 {
                     Move? move = target.LastMove;
-                    if (source.Transformed || move == null || source.Moves.Contains(move.Id))
+                    if (source.Transformed || move == null || source.HasMove(move.Id))
                         return false;
                     if (move.Flags.NoSketch == true) return false;
 
-                    int sketchIndex = source.Moves.IndexOf(MoveId.Sketch);
+                    int sketchIndex = source.FindMoveIndex(MoveId.Sketch);
                     if (sketchIndex < 0) return false;
 
                     var sketchedMove = new MoveSlot()

@@ -238,13 +238,55 @@ public partial class Pokemon : IPriorityComparison
 
     /// <summary>
     /// Gets the list of move IDs for the Pokemon's current move slots.
+    /// Allocates a new list on each access — prefer <see cref="HasMove"/>/<see cref="FindMoveIndex"/> for lookups.
     /// </summary>
-    public List<MoveId> Moves => MoveSlots.Select(moveSlot => moveSlot.Id).ToList();
+    public List<MoveId> Moves
+    {
+        get
+        {
+            var list = new List<MoveId>(MoveSlots.Count);
+            foreach (var slot in MoveSlots) list.Add(slot.Id);
+            return list;
+        }
+    }
 
     /// <summary>
     /// Gets the list of move IDs for the Pokemon's base move slots (original moves before transformations).
+    /// Allocates a new list on each access — prefer <see cref="HasBaseMove"/>/<see cref="FindBaseMoveIndex"/> for lookups.
     /// </summary>
-    public List<MoveId> BaseMoves => BaseMoveSlots.Select(moveSlot => moveSlot.Id).ToList();
+    public List<MoveId> BaseMoves
+    {
+        get
+        {
+            var list = new List<MoveId>(BaseMoveSlots.Count);
+            foreach (var slot in BaseMoveSlots) list.Add(slot.Id);
+            return list;
+        }
+    }
+
+    /// <summary>Zero-allocation check for whether a move is in the base move slots.</summary>
+    public bool HasBaseMove(MoveId moveId)
+    {
+        foreach (var slot in BaseMoveSlots)
+            if (slot.Id == moveId) return true;
+        return false;
+    }
+
+    /// <summary>Zero-allocation index-of for the current move slots. Returns -1 if not found.</summary>
+    public int FindMoveIndex(MoveId moveId)
+    {
+        for (int i = 0; i < MoveSlots.Count; i++)
+            if (MoveSlots[i].Id == moveId) return i;
+        return -1;
+    }
+
+    /// <summary>Zero-allocation index-of for the base move slots. Returns -1 if not found.</summary>
+    public int FindBaseMoveIndex(MoveId moveId)
+    {
+        for (int i = 0; i < BaseMoveSlots.Count; i++)
+            if (BaseMoveSlots[i].Id == moveId) return i;
+        return -1;
+    }
 
     private const int TrickRoomSpeedOffset = 10000;
 
