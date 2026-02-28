@@ -242,7 +242,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         // Hardcoded for single-target purposes
         // (no spread moves have any kind of onTryHit handler)
         Pokemon target = SpreadMoveTargets.ToPokemonList(targets)[0];
-        var damage = new SpreadMoveDamage();
+        var damage = new SpreadMoveDamage(targets.Count);
 
         for (int i = 0; i < targets.Count; i++)
         {
@@ -406,37 +406,39 @@ if (tryResult is BoolRelayVar { Value: false } ||
             }
         }
 
-        var damagedTargets = new List<Pokemon>();
-        var damagedDamage = new List<int>();
+        var damagedTargets = new Pokemon[targets.Count];
+        var damagedDamage = new int[targets.Count];
+        int damagedCount = 0;
 
         for (int i = 0; i < targets.Count; i++)
         {
             if (damage[i] is IntBoolIntUndefinedUnion intDmg &&
                 targets[i] is PokemonPokemonUnion pokemonUnion)
             {
-                damagedTargets.Add(pokemonUnion.Pokemon);
-                damagedDamage.Add(intDmg.Value);
+                damagedTargets[damagedCount] = pokemonUnion.Pokemon;
+                damagedDamage[damagedCount] = intDmg.Value;
+                damagedCount++;
             }
         }
 
         int pokemonOriginalHp = pokemon.Hp;
 
-        if (damagedDamage.Count > 0 && !isSecondary && !isSelf)
+        if (damagedCount > 0 && !isSecondary && !isSelf)
         {
-            var damageRelayVars = new List<RelayVar>(damagedDamage.Count);
-            foreach (int d in damagedDamage)
+            var damageRelayVars = new List<RelayVar>(damagedCount);
+            for (int i = 0; i < damagedCount; i++)
             {
-                damageRelayVars.Add(IntRelayVar.Get(d));
+                damageRelayVars.Add(IntRelayVar.Get(damagedDamage[i]));
             }
 
-            Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move,
+            Battle.RunEvent(EventId.DamagingHit, damagedTargets.AsSpan(0, damagedCount).ToArray(), pokemon, move,
                 new ArrayRelayVar(damageRelayVars));
 
             if (move.OnAfterHit != null)
             {
-                foreach (Pokemon t in damagedTargets)
+                for (int i = 0; i < damagedCount; i++)
                 {
-                    Battle.SingleEvent(EventId.AfterHit, move, null, t, pokemon, move);
+                    Battle.SingleEvent(EventId.AfterHit, move, null, damagedTargets[i], pokemon, move);
                 }
             }
 

@@ -9,6 +9,10 @@ public class SpreadMoveDamage : List<BoolIntUndefinedUnion>
     {
     }
 
+    public SpreadMoveDamage(int capacity) : base(capacity)
+    {
+    }
+
     public SpreadMoveDamage(SpreadMoveDamage other)
     {
         foreach (BoolIntUndefinedUnion item in other)
