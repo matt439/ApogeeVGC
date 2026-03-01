@@ -393,8 +393,10 @@ public partial class Pokemon : IPriorityComparison
 
         WeightKg = 1.0;
 
-        CanTerastallize = TeraType;
         CanMegaEvo = battle.Actions.CanMegaEvo(this);
+        CanTerastallize = battle.RuleTable.AllowTerastallization && CanMegaEvo is null
+            ? TeraType
+            : null;
 
         // Initialize stats by calling SetSpecie
         // This must be done before ClearVolatile() and Hp = MaxHp

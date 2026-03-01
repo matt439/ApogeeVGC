@@ -245,6 +245,7 @@ public record Formats
                 MaxMoveCount = 4,
                 EvLimit = 510,
                 AllowMegaEvolution = true,
+                AllowTerastallization = false,
             },
         },
     };

@@ -29,6 +29,9 @@ public class RuleTable : Dictionary<RuleId, Rule>
     // Mega Evolution
     public bool AllowMegaEvolution { get; set; }
 
+    // Terastallization (defaults to true for Gen 9)
+    public bool AllowTerastallization { get; set; } = true;
+
     // Source gen (for legality checking)
     public int MinSourceGen { get; set; } = 1;
 
