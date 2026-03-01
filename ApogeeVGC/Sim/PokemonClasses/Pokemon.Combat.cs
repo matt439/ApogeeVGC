@@ -166,7 +166,7 @@ public partial class Pokemon
         // Convert damage to numeric value (0 if false/null)
         int damageNumber = damage switch
         {
-            IntIntFalseUnion intDamage => intDamage.Value,
+            { IsInt: true } intDamage => intDamage.Value,
             _ => 0,
         };
 
@@ -199,7 +199,7 @@ public partial class Pokemon
         var damagedBy = AttackedBy.Where(attacker =>
         {
             // Check if damageValue is a numeric value (not false/null)
-            bool hasNumericDamage = attacker.DamageValue is IntIntFalseUnion;
+            bool hasNumericDamage = attacker.DamageValue is { IsInt: true };
 
             // If no same-side filtering, just check damage
             if (!filterOutSameSide)

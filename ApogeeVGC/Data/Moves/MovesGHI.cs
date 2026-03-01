@@ -1035,7 +1035,7 @@ public partial record Moves
                     }
 
                     IntFalseUnion healResult = battle.Heal(healAmount, target);
-                    bool success = healResult is not FalseIntFalseUnion;
+                    bool success = !healResult.IsFalse;
 
                     if (success && !target.IsAlly(source))
                     {

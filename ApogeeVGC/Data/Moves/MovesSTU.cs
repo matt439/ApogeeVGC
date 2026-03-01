@@ -845,7 +845,7 @@ public partial record Moves
                     int healAmount = battle.Modify(target.MaxHp, factor);
                     IntFalseUnion result = battle.Heal(healAmount, target);
 
-                    if (result is FalseIntFalseUnion)
+                    if (result.IsFalse)
                     {
                         if (battle.DisplayUi)
                         {
@@ -2650,7 +2650,7 @@ public partial record Moves
                     IntFalseUnion healResult = battle.Heal(targetAtk, source, target);
 
                     // Move succeeds if either heal or boost worked
-                    bool success = healResult is not FalseIntFalseUnion ||
+                    bool success = !healResult.IsFalse ||
                                    boostResult?.IsTruthy() == true;
                     return success ? new VoidReturn() : false;
                 }),
@@ -3122,7 +3122,7 @@ public partial record Moves
                     double[] healAmount = [0.25, 0.5, 1.0];
                     bool success =
                         battle.Heal(battle.Modify(target.MaxHp, healAmount[layers - 1])) is not
-                            FalseIntFalseUnion;
+                            { IsFalse: true };
                     if (!success) battle.Add("-fail", target, "heal");
                     target.RemoveVolatile(_library.Conditions[ConditionId.StockpileStorage]);
                     // Always return success or NOT_FAIL (Empty) - stockpile is consumed regardless
@@ -3344,7 +3344,7 @@ public partial record Moves
                         factor = 0.25;
 
                     bool success =
-                        battle.Heal(battle.Modify(target.MaxHp, factor)) is not FalseIntFalseUnion;
+                        battle.Heal(battle.Modify(target.MaxHp, factor)) is not { IsFalse: true };
                     if (!success)
                     {
                         if (battle.DisplayUi)

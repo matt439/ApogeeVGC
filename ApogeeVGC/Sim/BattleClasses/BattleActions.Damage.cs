@@ -44,7 +44,7 @@ public partial class BattleActions
                 target,
                 move
             );
-            return damageResult?.ToIntUndefinedFalseUnion() ?? IntUndefinedFalseUnion.FromFalse();
+            return damageResult.ToIntUndefinedFalseUnion();
         }
 
         // Fixed damage moves
@@ -80,7 +80,7 @@ public partial class BattleActions
             return basePower == 0 ? new Undefined() : IntUndefinedFalseUnion.FromFalse();
         }
 
-        basePower = Battle.ClampIntRange(basePower.ToInt(), 1, null);
+        basePower = Battle.ClampIntRange(basePower.Value.ToInt(), 1, null);
 
         // Calculate critical hit ratio (Gen 7+ logic, used in Gen 9)
         var critRatio = move.CritRatio ?? 0;
@@ -118,9 +118,9 @@ public partial class BattleActions
         }
 
         // Run BasePower event after crit calculation
-        Battle.Debug($"[GetDamage] About to call BasePower event with IntRelayVar({basePower.ToInt()})");
+        Battle.Debug($"[GetDamage] About to call BasePower event with IntRelayVar({basePower.Value.ToInt()})");
         var basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
-            RunEventSource.FromNullablePokemon(target), move, IntRelayVar.Get(basePower.ToInt()), true);
+            RunEventSource.FromNullablePokemon(target), move, IntRelayVar.Get(basePower.Value.ToInt()), true);
         Battle.Debug(
             $"[GetDamage] BasePower event returned: {(basePowerEvent != null ? basePowerEvent.GetType().Name : "null")}");
 
@@ -134,7 +134,7 @@ public partial class BattleActions
             return 0;
         }
 
-        basePower = Battle.ClampIntRange(basePower.ToInt(), 1, null);
+        basePower = Battle.ClampIntRange(basePower.Value.ToInt(), 1, null);
 
         // Terastallization 60 BP boost for low base power moves (Gen 9)
         var dexMove = Library.Moves[move.Id];
@@ -142,7 +142,7 @@ public partial class BattleActions
             (source.Terastallized == MoveType.Stellar
                 ? !source.StellarBoostedTypes.Contains(move.Type)
                 : source.HasType((PokemonType)move.Type)) &&
-            basePower.ToInt() < 60 &&
+            basePower.Value.ToInt() < 60 &&
             dexMove is { Priority: <= 0, MultiHit: null } &&
             // Exclude moves like Dragon Energy with variable BP
             !(move.BasePower is 0 or 150 && move.BasePowerCallback != null))
@@ -261,7 +261,7 @@ public partial class BattleActions
         var baseDamage = Battle.Trunc(
             Battle.Trunc(
                 Battle.Trunc(
-                    Battle.Trunc(2 * level / 5 + 2) * basePower.ToInt() * attack
+                    Battle.Trunc(2 * level / 5 + 2) * basePower.Value.ToInt() * attack
                 ) / defense
             ) / 50
         );

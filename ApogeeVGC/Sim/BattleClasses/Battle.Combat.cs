@@ -351,12 +351,12 @@ public partial class Battle
         // If event prevented healing, return the result
         if (tryHealResult is not IntRelayVar healAmount)
         {
-            return new IntIntFalseUnion(0);
+            return IntFalseUnion.FromInt(0);
         }
 
         if (healAmount.Value == 0)
         {
-            return new IntIntFalseUnion(0);
+            return IntFalseUnion.FromInt(0);
         }
 
         damage = healAmount.Value;
@@ -364,19 +364,19 @@ public partial class Battle
         // Return false if target has no HP
         if (target?.Hp <= 0)
         {
-            return new FalseIntFalseUnion();
+            return IntFalseUnion.FromFalse();
         }
 
         // Return false if target is not active
         if (target is { IsActive: false })
         {
-            return new FalseIntFalseUnion();
+            return IntFalseUnion.FromFalse();
         }
 
         // Return false if target is already at max HP
         if (target != null && target.Hp >= target.MaxHp)
         {
-            return new FalseIntFalseUnion();
+            return IntFalseUnion.FromFalse();
         }
 
         if (target is null)
@@ -413,7 +413,7 @@ public partial class Battle
             IntRelayVar.Get(finalDamage)
         );
 
-        return new IntIntFalseUnion(finalDamage);
+        return IntFalseUnion.FromInt(finalDamage);
     }
 
     /// <summary>

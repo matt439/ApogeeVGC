@@ -220,7 +220,7 @@ public partial record Abilities
                     {
                         battle.EffectState.CheckedAngerShell = true;
                         if (source is null || source == target || target.Hp == 0) return;
-                        if (move.TotalDamage is not IntIntFalseUnion totalDamage) return;
+                        if (move.TotalDamage is not { IsInt: true } totalDamage) return;
 
                         Attacker? lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;
@@ -702,7 +702,7 @@ public partial record Abilities
                     {
                         battle.EffectState.CheckedBerserk = true;
                         if (source == null || source == target || target.Hp == 0) return;
-                        if (move.TotalDamage is not IntIntFalseUnion totalDamage) return;
+                        if (move.TotalDamage is not { IsInt: true } totalDamage) return;
 
                         Attacker? lastAttackedBy = target.GetLastAttackedBy();
                         if (lastAttackedBy == null) return;

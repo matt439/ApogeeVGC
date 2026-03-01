@@ -147,10 +147,10 @@ public partial record Items
                 OnAfterMoveSecondarySelf = OnAfterMoveSecondarySelfEventInfo.Create(
                     (battle, pokemon, _, move) =>
                     {
-                        if (move.TotalDamage != null && move.TotalDamage.ToInt() > 0 &&
+                        if (move.TotalDamage != null && move.TotalDamage.Value.ToInt() > 0 &&
                             !pokemon.ForceSwitchFlag)
                         {
-                            battle.Heal(move.TotalDamage.ToInt() / 8, pokemon);
+                            battle.Heal(move.TotalDamage.Value.ToInt() / 8, pokemon);
                         }
                     }, -1),
                 Num = 253,

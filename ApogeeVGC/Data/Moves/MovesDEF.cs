@@ -2631,7 +2631,7 @@ public partial record Moves
                     IntFalseUnion result = battle.Heal(healAmount, target);
 
                     // TS: success = !!this.heal(...) — 0 and false are both falsy
-                    bool success = result is IntIntFalseUnion { Value: > 0 };
+                    bool success = result is { IsInt: true, Value: > 0 };
 
                     // Mark as externally influenced if healing opponent
                     if (success && !target.IsAlly(source))

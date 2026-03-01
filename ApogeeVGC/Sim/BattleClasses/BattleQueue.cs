@@ -146,7 +146,7 @@ public class BattleQueue(Battle battle)
         }
 
         // Set order if not already set
-        if (currentAction.Order is FalseIntFalseUnion)
+        if (currentAction.Order.IsFalse)
         {
             if (_orders.TryGetValue(currentAction.Choice, out int order))
             {

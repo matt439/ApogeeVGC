@@ -119,7 +119,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Electric)
                     {
-                        if (battle.Heal(target.BaseMaxHp / 4) is FalseIntFalseUnion)
+                        if (battle.Heal(target.BaseMaxHp / 4).IsFalse)
                         {
                             battle.Add("-immune", target, "[from] ability: Volt Absorb");
                         }
@@ -184,7 +184,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Water)
                     {
-                        if (battle.Heal(target.BaseMaxHp / 4) is FalseIntFalseUnion or IntIntFalseUnion { Value: 0 })
+                        if (battle.Heal(target.BaseMaxHp / 4) is { IsFalse: true } or { Value: 0 })
                         {
                             battle.Add("-immune", target, "[from] ability: Water Absorb");
                         }

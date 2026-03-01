@@ -1,53 +1,49 @@
 namespace ApogeeVGC.Sim.Utils.Unions;
 
 /// <summary>
-/// int | false
+/// int | false — a struct-based discriminated union that avoids heap allocations.
+/// Replaces the previous IntFalseUnion / IntIntFalseUnion / FalseIntFalseUnion class hierarchy.
 /// </summary>
-public abstract record IntFalseUnion
+public readonly record struct IntFalseUnion
 {
-    public abstract int ToInt();
-    public abstract IntUndefinedFalseUnion ToIntUndefinedFalseUnion();
+    public int Value { get; }
+    public bool IsFalse { get; }
+    public bool IsInt => !IsFalse;
 
-    public static IntFalseUnion FromInt(int value) => new IntIntFalseUnion(value);
-    public static IntFalseUnion FromFalse() => new FalseIntFalseUnion();
+    private IntFalseUnion(int value, bool isFalse)
+    {
+        Value = value;
+        IsFalse = isFalse;
+    }
 
-    public static implicit operator IntFalseUnion(int value) => new IntIntFalseUnion(value);
+    public int ToInt() => IsFalse ? 0 : Value;
 
-/// <summary>
+    public IntUndefinedFalseUnion ToIntUndefinedFalseUnion() =>
+        IsFalse
+            ? new FalseIntUndefinedFalseUnion()
+            : new IntIntUndefinedFalseUnion(Value);
+
+    public static IntFalseUnion FromInt(int value) => new(value, false);
+    public static IntFalseUnion FromFalse() => new(0, true);
+
+    public static implicit operator IntFalseUnion(int value) => new(value, false);
+
+    /// <summary>
     /// Compares this IntFalseUnion to another.
     /// False is treated as having the lowest priority (comes last when sorting ascending).
     /// When both are integers, standard integer comparison is used.
     /// </summary>
     public int CompareTo(IntFalseUnion? other)
     {
-    if (other == null) return 1;
+        if (other == null) return 1;
+        var o = other.Value;
 
-        return (this, other) switch
+        return (IsFalse, o.IsFalse) switch
         {
-   // False < any integer (false has lower priority)
-          (FalseIntFalseUnion, IntIntFalseUnion) => 1,  // this is false, other is int -> this > other
-         (IntIntFalseUnion, FalseIntFalseUnion) => -1, // this is int, other is false -> this < other
-
-  // Both are false - they're equal
-            (FalseIntFalseUnion, FalseIntFalseUnion) => 0,
-
- // Both are integers - compare the values
-    (IntIntFalseUnion thisInt, IntIntFalseUnion otherInt) =>
-         thisInt.Value.CompareTo(otherInt.Value),
-
-      _ => 0,
+            (true, false) => 1,    // this is false, other is int -> this > other
+            (false, true) => -1,   // this is int, other is false -> this < other
+            (true, true) => 0,     // both false
+            (false, false) => Value.CompareTo(o.Value),
         };
     }
-}
-
-public record IntIntFalseUnion(int Value) : IntFalseUnion
-{
-    public override int ToInt() => Value;
-    public override IntUndefinedFalseUnion ToIntUndefinedFalseUnion() => new IntIntUndefinedFalseUnion(Value);
-}
-
-public record FalseIntFalseUnion : IntFalseUnion
-{
-    public override int ToInt() => 0;
-    public override IntUndefinedFalseUnion ToIntUndefinedFalseUnion() => new FalseIntUndefinedFalseUnion();
 }

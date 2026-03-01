@@ -1039,7 +1039,7 @@ public partial record Moves
                     }
 
                     bool success =
-                        battle.Heal(battle.Modify(target.MaxHp, factor), target) is not FalseIntFalseUnion;
+                        battle.Heal(battle.Modify(target.MaxHp, factor), target) is not { IsFalse: true };
                     if (!success)
                     {
                         if (battle.DisplayUi)
@@ -1089,7 +1089,7 @@ public partial record Moves
                     }
 
                     bool success =
-                        battle.Heal(battle.Modify(target.MaxHp, factor), target) is not FalseIntFalseUnion;
+                        battle.Heal(battle.Modify(target.MaxHp, factor), target) is not { IsFalse: true };
                     if (!success)
                     {
                         if (battle.DisplayUi)

@@ -712,7 +712,7 @@ public partial record Moves
                         IntFalseUnion healResult =
                             battle.Heal(target.BaseMaxHp / 2, target, source);
                         // TS: !this.heal(...) catches both false and 0 (both falsy)
-                        if (healResult is FalseIntFalseUnion or IntIntFalseUnion { Value: 0 })
+                        if (healResult is { IsFalse: true } or { Value: 0 })
                         {
                             return BoolEmptyVoidUnion.FromEmpty(); // NOT_FAIL equivalent
                         }

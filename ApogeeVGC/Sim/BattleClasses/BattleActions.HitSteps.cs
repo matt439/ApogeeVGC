@@ -896,7 +896,7 @@ public partial class BattleActions
                 {
                     int currentTotal = move.TotalDamage switch
                     {
-                        IntIntFalseUnion intVal => intVal.Value,
+                        { IsInt: true } intVal => intVal.Value,
                         _ => 0,
                     };
                     move.TotalDamage = IntFalseUnion.FromInt(currentTotal + dmgInt.Value);
@@ -958,7 +958,7 @@ public partial class BattleActions
 
         // Recoil damage
         if ((move.Recoil != null || move.Id == MoveId.Chloroblast) &&
-            move.TotalDamage is IntIntFalseUnion { Value: > 0 } totalDamageInt)
+            move.TotalDamage is { IsInt: true, Value: > 0 } totalDamageInt)
         {
             int hpBeforeRecoil = pokemon.Hp;
 
@@ -1046,7 +1046,7 @@ public partial class BattleActions
                 if (targets.Count == 1)
                 {
                     // For single target moves, use TotalDamage if it's an integer
-                    curDamage = move.TotalDamage is IntIntFalseUnion totalDmgInt
+                    curDamage = move.TotalDamage is { IsInt: true } totalDmgInt
                         ? totalDmgInt.Value
                         : 0;
                 }

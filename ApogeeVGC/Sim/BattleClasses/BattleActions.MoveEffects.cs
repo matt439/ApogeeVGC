@@ -63,7 +63,7 @@ public partial class BattleActions
                 IntFalseUnion? healResult = Battle.Heal(roundedAmount, target, source,
                     BattleHealEffect.FromIEffect(move));
 
-                if (healResult is not IntIntFalseUnion intHeal || (intHeal.Value == 0 && healResult is FalseIntFalseUnion))
+                if (healResult is not { IsInt: true } intHeal || (intHeal.Value == 0 && healResult is { IsFalse: true }))
                 {
                     if (healResult is not null)
                     {

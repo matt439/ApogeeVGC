@@ -457,7 +457,7 @@ public partial record Abilities
                     if (target != source && move.Type == MoveType.Water)
                     {
                         IntFalseUnion healResult = battle.Heal(target.BaseMaxHp / 4, target);
-                        if (healResult is FalseIntFalseUnion)
+                        if (healResult.IsFalse)
                         {
                             battle.Add("-immune", target, "[from] ability: Dry Skin");
                         }
@@ -513,7 +513,7 @@ public partial record Abilities
                     if (target != source && move.Type == MoveType.Ground)
                     {
                         IntFalseUnion healResult = battle.Heal(target.BaseMaxHp / 4, target);
-                        if (healResult is FalseIntFalseUnion)
+                        if (healResult.IsFalse)
                         {
                             battle.Add("-immune", target, "[from] ability: Earth Eater");
                         }

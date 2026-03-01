@@ -26,25 +26,18 @@ public record SwitchAction : IAction
         get;
         init
         {
-            switch (value)
+            if (value.IsFalse)
+                throw new ArgumentException("Order cannot be false.", nameof(value));
+
+            int i = value.Value;
+            if (i is 3 or 6 or 103)
             {
-                case IntIntFalseUnion iifu:
-                    int i = iifu.Value;
-                    if (i is 3 or 6 or 103)
-                    {
-                        field = i;
-                    }
-                    else
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(value),
-                            "Order must be one of the predefined values.");
-                    }
-                    break;
-                case FalseIntFalseUnion:
-                    throw new ArgumentException("Order cannot be of type FalseIntFalseUnion.", nameof(value));
-                default:
-                    throw new ArgumentException("Order must be of type FalseIntFalseUnion or IntIntFalseUnion.",
-                        nameof(value));
+                field = value;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    "Order must be one of the predefined values.");
             }
         }
     }

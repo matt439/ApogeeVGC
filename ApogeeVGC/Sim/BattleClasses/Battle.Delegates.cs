@@ -75,8 +75,8 @@ public partial class Battle
             UndefinedIntFalseUndefined => new UndefinedRelayVar(),
 
             // IntFalseUnion -> int or false (used by Heal method)
-            IntIntFalseUnion intFalse => IntRelayVar.Get(intFalse.Value),
-            FalseIntFalseUnion => BoolRelayVar.False,
+            IntFalseUnion { IsInt: true } intFalse => IntRelayVar.Get(intFalse.Value),
+            IntFalseUnion { IsFalse: true } => BoolRelayVar.False,
 
             // IntBoolUnion -> int or bool
             IntIntBoolUnion intBool => IntRelayVar.Get(intBool.Value),
