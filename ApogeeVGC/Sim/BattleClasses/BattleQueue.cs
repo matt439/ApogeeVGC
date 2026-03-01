@@ -260,9 +260,10 @@ public class BattleQueue(Battle battle)
                     if (sa.Pokemon.SwitchFlag is MoveIdMoveIdBoolUnion moveIdUnion)
                     {
                         // Set the source effect to the move that caused the switch
+                        // Use shared template — SourceEffect is only used as IEffect for dispatch
                         currentAction = sa with
                         {
-                            SourceEffect = Battle.Library.Moves[moveIdUnion.MoveId].ToActiveMove(),
+                            SourceEffect = Battle.Library.Moves[moveIdUnion.MoveId].AsActiveMove(),
                         };
                     }
 
