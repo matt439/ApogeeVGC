@@ -201,6 +201,10 @@ public partial class Battle
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
 
+        // Actions must be initialized before Side construction because
+        // the Pokemon constructor calls battle.Actions.CanMegaEvo(this)
+        Actions = new BattleActions(this);
+
         // Create sides with temporary Foe references (will be set properly below)
         var side1 = new Side(options.Player1Options.Name, this, SideId.P1,
             options.Player1Options.Team.ToArray())
@@ -234,7 +238,6 @@ public partial class Battle
         Rated = options.Rated ?? false;
 
         Queue = new BattleQueue(this);
-        Actions = new BattleActions(this);
 
         // Initialize effect as an empty Format.
         Effect = new Format
