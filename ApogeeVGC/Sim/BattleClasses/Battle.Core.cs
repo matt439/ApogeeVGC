@@ -183,6 +183,29 @@ public partial class Battle
     public BattleHistory History { get; } = new();
 
     /// <summary>
+    /// Pool of reusable <see cref="List{IAction}"/> instances to eliminate per-commit
+    /// allocations when saving/restoring the action queue in <see cref="CommitChoices"/>.
+    /// </summary>
+    private readonly Stack<List<IAction>> _actionListPool = new();
+
+    internal List<IAction> RentActionList()
+    {
+        if (_actionListPool.Count > 0)
+        {
+            var list = _actionListPool.Pop();
+            list.Clear();
+            return list;
+        }
+        return new List<IAction>(8);
+    }
+
+    internal void ReturnActionList(List<IAction> list)
+    {
+        list.Clear();
+        _actionListPool.Push(list);
+    }
+
+    /// <summary>
     /// Maximum number of turns before the battle is automatically ended as a tie.
     /// If null or 0, no turn limit is enforced.
     /// </summary>

@@ -219,14 +219,17 @@ public partial class Battle
                     Side side = Sides[i];
                     if (side.PokemonLeft <= 0) continue;
 
-                    // Create a table of which active Pokemon need to switch
-                    // Convert MoveIdBoolUnion to bool using IsTrue() method
-                    var switchTable = side.Active
-                        .Select(pokemon => pokemon?.SwitchFlag.IsTrue() ?? false)
-                        .ToList();
+                    // Build switch table without LINQ to avoid iterator/list allocations
+                    var switchTable = new List<bool>(side.Active.Count);
+                    bool anySwitch = false;
+                    foreach (Pokemon? pokemon in side.Active)
+                    {
+                        bool needsSwitch = pokemon?.SwitchFlag.IsTrue() ?? false;
+                        switchTable.Add(needsSwitch);
+                        anySwitch |= needsSwitch;
+                    }
 
-                    // Only create a switch request if at least one Pokemon needs to switch
-                    if (switchTable.Any(flag => flag))
+                    if (anySwitch)
                     {
                         requests[i] = new SwitchRequest
                         {
@@ -266,12 +269,17 @@ public partial class Battle
                     // Get move request data for each active slot, preserving indices
                     // Fainted or null Pokemon produce null entries (matching TypeScript behavior)
                     // This ensures Side.Active[i] maps to moveRequest.Active[i]
-                    var activeData = side.Active
-                        .Select(pokemon => pokemon is { Fainted: false } ? pokemon.GetMoveRequestData() : null)
-                        .ToList();
+                    var activeData = new List<PokemonMoveRequestData?>(side.Active.Count);
+                    bool anyActive = false;
+                    foreach (Pokemon? pokemon in side.Active)
+                    {
+                        PokemonMoveRequestData? data = pokemon is { Fainted: false } ? pokemon.GetMoveRequestData() : null;
+                        activeData.Add(data);
+                        anyActive |= data != null;
+                    }
 
                     // Only create a move request if there are active Pokemon that can make moves
-                    if (activeData.Any(data => data != null))
+                    if (anyActive)
                     {
                         var moveRequest = new MoveRequest
                         {
@@ -336,7 +344,12 @@ public partial class Battle
         }
 
         // Check if multiple requests exist (multiple players need to make choices)
-        bool multipleRequestsExist = requests.Count(r => r != null) >= 2;
+        int nonNullCount = 0;
+        for (int k = 0; k < requests.Length; k++)
+        {
+            if (requests[k] != null) nonNullCount++;
+        }
+        bool multipleRequestsExist = nonNullCount >= 2;
 
         // Finalize all requests
         for (int i = 0; i < Sides.Count; i++)
@@ -365,7 +378,12 @@ public partial class Battle
             }
         }
 
-        return requests.Where(r => r != null).Cast<IChoiceRequest>().ToList();
+        var result = new List<IChoiceRequest>(requests.Length);
+        for (int k = 0; k < requests.Length; k++)
+        {
+            if (requests[k] != null) result.Add(requests[k]!);
+        }
+        return result;
     }
 
     /// <summary>
@@ -472,7 +490,9 @@ public partial class Battle
         // fainting). When this happens, the rest of the turn is saved (and not
         // re-sorted), but the new switch choices are sorted and inserted before
         // the rest of the turn.
-        var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+        // Use a pooled list to avoid per-commit allocations
+        var oldQueue = RentActionList();
+        oldQueue.AddRange(Queue.List);
         Debug($"[CommitChoices] Saved oldQueue with {oldQueue.Count} items");
 
         Queue.Clear();
@@ -520,6 +540,7 @@ public partial class Battle
 
         // Append the old queue actions after the new ones
         Queue.List.AddRange(oldQueue);
+        ReturnActionList(oldQueue);
 
         Debug($"[CommitChoices] After restoring oldQueue, queue size = {Queue.List.Count}");
         Debug($"Total queue size: {Queue.List.Count}");

@@ -39,41 +39,44 @@ public partial class Battle
     }
 
     /// <summary>
+    /// Set of attacking events that should be suppressed by Mold Breaker for custom abilities.
+    /// Static to avoid allocating a new HashSet on every call.
+    /// </summary>
+    private static readonly HashSet<EventId> AttackingEvents =
+    [
+        EventId.BeforeMove,
+        EventId.BasePower,
+        EventId.Immunity,
+        EventId.RedirectTarget,
+        EventId.Heal,
+        EventId.SetStatus,
+        EventId.CriticalHit,
+        EventId.ModifyAtk,
+        EventId.ModifyDef,
+        EventId.ModifySpA,
+        EventId.ModifySpD,
+        EventId.ModifySpe,
+        EventId.ModifyAccuracy,
+        EventId.ModifyBoost,
+        EventId.ModifyDamage,
+        EventId.ModifySecondaries,
+        EventId.ModifyWeight,
+        EventId.TryAddVolatile,
+        EventId.TryHit,
+        EventId.TryHitSide,
+        EventId.TryMove,
+        EventId.Boost,
+        EventId.DragOut,
+        EventId.Effectiveness,
+    ];
+
+    /// <summary>
     /// Checks if an event is an "attacking event" that should be suppressed by Mold Breaker
     /// for custom abilities.
     /// </summary>
     private static bool IsAttackingEvent(EventId eventId, IEffect? sourceEffect)
     {
-        // List of attacking events that should be suppressed
-        HashSet<EventId> attackingEvents =
-        [
-            EventId.BeforeMove,
-            EventId.BasePower,
-            EventId.Immunity,
-            EventId.RedirectTarget,
-            EventId.Heal,
-            EventId.SetStatus,
-            EventId.CriticalHit,
-            EventId.ModifyAtk,
-            EventId.ModifyDef,
-            EventId.ModifySpA,
-            EventId.ModifySpD,
-            EventId.ModifySpe,
-            EventId.ModifyAccuracy,
-            EventId.ModifyBoost,
-            EventId.ModifyDamage,
-            EventId.ModifySecondaries,
-            EventId.ModifyWeight,
-            EventId.TryAddVolatile,
-            EventId.TryHit,
-            EventId.TryHitSide,
-            EventId.TryMove,
-            EventId.Boost,
-            EventId.DragOut,
-            EventId.Effectiveness,
-        ];
-
-        if (attackingEvents.Contains(eventId))
+        if (AttackingEvents.Contains(eventId))
         {
             return true;
         }

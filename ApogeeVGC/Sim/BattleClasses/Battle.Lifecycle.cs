@@ -711,9 +711,12 @@ public partial class Battle
 
                 ClearActiveMove(failed: true);
                 UpdateSpeed();
-                residualPokemon = GetAllActive()
-                    .Select(p => (p, p.GetUndynamaxedHp()))
-                    .ToList();
+                // Build residual pokemon list without LINQ to avoid allocations
+                residualPokemon = [];
+                foreach (Pokemon p in EnumerateAllActive())
+                {
+                    residualPokemon.Add((p, p.GetUndynamaxedHp()));
+                }
                 FieldEvent(EventId.Residual);
 
                 Debug($"[RunAction] FieldEvent(Residual) returned");
@@ -796,10 +799,17 @@ public partial class Battle
             }
         }
 
-        // Check for switches
-        var switches = Sides
-            .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
-            .ToList();
+        // Check for switches — manual loop avoids LINQ allocations
+        Span<bool> switches = stackalloc bool[Sides.Count];
+        for (int si = 0; si < Sides.Count; si++)
+        {
+            bool anySwitch = false;
+            foreach (Pokemon? p in Sides[si].Active)
+            {
+                if (p != null && p.SwitchFlag.IsTrue()) { anySwitch = true; break; }
+            }
+            switches[si] = anySwitch;
+        }
 
         for (int i = 0; i < Sides.Count; i++)
         {
@@ -857,8 +867,12 @@ public partial class Battle
                         if (Ended) return true;
                         if (pokemon.Fainted)
                         {
-                            switches[i] = Sides[i].Active
-                                .Any(p => p != null && p.SwitchFlag.IsTrue());
+                            bool anyFlag = false;
+                            foreach (Pokemon? ap in Sides[i].Active)
+                            {
+                                if (ap != null && ap.SwitchFlag.IsTrue()) { anyFlag = true; break; }
+                            }
+                            switches[i] = anyFlag;
                         }
                     }
                 }

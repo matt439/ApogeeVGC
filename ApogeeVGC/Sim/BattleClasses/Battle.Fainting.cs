@@ -19,12 +19,17 @@ public partial class Battle
 
     public void CheckFainted()
     {
-        // Iterate through all sides in the battle
-        foreach (Pokemon pokemon in Sides.SelectMany(side => side.Active.OfType<Pokemon>()
-                     .Where(pokemon => pokemon.Fainted)))
+        // Iterate through all sides in the battle — manual loops avoid LINQ allocations
+        foreach (Side side in Sides)
         {
-            // Mark that this Pok�mon needs to be switched out
-            pokemon.SwitchFlag = true;
+            foreach (Pokemon? pokemon in side.Active)
+            {
+                if (pokemon is { Fainted: true })
+                {
+                    // Mark that this Pokémon needs to be switched out
+                    pokemon.SwitchFlag = true;
+                }
+            }
         }
     }
 

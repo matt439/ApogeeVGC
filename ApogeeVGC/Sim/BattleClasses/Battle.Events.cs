@@ -619,8 +619,9 @@ public partial class Battle
             }
 
             // Process each active Pokemon on this side
-            foreach (Pokemon active in side.Active.OfType<Pokemon>())
+            foreach (Pokemon? activeSlot in side.Active)
             {
+                if (activeSlot is not Pokemon active) continue;
                 // For SwitchIn events, also trigger AnySwitchIn handlers
                 if (eventId == EventId.SwitchIn)
                 {
