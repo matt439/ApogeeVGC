@@ -131,7 +131,8 @@ public partial class Battle
 
         // Set up new event context
         Effect = effect;
-        EffectState = state ?? InitEffectState();
+        bool rentedEffectState = state == null;
+        EffectState = state ?? RentEffectState();
         Event rentedEvent = _eventPool.Count > 0 ? _eventPool.Pop() : new Event();
         rentedEvent.Id = eventId;
         rentedEvent.Target = target;
@@ -161,9 +162,10 @@ public partial class Battle
         }
         finally
         {
-            // Restore parent context and return event to pool
+            // Restore parent context and return event/state to pools
             EventDepth--;
             Effect = parentEffect;
+            if (rentedEffectState) ReturnEffectState(EffectState);
             EffectState = parentEffectState;
             rentedEvent.Reset();
             _eventPool.Push(rentedEvent);
@@ -429,12 +431,13 @@ public partial class Battle
             // Save parent effect context
             IEffect parentEffect = Effect;
             EffectState parentEffectState = EffectState;
+            bool rentedHandlerState = handler.State == null;
 
             try
             {
                 // Set up handler's effect context
                 Effect = handler.Effect;
-                EffectState = handler.State ?? InitEffectState();
+                EffectState = handler.State ?? RentEffectState();
                 EffectState.Target = effectHolder switch
                 {
                     PokemonEffectHolder pokemonEh => new PokemonEffectStateTarget(pokemonEh.Pokemon),
@@ -461,6 +464,7 @@ public partial class Battle
             {
                 // Restore parent effect context (always, even on exception)
                 Effect = parentEffect;
+                if (rentedHandlerState) ReturnEffectState(EffectState);
                 EffectState = parentEffectState;
             }
 

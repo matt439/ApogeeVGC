@@ -52,7 +52,7 @@ public partial class BattleActions
             targets.Count > 0 ? SingleEventSource.FromNullablePokemon(targets[0]) : null, move);
 
         RelayVar? prepareHitResult1 = Battle.SingleEvent(EventId.PrepareHit, move,
-     Battle.InitEffectState(),
+     null,
           targets.Count > 0 ? SingleEventTarget.FromNullablePokemon(targets[0]) : null,
   pokemon, move);
 
@@ -182,7 +182,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         RelayVar? tryResult = Battle.SingleEvent(EventId.Try, move, null, pokemon,
             SingleEventSource.FromNullablePokemon(target), move);
         RelayVar? prepareHitResult1 = Battle.SingleEvent(EventId.PrepareHit, move,
-            Battle.InitEffectState(), SingleEventTarget.FromNullablePokemon(target), pokemon, move);
+            null, SingleEventTarget.FromNullablePokemon(target), pokemon, move);
         RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon,
             RunEventSource.FromNullablePokemon(target), move);
 
@@ -259,7 +259,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         // Run TryHit events for field/side moves
         if (move.Target == MoveTarget.All && !isSelf)
         {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, null,
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
             if (!Battle.IsRelayVarTruthy(hitResult))
@@ -276,7 +276,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         }
         else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam && !isSelf)
         {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, null,
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
             if (!Battle.IsRelayVarTruthy(hitResult))
@@ -293,7 +293,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         }
         else
         {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, null,
                 target, pokemon, move);
 
             if (!Battle.IsRelayVarTruthy(hitResult))

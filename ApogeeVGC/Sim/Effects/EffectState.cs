@@ -85,6 +85,78 @@ public class EffectState
     public int? Damage { get; set; }
     public Pokemon? LastDamageSource { get; set; } // For Counter/Mirror Coat damage source
 
+    /// <summary>
+    /// Resets all fields to the default "empty" state so this instance can be
+    /// returned to a pool and reused without stale data leaking across events.
+    /// </summary>
+    internal void ResetForPool()
+    {
+        Id = EffectStateId.FromEmpty();
+        EffectOrder = 0;
+        Duration = null;
+        Target = null;
+
+        // Reference-type fields
+        Source = null;
+        SourceEffect = null;
+        SourceSlot = null;
+        LinkedStatus = null;
+        LinkedPokemon = null;
+        Berry = null;
+        MoveData = null;
+        LastDamageSource = null;
+        Boosts = null;
+        TypeWas = null;
+
+        // Nullable value-type fields
+        FromBooster = null;
+        BestStat = null;
+        Unnerved = null;
+        StartTime = null;
+        Time = null;
+        Stage = null;
+        Move = null;
+        Counter = null;
+        Started = null;
+        KnockedOff = null;
+        Ending = null;
+        Resisted = null;
+        IsSlotCondition = null;
+        HasDragonType = null;
+        ContactHitCount = null;
+        CheckedAngerShell = null;
+        CheckedBerserk = null;
+        Embodied = null;
+        Gluttony = null;
+        ChoiceLock = null;
+        Busted = null;
+        Libero = null;
+        Protean = null;
+        BerryWeaken = null;
+        Seek = null;
+        Ready = null;
+        LastMove = null;
+        NumConsecutive = null;
+        Eject = null;
+        Inactive = null;
+        LostFocus = null;
+        HitCount = null;
+        Multiplier = null;
+        DoubleMultiplier = null;
+        TargetSlot = null;
+        TargetLoc = null;
+        EndingTurn = null;
+        TrueDuration = null;
+        Layers = null;
+        Def = null;
+        Spd = null;
+        BoundDivisor = null;
+        Hp = null;
+        StartingTurn = null;
+        Slot = null;
+        Damage = null;
+    }
+
     public int? GetProperty(EffectStateKey? key)
     {
         return key switch
