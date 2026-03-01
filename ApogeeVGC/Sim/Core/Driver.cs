@@ -20,9 +20,8 @@ public partial class Driver
     private const int Team1EvalSeed = 54321;
     private const int Team2EvalSeed = 67890;
 
-    private const int RandomEvaluationNumTest = 100000;
+    private const int RandomEvaluationNumTest = 20000;
     private const int NumThreads = 16;
-    private const int BattleTimeoutMilliseconds = 10000; // 10 seconds timeout per battle
 
     public void Start(DriverMode mode)
     {
@@ -40,17 +39,17 @@ public partial class Driver
             case DriverMode.ConsoleVsRandomDoubles:
                 RunConsoleVsRandomDoublesTest();
                 break;
-            case DriverMode.RandomVsRandomSinglesEvaluation:
-                RunRandomVsRandomSinglesEvaluationTest();
-                break;
-            case DriverMode.RandomVsRandomDoublesEvaluation:
-                RunRandomVsRandomDoublesEvaluationTest();
-                break;
             case DriverMode.RndVsRndVgcRegIEvaluation:
                 RunRndVsRndVgcRegIEvaluation();
                 break;
+            case DriverMode.RndVsRndMegaEvaluation:
+                RunRndVsRndMegaEvaluation();
+                break;
             case DriverMode.SingleBattleDebugVgcRegI:
                 RunSingleBattleDebugVgcRegI();
+                break;
+            case DriverMode.SingleBattleDebugMega:
+                RunSingleBattleDebugMega();
                 break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");

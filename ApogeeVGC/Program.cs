@@ -7,7 +7,7 @@ public class Program
     public static void Main(string[] args)
     {
         var driver = new Driver();
-        driver.Start(DriverMode.RndVsRndVgcRegIEvaluation);
+        driver.Start(DriverMode.RndVsRndMegaEvaluation);
 
         //Console.WriteLine("Press Enter key to exit...");
         //Console.ReadLine();
