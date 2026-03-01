@@ -57,7 +57,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ### UI and Display
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
-- [GUI Team Preview Fix](#gui-team-preview-fix) - No Pokémon displayed during GUI team preview
+- [GUI Team Preview Fix](#gui-team-preview-fix) - No Pokï¿½mon displayed during GUI team preview
 
 
 ### Battle Lifecycle
@@ -67,6 +67,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended during request generation
 - [Player 2 Always Wins Bug Fix](#player-2-always-wins-bug-fix) - Winner detection comparing player names against side IDs incorrectly
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player always returning invalid target location 0 for targeting moves in doubles
+- [Infinite Battle CheckWin & Struggle Fix](#infinite-battle-checkwin--struggle-fix) - Two bugs causing BattleTurnLimitException: CheckWin skipped after target faints, and random player infinite switching when out of PP
 
 ### Choice System
 - [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position to index into Active-sized arrays
@@ -124,7 +125,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **Severity**: Critical  
 **Systems Affected**: All status conditions and items with OnStart/OnEnd/Restart handlers, Sleep status never ending
 
-**Problem**: Battle exceeded 1000-turn limit due to Sleep status that never ended, causing every move to be blocked indefinitely. Both Pokémon had Sleep status with `StatusState.Time=null` because the `OnStart` handler never executed despite `SetStatus` being called.
+**Problem**: Battle exceeded 1000-turn limit due to Sleep status that never ended, causing every move to be blocked indefinitely. Both Pokï¿½mon had Sleep status with `StatusState.Time=null` because the `OnStart` handler never executed despite `SetStatus` being called.
 
 **Root Cause**: `EventId.Start`, `EventId.End`, and `EventId.Restart` were only mapped in `AbilityEventMethodsMap` (for abilities) but completely missing from the base `EventMethodsMap`. When `SingleEvent` tried to find a handler for Condition/Item lifecycle events, `GetEventHandlerInfo` returned `null`, so handlers never executed. Since Sleep's `OnStart` never ran, `Time` stayed `null`, and `null--` stays `null` in C# (lifted nullable arithmetic), so `null <= 0` was always `false` and Sleep never cured itself.
 
@@ -304,7 +305,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 
 **Problem**: `KeyNotFoundException` when attempting to apply status conditions from items like Flame Orb. Battle would crash completely.
 
-**Root Cause**: Incorrect ternary operator logic in `TrySetStatus` - when Pokémon already had a status, method passed `ConditionId.None` to `SetStatus` instead of the current status, causing dictionary lookup failure.
+**Root Cause**: Incorrect ternary operator logic in `TrySetStatus` - when Pokï¿½mon already had a status, method passed `ConditionId.None` to `SetStatus` instead of the current status, causing dictionary lookup failure.
 
 **Solution**: Changed from `Status == ConditionId.None ? status : ConditionId.None` to `Status == ConditionId.None ? status : Status`. This allows the duplicate check in `SetStatus` to properly handle the case.
 
@@ -319,7 +320,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 **Severity**: High  
 **Systems Affected**: Recoil damage moves, move execution pipeline
 
-**Problem**: When any Pokémon used a recoil move (e.g., Wild Charge, Double-Edge, Brave Bird), the move would deal damage correctly but immediately after applying recoil damage, the battle would end prematurely as a tie with `KeyNotFoundException: The given key 'Recoil' was not present in the dictionary.`
+**Problem**: When any Pokï¿½mon used a recoil move (e.g., Wild Charge, Double-Edge, Brave Bird), the move would deal damage correctly but immediately after applying recoil damage, the battle would end prematurely as a tie with `KeyNotFoundException: The given key 'Recoil' was not present in the dictionary.`
 
 **Root Cause**: The `ConditionId.Recoil` enum value existed in the `ConditionId` enum, but there was no corresponding entry in the `Conditions` dictionary in `Conditions.cs`. When `BattleActions.HitSteps.cs` tried to apply recoil damage using `Library.Conditions[ConditionId.Recoil]`, the dictionary lookup threw a `KeyNotFoundException`.
 
@@ -424,7 +425,7 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 **Severity**: High  
 **Systems Affected**: ModifyBoost events, stat boost modifications, Unaware ability
 
-**Problem**: When a Pokémon with the Unaware ability was switching in, the battle crashed with `InvalidOperationException: Event ModifyBoost adapted handler failed on effect Unaware (Ability)` with inner exception `Unable to convert return value of type 'VoidSparseBoostsTableVoidUnion' to RelayVar`.
+**Problem**: When a Pokï¿½mon with the Unaware ability was switching in, the battle crashed with `InvalidOperationException: Event ModifyBoost adapted handler failed on effect Unaware (Ability)` with inner exception `Unable to convert return value of type 'VoidSparseBoostsTableVoidUnion' to RelayVar`.
 
 **Root Cause**: The Unaware ability's `OnAnyModifyBoost` handler returns `SparseBoostsTableVoidUnion`, which can be either `SparseBoostsTableSparseBoostsTableVoidUnion` (containing a `SparseBoostsTable` with modified boosts) or `VoidSparseBoostsTableVoidUnion` (indicating no modification). The `EventHandlerAdapter.ConvertReturnValue` method had cases for many union types but was missing the case for `SparseBoostsTableVoidUnion`.
 
@@ -746,9 +747,9 @@ this.singleEvent('TakeItem', yourItem, target.itemState, source, target, move, y
 **Severity**: High  
 **Systems Affected**: GUI rendering, battle perspectives, team preview
 
-**Problem**: When running GUI battles, no Pokémon were displayed during the team preview phase. The screen showed an empty battlefield with no Pokémon sprites or information.
+**Problem**: When running GUI battles, no Pokï¿½mon were displayed during the team preview phase. The screen showed an empty battlefield with no Pokï¿½mon sprites or information.
 
-**Root Cause**: The `BattleRenderer` was receiving perspectives with the wrong `BattlePerspectiveType`. When `RequestPlayerChoices()` was called during team preview, it called `UpdateAllPlayersUi()` without parameters, which defaulted to `BattlePerspectiveType.InBattle` instead of `TeamPreview`. This caused the renderer to use `RenderInBattle()` (which only shows active Pokémon) instead of `RenderTeamPreview()` (which shows the full team).
+**Root Cause**: The `BattleRenderer` was receiving perspectives with the wrong `BattlePerspectiveType`. When `RequestPlayerChoices()` was called during team preview, it called `UpdateAllPlayersUi()` without parameters, which defaulted to `BattlePerspectiveType.InBattle` instead of `TeamPreview`. This caused the renderer to use `RenderInBattle()` (which only shows active Pokï¿½mon) instead of `RenderTeamPreview()` (which shows the full team).
 
 **Solution**: Modified `Battle.Requests.RequestPlayerChoices()` to determine the correct perspective type based on `RequestState` and pass it explicitly to `UpdateAllPlayersUi()`.
 
@@ -924,7 +925,7 @@ OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, type, m
 **Severity**: High  
 **Systems Affected**: Ripen ability `OnTryHeal` event handler
 
-**Problem**: The Ripen ability crashed with a `NullReferenceException` when trying to access `effect.EffectStateId` in its `OnTryHeal` handler. The error occurred when a Pokémon with Ripen was healed from sources that don't have an associated `IEffect` (e.g., natural regeneration, certain abilities).
+**Problem**: The Ripen ability crashed with a `NullReferenceException` when trying to access `effect.EffectStateId` in its `OnTryHeal` handler. The error occurred when a Pokï¿½mon with Ripen was healed from sources that don't have an associated `IEffect` (e.g., natural regeneration, certain abilities).
 
 **Root Cause**: The handler did not check if the `effect` parameter was null before accessing its properties. The TypeScript reference implementation includes an explicit null check (`if (!effect) return;`) that was missing from the C# port.
 
@@ -995,7 +996,7 @@ if (effect != null && effect.EffectStateId == AbilityId.Intimidate)
 **Severity**: High  
 **Systems Affected**: Berserk ability `OnDamage` event handler
 
-**Problem**: The Berserk ability crashed with a `NullReferenceException` when trying to access `effect.EffectType` in its `OnDamage` handler at line 647 of `AbilitiesABC.cs`. The error occurred during random battle testing when a Pokémon with Berserk took damage from sources that don't have an associated `IEffect`.
+**Problem**: The Berserk ability crashed with a `NullReferenceException` when trying to access `effect.EffectType` in its `OnDamage` handler at line 647 of `AbilitiesABC.cs`. The error occurred during random battle testing when a Pokï¿½mon with Berserk took damage from sources that don't have an associated `IEffect`.
 
 **Root Cause**: The handler did not check if the `effect` parameter was null before accessing its `EffectType` property. Damage can come from various sources that don't have an associated effect (confusion self-damage, recoil, weather damage, status conditions). The TypeScript reference directly accesses `effect.effectType` without a null check, which works in JavaScript because accessing a property on `undefined` returns `undefined` (no error), but in C# it throws a `NullReferenceException`.
 
@@ -1127,7 +1128,7 @@ foreach (Pokemon? pokemon in activeSnapshot) { ... }
 **Severity**: High  
 **Systems Affected**: Battle lifecycle, request/choice system, win condition detection
 
-**Problem**: When one side's last Pokémon fainted, the battle attempted to request moves from the losing player (who had no Pokémon left), causing `ArgumentNullException: Choice request cannot be null`. The battle correctly detected the win condition but continued to process choice requests.
+**Problem**: When one side's last Pokï¿½mon fainted, the battle attempted to request moves from the losing player (who had no Pokï¿½mon left), causing `ArgumentNullException: Choice request cannot be null`. The battle correctly detected the win condition but continued to process choice requests.
 
 **Root Causes**:
 1. **Request Assignment Before End Check**: Requests were assigned to all sides (including WaitRequest for loser) before detecting the battle should end
@@ -1152,12 +1153,12 @@ foreach (Pokemon? pokemon in activeSnapshot) { ... }
 **Severity**: Critical  
 **Systems Affected**: Battle lifecycle, request generation, win condition detection
 
-**Problem**: Battle entered an infinite loop when a side had all active Pokémon fainted but still had Pokémon in reserve. The battle continued for 1000+ turns with one player receiving `WaitRequest` while the other switched Pokémon indefinitely, eventually throwing `BattleTurnLimitException`.
+**Problem**: Battle entered an infinite loop when a side had all active Pokï¿½mon fainted but still had Pokï¿½mon in reserve. The battle continued for 1000+ turns with one player receiving `WaitRequest` while the other switched Pokï¿½mon indefinitely, eventually throwing `BattleTurnLimitException`.
 
-**Root Cause**: Active Pokémon fainted but weren't properly processed through `FaintMessages()` and `CheckFainted()`, so `SwitchFlag` was never set. This caused `EndTurn()` to call `MakeRequest(RequestState.Move)` instead of detecting that switches were needed. `GetRequests()` then created a `WaitRequest` for the side with no active Pokémon but didn't check if the battle should end.
+**Root Cause**: Active Pokï¿½mon fainted but weren't properly processed through `FaintMessages()` and `CheckFainted()`, so `SwitchFlag` was never set. This caused `EndTurn()` to call `MakeRequest(RequestState.Move)` instead of detecting that switches were needed. `GetRequests()` then created a `WaitRequest` for the side with no active Pokï¿½mon but didn't check if the battle should end.
 
 **Solution**: 
-1. **GetRequests()**: When detecting a side has no active non-fainted Pokémon, force switch flags on fainted Pokémon, check available switches, and call `Lose(side)` if no switches available
+1. **GetRequests()**: When detecting a side has no active non-fainted Pokï¿½mon, force switch flags on fainted Pokï¿½mon, check available switches, and call `Lose(side)` if no switches available
 2. **MakeRequest()**: Check if battle ended during `GetRequests()` and return early if so
 3. **CheckFainted()**: Added validation logging to detect problematic states
 
@@ -1176,7 +1177,7 @@ foreach (Pokemon? pokemon in activeSnapshot) { ... }
 **Severity**: High  
 **Systems Affected**: Synchronous simulation, battle lifecycle, request/choice system
 
-**Problem**: When running a synchronous battle test (`SyncSimulator`), the battle crashed with `InvalidOperationException: Cannot request choices from players: Some sides have no active request` after one side's last Pokémon fainted. This occurred when `GetRequests()` detected a win condition and called `Lose()`, but the simulator still attempted to request player choices.
+**Problem**: When running a synchronous battle test (`SyncSimulator`), the battle crashed with `InvalidOperationException: Cannot request choices from players: Some sides have no active request` after one side's last Pokï¿½mon fainted. This occurred when `GetRequests()` detected a win condition and called `Lose()`, but the simulator still attempted to request player choices.
 
 **Root Cause**: In `SyncSimulator.Run()`, the main loop checks `if (Battle.RequestState != RequestState.None)` before calling `RequestPlayerChoices()`. When `GetRequests()` calls `Lose()` during request generation, it sets `Ended = true` but doesn't clear `RequestState`. The simulator checks for pending requests before checking if the battle ended during request generation, causing it to attempt requesting choices with no active requests.
 
@@ -1426,7 +1427,7 @@ However:
 - **`BoostId`** includes: Atk, Def, SpA, SpD, Spe, **Accuracy**, **Evasion**
 - **`StatId`** includes: HP, Atk, Def, SpA, SpD, Spe
 
-Accuracy and Evasion are **boost-only values**—they can be modified by stat boosts but are not actual stats that Pokemon possess. They don't appear in `StatId`, so conversion correctly threw an exception.
+Accuracy and Evasion are **boost-only values**ï¿½they can be modified by stat boosts but are not actual stats that Pokemon possess. They don't appear in `StatId`, so conversion correctly threw an exception.
 
 **Solution**: Rewrote `ConvertToString(BoostId)` to handle all `BoostId` values directly, including Accuracy and Evasion, using a comprehensive switch expression that mirrors the stat conversion logic but includes the two additional boost-only values.
 
@@ -1489,7 +1490,7 @@ BattleDamageEffect.FromIEffect(move)
 **Severity**: High  
 **Systems Affected**: Big Root item OnTryHeal event handler
 
-**Problem**: Big Root's `OnTryHeal` handler threw `NullReferenceException` when a Pokémon holding Big Root was healed by Heal Pulse or other moves that don't pass an explicit effect parameter.
+**Problem**: Big Root's `OnTryHeal` handler threw `NullReferenceException` when a Pokï¿½mon holding Big Root was healed by Heal Pulse or other moves that don't pass an explicit effect parameter.
 
 **Root Cause**: When Heal Pulse calls `battle.Heal(healAmount, target)` with only damage and target, the `effect` parameter defaults to null. In `Battle.Heal()`, when `effect` is `null`, it tries `Effect as Condition`, but `Effect` is the move itself (not a Condition), so the cast returns null. This null effect is then passed to event handlers, causing the NullReferenceException when Big Root's handler tries to access `effect.EffectStateId`.
 
@@ -1543,9 +1544,9 @@ BattleDamageEffect.FromIEffect(move)
 
 **Problem**: When running large-scale parallel battle simulations with 32 threads, intermittent `System.InvalidOperationException: Stack overflow` exceptions occurred. The stack trace showed infinite recursion through the Magic Bounce ability handler. The bug was intermittent and not reproducible in single-battle debug mode with the same seeds.
 
-**Root Cause**: Two opposing Pokémon with Magic Bounce abilities would bounce a reflectable move back and forth indefinitely. When Magic Bounce's `OnTryHit` handler created a new `ActiveMove` and set `HasBounced = true` to prevent re-bouncing, this flag was lost when `UseMoveInner` called `move.ToActiveMove()`. The `ToActiveMove()` method creates a fresh `ActiveMove` from base `Move` properties only, not preserving `ActiveMove`-specific properties like `HasBounced`. Without the guard flag, the second Magic Bounce holder would bounce the move again, creating infinite recursion.
+**Root Cause**: Two opposing Pokï¿½mon with Magic Bounce abilities would bounce a reflectable move back and forth indefinitely. When Magic Bounce's `OnTryHit` handler created a new `ActiveMove` and set `HasBounced = true` to prevent re-bouncing, this flag was lost when `UseMoveInner` called `move.ToActiveMove()`. The `ToActiveMove()` method creates a fresh `ActiveMove` from base `Move` properties only, not preserving `ActiveMove`-specific properties like `HasBounced`. Without the guard flag, the second Magic Bounce holder would bounce the move again, creating infinite recursion.
 
-**Why Intermittent**: Only triggered when both Pokémon had Magic Bounce (rare), one used a reflectable move, and recursion depth exceeded stack limits before natural battle termination (faint, PP depletion). Thread pool threads have 1 MB stacks vs. 4-8 MB main thread stacks, so the bug manifested in parallel execution but not single debug runs.
+**Why Intermittent**: Only triggered when both Pokï¿½mon had Magic Bounce (rare), one used a reflectable move, and recursion depth exceeded stack limits before natural battle termination (faint, PP depletion). Thread pool threads have 1 MB stacks vs. 4-8 MB main thread stacks, so the bug manifested in parallel execution but not single debug runs.
 
 **Solution**: Modified `UseMoveInner` in `BattleActions.Moves.cs` to preserve the `HasBounced` flag when converting an incoming `ActiveMove`:
 
@@ -1567,6 +1568,27 @@ This ensures the second Magic Bounce holder sees `HasBounced == true` and skips 
 
 ---
 
-*Last Updated*: 2025-01-20  
-*Total Bug Fixes Documented*: 33  
+### Infinite Battle CheckWin & Struggle Fix
+**File**: `InfiniteBattleCheckWinAndStruggleFix.md`
+**Severity**: Critical
+**Systems Affected**: Battle win detection (`FaintMessages`/`CheckWin`), Random player choice generation
+
+**Problem**: Battles running in parallel evaluation intermittently exceeded the 5000-turn limit and threw `BattleTurnLimitException`. Two separate bugs were identified:
+
+1. **CheckWin skipped after target faints**: In `HitStepMoveHitLoop`, `FaintMessages` was called with `checkWin = attacker.Hp <= 0`. When the attacker's move KO'd the last opposing Pokemon but the attacker survived, `CheckWin()` was never called, leaving the battle in a state where one side had `PokemonLeft=0` but `Ended=False`.
+
+2. **Random player infinite switching**: When all moves hit 0 PP and were marked disabled, the random player's only available choice was "switch". Both sides endlessly swapped Pokemon in and out without ever triggering Struggle (which requires choosing a move). No damage, no recoil, no progress.
+
+**Solutions**:
+1. Added safety net in `Battle.Fainting.cs`: force `checkWin=true` when any side has `PokemonLeft <= 0`, regardless of the caller's parameter.
+2. Added Struggle fallback in `PlayerRandom.cs`: when all moves are disabled, add a "use first move" option so the battle engine converts it to Struggle with 25% max HP recoil.
+
+**Investigation Note**: The original suspicion was that a `List<PokemonType>` â†’ `PokemonType[]` optimization introduced shared mutable state. Investigation confirmed the optimization is safe â€” it merely changed execution timing, exposing these latent bugs more frequently during parallel evaluation.
+
+**Keywords**: `BattleTurnLimitException`, `infinite loop`, `CheckWin`, `FaintMessages`, `Struggle`, `PlayerRandom`, `switching loop`, `PP depletion`, `disabled moves`, `HitStepMoveHitLoop`, `parallel battles`, `PokemonType array`
+
+---
+
+*Last Updated*: 2025-03-01
+*Total Bug Fixes Documented*: 34
 *Reference Guides*: 1
