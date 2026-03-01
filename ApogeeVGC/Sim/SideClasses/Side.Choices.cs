@@ -239,6 +239,19 @@ public partial class Side
             return EmitChoiceError("Can't move: You can only Terastallize in Gen 9.");
         }
 
+        // Step 11b: Mega Evolution
+        bool mega = eventType == EventType.MegaEvo;
+
+        if (mega && request.CanMegaEvo is null)
+        {
+            return EmitChoiceError($"Can't move: {pokemon.Name} can't Mega Evolve.");
+        }
+
+        if (mega && Choice.Mega)
+        {
+            return EmitChoiceError("Can't move: You can only Mega Evolve once per battle.");
+        }
+
         // Step 12: Add action to choice
         Choice.Actions =
         [
@@ -249,6 +262,7 @@ public partial class Side
                 TargetLoc = targetLoc,
                 MoveId = moveid,
                 Terastallize = terastallize ? pokemon.TeraType : null,
+                Mega = mega ? pokemon.CanMegaEvo : null,
             }
         ];
 
@@ -264,6 +278,11 @@ public partial class Side
         if (terastallize)
         {
             Choice.Terastallize = true;
+        }
+
+        if (mega)
+        {
+            Choice.Mega = true;
         }
 
         return true;
@@ -706,6 +725,11 @@ public partial class Side
             Choice.Terastallize = true;
         }
 
+        if (input.Mega)
+        {
+            Choice.Mega = true;
+        }
+
         if (input.CantUndo)
         {
             Choice.CantUndo = true;
@@ -719,10 +743,12 @@ public partial class Side
 
     private bool ProcessChosenMoveAction(ChosenAction action)
     {
-        // Determine event type based on Terastallize flag
+        // Determine event type based on Terastallize/Mega flag
         EventType eventType = action.Terastallize != null
             ? EventType.Terastallize
-            : EventType.None;
+            : action.Mega != null
+                ? EventType.MegaEvo
+                : EventType.None;
 
         // Use ChooseMove with the move ID and target location
         return ChooseMove(

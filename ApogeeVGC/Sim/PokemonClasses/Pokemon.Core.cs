@@ -178,6 +178,9 @@ public partial class Pokemon : IPriorityComparison
     public PokemonType[] BaseTypes { get; set; }
     public MoveType? Terastallized { get; set; }
 
+    // Mega Evolution
+    public SpecieId? CanMegaEvo { get; set; }
+
     public StalenessId? Staleness { get; set; }
     public StalenessId? PendingStaleness { get; set; }
 
@@ -390,7 +393,10 @@ public partial class Pokemon : IPriorityComparison
 
         WeightKg = 1.0;
 
-        CanTerastallize = TeraType;
+        CanMegaEvo = battle.Actions.CanMegaEvo(this);
+        CanTerastallize = battle.RuleTable.AllowTerastallization && CanMegaEvo is null
+            ? TeraType
+            : null;
 
         // Initialize stats by calling SetSpecie
         // This must be done before ClearVolatile() and Hp = MaxHp
@@ -516,6 +522,9 @@ public partial class Pokemon : IPriorityComparison
         TeraType = source.TeraType;
         Terastallized = source.Terastallized;
         StellarBoostedTypes = new List<MoveType>(source.StellarBoostedTypes);
+
+        // Mega Evolution
+        CanMegaEvo = source.CanMegaEvo;
 
         // Staleness
         Staleness = source.Staleness;

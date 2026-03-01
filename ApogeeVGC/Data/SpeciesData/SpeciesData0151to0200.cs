@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -109,6 +110,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 100.5,
                 Color = "Green",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.MeganiummMega] = new()
             {
@@ -136,6 +138,7 @@ public partial record SpeciesData
                 HeightM = 2.4,
                 WeightKg = 201,
                 Color = "Green",
+                RequiredItem = ItemId.Meganiummite,
             },
             [SpecieId.Cyndaquil] = new()
             {
@@ -313,6 +316,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 88.8,
                 Color = "Blue",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.FeraligatrMega] = new()
             {
@@ -340,6 +344,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 108.8,
                 Color = "Blue",
+                RequiredItem = ItemId.Feraligatrite,
             },
             [SpecieId.Sentret] = new()
             {
@@ -907,6 +912,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 61.5,
                 Color = "Yellow",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.AmpharosMega] = new()
             {
@@ -933,6 +939,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 61.5,
                 Color = "Yellow",
+                RequiredItem = ItemId.Ampharosite,
             },
             [SpecieId.Bellossom] = new()
             {

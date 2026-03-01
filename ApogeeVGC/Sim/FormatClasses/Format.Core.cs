@@ -30,6 +30,9 @@ public enum FormatId
     Gen9VgcRegulationG, // All obtainable, 2 restricted (2025)
     Gen9VgcRegulationH, // All obtainable, 1 restricted
     Gen9VgcRegulationI, // All obtainable, no restricted
+
+    // Mega Evolution formats
+    Gen9VgcMega, // VGC Doubles with Mega Evolution enabled
 }
 
 

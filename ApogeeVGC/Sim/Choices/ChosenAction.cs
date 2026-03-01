@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Choices;
@@ -33,6 +34,7 @@ public record ChosenAction : IAction
     public int? Index { get; init; }
     public Side? Side { get; init; }
     public MoveType? Terastallize { get; init; }
+    public SpecieId? Mega { get; init; }
 
     public IntFalseUnion Order { get; init; } = int.MaxValue;
     public int Priority { get; init; }

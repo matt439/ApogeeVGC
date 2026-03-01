@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -535,6 +536,7 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 80,
                 Color = "Brown",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.KangaskhanMega] = new()
             {
@@ -561,6 +563,7 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 100,
                 Color = "Brown",
+                RequiredItem = ItemId.Kangaskhanite,
             },
             [SpecieId.Horsea] = new()
             {
@@ -717,6 +720,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 80,
                 Color = "Purple",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.StarmieMega] = new()
             {
@@ -745,6 +749,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 80,
                 Color = "Purple",
+                RequiredItem = ItemId.Starmite,
             },
             [SpecieId.MrMime] = new()
             {
@@ -927,6 +932,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 55,
                 Color = "Brown",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.PinsirMega] = new()
             {
@@ -953,6 +959,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 59,
                 Color = "Brown",
+                RequiredItem = ItemId.Pinsirite,
             },
             [SpecieId.Tauros] = new()
             {
@@ -1113,6 +1120,7 @@ public partial record SpeciesData
                 HeightM = 6.5,
                 WeightKg = 235,
                 Color = "Blue",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.GyaradosMega] = new()
             {
@@ -1139,6 +1147,7 @@ public partial record SpeciesData
                 HeightM = 6.5,
                 WeightKg = 305,
                 Color = "Blue",
+                RequiredItem = ItemId.Gyaradosite,
             },
             [SpecieId.Lapras] = new()
             {
@@ -1475,6 +1484,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 59,
                 Color = "Purple",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.AerodactylMega] = new()
             {
@@ -1501,6 +1511,7 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 79,
                 Color = "Purple",
+                RequiredItem = ItemId.Aerodactylite,
             },
             [SpecieId.Snorlax] = new()
             {
@@ -1755,6 +1766,7 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 210,
                 Color = "Brown",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.DragoniteMega] = new()
             {
@@ -1782,6 +1794,7 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 290,
                 Color = "Brown",
+                RequiredItem = ItemId.Dragonitite,
             },
             [SpecieId.Mewtwo] = new()
             {
@@ -1807,6 +1820,7 @@ public partial record SpeciesData
                 HeightM = 2,
                 WeightKg = 122,
                 Color = "Purple",
+                OtherFormes = [FormeId.MegaX, FormeId.MegaY],
             },
             [SpecieId.MewtwoMegaX] = new()
             {
@@ -1833,6 +1847,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 127,
                 Color = "Purple",
+                RequiredItem = ItemId.MewtwoniteX,
             },
             [SpecieId.MewtwoMegaY] = new()
             {
@@ -1859,6 +1874,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 33,
                 Color = "Purple",
+                RequiredItem = ItemId.MewtwoniteY,
             },
         };
     }

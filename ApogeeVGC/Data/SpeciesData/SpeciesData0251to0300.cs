@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -109,6 +110,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 52.2,
                 Color = "Green",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.SceptileMega] = new()
             {
@@ -135,6 +137,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 55.2,
                 Color = "Green",
+                RequiredItem = ItemId.Sceptilite,
             },
             [SpecieId.Torchic] = new()
             {
@@ -210,6 +213,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 52,
                 Color = "Red",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.BlazikenMega] = new()
             {
@@ -236,6 +240,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 52,
                 Color = "Red",
+                RequiredItem = ItemId.Blazikenite,
             },
             [SpecieId.Mudkip] = new()
             {
@@ -311,6 +316,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 81.9,
                 Color = "Blue",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.SwampertMega] = new()
             {
@@ -337,6 +343,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 102,
                 Color = "Blue",
+                RequiredItem = ItemId.Swampertite,
             },
             [SpecieId.Poochyena] = new()
             {
@@ -956,6 +963,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 48.4,
                 Color = "White",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.GardevoirMega] = new()
             {
@@ -982,6 +990,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 48.4,
                 Color = "White",
+                RequiredItem = ItemId.Gardevoirite,
             },
             [SpecieId.Surskit] = new()
             {

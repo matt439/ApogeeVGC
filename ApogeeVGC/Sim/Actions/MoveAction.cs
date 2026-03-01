@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Actions;
@@ -60,6 +61,7 @@ public record MoveAction : IAction
     public required Move Move { get; set; }
     public IEffect? SourceEffect { get; init; }
     public MoveType? Terastallize { get; init; }
+    public SpecieId? Mega { get; init; }
 
     /// <summary>
     /// Cached <see cref="ActiveMove"/> derived from <see cref="Move"/>.

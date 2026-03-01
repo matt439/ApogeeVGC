@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -36,6 +37,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 21.5,
                 Color = "Green",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.HawluchaMega] = new()
             {
@@ -64,6 +66,7 @@ public partial record SpeciesData
                 HeightM = 1.0,
                 WeightKg = 25,
                 Color = "Green",
+                RequiredItem = ItemId.Hawluchite,
             },
             [SpecieId.Dedenne] = new()
             {
@@ -802,6 +805,7 @@ public partial record SpeciesData
                 HeightM = 5.0,
                 WeightKg = 305.0,
                 Color = "Green",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.Zygarde10] = new()
             {
@@ -880,6 +884,7 @@ public partial record SpeciesData
                 HeightM = 7.7,
                 WeightKg = 610.0,
                 Color = "Green",
+                RequiredItem = ItemId.Zygardite,
             },
             [SpecieId.Diancie] = new()
             {
@@ -904,6 +909,7 @@ public partial record SpeciesData
                 HeightM = 0.7,
                 WeightKg = 8.8,
                 Color = "Pink",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.DiancieMega] = new()
             {
@@ -930,6 +936,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 27.8,
                 Color = "Pink",
+                RequiredItem = ItemId.Diancite,
             },
             [SpecieId.Hoopa] = new()
             {

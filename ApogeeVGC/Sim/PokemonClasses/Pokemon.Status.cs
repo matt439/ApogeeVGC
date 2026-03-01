@@ -480,7 +480,7 @@ public partial class Pokemon
 
     public void CopyVolatileFrom(Pokemon pokemon, ConditionIdBoolUnion? switchCause = null)
     {
-        // Clear this Pokémon's current volatiles
+        // Clear this Pokï¿½mon's current volatiles
         ClearVolatile();
 
         // Determine if switchCause is 'shedtail'
@@ -523,27 +523,27 @@ public partial class Pokemon
                 continue;
             }
 
-            // Create a shallow clone of the volatile state with this Pokémon as the target
+            // Create a shallow clone of the volatile state with this Pokï¿½mon as the target
             EffectState clonedState = volatileState.ShallowClone();
             clonedState.Target = this;
 
-            // Initialize the effect state for this Pokémon
+            // Initialize the effect state for this Pokï¿½mon
             Volatiles[conditionId] = clonedState;
 
-            // Handle linked Pokémon (for moves like Bind, Wrap, etc.)
+            // Handle linked Pokï¿½mon (for moves like Bind, Wrap, etc.)
             if (clonedState.LinkedPokemon is null || clonedState.LinkedStatus is null) continue;
             // Clear the source's linked references
             pokemon.Volatiles[conditionId].LinkedPokemon = null;
             pokemon.Volatiles[conditionId].LinkedStatus = null;
 
-            // Update all linked Pokémon to point to this Pokémon instead of the source
+            // Update all linked Pokï¿½mon to point to this Pokï¿½mon instead of the source
             foreach (Pokemon linkedPoke in clonedState.LinkedPokemon)
             {
-                // Get the linked Pokémon's volatile state for this condition
+                // Get the linked Pokï¿½mon's volatile state for this condition
                 if (!linkedPoke.Volatiles.TryGetValue(clonedState.LinkedStatus.Id,
                         out EffectState? linkedState)
                     || linkedState.LinkedPokemon is null) continue;
-                // Find and replace the source Pokémon with this Pokémon
+                // Find and replace the source Pokï¿½mon with this Pokï¿½mon
                 int sourceIndex = linkedState.LinkedPokemon.IndexOf(pokemon);
                 if (sourceIndex >= 0)
                 {
@@ -552,7 +552,7 @@ public partial class Pokemon
             }
         }
 
-        // Clear the source Pokémon's volatiles after copying
+        // Clear the source Pokï¿½mon's volatiles after copying
         pokemon.ClearVolatile();
 
         // Trigger Copy event for each copied volatile
@@ -581,7 +581,7 @@ public partial class Pokemon
 
         Transformed = false;
         Ability = BaseAbility;
-        if (CanTerastallize is FalseMoveTypeFalseUnion)
+        if (CanTerastallize is FalseMoveTypeFalseUnion && Battle.RuleTable.AllowTerastallization)
         {
             CanTerastallize = TeraType;
         }

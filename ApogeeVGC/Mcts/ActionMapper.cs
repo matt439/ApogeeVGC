@@ -20,6 +20,7 @@ public readonly struct LegalAction
     public int TargetLoc { get; init; }
     public int SwitchIndex { get; init; }
     public MoveType? Terastallize { get; init; }
+    public SpecieId? Mega { get; init; }
 }
 
 /// <summary>
@@ -88,6 +89,9 @@ public sealed class ActionMapper
             _ => null,
         };
 
+        // Check mega evolution availability
+        SpecieId? megaEvo = pokemonRequest.CanMegaEvo;
+
         // Add move actions
         for (var i = 0; i < pokemonRequest.Moves.Count; i++)
         {
@@ -115,6 +119,19 @@ public sealed class ActionMapper
                     MoveId = move.Id,
                     TargetLoc = targetLoc,
                     Terastallize = teraType,
+                });
+            }
+
+            // Add mega evolution variant if available
+            if (megaEvo.HasValue)
+            {
+                actions.Add(new LegalAction
+                {
+                    VocabIndex = vocabIdx, // Same vocab index — model doesn't distinguish
+                    ChoiceType = ChoiceType.Move,
+                    MoveId = move.Id,
+                    TargetLoc = targetLoc,
+                    Mega = megaEvo,
                 });
             }
         }
@@ -235,6 +252,7 @@ public sealed class ActionMapper
                 MoveId = action.MoveId,
                 TargetLoc = action.TargetLoc,
                 Terastallize = action.Terastallize,
+                Mega = action.Mega,
             },
             ChoiceType.Switch => new ChosenAction
             {

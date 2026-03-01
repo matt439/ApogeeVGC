@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -585,6 +586,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 62,
                 Color = "Yellow",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.FalinksMega] = new()
             {
@@ -612,6 +614,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 99,
                 Color = "Yellow",
+                RequiredItem = ItemId.Falinksite,
             },
             // 871 - Pincurchin
             [SpecieId.Pincurchin] = new()

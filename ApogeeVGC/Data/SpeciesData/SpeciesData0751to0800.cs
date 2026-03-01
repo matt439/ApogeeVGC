@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -1414,6 +1415,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 185,
                 Color = "White",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.DrampaMega] = new()
             {
@@ -1442,6 +1444,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 185,
                 Color = "White",
+                RequiredItem = ItemId.Drampite,
             },
             [SpecieId.Dhelmise] = new()
             {

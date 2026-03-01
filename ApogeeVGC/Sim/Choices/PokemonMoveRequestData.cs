@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 using System.Text.Json.Serialization;
 
@@ -28,4 +29,5 @@ public record PokemonMoveRequestData
     public bool? Trapped { get; set; }
     public bool? MaybeTrapped { get; set; }
     public MoveTypeFalseUnion? CanTerastallize { get; set; }
+    public SpecieId? CanMegaEvo { get; set; }
 }
