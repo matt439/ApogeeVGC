@@ -43,7 +43,10 @@ public record PokemonPerspective
     public required MoveType? Terastallized { get; init; }
     public required MoveType TeraType { get; init; }
     public MoveTypeFalseUnion? CanTerastallize { get; init; }
-    
+
+    // Mega Evolution
+    public SpecieId? CanMegaEvo { get; init; }
+
     // Volatiles (temporary battle conditions like confusion, substitute, etc.)
     public required IReadOnlyList<ConditionId> Volatiles { get; init; }
   

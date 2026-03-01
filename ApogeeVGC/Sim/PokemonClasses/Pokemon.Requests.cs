@@ -224,6 +224,15 @@ public partial class Pokemon
             }
         }
 
+        // Handle Mega Evolution
+        if (lockedMove == null)
+        {
+            if (CanMegaEvo is not null)
+            {
+                data = data with { CanMegaEvo = CanMegaEvo };
+            }
+        }
+
         return data;
     }
 }

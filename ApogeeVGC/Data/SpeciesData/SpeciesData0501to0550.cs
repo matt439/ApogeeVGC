@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -187,6 +188,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 150,
                 Color = "Red",
+                OtherFormes = [FormeId.Mega],
                 Prevo = SpecieId.Pignite,
             },
             [SpecieId.EmboarMega] = new()
@@ -213,6 +215,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 165,
                 Color = "Red",
+                RequiredItem = ItemId.Emboarite,
                 BaseSpecies = SpecieId.Emboar,
                 Forme = FormeId.Mega,
             },
@@ -1030,6 +1033,7 @@ public partial record SpeciesData
                 HeightM = 0.7,
                 WeightKg = 40.4,
                 Color = "Gray",
+                OtherFormes = [FormeId.Mega],
                 Prevo = SpecieId.Drilbur,
             },
             [SpecieId.ExcadrillMega] = new()
@@ -1057,6 +1061,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 60,
                 Color = "Gray",
+                RequiredItem = ItemId.Excadrillite,
                 BaseSpecies = SpecieId.Excadrill,
                 Forme = FormeId.Mega,
             },
@@ -1085,6 +1090,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 31,
                 Color = "Pink",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.AudinoMega] = new()
             {
@@ -1109,6 +1115,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 32,
                 Color = "White",
+                RequiredItem = ItemId.Audinite,
                 BaseSpecies = SpecieId.Audino,
                 Forme = FormeId.Mega,
             },
@@ -1482,6 +1489,7 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 200.5,
                 Color = "Red",
+                OtherFormes = [FormeId.Mega],
                 Prevo = SpecieId.Whirlipede,
             },
             [SpecieId.ScolipedeMega] = new()
@@ -1509,6 +1517,7 @@ public partial record SpeciesData
                 HeightM = 3.2,
                 WeightKg = 230.5,
                 Color = "Red",
+                RequiredItem = ItemId.Scolipedite,
                 BaseSpecies = SpecieId.Scolipede,
                 Forme = FormeId.Mega,
             },

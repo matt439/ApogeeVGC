@@ -26,4 +26,5 @@ public enum ActionId
     RunSwitch,
     Event,
     Terastallize,
+    MegaEvo,
 }

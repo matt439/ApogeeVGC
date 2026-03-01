@@ -12,4 +12,5 @@ public class Choice
     public int ForcedPassesLeft { get; set; }
     public HashSet<int> SwitchIns { get; init; } = [];
     public bool Terastallize { get; set; }
+    public bool Mega { get; set; }
 }

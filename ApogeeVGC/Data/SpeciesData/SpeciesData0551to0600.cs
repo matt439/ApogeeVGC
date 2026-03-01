@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -598,6 +599,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 30,
                 Color = "Red",
+                OtherFormes = [FormeId.Mega],
                 Prevo = SpecieId.Scraggy,
             },
             [SpecieId.ScraftyMega] = new()
@@ -625,6 +627,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 31,
                 Color = "Red",
+                RequiredItem = ItemId.Scraftite,
                 BaseSpecies = SpecieId.Scrafty,
                 Forme = FormeId.Mega,
             },

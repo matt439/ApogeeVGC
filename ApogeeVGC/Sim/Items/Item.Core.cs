@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Items;
@@ -53,6 +54,11 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
                 return new FlingData { BasePower = 50 };
             }
 
+            if (MegaStone != null)
+            {
+                return new FlingData { BasePower = 80 };
+            }
+
             return field;
         }
         init;
@@ -88,6 +94,7 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     public bool IsGem { get; init; }
     public bool IsPokeball { get; init; }
     public bool IsPrimalOrb { get; init; }
+    public IReadOnlyDictionary<SpecieId, SpecieId>? MegaStone { get; init; }
     public Condition? Condition { get; init; }
     public string? ForcedForme { get; init; }
     public bool? IsChoice { get; init; }

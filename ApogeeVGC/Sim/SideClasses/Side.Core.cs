@@ -298,6 +298,7 @@ public partial class Side
                     Terastallized = p.Terastallized,
                     TeraType = p.TeraType,
                     CanTerastallize = p.CanTerastallize,
+                    CanMegaEvo = p.CanMegaEvo,
                     Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
                     VolatilesWithDuration = p.Volatiles.ToDictionary(
                      kvp => kvp.Key,
@@ -368,6 +369,7 @@ public partial class Side
                     Terastallized = p.Terastallized,
                     TeraType = p.TeraType,
                     CanTerastallize = p.CanTerastallize,
+                    CanMegaEvo = p.CanMegaEvo,
                     Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
                     VolatilesWithDuration = p.Volatiles.ToDictionary(
                      kvp => kvp.Key,

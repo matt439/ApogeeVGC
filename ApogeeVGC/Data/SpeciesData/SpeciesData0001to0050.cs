@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -85,6 +86,7 @@ public partial record SpeciesData
                 HeightM = 2,
                 WeightKg = 100,
                 Color = "Green",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.VenusaurMega] = new()
             {
@@ -111,6 +113,7 @@ public partial record SpeciesData
                 HeightM = 2.4,
                 WeightKg = 155.5,
                 Color = "Green",
+                RequiredItem = ItemId.Venusaurite,
             },
             [SpecieId.Charmander] = new()
             {
@@ -186,6 +189,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 90.5,
                 Color = "Red",
+                OtherFormes = [FormeId.MegaX, FormeId.MegaY],
             },
             [SpecieId.CharizardMegaX] = new()
             {
@@ -212,6 +216,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 110.5,
                 Color = "Black",
+                RequiredItem = ItemId.CharizarditeX,
             },
             [SpecieId.CharizardMegaY] = new()
             {
@@ -238,6 +243,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 100.5,
                 Color = "Red",
+                RequiredItem = ItemId.CharizarditeY,
             },
             [SpecieId.Squirtle] = new()
             {
@@ -313,6 +319,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 85.5,
                 Color = "Blue",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.BlastoiseMega] = new()
             {
@@ -339,6 +346,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 101.1,
                 Color = "Blue",
+                RequiredItem = ItemId.Blastoisinite,
             },
             [SpecieId.Caterpie] = new()
             {
@@ -487,6 +495,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 29.5,
                 Color = "Yellow",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.BeedrillMega] = new()
             {
@@ -513,6 +522,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 40.5,
                 Color = "Yellow",
+                RequiredItem = ItemId.Beedrillite,
             },
             [SpecieId.Pidgey] = new()
             {
@@ -591,6 +601,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 39.5,
                 Color = "Brown",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.PidgeotMega] = new()
             {
@@ -617,6 +628,7 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 50.5,
                 Color = "Brown",
+                RequiredItem = ItemId.Pidgeotite,
             },
             [SpecieId.Rattata] = new()
             {
@@ -1640,6 +1652,7 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 40,
                 Color = "Pink",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.ClefableMega] = new()
             {
@@ -1668,6 +1681,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 42.3,
                 Color = "Pink",
+                RequiredItem = ItemId.Clefablite,
             },
             [SpecieId.Vulpix] = new()
             {

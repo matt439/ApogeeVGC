@@ -555,6 +555,13 @@ public partial class Battle
                 break;
             }
 
+            case ActionId.MegaEvo:
+            {
+                var megaAction = (PokemonAction)action;
+                Actions.RunMegaEvo(megaAction.Pokemon);
+                break;
+            }
+
             case ActionId.BeforeTurnMove:
             {
                 var btmAction = (MoveAction)action;

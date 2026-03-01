@@ -1,4 +1,6 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -218,6 +220,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 13,
                 Color = "Black",
+                RequiredItem = ItemId.Banettite,
             },
             [SpecieId.Duskull] = new()
             {
@@ -372,6 +375,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 49,
                 Color = "White",
+                RequiredItem = ItemId.Absolite,
             },
             [SpecieId.Wynaut] = new()
             {
@@ -477,6 +481,7 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 350.2,
                 Color = "Gray",
+                RequiredItem = ItemId.Glalitite,
             },
             [SpecieId.Spheal] = new()
             {
@@ -789,6 +794,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 112.6,
                 Color = "Blue",
+                RequiredItem = ItemId.Salamencite,
             },
             [SpecieId.Beldum] = new()
             {
@@ -893,6 +899,7 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 942.9,
                 Color = "Blue",
+                RequiredItem = ItemId.Metagrossite,
             },
             [SpecieId.Regirock] = new()
             {
@@ -1019,6 +1026,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 52,
                 Color = "Purple",
+                RequiredItem = ItemId.Latiasite,
             },
             [SpecieId.Latios] = new()
             {
@@ -1070,6 +1078,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 70,
                 Color = "Purple",
+                RequiredItem = ItemId.Latiosite,
             },
             [SpecieId.Kyogre] = new()
             {
@@ -1223,6 +1232,7 @@ public partial record SpeciesData
                 HeightM = 10.8,
                 WeightKg = 392,
                 Color = "Green",
+                RequiredMove = MoveId.DragonAscent,
             },
             [SpecieId.Jirachi] = new()
             {

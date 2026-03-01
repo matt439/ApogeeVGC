@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -213,6 +214,7 @@ public partial record SpeciesData
                 HeightM = 9.2,
                 WeightKg = 400,
                 Color = "Gray",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.SteelixMega] = new()
             {
@@ -239,6 +241,7 @@ public partial record SpeciesData
                 HeightM = 10.5,
                 WeightKg = 740,
                 Color = "Gray",
+                RequiredItem = ItemId.Steelixite,
             },
             [SpecieId.Snubbull] = new()
             {
@@ -371,6 +374,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 118,
                 Color = "Red",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.ScizorMega] = new()
             {
@@ -397,6 +401,7 @@ public partial record SpeciesData
                 HeightM = 2.0,
                 WeightKg = 125,
                 Color = "Red",
+                RequiredItem = ItemId.Scizorite,
             },
             [SpecieId.Shuckle] = new()
             {
@@ -449,6 +454,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 54,
                 Color = "Blue",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.HeracrossMega] = new()
             {
@@ -475,6 +481,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 62.5,
                 Color = "Blue",
+                RequiredItem = ItemId.Heracronite,
             },
             [SpecieId.Sneasel] = new()
             {
@@ -868,6 +875,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 50.5,
                 Color = "Gray",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.SkarmoryMega] = new()
             {
@@ -896,6 +904,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 40.4,
                 Color = "Gray",
+                RequiredItem = ItemId.Skarmoryite,
             },
             [SpecieId.Houndour] = new()
             {
@@ -948,6 +957,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 35,
                 Color = "Black",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.HoundoomMega] = new()
             {
@@ -974,6 +984,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 49.5,
                 Color = "Black",
+                RequiredItem = ItemId.Houndoominite,
             },
             [SpecieId.Kingdra] = new()
             {
@@ -1457,6 +1468,7 @@ public partial record SpeciesData
                 HeightM = 2.0,
                 WeightKg = 202,
                 Color = "Green",
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.TyranitarMega] = new()
             {
@@ -1483,6 +1495,7 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 255,
                 Color = "Green",
+                RequiredItem = ItemId.Tyranitarite,
             },
             [SpecieId.Lugia] = new()
             {

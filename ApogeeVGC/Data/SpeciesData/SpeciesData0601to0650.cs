@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -110,6 +111,7 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 80.5,
                 Color = "Blue",
+                OtherFormes = [FormeId.Mega],
                 Prevo = SpecieId.Eelektrik,
             },
             [SpecieId.EelektrossMega] = new()
@@ -137,6 +139,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 160,
                 Color = "Blue",
+                RequiredItem = ItemId.Eelektrossite,
             },
             [SpecieId.Elgyem] = new()
             {
@@ -269,6 +272,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 34.3,
                 Color = "Black",
+                OtherFormes = [FormeId.Mega],
                 Prevo = SpecieId.Lampent,
             },
             [SpecieId.ChandelureMega] = new()
@@ -298,6 +302,7 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 69.6,
                 Color = "Black",
+                RequiredItem = ItemId.Chandelurite,
             },
             [SpecieId.Axew] = new()
             {

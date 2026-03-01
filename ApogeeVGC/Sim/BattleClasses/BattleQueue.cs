@@ -99,6 +99,7 @@ public class BattleQueue(Battle battle)
                     OriginalTarget =
                         chosenAction.Pokemon!, // Will be updated later with actual target
                     Terastallize = chosenAction.Terastallize, // Preserve terastallize flag
+                    Mega = chosenAction.Mega, // Preserve mega evolution flag
                 },
                 ChoiceType.Switch => new SwitchAction
                 {
@@ -196,7 +197,16 @@ public class BattleQueue(Battle battle)
                     }));
                 }
 
-                // Note: Mega Evolution and Dynamax are deliberately excluded as per requirements
+                // Add MegaEvo action if the player chose to mega evolve
+                if (ma.Mega.HasValue &&
+                    ma.Pokemon is { CanMegaEvo: not null })
+                {
+                    actions.InsertRange(0, ResolveAction(new PokemonAction
+                    {
+                        Choice = ActionId.MegaEvo,
+                        Pokemon = ma.Pokemon,
+                    }));
+                }
 
                 // Add Terastallize action if the player chose to terastallize
                 if (ma.Terastallize.HasValue &&
@@ -673,6 +683,7 @@ public class BattleQueue(Battle battle)
 
         { ActionId.RunSwitch, 101 },
         { ActionId.Switch, 103 },
+        { ActionId.MegaEvo, 105 },
         { ActionId.Terastallize, 106 },
         { ActionId.PriorityChargeMove, 107 },
 

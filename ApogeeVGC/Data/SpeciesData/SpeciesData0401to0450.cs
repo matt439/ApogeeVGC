@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -817,6 +818,7 @@ public partial record SpeciesData
                 WeightKg = 33.3,
                 Color = "Brown",
                 Prevo = SpecieId.Buneary,
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.LopunnyMega] = new()
             {
@@ -843,6 +845,7 @@ public partial record SpeciesData
                 Color = "Brown",
                 BaseSpecies = SpecieId.Lopunny,
                 Forme = FormeId.Mega,
+                RequiredItem = ItemId.Lopunnite,
             },
             [SpecieId.Mismagius] = new()
             {
@@ -1282,6 +1285,7 @@ public partial record SpeciesData
                 WeightKg = 95,
                 Color = "Blue",
                 Prevo = SpecieId.Gabite,
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.GarchompMega] = new()
             {
@@ -1308,6 +1312,7 @@ public partial record SpeciesData
                 Color = "Blue",
                 BaseSpecies = SpecieId.Garchomp,
                 Forme = FormeId.Mega,
+                RequiredItem = ItemId.Garchompite,
             },
             [SpecieId.Munchlax] = new()
             {
@@ -1387,6 +1392,7 @@ public partial record SpeciesData
                 WeightKg = 54,
                 Color = "Blue",
                 Prevo = SpecieId.Riolu,
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.LucarioMega] = new()
             {
@@ -1413,6 +1419,7 @@ public partial record SpeciesData
                 Color = "Blue",
                 BaseSpecies = SpecieId.Lucario,
                 Forme = FormeId.Mega,
+                RequiredItem = ItemId.Lucarionite,
             },
             [SpecieId.Hippopotas] = new()
             {

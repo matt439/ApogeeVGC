@@ -46,6 +46,9 @@ public partial record Items
         foreach (var kvp in CreateItemsYz())
             items[kvp.Key] = kvp.Value;
 
+        foreach (var kvp in CreateItemsMegaStones())
+            items[kvp.Key] = kvp.Value;
+
         return items;
     }
 
@@ -59,4 +62,5 @@ public partial record Items
     private partial Dictionary<ItemId, Item> CreateItemsStu();
     private partial Dictionary<ItemId, Item> CreateItemsVwx();
     private partial Dictionary<ItemId, Item> CreateItemsYz();
+    private partial Dictionary<ItemId, Item> CreateItemsMegaStones();
 }

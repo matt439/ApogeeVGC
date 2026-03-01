@@ -26,6 +26,9 @@ public class RuleTable : Dictionary<RuleId, Rule>
     public int MaxMoveCount { get; set; } = 4;
     public int? EvLimit { get; set; }
 
+    // Mega Evolution
+    public bool AllowMegaEvolution { get; set; }
+
     // Source gen (for legality checking)
     public int MinSourceGen { get; set; } = 1;
 

@@ -57,6 +57,7 @@ public record Formats
             RuleTable = new RuleTable
             {
                 PickedTeamSize = 4,
+                AllowMegaEvolution = true,
             },
         },
 
@@ -223,6 +224,27 @@ public record Formats
                 AdjustLevelDown = 50,
                 MaxMoveCount = 4,
                 EvLimit = 510,
+            },
+        },
+        // ===========================================
+        // Mega Evolution Formats
+        // ===========================================
+
+        [FormatId.Gen9VgcMega] = new Format
+        {
+            Name = "[Gen 9] VGC Mega Evolution",
+            GameType = GameType.Doubles,
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer],
+            Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
+            RuleTable = new RuleTable
+            {
+                MinTeamSize = 4,
+                MaxTeamSize = 6,
+                PickedTeamSize = 4,
+                AdjustLevelDown = 50,
+                MaxMoveCount = 4,
+                EvLimit = 510,
+                AllowMegaEvolution = true,
             },
         },
     };

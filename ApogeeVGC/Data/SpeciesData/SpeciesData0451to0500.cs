@@ -1,4 +1,5 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
@@ -270,6 +271,7 @@ public partial record SpeciesData
                 WeightKg = 135.5,
                 Color = "White",
                 Prevo = SpecieId.Snover,
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.AbomasnowMega] = new()
             {
@@ -296,6 +298,7 @@ public partial record SpeciesData
                 Color = "White",
                 BaseSpecies = SpecieId.Abomasnow,
                 Forme = FormeId.Mega,
+                RequiredItem = ItemId.Abomasite,
             },
             [SpecieId.Weavile] = new()
             {
@@ -696,6 +699,7 @@ public partial record SpeciesData
                 WeightKg = 52,
                 Color = "White",
                 Prevo = SpecieId.Kirlia,
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.GalladeMega] = new()
             {
@@ -722,6 +726,7 @@ public partial record SpeciesData
                 Color = "White",
                 BaseSpecies = SpecieId.Gallade,
                 Forme = FormeId.Mega,
+                RequiredItem = ItemId.Galladite,
             },
             [SpecieId.Probopass] = new()
             {
@@ -801,6 +806,7 @@ public partial record SpeciesData
                 WeightKg = 26.6,
                 Color = "White",
                 Prevo = SpecieId.Snorunt,
+                OtherFormes = [FormeId.Mega],
             },
             [SpecieId.FroslassMega] = new()
             {
@@ -828,6 +834,7 @@ public partial record SpeciesData
                 Color = "White",
                 BaseSpecies = SpecieId.Froslass,
                 Forme = FormeId.Mega,
+                RequiredItem = ItemId.Froslassite,
             },
             [SpecieId.Rotom] = new()
             {
