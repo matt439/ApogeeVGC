@@ -666,7 +666,7 @@ public partial class BattleActions
             targetHitResult = 1;
         }
 
-        Battle.Debug($"[HitStepMoveHitLoop] Target hit count: {targetHitResult}");
+        if (Battle.DebugMode) Battle.Debug($"[HitStepMoveHitLoop] Target hit count: {targetHitResult}");
 
         // Loaded Dice for 10-hit moves (Population Bomb)
         if (targetHitResult == 10 && pokemon.HasItem(ItemId.LoadedDice))
@@ -690,7 +690,7 @@ public partial class BattleActions
 
         for (hit = 1; hit <= targetHitResult; hit++)
         {
-            Battle.Debug($"[HitStepMoveHitLoop] Starting hit #{hit} of {targetHitResult}");
+            if (Battle.DebugMode) Battle.Debug($"[HitStepMoveHitLoop] Starting hit #{hit} of {targetHitResult}");
 
             // Break if any target has already failed
             if (damage.Any(d => d is BoolBoolIntEmptyUndefinedUnion { Value: false })) break;

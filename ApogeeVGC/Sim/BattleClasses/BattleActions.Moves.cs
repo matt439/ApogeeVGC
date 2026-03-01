@@ -555,11 +555,11 @@ public partial class BattleActions
         else
         {
             // Single-target moves
-            Battle.Debug($"[UseMoveInner] Single-target path, targets.Count={targets.Count}");
- 
+            if (Battle.DebugMode) Battle.Debug($"[UseMoveInner] Single-target path, targets.Count={targets.Count}");
+
             if (targets.Count == 0)
             {
-                Battle.Debug($"[UseMoveInner] No targets, failing move");
+                if (Battle.DebugMode) Battle.Debug($"[UseMoveInner] No targets, failing move");
                 if (Battle.DisplayUi)
                 {
                     Battle.AttrLastMove("[notarget]");
@@ -569,7 +569,7 @@ public partial class BattleActions
                 return false;
             }
 
-            Battle.Debug($"[UseMoveInner] About to call TrySpreadMoveHit for {activeMove.Name}");
+            if (Battle.DebugMode) Battle.Debug($"[UseMoveInner] About to call TrySpreadMoveHit for {activeMove.Name}");
 
 // Gen 4: Self-destruct moves faint the user before hitting
             if (Battle.Gen == 4 && activeMove.SelfDestruct is AlwaysMoveSelfDestruct)
@@ -578,8 +578,8 @@ public partial class BattleActions
             }
 
          moveResult = TrySpreadMoveHit(targets, pokemon, activeMove, notActive: false);
- 
-      Battle.Debug($"[UseMoveInner] TrySpreadMoveHit returned: {moveResult}");
+
+      if (Battle.DebugMode) Battle.Debug($"[UseMoveInner] TrySpreadMoveHit returned: {moveResult}");
         }
 
         // Apply self-boost if move succeeded

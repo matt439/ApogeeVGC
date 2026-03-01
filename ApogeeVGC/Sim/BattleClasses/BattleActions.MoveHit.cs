@@ -379,7 +379,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         // 4. self drops (start checking for targets[i] === false here)
         if (move.Self != null && move.SelfDropped != true)
         {
-            Battle.Debug($"[SpreadMoveHit] Calling SelfDrops for {move.Name}");
+            if (Battle.DebugMode) Battle.Debug($"[SpreadMoveHit] Calling SelfDrops for {move.Name}");
             SelfDrops(targets, pokemon, move, move, isSecondary);
         }
 

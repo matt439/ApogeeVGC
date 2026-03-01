@@ -7,7 +7,7 @@ public class Program
     public static void Main(string[] args)
     {
         var driver = new Driver();
-        driver.Start(DriverMode.DeterministicRegressionTest);
+        driver.Start(DriverMode.RndVsRndVgcRegIEvaluation);
 
         //Console.WriteLine("Press Enter key to exit...");
         //Console.ReadLine();

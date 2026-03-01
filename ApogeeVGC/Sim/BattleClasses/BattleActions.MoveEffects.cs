@@ -114,12 +114,12 @@ public partial class BattleActions
             ConditionId? volatileToApply = moveData.VolatileStatus ?? (move.HitEffect as HitEffect)?.VolatileStatus;
             if (volatileToApply != null)
             {
-                Battle.Debug($"[RunMoveEffects] Attempting to apply volatile status {volatileToApply.Value} to {target.Name}");
+                if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] Attempting to apply volatile status {volatileToApply.Value} to {target.Name}");
                 RelayVar volatileResult = target.AddVolatile(volatileToApply.Value, source, move);
-                Battle.Debug($"[RunMoveEffects] AddVolatile returned: {volatileResult?.GetType().Name ?? "null"}");
+                if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] AddVolatile returned: {volatileResult?.GetType().Name ?? "null"}");
                 if (volatileResult is BoolRelayVar brvCheck)
                 {
-                    Battle.Debug($"[RunMoveEffects] Volatile application result: {brvCheck.Value}");
+                    if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] Volatile application result: {brvCheck.Value}");
                 }
                 hitResult = volatileResult switch
                 {
@@ -300,7 +300,7 @@ public partial class BattleActions
     public void SelfDrops(SpreadMoveTargets targets, Pokemon source, ActiveMove move, ActiveMove moveData,
         bool isSecondary = false)
     {
-        Battle.Debug($"[SelfDrops] Called for {move.Name}, isSecondary={isSecondary}, moveData.Self != null: {moveData.Self != null}, move.SelfDropped: {move.SelfDropped}");
+        if (Battle.DebugMode) Battle.Debug($"[SelfDrops] Called for {move.Name}, isSecondary={isSecondary}, moveData.Self != null: {moveData.Self != null}, move.SelfDropped: {move.SelfDropped}");
 
         foreach (PokemonFalseUnion targetUnion in targets)
         {
@@ -311,12 +311,12 @@ public partial class BattleActions
 
             if (moveData.Self != null && move.SelfDropped != true)
             {
-                Battle.Debug($"[SelfDrops] Processing self effect for {source.Name}");
+                if (Battle.DebugMode) Battle.Debug($"[SelfDrops] Processing self effect for {source.Name}");
 
                 if (!isSecondary && moveData.Self.Boosts != null)
                 {
                     int secondaryRoll = Battle.Random(100);
-                    Battle.Debug($"[SelfDrops] secondaryRoll={secondaryRoll}, Chance={moveData.Self.Chance}");
+                    if (Battle.DebugMode) Battle.Debug($"[SelfDrops] secondaryRoll={secondaryRoll}, Chance={moveData.Self.Chance}");
 
                     if (moveData.Self.Chance == null || secondaryRoll < moveData.Self.Chance)
                     {
@@ -343,7 +343,7 @@ public partial class BattleActions
     {
         if (moveData.Secondaries == null) return;
 
-        Battle.Debug($"[Secondaries] Called for move {move.Name}, Secondaries count={moveData.Secondaries.Length}");
+        if (Battle.DebugMode) Battle.Debug($"[Secondaries] Called for move {move.Name}, Secondaries count={moveData.Secondaries.Length}");
 
         foreach (PokemonFalseUnion targetUnion in targets)
         {
@@ -354,7 +354,7 @@ public partial class BattleActions
 
             Pokemon target = pokemonUnion.Pokemon;
 
-            Battle.Debug($"[Secondaries] Processing secondary effects for target {target.Name}");
+            if (Battle.DebugMode) Battle.Debug($"[Secondaries] Processing secondary effects for target {target.Name}");
 
             // Run ModifySecondaries event to get the list of secondary effects
             RelayVar? modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
@@ -366,8 +366,8 @@ public partial class BattleActions
 
             foreach (SecondaryEffect secondary in secondaries)
             {
-                Battle.Debug($"[Secondaries] Secondary effect: VolatileStatus={secondary.VolatileStatus}, Chance={secondary.Chance}");
-                
+                if (Battle.DebugMode) Battle.Debug($"[Secondaries] Secondary effect: VolatileStatus={secondary.VolatileStatus}, Chance={secondary.Chance}");
+
                 int secondaryRoll = Battle.Random(100);
 
                 // User stat boosts or target stat drops can possibly overflow if it goes beyond 256 in Gen 8 or prior
@@ -379,16 +379,16 @@ public partial class BattleActions
                     effectiveChance %= 256;
                 }
 
-                Battle.Debug($"[Secondaries] secondaryRoll={secondaryRoll}, effectiveChance={effectiveChance}");
+                if (Battle.DebugMode) Battle.Debug($"[Secondaries] secondaryRoll={secondaryRoll}, effectiveChance={effectiveChance}");
 
                 if (secondary.Chance == null || secondaryRoll < effectiveChance)
                 {
-                    Battle.Debug($"[Secondaries] Applying secondary effect, calling MoveHit");
+                    if (Battle.DebugMode) Battle.Debug($"[Secondaries] Applying secondary effect, calling MoveHit");
                     MoveHit(target, source, move, secondary, true, isSelf);
                 }
                 else
                 {
-                    Battle.Debug($"[Secondaries] Secondary effect chance failed");
+                    if (Battle.DebugMode) Battle.Debug($"[Secondaries] Secondary effect chance failed");
                 }
             }
         }
