@@ -264,7 +264,7 @@ public partial class Side
                 StoredStats = p.StoredStats,
                 Ability = p.Ability,
                 Item = p.Item,
-                Types = p.Types.AsReadOnly(),
+                Types = p.Types,
                 Terastallized = p.Terastallized,
                 TeraType = p.TeraType,
                 CanTerastallize = p.CanTerastallize,
@@ -294,7 +294,7 @@ public partial class Side
                     StoredStats = p.StoredStats,
                     Ability = p.Ability,
                     Item = p.Item,
-                    Types = p.Types.AsReadOnly(),
+                    Types = p.Types,
                     Terastallized = p.Terastallized,
                     TeraType = p.TeraType,
                     CanTerastallize = p.CanTerastallize,
@@ -333,7 +333,7 @@ public partial class Side
                 StoredStats = p.StoredStats,  // Full observability - all stats
                 Ability = p.Ability,  // Full observability - ability always visible
                 Item = p.Item,  // Full observability - item always visible
-                Types = p.Types.AsReadOnly(),
+                Types = p.Types,
                 Terastallized = p.Terastallized,
                 TeraType = p.TeraType,
                 CanTerastallize = p.CanTerastallize,
@@ -364,7 +364,7 @@ public partial class Side
                     StoredStats = p.StoredStats,  // Full observability - all stats
                     Ability = p.Ability,  // Full observability - ability always visible
                     Item = p.Item,  // Full observability - item always visible
-                    Types = p.Types.AsReadOnly(),
+                    Types = p.Types,
                     Terastallized = p.Terastallized,
                     TeraType = p.TeraType,
                     CanTerastallize = p.CanTerastallize,

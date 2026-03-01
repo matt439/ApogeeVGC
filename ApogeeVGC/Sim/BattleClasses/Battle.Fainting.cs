@@ -23,25 +23,8 @@ public partial class Battle
         foreach (Pokemon pokemon in Sides.SelectMany(side => side.Active.OfType<Pokemon>()
                      .Where(pokemon => pokemon.Fainted)))
         {
-            // Mark that this Pokémon needs to be switched out
+            // Mark that this Pokï¿½mon needs to be switched out
             pokemon.SwitchFlag = true;
-        }
-        
-        // CRITICAL: After setting switch flags, verify battle state is consistent
-        // If any side has all active Pokemon fainted and no Pokemon left to switch in,
-        // they should lose the battle immediately
-        foreach (Side side in Sides)
-        {
-            // Check if all active slots have fainted Pokemon
-            bool allActiveFainted = side.Active.All(p => p == null || p.Fainted);
-            
-            if (allActiveFainted && side.PokemonLeft <= 0)
-            {
-                Debug($"[CheckFainted] {side.Name} has all active Pokemon fainted and no Pokemon left to switch");
-                Debug($"[CheckFainted] This side should lose the battle");
-                // Don't call Win/Lose here - just ensure CheckWin will be called next
-                // The battle loop will handle this properly
-            }
         }
     }
 
@@ -165,6 +148,15 @@ public partial class Battle
                     checkWin = true;
                 }
             }
+        }
+
+        // Safety net: if any side has no Pokemon left, always check for a winner
+        // regardless of the checkWin parameter. This guards against callers that pass
+        // checkWin=false based only on the attacker's HP, missing target-side faints
+        // (e.g., HitStepMoveHitLoop passing checkWin = attacker.Hp <= 0).
+        if (!checkWin && Sides.Any(side => side.PokemonLeft <= 0))
+        {
+            checkWin = true;
         }
 
         // Check for battle end
@@ -395,13 +387,13 @@ public partial class Battle
         // Can happen if a battle crashes
         if (side is null) return false;
 
-        // Already no Pokémon left
+        // Already no Pokï¿½mon left
         if (side.PokemonLeft <= 0) return false;
 
-        // Force the side to lose by setting their Pokémon count to 0
+        // Force the side to lose by setting their Pokï¿½mon count to 0
         side.PokemonLeft = 0;
 
-        // Faint the first active Pokémon if present
+        // Faint the first active Pokï¿½mon if present
         Pokemon? firstActive = side.Active.FirstOrDefault(p => p != null);
         firstActive?.Faint();
 

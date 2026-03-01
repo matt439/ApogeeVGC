@@ -245,14 +245,23 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                     availableSwitchCount++;
             }
 
+            // When all moves are disabled (e.g., 0 PP), add a "use move" option so the
+            // battle engine converts it to Struggle. Without this, the random player would
+            // always switch when out of PP, creating infinite switching loops where no
+            // damage or recoil ever occurs.
+            bool allMovesDisabled = !availableChoices.Any(c => c.isMove);
+            if (allMovesDisabled && pokemonRequest.Moves.Count > 0)
+            {
+                availableChoices.Add((true, 0, false));
+            }
+
             bool canSwitch = !isTrapped && availableSwitchCount > 0;
             if (canSwitch)
             {
                 availableChoices.Add((false, -1, false)); // Switch option
             }
 
-            // If no choices available (all moves disabled and can't switch), 
-            // use the first move anyway - the battle engine will force Struggle
+            // If no choices available (all moves disabled, can't switch, and no Struggle fallback)
             if (availableChoices.Count == 0)
             {
                 if (pokemonRequest.Moves.Count > 0)

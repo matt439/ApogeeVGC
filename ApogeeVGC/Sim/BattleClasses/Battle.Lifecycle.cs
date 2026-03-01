@@ -222,7 +222,7 @@ public partial class Battle
                         }
 
                         seenPokemon.ApparentType =
-                            seenPokemon.GetTypes(excludeAdded: true).ToList();
+                            seenPokemon.GetTypes(excludeAdded: true);
 
                         if (pokemon.AddedType != null)
                         {

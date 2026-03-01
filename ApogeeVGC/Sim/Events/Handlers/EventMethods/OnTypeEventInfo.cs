@@ -39,7 +39,7 @@ public sealed record OnTypeEventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
-                    TypesTypesVoidUnion t => new TypesRelayVar(t.Types.ToList()),
+                    TypesTypesVoidUnion t => new TypesRelayVar(t.Types),
                     VoidTypesVoidUnion => null,
                     _ => null
                 };

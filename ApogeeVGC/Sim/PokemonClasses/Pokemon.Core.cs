@@ -124,10 +124,10 @@ public partial class Pokemon : IPriorityComparison
 
     public bool FormeRegression { get; set; }
 
-    public List<PokemonType> Types { get; set; }
+    public PokemonType[] Types { get; set; }
     public PokemonType? AddedType { get; set; }
     public bool KnownType { get; set; }
-    public List<PokemonType> ApparentType { get; set; }
+    public PokemonType[] ApparentType { get; set; }
 
     public MoveIdBoolUnion SwitchFlag { get; set; }
     public bool ForceSwitchFlag { get; set; }
@@ -175,7 +175,7 @@ public partial class Pokemon : IPriorityComparison
 
     public MoveTypeFalseUnion? CanTerastallize { get; set; }
     public MoveType TeraType { get; set; }
-    public List<PokemonType> BaseTypes { get; set; }
+    public PokemonType[] BaseTypes { get; set; }
     public MoveType? Terastallized { get; set; }
 
     public StalenessId? Staleness { get; set; }
@@ -374,7 +374,7 @@ public partial class Pokemon : IPriorityComparison
 
         Trapped = PokemonTrapped.False;
 
-        Types = BaseSpecies.Types.ToList();
+        Types = [..BaseSpecies.Types];
         BaseTypes = Types;
         KnownType = true;
         ApparentType = BaseTypes;
@@ -459,10 +459,10 @@ public partial class Pokemon : IPriorityComparison
         Transformed = source.Transformed;
         FormeRegression = source.FormeRegression;
 
-        // Types (copy lists of enums)
-        Types = new List<PokemonType>(source.Types);
-        BaseTypes = new List<PokemonType>(source.BaseTypes);
-        ApparentType = new List<PokemonType>(source.ApparentType);
+        // Types (copy arrays of enums)
+        Types = [..source.Types];
+        BaseTypes = [..source.BaseTypes];
+        ApparentType = [..source.ApparentType];
         AddedType = source.AddedType;
         KnownType = source.KnownType;
 

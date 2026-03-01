@@ -60,8 +60,8 @@ public partial class Pokemon
             throw new ArgumentException("Must pass type to SetType");
         }
 
-        // Set the new types
-        Types = new List<PokemonType>(types);
+        // Set the new types (defensive copy to prevent aliasing with caller's array)
+        Types = [..types];
 
         // Clear any added type
         AddedType = null;
@@ -70,7 +70,7 @@ public partial class Pokemon
         KnownType = true;
 
         // Update apparent type for display (join types with '/')
-        ApparentType = new List<PokemonType>(Types);
+        ApparentType = [..Types];
 
         return true;
     }

@@ -171,7 +171,7 @@ public partial class Pokemon
         var species = srv.Species;
 
         SetType(species.Types.ToArray(), true);
-        ApparentType = new List<PokemonType>(rawSpecies.Types);
+        ApparentType = [..rawSpecies.Types];
         AddedType = species.AddedType;
         KnownType = true;
         WeightHg = species.WeightHg;

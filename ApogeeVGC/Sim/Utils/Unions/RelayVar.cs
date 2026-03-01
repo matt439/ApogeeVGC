@@ -29,7 +29,7 @@ public abstract record RelayVar
     public static implicit operator RelayVar(PokemonType type) => new PokemonTypeRelayVar(type);
     public static implicit operator RelayVar(ConditionId? id) => new ConditionIdRelayVar(id);
     public static implicit operator RelayVar(BoostsTable table) => new BoostsTableRelayVar(table);
-    public static implicit operator RelayVar(List<PokemonType> types) => new TypesRelayVar(types);
+    public static implicit operator RelayVar(PokemonType[] types) => new TypesRelayVar(types);
  public static implicit operator RelayVar(MoveType type) => new PokemonTypeRelayVar((PokemonType)type);
     public static implicit operator RelayVar(SparseBoostsTable table) => new SparseBoostsTableRelayVar(table);
     public static implicit operator RelayVar(decimal value) => new DecimalRelayVar(value);
@@ -90,7 +90,7 @@ public record SpecieRelayVar(Species Species) : RelayVar;
 public record PokemonTypeRelayVar(PokemonType Type) : RelayVar;
 public record ConditionIdRelayVar(ConditionId? Id) : RelayVar;
 public record BoostsTableRelayVar(BoostsTable Table) : RelayVar;
-public record TypesRelayVar(List<PokemonType> Types) : RelayVar;
+public record TypesRelayVar(PokemonType[] Types) : RelayVar;
 public record MoveTypeRelayVar(MoveType Type) : RelayVar;
 public record SparseBoostsTableRelayVar(SparseBoostsTable Table) : RelayVar;
 public record DecimalRelayVar(decimal Value) : RelayVar;

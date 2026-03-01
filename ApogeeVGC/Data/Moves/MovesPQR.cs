@@ -2087,7 +2087,7 @@ public partial record Moves
                         return false;
                     }
 
-                    var oldApparentType = source.ApparentType.ToList();
+                    var oldApparentType = source.ApparentType;
 
                     // Get target's types
                     var newTypes = target.GetTypes(true).Where(t => t != PokemonType.Unknown)
