@@ -1199,11 +1199,13 @@ public partial record Abilities
                 Rating = 1.5,
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
-                    foreach (Pokemon target in pokemon.Foes()
-                                 .Where(target => target.Item != ItemId.None))
+                    foreach (Pokemon target in pokemon.Foes())
                     {
-                        battle.Add("-item", target, battle.Library.Items[target.Item].Name,
-                            "[from] ability: Frisk", $"[of] {pokemon}");
+                        if (target.Item != ItemId.None)
+                        {
+                            battle.Add("-item", target, battle.Library.Items[target.Item].Name,
+                                "[from] ability: Frisk", $"[of] {pokemon}");
+                        }
                     }
                 }),
             },

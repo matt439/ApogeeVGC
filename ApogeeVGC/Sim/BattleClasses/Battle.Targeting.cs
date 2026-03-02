@@ -203,7 +203,7 @@ public partial class Battle
 
             // Get adjacent allies and return random one if available
             var adjacentAllies = pokemon.AdjacentAllies();
-            return adjacentAllies.Count > 0 ? Sample(adjacentAllies) : null;
+            return adjacentAllies.Count > 0 ? adjacentAllies[Prng.Random(adjacentAllies.Count)] : null;
         }
 
         // Singles battles: target the opponent's active Pokémon
@@ -226,7 +226,7 @@ public partial class Battle
                 var adjacentFoes = pokemon.AdjacentFoes();
                 if (adjacentFoes.Count > 0)
                 {
-                    return Sample(adjacentFoes);
+                    return adjacentFoes[Prng.Random(adjacentFoes.Count)];
                 }
 
                 // No valid target at all, return slot directly across for any possible redirection

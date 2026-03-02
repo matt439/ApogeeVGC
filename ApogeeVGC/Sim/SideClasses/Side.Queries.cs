@@ -7,7 +7,9 @@ public partial class Side
     public Pokemon? RandomFoe()
     {
         var actives = Foes();
-        return actives.Count == 0 ? null : Battle.Sample(actives);
+        if (actives.Count == 0) return null;
+        int index = Battle.Prng.Random(actives.Count);
+        return actives[index];
     }
 
     public List<Side> FoeSidesWithConditions()
@@ -20,9 +22,9 @@ public partial class Side
         return Foe.PokemonLeft;
     }
 
-    public List<Pokemon> Allies(bool all = false)
+    public PokemonBuffer Allies(bool all = false)
     {
-        var allies = new List<Pokemon>(Active.Count);
+        var allies = new PokemonBuffer();
         foreach (var p in Active)
         {
             if (p != null && (all || p.Hp > 0))
@@ -31,14 +33,14 @@ public partial class Side
         return allies;
     }
 
-    public List<Pokemon> Foes(bool all = false)
+    public PokemonBuffer Foes(bool all = false)
     {
         return Foe.Allies(all);
     }
 
-    public List<Pokemon> ActiveTeam()
+    public PokemonBuffer ActiveTeam()
     {
-        var team = new List<Pokemon>(Active.Count);
+        var team = new PokemonBuffer();
         foreach (var p in Active)
         {
             if (p != null) team.Add(p);

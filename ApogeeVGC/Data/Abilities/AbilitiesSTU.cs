@@ -1980,11 +1980,16 @@ public partial record Abilities
                 {
                     if (battle.EffectState.Seek != true) return;
 
-                    var possibleTargets = pokemon.AdjacentFoes()
-                        .Where(target =>
-                            target.GetAbility().Flags.NoTrace != true &&
+                    var foes = pokemon.AdjacentFoes();
+                    var possibleTargets = new List<Pokemon>(foes.Count);
+                    foreach (Pokemon target in foes)
+                    {
+                        if (target.GetAbility().Flags.NoTrace != true &&
                             target.Ability != AbilityId.None)
-                        .ToList();
+                        {
+                            possibleTargets.Add(target);
+                        }
+                    }
 
                     if (possibleTargets.Count == 0) return;
 

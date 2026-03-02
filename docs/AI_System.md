@@ -11,6 +11,43 @@ The AI system has four main components:
 3. **MCTS Engine** — uses the battle model to search the game tree
 4. **Information Model** — formalises what is known and unknown at each phase of battle
 
+### System Integration
+
+The three battle systems are not independent — they form a loop where each feeds into the others:
+
+```
+ Information Model
+   ├─ Deduction engine → hard constraints on opponent state
+   ├─ Revealed-info tracking → extra features for DL input
+   │
+   ▼
+ Determinize: sample K plausible opponent states
+   │
+   ▼  (for each determinization)
+ MCTS iteration:
+   ├─ SELECT:   PUCT using DL policy priors (P) + visit counts (N) + avg value (Q)
+   ├─ EXPAND:   generate legal children at leaf
+   ├─ EVALUATE: DL value head scores the leaf
+   └─ BACKPROP: update Q and N up the tree
+   │
+   ▼
+ Aggregate visit counts across K trees → choose action
+```
+
+**DL Model** feeds into two MCTS phases:
+- **Selection** — the policy heads provide the prior P(s,a) in the PUCT formula, biasing search toward promising moves first
+- **Evaluation** — the value head provides the leaf score, replacing random rollouts. This is the signal that gets backpropagated up the tree
+
+The model is called once per leaf expansion and provides both signals simultaneously.
+
+**Information Model** operates upstream of and around MCTS:
+- **Determinization** (pre-search) — the deduction engine eliminates impossible opponent states (e.g., "this Pokemon definitely has Choice Scarf" becomes a hard constraint), and revealed-info tracking narrows what remains uncertain. This produces higher-quality determinizations for MCTS to search over
+- **State encoding** (feeds into DL) — revealed and deduced information becomes input features to the model (move known/unknown flags, confirmed items, etc.), which improves both the policy priors and value estimates the model produces
+
+The information model does not directly plug into PUCT selection — it improves MCTS indirectly by constraining the search space (fewer/better determinizations) and enriching the DL model's inputs (better features → better priors and values).
+
+**Team preview** uses DL only (no MCTS or information model) — the team preview model directly predicts bring/lead selections from the 12 species.
+
 The DL models are trained in Python (PyTorch), exported to ONNX, and loaded in C# via `Microsoft.ML.OnnxRuntime` for inference.
 
 ## Data Pipeline

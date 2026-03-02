@@ -166,9 +166,13 @@ public partial record Moves
                 OnHitSide = OnHitSideEventInfo.Create((battle, side, source, move) =>
                 {
                     // Find allies with Plus or Minus abilities
-                    var targets = side.Allies().Where(ally =>
-                            ally.HasAbility(AbilityId.Plus) || ally.HasAbility(AbilityId.Minus))
-                        .ToList();
+                    var allAllies = side.Allies();
+                    var targets = new List<Pokemon>(allAllies.Count);
+                    foreach (Pokemon ally in allAllies)
+                    {
+                        if (ally.HasAbility(AbilityId.Plus) || ally.HasAbility(AbilityId.Minus))
+                            targets.Add(ally);
+                    }
 
                     if (targets.Count == 0)
                     {

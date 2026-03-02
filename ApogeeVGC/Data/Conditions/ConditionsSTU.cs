@@ -1505,8 +1505,7 @@ public partial record Conditions
                                     }
                                     else
                                     {
-                                        targetPokemon = battle.Sample(foes) ??
-                                                        throw new InvalidOperationException();
+                                        targetPokemon = foes[battle.Prng.Random(foes.Count)];
                                     }
                                 }
 

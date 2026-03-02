@@ -23,13 +23,13 @@ public partial class Pokemon
                 // Add allies if not a foe-only move
                 if (move.Target != MoveTarget.FoeSide)
                 {
-                    targets.AddRange(AlliesAndSelf());
+                    AlliesAndSelf().AddTo(targets);
                 }
 
                 // Add foes if not an ally-only move
                 if (move.Target != MoveTarget.AllySide && move.Target != MoveTarget.AllyTeam)
                 {
-                    targets.AddRange(Foes(all: true));
+                    Foes(all: true).AddTo(targets);
                 }
 
                 // Retarget if the original target isn't in the list
@@ -42,11 +42,11 @@ public partial class Pokemon
             }
 
             case MoveTarget.AllAdjacent:
-                targets.AddRange(AdjacentAllies());
+                AdjacentAllies().AddTo(targets);
                 goto case MoveTarget.AllAdjacentFoes; // Fall through
 
             case MoveTarget.AllAdjacentFoes:
-                targets.AddRange(AdjacentFoes());
+                AdjacentFoes().AddTo(targets);
                 if (targets.Count > 0 && !targets.Contains(target))
                 {
                     Battle.RetargetLastMove(targets[^1]);
@@ -55,7 +55,7 @@ public partial class Pokemon
                 break;
 
             case MoveTarget.Allies:
-                targets = AlliesAndSelf();
+                targets = AlliesAndSelf().ToList();
                 break;
 
             default:
@@ -156,7 +156,7 @@ public partial class Pokemon
         if (move.Flags.MustPressure == true)
         {
             // Some moves always trigger Pressure on all foes
-            pressureTargets = Foes();
+            pressureTargets = Foes().ToList();
         }
 
         return new MoveTargets
@@ -232,14 +232,14 @@ public partial class Pokemon
         return sameHalf ? -position : position;
     }
 
-    public List<Pokemon> AlliesAndSelf()
+    public PokemonBuffer AlliesAndSelf()
     {
         return Side.Allies();
     }
 
-    public List<Pokemon> Allies()
+    public PokemonBuffer Allies()
     {
-        var allies = new List<Pokemon>(Side.Active.Count);
+        var allies = new PokemonBuffer();
         foreach (var p in Side.Active)
         {
             if (p != null && p.Hp > 0 && p != this)
@@ -248,9 +248,9 @@ public partial class Pokemon
         return allies;
     }
 
-    public List<Pokemon> AdjacentAllies()
+    public PokemonBuffer AdjacentAllies()
     {
-        var allies = new List<Pokemon>(Side.Active.Count);
+        var allies = new PokemonBuffer();
         foreach (var p in Side.Active)
         {
             if (p != null && p.Hp > 0 && IsAdjacent(p))
@@ -259,17 +259,17 @@ public partial class Pokemon
         return allies;
     }
 
-    public List<Pokemon> Foes(bool all = false)
+    public PokemonBuffer Foes(bool all = false)
     {
         return Side.Foes(all);
     }
 
-    public List<Pokemon> AdjacentFoes()
+    public PokemonBuffer AdjacentFoes()
     {
         if (Battle.ActivePerHalf <= 2)
             return Side.Foes();
 
-        var foes = new List<Pokemon>(Side.Foe.Active.Count);
+        var foes = new PokemonBuffer();
         foreach (var p in Side.Foe.Active)
         {
             if (p != null && p.Hp > 0 && IsAdjacent(p))

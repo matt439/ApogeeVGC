@@ -1314,7 +1314,7 @@ public partial record Abilities
         IAction? peek = battle.Queue.Peek();
         if (peek?.Choice == ActionId.RunSwitch) return;
 
-        var allies = pokemon.Allies().ToList();
+        var allies = pokemon.Allies();
         Pokemon? ally = allies.FirstOrDefault();
         if (pokemon.SwitchFlag.IsTrue() || ally?.SwitchFlag.IsTrue() == true) return;
 
