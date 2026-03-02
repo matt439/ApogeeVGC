@@ -27,7 +27,7 @@ public record MoveAction : IAction
     public required IntFalseUnion Order
     {
         get;
-        init
+        set
         {
             if (value.IsFalse)
                 throw new ArgumentException("Order cannot be false.", nameof(value));
@@ -45,14 +45,14 @@ public record MoveAction : IAction
         }
     }
     public int Priority { get; set; }
-    public int FractionalPriority { get; init; }
-    public int Speed { get; init; }
-    public required Pokemon Pokemon { get; init; }
+    public int FractionalPriority { get; set; }
+    public int Speed { get; set; }
+    public required Pokemon Pokemon { get; set; }
     public int TargetLoc { get; set; }
-    public Pokemon? OriginalTarget { get; init; }
+    public Pokemon? OriginalTarget { get; set; }
     public MoveId MoveId { get; init; }
     public required Move Move { get; set; }
-    public IEffect? SourceEffect { get; init; }
+    public IEffect? SourceEffect { get; set; }
     public MoveType? Terastallize { get; init; }
     public SpecieId? Mega { get; init; }
 

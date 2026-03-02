@@ -240,9 +240,10 @@ public partial class Battle
                 moveAction.Move.Priority = priority;
             }
 
-            // Update the speed - since Speed is init-only, create a new record with updated speed
+            // Update the speed directly — no record clone needed
             int actionSpeed = moveAction.Pokemon.GetActionSpeed();
-            return moveAction with { Speed = actionSpeed };
+            moveAction.Speed = actionSpeed;
+            return moveAction;
         }
 
         // Get the Pokemon's action speed (factors in speed stat, paralysis, etc.)

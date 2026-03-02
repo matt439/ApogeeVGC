@@ -1584,9 +1584,8 @@ public partial record Moves
                         return false;
                     }
 
-                    // Create a new action with order 201 (makes it move last)
-                    MoveAction newAction = action with { Order = 201 };
-                    battle.Queue.List[index] = newAction;
+                    // Set order to 201 in-place (makes it move last)
+                    action.Order = 201;
 
                     if (battle.DisplayUi)
                     {

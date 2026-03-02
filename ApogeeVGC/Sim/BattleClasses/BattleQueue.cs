@@ -138,11 +138,7 @@ public class BattleQueue(Battle battle)
         // Populate move if missing (from moveId)
         if (currentAction is MoveAction moveAction)
         {
-            // Ensure we have the Move object, not just the ID
-            currentAction = moveAction with
-            {
-                Move = moveAction.Move,
-            };
+            // MoveAction already has Move set from construction; no clone needed.
         }
 
         // Set order if not already set
@@ -151,13 +147,17 @@ public class BattleQueue(Battle battle)
             if (_orders.TryGetValue(currentAction.Choice, out int order))
             {
                 // Update order based on action type
-                currentAction = currentAction switch
+                switch (currentAction)
                 {
-                    MoveAction ma => ma with { Order = order },
-                    SwitchAction sa => sa with { Order = order },
-                    PokemonAction pa => pa, // PokemonAction.Order returns int.MaxValue
-                    _ => currentAction,
-                };
+                    case MoveAction ma:
+                        ma.Order = order;
+                        break;
+                    case SwitchAction sa:
+                        currentAction = sa with { Order = order };
+                        break;
+                    case PokemonAction:
+                        break; // PokemonAction.Order returns int.MaxValue
+                }
             }
             else
             {
@@ -170,7 +170,7 @@ public class BattleQueue(Battle battle)
 
                 if (currentAction is MoveAction maDefault)
                 {
-                    currentAction = maDefault with { Order = 200 };
+                    maDefault.Order = 200;
                 }
             }
         }
@@ -249,7 +249,8 @@ public class BattleQueue(Battle battle)
                     _ => 0,
                 };
 
-                currentAction = ma with { FractionalPriority = fractionalPriority };
+                currentAction = ma;
+                ma.FractionalPriority = fractionalPriority;
             }
             else if (currentAction.Choice is ActionId.Switch or ActionId.InstaSwitch)
             {
@@ -284,23 +285,18 @@ public class BattleQueue(Battle battle)
                 Pokemon? target = Battle.GetRandomTarget(moveAct.Pokemon, move);
                 if (target is not null)
                 {
-                    moveAct = moveAct with
-                    {
-                        TargetLoc =
-                        moveAct.Pokemon.GetSlot().GetRelativeLocation(target.GetSlot())
-                    };
+                    moveAct.TargetLoc =
+                        moveAct.Pokemon.GetSlot().GetRelativeLocation(target.GetSlot());
                 }
             }
 
             // Set the original target based on target location
             // When targetLoc is 0 (no valid target found by GetRandomTarget), OriginalTarget is null
             // This matches TS behavior where getAtLoc(0) returns undefined (active[-1])
-            currentAction = moveAct with
-            {
-                OriginalTarget = moveAct.TargetLoc != 0
-                    ? moveAct.Pokemon.GetAtLoc(moveAct.TargetLoc)
-                    : null,
-            };
+            moveAct.OriginalTarget = moveAct.TargetLoc != 0
+                ? moveAct.Pokemon.GetAtLoc(moveAct.TargetLoc)
+                : null;
+            currentAction = moveAct;
         }
 
         // Calculate action speed for queue sorting and get the updated action
@@ -338,24 +334,26 @@ public class BattleQueue(Battle battle)
         }
 
         // Update the action with the source effect and priority order
-        IAction prioritizedAction = action switch
+        switch (action)
         {
-            MoveActionMoveSwitchActionUnion ma => ma.MoveAction with
-            {
-                SourceEffect = sourceEffect,
-                Order = 3, // InstaSwitch priority
-            },
-            SwitchActionMoveSwitchActionUnion sa => sa.SwitchAction with
-            {
-                SourceEffect = sourceEffect,
-                Order = 3, // InstaSwitch priority
-            },
-            _ => throw new InvalidOperationException(
-                "Unknown action type in MoveSwitchActionUnion"),
-        };
+            case MoveActionMoveSwitchActionUnion ma:
+                ma.MoveAction.SourceEffect = sourceEffect;
+                ma.MoveAction.Order = 3; // InstaSwitch priority
+                break;
+            case SwitchActionMoveSwitchActionUnion sa:
+                actualAction = sa.SwitchAction with
+                {
+                    SourceEffect = sourceEffect,
+                    Order = 3, // InstaSwitch priority
+                };
+                break;
+            default:
+                throw new InvalidOperationException(
+                    "Unknown action type in MoveSwitchActionUnion");
+        }
 
         // Add to the front of the queue
-        List.Insert(0, prioritizedAction);
+        List.Insert(0, actualAction);
     }
 
     /// <summary>
@@ -374,14 +372,21 @@ public class BattleQueue(Battle battle)
         if (action is IAction actionWithPokemon && actionWithPokemon.Pokemon != pokemon)
         {
             // Update the action with the correct Pokémon
-            action = action switch
+            switch (action)
             {
-                MoveAction ma => ma with { Pokemon = pokemon },
-                SwitchAction sa => sa with { Pokemon = pokemon },
-                PokemonAction pa => pa with { Pokemon = pokemon },
-                TeamAction ta => ta with { Pokemon = pokemon },
-                _ => action,
-            };
+                case MoveAction ma:
+                    ma.Pokemon = pokemon;
+                    break;
+                case SwitchAction sa:
+                    action = sa with { Pokemon = pokemon };
+                    break;
+                case PokemonAction pa:
+                    action = pa with { Pokemon = pokemon };
+                    break;
+                case TeamAction ta:
+                    action = ta with { Pokemon = pokemon };
+                    break;
+            }
         }
 
         // Insert the new action in priority order
