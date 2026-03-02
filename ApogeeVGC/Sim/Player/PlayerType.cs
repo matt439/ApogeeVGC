@@ -6,4 +6,5 @@ public enum PlayerType
     Gui,
     Console,
     Mcts,
+    Greedy,
 }

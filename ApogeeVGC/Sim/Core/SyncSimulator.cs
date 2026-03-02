@@ -322,6 +322,7 @@ public class SyncSimulator : IBattleController
             Player.PlayerType.Gui => throw new NotSupportedException(
                 "GUI player cannot be used in synchronous mode"),
             Player.PlayerType.Mcts => Mcts.PlayerMcts.Create(sideId, options, this),
+            Player.PlayerType.Greedy => new PlayerGreedy(sideId, options, this),
             _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
         };
     }

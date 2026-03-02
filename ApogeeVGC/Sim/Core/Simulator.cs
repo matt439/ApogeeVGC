@@ -766,6 +766,7 @@ public class Simulator : IBattleController
             Player.PlayerType.Console => new PlayerConsole(sideId, options, this),
             Player.PlayerType.Mcts => throw new NotImplementedException(
                 "MCTS player not implemented yet"),
+            Player.PlayerType.Greedy => new PlayerGreedy(sideId, options, this),
             _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
         };
     }
