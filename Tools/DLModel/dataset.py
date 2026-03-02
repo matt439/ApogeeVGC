@@ -7,6 +7,16 @@ State encoding (per sample):
   species_ids: [8] int — embedding indices for 8 pokemon slots
     [my_a, my_b, opp_a, opp_b, my_bench_0, my_bench_1, opp_bench_0, opp_bench_1]
 
+  move_ids:    [8, 4] int — up to 4 moves per pokemon
+  ability_ids: [8] int    — ability per pokemon
+  item_ids:    [8] int    — held item per pokemon
+  tera_ids:    [8] int    — tera type per pokemon
+
+  Own-team slots use end-of-game revealed data (always known to the player).
+  Opponent slots use progressively revealed data (moves/tera from turn
+  actions only — no forward leak). Opponent abilities/items stay at 0
+  since per-turn revelation can't be tracked from parsed actions.
+
   numeric: [200] float — concatenated feature vector:
     [0..34]    my_a active features (35)
     [35..69]   my_b active features (35)
@@ -201,35 +211,89 @@ class VGCDataset(Dataset):
 
     Each sample represents one turn from one player's perspective.
     Two samples are generated per turn (one per player).
+
+    Per-pokemon features (moves, ability, item, tera) are encoded as:
+      - Own team: from end-of-game revealed data (player always knows)
+      - Opponent: progressively from turn actions (moves, tera only;
+        abilities/items stay 0 since per-turn reveal can't be tracked)
     """
 
     def __init__(self, games: list[dict], vocab: dict):
         species_map = vocab['species']
         action_map = vocab['actions']
+        move_map = vocab['moves']
+        ability_map = vocab['abilities']
+        item_map = vocab['items']
+        tera_map = vocab['tera_types']
         none_id = action_map.get('<none>', 1)
         cant_id = action_map.get('<cant>', 2)
+        mv_unk = move_map.get('<unknown>', 1)
+        ab_unk = ability_map.get('<unknown>', 1)
+        it_unk = item_map.get('<unknown>', 1)
+        te_unk = tera_map.get('<unknown>', 1)
 
         # Pre-count samples (skip games with no winner)
         valid_games = [g for g in games if g.get('winner') in ('p1', 'p2')]
         n = sum(len(g['turns']) * 2 for g in valid_games)
 
         self.species_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
+        self.move_ids = torch.zeros(n, NUM_SPECIES_SLOTS, 4, dtype=torch.long)
+        self.ability_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
+        self.item_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
+        self.tera_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
         self.numeric = torch.zeros(n, NUMERIC_DIM, dtype=torch.float32)
         self.value_targets = torch.zeros(n, dtype=torch.float32)
         self.policy_a = torch.zeros(n, dtype=torch.long)
         self.policy_b = torch.zeros(n, dtype=torch.long)
 
+        def fill_own(idx: int, slot: int, species: str,
+                     side_revealed: dict) -> None:
+            """Fill features for an own-team slot from end-of-game revealed."""
+            info = side_revealed.get(species)
+            if info is None:
+                return
+            for j, m in enumerate(info.get('moves', [])[:4]):
+                self.move_ids[idx, slot, j] = move_map.get(m, mv_unk)
+            ab = info.get('ability')
+            if ab:
+                self.ability_ids[idx, slot] = ability_map.get(ab, ab_unk)
+            it = info.get('item')
+            if it:
+                self.item_ids[idx, slot] = item_map.get(it, it_unk)
+            te = info.get('tera_type')
+            if te:
+                self.tera_ids[idx, slot] = tera_map.get(te, te_unk)
+
+        def fill_opp(idx: int, slot: int, species: str,
+                     prog_moves: dict, prog_tera: dict) -> None:
+            """Fill features for an opponent slot from progressive state."""
+            moves = prog_moves.get(species, [])
+            for j, m in enumerate(moves[:4]):
+                self.move_ids[idx, slot, j] = move_map.get(m, mv_unk)
+            te = prog_tera.get(species)
+            if te:
+                self.tera_ids[idx, slot] = tera_map.get(te, te_unk)
+
         idx = 0
         for game in valid_games:
             winner = game['winner']
             team_brought = game.get('team_brought', {})
+            game_revealed = game.get('revealed', {})
 
             # Track last-known state for bench pokemon across turns
             last_known: dict[tuple[str, str], dict] = {}
 
+            # Progressive revealed state (opponent moves/tera seen so far)
+            prog_moves: dict[str, dict[str, list[str]]] = {
+                'p1': {}, 'p2': {},
+            }
+            prog_tera: dict[str, dict[str, str]] = {'p1': {}, 'p2': {}}
+
             for turn in game.get('turns', []):
+                active = turn.get('active', {})
+
                 # Update last-known from active slots
-                for slot, state in turn.get('active', {}).items():
+                for slot, state in active.items():
                     side = slot[:2]
                     sp = state['species']
                     last_known[(side, sp)] = {
@@ -239,20 +303,41 @@ class VGCDataset(Dataset):
                         'status': state.get('status'),
                     }
 
+                # Build slot → species for progressive update later
+                slot_species: dict[str, str] = {}
+                for slot, state in active.items():
+                    slot_species[slot] = state['species']
+
                 for perspective in ('p1', 'p2'):
                     opp = 'p2' if perspective == 'p1' else 'p1'
-                    active = turn.get('active', {})
 
                     my_a = active.get(f'{perspective}a')
                     my_b = active.get(f'{perspective}b')
                     opp_a = active.get(f'{opp}a')
                     opp_b = active.get(f'{opp}b')
 
+                    my_revealed = game_revealed.get(perspective, {})
+                    opp_prog_m = prog_moves[opp]
+                    opp_prog_t = prog_tera[opp]
+
                     # ── Species IDs ──
                     for si, st in enumerate([my_a, my_b, opp_a, opp_b]):
                         if st:
                             self.species_ids[idx, si] = species_map.get(
                                 st['species'], 1)
+
+                    # ── Per-pokemon features (active) ──
+                    for si, (st, is_own) in enumerate([
+                        (my_a, True), (my_b, True),
+                        (opp_a, False), (opp_b, False),
+                    ]):
+                        if st is None:
+                            continue
+                        sp = st['species']
+                        if is_own:
+                            fill_own(idx, si, sp, my_revealed)
+                        else:
+                            fill_opp(idx, si, sp, opp_prog_m, opp_prog_t)
 
                     # ── Active numeric features ──
                     feat = self.numeric[idx]
@@ -275,6 +360,7 @@ class VGCDataset(Dataset):
                     for bi, sp in enumerate(my_bench[:2]):
                         off = bench_base + bi * BENCH_DIM
                         self.species_ids[idx, 4 + bi] = species_map.get(sp, 1)
+                        fill_own(idx, 4 + bi, sp, my_revealed)
                         lk = last_known.get((perspective, sp))
                         if lk:
                             encode_bench(feat, off, lk['hp'], lk['fainted'],
@@ -293,6 +379,7 @@ class VGCDataset(Dataset):
                     for bi, sp in enumerate(opp_bench[:2]):
                         off = bench_base + (2 + bi) * BENCH_DIM
                         self.species_ids[idx, 6 + bi] = species_map.get(sp, 1)
+                        fill_opp(idx, 6 + bi, sp, opp_prog_m, opp_prog_t)
                         lk = last_known.get((opp, sp))
                         if lk:
                             encode_bench(feat, off, lk['hp'], lk['fainted'],
@@ -321,8 +408,26 @@ class VGCDataset(Dataset):
 
                     idx += 1
 
+                # ── Update progressive revealed from this turn's actions ──
+                for action in turn.get('actions', []):
+                    side = action['slot'][:2]
+                    sp = slot_species.get(action['slot'])
+                    if sp is None:
+                        continue
+                    if action['type'] == 'move':
+                        sp_moves = prog_moves[side].setdefault(sp, [])
+                        if action['detail'] not in sp_moves:
+                            sp_moves.append(action['detail'])
+                    tera = action.get('tera')
+                    if tera:
+                        prog_tera[side][sp] = tera
+
         # Trim in case some turns were skipped
         self.species_ids = self.species_ids[:idx]
+        self.move_ids = self.move_ids[:idx]
+        self.ability_ids = self.ability_ids[:idx]
+        self.item_ids = self.item_ids[:idx]
+        self.tera_ids = self.tera_ids[:idx]
         self.numeric = self.numeric[:idx]
         self.value_targets = self.value_targets[:idx]
         self.policy_a = self.policy_a[:idx]
@@ -355,6 +460,10 @@ class VGCDataset(Dataset):
     def __getitem__(self, idx: int):
         return (
             self.species_ids[idx],
+            self.move_ids[idx],
+            self.ability_ids[idx],
+            self.item_ids[idx],
+            self.tera_ids[idx],
             self.numeric[idx],
             self.value_targets[idx],
             self.policy_a[idx],

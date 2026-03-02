@@ -62,7 +62,9 @@ def train(args: argparse.Namespace) -> None:
             vocab = json.load(f)
 
     print(f'Vocab: {vocab["num_species"]} species, '
-          f'{vocab["num_actions"]} actions')
+          f'{vocab["num_actions"]} actions, '
+          f'{vocab["num_moves"]} moves, {vocab["num_abilities"]} abilities, '
+          f'{vocab["num_items"]} items, {vocab["num_tera_types"]} tera types')
 
     # ── Data ──
     print(f'Loading games from {args.data}...')
@@ -97,8 +99,16 @@ def train(args: argparse.Namespace) -> None:
 
     # ── Model ──
     model = BattleNet(
-        vocab['num_species'], vocab['num_actions'],
-        args.embed_dim, args.hidden_dim,
+        num_species=vocab['num_species'],
+        num_actions=vocab['num_actions'],
+        num_moves=vocab['num_moves'],
+        num_abilities=vocab['num_abilities'],
+        num_items=vocab['num_items'],
+        num_tera_types=vocab['num_tera_types'],
+        embed_dim=args.embed_dim,
+        feat_embed_dim=args.feat_embed_dim,
+        pokemon_dim=args.pokemon_dim,
+        hidden_dim=args.hidden_dim,
     ).to(device)
     total_params = sum(p.numel() for p in model.parameters())
     print(f'Model: {total_params:,} parameters')
@@ -125,10 +135,10 @@ def train(args: argparse.Namespace) -> None:
         n_batches = 0
 
         for batch in train_loader:
-            sids, num, vtgt, pa_tgt, pb_tgt = [
+            sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt = [
                 x.to(device) for x in batch]
 
-            value, pol_a, pol_b = model(sids, num)
+            value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
             v_loss = value_loss_fn(value, vtgt)
             p_loss_a = policy_loss_fn(pol_a, pa_tgt)
@@ -162,10 +172,10 @@ def train(args: argparse.Namespace) -> None:
 
         with torch.no_grad():
             for batch in val_loader:
-                sids, num, vtgt, pa_tgt, pb_tgt = [
+                sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt = [
                     x.to(device) for x in batch]
 
-                value, pol_a, pol_b = model(sids, num)
+                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
                 v_loss = value_loss_fn(value, vtgt)
                 p_loss_a = policy_loss_fn(pol_a, pa_tgt)
@@ -254,6 +264,8 @@ def main():
     parser.add_argument('--batch-size', type=int, default=512)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--embed-dim', type=int, default=32)
+    parser.add_argument('--feat-embed-dim', type=int, default=16)
+    parser.add_argument('--pokemon-dim', type=int, default=48)
     parser.add_argument('--hidden-dim', type=int, default=256)
     parser.add_argument('--val-split', type=float, default=0.2)
     parser.add_argument('--patience', type=int, default=5)
