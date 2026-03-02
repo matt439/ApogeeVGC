@@ -42,7 +42,7 @@ public partial record SpeciesData
                 Num = 252,
                 Name = "Treecko",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 40,
@@ -67,7 +67,7 @@ public partial record SpeciesData
                 Num = 253,
                 Name = "Grovyle",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -92,7 +92,7 @@ public partial record SpeciesData
                 Num = 254,
                 Name = "Sceptile",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -120,7 +120,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Sceptile,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Grass, PokemonType.Dragon],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -145,7 +145,7 @@ public partial record SpeciesData
                 Num = 255,
                 Name = "Torchic",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 45,
@@ -170,7 +170,7 @@ public partial record SpeciesData
                 Num = 256,
                 Name = "Combusken",
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -195,7 +195,7 @@ public partial record SpeciesData
                 Num = 257,
                 Name = "Blaziken",
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -223,7 +223,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Blaziken,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -248,7 +248,7 @@ public partial record SpeciesData
                 Num = 258,
                 Name = "Mudkip",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -273,7 +273,7 @@ public partial record SpeciesData
                 Num = 259,
                 Name = "Marshtomp",
                 Types = [PokemonType.Water, PokemonType.Ground],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -298,7 +298,7 @@ public partial record SpeciesData
                 Num = 260,
                 Name = "Swampert",
                 Types = [PokemonType.Water, PokemonType.Ground],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 100,
@@ -326,7 +326,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Swampert,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Water, PokemonType.Ground],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 100,
@@ -1321,7 +1321,7 @@ public partial record SpeciesData
                 Num = 296,
                 Name = "Makuhita",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 72,
@@ -1347,7 +1347,7 @@ public partial record SpeciesData
                 Num = 297,
                 Name = "Hariyama",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 144,
@@ -1373,7 +1373,7 @@ public partial record SpeciesData
                 Num = 298,
                 Name = "Azurill",
                 Types = [PokemonType.Normal, PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,

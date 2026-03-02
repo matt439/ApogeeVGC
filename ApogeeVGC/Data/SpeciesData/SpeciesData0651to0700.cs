@@ -19,7 +19,7 @@ public partial record SpeciesData
                 Num = 651,
                 Name = "Quilladin",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 61,
@@ -47,7 +47,7 @@ public partial record SpeciesData
                 Num = 652,
                 Name = "Chesnaught",
                 Types = [PokemonType.Grass, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 88,
@@ -78,7 +78,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Chesnaught,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Grass, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 88,
@@ -106,7 +106,7 @@ public partial record SpeciesData
                 Num = 653,
                 Name = "Fennekin",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 40,
@@ -133,7 +133,7 @@ public partial record SpeciesData
                 Num = 654,
                 Name = "Braixen",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 59,
@@ -161,7 +161,7 @@ public partial record SpeciesData
                 Num = 655,
                 Name = "Delphox",
                 Types = [PokemonType.Fire, PokemonType.Psychic],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -192,7 +192,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Delphox,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Fire, PokemonType.Psychic],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -220,7 +220,7 @@ public partial record SpeciesData
                 Num = 656,
                 Name = "Froakie",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 41,
@@ -247,7 +247,7 @@ public partial record SpeciesData
                 Num = 657,
                 Name = "Frogadier",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 54,
@@ -275,7 +275,7 @@ public partial record SpeciesData
                 Num = 658,
                 Name = "Greninja",
                 Types = [PokemonType.Water, PokemonType.Dark],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 72,
@@ -289,11 +289,12 @@ public partial record SpeciesData
                 {
                     Slot0 = AbilityId.Torrent,
                     Hidden = AbilityId.Protean,
+                    Special = AbilityId.BattleBond,
                 },
                 HeightM = 1.5,
                 WeightKg = 40,
                 Color = "Blue",
-                OtherFormes = [FormeId.Mega],
+                OtherFormes = [FormeId.Bond, FormeId.Ash, FormeId.Mega],
                 Prevo = SpecieId.Frogadier,
             },
 
@@ -364,7 +365,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Greninja,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Water, PokemonType.Dark],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 72,
@@ -678,7 +679,7 @@ public partial record SpeciesData
                 Num = 667,
                 Name = "Litleo",
                 Types = [PokemonType.Fire, PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M125F875,
                 BaseStats = new StatsTable
                 {
                     Hp = 62,
@@ -706,7 +707,7 @@ public partial record SpeciesData
                 Num = 668,
                 Name = "Pyroar",
                 Types = [PokemonType.Fire, PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M125F875,
                 BaseStats = new StatsTable
                 {
                     Hp = 86,
@@ -738,7 +739,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Pyroar,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Fire, PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M125F875,
                 BaseStats = new StatsTable
                 {
                     Hp = 86,
@@ -812,7 +813,7 @@ public partial record SpeciesData
                 HeightM = 0.2,
                 WeightKg = 0.9,
                 Color = "White",
-                OtherFormes = [FormeId.Mega],
+                OtherFormes = [FormeId.Eternal, FormeId.Mega],
                 Prevo = SpecieId.Flabebe,
             },
 
@@ -1734,7 +1735,7 @@ public partial record SpeciesData
                 Num = 696,
                 Name = "Tyrunt",
                 Types = [PokemonType.Rock, PokemonType.Dragon],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 58,
@@ -1761,7 +1762,7 @@ public partial record SpeciesData
                 Num = 697,
                 Name = "Tyrantrum",
                 Types = [PokemonType.Rock, PokemonType.Dragon],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 82,
@@ -1789,7 +1790,7 @@ public partial record SpeciesData
                 Num = 698,
                 Name = "Amaura",
                 Types = [PokemonType.Rock, PokemonType.Ice],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 77,
@@ -1816,7 +1817,7 @@ public partial record SpeciesData
                 Num = 699,
                 Name = "Aurorus",
                 Types = [PokemonType.Rock, PokemonType.Ice],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 123,
@@ -1844,7 +1845,7 @@ public partial record SpeciesData
                 Num = 700,
                 Name = "Sylveon",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 95,

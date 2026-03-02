@@ -440,7 +440,7 @@ public partial record SpeciesData
                 Num = 466,
                 Name = "Electivire",
                 Types = [PokemonType.Electric],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -466,7 +466,7 @@ public partial record SpeciesData
                 Num = 467,
                 Name = "Magmortar",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -492,7 +492,7 @@ public partial record SpeciesData
                 Num = 468,
                 Name = "Togekiss",
                 Types = [PokemonType.Fairy, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 85,
@@ -546,7 +546,7 @@ public partial record SpeciesData
                 Num = 470,
                 Name = "Leafeon",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -572,7 +572,7 @@ public partial record SpeciesData
                 Num = 471,
                 Name = "Glaceon",
                 Types = [PokemonType.Ice],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -859,6 +859,7 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 0.3,
                 Color = "Red",
+                OtherFormes = [FormeId.Heat, FormeId.Wash, FormeId.Frost, FormeId.Fan, FormeId.Mow],
             },
             [SpecieId.RotomHeat] = new()
             {
@@ -885,6 +886,7 @@ public partial record SpeciesData
                 Color = "Red",
                 BaseSpecies = SpecieId.Rotom,
                 Forme = FormeId.Heat,
+                ChangesFrom = FormeId.Standard,
             },
             [SpecieId.RotomWash] = new()
             {
@@ -911,6 +913,7 @@ public partial record SpeciesData
                 Color = "Red",
                 BaseSpecies = SpecieId.Rotom,
                 Forme = FormeId.Wash,
+                ChangesFrom = FormeId.Standard,
             },
             [SpecieId.RotomFrost] = new()
             {
@@ -937,6 +940,7 @@ public partial record SpeciesData
                 Color = "Red",
                 BaseSpecies = SpecieId.Rotom,
                 Forme = FormeId.Frost,
+                ChangesFrom = FormeId.Standard,
             },
             [SpecieId.RotomFan] = new()
             {
@@ -963,6 +967,7 @@ public partial record SpeciesData
                 Color = "Red",
                 BaseSpecies = SpecieId.Rotom,
                 Forme = FormeId.Fan,
+                ChangesFrom = FormeId.Standard,
             },
             [SpecieId.RotomMow] = new()
             {
@@ -989,6 +994,7 @@ public partial record SpeciesData
                 Color = "Red",
                 BaseSpecies = SpecieId.Rotom,
                 Forme = FormeId.Mow,
+                ChangesFrom = FormeId.Standard,
             },
             [SpecieId.Uxie] = new()
             {
@@ -1086,6 +1092,7 @@ public partial record SpeciesData
                 HeightM = 5.4,
                 WeightKg = 683,
                 Color = "White",
+                OtherFormes = [FormeId.Origin],
             },
             [SpecieId.DialgaOrigin] = new()
             {
@@ -1113,6 +1120,8 @@ public partial record SpeciesData
                 Color = "Blue",
                 BaseSpecies = SpecieId.Dialga,
                 Forme = FormeId.Origin,
+                ChangesFrom = FormeId.Standard,
+                RequiredItem = ItemId.AdamantCrystal,
             },
             [SpecieId.Palkia] = new()
             {
@@ -1138,6 +1147,7 @@ public partial record SpeciesData
                 HeightM = 4.2,
                 WeightKg = 336,
                 Color = "Purple",
+                OtherFormes = [FormeId.Origin],
             },
             [SpecieId.PalkiaOrigin] = new()
             {
@@ -1165,6 +1175,8 @@ public partial record SpeciesData
                 Color = "Purple",
                 BaseSpecies = SpecieId.Palkia,
                 Forme = FormeId.Origin,
+                ChangesFrom = FormeId.Standard,
+                RequiredItem = ItemId.LustrousGlobe,
             },
             [SpecieId.Heatran] = new()
             {
@@ -1239,6 +1251,7 @@ public partial record SpeciesData
                 HeightM = 4.5,
                 WeightKg = 750,
                 Color = "Black",
+                OtherFormes = [FormeId.Origin],
             },
             [SpecieId.GiratinaOrigin] = new()
             {
@@ -1265,6 +1278,8 @@ public partial record SpeciesData
                 Color = "Black",
                 BaseSpecies = SpecieId.Giratina,
                 Forme = FormeId.Origin,
+                ChangesFrom = FormeId.Altered,
+                RequiredItem = ItemId.GriseousCore,
             },
             [SpecieId.Cresselia] = new()
             {
@@ -1385,6 +1400,7 @@ public partial record SpeciesData
                 HeightM = 0.2,
                 WeightKg = 2.1,
                 Color = "Green",
+                OtherFormes = [FormeId.Sky],
             },
             [SpecieId.ShayminSky] = new()
             {
@@ -1411,6 +1427,7 @@ public partial record SpeciesData
                 Color = "Green",
                 BaseSpecies = SpecieId.Shaymin,
                 Forme = FormeId.Sky,
+                ChangesFrom = FormeId.Land,
             },
             [SpecieId.Arceus] = new()
             {

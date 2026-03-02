@@ -249,7 +249,7 @@ public partial record SpeciesData
                 Num = 209,
                 Name = "Snubbull",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -275,7 +275,7 @@ public partial record SpeciesData
                 Num = 210,
                 Name = "Granbull",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 90,
@@ -699,7 +699,7 @@ public partial record SpeciesData
                 Num = 222,
                 Name = "Corsola",
                 Types = [PokemonType.Water, PokemonType.Rock],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -727,7 +727,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Corsola,
                 Forme = FormeId.Galar,
                 Types = [PokemonType.Ghost],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -1224,7 +1224,7 @@ public partial record SpeciesData
                 Num = 239,
                 Name = "Elekid",
                 Types = [PokemonType.Electric],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 45,
@@ -1249,7 +1249,7 @@ public partial record SpeciesData
                 Num = 240,
                 Name = "Magby",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 45,

@@ -269,7 +269,7 @@ public partial record SpeciesData
                 {
                     Slot0 = AbilityId.Limber,
                     Slot1 = AbilityId.Reckless,
-                    Hidden = AbilityId.Unnerve,
+                    Hidden = AbilityId.Unburden,
                 },
                 HeightM = 1.5,
                 WeightKg = 49.8,
@@ -294,7 +294,7 @@ public partial record SpeciesData
                 Abilities = new SpeciesAbility
                 {
                     Slot0 = AbilityId.KeenEye,
-                    Slot1 = AbilityId.HyperCutter,
+                    Slot1 = AbilityId.IronFist,
                     Hidden = AbilityId.InnerFocus,
                 },
                 HeightM = 1.4,
@@ -863,7 +863,7 @@ public partial record SpeciesData
                 Num = 125,
                 Name = "Electabuzz",
                 Types = [PokemonType.Electric],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -888,7 +888,7 @@ public partial record SpeciesData
                 Num = 126,
                 Name = "Magmar",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -1206,7 +1206,7 @@ public partial record SpeciesData
                 Num = 133,
                 Name = "Eevee",
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 55,
@@ -1234,7 +1234,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Eevee,
                 Forme = FormeId.Starter,
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -1260,7 +1260,7 @@ public partial record SpeciesData
                 Num = 134,
                 Name = "Vaporeon",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 130,
@@ -1285,7 +1285,7 @@ public partial record SpeciesData
                 Num = 135,
                 Name = "Jolteon",
                 Types = [PokemonType.Electric],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -1310,7 +1310,7 @@ public partial record SpeciesData
                 Num = 136,
                 Name = "Flareon",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -1361,7 +1361,7 @@ public partial record SpeciesData
                 Num = 138,
                 Name = "Omanyte",
                 Types = [PokemonType.Rock, PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 35,
@@ -1387,7 +1387,7 @@ public partial record SpeciesData
                 Num = 139,
                 Name = "Omastar",
                 Types = [PokemonType.Rock, PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -1413,7 +1413,7 @@ public partial record SpeciesData
                 Num = 140,
                 Name = "Kabuto",
                 Types = [PokemonType.Rock, PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 30,
@@ -1439,7 +1439,7 @@ public partial record SpeciesData
                 Num = 141,
                 Name = "Kabutops",
                 Types = [PokemonType.Rock, PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -1465,7 +1465,7 @@ public partial record SpeciesData
                 Num = 142,
                 Name = "Aerodactyl",
                 Types = [PokemonType.Rock, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -1494,7 +1494,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Aerodactyl,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Rock, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -1519,7 +1519,7 @@ public partial record SpeciesData
                 Num = 143,
                 Name = "Snorlax",
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 160,

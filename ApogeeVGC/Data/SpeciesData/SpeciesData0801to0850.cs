@@ -259,7 +259,7 @@ public partial record SpeciesData
                 Num = 810,
                 Name = "Grookey",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -284,7 +284,7 @@ public partial record SpeciesData
                 Num = 811,
                 Name = "Thwackey",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -309,7 +309,7 @@ public partial record SpeciesData
                 Num = 812,
                 Name = "Rillaboom",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 100,
@@ -334,7 +334,7 @@ public partial record SpeciesData
                 Num = 813,
                 Name = "Scorbunny",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -359,7 +359,7 @@ public partial record SpeciesData
                 Num = 814,
                 Name = "Raboot",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -384,7 +384,7 @@ public partial record SpeciesData
                 Num = 815,
                 Name = "Cinderace",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -409,7 +409,7 @@ public partial record SpeciesData
                 Num = 816,
                 Name = "Sobble",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -434,7 +434,7 @@ public partial record SpeciesData
                 Num = 817,
                 Name = "Drizzile",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -459,7 +459,7 @@ public partial record SpeciesData
                 Num = 818,
                 Name = "Inteleon",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -1199,6 +1199,8 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 18,
                 Color = "Blue",
+                RequiredAbility = AbilityId.GulpMissile,
+                BattleOnly = FormeId.Standard,
             },
             [SpecieId.CramorantGorging] = new()
             {
@@ -1225,6 +1227,8 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 18,
                 Color = "Blue",
+                RequiredAbility = AbilityId.GulpMissile,
+                BattleOnly = FormeId.Standard,
             },
             [SpecieId.Arrokuda] = new()
             {

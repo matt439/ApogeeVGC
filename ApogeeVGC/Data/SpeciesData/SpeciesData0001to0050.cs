@@ -18,7 +18,7 @@ public partial record SpeciesData
                 Num = 1,
                 Name = "Bulbasaur",
                 Types = [PokemonType.Grass, PokemonType.Poison],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 45,
@@ -43,7 +43,7 @@ public partial record SpeciesData
                 Num = 2,
                 Name = "Ivysaur",
                 Types = [PokemonType.Grass, PokemonType.Poison],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -68,7 +68,7 @@ public partial record SpeciesData
                 Num = 3,
                 Name = "Venusaur",
                 Types = [PokemonType.Grass, PokemonType.Poison],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -96,7 +96,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Venusaur,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Grass, PokemonType.Poison],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -121,7 +121,7 @@ public partial record SpeciesData
                 Num = 4,
                 Name = "Charmander",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 39,
@@ -146,7 +146,7 @@ public partial record SpeciesData
                 Num = 5,
                 Name = "Charmeleon",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 58,
@@ -171,7 +171,7 @@ public partial record SpeciesData
                 Num = 6,
                 Name = "Charizard",
                 Types = [PokemonType.Fire, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 78,
@@ -199,7 +199,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Charizard,
                 Forme = FormeId.MegaX,
                 Types = [PokemonType.Fire, PokemonType.Dragon],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 78,
@@ -226,7 +226,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Charizard,
                 Forme = FormeId.MegaY,
                 Types = [PokemonType.Fire, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 78,
@@ -251,7 +251,7 @@ public partial record SpeciesData
                 Num = 7,
                 Name = "Squirtle",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 44,
@@ -276,7 +276,7 @@ public partial record SpeciesData
                 Num = 8,
                 Name = "Wartortle",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 59,
@@ -301,7 +301,7 @@ public partial record SpeciesData
                 Num = 9,
                 Name = "Blastoise",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 79,
@@ -329,7 +329,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Blastoise,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 79,
@@ -1607,7 +1607,7 @@ public partial record SpeciesData
                 Num = 35,
                 Name = "Clefairy",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -1633,7 +1633,7 @@ public partial record SpeciesData
                 Num = 36,
                 Name = "Clefable",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 95,
@@ -1662,7 +1662,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Clefable,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Fairy, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 95,
@@ -1689,7 +1689,7 @@ public partial record SpeciesData
                 Num = 37,
                 Name = "Vulpix",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 38,
@@ -1716,7 +1716,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Vulpix,
                 Forme = FormeId.Alola,
                 Types = [PokemonType.Ice],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 38,
@@ -1741,7 +1741,7 @@ public partial record SpeciesData
                 Num = 38,
                 Name = "Ninetales",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 73,
@@ -1768,7 +1768,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Ninetales,
                 Forme = FormeId.Alola,
                 Types = [PokemonType.Ice, PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 73,
@@ -1793,7 +1793,7 @@ public partial record SpeciesData
                 Num = 39,
                 Name = "Jigglypuff",
                 Types = [PokemonType.Normal, PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 115,
@@ -1819,7 +1819,7 @@ public partial record SpeciesData
                 Num = 40,
                 Name = "Wigglytuff",
                 Types = [PokemonType.Normal, PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 140,

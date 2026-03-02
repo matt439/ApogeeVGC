@@ -42,7 +42,7 @@ public partial record SpeciesData
                 Num = 495,
                 Name = "Snivy",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 45,
@@ -67,7 +67,7 @@ public partial record SpeciesData
                 Num = 496,
                 Name = "Servine",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -93,7 +93,7 @@ public partial record SpeciesData
                 Num = 497,
                 Name = "Serperior",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -119,7 +119,7 @@ public partial record SpeciesData
                 Num = 498,
                 Name = "Tepig",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -144,7 +144,7 @@ public partial record SpeciesData
                 Num = 499,
                 Name = "Pignite",
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 90,
@@ -170,7 +170,7 @@ public partial record SpeciesData
                 Num = 500,
                 Name = "Emboar",
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 110,
@@ -197,23 +197,23 @@ public partial record SpeciesData
                 Num = 500,
                 Name = "Emboar-Mega",
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 110,
-                    Atk = 163,
-                    Def = 85,
-                    SpA = 130,
-                    SpD = 85,
-                    Spe = 55,
+                    Atk = 148,
+                    Def = 75,
+                    SpA = 110,
+                    SpD = 110,
+                    Spe = 75,
                 },
                 Abilities = new SpeciesAbility
                 {
                     Slot0 = AbilityId.Blaze,
                     Hidden = AbilityId.Reckless,
                 },
-                HeightM = 1.6,
-                WeightKg = 165,
+                HeightM = 1.8,
+                WeightKg = 180.3,
                 Color = "Red",
                 RequiredItem = ItemId.Emboarite,
                 BaseSpecies = SpecieId.Emboar,
@@ -225,7 +225,7 @@ public partial record SpeciesData
                 Num = 501,
                 Name = "Oshawott",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 55,
@@ -250,7 +250,7 @@ public partial record SpeciesData
                 Num = 502,
                 Name = "Dewott",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -276,7 +276,7 @@ public partial record SpeciesData
                 Num = 503,
                 Name = "Samurott",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 95,
@@ -302,7 +302,7 @@ public partial record SpeciesData
                 Num = 503,
                 Name = "Samurott-Hisui",
                 Types = [PokemonType.Water, PokemonType.Dark],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 90,
@@ -516,7 +516,7 @@ public partial record SpeciesData
                 Num = 511,
                 Name = "Pansage",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -541,7 +541,7 @@ public partial record SpeciesData
                 Num = 512,
                 Name = "Simisage",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -567,7 +567,7 @@ public partial record SpeciesData
                 Num = 513,
                 Name = "Pansear",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -592,7 +592,7 @@ public partial record SpeciesData
                 Num = 514,
                 Name = "Simisear",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -618,7 +618,7 @@ public partial record SpeciesData
                 Num = 515,
                 Name = "Panpour",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -643,7 +643,7 @@ public partial record SpeciesData
                 Num = 516,
                 Name = "Simipour",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -1125,7 +1125,7 @@ public partial record SpeciesData
                 Num = 532,
                 Name = "Timburr",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -1151,7 +1151,7 @@ public partial record SpeciesData
                 Num = 533,
                 Name = "Gurdurr",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 85,
@@ -1178,7 +1178,7 @@ public partial record SpeciesData
                 Num = 534,
                 Name = "Conkeldurr",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 105,

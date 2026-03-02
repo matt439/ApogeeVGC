@@ -42,7 +42,7 @@ public partial record SpeciesData
                 Num = 152,
                 Name = "Chikorita",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 45,
@@ -67,7 +67,7 @@ public partial record SpeciesData
                 Num = 153,
                 Name = "Bayleef",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -92,7 +92,7 @@ public partial record SpeciesData
                 Num = 154,
                 Name = "Meganium",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -120,7 +120,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Meganium,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Grass, PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -146,7 +146,7 @@ public partial record SpeciesData
                 Num = 155,
                 Name = "Cyndaquil",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 39,
@@ -171,7 +171,7 @@ public partial record SpeciesData
                 Num = 156,
                 Name = "Quilava",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 58,
@@ -196,7 +196,7 @@ public partial record SpeciesData
                 Num = 157,
                 Name = "Typhlosion",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 78,
@@ -223,7 +223,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Typhlosion,
                 Forme = FormeId.Hisui,
                 Types = [PokemonType.Fire, PokemonType.Ghost],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 73,
@@ -248,7 +248,7 @@ public partial record SpeciesData
                 Num = 158,
                 Name = "Totodile",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -273,7 +273,7 @@ public partial record SpeciesData
                 Num = 159,
                 Name = "Croconaw",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -298,7 +298,7 @@ public partial record SpeciesData
                 Num = 160,
                 Name = "Feraligatr",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 85,
@@ -326,7 +326,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Feraligatr,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Water, PokemonType.Dragon],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 85,
@@ -688,7 +688,7 @@ public partial record SpeciesData
                 Num = 173,
                 Name = "Cleffa",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -714,7 +714,7 @@ public partial record SpeciesData
                 Num = 174,
                 Name = "Igglybuff",
                 Types = [PokemonType.Normal, PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 90,
@@ -740,7 +740,7 @@ public partial record SpeciesData
                 Num = 175,
                 Name = "Togepi",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 35,
@@ -766,7 +766,7 @@ public partial record SpeciesData
                 Num = 176,
                 Name = "Togetic",
                 Types = [PokemonType.Fairy, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 55,
@@ -1338,7 +1338,7 @@ public partial record SpeciesData
                 Num = 196,
                 Name = "Espeon",
                 Types = [PokemonType.Psychic],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 65,
@@ -1363,7 +1363,7 @@ public partial record SpeciesData
                 Num = 197,
                 Name = "Umbreon",
                 Types = [PokemonType.Dark],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 95,

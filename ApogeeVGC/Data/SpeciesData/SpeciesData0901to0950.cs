@@ -36,6 +36,7 @@ public partial record SpeciesData
                 HeightM = 2.4,
                 WeightKg = 290,
                 Color = "Brown",
+                OtherFormes = [FormeId.Bloodmoon],
             },
             [SpecieId.UrsalunaBloodmoon] = new()
             {
@@ -89,6 +90,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 110,
                 Color = "Green",
+                OtherFormes = [FormeId.F],
             },
             [SpecieId.BasculegionF] = new()
             {
@@ -195,6 +197,8 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 48,
                 Color = "Pink",
+                BaseForme = FormeId.Incarnate,
+                OtherFormes = [FormeId.Therian],
             },
             [SpecieId.EnamorusTherian] = new()
             {
@@ -221,6 +225,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 48,
                 Color = "Pink",
+                ChangesFrom = FormeId.Incarnate,
             },
             // 906 - Sprigatito
             [SpecieId.Sprigatito] = new()
@@ -508,6 +513,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 120,
                 Color = "Gray",
+                OtherFormes = [FormeId.F],
             },
             [SpecieId.OinkologneF] = new()
             {
@@ -768,6 +774,8 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 2.3,
                 Color = "White",
+                BaseForme = FormeId.Three,
+                OtherFormes = [FormeId.Four],
             },
             [SpecieId.MausholdFour] = new()
             {
@@ -947,6 +955,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 2.4,
                 Color = "Green",
+                OtherFormes = [FormeId.Blue2, FormeId.Yellow2, FormeId.White2],
             },
             [SpecieId.SquawkabillyBlue] = new()
             {

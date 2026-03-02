@@ -412,7 +412,8 @@ public partial record SpeciesData
                 Color = "Blue",
                 BaseSpecies = SpecieId.Darmanitan,
                 Forme = FormeId.Zen,
-                ChangesFrom = FormeId.Standard,
+                RequiredAbility = AbilityId.ZenMode,
+                BattleOnly = FormeId.Standard,
             },
             [SpecieId.DarmanitanGalar] = new()
             {
@@ -467,7 +468,8 @@ public partial record SpeciesData
                 Color = "White",
                 BaseSpecies = SpecieId.Darmanitan,
                 Forme = FormeId.GalarZen,
-                ChangesFrom = FormeId.Galar,
+                RequiredAbility = AbilityId.ZenMode,
+                BattleOnly = FormeId.Galar,
             },
             [SpecieId.Maractus] = new()
             {

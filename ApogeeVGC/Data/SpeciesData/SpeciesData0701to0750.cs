@@ -705,6 +705,8 @@ public partial record SpeciesData
                 HeightM = 3.0,
                 WeightKg = 215.0,
                 Color = "Blue",
+                BaseForme = FormeId.Active,
+                OtherFormes = [FormeId.Neutral],
             },
             [SpecieId.XerneasNeutral] = new()
             {
@@ -713,32 +715,6 @@ public partial record SpeciesData
                 Name = "Xerneas-Neutral",
                 BaseSpecies = SpecieId.Xerneas,
                 Forme = FormeId.Neutral,
-                Types = [PokemonType.Fairy],
-                Gender = GenderId.N,
-                BaseStats = new StatsTable
-                {
-                    Hp = 126,
-                    Atk = 131,
-                    Def = 95,
-                    SpA = 131,
-                    SpD = 98,
-                    Spe = 99,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.FairyAura,
-                },
-                HeightM = 3.0,
-                WeightKg = 215.0,
-                Color = "Blue",
-            },
-            [SpecieId.XerneasActive] = new()
-            {
-                Id = SpecieId.XerneasActive,
-                Num = 716,
-                Name = "Xerneas-Active",
-                BaseSpecies = SpecieId.Xerneas,
-                Forme = FormeId.Active,
                 Types = [PokemonType.Fairy],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -801,11 +777,12 @@ public partial record SpeciesData
                 Abilities = new SpeciesAbility
                 {
                     Slot0 = AbilityId.AuraBreak,
+                    Special = AbilityId.PowerConstruct,
                 },
                 HeightM = 5.0,
                 WeightKg = 305.0,
                 Color = "Green",
-                OtherFormes = [FormeId.Mega],
+                OtherFormes = [FormeId.TenPercent, FormeId.Complete, FormeId.Mega],
             },
             [SpecieId.Zygarde10] = new()
             {
@@ -828,6 +805,7 @@ public partial record SpeciesData
                 Abilities = new SpeciesAbility
                 {
                     Slot0 = AbilityId.AuraBreak,
+                    Special = AbilityId.PowerConstruct,
                 },
                 HeightM = 1.2,
                 WeightKg = 33.5,
@@ -1771,10 +1749,12 @@ public partial record SpeciesData
                     Slot0 = AbilityId.KeenEye,
                     Slot1 = AbilityId.VitalSpirit,
                     Hidden = AbilityId.Steadfast,
+                    Special = AbilityId.OwnTempo,
                 },
                 HeightM = 0.5,
                 WeightKg = 9.2,
                 Color = "Brown",
+                OtherFormes = [FormeId.Dusk],
             },
             [SpecieId.RockruffDusk] = new()
             {
@@ -1827,6 +1807,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 25.0,
                 Color = "Brown",
+                OtherFormes = [FormeId.Midnight, FormeId.Dusk],
             },
             [SpecieId.LycanrocMidnight] = new()
             {

@@ -1677,7 +1677,7 @@ public partial record SpeciesData
                 Num = 650,
                 Name = "Chespin",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 56,

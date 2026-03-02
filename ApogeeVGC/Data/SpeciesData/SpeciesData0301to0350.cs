@@ -18,7 +18,7 @@ public partial record SpeciesData
                 Num = 300,
                 Name = "Skitty",
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 50,
@@ -44,7 +44,7 @@ public partial record SpeciesData
                 Num = 301,
                 Name = "Delcatty",
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -1404,7 +1404,7 @@ public partial record SpeciesData
                 Num = 345,
                 Name = "Lileep",
                 Types = [PokemonType.Rock, PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 66,
@@ -1429,7 +1429,7 @@ public partial record SpeciesData
                 Num = 346,
                 Name = "Cradily",
                 Types = [PokemonType.Rock, PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 86,
@@ -1455,7 +1455,7 @@ public partial record SpeciesData
                 Num = 347,
                 Name = "Anorith",
                 Types = [PokemonType.Rock, PokemonType.Bug],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 45,
@@ -1480,7 +1480,7 @@ public partial record SpeciesData
                 Num = 348,
                 Name = "Armaldo",
                 Types = [PokemonType.Rock, PokemonType.Bug],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,

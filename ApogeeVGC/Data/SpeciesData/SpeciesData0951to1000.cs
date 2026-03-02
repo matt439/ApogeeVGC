@@ -773,7 +773,7 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 8,
                 Color = "Red",
-                CosmeticFormes = [FormeId.Droopy, FormeId.Stretchy],
+                OtherFormes = [FormeId.Droopy, FormeId.Stretchy],
                 FormeOrder = [FormeId.Curly, FormeId.Droopy, FormeId.Stretchy],
             },
             [SpecieId.Annihilape] = new()

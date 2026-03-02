@@ -201,7 +201,7 @@ public partial record SpeciesData
                 Num = 408,
                 Name = "Cranidos",
                 Types = [PokemonType.Rock],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 67,
@@ -226,7 +226,7 @@ public partial record SpeciesData
                 Num = 409,
                 Name = "Rampardos",
                 Types = [PokemonType.Rock],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 97,
@@ -252,7 +252,7 @@ public partial record SpeciesData
                 Num = 410,
                 Name = "Shieldon",
                 Types = [PokemonType.Rock, PokemonType.Steel],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 30,
@@ -277,7 +277,7 @@ public partial record SpeciesData
                 Num = 411,
                 Name = "Bastiodon",
                 Types = [PokemonType.Rock, PokemonType.Steel],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -436,7 +436,7 @@ public partial record SpeciesData
                 Num = 415,
                 Name = "Combee",
                 Types = [PokemonType.Bug, PokemonType.Flying],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 30,
@@ -903,7 +903,7 @@ public partial record SpeciesData
                 Num = 431,
                 Name = "Glameow",
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 49,
@@ -929,7 +929,7 @@ public partial record SpeciesData
                 Num = 432,
                 Name = "Purugly",
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 71,
@@ -1320,7 +1320,7 @@ public partial record SpeciesData
                 Num = 446,
                 Name = "Munchlax",
                 Types = [PokemonType.Normal],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 135,
@@ -1346,7 +1346,7 @@ public partial record SpeciesData
                 Num = 447,
                 Name = "Riolu",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 40,
@@ -1372,7 +1372,7 @@ public partial record SpeciesData
                 Num = 448,
                 Name = "Lucario",
                 Types = [PokemonType.Fighting, PokemonType.Steel],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -1400,7 +1400,7 @@ public partial record SpeciesData
                 Num = 448,
                 Name = "Lucario-Mega",
                 Types = [PokemonType.Fighting, PokemonType.Steel],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,

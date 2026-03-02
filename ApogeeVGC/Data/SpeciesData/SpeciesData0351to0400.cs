@@ -45,6 +45,8 @@ public partial record SpeciesData
                 Name = "Castform-Sunny",
                 BaseSpecies = SpecieId.Castform,
                 Forme = FormeId.Sunny,
+                RequiredAbility = AbilityId.Forecast,
+                BattleOnly = FormeId.Standard,
                 Types = [PokemonType.Fire],
                 Gender = GenderId.Empty,
                 BaseStats = new StatsTable
@@ -71,6 +73,8 @@ public partial record SpeciesData
                 Name = "Castform-Rainy",
                 BaseSpecies = SpecieId.Castform,
                 Forme = FormeId.Rainy,
+                RequiredAbility = AbilityId.Forecast,
+                BattleOnly = FormeId.Standard,
                 Types = [PokemonType.Water],
                 Gender = GenderId.Empty,
                 BaseStats = new StatsTable
@@ -97,6 +101,8 @@ public partial record SpeciesData
                 Name = "Castform-Snowy",
                 BaseSpecies = SpecieId.Castform,
                 Forme = FormeId.Snowy,
+                RequiredAbility = AbilityId.Forecast,
+                BattleOnly = FormeId.Standard,
                 Types = [PokemonType.Ice],
                 Gender = GenderId.Empty,
                 BaseStats = new StatsTable
@@ -646,7 +652,7 @@ public partial record SpeciesData
                 Num = 369,
                 Name = "Relicanth",
                 Types = [PokemonType.Water, PokemonType.Rock],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 100,
@@ -672,7 +678,7 @@ public partial record SpeciesData
                 Num = 370,
                 Name = "Luvdisc",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 43,
@@ -1112,6 +1118,7 @@ public partial record SpeciesData
                 Name = "Kyogre-Primal",
                 BaseSpecies = SpecieId.Kyogre,
                 Forme = FormeId.Primal,
+                RequiredItem = ItemId.BlueOrb,
                 Types = [PokemonType.Water],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1163,6 +1170,7 @@ public partial record SpeciesData
                 Name = "Groudon-Primal",
                 BaseSpecies = SpecieId.Groudon,
                 Forme = FormeId.Primal,
+                RequiredItem = ItemId.RedOrb,
                 Types = [PokemonType.Ground, PokemonType.Fire],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1367,7 +1375,7 @@ public partial record SpeciesData
                 Num = 387,
                 Name = "Turtwig",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 55,
@@ -1392,7 +1400,7 @@ public partial record SpeciesData
                 Num = 388,
                 Name = "Grotle",
                 Types = [PokemonType.Grass],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 75,
@@ -1418,7 +1426,7 @@ public partial record SpeciesData
                 Num = 389,
                 Name = "Torterra",
                 Types = [PokemonType.Grass, PokemonType.Ground],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 95,
@@ -1444,7 +1452,7 @@ public partial record SpeciesData
                 Num = 390,
                 Name = "Chimchar",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 44,
@@ -1469,7 +1477,7 @@ public partial record SpeciesData
                 Num = 391,
                 Name = "Monferno",
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 64,
@@ -1495,7 +1503,7 @@ public partial record SpeciesData
                 Num = 392,
                 Name = "Infernape",
                 Types = [PokemonType.Fire, PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 76,
@@ -1521,7 +1529,7 @@ public partial record SpeciesData
                 Num = 393,
                 Name = "Piplup",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 53,
@@ -1546,7 +1554,7 @@ public partial record SpeciesData
                 Num = 394,
                 Name = "Prinplup",
                 Types = [PokemonType.Water],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 64,
@@ -1572,7 +1580,7 @@ public partial record SpeciesData
                 Num = 395,
                 Name = "Empoleon",
                 Types = [PokemonType.Water, PokemonType.Steel],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 84,

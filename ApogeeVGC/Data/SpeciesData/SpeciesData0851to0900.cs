@@ -415,7 +415,7 @@ public partial record SpeciesData
                 Num = 864,
                 Name = "Cursola",
                 Types = [PokemonType.Ghost],
-                // Note: In TS has genderRatio M: 0.25, F: 0.75 (inherited from Corsola-Galar)
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -763,6 +763,8 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 89,
                 Color = "Blue",
+                RequiredAbility = AbilityId.IceFace,
+                BattleOnly = FormeId.Standard,
             },
             // 876 - Indeedee
             [SpecieId.Indeedee] = new()
@@ -867,6 +869,8 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 3,
                 Color = "Purple",
+                RequiredAbility = AbilityId.HungerSwitch,
+                BattleOnly = FormeId.Standard,
             },
             // 878 - Cufant
             [SpecieId.Cufant] = new()
@@ -1154,32 +1158,8 @@ public partial record SpeciesData
                 HeightM = 2.8,
                 WeightKg = 110,
                 Color = "Blue",
-            },
-            [SpecieId.ZacianHero] = new()
-            {
-                Id = SpecieId.ZacianHero,
-                Num = 888,
-                Name = "Zacian-Hero",
-                BaseSpecies = SpecieId.Zacian,
-                Forme = FormeId.Hero,
-                Types = [PokemonType.Fairy],
-                Gender = GenderId.N,
-                BaseStats = new StatsTable
-                {
-                    Hp = 92,
-                    Atk = 120,
-                    Def = 115,
-                    SpA = 80,
-                    SpD = 115,
-                    Spe = 138,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.IntrepidSword,
-                },
-                HeightM = 2.8,
-                WeightKg = 110,
-                Color = "Blue",
+                BaseForme = FormeId.Hero,
+                OtherFormes = [FormeId.Crowned],
             },
             [SpecieId.ZacianCrowned] = new()
             {
@@ -1188,6 +1168,7 @@ public partial record SpeciesData
                 Name = "Zacian-Crowned",
                 BaseSpecies = SpecieId.Zacian,
                 Forme = FormeId.Crowned,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Fairy, PokemonType.Steel],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1206,6 +1187,7 @@ public partial record SpeciesData
                 HeightM = 2.8,
                 WeightKg = 355,
                 Color = "Blue",
+                RequiredItem = ItemId.RustedSword,
             },
             // 889 - Zamazenta
             [SpecieId.Zamazenta] = new()
@@ -1231,32 +1213,8 @@ public partial record SpeciesData
                 HeightM = 2.9,
                 WeightKg = 210,
                 Color = "Red",
-            },
-            [SpecieId.ZamazentaHero] = new()
-            {
-                Id = SpecieId.ZamazentaHero,
-                Num = 889,
-                Name = "Zamazenta-Hero",
-                BaseSpecies = SpecieId.Zamazenta,
-                Forme = FormeId.Hero,
-                Types = [PokemonType.Fighting],
-                Gender = GenderId.N,
-                BaseStats = new StatsTable
-                {
-                    Hp = 92,
-                    Atk = 120,
-                    Def = 115,
-                    SpA = 80,
-                    SpD = 115,
-                    Spe = 138,
-                },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.DauntlessShield,
-                },
-                HeightM = 2.9,
-                WeightKg = 210,
-                Color = "Red",
+                BaseForme = FormeId.Hero,
+                OtherFormes = [FormeId.Crowned],
             },
             [SpecieId.ZamazentaCrowned] = new()
             {
@@ -1265,6 +1223,7 @@ public partial record SpeciesData
                 Name = "Zamazenta-Crowned",
                 BaseSpecies = SpecieId.Zamazenta,
                 Forme = FormeId.Crowned,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Fighting, PokemonType.Steel],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1283,6 +1242,7 @@ public partial record SpeciesData
                 HeightM = 2.9,
                 WeightKg = 785,
                 Color = "Red",
+                RequiredItem = ItemId.RustedShield,
             },
             // 890 - Eternatus
             [SpecieId.Eternatus] = new()
@@ -1342,6 +1302,7 @@ public partial record SpeciesData
                 Num = 891,
                 Name = "Kubfu",
                 Types = [PokemonType.Fighting],
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -1366,6 +1327,7 @@ public partial record SpeciesData
                 Num = 892,
                 Name = "Urshifu",
                 Types = [PokemonType.Fighting, PokemonType.Dark],
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 100,
@@ -1391,6 +1353,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Urshifu,
                 Forme = FormeId.RapidStrike,
                 Types = [PokemonType.Fighting, PokemonType.Water],
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 100,
@@ -1592,6 +1555,7 @@ public partial record SpeciesData
                 Name = "Calyrex-Ice",
                 BaseSpecies = SpecieId.Calyrex,
                 Forme = FormeId.Ice,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Psychic, PokemonType.Ice],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1618,6 +1582,7 @@ public partial record SpeciesData
                 Name = "Calyrex-Shadow",
                 BaseSpecies = SpecieId.Calyrex,
                 Forme = FormeId.Shadow,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Psychic, PokemonType.Ghost],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable

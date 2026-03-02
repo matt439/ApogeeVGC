@@ -222,7 +222,7 @@ public partial record SpeciesData
                 Num = 757,
                 Name = "Salandit",
                 Types = [PokemonType.Poison, PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M875F125,
                 BaseStats = new StatsTable
                 {
                     Hp = 48,
@@ -428,7 +428,7 @@ public partial record SpeciesData
                 Num = 764,
                 Name = "Comfey",
                 Types = [PokemonType.Fairy],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M25F75,
                 BaseStats = new StatsTable
                 {
                     Hp = 51,
@@ -677,6 +677,7 @@ public partial record SpeciesData
                 Name = "Silvally-Bug",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Bug,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Bug],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -695,6 +696,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.BugMemory,
             },
             [SpecieId.SilvallyDark] = new()
             {
@@ -703,6 +705,7 @@ public partial record SpeciesData
                 Name = "Silvally-Dark",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Dark,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Dark],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -721,6 +724,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.DarkMemory,
             },
             [SpecieId.SilvallyDragon] = new()
             {
@@ -729,6 +733,7 @@ public partial record SpeciesData
                 Name = "Silvally-Dragon",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Dragon,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Dragon],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -747,6 +752,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.DragonMemory,
             },
             [SpecieId.SilvallyElectric] = new()
             {
@@ -755,6 +761,7 @@ public partial record SpeciesData
                 Name = "Silvally-Electric",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Electric,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Electric],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -773,6 +780,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.ElectricMemory,
             },
             [SpecieId.SilvallyFairy] = new()
             {
@@ -781,6 +789,7 @@ public partial record SpeciesData
                 Name = "Silvally-Fairy",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Fairy,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Fairy],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -799,6 +808,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.FairyMemory,
             },
             [SpecieId.SilvallyFighting] = new()
             {
@@ -807,6 +817,7 @@ public partial record SpeciesData
                 Name = "Silvally-Fighting",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Fighting,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Fighting],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -825,6 +836,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.FightingMemory,
             },
             [SpecieId.SilvallyFire] = new()
             {
@@ -833,6 +845,7 @@ public partial record SpeciesData
                 Name = "Silvally-Fire",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Fire,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Fire],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -851,6 +864,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.FireMemory,
             },
             [SpecieId.SilvallyFlying] = new()
             {
@@ -859,6 +873,7 @@ public partial record SpeciesData
                 Name = "Silvally-Flying",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Flying,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Flying],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -877,6 +892,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.FlyingMemory,
             },
             [SpecieId.SilvallyGhost] = new()
             {
@@ -885,6 +901,7 @@ public partial record SpeciesData
                 Name = "Silvally-Ghost",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Ghost,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Ghost],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -903,6 +920,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.GhostMemory,
             },
             [SpecieId.SilvallyGrass] = new()
             {
@@ -911,6 +929,7 @@ public partial record SpeciesData
                 Name = "Silvally-Grass",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Grass,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Grass],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -929,6 +948,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.GrassMemory,
             },
             [SpecieId.SilvallyGround] = new()
             {
@@ -937,6 +957,7 @@ public partial record SpeciesData
                 Name = "Silvally-Ground",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Ground,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Ground],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -955,6 +976,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.GroundMemory,
             },
             [SpecieId.SilvallyIce] = new()
             {
@@ -963,6 +985,7 @@ public partial record SpeciesData
                 Name = "Silvally-Ice",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Ice,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Ice],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -981,6 +1004,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.IceMemory,
             },
             [SpecieId.SilvallyPoison] = new()
             {
@@ -989,6 +1013,7 @@ public partial record SpeciesData
                 Name = "Silvally-Poison",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Poison,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Poison],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1007,6 +1032,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.PoisonMemory,
             },
             [SpecieId.SilvallyPsychic] = new()
             {
@@ -1015,6 +1041,7 @@ public partial record SpeciesData
                 Name = "Silvally-Psychic",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Psychic,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Psychic],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1033,6 +1060,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.PsychicMemory,
             },
             [SpecieId.SilvallyRock] = new()
             {
@@ -1041,6 +1069,7 @@ public partial record SpeciesData
                 Name = "Silvally-Rock",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Rock,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Rock],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1059,6 +1088,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.RockMemory,
             },
             [SpecieId.SilvallySteel] = new()
             {
@@ -1067,6 +1097,7 @@ public partial record SpeciesData
                 Name = "Silvally-Steel",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Steel,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Steel],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1085,6 +1116,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.SteelMemory,
             },
             [SpecieId.SilvallyWater] = new()
             {
@@ -1093,6 +1125,7 @@ public partial record SpeciesData
                 Name = "Silvally-Water",
                 BaseSpecies = SpecieId.Silvally,
                 Forme = FormeId.Water,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Water],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1111,6 +1144,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                RequiredItem = ItemId.WaterMemory,
             },
             [SpecieId.Minior] = new()
             {
@@ -1161,6 +1195,8 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 40,
                 Color = "Brown",
+                RequiredAbility = AbilityId.ShieldsDown,
+                BattleOnly = FormeId.Standard,
             },
             [SpecieId.Komala] = new()
             {
@@ -1311,6 +1347,8 @@ public partial record SpeciesData
                 HeightM = 0.2,
                 WeightKg = 0.7,
                 Color = "Yellow",
+                RequiredAbility = AbilityId.Disguise,
+                BattleOnly = FormeId.Standard,
             },
             [SpecieId.MimikyuTotem] = new()
             {
@@ -1363,6 +1401,8 @@ public partial record SpeciesData
                 HeightM = 0.4,
                 WeightKg = 2.8,
                 Color = "Yellow",
+                RequiredAbility = AbilityId.Disguise,
+                BattleOnly = FormeId.Totem,
             },
             [SpecieId.Bruxish] = new()
             {
@@ -1969,6 +2009,7 @@ public partial record SpeciesData
                 Name = "Necrozma-Dusk-Mane",
                 BaseSpecies = SpecieId.Necrozma,
                 Forme = FormeId.DuskMane,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Psychic, PokemonType.Steel],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1995,6 +2036,7 @@ public partial record SpeciesData
                 Name = "Necrozma-Dawn-Wings",
                 BaseSpecies = SpecieId.Necrozma,
                 Forme = FormeId.DawnWings,
+                ChangesFrom = FormeId.Standard,
                 Types = [PokemonType.Psychic, PokemonType.Ghost],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -2039,6 +2081,8 @@ public partial record SpeciesData
                 HeightM = 7.5,
                 WeightKg = 230,
                 Color = "Yellow",
+                RequiredItem = ItemId.UltranecroziumZ,
+                BattleOnly = FormeId.DuskMane,
             },
         };
     }

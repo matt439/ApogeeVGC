@@ -312,7 +312,7 @@ public partial record SpeciesData
                 Num = 58,
                 Name = "Growlithe",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 55,
@@ -340,7 +340,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Growlithe,
                 Forme = FormeId.Hisui,
                 Types = [PokemonType.Fire, PokemonType.Rock],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 60,
@@ -366,7 +366,7 @@ public partial record SpeciesData
                 Num = 59,
                 Name = "Arcanine",
                 Types = [PokemonType.Fire],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 90,
@@ -394,7 +394,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Arcanine,
                 Forme = FormeId.Hisui,
                 Types = [PokemonType.Fire, PokemonType.Rock],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 95,
@@ -498,7 +498,7 @@ public partial record SpeciesData
                 Num = 63,
                 Name = "Abra",
                 Types = [PokemonType.Psychic],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 25,
@@ -524,7 +524,7 @@ public partial record SpeciesData
                 Num = 64,
                 Name = "Kadabra",
                 Types = [PokemonType.Psychic],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 40,
@@ -550,7 +550,7 @@ public partial record SpeciesData
                 Num = 65,
                 Name = "Alakazam",
                 Types = [PokemonType.Psychic],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 55,
@@ -579,7 +579,7 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Alakazam,
                 Forme = FormeId.Mega,
                 Types = [PokemonType.Psychic],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 55,
@@ -604,7 +604,7 @@ public partial record SpeciesData
                 Num = 66,
                 Name = "Machop",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 70,
@@ -630,7 +630,7 @@ public partial record SpeciesData
                 Num = 67,
                 Name = "Machoke",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 80,
@@ -656,7 +656,7 @@ public partial record SpeciesData
                 Num = 68,
                 Name = "Machamp",
                 Types = [PokemonType.Fighting],
-                Gender = GenderId.Empty,
+                Gender = GenderId.M75F25,
                 BaseStats = new StatsTable
                 {
                     Hp = 90,
