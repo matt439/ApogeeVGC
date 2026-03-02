@@ -265,8 +265,8 @@ public partial class Pokemon
 
     public void MoveUsed(ActiveMove move, int? targetLoc = null)
     {
-        LastMove = move;
-        if (Battle.Gen == 2) LastMoveEncore = move;
+        LastMove = Battle.Library.Moves[move.Id];
+        if (Battle.Gen == 2) LastMoveEncore = Battle.Library.Moves[move.Id];
         LastMoveTargetLoc = targetLoc;
         MoveThisTurn = move.Id;
     }

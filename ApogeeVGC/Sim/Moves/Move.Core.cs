@@ -191,10 +191,10 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     /// <summary>
     /// Returns a fresh <see cref="ActiveMove"/> clone derived from a lazily-cached template.
     /// The template is built once per <see cref="Move"/> (thread-safe); subsequent calls
-    /// clone it via the record <c>with</c> expression, avoiding per-call MoveSlot allocation,
-    /// Secondaries wrapping, and handler-cache resolution.
+    /// clone it via <see cref="ActiveMove.ShallowClone"/>, a flat memory copy that is faster
+    /// than the record copy constructor chain for this large (~900-byte) object.
     /// </summary>
-    public ActiveMove ToActiveMove() => AsActiveMove() with { };
+    public ActiveMove ToActiveMove() => AsActiveMove().ShallowClone();
 
     /// <summary>
     /// Pre-computed move handler cache, shared by all ActiveMove instances created from this Move.

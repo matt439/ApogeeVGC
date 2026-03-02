@@ -16,6 +16,13 @@ public record ActiveMove : Move, IEffect
     public required MoveSlot MoveSlot { get; init; }
 
     /// <summary>
+    /// Creates a shallow clone using <see cref="MemberwiseClone"/>,
+    /// which is a flat memory copy — faster than the record copy constructor
+    /// chain (HitEffect → Move → ActiveMove) for this ~900-byte object.
+    /// </summary>
+    internal ActiveMove ShallowClone() => (ActiveMove)MemberwiseClone();
+
+    /// <summary>
     /// Creates an ActiveMove from a base Move, leveraging the record copy constructor
     /// to efficiently copy all Move properties instead of manual property-by-property assignment.
     /// </summary>

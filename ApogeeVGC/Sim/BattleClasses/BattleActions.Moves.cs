@@ -347,7 +347,7 @@ public partial class BattleActions
         // Only create a new ActiveMove when the input is a base Move from the library.
         var activeMove = move as ActiveMove ?? move.ToActiveMove();
 
-        pokemon.LastMoveUsed = activeMove;
+        pokemon.LastMoveUsed = Battle.Library.Moves[activeMove.Id];
 
         // Copy priority and prankster boost from active move if it exists
         if (Battle.ActiveMove != null)
