@@ -1,14 +1,15 @@
 # AI System
 
-This document describes the AI components of ApogeeVGC: the deep learning models and (once implemented) the MCTS engine.
+This document describes the AI components of ApogeeVGC: the deep learning models, the MCTS engine, and the information model.
 
 ## Overview
 
-The AI system has three main components:
+The AI system has four main components:
 
 1. **Team Preview Model** — chooses which 4 Pokemon to bring and which 2 to lead
 2. **Battle Model** — evaluates battle states and suggests actions (move/switch) each turn
-3. **MCTS Engine** — uses the battle model to search the game tree (TODO)
+3. **MCTS Engine** — uses the battle model to search the game tree
+4. **Information Model** — formalises what is known and unknown at each phase of battle
 
 The DL models are trained in Python (PyTorch), exported to ONNX, and loaded in C# via `Microsoft.ML.OnnxRuntime` for inference.
 
@@ -221,7 +222,7 @@ The vocab JSON is saved alongside the ONNX file so C# can map species/action nam
 
 ## MCTS Engine
 
-**Location:** `ApogeeVGC/Mcts/` (TODO)
+**Location:** `ApogeeVGC/Mcts/`
 
 ### How DL and MCTS Work Together
 
@@ -277,9 +278,13 @@ The opponent's actions are handled by running the model from the opponent's pers
 
 These create extra decision points *inside* turn resolution. The simulator already models this (it sends `SwitchRequest` mid-turn), so the tree accommodates them as additional nodes — same PUCT machinery, different legal action set (switches only, no moves).
 
-### Imperfect Information (Determinization)
+### Current Implementation
 
-The opponent's hidden info includes unrevealed moves, items, abilities, bench Pokemon species/sets, and tera type.
+The current MCTS runs single-tree search under full observability — the opponent's full state is visible. This is a reasonable starting point for OTS (Open Team Sheets) mode, where the main unknowns are stat spreads and turn-by-turn decisions. Against a random opponent, MCTS with policy priors achieves ~67% win rate.
+
+### Imperfect Information (Future)
+
+The opponent's hidden info includes unrevealed moves, items, abilities, bench Pokemon species/sets, and tera type. The classical approach is ISMCTS (Information Set MCTS) via determinization:
 
 1. **Maintain a belief state** — probability distribution over opponent sets, starting from metagame priors (usage stats)
 2. **Update beliefs** — as info is revealed during battle (opponent uses a move, reveals an item, teras), narrow the distribution via Bayesian update
@@ -287,7 +292,7 @@ The opponent's hidden info includes unrevealed moves, items, abilities, bench Po
 4. **Run MCTS independently** on each determinization (each is a perfect-information game)
 5. **Aggregate** — average visit counts across determinizations to choose an action robust across plausible opponent states
 
-K doesn't need to be large — 8–20 determinizations is typical.
+However, ISMCTS determinization may not scale well for VGC due to the enormous hidden state space (moves × abilities × items × tera types × EVs across multiple Pokemon). The planned approach is a hybrid architecture — see the Information Model section below.
 
 ### Performance Considerations
 
@@ -316,6 +321,47 @@ float[] policyA = results[1].AsEnumerable<float>().ToArray();
 ```
 
 The encoding logic in `dataset.py` must be replicated exactly in C# — the numeric feature layout documented above defines the contract between training and inference.
+
+## Information Model
+
+**Full reference:** [`Docs/information_model.md`](information_model.md)
+
+### Summary
+
+The information model formalises what each player knows, can observe, and can deduce at each phase of a VGC battle. It covers both Open Team Sheets (OTS) and Closed Team Sheets (CTS) formats.
+
+**Team preview** — Both players always see all 12 species. Under OTS, moves, abilities, items, and tera types are also visible. Under CTS, only species are known. EVs, IVs, natures, and the bring/lead selection are always hidden.
+
+**In battle** — Active species, HP%, status, boosts, field conditions, and tera state are always visible. Under CTS, moves are revealed one at a time as used, abilities when triggered, items when consumed/activated, and tera type when terastallised. Certain abilities (Trace, Frisk, Forewarn) and moves (Knock Off, Trick, Skill Swap) passively reveal opponent information.
+
+### Logical Deduction Engine
+
+A key insight is that certain game events allow a player to deduce hidden information with certainty — but only when all alternative explanations can be ruled out. For example:
+
+- **Choice Scarf**: A Pokemon outspeeds yours when even max Speed investment can't explain it — but only after ruling out Tailwind, speed boosts, and speed-boosting abilities
+- **Bright Powder**: A 100% accuracy move misses — but only if there are no evasion boosts, no Sand Veil/Snow Cloak in active weather, and no other evasion sources
+- **Not Choice-locked**: A Pokemon uses two different moves across turns — but only if it didn't switch out and back in between
+
+The full document catalogues these deductions with their required preconditions across items, abilities, speed tiers, damage ranges, and moves.
+
+### Hybrid Architecture (Planned)
+
+Rather than relying solely on ISMCTS determinization (which struggles with VGC's enormous hidden state space), the planned approach combines:
+
+1. **Logical deduction engine** — deterministic rules that lock in information when preconditions are met (e.g., "this Pokemon has Choice Scarf" becomes a fact, not a probability)
+2. **Neural network estimation** — the model handles probabilistic inference for things that can't be deduced with certainty (likely remaining moves, probable EV spreads, expected opponent behaviour)
+3. **Revealed-information tracking** — maintain what has been observed per opponent Pokemon (moves seen, ability triggered, item revealed, tera type used) and feed this as features to the model
+
+This hybrid gives the AI capabilities that pure MCTS+DL cannot deliver — the deduction engine provides hard logical constraints that narrow the uncertainty space before the neural network estimates the rest.
+
+### Priority for Implementation
+
+1. Restrict opponent perspective to realistic observability (currently full-information)
+2. Add revealed-information tracking (moves seen, items revealed, etc.)
+3. Encode observation state as model features (move known/unknown flags, etc.)
+4. Retrain model on realistic partial-information states
+5. Build logical deduction engine for deterministic inferences
+6. Integrate deduction outputs as additional model features
 
 ## Evaluation: Player Variants
 
