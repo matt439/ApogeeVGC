@@ -12,24 +12,26 @@ public static class MctsResources
     private static Vocab? _vocab;
     private static StateEncoder? _encoder;
     private static Library? _library;
-    private static MctsConfig _config = new();
-    private static bool _initialized;
 
-    public static bool IsInitialized => _initialized;
+    public static bool IsInitialized { get; private set; }
 
     public static ModelInference Model => _model
-        ?? throw new InvalidOperationException("MctsResources not initialized. Call Initialize() first.");
+                                          ?? throw new InvalidOperationException(
+                                              "MctsResources not initialized. Call Initialize() first.");
 
     public static Vocab Vocab => _vocab
-        ?? throw new InvalidOperationException("MctsResources not initialized. Call Initialize() first.");
+                                 ?? throw new InvalidOperationException(
+                                     "MctsResources not initialized. Call Initialize() first.");
 
     public static StateEncoder Encoder => _encoder
-        ?? throw new InvalidOperationException("MctsResources not initialized. Call Initialize() first.");
+                                          ?? throw new InvalidOperationException(
+                                              "MctsResources not initialized. Call Initialize() first.");
 
     public static Library Library => _library
-        ?? throw new InvalidOperationException("MctsResources not initialized. Call Initialize() first.");
+                                     ?? throw new InvalidOperationException(
+                                         "MctsResources not initialized. Call Initialize() first.");
 
-    public static MctsConfig Config => _config;
+    public static MctsConfig Config { get; private set; } = new();
 
     /// <summary>
     /// Initialize MCTS resources. Call once before creating any MCTS players.
@@ -44,8 +46,8 @@ public static class MctsResources
         _vocab = Vocab.Load(vocabPath, library);
         _encoder = new StateEncoder(_vocab);
         _model = new ModelInference(modelPath, _encoder);
-        _config = config ?? new MctsConfig();
-        _initialized = true;
+        Config = config ?? new MctsConfig();
+        IsInitialized = true;
     }
 
     /// <summary>
@@ -58,6 +60,6 @@ public static class MctsResources
         _vocab = null;
         _encoder = null;
         _library = null;
-        _initialized = false;
+        IsInitialized = false;
     }
 }

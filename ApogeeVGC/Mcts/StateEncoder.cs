@@ -7,20 +7,13 @@ using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Mcts;
 
-public sealed class StateEncoder
+public sealed class StateEncoder(Vocab vocab)
 {
-    private readonly Vocab _vocab;
-
     public const int NumSpeciesSlots = 8;
     public const int ActiveDim = 35;
     public const int BenchDim = 10;
     public const int FieldDim = 20;
     public const int NumericDim = 4 * ActiveDim + 4 * BenchDim + FieldDim; // 200
-
-    public StateEncoder(Vocab vocab)
-    {
-        _vocab = vocab;
-    }
 
     public (long[] SpeciesIds, float[] Numeric) Encode(BattlePerspective perspective)
     {
@@ -37,10 +30,10 @@ public sealed class StateEncoder
         PokemonPerspective? oppActiveB = opponentSide.Active.Count > 1 ? opponentSide.Active[1] : null;
 
         // Species IDs for active slots
-        speciesIds[0] = myActiveA != null ? _vocab.GetSpeciesIndex(myActiveA.Species) : Vocab.PadIndex;
-        speciesIds[1] = myActiveB != null ? _vocab.GetSpeciesIndex(myActiveB.Species) : Vocab.PadIndex;
-        speciesIds[2] = oppActiveA != null ? _vocab.GetSpeciesIndex(oppActiveA.Species) : Vocab.PadIndex;
-        speciesIds[3] = oppActiveB != null ? _vocab.GetSpeciesIndex(oppActiveB.Species) : Vocab.PadIndex;
+        speciesIds[0] = myActiveA != null ? vocab.GetSpeciesIndex(myActiveA.Species) : Vocab.PadIndex;
+        speciesIds[1] = myActiveB != null ? vocab.GetSpeciesIndex(myActiveB.Species) : Vocab.PadIndex;
+        speciesIds[2] = oppActiveA != null ? vocab.GetSpeciesIndex(oppActiveA.Species) : Vocab.PadIndex;
+        speciesIds[3] = oppActiveB != null ? vocab.GetSpeciesIndex(oppActiveB.Species) : Vocab.PadIndex;
 
         // Encode active numeric features
         EncodeActive(numeric, 0, myActiveA);
@@ -53,20 +46,20 @@ public sealed class StateEncoder
         var oppBench = GetBenchPokemon(opponentSide.Pokemon);
 
         // Species IDs for bench slots
-        speciesIds[4] = myBench.Count > 0 ? _vocab.GetSpeciesIndex(myBench[0].Species) : Vocab.PadIndex;
-        speciesIds[5] = myBench.Count > 1 ? _vocab.GetSpeciesIndex(myBench[1].Species) : Vocab.PadIndex;
-        speciesIds[6] = oppBench.Count > 0 ? _vocab.GetSpeciesIndex(oppBench[0].Species) : Vocab.PadIndex;
-        speciesIds[7] = oppBench.Count > 1 ? _vocab.GetSpeciesIndex(oppBench[1].Species) : Vocab.PadIndex;
+        speciesIds[4] = myBench.Count > 0 ? vocab.GetSpeciesIndex(myBench[0].Species) : Vocab.PadIndex;
+        speciesIds[5] = myBench.Count > 1 ? vocab.GetSpeciesIndex(myBench[1].Species) : Vocab.PadIndex;
+        speciesIds[6] = oppBench.Count > 0 ? vocab.GetSpeciesIndex(oppBench[0].Species) : Vocab.PadIndex;
+        speciesIds[7] = oppBench.Count > 1 ? vocab.GetSpeciesIndex(oppBench[1].Species) : Vocab.PadIndex;
 
         // Encode bench numeric features
-        int benchOffset = 4 * ActiveDim; // 140
+        const int benchOffset = 4 * ActiveDim; // 140
         EncodeBench(numeric, benchOffset, myBench.Count > 0 ? myBench[0] : null);
         EncodeBench(numeric, benchOffset + BenchDim, myBench.Count > 1 ? myBench[1] : null);
         EncodeBench(numeric, benchOffset + 2 * BenchDim, oppBench.Count > 0 ? oppBench[0] : null);
         EncodeBench(numeric, benchOffset + 3 * BenchDim, oppBench.Count > 1 ? oppBench[1] : null);
 
         // Field features
-        int fieldOffset = 4 * ActiveDim + 4 * BenchDim; // 180
+        const int fieldOffset = 4 * ActiveDim + 4 * BenchDim; // 180
         EncodeField(
             numeric, fieldOffset,
             perspective.Field,

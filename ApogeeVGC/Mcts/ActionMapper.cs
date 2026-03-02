@@ -2,7 +2,6 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -32,15 +31,9 @@ public sealed class LegalActionSet
     public required IReadOnlyList<LegalAction> SlotB { get; init; }
 }
 
-public sealed class ActionMapper
+public sealed class ActionMapper(Vocab vocab)
 {
-    private readonly Vocab _vocab;
     private readonly Random _rng = new();
-
-    public ActionMapper(Vocab vocab)
-    {
-        _vocab = vocab;
-    }
 
     public LegalActionSet GetLegalActions(IChoiceRequest request, BattlePerspective perspective)
     {
@@ -50,7 +43,11 @@ public sealed class ActionMapper
             SwitchRequest sr => GetLegalActionsForSwitch(sr, perspective),
             _ => new LegalActionSet
             {
-                SlotA = [new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None }],
+                SlotA =
+                [
+                    new LegalAction
+                        { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None }
+                ],
                 SlotB = [],
             },
         };
@@ -59,11 +56,15 @@ public sealed class ActionMapper
     private LegalActionSet GetLegalActionsForMove(MoveRequest request, BattlePerspective perspective)
     {
         var slotA = request.Active.Count > 0
-            ? GetSlotLegalActions(request.Active[0], request, perspective, 0)
-            : [new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None }];
+            ? GetSlotLegalActions(request.Active[0], request, perspective)
+            :
+            [
+                new LegalAction
+                    { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None }
+            ];
 
         var slotB = request.Active.Count > 1
-            ? GetSlotLegalActions(request.Active[1], request, perspective, 1)
+            ? GetSlotLegalActions(request.Active[1], request, perspective)
             : [];
 
         return new LegalActionSet { SlotA = slotA, SlotB = slotB };
@@ -72,12 +73,15 @@ public sealed class ActionMapper
     private List<LegalAction> GetSlotLegalActions(
         PokemonMoveRequestData? pokemonRequest,
         MoveRequest request,
-        BattlePerspective perspective,
-        int slotIndex)
+        BattlePerspective perspective)
     {
         if (pokemonRequest == null)
         {
-            return [new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None }];
+            return
+            [
+                new LegalAction
+                    { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None }
+            ];
         }
 
         var actions = new List<LegalAction>();
@@ -90,15 +94,14 @@ public sealed class ActionMapper
         };
 
         // Check mega evolution availability
-        SpecieId? megaEvo = pokemonRequest.CanMegaEvo;
+        var megaEvo = pokemonRequest.CanMegaEvo;
 
         // Add move actions
-        for (var i = 0; i < pokemonRequest.Moves.Length; i++)
+        foreach (PokemonMoveData move in pokemonRequest.Moves)
         {
-            PokemonMoveData move = pokemonRequest.Moves[i];
             if (IsDisabled(move.Disabled)) continue;
 
-            int vocabIdx = _vocab.GetMoveActionIndex(move.Id);
+            int vocabIdx = vocab.GetMoveActionIndex(move.Id);
             int targetLoc = GetTargetLocation(move.Move.Target);
 
             actions.Add(new LegalAction
@@ -149,7 +152,7 @@ public sealed class ActionMapper
             PokemonMoveData firstMove = pokemonRequest.Moves[0];
             actions.Add(new LegalAction
             {
-                VocabIndex = _vocab.GetMoveActionIndex(firstMove.Id),
+                VocabIndex = vocab.GetMoveActionIndex(firstMove.Id),
                 ChoiceType = ChoiceType.Move,
                 MoveId = firstMove.Id,
                 TargetLoc = GetTargetLocation(firstMove.Move.Target),
@@ -158,7 +161,8 @@ public sealed class ActionMapper
 
         if (actions.Count == 0)
         {
-            actions.Add(new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+            actions.Add(new LegalAction
+                { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
         }
 
         return actions;
@@ -177,20 +181,23 @@ public sealed class ActionMapper
         {
             AddSwitchActions(slotAActions, request.Side, perspective);
             if (slotAActions.Count == 0)
-                slotAActions.Add(new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+                slotAActions.Add(new LegalAction
+                    { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
         }
         else if (slotBNeeds)
         {
             // Slot A doesn't need to switch but slot B does — give slot A a pass
             // so the joint action cross-product in CreateRoot has at least one edge.
-            slotAActions.Add(new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+            slotAActions.Add(new LegalAction
+                { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
         }
 
         if (slotBNeeds)
         {
             AddSwitchActions(slotBActions, request.Side, perspective);
             if (slotBActions.Count == 0)
-                slotBActions.Add(new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+                slotBActions.Add(new LegalAction
+                    { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
         }
 
         return new LegalActionSet { SlotA = slotAActions, SlotB = slotBActions };
@@ -206,7 +213,7 @@ public sealed class ActionMapper
 
             // Get species from the perspective for accurate vocab lookup
             SpecieId specieId = perspective.PlayerSide.Pokemon[i].Species;
-            int switchVocabIdx = _vocab.GetSwitchActionIndex(specieId);
+            int switchVocabIdx = vocab.GetSwitchActionIndex(specieId);
 
             actions.Add(new LegalAction
             {
@@ -223,11 +230,12 @@ public sealed class ActionMapper
     /// </summary>
     public bool[] BuildLegalMask(IReadOnlyList<LegalAction> actions)
     {
-        var mask = new bool[_vocab.NumActions];
-        for (var i = 0; i < actions.Count; i++)
+        var mask = new bool[vocab.NumActions];
+        foreach (LegalAction t in actions)
         {
-            mask[actions[i].VocabIndex] = true;
+            mask[t.VocabIndex] = true;
         }
+
         return mask;
     }
 
@@ -236,9 +244,7 @@ public sealed class ActionMapper
     /// </summary>
     public Choice BuildChoice(LegalAction slotA, LegalAction? slotB)
     {
-        var actions = new List<ChosenAction>();
-
-        actions.Add(BuildChosenAction(slotA));
+        var actions = new List<ChosenAction> { BuildChosenAction(slotA) };
 
         if (slotB.HasValue)
         {

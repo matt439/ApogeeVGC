@@ -10,19 +10,8 @@ namespace ApogeeVGC.Mcts;
 /// applies the selected action, lets the opponent auto-choose, advances
 /// one turn, and evaluates the resulting state with the neural network.
 /// </summary>
-public sealed class MctsSearch
+public sealed class MctsSearch(MctsConfig config, ModelInference model, ActionMapper actionMapper)
 {
-    private readonly MctsConfig _config;
-    private readonly ModelInference _model;
-    private readonly ActionMapper _actionMapper;
-
-    public MctsSearch(MctsConfig config, ModelInference model, ActionMapper actionMapper)
-    {
-        _config = config;
-        _model = model;
-        _actionMapper = actionMapper;
-    }
-
     /// <summary>
     /// Run MCTS from the given state and return the best action pair.
     /// </summary>
@@ -33,26 +22,26 @@ public sealed class MctsSearch
         BattlePerspective perspective)
     {
         // Get legal actions
-        LegalActionSet legalActions = _actionMapper.GetLegalActions(request, perspective);
+        LegalActionSet legalActions = actionMapper.GetLegalActions(request, perspective);
 
         // Single action, no search needed
         if (legalActions.SlotA.Count == 1 && legalActions.SlotB.Count <= 1)
         {
             return (legalActions.SlotA[0],
-                    legalActions.SlotB.Count > 0 ? legalActions.SlotB[0] : null);
+                legalActions.SlotB.Count > 0 ? legalActions.SlotB[0] : null);
         }
 
         // Evaluate the current state for policy priors
-        ModelOutput output = _model.Evaluate(perspective);
+        ModelOutput output = model.Evaluate(perspective);
 
         // Build legal masks and compute softmax priors
-        bool[] maskA = _actionMapper.BuildLegalMask(legalActions.SlotA);
+        bool[] maskA = actionMapper.BuildLegalMask(legalActions.SlotA);
         float[] probsA = ModelInference.MaskedSoftmax(output.PolicyA, maskA);
 
         float[]? probsB = null;
         if (legalActions.SlotB.Count > 0)
         {
-            bool[] maskB = _actionMapper.BuildLegalMask(legalActions.SlotB);
+            bool[] maskB = actionMapper.BuildLegalMask(legalActions.SlotB);
             probsB = ModelInference.MaskedSoftmax(output.PolicyB, maskB);
         }
 
@@ -64,7 +53,7 @@ public sealed class MctsSearch
 
         // Run MCTS iterations with forward simulation
         SideId opponentId = sideId == SideId.P1 ? SideId.P2 : SideId.P1;
-        for (var i = 0; i < _config.NumIterations; i++)
+        for (var i = 0; i < config.NumIterations; i++)
         {
             RunIteration(root, battle, sideId, opponentId);
         }
@@ -73,16 +62,15 @@ public sealed class MctsSearch
         return SelectBestAction(root);
     }
 
-    private MctsNode CreateRoot(LegalActionSet legalActions, float[] probsA, float[]? probsB)
+    private static MctsNode CreateRoot(LegalActionSet legalActions, float[] probsA, float[]? probsB)
     {
         var root = new MctsNode { IsExpanded = true };
 
         if (legalActions.SlotB.Count == 0)
         {
             // Single-slot decision (e.g., singles or single forced switch)
-            for (var a = 0; a < legalActions.SlotA.Count; a++)
+            foreach (LegalAction actionA in legalActions.SlotA)
             {
-                LegalAction actionA = legalActions.SlotA[a];
                 float prior = probsA[actionA.VocabIndex];
 
                 root.Edges.Add(new MctsEdge
@@ -96,15 +84,12 @@ public sealed class MctsSearch
         else
         {
             // Joint action space for doubles
-            for (var a = 0; a < legalActions.SlotA.Count; a++)
+            foreach (LegalAction actionA in legalActions.SlotA)
             {
-                LegalAction actionA = legalActions.SlotA[a];
                 float priorA = probsA[actionA.VocabIndex];
 
-                for (var b = 0; b < legalActions.SlotB.Count; b++)
+                foreach (LegalAction actionB in legalActions.SlotB)
                 {
-                    LegalAction actionB = legalActions.SlotB[b];
-
                     // Prevent both slots switching to the same Pokemon
                     if (actionA.ChoiceType == ChoiceType.Switch &&
                         actionB.ChoiceType == ChoiceType.Switch &&
@@ -135,13 +120,13 @@ public sealed class MctsSearch
     private static void NormalizePriors(MctsNode node)
     {
         var sum = 0f;
-        for (var i = 0; i < node.Edges.Count; i++)
-            sum += node.Edges[i].PriorP;
+        foreach (MctsEdge t in node.Edges)
+            sum += t.PriorP;
 
         if (sum > 0f)
         {
-            for (var i = 0; i < node.Edges.Count; i++)
-                node.Edges[i].PriorP /= sum;
+            foreach (MctsEdge t in node.Edges)
+                t.PriorP /= sum;
         }
     }
 
@@ -159,7 +144,7 @@ public sealed class MctsSearch
         float leafValue;
         try
         {
-            leafValue = SimulateEdge(edge, battle, sideId, opponentId);
+            leafValue = SimulateEdge(edge, battle, sideId);
         }
         catch
         {
@@ -177,12 +162,12 @@ public sealed class MctsSearch
     /// Clone the battle, apply the edge's action for our side, auto-choose for the opponent,
     /// advance one turn, and return the leaf evaluation.
     /// </summary>
-    private float SimulateEdge(MctsEdge edge, Battle battle, SideId sideId, SideId opponentId)
+    private float SimulateEdge(MctsEdge edge, Battle battle, SideId sideId)
     {
         Battle sim = battle.Copy();
 
         // Build our choice from the edge's actions
-        Choice ourChoice = _actionMapper.BuildChoice(edge.ActionA, edge.ActionB);
+        Choice ourChoice = actionMapper.BuildChoice(edge.ActionA, edge.ActionB);
 
         // Submit choices: our side uses the selected action, opponent auto-chooses
         Side ourSide = sideId == SideId.P1 ? sim.P1 : sim.P2;
@@ -202,7 +187,7 @@ public sealed class MctsSearch
 
         // Evaluate the resulting state with the model
         BattlePerspective perspective = sim.GetPerspectiveForSide(sideId);
-        ModelOutput output = _model.Evaluate(perspective);
+        ModelOutput output = model.Evaluate(perspective);
         return output.Value;
     }
 
@@ -229,13 +214,13 @@ public sealed class MctsSearch
         float bestScore = float.NegativeInfinity;
         int parentVisits = node.VisitCount;
 
-        for (var i = 0; i < node.Edges.Count; i++)
+        foreach (MctsEdge t in node.Edges)
         {
-            float score = PuctScore(node.Edges[i], parentVisits);
+            float score = PuctScore(t, parentVisits);
             if (score > bestScore)
             {
                 bestScore = score;
-                best = node.Edges[i];
+                best = t;
             }
         }
 
@@ -248,8 +233,8 @@ public sealed class MctsSearch
     private float PuctScore(MctsEdge edge, int parentVisits)
     {
         float exploitation = edge.Q;
-        float exploration = _config.CPuct * edge.PriorP *
-                           MathF.Sqrt(parentVisits) / (1 + edge.VisitCount);
+        float exploration = config.CPuct * edge.PriorP *
+            MathF.Sqrt(parentVisits) / (1 + edge.VisitCount);
         return exploitation + exploration;
     }
 
@@ -261,12 +246,12 @@ public sealed class MctsSearch
         MctsEdge? best = null;
         int bestVisits = -1;
 
-        for (var i = 0; i < root.Edges.Count; i++)
+        foreach (MctsEdge t in root.Edges)
         {
-            if (root.Edges[i].VisitCount > bestVisits)
+            if (t.VisitCount > bestVisits)
             {
-                bestVisits = root.Edges[i].VisitCount;
-                best = root.Edges[i];
+                bestVisits = t.VisitCount;
+                best = t;
             }
         }
 
@@ -286,8 +271,8 @@ public sealed class MctsSearch
     {
         if (root.Edges.Count == 0) return;
 
-        float epsilon = _config.DirichletEpsilon;
-        float[] noise = SampleDirichlet(root.Edges.Count, _config.DirichletAlpha);
+        float epsilon = config.DirichletEpsilon;
+        float[] noise = SampleDirichlet(root.Edges.Count, config.DirichletAlpha);
 
         for (var i = 0; i < root.Edges.Count; i++)
         {

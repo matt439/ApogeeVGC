@@ -9,8 +9,8 @@ public sealed class Vocab
 {
     public const int PadIndex = 0;
     public const int UnknownSpeciesIndex = 1;
-    public const int NoneActionIndex = 1;  // "<none>"
-    public const int CantActionIndex = 2;  // "<cant>"
+    public const int NoneActionIndex = 1; // "<none>"
+    public const int CantActionIndex = 2; // "<cant>"
 
     public int NumSpecies { get; }
     public int NumActions { get; }

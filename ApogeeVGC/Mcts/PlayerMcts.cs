@@ -4,23 +4,26 @@ using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Player;
 using ApogeeVGC.Sim.Utils;
-
 using PlayerUiType = ApogeeVGC.Sim.Player.PlayerUiType;
 
 namespace ApogeeVGC.Mcts;
 
-public sealed class PlayerMcts : IPlayer
+public sealed class PlayerMcts(
+    SideId sideId,
+    PlayerOptions options,
+    IBattleController battleController,
+    MctsSearch search,
+    ActionMapper actionMapper,
+    BattleInfoTracker infoTracker)
+    : IPlayer
 {
-    public SideId SideId { get; }
-    public PlayerOptions Options { get; }
+    public SideId SideId { get; } = sideId;
+    public PlayerOptions Options { get; } = options;
     public PlayerUiType UiType => PlayerUiType.None;
-    public IBattleController BattleController { get; }
-    public bool PrintDebug { get; }
+    public IBattleController BattleController { get; } = battleController;
+    public bool PrintDebug { get; } = options.PrintDebug;
 
-    private readonly MctsSearch _search;
-    private readonly ActionMapper _actionMapper;
-    private readonly BattleInfoTracker _infoTracker;
-    private readonly Prng _rng;
+    private readonly Prng _rng = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<Choice>? ChoiceSubmitted;
@@ -28,25 +31,7 @@ public sealed class PlayerMcts : IPlayer
     /// <summary>
     /// The information tracker for this player, tracking what opponent info has been revealed.
     /// </summary>
-    public BattleInfoTracker InfoTracker => _infoTracker;
-
-    public PlayerMcts(
-        SideId sideId,
-        PlayerOptions options,
-        IBattleController battleController,
-        MctsSearch search,
-        ActionMapper actionMapper,
-        BattleInfoTracker infoTracker)
-    {
-        SideId = sideId;
-        Options = options;
-        BattleController = battleController;
-        PrintDebug = options.PrintDebug;
-        _search = search;
-        _actionMapper = actionMapper;
-        _infoTracker = infoTracker;
-        _rng = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
-    }
+    public BattleInfoTracker InfoTracker => infoTracker;
 
     /// <summary>
     /// Factory method that creates a PlayerMcts using MctsResources.
@@ -82,12 +67,15 @@ public sealed class PlayerMcts : IPlayer
         return Task.FromResult(choice);
     }
 
-    public void UpdateUi(BattlePerspective perspective) { }
+    public void UpdateUi(BattlePerspective perspective)
+    {
+    }
 
     public void UpdateEvents(IEnumerable<BattleEvent> events)
     {
-        _infoTracker.ProcessEvents(events);
+        infoTracker.ProcessEvents(events);
     }
+
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime) => Task.CompletedTask;
     public Task NotifyChoiceTimeoutAsync() => Task.CompletedTask;
 
@@ -98,25 +86,25 @@ public sealed class PlayerMcts : IPlayer
         BattlePerspective rawPerspective = perspectiveFactory();
 
         // Initialize tracker if this is the first perspective we see
-        _infoTracker.EnsureInitialized(rawPerspective);
+        infoTracker.EnsureInitialized(rawPerspective);
 
         // Filter the perspective to only include revealed opponent information
-        BattlePerspective perspective = _infoTracker.FilterPerspective(rawPerspective);
+        BattlePerspective perspective = infoTracker.FilterPerspective(rawPerspective);
 
-        (LegalAction actionA, var actionB) = _search.Search(battle, SideId, request, perspective);
+        (LegalAction actionA, var actionB) = search.Search(battle, SideId, request, perspective);
 
         if (PrintDebug)
         {
             Console.WriteLine($"[PlayerMcts] SlotA: {MctsResources.Vocab.GetActionKey(actionA.VocabIndex)} " +
-                            $"(type={actionA.ChoiceType}, tera={actionA.Terastallize})");
+                              $"(type={actionA.ChoiceType}, tera={actionA.Terastallize})");
             if (actionB.HasValue)
             {
                 Console.WriteLine($"[PlayerMcts] SlotB: {MctsResources.Vocab.GetActionKey(actionB.Value.VocabIndex)} " +
-                                $"(type={actionB.Value.ChoiceType}, tera={actionB.Value.Terastallize})");
+                                  $"(type={actionB.Value.ChoiceType}, tera={actionB.Value.Terastallize})");
             }
         }
 
-        return _actionMapper.BuildChoice(actionA, actionB);
+        return actionMapper.BuildChoice(actionA, actionB);
     }
 
     /// <summary>

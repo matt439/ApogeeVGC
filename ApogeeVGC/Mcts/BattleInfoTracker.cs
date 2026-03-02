@@ -16,20 +16,15 @@ namespace ApogeeVGC.Mcts;
 /// during battle through game events (moves used, abilities triggered,
 /// items consumed, terastallization, etc.).
 /// </summary>
-public sealed class RevealedPokemonInfo
+public sealed class RevealedPokemonInfo(SpecieId species)
 {
-    public SpecieId Species { get; }
+    public SpecieId Species { get; } = species;
     public HashSet<MoveId> RevealedMoves { get; } = [];
     public AbilityId? RevealedAbility { get; set; }
     public ItemId? RevealedItem { get; set; }
     public bool ItemConsumed { get; set; }
     public MoveType? RevealedTeraType { get; set; }
     public bool HasBeenActive { get; set; }
-
-    public RevealedPokemonInfo(SpecieId species)
-    {
-        Species = species;
-    }
 }
 
 /// <summary>
@@ -348,7 +343,7 @@ public sealed class BattleInfoTracker
                 {
                     Id = slot.Id,
                     Move = slot.Move,
-                    Pp = 0,    // PP is not observable
+                    Pp = 0, // PP is not observable
                     MaxPp = 0, // PP is not observable
                     Target = slot.Target,
                     Disabled = slot.Disabled,
