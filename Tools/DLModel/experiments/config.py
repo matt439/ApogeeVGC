@@ -49,10 +49,15 @@ class DataConfig:
     train_frac: float = 0.7
     val_frac: float = 0.15
     test_frac: float = 0.15
+    training_strategy: str = 'winners_only'  # 'winners_only' or 'all_games'
 
     @property
     def data_path(self) -> Path:
         return Path(self.data_root) / self.regulation / 'parsed.jsonl'
+
+    @property
+    def winners_only(self) -> bool:
+        return self.training_strategy == 'winners_only'
 
 
 @dataclass

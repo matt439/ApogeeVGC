@@ -79,6 +79,11 @@ def main():
     parser.add_argument(
         '--test-frac', type=float, default=0.15,
         help='Test set fraction')
+    parser.add_argument(
+        '--training-strategy', default='winners_only',
+        choices=['winners_only', 'all_games'],
+        help='Training data strategy: winners_only (default) trains on '
+             'winning players only; all_games trains on both perspectives')
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -89,13 +94,17 @@ def main():
     print(f'  Regulation: {reg}')
     print(f'{"=" * 60}')
 
+    strategy = args.training_strategy
     data_config = DataConfig(
         regulation=reg,
         data_root=args.data_root,
         train_frac=args.train_frac,
         val_frac=args.val_frac,
         test_frac=args.test_frac,
+        training_strategy=strategy,
     )
+    winners_only = data_config.winners_only
+    print(f'Training strategy: {strategy}')
 
     results_dir = Path(args.results_root) / reg
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -193,10 +202,10 @@ def main():
         baselines_dir = results_dir / 'baselines'
         baselines_dir.mkdir(parents=True, exist_ok=True)
 
-        test_ds = TeamPreviewDataset(test_games, vocab)
+        test_ds = TeamPreviewDataset(test_games, vocab, winners_only=winners_only)
         test_loader = DataLoader(
             test_ds, batch_size=1024, shuffle=False, num_workers=0)
-        train_ds = TeamPreviewDataset(train_games, vocab)
+        train_ds = TeamPreviewDataset(train_games, vocab, winners_only=winners_only)
         train_loader = DataLoader(
             train_ds, batch_size=1024, shuffle=False, num_workers=0)
 

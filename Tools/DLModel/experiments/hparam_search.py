@@ -115,7 +115,8 @@ def run_hparam_search(
 
         train_loader, val_loader = make_loaders(
             train_games, val_games, vocab,
-            config.train.batch_size, device)
+            config.train.batch_size, device,
+            winners_only=config.data.winners_only)
 
         trial_dir = search_dir / f'trial_{trial.number}'
 

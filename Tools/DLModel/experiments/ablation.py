@@ -79,7 +79,8 @@ def run_ablation(
 
         train_loader, val_loader = make_loaders(
             train_games, val_games, vocab,
-            config.train.batch_size, device)
+            config.train.batch_size, device,
+            winners_only=config.data.winners_only)
 
         result = train_model(
             config=config,
@@ -91,7 +92,7 @@ def run_ablation(
         )
 
         # Evaluate on test set
-        test_ds = TeamPreviewDataset(test_games, vocab)
+        test_ds = TeamPreviewDataset(test_games, vocab, winners_only=config.data.winners_only)
         test_loader = DataLoader(
             test_ds, batch_size=config.train.batch_size,
             shuffle=False, num_workers=0)

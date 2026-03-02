@@ -14,7 +14,8 @@ Per sample:
   lead_target:  [6] float   — binary, which of my 6 were leads
   value_target: float        — 1.0 if this player won, 0.0 if lost
 
-Two samples per game (one per player perspective).
+By default, only the winning player's perspective is used (winners_only=True).
+Set winners_only=False to get two samples per game (both perspectives).
 
 Feature sources:
   Own team features come from revealed[perspective] — a lower bound of
@@ -31,7 +32,7 @@ from torch.utils.data import Dataset
 
 
 class TeamPreviewDataset(Dataset):
-    def __init__(self, games: list[dict], vocab: dict):
+    def __init__(self, games: list[dict], vocab: dict, winners_only: bool = True):
         species_map = vocab['species']
         move_map = vocab['moves']
         ability_map = vocab['abilities']
@@ -45,7 +46,7 @@ class TeamPreviewDataset(Dataset):
         te_unk = tera_map.get('<unknown>', 1)
 
         valid = [g for g in games if g.get('winner') in ('p1', 'p2')]
-        n = len(valid) * 2
+        n = len(valid) * (1 if winners_only else 2)
 
         self.species_ids = torch.zeros(n, 12, dtype=torch.long)
         self.move_ids = torch.zeros(n, 12, 4, dtype=torch.long)
@@ -72,7 +73,8 @@ class TeamPreviewDataset(Dataset):
                     side = slot[:2]
                     leads[side].add(state['species'])
 
-            for perspective in ('p1', 'p2'):
+            perspectives = (winner,) if winners_only else ('p1', 'p2')
+            for perspective in perspectives:
                 opp = 'p2' if perspective == 'p1' else 'p1'
 
                 my_preview = preview.get(perspective, [])

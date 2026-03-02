@@ -48,6 +48,13 @@ python -m experiments.run_all --regulation gen9vgc2025regi --train-frac 0.7 --va
 | `--train-frac` | 0.7 | Training set fraction |
 | `--val-frac` | 0.15 | Validation set fraction |
 | `--test-frac` | 0.15 | Test set fraction |
+| `--training-strategy` | `winners_only` | `winners_only` trains on winning player's choices only; `all_games` trains on both perspectives |
+
+## Training Strategy
+
+By default, the model trains **only on the winning player's perspective** (`--training-strategy winners_only`). The rationale: the model performs behavioural cloning — it learns to replicate human team selection decisions. Training on losing players' choices teaches the model to imitate decisions that led to losses, diluting the signal from successful play.
+
+The `all_games` option (both perspectives) is available for experimental comparison but is not recommended as a default.
 
 ## Pipeline Stages
 

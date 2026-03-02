@@ -117,10 +117,11 @@ def make_loaders(
     vocab: dict,
     batch_size: int,
     device: torch.device,
+    winners_only: bool = True,
 ) -> tuple[DataLoader, DataLoader]:
     """Build train and val DataLoaders from game lists."""
-    train_ds = TeamPreviewDataset(train_games, vocab)
-    val_ds = TeamPreviewDataset(val_games, vocab)
+    train_ds = TeamPreviewDataset(train_games, vocab, winners_only=winners_only)
+    val_ds = TeamPreviewDataset(val_games, vocab, winners_only=winners_only)
 
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
