@@ -76,7 +76,9 @@ def train(args: argparse.Namespace) -> None:
         with open(vocab_path) as f:
             vocab = json.load(f)
 
-    print(f'Vocab: {vocab["num_species"]} species')
+    print(f'Vocab: {vocab["num_species"]} species, '
+          f'{vocab["num_moves"]} moves, {vocab["num_abilities"]} abilities, '
+          f'{vocab["num_items"]} items, {vocab["num_tera_types"]} tera types')
 
     # ── Data ──
     print(f'Loading games from {args.data}...')
@@ -108,7 +110,15 @@ def train(args: argparse.Namespace) -> None:
 
     # ── Model ──
     model = TeamPreviewNet(
-        vocab['num_species'], args.embed_dim, args.hidden_dim,
+        num_species=vocab['num_species'],
+        num_moves=vocab['num_moves'],
+        num_abilities=vocab['num_abilities'],
+        num_items=vocab['num_items'],
+        num_tera_types=vocab['num_tera_types'],
+        species_embed_dim=args.embed_dim,
+        feat_embed_dim=args.feat_embed_dim,
+        pokemon_dim=args.pokemon_dim,
+        hidden_dim=args.hidden_dim,
     ).to(device)
     total_params = sum(p.numel() for p in model.parameters())
     print(f'Model: {total_params:,} parameters')
@@ -134,12 +144,16 @@ def train(args: argparse.Namespace) -> None:
         t_lloss = 0.0
         n_batches = 0
 
-        for sids, bring_tgt, lead_tgt, val_tgt in train_loader:
+        for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in train_loader:
             sids = sids.to(device)
+            mids = mids.to(device)
+            aids = aids.to(device)
+            iids = iids.to(device)
+            tids = tids.to(device)
             bring_tgt = bring_tgt.to(device)
             lead_tgt = lead_tgt.to(device)
 
-            bring_pred, lead_pred = model(sids)
+            bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
             b_loss = bring_loss_fn(bring_pred, bring_tgt)
 
@@ -172,12 +186,16 @@ def train(args: argparse.Namespace) -> None:
         n_vbatches = 0
 
         with torch.no_grad():
-            for sids, bring_tgt, lead_tgt, val_tgt in val_loader:
+            for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in val_loader:
                 sids = sids.to(device)
+                mids = mids.to(device)
+                aids = aids.to(device)
+                iids = iids.to(device)
+                tids = tids.to(device)
                 bring_tgt = bring_tgt.to(device)
                 lead_tgt = lead_tgt.to(device)
 
-                bring_pred, lead_pred = model(sids)
+                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
                 b_loss = bring_loss_fn(bring_pred, bring_tgt)
                 l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
@@ -249,6 +267,8 @@ def main():
     parser.add_argument('--batch-size', type=int, default=1024)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--embed-dim', type=int, default=48)
+    parser.add_argument('--feat-embed-dim', type=int, default=16)
+    parser.add_argument('--pokemon-dim', type=int, default=64)
     parser.add_argument('--hidden-dim', type=int, default=256)
     parser.add_argument('--val-split', type=float, default=0.2)
     parser.add_argument('--patience', type=int, default=5)

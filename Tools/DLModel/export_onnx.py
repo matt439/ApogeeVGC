@@ -71,23 +71,39 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
     train_args = checkpoint['args']
 
     model = TeamPreviewNet(
-        vocab['num_species'],
-        train_args['embed_dim'],
-        train_args['hidden_dim'],
+        num_species=vocab['num_species'],
+        num_moves=vocab['num_moves'],
+        num_abilities=vocab['num_abilities'],
+        num_items=vocab['num_items'],
+        num_tera_types=vocab['num_tera_types'],
+        species_embed_dim=train_args['embed_dim'],
+        feat_embed_dim=train_args['feat_embed_dim'],
+        pokemon_dim=train_args['pokemon_dim'],
+        hidden_dim=train_args['hidden_dim'],
     )
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
     species_ids = torch.zeros(1, 12, dtype=torch.long)
+    move_ids = torch.zeros(1, 12, 4, dtype=torch.long)
+    ability_ids = torch.zeros(1, 12, dtype=torch.long)
+    item_ids = torch.zeros(1, 12, dtype=torch.long)
+    tera_ids = torch.zeros(1, 12, dtype=torch.long)
 
     torch.onnx.export(
         model,
-        (species_ids,),
+        (species_ids, move_ids, ability_ids, item_ids, tera_ids),
         output_path,
-        input_names=['species_ids'],
+        input_names=[
+            'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
+        ],
         output_names=['bring_scores', 'lead_scores'],
         dynamic_axes={
             'species_ids': {0: 'batch'},
+            'move_ids': {0: 'batch'},
+            'ability_ids': {0: 'batch'},
+            'item_ids': {0: 'batch'},
+            'tera_ids': {0: 'batch'},
             'bring_scores': {0: 'batch'},
             'lead_scores': {0: 'batch'},
         },
@@ -100,7 +116,9 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
 
     print(f'Exported TeamPreviewNet to {output_path}')
     print(f'Exported vocab to {vocab_out}')
-    print(f'  Species: {vocab["num_species"]}')
+    print(f'  Species: {vocab["num_species"]}, Moves: {vocab["num_moves"]}, '
+          f'Abilities: {vocab["num_abilities"]}, Items: {vocab["num_items"]}, '
+          f'Tera types: {vocab["num_tera_types"]}')
     print(f'  Epoch: {checkpoint.get("epoch", "?")}')
     print(f'  Val loss: {checkpoint.get("val_loss", "?"):.4f}')
 

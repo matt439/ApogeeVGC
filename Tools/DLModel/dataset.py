@@ -132,9 +132,13 @@ def encode_field(feat: torch.Tensor, off: int, field: dict,
 
 
 def build_vocab(parsed_path: str) -> dict:
-    """Scan parsed JSONL to build species/action vocabularies."""
+    """Scan parsed JSONL to build species/action/move/ability/item/tera vocabularies."""
     species: set[str] = set()
     actions: set[str] = set()
+    moves: set[str] = set()
+    abilities: set[str] = set()
+    items: set[str] = set()
+    tera_types: set[str] = set()
 
     with open(parsed_path, encoding='utf-8') as f:
         for line in f:
@@ -144,6 +148,17 @@ def build_vocab(parsed_path: str) -> dict:
                     species.add(poke['species'])
                 for sp in game.get('team_brought', {}).get(side, []):
                     species.add(sp)
+
+                # Collect from revealed info
+                for sp, info in game.get('revealed', {}).get(side, {}).items():
+                    for m in info.get('moves', []):
+                        moves.add(m)
+                    if info.get('ability'):
+                        abilities.add(info['ability'])
+                    if info.get('item'):
+                        items.add(info['item'])
+                    if info.get('tera_type'):
+                        tera_types.add(info['tera_type'])
 
             for turn in game.get('turns', []):
                 for slot, state in turn.get('active', {}).items():
@@ -157,12 +172,24 @@ def build_vocab(parsed_path: str) -> dict:
 
     species_list = ['<pad>', '<unknown>'] + sorted(species)
     action_list = ['<pad>', '<none>', '<cant>'] + sorted(actions)
+    move_list = ['<pad>', '<unknown>'] + sorted(moves)
+    ability_list = ['<pad>', '<unknown>'] + sorted(abilities)
+    item_list = ['<pad>', '<unknown>'] + sorted(items)
+    tera_list = ['<pad>', '<unknown>'] + sorted(tera_types)
 
     return {
         'species': {s: i for i, s in enumerate(species_list)},
         'actions': {a: i for i, a in enumerate(action_list)},
+        'moves': {m: i for i, m in enumerate(move_list)},
+        'abilities': {a: i for i, a in enumerate(ability_list)},
+        'items': {it: i for i, it in enumerate(item_list)},
+        'tera_types': {t: i for i, t in enumerate(tera_list)},
         'num_species': len(species_list),
         'num_actions': len(action_list),
+        'num_moves': len(move_list),
+        'num_abilities': len(ability_list),
+        'num_items': len(item_list),
+        'num_tera_types': len(tera_list),
     }
 
 
