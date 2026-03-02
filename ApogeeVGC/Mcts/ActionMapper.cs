@@ -179,6 +179,12 @@ public sealed class ActionMapper
             if (slotAActions.Count == 0)
                 slotAActions.Add(new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
         }
+        else if (slotBNeeds)
+        {
+            // Slot A doesn't need to switch but slot B does — give slot A a pass
+            // so the joint action cross-product in CreateRoot has at least one edge.
+            slotAActions.Add(new LegalAction { VocabIndex = Vocab.NoneActionIndex, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+        }
 
         if (slotBNeeds)
         {

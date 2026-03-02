@@ -58,4 +58,10 @@
     <Content Include="Data\Learnsets\learnsets.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('Data\Learnsets\learnsets.json')" />
   </ItemGroup>
 
+  <!-- MCTS model files - copied to output directory preserving relative path -->
+  <ItemGroup>
+    <Content Include="..\Tools\DLModel\battle_model.onnx" Link="Tools\DLModel\battle_model.onnx" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\battle_model.onnx')" />
+    <Content Include="..\Tools\DLModel\vocab.json" Link="Tools\DLModel\vocab.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\vocab.json')" />
+  </ItemGroup>
+
 </Project>
