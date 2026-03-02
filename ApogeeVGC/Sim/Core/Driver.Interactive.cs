@@ -43,7 +43,7 @@ public partial class Driver
             Seed = new PrngSeed(BattleSeed),
         };
 
-        var simulator = new Simulator();
+        var simulator = new SimulatorAsync();
         Console.WriteLine("[Driver] Simulator created");
 
         SimulatorResult result =
@@ -91,7 +91,7 @@ public partial class Driver
             Seed = new PrngSeed(BattleSeed),
         };
 
-        var simulator = new Simulator();
+        var simulator = new SimulatorAsync();
         Console.WriteLine("[Driver] Simulator created");
 
         game.StartBattle(Library, battleOptions, simulator);

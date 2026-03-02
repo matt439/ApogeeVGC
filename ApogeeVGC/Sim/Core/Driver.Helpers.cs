@@ -97,7 +97,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SyncSimulator();
+            var simulator = new SimulatorSync();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
@@ -164,7 +164,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SyncSimulator();
+            var simulator = new SimulatorSync();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }

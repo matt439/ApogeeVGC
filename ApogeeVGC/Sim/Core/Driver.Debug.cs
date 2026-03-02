@@ -64,7 +64,7 @@ public partial class Driver
                 MaxTurns = 2000,
             };
 
-            var simulator = new SyncSimulator();
+            var simulator = new SimulatorSync();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
 
             Console.WriteLine();

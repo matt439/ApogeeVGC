@@ -11,7 +11,7 @@ public class BattleRunner
 {
     private readonly Library _library;
     private readonly BattleOptions _battleOptions;
-    private readonly Simulator _simulator;
+    private readonly SimulatorAsync _simulator;
     private Task<SimulatorResult>? _battleTask;
     private CancellationTokenSource? _cancellationTokenSource;
 
@@ -20,7 +20,7 @@ public class BattleRunner
     public bool IsCompleted => _battleTask?.IsCompleted ?? false;
     public SimulatorResult? Result { get; private set; }
 
-    public BattleRunner(Library library, BattleOptions battleOptions, Simulator simulator)
+    public BattleRunner(Library library, BattleOptions battleOptions, SimulatorAsync simulator)
     {
         _library = library;
         _battleOptions = battleOptions;

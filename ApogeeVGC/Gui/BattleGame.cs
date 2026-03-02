@@ -12,7 +12,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 namespace ApogeeVGC.Gui;
 
 /// <summary>
-/// Main MonoGame window for the Pokémon battle GUI.
+/// Main MonoGame window for the Pokï¿½mon battle GUI.
 /// Runs the GUI loop on the main thread while the battle simulation runs on a background thread.
 /// </summary>
 public class BattleGame : Game
@@ -45,7 +45,7 @@ public class BattleGame : Game
     // Pending battle start data
     private Library? _pendingLibrary;
     private BattleOptions? _pendingBattleOptions;
-    private Simulator? _pendingPlayerController;
+    private SimulatorAsync? _pendingPlayerController;
     private bool _shouldStartBattle;
 
     // Screen dimensions
@@ -65,7 +65,7 @@ public class BattleGame : Game
 
     protected override void Initialize()
     {
-        Window.Title = "Apogee VGC - Pokémon Battle Simulator";
+        Window.Title = "Apogee VGC - Pokï¿½mon Battle Simulator";
 
         base.Initialize();
     }
@@ -152,7 +152,7 @@ public class BattleGame : Game
     /// If called before LoadContent(), the battle will be queued and started after content loads.
     /// </summary>
     public void StartBattle(Library library, BattleOptions battleOptions,
-        Simulator simulator)
+        SimulatorAsync simulator)
     {
         Console.WriteLine(
             $"[BattleGame] StartBattle called. _choiceInputManager null? {_choiceInputManager == null}");
@@ -181,7 +181,7 @@ public class BattleGame : Game
     }
 
     private void StartBattleInternal(Library library, BattleOptions battleOptions,
-        Simulator simulator)
+        SimulatorAsync simulator)
     {
         Console.WriteLine("[BattleGame] StartBattleInternal called");
 

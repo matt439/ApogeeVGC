@@ -56,7 +56,7 @@ public class BattleSimulationBenchmark
             Seed = new PrngSeed(9876),
             MaxTurns = 1000,
         };
-        var simulator = new SyncSimulator();
+        var simulator = new SimulatorSync();
         return simulator.Run(_library, battleOptions, printDebug: false);
     }
 }
