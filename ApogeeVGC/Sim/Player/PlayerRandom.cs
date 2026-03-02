@@ -205,7 +205,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             }
 
             // Build list of all available choices (moves with and without tera, plus switch option)
-            var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>(pokemonRequest.Moves.Count * 2 + 1);
+            var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>(pokemonRequest.Moves.Length * 2 + 1);
 
             // Check if terastallization is available
             MoveType? teraType = pokemonRequest.CanTerastallize switch
@@ -215,7 +215,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             };
 
             // Add moves to available choices
-            for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+            for (int i = 0; i < pokemonRequest.Moves.Length; i++)
             {
                 PokemonMoveData move = pokemonRequest.Moves[i];
                 bool disabled = IsDisabled(move.Disabled);
@@ -250,7 +250,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             // always switch when out of PP, creating infinite switching loops where no
             // damage or recoil ever occurs.
             bool allMovesDisabled = !availableChoices.Any(c => c.isMove);
-            if (allMovesDisabled && pokemonRequest.Moves.Count > 0)
+            if (allMovesDisabled && pokemonRequest.Moves.Length > 0)
             {
                 availableChoices.Add((true, 0, false));
             }
@@ -264,7 +264,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             // If no choices available (all moves disabled, can't switch, and no Struggle fallback)
             if (availableChoices.Count == 0)
             {
-                if (pokemonRequest.Moves.Count > 0)
+                if (pokemonRequest.Moves.Length > 0)
                 {
                     // Use the first move (likely Struggle or will be converted to Struggle)
                     availableChoices.Add((true, 0, false));

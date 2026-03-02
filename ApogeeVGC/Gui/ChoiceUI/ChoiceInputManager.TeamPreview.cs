@@ -329,7 +329,7 @@ public partial class ChoiceInputManager
         if (_currentRequest is MoveRequest moveRequest)
         {
             // Check if first active Pokemon has valid request data (not fainted)
-            if (moveRequest.Active[0] is { } firstPokemon && number <= firstPokemon.Moves.Count)
+            if (moveRequest.Active[0] is { } firstPokemon && number <= firstPokemon.Moves.Length)
             {
                 SelectMove(number - 1, firstPokemon);
             }

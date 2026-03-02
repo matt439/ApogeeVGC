@@ -49,7 +49,7 @@ public partial class Side
             {
                 // Parse a one-based move index
                 int moveIndex = intUnion.Value - 1;
-                if (moveIndex < 0 || moveIndex >= request.Moves.Count)
+                if (moveIndex < 0 || moveIndex >= request.Moves.Length)
                 {
                     return EmitChoiceError(
                         $"Can't move: Your {pokemon.Name} doesn't have a move {intUnion.Value}");
@@ -85,7 +85,7 @@ public partial class Side
         // when isLastActive=true, but ARE disabled in the unrestricted list.
         if (autoChoose)
         {
-            for (int i = 0; i < request.Moves.Count; i++)
+            for (int i = 0; i < request.Moves.Length; i++)
             {
                 PokemonMoveData pokemonMoveData = request.Moves[i];
 
@@ -1106,19 +1106,19 @@ public partial class Side
     {
         bool updated = UpdateDisabledRequest(pokemon, req);
 
-        foreach (PokemonMoveData m in req.Moves)
+        for (int i = 0; i < req.Moves.Length; i++)
         {
-            if (m.Id != moveid) continue;
+            if (req.Moves[i].Id != moveid) continue;
 
             // Check if we need to update the disabled state
-            bool needsUpdate = m.Disabled is null or BoolMoveIdBoolUnion { Value: false } ||
-                               m.DisabledSource != disabledSource;
+            bool needsUpdate = req.Moves[i].Disabled is null or BoolMoveIdBoolUnion { Value: false } ||
+                               req.Moves[i].DisabledSource != disabledSource;
 
             if (needsUpdate)
             {
                 // Actually update the disabled state, not just flag that it needs updating
-                m.Disabled = true;
-                m.DisabledSource = disabledSource;
+                req.Moves[i].Disabled = true;
+                req.Moves[i].DisabledSource = disabledSource;
                 updated = true;
             }
 
@@ -1152,17 +1152,17 @@ public partial class Side
             }
 
             // Update individual move disabled states
-            foreach (PokemonMoveData m in req.Moves)
+            for (int i = 0; i < req.Moves.Length; i++)
             {
-                MoveSlot? moveData = pokemon.GetMoveData(m.Id);
+                MoveSlot? moveData = pokemon.GetMoveData(req.Moves[i].Id);
                 BoolHiddenUnion? disabled = moveData?.Disabled;
 
                 // Check if move should be marked as disabled
                 if (disabled != null &&
                     (Battle.Gen >= 4 ||
-                     Battle.Actions.TargetTypeChoices(m.Target ?? MoveTarget.None)))
+                     Battle.Actions.TargetTypeChoices(req.Moves[i].Target ?? MoveTarget.None)))
                 {
-                    m.Disabled = true;
+                    req.Moves[i].Disabled = true;
                     updated = true;
                 }
             }

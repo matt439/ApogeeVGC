@@ -595,7 +595,7 @@ public class PlayerConsole : IPlayer
             }
 
             // Add moves
-            for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+            for (int i = 0; i < pokemonRequest.Moves.Length; i++)
             {
                 PokemonMoveData move = pokemonRequest.Moves[i];
                 bool disabled = IsDisabled(move.Disabled);

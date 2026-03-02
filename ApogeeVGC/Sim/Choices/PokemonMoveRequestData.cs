@@ -5,15 +5,15 @@ using System.Text.Json.Serialization;
 
 namespace ApogeeVGC.Sim.Choices;
 
-public record PokemonMoveData
+public record struct PokemonMoveData
 {
     [JsonIgnore]
     public required Move Move { get; init; }
-    
+
     [JsonPropertyName("move")]
-    public string Name => Move.Name;
-    
-    public MoveId Id => Move.Id;
+    public readonly string Name => Move.Name;
+
+    public readonly MoveId Id => Move.Id;
     public MoveTarget? Target { get; init; }
     public MoveIdBoolUnion? Disabled { get; set; }
     public EffectStateId? DisabledSource { get; set; }
@@ -23,7 +23,7 @@ public record PokemonMoveData
 
 public record PokemonMoveRequestData
 {
-    public required IReadOnlyList<PokemonMoveData> Moves { get; init; }
+    public required PokemonMoveData[] Moves { get; init; }
     public bool? MaybeDisabled { get; set; }
     public bool? MaybeLocked { get; set; }
     public bool? Trapped { get; set; }

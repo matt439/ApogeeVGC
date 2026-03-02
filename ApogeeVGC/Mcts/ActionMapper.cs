@@ -93,7 +93,7 @@ public sealed class ActionMapper
         SpecieId? megaEvo = pokemonRequest.CanMegaEvo;
 
         // Add move actions
-        for (var i = 0; i < pokemonRequest.Moves.Count; i++)
+        for (var i = 0; i < pokemonRequest.Moves.Length; i++)
         {
             PokemonMoveData move = pokemonRequest.Moves[i];
             if (IsDisabled(move.Disabled)) continue;
@@ -144,7 +144,7 @@ public sealed class ActionMapper
         }
 
         // Fallback: if everything is disabled and can't switch, use first move (Struggle)
-        if (actions.Count == 0 && pokemonRequest.Moves.Count > 0)
+        if (actions.Count == 0 && pokemonRequest.Moves.Length > 0)
         {
             PokemonMoveData firstMove = pokemonRequest.Moves[0];
             actions.Add(new LegalAction
