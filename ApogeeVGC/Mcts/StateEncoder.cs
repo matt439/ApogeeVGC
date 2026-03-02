@@ -7,17 +7,32 @@ using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Mcts;
 
+public readonly struct EncodedState
+{
+    public required long[] SpeciesIds { get; init; }
+    public required long[] MoveIds { get; init; }
+    public required long[] AbilityIds { get; init; }
+    public required long[] ItemIds { get; init; }
+    public required long[] TeraIds { get; init; }
+    public required float[] Numeric { get; init; }
+}
+
 public sealed class StateEncoder(Vocab vocab)
 {
     public const int NumSpeciesSlots = 8;
+    public const int NumMoveSlotsPerPokemon = 4;
     public const int ActiveDim = 35;
     public const int BenchDim = 10;
     public const int FieldDim = 20;
     public const int NumericDim = 4 * ActiveDim + 4 * BenchDim + FieldDim; // 200
 
-    public (long[] SpeciesIds, float[] Numeric) Encode(BattlePerspective perspective)
+    public EncodedState Encode(BattlePerspective perspective)
     {
         var speciesIds = new long[NumSpeciesSlots];
+        var moveIds = new long[NumSpeciesSlots * NumMoveSlotsPerPokemon]; // flat [8*4]
+        var abilityIds = new long[NumSpeciesSlots];
+        var itemIds = new long[NumSpeciesSlots];
+        var teraIds = new long[NumSpeciesSlots];
         var numeric = new float[NumericDim];
 
         SidePlayerPerspective playerSide = perspective.PlayerSide;
@@ -29,11 +44,11 @@ public sealed class StateEncoder(Vocab vocab)
         PokemonPerspective? oppActiveA = opponentSide.Active.Count > 0 ? opponentSide.Active[0] : null;
         PokemonPerspective? oppActiveB = opponentSide.Active.Count > 1 ? opponentSide.Active[1] : null;
 
-        // Species IDs for active slots
-        speciesIds[0] = myActiveA != null ? vocab.GetSpeciesIndex(myActiveA.Species) : Vocab.PadIndex;
-        speciesIds[1] = myActiveB != null ? vocab.GetSpeciesIndex(myActiveB.Species) : Vocab.PadIndex;
-        speciesIds[2] = oppActiveA != null ? vocab.GetSpeciesIndex(oppActiveA.Species) : Vocab.PadIndex;
-        speciesIds[3] = oppActiveB != null ? vocab.GetSpeciesIndex(oppActiveB.Species) : Vocab.PadIndex;
+        // Active slots: species + per-pokemon features + numeric
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 0, myActiveA);
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 1, myActiveB);
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 2, oppActiveA);
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 3, oppActiveB);
 
         // Encode active numeric features
         EncodeActive(numeric, 0, myActiveA);
@@ -45,18 +60,23 @@ public sealed class StateEncoder(Vocab vocab)
         var myBench = GetBenchPokemon(playerSide.Pokemon);
         var oppBench = GetBenchPokemon(opponentSide.Pokemon);
 
-        // Species IDs for bench slots
-        speciesIds[4] = myBench.Count > 0 ? vocab.GetSpeciesIndex(myBench[0].Species) : Vocab.PadIndex;
-        speciesIds[5] = myBench.Count > 1 ? vocab.GetSpeciesIndex(myBench[1].Species) : Vocab.PadIndex;
-        speciesIds[6] = oppBench.Count > 0 ? vocab.GetSpeciesIndex(oppBench[0].Species) : Vocab.PadIndex;
-        speciesIds[7] = oppBench.Count > 1 ? vocab.GetSpeciesIndex(oppBench[1].Species) : Vocab.PadIndex;
+        // Bench slots: species + per-pokemon features + numeric
+        PokemonPerspective? myBench0 = myBench.Count > 0 ? myBench[0] : null;
+        PokemonPerspective? myBench1 = myBench.Count > 1 ? myBench[1] : null;
+        PokemonPerspective? oppBench0 = oppBench.Count > 0 ? oppBench[0] : null;
+        PokemonPerspective? oppBench1 = oppBench.Count > 1 ? oppBench[1] : null;
+
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 4, myBench0);
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 5, myBench1);
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 6, oppBench0);
+        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 7, oppBench1);
 
         // Encode bench numeric features
         const int benchOffset = 4 * ActiveDim; // 140
-        EncodeBench(numeric, benchOffset, myBench.Count > 0 ? myBench[0] : null);
-        EncodeBench(numeric, benchOffset + BenchDim, myBench.Count > 1 ? myBench[1] : null);
-        EncodeBench(numeric, benchOffset + 2 * BenchDim, oppBench.Count > 0 ? oppBench[0] : null);
-        EncodeBench(numeric, benchOffset + 3 * BenchDim, oppBench.Count > 1 ? oppBench[1] : null);
+        EncodeBench(numeric, benchOffset, myBench0);
+        EncodeBench(numeric, benchOffset + BenchDim, myBench1);
+        EncodeBench(numeric, benchOffset + 2 * BenchDim, oppBench0);
+        EncodeBench(numeric, benchOffset + 3 * BenchDim, oppBench1);
 
         // Field features
         const int fieldOffset = 4 * ActiveDim + 4 * BenchDim; // 180
@@ -67,7 +87,33 @@ public sealed class StateEncoder(Vocab vocab)
             opponentSide.SideConditionsWithDuration,
             perspective.TurnCounter);
 
-        return (speciesIds, numeric);
+        return new EncodedState
+        {
+            SpeciesIds = speciesIds,
+            MoveIds = moveIds,
+            AbilityIds = abilityIds,
+            ItemIds = itemIds,
+            TeraIds = teraIds,
+            Numeric = numeric,
+        };
+    }
+
+    private void EncodeSlot(
+        long[] speciesIds, long[] moveIds, long[] abilityIds,
+        long[] itemIds, long[] teraIds, int slot, PokemonPerspective? p)
+    {
+        if (p == null) return;
+
+        speciesIds[slot] = vocab.GetSpeciesIndex(p.Species);
+
+        IReadOnlyList<MoveSlot> moves = p.MoveSlots;
+        int moveBase = slot * NumMoveSlotsPerPokemon;
+        for (int j = 0; j < moves.Count && j < NumMoveSlotsPerPokemon; j++)
+            moveIds[moveBase + j] = vocab.GetMoveEmbedIndex(moves[j].Move);
+
+        abilityIds[slot] = vocab.GetAbilityIndex(p.Ability);
+        itemIds[slot] = vocab.GetItemIndex(p.Item);
+        teraIds[slot] = vocab.GetTeraTypeIndex(p.TeraType);
     }
 
     private static List<PokemonPerspective> GetBenchPokemon(IReadOnlyList<PokemonPerspective> pokemon)

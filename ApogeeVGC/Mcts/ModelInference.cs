@@ -36,14 +36,22 @@ public sealed class ModelInference : IDisposable
     /// </summary>
     public ModelOutput Evaluate(BattlePerspective perspective)
     {
-        (long[] speciesIds, float[] numeric) = _encoder.Encode(perspective);
+        EncodedState state = _encoder.Encode(perspective);
 
-        var speciesTensor = new DenseTensor<long>(speciesIds, [1, StateEncoder.NumSpeciesSlots]);
-        var numericTensor = new DenseTensor<float>(numeric, [1, StateEncoder.NumericDim]);
+        var speciesTensor = new DenseTensor<long>(state.SpeciesIds, [1, StateEncoder.NumSpeciesSlots]);
+        var moveTensor = new DenseTensor<long>(state.MoveIds, [1, StateEncoder.NumSpeciesSlots, StateEncoder.NumMoveSlotsPerPokemon]);
+        var abilityTensor = new DenseTensor<long>(state.AbilityIds, [1, StateEncoder.NumSpeciesSlots]);
+        var itemTensor = new DenseTensor<long>(state.ItemIds, [1, StateEncoder.NumSpeciesSlots]);
+        var teraTensor = new DenseTensor<long>(state.TeraIds, [1, StateEncoder.NumSpeciesSlots]);
+        var numericTensor = new DenseTensor<float>(state.Numeric, [1, StateEncoder.NumericDim]);
 
         var inputs = new List<NamedOnnxValue>
         {
             NamedOnnxValue.CreateFromTensor("species_ids", speciesTensor),
+            NamedOnnxValue.CreateFromTensor("move_ids", moveTensor),
+            NamedOnnxValue.CreateFromTensor("ability_ids", abilityTensor),
+            NamedOnnxValue.CreateFromTensor("item_ids", itemTensor),
+            NamedOnnxValue.CreateFromTensor("tera_ids", teraTensor),
             NamedOnnxValue.CreateFromTensor("numeric", numericTensor),
         };
 

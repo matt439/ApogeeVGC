@@ -5,6 +5,10 @@ Per-pokemon features (species + moves + ability + item + tera) are encoded
 with shared weights, then concatenated with numeric state features and
 fed through a trunk that produces value and policy outputs.
 
+A single slot-conditioned policy head is used for both active slots —
+it receives the trunk output concatenated with the specific slot's
+Pokemon encoding, giving it direct access to who is acting.
+
 Unknown features (padding_idx=0) produce zero vectors, handling partial
 information (e.g. unrevealed opponent moves in CTS) gracefully.
 
@@ -87,14 +91,9 @@ class BattleNet(nn.Module):
             nn.Linear(64, 1),
         )
 
-        self.policy_head_a = nn.Sequential(
-            nn.Linear(hidden_dim // 2, 128),
-            nn.ReLU(),
-            nn.Linear(128, num_actions),
-        )
-
-        self.policy_head_b = nn.Sequential(
-            nn.Linear(hidden_dim // 2, 128),
+        # Single policy head conditioned on the acting slot's encoding
+        self.policy_head = nn.Sequential(
+            nn.Linear(hidden_dim // 2 + pokemon_dim, 128),
             nn.ReLU(),
             nn.Linear(128, num_actions),
         )
@@ -129,7 +128,11 @@ class BattleNet(nn.Module):
         x = self.trunk(x)                                     # [B, H/2]
 
         value = torch.sigmoid(self.value_head(x)).squeeze(-1)  # [B]
-        policy_a = self.policy_head_a(x)                       # [B, A]
-        policy_b = self.policy_head_b(x)                       # [B, A]
+
+        # Slot-conditioned policy: concat trunk with acting slot's encoding
+        slot_a = enc[:, 0, :]                                  # [B, P]
+        slot_b = enc[:, 1, :]                                  # [B, P]
+        policy_a = self.policy_head(torch.cat([x, slot_a], dim=1))  # [B, A]
+        policy_b = self.policy_head(torch.cat([x, slot_b], dim=1))  # [B, A]
 
         return value, policy_a, policy_b
