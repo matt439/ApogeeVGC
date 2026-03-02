@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from dataset import build_vocab
+from dataset import build_vocab, VGCDataset
 from team_preview_dataset import TeamPreviewDataset
 
 from .config import DataConfig
@@ -122,6 +122,28 @@ def make_loaders(
     """Build train and val DataLoaders from game lists."""
     train_ds = TeamPreviewDataset(train_games, vocab, winners_only=winners_only)
     val_ds = TeamPreviewDataset(val_games, vocab, winners_only=winners_only)
+
+    train_loader = DataLoader(
+        train_ds, batch_size=batch_size, shuffle=True,
+        num_workers=0, pin_memory=(device.type == 'cuda'))
+    val_loader = DataLoader(
+        val_ds, batch_size=batch_size, shuffle=False,
+        num_workers=0, pin_memory=(device.type == 'cuda'))
+
+    return train_loader, val_loader
+
+
+def make_battle_loaders(
+    train_games: list[dict],
+    val_games: list[dict],
+    vocab: dict,
+    batch_size: int,
+    device: torch.device,
+    winners_only: bool = False,
+) -> tuple[DataLoader, DataLoader]:
+    """Build train and val DataLoaders for BattleNet from game lists."""
+    train_ds = VGCDataset(train_games, vocab, winners_only=winners_only)
+    val_ds = VGCDataset(val_games, vocab, winners_only=winners_only)
 
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,

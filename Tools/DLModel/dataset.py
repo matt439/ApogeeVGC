@@ -210,7 +210,8 @@ class VGCDataset(Dataset):
     """PyTorch dataset that encodes parsed VGC replays into tensors.
 
     Each sample represents one turn from one player's perspective.
-    Two samples are generated per turn (one per player).
+    By default, two samples are generated per turn (one per player).
+    Set winners_only=True to generate only the winning player's perspective.
 
     Per-pokemon features (moves, ability, item, tera) are encoded as:
       - Own team: from end-of-game revealed data (player always knows)
@@ -218,7 +219,7 @@ class VGCDataset(Dataset):
         abilities/items stay 0 since per-turn reveal can't be tracked)
     """
 
-    def __init__(self, games: list[dict], vocab: dict):
+    def __init__(self, games: list[dict], vocab: dict, winners_only: bool = False):
         species_map = vocab['species']
         action_map = vocab['actions']
         move_map = vocab['moves']
@@ -234,7 +235,8 @@ class VGCDataset(Dataset):
 
         # Pre-count samples (skip games with no winner)
         valid_games = [g for g in games if g.get('winner') in ('p1', 'p2')]
-        n = sum(len(g['turns']) * 2 for g in valid_games)
+        samples_per_turn = 1 if winners_only else 2
+        n = sum(len(g['turns']) * samples_per_turn for g in valid_games)
 
         self.species_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
         self.move_ids = torch.zeros(n, NUM_SPECIES_SLOTS, 4, dtype=torch.long)
@@ -308,7 +310,8 @@ class VGCDataset(Dataset):
                 for slot, state in active.items():
                     slot_species[slot] = state['species']
 
-                for perspective in ('p1', 'p2'):
+                perspectives = (winner,) if winners_only else ('p1', 'p2')
+                for perspective in perspectives:
                     opp = 'p2' if perspective == 'p1' else 'p1'
 
                     my_a = active.get(f'{perspective}a')

@@ -1,6 +1,6 @@
 # Experimentation Framework
 
-This document describes the ML experimentation pipeline for evaluating and tuning the Team Preview model. The framework provides rigorous methodology for hyperparameter optimisation, feature ablation, baseline comparison, and statistical evaluation.
+This document describes the ML experimentation pipelines for evaluating and tuning the **Team Preview** and **BattleNet** models. The framework provides rigorous methodology for hyperparameter optimisation, feature ablation, baseline comparison, and statistical evaluation.
 
 **Location:** `Tools/DLModel/experiments/`
 
@@ -283,3 +283,187 @@ pandas           # Trial data analysis and CSV export
 ```
 
 These are in addition to the existing `torch>=2.0` and `numpy`.
+
+---
+
+# BattleNet Experimentation Framework
+
+The BattleNet pipeline mirrors the Team Preview framework above, adapted for BattleNet's distinct architecture: 3 output heads (value + 2 policy), per-turn samples, and 200 numeric features.
+
+**Location:** `Tools/DLModel/experiments/battle_*.py`
+
+## Key Differences from Team Preview
+
+| Aspect | Team Preview | BattleNet |
+|--------|-------------|-----------|
+| **Output heads** | 2 (bring, lead) — sigmoid | 3 (value, policy_a, policy_b) — sigmoid + softmax |
+| **Loss** | BCELoss (bring + lead) | BCELoss (value) + CrossEntropyLoss (policy_a, policy_b) |
+| **Samples per game** | 1 per game (team preview only) | 1 per turn per perspective |
+| **Input features** | 12 pokemon × embeddings | 8 pokemon × embeddings + 200 numeric features |
+| **Default training strategy** | `winners_only` | `all_games` |
+| **Metrics** | Set/overlap/hamming accuracy, per-slot F1 | Value accuracy, policy top-1/top-3 accuracy |
+
+## Training Strategy
+
+BattleNet defaults to **`all_games`** (both perspectives) rather than `winners_only`. The rationale: BattleNet's value head predicts win probability. Training only on winners makes every value target 1.0, which is useless for learning win prediction. The model needs both winning and losing examples.
+
+The `winners_only` option is available for experimental comparison via `--training-strategy winners_only`.
+
+## Quick Start
+
+```bash
+cd Tools/DLModel
+
+# Full pipeline
+python -m experiments.battle_run_all --regulation gen9vgc2025regi
+
+# Run specific stages
+python -m experiments.battle_run_all --regulation gen9vgc2025regi --stages hparam ablation
+
+# Quick test run
+python -m experiments.battle_run_all --regulation gen9vgc2025regi --n-trials 3 --epochs 5
+```
+
+### CLI Reference
+
+Same flags as Team Preview (`--regulation`, `--stages`, `--data-root`, `--results-root`, `--n-trials`, `--timeout-hours`, `--min-rating`, `--epochs`, `--patience`, `--train-frac`, `--val-frac`, `--test-frac`, `--training-strategy`), with the key difference that `--training-strategy` defaults to `all_games`.
+
+## Pipeline Stages
+
+### Stage 1: Hyperparameter Search (`hparam`)
+
+Same Optuna TPE + median pruner approach as Team Preview. Search space:
+
+| Parameter | Range | Type |
+|-----------|-------|------|
+| `embed_dim` | {16, 32, 48, 64} | categorical |
+| `feat_embed_dim` | {8, 16, 24, 32} | categorical |
+| `pokemon_dim` | {32, 48, 64, 96} | categorical |
+| `hidden_dim` | {128, 192, 256, 384, 512} | categorical |
+| `num_trunk_layers` | [2, 5] | integer |
+| `trunk_dropout` | [0.1, 0.5] | float |
+| `head_dim` | {32, 64, 96, 128} | categorical |
+| `lr` | [1e-4, 5e-3] | log-uniform |
+| `weight_decay` | [1e-6, 1e-3] | log-uniform |
+| `batch_size` | {256, 512, 1024} | categorical |
+
+Note: batch size is capped at 1024 (no 2048) due to larger per-sample memory from 200 numeric features.
+
+**Output:** `results/<regulation>/battle/hparam_search/best_config.json`
+
+### Stage 2: Feature Ablation (`ablation`)
+
+Same cumulative feature ablation as Team Preview (species only → full). Each variant uses the best hyperparameters with only `feature_flags` changed.
+
+**Output:** `results/<regulation>/battle/ablation/summary.json`
+
+### Stage 3: Baselines (`baselines`)
+
+Two non-learned baselines:
+
+1. **Random** — Value = 0.5 (coin flip), policy = uniform over actions, averaged over 100 trials
+2. **Most-popular** — Value = training set win rate, policy = slot-wise action frequency from training set
+
+**Output:** `results/<regulation>/battle/baselines/random_metrics.json`, `popular_metrics.json`
+
+### Stage 4: Multi-Seed Evaluation (`multiseed`)
+
+Same 5-seed evaluation (42, 123, 456, 789, 1024) as Team Preview.
+
+**Output:** `results/<regulation>/battle/multiseed/summary.json`
+
+### Stage 5: Figures (`figures`)
+
+| Figure | Description |
+|--------|-------------|
+| `learning_curves` | 3-panel: loss, value accuracy, policy accuracy with mean +/- std bands across seeds |
+| `hparam_sensitivity` | Scatter plots from trials.csv |
+| `ablation_bars` | Grouped bars: value accuracy, policy A top-1, policy B top-1 |
+| `calibration` | Reliability diagram for value predictions |
+| `baseline_comparison` | Model vs baselines on value accuracy and policy top-1 |
+| `multiseed_distribution` | Box plot of value/policy accuracies across seeds |
+
+**Output:** `results/<regulation>/battle/figures/`
+
+## Evaluation Metrics
+
+### Value Head
+
+| Metric | Description |
+|--------|-------------|
+| **Value accuracy** | Binary accuracy (threshold 0.5): did the model correctly predict win/loss? |
+| **Value ECE** | Expected Calibration Error for the value prediction |
+| **Reliability diagram** | Predicted win probability vs observed win rate |
+
+### Policy Heads
+
+| Metric | Description |
+|--------|-------------|
+| **Top-1 accuracy** | Did the model's top-predicted action match the actual action? (per head: A, B, combined) |
+| **Top-3 accuracy** | Was the actual action in the model's top-3 predictions? (per head: A, B) |
+
+Policy metrics only count non-padded targets (where target > 0) to avoid inflating accuracy on padding.
+
+## Model Architecture (BattleNetV2)
+
+`BattleNetV2` extends `BattleNet` with parameterised architecture for experimentation:
+
+- **Trunk depth** (`num_trunk_layers`) — variable number of MLP blocks
+- **Dropout rate** (`trunk_dropout`) — uniform across trunk; final layer uses 67% of this rate
+- **Head dimension** (`head_dim`) — intermediate dimension in value and policy heads
+- **Feature flags** (`feature_flags`) — dict controlling which embedding groups are active
+- **Slot-conditioned policy** — policy head concatenates trunk output with acting slot's encoding
+
+The original `BattleNet` class is untouched. ONNX export detects `model_version: 2` in checkpoints and instantiates `BattleNetV2` accordingly. The ONNX interface is identical to V1.
+
+## Results Directory Structure
+
+BattleNet results are stored under `battle/` to separate from Team Preview. Vocab and splits are shared at the regulation level.
+
+```
+results/<regulation>/
+  splits/                        # Shared: same splits for both models
+  vocab.json                     # Shared: same vocabulary
+  hparam_search/                 # Team Preview results
+  ablation/
+  baselines/
+  multiseed/
+  figures/
+  battle/                        # BattleNet results
+    hparam_search/
+      optuna_study.db
+      trials.csv
+      best_config.json
+    ablation/
+      species_only/
+      species_moves/
+      species_moves_abilities/
+      species_moves_abilities_items/
+      full/
+      summary.json
+    baselines/
+      random_metrics.json
+      popular_metrics.json
+    multiseed/
+      seed_42/
+      seed_123/
+      seed_456/
+      seed_789/
+      seed_1024/
+      summary.json
+    figures/
+```
+
+## BattleNet Module Reference
+
+| Module | Purpose |
+|--------|---------|
+| `experiments/battle_config.py` | `BattleModelConfig`, `BattleExperimentConfig`, search space, ablation configs |
+| `experiments/battle_training.py` | Training loop with value + 2 policy losses; `BattleTrainResult` |
+| `experiments/battle_metrics.py` | `evaluate_battle_comprehensive()` → `BattleComprehensiveMetrics` |
+| `experiments/battle_baselines.py` | `evaluate_random_battle_baseline()`, `evaluate_popular_battle_baseline()` |
+| `experiments/battle_hparam_search.py` | Optuna search for BattleNet |
+| `experiments/battle_ablation.py` | Feature ablation for BattleNet |
+| `experiments/battle_multiseed.py` | Multi-seed evaluation for BattleNet |
+| `experiments/battle_visualise.py` | BattleNet thesis-quality plots |
+| `experiments/battle_run_all.py` | CLI: `python -m experiments.battle_run_all` |

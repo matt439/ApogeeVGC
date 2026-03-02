@@ -14,7 +14,7 @@ import json
 
 import torch
 
-from model import BattleNet
+from model import BattleNet, BattleNetV2
 from team_preview_model import TeamPreviewNet, TeamPreviewNetV2
 
 
@@ -24,18 +24,38 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
     vocab = checkpoint['vocab']
     train_args = checkpoint['args']
 
-    model = BattleNet(
-        num_species=vocab['num_species'],
-        num_actions=vocab['num_actions'],
-        num_moves=vocab['num_moves'],
-        num_abilities=vocab['num_abilities'],
-        num_items=vocab['num_items'],
-        num_tera_types=vocab['num_tera_types'],
-        embed_dim=train_args['embed_dim'],
-        feat_embed_dim=train_args['feat_embed_dim'],
-        pokemon_dim=train_args['pokemon_dim'],
-        hidden_dim=train_args['hidden_dim'],
-    )
+    model_version = checkpoint.get('model_version', 1)
+
+    if model_version >= 2:
+        model = BattleNetV2(
+            num_species=vocab['num_species'],
+            num_actions=vocab['num_actions'],
+            num_moves=vocab['num_moves'],
+            num_abilities=vocab['num_abilities'],
+            num_items=vocab['num_items'],
+            num_tera_types=vocab['num_tera_types'],
+            embed_dim=train_args['embed_dim'],
+            feat_embed_dim=train_args['feat_embed_dim'],
+            pokemon_dim=train_args['pokemon_dim'],
+            hidden_dim=train_args['hidden_dim'],
+            num_trunk_layers=train_args.get('num_trunk_layers', 3),
+            trunk_dropout=train_args.get('trunk_dropout', 0.3),
+            head_dim=train_args.get('head_dim', 64),
+            feature_flags=train_args.get('feature_flags'),
+        )
+    else:
+        model = BattleNet(
+            num_species=vocab['num_species'],
+            num_actions=vocab['num_actions'],
+            num_moves=vocab['num_moves'],
+            num_abilities=vocab['num_abilities'],
+            num_items=vocab['num_items'],
+            num_tera_types=vocab['num_tera_types'],
+            embed_dim=train_args['embed_dim'],
+            feat_embed_dim=train_args['feat_embed_dim'],
+            pokemon_dim=train_args['pokemon_dim'],
+            hidden_dim=train_args['hidden_dim'],
+        )
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
