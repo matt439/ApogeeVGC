@@ -371,7 +371,7 @@ public partial record Abilities
 
                         if (blockedVolatiles.Contains(status.Id))
                         {
-                            if (effect.EffectType == EffectType.Move)
+                            if (effect?.EffectType == EffectType.Move)
                             {
                                 if (battle.EffectState.Target is PokemonEffectStateTarget
                                     {

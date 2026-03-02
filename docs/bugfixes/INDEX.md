@@ -68,6 +68,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Player 2 Always Wins Bug Fix](#player-2-always-wins-bug-fix) - Winner detection comparing player names against side IDs incorrectly
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player always returning invalid target location 0 for targeting moves in doubles
 - [Infinite Battle CheckWin & Struggle Fix](#infinite-battle-checkwin--struggle-fix) - Two bugs causing BattleTurnLimitException: CheckWin skipped after target faints, and random player infinite switching when out of PP
+- [SingleEvent Default RelayVar Focus Punch Fix](#singleevent-default-relayvar-focus-punch-fix) - SingleEvent returning BoolRelayVar.True default when handler returns void, blocking BeforeMoveCallback moves and preventing PP deduction
 
 ### Choice System
 - [Pokemon Position Index Mismatch Fix](#pokemon-position-index-mismatch-fix) - ArgumentOutOfRangeException when using pokemon.Position to index into Active-sized arrays
@@ -1589,6 +1590,44 @@ This ensures the second Magic Bounce holder sees `HasBounced == true` and skips 
 
 ---
 
-*Last Updated*: 2025-03-01
-*Total Bug Fixes Documented*: 34
+### SingleEvent Default RelayVar Focus Punch Fix
+**Severity**: Critical
+**Systems Affected**: SingleEvent return value, BeforeMoveCallback, Focus Punch, PP deduction
+
+**Problem**: Battles hit `BattleTurnLimitException` (5000+ turns) when Pokemon had Focus Punch. Both Pokemon repeatedly used Focus Punch every turn with zero damage dealt and zero PP deducted. All 4 moves remained available (not disabled) indefinitely, so Struggle was never forced.
+
+**Root Cause**: In `Battle.Events.cs`, `SingleEvent` unconditionally defaulted a null `relayVar` parameter to `BoolRelayVar.True` (line 56: `relayVar ??= BoolRelayVar.True`). When Focus Punch's `BeforeMoveCallback` handler returned `BoolVoidUnion.FromVoid()` (meaning "focus maintained, proceed"), the conversion chain produced `null`:
+
+1. `BeforeMoveCallbackEventInfo.Create` correctly converts `VoidBoolVoidUnion` → `null`
+2. `InvokeEventHandlerInfo` returns `null`
+3. `SingleEvent` line 175: `return returnVal ?? relayVar` → `return null ?? BoolRelayVar.True` → **`BoolRelayVar.True`**
+4. `RunMove` checks `callbackResult is BoolRelayVar { Value: true }` → **match! Move blocked before PP deduction**
+
+This meant Focus Punch was **always** silently blocked by its own callback, even when focus was maintained. The move returned early before PP deduction and before `UseMove`, causing: no PP deduction, no damage, no Struggle, infinite loop.
+
+**Contrast with TypeScript reference**: In pokemon-showdown, `beforeMoveCallback` is called directly (not through `singleEvent`), so this default value issue doesn't exist. The C# implementation routes it through `SingleEvent`, which introduced the incorrect default.
+
+**Solution**: Changed line 175 of `Battle.Events.cs` from:
+```csharp
+return returnVal ?? relayVar;
+```
+to:
+```csharp
+return returnVal ?? (hasRelayVar ? relayVar : null);
+```
+
+This preserves the existing behavior when `relayVar` was explicitly provided by the caller, but returns `null` (instead of the arbitrary `BoolRelayVar.True` default) when no `relayVar` was provided and the handler returned null. The `hasRelayVar` flag (already tracked at line 55) distinguishes these cases.
+
+**Impact analysis**: All existing callers of `SingleEvent` were verified safe:
+- Callers using `is not BoolRelayVar { Value: false }` pattern: null behaves identically to `BoolRelayVar.True` (both pass)
+- Callers using `is BoolRelayVar { Value: false }` pattern: null behaves identically (both fail)
+- Callers using `?? fallback` or `is null or ...`: explicitly handle null already
+- Only `is BoolRelayVar { Value: true }` pattern (BeforeMoveCallback) changes behavior — which is the fix
+
+**Keywords**: `SingleEvent`, `relayVar`, `BoolRelayVar.True`, `BeforeMoveCallback`, `Focus Punch`, `PP deduction`, `BattleTurnLimitException`, `infinite loop`, `void handler return`, `hasRelayVar`
+
+---
+
+*Last Updated*: 2026-03-02
+*Total Bug Fixes Documented*: 35
 *Reference Guides*: 1

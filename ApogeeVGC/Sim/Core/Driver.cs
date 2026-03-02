@@ -21,7 +21,7 @@ public partial class Driver
     private const int Team2EvalSeed = 67890;
 
     // Random vs Random evaluation settings
-    private const int RandomEvaluationNumTest = 20000;
+    private const int RandomEvaluationNumTest = 100000;
     private const int NumThreads = 16;
 
     // MCTS evaluation settings

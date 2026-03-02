@@ -172,7 +172,11 @@ public partial class Battle
             Event = parentEvent;
         }
 
-        return returnVal ?? relayVar;
+        // If handler returned null and no relayVar was explicitly provided,
+        // return null instead of the default BoolRelayVar.True.
+        // This matches pokemon-showdown's singleEvent behavior where undefined
+        // handler returns propagate as undefined, not as a truthy default.
+        return returnVal ?? (hasRelayVar ? relayVar : null);
     }
 
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null,
@@ -525,7 +529,7 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Runs an event with no source on each Pokémon on the field, in Speed order.
+    /// Runs an event with no source on each Pokï¿½mon on the field, in Speed order.
     /// Speed ties are resolved randomly using the battle's PRNG.
     /// </summary>
     public void EachEvent(EventId eventId, IEffect? effect = null, bool? relayVar = null)
@@ -535,7 +539,7 @@ public partial class Battle
         {
         while (true)
         {
-            // Get all active Pokémon on the field
+            // Get all active Pokï¿½mon on the field
             FillAllActive(actives);
 
             // Use current battle effect if none provided
@@ -548,7 +552,7 @@ public partial class Battle
             RelayVar? relayVarConverted =
                 relayVar.HasValue ? (relayVar.Value ? BoolRelayVar.True : BoolRelayVar.False) : null;
 
-            // Run the event on each Pokémon
+            // Run the event on each Pokï¿½mon
             foreach (Pokemon pokemon in actives)
             {
                 RunEvent(eventId, (RunEventTarget)pokemon, null, effect,
