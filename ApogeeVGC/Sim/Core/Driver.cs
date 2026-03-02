@@ -30,39 +30,30 @@ public partial class Driver
     private const string MctsModelPath = "Tools/DLModel/battle_model.onnx";
     private const string MctsVocabPath = "Tools/DLModel/vocab.json";
 
-    // !! EDIT THIS to change the format for Console/GUI interactive modes !!
-    private const FormatId InteractiveFormatId = FormatId.Gen9VgcRegulationI;
+    // !! EDIT THIS to change the format for all driver modes (except DeterministicRegressionTest) !!
+    private const FormatId ActiveFormatId = FormatId.Gen9VgcRegulationI;
 
     public void Start(DriverMode mode)
     {
         switch (mode)
         {
             case DriverMode.ConsoleVsRandom:
-                RunConsoleVsRandom(InteractiveFormatId);
+                RunConsoleVsRandom(ActiveFormatId);
                 break;
             case DriverMode.GuiVsRandom:
-                RunGuiVsRandom(InteractiveFormatId);
+                RunGuiVsRandom(ActiveFormatId);
                 break;
-            case DriverMode.RndVsRndVgcRegIEvaluation:
-                RunRndVsRndVgcRegIEvaluation();
+            case DriverMode.RndVsRndEvaluation:
+                RunRandomTeamEvaluation(ActiveFormatId);
                 break;
-            case DriverMode.RndVsRndMegaEvaluation:
-                RunRndVsRndMegaEvaluation();
-                break;
-            case DriverMode.MctsVsRndVgcRegIEvaluation:
-                RunMctsVsRndVgcRegIEvaluation();
-                break;
-            case DriverMode.MctsVsRndMegaEvaluation:
-                RunMctsVsRndMegaEvaluation();
+            case DriverMode.MctsVsRndEvaluation:
+                RunMctsVsRandomEvaluation(ActiveFormatId);
                 break;
             case DriverMode.DeterministicRegressionTest:
                 RunDeterministicRegressionTest();
                 break;
-            case DriverMode.SingleBattleDebugVgcRegI:
-                RunSingleBattleDebugVgcRegI();
-                break;
-            case DriverMode.SingleBattleDebugMega:
-                RunSingleBattleDebugMega();
+            case DriverMode.SingleBattleDebug:
+                RunSingleBattleDebug(ActiveFormatId);
                 break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");

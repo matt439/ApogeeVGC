@@ -2,30 +2,22 @@ namespace ApogeeVGC.Sim.Core;
 
 public enum DriverMode
 {
-    // Interactive modes — format controlled by InteractiveFormatId constant in Driver.cs
+    // Interactive modes
     ConsoleVsRandom,
     GuiVsRandom,
 
-    // Parallel random-team evaluations
-    RndVsRndVgcRegIEvaluation,
-    RndVsRndMegaEvaluation,
+    // Parallel random-team evaluation
+    RndVsRndEvaluation,
 
-    // MCTS vs Random evaluations
-    MctsVsRndVgcRegIEvaluation,
-    MctsVsRndMegaEvaluation,
+    // MCTS vs Random evaluation
+    MctsVsRndEvaluation,
 
     // Deterministic regression test — runs fixed battles across formats, prints hash
     DeterministicRegressionTest,
 
     /// <summary>
-    /// Runs a single VGC Reg I battle with 5 specific seeds for debugging purposes.
-    /// Useful for reproducing failures from RndVsRndVgcRegIEvaluation.
+    /// Runs a single battle with 5 specific seeds for debugging purposes.
+    /// Useful for reproducing failures from RndVsRndEvaluation.
     /// </summary>
-    SingleBattleDebugVgcRegI,
-
-    /// <summary>
-    /// Runs a single Mega Evolution battle with 5 specific seeds for debugging purposes.
-    /// Useful for reproducing failures from RndVsRndMegaEvaluation.
-    /// </summary>
-    SingleBattleDebugMega,
+    SingleBattleDebug,
 }

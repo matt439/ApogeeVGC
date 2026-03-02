@@ -39,29 +39,14 @@ public partial class Driver
         int Player2Seed,
         int BattleRandSeed);
 
-    private void RunRndVsRndVgcRegIEvaluation()
-    {
-        RunRandomTeamEvaluation(
-            formatId: FormatId.Gen9VgcRegulationI,
-            formatLabel: "VGC 2025 Regulation I",
-            debugModeName: "RndVsRndVgcRegIEvaluation");
-    }
-
-    private void RunRndVsRndMegaEvaluation()
-    {
-        RunRandomTeamEvaluation(
-            formatId: FormatId.Gen9VgcMega,
-            formatLabel: "VGC Mega Evolution",
-            debugModeName: "RndVsRndMegaEvaluation");
-    }
-
     /// <summary>
     /// Runs a parallel random-team evaluation for the given format.
     /// Pre-generates teams, runs battles in parallel with thread-local state,
     /// and prints comprehensive statistics.
     /// </summary>
-    private void RunRandomTeamEvaluation(FormatId formatId, string formatLabel, string debugModeName)
+    private void RunRandomTeamEvaluation(FormatId formatId)
     {
+        string formatLabel = Library.Formats[formatId].Name;
         Console.WriteLine($"[Driver] Starting Random Team vs Random Team {formatLabel} Evaluation");
         Console.WriteLine($"[Driver] Running {RandomEvaluationNumTest} battles with {NumThreads} threads");
 
@@ -162,7 +147,7 @@ public partial class Driver
                         battle.Player2Seed,
                         battle.BattleRandSeed,
                         ex,
-                        debugModeName);
+                        nameof(DriverMode.SingleBattleDebug));
                 }
 
                 return localState;
@@ -318,26 +303,13 @@ public partial class Driver
 
     #region MCTS Evaluation
 
-    private void RunMctsVsRndVgcRegIEvaluation()
-    {
-        RunMctsVsRandomEvaluation(
-            formatId: FormatId.Gen9VgcRegulationI,
-            formatLabel: "VGC 2025 Regulation I");
-    }
-
-    private void RunMctsVsRndMegaEvaluation()
-    {
-        RunMctsVsRandomEvaluation(
-            formatId: FormatId.Gen9VgcMega,
-            formatLabel: "VGC Mega Evolution");
-    }
-
     /// <summary>
     /// Runs MCTS (Player 1) vs Random (Player 2) evaluation for the given format.
     /// Requires ONNX model and vocab files — fails gracefully if missing.
     /// </summary>
-    private void RunMctsVsRandomEvaluation(FormatId formatId, string formatLabel)
+    private void RunMctsVsRandomEvaluation(FormatId formatId)
     {
+        string formatLabel = Library.Formats[formatId].Name;
         Console.WriteLine($"[Driver] Starting MCTS vs Random {formatLabel} Evaluation");
         Console.WriteLine($"[Driver] Running {MctsEvaluationNumTest} battles with {MctsNumThreads} threads");
 
@@ -437,7 +409,7 @@ public partial class Driver
                         battle.Player2Seed,
                         battle.BattleRandSeed,
                         ex,
-                        "MctsVsRndVgcRegIEvaluation");
+                        nameof(DriverMode.SingleBattleDebug));
                 }
 
                 return localState;
