@@ -1,2 +1,5 @@
 torch>=2.0
 numpy
+optuna>=3.0
+matplotlib>=3.5
+pandas

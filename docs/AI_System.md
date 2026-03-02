@@ -107,6 +107,8 @@ python parser.py --format gen9vgc2025regi --min-rating 1300
 
 **Location:** `Tools/DLModel/team_preview_model.py`, `train_team_preview.py`
 
+**Experimentation:** See [`Docs/Experimentation.md`](Experimentation.md) for the full evaluation pipeline (hyperparameter search, ablation studies, baselines, multi-seed evaluation, and figure generation).
+
 ### Purpose
 
 Given both players' 6-Pokemon teams, predict:

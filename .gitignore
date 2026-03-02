@@ -368,5 +368,8 @@ FodyWeavers.xsd
 # Replay scraper data
 Tools/ReplayScraper/data/
 
+# ML experiment results
+Tools/DLModel/results/
+
 # Windows reserved device name
 NUL
