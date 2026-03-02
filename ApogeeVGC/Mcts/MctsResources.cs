@@ -11,6 +11,7 @@ public static class MctsResources
     private static ModelInference? _model;
     private static Vocab? _vocab;
     private static StateEncoder? _encoder;
+    private static Library? _library;
     private static MctsConfig _config = new();
     private static bool _initialized;
 
@@ -25,6 +26,9 @@ public static class MctsResources
     public static StateEncoder Encoder => _encoder
         ?? throw new InvalidOperationException("MctsResources not initialized. Call Initialize() first.");
 
+    public static Library Library => _library
+        ?? throw new InvalidOperationException("MctsResources not initialized. Call Initialize() first.");
+
     public static MctsConfig Config => _config;
 
     /// <summary>
@@ -36,6 +40,7 @@ public static class MctsResources
     /// <param name="config">Optional MCTS configuration. Uses defaults if null.</param>
     public static void Initialize(string modelPath, string vocabPath, Library library, MctsConfig? config = null)
     {
+        _library = library;
         _vocab = Vocab.Load(vocabPath, library);
         _encoder = new StateEncoder(_vocab);
         _model = new ModelInference(modelPath, _encoder);
@@ -52,6 +57,7 @@ public static class MctsResources
         _model = null;
         _vocab = null;
         _encoder = null;
+        _library = null;
         _initialized = false;
     }
 }

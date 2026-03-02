@@ -19,17 +19,24 @@ public sealed class PlayerMcts : IPlayer
 
     private readonly MctsSearch _search;
     private readonly ActionMapper _actionMapper;
+    private readonly BattleInfoTracker _infoTracker;
     private readonly Prng _rng;
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<Choice>? ChoiceSubmitted;
+
+    /// <summary>
+    /// The information tracker for this player, tracking what opponent info has been revealed.
+    /// </summary>
+    public BattleInfoTracker InfoTracker => _infoTracker;
 
     public PlayerMcts(
         SideId sideId,
         PlayerOptions options,
         IBattleController battleController,
         MctsSearch search,
-        ActionMapper actionMapper)
+        ActionMapper actionMapper,
+        BattleInfoTracker infoTracker)
     {
         SideId = sideId;
         Options = options;
@@ -37,6 +44,7 @@ public sealed class PlayerMcts : IPlayer
         PrintDebug = options.PrintDebug;
         _search = search;
         _actionMapper = actionMapper;
+        _infoTracker = infoTracker;
         _rng = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
     }
 
@@ -47,7 +55,8 @@ public sealed class PlayerMcts : IPlayer
     {
         var actionMapper = new ActionMapper(MctsResources.Vocab);
         var search = new MctsSearch(MctsResources.Config, MctsResources.Model, actionMapper);
-        return new PlayerMcts(sideId, options, battleController, search, actionMapper);
+        var infoTracker = new BattleInfoTracker(sideId, MctsResources.Library);
+        return new PlayerMcts(sideId, options, battleController, search, actionMapper, infoTracker);
     }
 
     public Choice GetChoiceSync(IChoiceRequest choiceRequest, BattleRequestType requestType,
@@ -74,7 +83,11 @@ public sealed class PlayerMcts : IPlayer
     }
 
     public void UpdateUi(BattlePerspective perspective) { }
-    public void UpdateEvents(IEnumerable<BattleEvent> events) { }
+
+    public void UpdateEvents(IEnumerable<BattleEvent> events)
+    {
+        _infoTracker.ProcessEvents(events);
+    }
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime) => Task.CompletedTask;
     public Task NotifyChoiceTimeoutAsync() => Task.CompletedTask;
 
@@ -82,7 +95,14 @@ public sealed class PlayerMcts : IPlayer
     {
         Battle battle = BattleController.Battle
                         ?? throw new InvalidOperationException("Battle is not initialized on the controller");
-        BattlePerspective perspective = perspectiveFactory();
+        BattlePerspective rawPerspective = perspectiveFactory();
+
+        // Initialize tracker if this is the first perspective we see
+        _infoTracker.EnsureInitialized(rawPerspective);
+
+        // Filter the perspective to only include revealed opponent information
+        BattlePerspective perspective = _infoTracker.FilterPerspective(rawPerspective);
+
         (LegalAction actionA, var actionB) = _search.Search(battle, SideId, request, perspective);
 
         if (PrintDebug)

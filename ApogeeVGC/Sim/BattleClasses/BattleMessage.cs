@@ -21,7 +21,7 @@ public abstract class BattleMessage
 }
 
 /// <summary>
-/// Message for when a Pokémon uses a move
+/// Message for when a Pokï¿½mon uses a move
 /// </summary>
 public class MoveUsedMessage : BattleMessage
 {
@@ -65,7 +65,7 @@ public class EffectivenessMessage : BattleMessage
 }
 
 /// <summary>
-/// Message for when a Pokémon takes damage
+/// Message for when a Pokï¿½mon takes damage
 /// </summary>
 public class DamageMessage : BattleMessage
 {
@@ -116,7 +116,7 @@ public class DamageMessage : BattleMessage
 }
 
 /// <summary>
-/// Message for when a Pokémon faints
+/// Message for when a Pokï¿½mon faints
 /// </summary>
 public class FaintMessage : BattleMessage
 {
@@ -133,12 +133,13 @@ public class FaintMessage : BattleMessage
 }
 
 /// <summary>
-/// Message for when a Pokémon is switched in
+/// Message for when a Pokï¿½mon is switched in
 /// </summary>
 public class SwitchMessage : BattleMessage
 {
     public required string TrainerName { get; init; }
     public required string PokemonName { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
@@ -365,7 +366,7 @@ public class AbilityMessage : BattleMessage
 }
 
 /// <summary>
-/// Message for when a Pokémon can't move (flinch, paralysis, sleep, etc.)
+/// Message for when a Pokï¿½mon can't move (flinch, paralysis, sleep, etc.)
 /// </summary>
 public class CantMessage : BattleMessage
 {
@@ -387,5 +388,47 @@ public class CantMessage : BattleMessage
             "frz" => $"{pokemonDisplay} is frozen solid!",
             _ => $"{pokemonDisplay} can't move!"
         };
+    }
+}
+
+/// <summary>
+/// Message for when an item is consumed, removed, or otherwise ends.
+/// Reveals the item to the opponent (e.g., Focus Sash activating, Knock Off removing).
+/// </summary>
+public class EndItemMessage : BattleMessage
+{
+    public required string PokemonName { get; init; }
+    public required string ItemName { get; init; }
+    public SideId? SideId { get; init; }
+
+    /// <summary>
+    /// How the item was lost: "eat" (berry), "move" (Knock Off/Trick), or null (general consumption).
+    /// </summary>
+    public string? Reason { get; init; }
+
+    public override string ToDisplayText()
+    {
+        string pokemonDisplay = SideId.HasValue
+            ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+            : PokemonName;
+        return $"{pokemonDisplay}'s {ItemName} was consumed!";
+    }
+}
+
+/// <summary>
+/// Message for when a Pokemon terastallizes, revealing its tera type.
+/// </summary>
+public class TerastallizeMessage : BattleMessage
+{
+    public required string PokemonName { get; init; }
+    public required string TeraTypeName { get; init; }
+    public SideId? SideId { get; init; }
+
+    public override string ToDisplayText()
+    {
+        string pokemonDisplay = SideId.HasValue
+            ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+            : PokemonName;
+        return $"{pokemonDisplay} terastallized into the {TeraTypeName} type!";
     }
 }

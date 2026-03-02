@@ -674,7 +674,8 @@ public partial class Battle
                     new SwitchMessage
                     {
                         TrainerName = ExtractTrainerName(parts[2]),
-                        PokemonName = ExtractPokemonName(parts[2])
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2])
                     },
 
                 "faint" when parts.Length > 2 =>
@@ -761,6 +762,23 @@ public partial class Battle
                         PokemonName = ExtractPokemonName(parts[2]),
                         SideId = ExtractSideId(parts[2]),
                         ItemName = parts[3]
+                    },
+
+                "-enditem" when parts.Length > 3 =>
+                    new EndItemMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2]),
+                        ItemName = parts[3],
+                        Reason = parts.Length > 4 ? parts[4].Trim('[', ']') : null
+                    },
+
+                "-terastallize" when parts.Length > 3 =>
+                    new TerastallizeMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2]),
+                        TeraTypeName = parts[3]
                     },
 
                 "-sidestart" when parts.Length > 3 =>
@@ -871,7 +889,8 @@ public partial class Battle
                         new SwitchMessage
                         {
                             TrainerName = ExtractTrainerName(parts[2]),
-                            PokemonName = ExtractPokemonName(parts[2])
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2])
                         },
 
                     "faint" when parts.Length > 2 =>
@@ -959,6 +978,23 @@ public partial class Battle
                             PokemonName = ExtractPokemonName(parts[2]),
                             SideId = ExtractSideId(parts[2]),
                             ItemName = parts[3]
+                        },
+
+                    "-enditem" when parts.Length > 3 =>
+                        new EndItemMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2]),
+                            ItemName = parts[3],
+                            Reason = parts.Length > 4 ? parts[4].Trim('[', ']') : null
+                        },
+
+                    "-terastallize" when parts.Length > 3 =>
+                        new TerastallizeMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2]),
+                            TeraTypeName = parts[3]
                         },
 
                     "-sidestart" when parts.Length > 3 =>
