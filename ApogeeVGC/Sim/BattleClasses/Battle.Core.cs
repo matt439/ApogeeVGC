@@ -183,6 +183,28 @@ public partial class Battle
         _effectStatePool.Push(state);
     }
 
+    /// <summary>
+    /// Pool of reusable <see cref="EventContext"/> instances to eliminate per-handler
+    /// allocations inside <see cref="InvokeEventHandlerInfo"/>.
+    /// Rented instances are populated, passed to the handler, then reset and returned.
+    /// </summary>
+    private readonly Stack<EventContext> _eventContextPool = new();
+
+    internal EventContext RentEventContext()
+    {
+        if (_eventContextPool.Count > 0)
+        {
+            return _eventContextPool.Pop();
+        }
+        return new EventContext();
+    }
+
+    internal void ReturnEventContext(EventContext context)
+    {
+        context.ResetForPool();
+        _eventContextPool.Push(context);
+    }
+
     // Note: TeamGenerator is not implemented as we only support constructed teams, not random battles.
     // Random battle team generation would require implementing the full Pokemon Showdown team generator.
     // TeamGenerator teamGenerator = null;

@@ -999,6 +999,7 @@ public partial class Battle
     /// Invokes an event handler using EventHandlerInfo.
     /// This provides type-safe invocation with compile-time validation and eliminates
     /// the need for complex pattern matching on EffectDelegate union types.
+    /// Uses a pooled EventContext to avoid per-invocation heap allocations.
     /// </summary>
     private RelayVar? InvokeEventHandlerInfo(EventHandlerInfo? handlerInfo, bool hasRelayVar,
         RelayVar relayVar,
@@ -1014,23 +1015,36 @@ public partial class Battle
             return ConvertConstantToRelayVar(constantValue, handlerInfo.Id);
         }
 
-        // Build the invocation context
-        var invocationContext = new EventInvocationContext
-        {
-            Battle = this,
-            EventId = handlerInfo.Id,
-            Effect = Effect,
-            Target = target,
-            Source = source,
-            SourceEffect = sourceEffect,
-            RelayVar = relayVar,
-            HasRelayVar = hasRelayVar
-        };
-
         // Use context-based handler if available
         if (handlerInfo.UsesContextHandler)
         {
-            EventContext eventContext = invocationContext.ToEventContext();
+            // Rent a pooled EventContext and populate it directly
+            // (eliminates the EventInvocationContext intermediary allocation)
+            EventContext eventContext = RentEventContext();
+            eventContext.Battle = this;
+            eventContext.EventId = handlerInfo.Id;
+            eventContext.Effect = Effect;
+            eventContext.TargetPokemon = target is { Kind: SingleEventTargetKind.Pokemon } tp ? tp.Pokemon : null;
+            eventContext.TargetSide = target switch
+            {
+                { Kind: SingleEventTargetKind.Side } s => s.Side,
+                { Kind: SingleEventTargetKind.Pokemon } p => p.Pokemon.Side,
+                _ => null
+            };
+            eventContext.TargetField = target is { Kind: SingleEventTargetKind.Field } tf ? tf.Field : null;
+            eventContext.SourcePokemon = source switch
+            {
+                { IsPokemon: true } s => s.Pokemon,
+                _ => null
+            };
+            eventContext.SourceType = source switch
+            {
+                { IsPokemonType: true } s => s.Type,
+                _ => null
+            };
+            eventContext.SourceEffect = sourceEffect;
+            eventContext.Move = sourceEffect as Moves.ActiveMove;
+            eventContext.RelayVar = relayVar;
 
             // Capture effect name before execution since nested events may change Effect
             string effectName = Effect?.Name ?? "unknown";
@@ -1045,6 +1059,10 @@ public partial class Battle
                 throw new InvalidOperationException(
                     $"Event {handlerInfo.Id} context handler failed on effect {effectName} ({effectType})",
                     ex);
+            }
+            finally
+            {
+                ReturnEventContext(eventContext);
             }
         }
 
@@ -1087,20 +1105,27 @@ public partial class Battle
         // Use context-based handler (set by Create factory)
         if (handlerInfo.ContextHandler is not null)
         {
-            var context = BuildCallbackContext(handlerInfo.Id, args);
-            RelayVar? relayResult = handlerInfo.ContextHandler(context);
-            return ConvertRelayVarToCallbackResult<TResult>(relayResult);
+            var context = RentCallbackContext(handlerInfo.Id, args);
+            try
+            {
+                RelayVar? relayResult = handlerInfo.ContextHandler(context);
+                return ConvertRelayVarToCallbackResult<TResult>(relayResult);
+            }
+            finally
+            {
+                ReturnEventContext(context);
+            }
         }
 
         return default;
     }
 
     /// <summary>
-    /// Builds an EventContext from positional callback arguments.
-    /// Maps args by type: Battle, then first Pokemon ? Target, second Pokemon ? Source,
-    /// ActiveMove ? Move, IEffect ? SourceEffect.
+    /// Rents a pooled EventContext and populates it from positional callback arguments.
+    /// Maps args by type: Battle, then first Pokemon → Target, second Pokemon → Source,
+    /// ActiveMove → Move, IEffect → SourceEffect.
     /// </summary>
-    private static EventContext BuildCallbackContext(EventId eventId, object?[] args)
+    private EventContext RentCallbackContext(EventId eventId, object?[] args)
     {
         Battle? battle = null;
         Pokemon? targetPokemon = null;
@@ -1130,16 +1155,15 @@ public partial class Battle
             }
         }
 
-        return new EventContext
-        {
-            Battle = battle ?? throw new InvalidOperationException(
-                $"Callback {eventId}: No Battle argument found in args"),
-            EventId = eventId,
-            TargetPokemon = targetPokemon,
-            SourcePokemon = sourcePokemon,
-            Move = move,
-            SourceEffect = sourceEffect
-        };
+        EventContext context = RentEventContext();
+        context.Battle = battle ?? throw new InvalidOperationException(
+            $"Callback {eventId}: No Battle argument found in args");
+        context.EventId = eventId;
+        context.TargetPokemon = targetPokemon;
+        context.SourcePokemon = sourcePokemon;
+        context.Move = move;
+        context.SourceEffect = sourceEffect;
+        return context;
     }
 
     /// <summary>

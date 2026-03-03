@@ -12,72 +12,91 @@ namespace ApogeeVGC.Sim.Events;
 /// <summary>
 /// Strongly-typed context passed to all event handlers.
 /// Provides type-safe access to event participants and state without reflection.
+/// Instances are pooled by <see cref="Battle"/> to avoid per-invocation heap allocations.
 /// </summary>
 public sealed class EventContext
 {
     // === Core References ===
-    
+
     /// <summary>
     /// The battle instance (always available).
     /// </summary>
-    public required Battle Battle { get; init; }
-    
+    public Battle Battle { get; set; } = null!;
+
   /// <summary>
   /// The event being triggered.
     /// </summary>
-    public required EventId EventId { get; init; }
-    
+    public EventId EventId { get; set; }
+
     /// <summary>
     /// The effect whose handler is being invoked (e.g., the Item, Ability, Move, or Condition that owns this handler).
     /// </summary>
-    public IEffect? Effect { get; init; }
-    
+    public IEffect? Effect { get; set; }
+
     // === Event Targets ===
-    
+
     /// <summary>
     /// Target Pokemon (if this is a Pokemon-targeted event).
  /// </summary>
-    public Pokemon? TargetPokemon { get; init; }
-    
+    public Pokemon? TargetPokemon { get; set; }
+
     /// <summary>
     /// Target Side (if this is a side-targeted event).
     /// </summary>
-    public Side? TargetSide { get; init; }
-    
+    public Side? TargetSide { get; set; }
+
   /// <summary>
     /// Target Field (if this is a field-targeted event).
     /// </summary>
-    public Field? TargetField { get; init; }
-    
+    public Field? TargetField { get; set; }
+
     // === Event Sources ===
-    
+
     /// <summary>
     /// Source Pokemon (the Pokemon triggering this event).
   /// </summary>
-    public Pokemon? SourcePokemon { get; init; }
-  
+    public Pokemon? SourcePokemon { get; set; }
+
     /// <summary>
     /// Source type (for type-specific events like Effectiveness).
     /// </summary>
-    public PokemonType? SourceType { get; init; }
-  
+    public PokemonType? SourceType { get; set; }
+
     /// <summary>
     /// Source effect (ability, item, move, condition, etc. that triggered this event).
     /// </summary>
-    public IEffect? SourceEffect { get; init; }
-    
+    public IEffect? SourceEffect { get; set; }
+
     // === Event-Specific Data ===
-    
+
     /// <summary>
     /// The active move being used (for move-related events).
     /// </summary>
- public ActiveMove? Move { get; init; }
-    
+ public ActiveMove? Move { get; set; }
+
     /// <summary>
     /// Relay variable for passing values through event chain.
     /// Can be modified by handlers to affect subsequent handlers or return values.
     /// </summary>
-    public RelayVar? RelayVar { get; init; }
+    public RelayVar? RelayVar { get; set; }
+
+    /// <summary>
+    /// Resets all fields so this instance can be returned to a pool.
+    /// </summary>
+    internal void ResetForPool()
+    {
+        Battle = null!;
+        EventId = default;
+        Effect = null;
+        TargetPokemon = null;
+        TargetSide = null;
+        TargetField = null;
+        SourcePokemon = null;
+        SourceType = null;
+        SourceEffect = null;
+        Move = null;
+        RelayVar = null;
+    }
 
     // === Type-Safe Accessors ===
 
