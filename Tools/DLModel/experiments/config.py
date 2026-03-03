@@ -109,7 +109,7 @@ HPARAM_SEARCH_SPACE = {
     'head_dim':          ('categorical', [32, 64, 96, 128]),
     'lr':                ('loguniform', 1e-4, 5e-3),
     'weight_decay':      ('loguniform', 1e-6, 1e-3),
-    'batch_size':        ('categorical', [256, 512, 1024, 2048]),
+    'batch_size':        ('categorical', [256, 512, 1024]),
 }
 
 # ── Ablation configurations (cumulative feature addition) ──

@@ -1,0 +1,1 @@
+python scraper.py --format gen9doublesou gen9randombattle gen9ou gen9randomdoublesbattle gen9vgc2024regf gen9vgc2025regi
