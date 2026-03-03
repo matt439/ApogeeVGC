@@ -71,7 +71,7 @@ public class ModdedDex(Library library)
     /// </summary>
     public bool GetImmunity(MoveType sourceType, Pokemon target)
     {
-        return GetImmunity(sourceType, target.Types);
+        return GetImmunity(sourceType, target.GetTypes());
     }
 
     /// <summary>

@@ -34,15 +34,32 @@ public record TypeChart
 
     public MoveEffectiveness GetMoveEffectiveness(IReadOnlyList<PokemonType> pokemon, MoveType moveType)
     {
-        return pokemon.Count switch
+        switch (pokemon.Count)
         {
-            0 => throw new ArgumentException("Pokemon type list cannot be empty.", nameof(pokemon)),
-            1 => GetMoveEffectiveness(pokemon[0], moveType),
-            > 2 => throw new ArgumentException("Pokemon type list can only contain up to two types.",
-                nameof(pokemon)),
-            _ => CombineTypeEffectivenesses(_typeData[pokemon[0]].DamageTaken[moveType],
-                _typeData[pokemon[1]].DamageTaken[moveType]),
-        };
+            case 0:
+                throw new ArgumentException("Pokemon type list cannot be empty.", nameof(pokemon));
+            case 1:
+                return GetMoveEffectiveness(pokemon[0], moveType);
+            case 2:
+                return CombineTypeEffectivenesses(_typeData[pokemon[0]].DamageTaken[moveType],
+                    _typeData[pokemon[1]].DamageTaken[moveType]);
+            default:
+                // 3+ types (e.g. Forest's Curse / Trick-or-Treat adding a third type).
+                // Match Showdown: sum individual type modifiers, with early exit on immunity.
+                int totalTypeMod = 0;
+                for (int i = 0; i < pokemon.Count; i++)
+                {
+                    var typeEff = _typeData[pokemon[i]].DamageTaken[moveType];
+                    if (typeEff == TypeEffectiveness.Immune) return MoveEffectiveness.Immune;
+                    totalTypeMod += typeEff switch
+                    {
+                        TypeEffectiveness.SuperEffective => 1,
+                        TypeEffectiveness.NotVeryEffective => -1,
+                        _ => 0,
+                    };
+                }
+                return totalTypeMod.ToMoveEffectiveness();
+        }
     }
 
     public MoveEffectiveness GetMoveEffectiveness(PokemonType[] pokemon, MoveType moveType)
