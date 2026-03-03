@@ -185,7 +185,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         }
 
 
-        var actions = new List<ChosenAction>(request.Active.Count);
+        var actions = new ChosenAction[request.Active.Count];
 
         // Handle each active Pokemon
         for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
@@ -195,17 +195,20 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             // Null entries represent fainted Pokemon or empty slots - add a pass action
             if (pokemonRequest == null)
             {
-                actions.Add(new ChosenAction
+                actions[pokemonIndex] = new ChosenAction
                 {
                     Choice = ChoiceType.Pass,
                     Pokemon = null,
                     MoveId = MoveId.None,
-                });
+                };
                 continue;
             }
 
-            // Build list of all available choices (moves with and without tera, plus switch option)
-            var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>(pokemonRequest.Moves.Length * 2 + 1);
+            // Build list of all available choices using stack-allocated span
+            // Max: 4 moves * 2 (with/without tera) + 1 switch = 9
+            Span<(bool isMove, int moveIndex, bool useTera)> availableChoices =
+                stackalloc (bool, int, bool)[pokemonRequest.Moves.Length * 2 + 1];
+            int availableChoiceCount = 0;
 
             // Check if terastallization is available
             MoveType? teraType = pokemonRequest.CanTerastallize switch
@@ -223,12 +226,12 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                 if (!disabled)
                 {
                     // Add regular move option
-                    availableChoices.Add((true, i, false));
+                    availableChoices[availableChoiceCount++] = (true, i, false);
 
                     // Add tera variant if available
                     if (teraType.HasValue)
                     {
-                        availableChoices.Add((true, i, true));
+                        availableChoices[availableChoiceCount++] = (true, i, true);
                     }
                 }
             }
@@ -249,40 +252,48 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             // battle engine converts it to Struggle. Without this, the random player would
             // always switch when out of PP, creating infinite switching loops where no
             // damage or recoil ever occurs.
-            bool allMovesDisabled = !availableChoices.Any(c => c.isMove);
+            bool allMovesDisabled = true;
+            for (int ci = 0; ci < availableChoiceCount; ci++)
+            {
+                if (availableChoices[ci].isMove)
+                {
+                    allMovesDisabled = false;
+                    break;
+                }
+            }
             if (allMovesDisabled && pokemonRequest.Moves.Length > 0)
             {
-                availableChoices.Add((true, 0, false));
+                availableChoices[availableChoiceCount++] = (true, 0, false);
             }
 
             bool canSwitch = !isTrapped && availableSwitchCount > 0;
             if (canSwitch)
             {
-                availableChoices.Add((false, -1, false)); // Switch option
+                availableChoices[availableChoiceCount++] = (false, -1, false); // Switch option
             }
 
             // If no choices available (all moves disabled, can't switch, and no Struggle fallback)
-            if (availableChoices.Count == 0)
+            if (availableChoiceCount == 0)
             {
                 if (pokemonRequest.Moves.Length > 0)
                 {
                     // Use the first move (likely Struggle or will be converted to Struggle)
-                    availableChoices.Add((true, 0, false));
+                    availableChoices[availableChoiceCount++] = (true, 0, false);
                 }
                 else
                 {
                     // No moves at all - this shouldn't happen, but add a pass just in case
-                    actions.Add(new ChosenAction
+                    actions[pokemonIndex] = new ChosenAction
                     {
                         Choice = ChoiceType.Pass,
                         Pokemon = null,
                         MoveId = MoveId.None,
-                    });
+                    };
                     continue;
                 }
             }
 
-            int randomIndex = _random.Random(0, availableChoices.Count);
+            int randomIndex = _random.Random(0, availableChoiceCount);
             (bool isMove, int moveIndex, bool useTera) = availableChoices[randomIndex];
 
             if (isMove)
@@ -300,14 +311,14 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                 // Random target location (0 for auto-targeting, will be resolved by battle engine)
                 int targetLoc = GetRandomTargetLocation(selectedMove.Move.Target);
 
-                actions.Add(new ChosenAction
+                actions[pokemonIndex] = new ChosenAction
                 {
                     Choice = ChoiceType.Move,
                     Pokemon = null,
                     MoveId = selectedMove.Id,
                     TargetLoc = targetLoc,
                     Terastallize = useTera ? teraType : null
-                });
+                };
             }
             else
             {
@@ -334,13 +345,13 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                     }
                 }
 
-                actions.Add(new ChosenAction
+                actions[pokemonIndex] = new ChosenAction
                 {
                     Choice = ChoiceType.Switch,
                     Pokemon = null,
                     MoveId = MoveId.None,
                     Index = selectedSwitchIndex,
-                });
+                };
             }
         }
 

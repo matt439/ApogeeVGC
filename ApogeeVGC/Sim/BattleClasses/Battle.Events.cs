@@ -306,7 +306,13 @@ public partial class Battle
         {
             if (relayVar is ArrayRelayVar arrayRelayVar)
             {
-                targetRelayVars = arrayRelayVar.Values.ToList();
+                // Copy values without LINQ .ToList() allocation
+                List<RelayVar> srcValues = arrayRelayVar.Values;
+                targetRelayVars = new List<RelayVar>(srcValues.Count);
+                for (int i = 0; i < srcValues.Count; i++)
+                {
+                    targetRelayVars.Add(srcValues[i]);
+                }
             }
             else
             {
@@ -490,7 +496,16 @@ public partial class Battle
                         targetRelayVars[handler.Index.Value] = relayVar;
 
                         // Check if all targets are falsy
-                        if (targetRelayVars.All(rv => !IsRelayVarTruthy(rv)))
+                        bool allFalsy = true;
+                        for (int ti = 0; ti < targetRelayVars.Count; ti++)
+                        {
+                            if (IsRelayVarTruthy(targetRelayVars[ti]))
+                            {
+                                allFalsy = false;
+                                break;
+                            }
+                        }
+                        if (allFalsy)
                         {
                             break;
                         }
@@ -511,7 +526,7 @@ public partial class Battle
 
         // Return appropriate result
         return target is { Kind: RunEventTargetKind.PokemonArray }
-            ? new ArrayRelayVar([.. targetRelayVars ?? []])
+            ? new ArrayRelayVar(targetRelayVars ?? [])
             : relayVar;
         }
         finally

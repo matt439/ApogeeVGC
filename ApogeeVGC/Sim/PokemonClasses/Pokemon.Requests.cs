@@ -42,15 +42,8 @@ public partial class Pokemon
     /// <returns>Pokemon switch request data object</returns>
     public PokemonSwitchRequestData GetSwitchRequestData(bool forAlly = false)
     {
-        // Build stats dictionary from base stored stats
-        var stats = new StatsTable
-        {
-            Atk = BaseStoredStats.Atk,
-            Def = BaseStoredStats.Def,
-            SpA = BaseStoredStats.SpA,
-            SpD = BaseStoredStats.SpD,
-            Spe = BaseStoredStats.Spe,
-        };
+        // Reuse existing BaseStoredStats reference instead of allocating a new StatsTable copy
+        StatsTable stats = BaseStoredStats;
 
         // Get move list - either base moves (for allies) or current moves
         var moveSource = forAlly ? BaseMoveSlots : MoveSlots;
@@ -163,7 +156,8 @@ public partial class Pokemon
             lockedMove = MoveId.Struggle;
         }
 
-        // Create base request data
+        // Create base request data — set all mutable properties directly instead of
+        // using 'with' expressions that allocate a new record copy each time
         var data = new PokemonMoveRequestData
         {
             Moves = moves,
@@ -177,23 +171,23 @@ public partial class Pokemon
 
             if (MaybeDisabled)
             {
-                data = data with { MaybeDisabled = true };
+                data.MaybeDisabled = true;
             }
 
             if (MaybeLocked == true)
             {
-                data = data with { MaybeLocked = true };
+                data.MaybeLocked = true;
             }
 
             if (canSwitchIn > 0)
             {
                 if (Trapped == PokemonTrapped.True)
                 {
-                    data = data with { Trapped = true };
+                    data.Trapped = true;
                 }
                 else if (MaybeTrapped)
                 {
-                    data = data with { MaybeTrapped = true };
+                    data.MaybeTrapped = true;
                 }
             }
         }
@@ -208,7 +202,7 @@ public partial class Pokemon
                 // Discovered by selecting a valid Pokemon as a switch target and cancelling
                 if (Trapped == PokemonTrapped.True)
                 {
-                    data = data with { Trapped = true };
+                    data.Trapped = true;
                 }
             }
 
@@ -220,7 +214,7 @@ public partial class Pokemon
         {
             if (CanTerastallize is not null and not FalseMoveTypeFalseUnion)
             {
-                data = data with { CanTerastallize = CanTerastallize };
+                data.CanTerastallize = CanTerastallize;
             }
         }
 
@@ -229,7 +223,7 @@ public partial class Pokemon
         {
             if (CanMegaEvo is not null)
             {
-                data = data with { CanMegaEvo = CanMegaEvo };
+                data.CanMegaEvo = CanMegaEvo;
             }
         }
 

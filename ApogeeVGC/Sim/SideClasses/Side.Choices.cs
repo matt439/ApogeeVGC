@@ -194,8 +194,11 @@ public partial class Side
         bool isEnabled = false;
         EffectStateId? disabledSource = null;
 
-        foreach (PokemonMoveData m in moves.Where(m => m.Id == moveid))
+        for (int mi = 0; mi < moves.Length; mi++)
         {
+            PokemonMoveData m = moves[mi];
+            if (m.Id != moveid) continue;
+
             if (m.Disabled is null || !m.Disabled.IsTrue())
             {
                 isEnabled = true;
@@ -694,26 +697,29 @@ public partial class Side
         }
 
         // Step 5: Process each action in the choice
-        if (input.Actions.Select((action, index) =>
+        bool anyFailed = false;
+        for (int actionIndex = 0; actionIndex < input.Actions.Count; actionIndex++)
+        {
+            ChosenAction action = input.Actions[actionIndex];
+            bool success = action.Choice switch
             {
-                bool success = action.Choice switch
-                {
-                    ChoiceType.Move => ProcessChosenMoveAction(action),
-                    ChoiceType.Switch or ChoiceType.InstaSwitch =>
-                        ProcessChosenSwitchAction(action),
-                    ChoiceType.Team => ProcessChosenTeamAction(action),
-                    ChoiceType.Pass => ChoosePass().IsTrue(),
-                    ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
-                    _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
-                };
+                ChoiceType.Move => ProcessChosenMoveAction(action),
+                ChoiceType.Switch or ChoiceType.InstaSwitch =>
+                    ProcessChosenSwitchAction(action),
+                ChoiceType.Team => ProcessChosenTeamAction(action),
+                ChoiceType.Pass => ChoosePass().IsTrue(),
+                ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
+                _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
+            };
 
-                if (!success)
-                {
-                    Battle.Debug($"[Side.Choose] Action {index} failed: {Choice.Error}");
-                }
-
-                return success;
-            }).Any(success => !success))
+            if (!success)
+            {
+                Battle.Debug($"[Side.Choose] Action {actionIndex} failed: {Choice.Error}");
+                anyFailed = true;
+                break;
+            }
+        }
+        if (anyFailed)
         {
             Battle.Debug($"[Side.Choose] Overall choice failed for {Name}");
             return false;

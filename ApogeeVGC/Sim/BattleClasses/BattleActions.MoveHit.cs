@@ -241,7 +241,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
     {
         // Hardcoded for single-target purposes
         // (no spread moves have any kind of onTryHit handler)
-        Pokemon target = SpreadMoveTargets.ToPokemonList(targets)[0];
+        Pokemon target = SpreadMoveTargets.FirstPokemon(targets);
         var damage = new SpreadMoveDamage(targets.Count);
 
         for (int i = 0; i < targets.Count; i++)
@@ -406,17 +406,13 @@ if (tryResult is BoolRelayVar { Value: false } ||
             }
         }
 
-        var damagedTargets = new Pokemon[targets.Count];
-        var damagedDamage = new int[targets.Count];
+        // Count damaged targets first to allocate exact-size array (avoids oversized + ToArray copy)
         int damagedCount = 0;
-
         for (int i = 0; i < targets.Count; i++)
         {
-            if (damage[i] is IntBoolIntUndefinedUnion intDmg &&
-                targets[i] is PokemonPokemonUnion pokemonUnion)
+            if (damage[i] is IntBoolIntUndefinedUnion &&
+                targets[i] is PokemonPokemonUnion)
             {
-                damagedTargets[damagedCount] = pokemonUnion.Pokemon;
-                damagedDamage[damagedCount] = intDmg.Value;
                 damagedCount++;
             }
         }
@@ -425,13 +421,20 @@ if (tryResult is BoolRelayVar { Value: false } ||
 
         if (damagedCount > 0 && !isSecondary && !isSelf)
         {
+            var damagedTargets = new Pokemon[damagedCount];
             var damageRelayVars = new List<RelayVar>(damagedCount);
-            for (int i = 0; i < damagedCount; i++)
+            int idx = 0;
+            for (int i = 0; i < targets.Count; i++)
             {
-                damageRelayVars.Add(IntRelayVar.Get(damagedDamage[i]));
+                if (damage[i] is IntBoolIntUndefinedUnion intDmg &&
+                    targets[i] is PokemonPokemonUnion pokemonUnion)
+                {
+                    damagedTargets[idx++] = pokemonUnion.Pokemon;
+                    damageRelayVars.Add(IntRelayVar.Get(intDmg.Value));
+                }
             }
 
-            Battle.RunEvent(EventId.DamagingHit, damagedTargets.AsSpan(0, damagedCount).ToArray(), pokemon, move,
+            Battle.RunEvent(EventId.DamagingHit, damagedTargets, pokemon, move,
                 new ArrayRelayVar(damageRelayVars));
 
             if (move.OnAfterHit != null)
