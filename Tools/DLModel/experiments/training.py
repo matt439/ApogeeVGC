@@ -149,11 +149,14 @@ def train_model(
             with autocast('cuda', enabled=use_amp):
                 bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-                b_loss = bring_loss_fn(bring_pred, bring_tgt)
-                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-                l_mask = bring_tgt
-                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-                loss = b_loss + l_loss
+            # BCELoss requires float32 — compute loss outside autocast
+            bring_pred = bring_pred.float()
+            lead_pred = lead_pred.float()
+            b_loss = bring_loss_fn(bring_pred, bring_tgt)
+            l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
+            l_mask = bring_tgt
+            l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
+            loss = b_loss + l_loss
 
             optimizer.zero_grad()
             scaler.scale(loss).backward()
@@ -186,11 +189,13 @@ def train_model(
                 with autocast('cuda', enabled=use_amp):
                     bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-                    b_loss = bring_loss_fn(bring_pred, bring_tgt)
-                    l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-                    l_mask = bring_tgt
-                    l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-                    loss = b_loss + l_loss
+                bring_pred = bring_pred.float()
+                lead_pred = lead_pred.float()
+                b_loss = bring_loss_fn(bring_pred, bring_tgt)
+                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
+                l_mask = bring_tgt
+                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
+                loss = b_loss + l_loss
 
                 v_loss += loss.item()
                 v_bloss += b_loss.item()

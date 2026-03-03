@@ -151,10 +151,10 @@ def train(args: argparse.Namespace) -> None:
             with autocast('cuda', enabled=use_amp):
                 value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-                v_loss = value_loss_fn(value, vtgt)
-                p_loss_a = policy_loss_fn(pol_a, pa_tgt)
-                p_loss_b = policy_loss_fn(pol_b, pb_tgt)
-                loss = v_loss + p_loss_a + p_loss_b
+            v_loss = value_loss_fn(value.float(), vtgt)
+            p_loss_a = policy_loss_fn(pol_a.float(), pa_tgt)
+            p_loss_b = policy_loss_fn(pol_b.float(), pb_tgt)
+            loss = v_loss + p_loss_a + p_loss_b
 
             optimizer.zero_grad()
             scaler.scale(loss).backward()
@@ -191,10 +191,10 @@ def train(args: argparse.Namespace) -> None:
                 with autocast('cuda', enabled=use_amp):
                     value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-                    v_loss = value_loss_fn(value, vtgt)
-                    p_loss_a = policy_loss_fn(pol_a, pa_tgt)
-                    p_loss_b = policy_loss_fn(pol_b, pb_tgt)
-                    loss = v_loss + p_loss_a + p_loss_b
+                v_loss = value_loss_fn(value.float(), vtgt)
+                p_loss_a = policy_loss_fn(pol_a.float(), pa_tgt)
+                p_loss_b = policy_loss_fn(pol_b.float(), pb_tgt)
+                loss = v_loss + p_loss_a + p_loss_b
 
                 val_loss += loss.item()
                 val_vloss += v_loss.item()

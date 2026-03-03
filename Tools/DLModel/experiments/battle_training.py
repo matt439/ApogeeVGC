@@ -154,10 +154,11 @@ def train_battle_model(
             with autocast('cuda', enabled=use_amp):
                 value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-                v_loss = value_loss_fn(value, vtgt)
-                pa_loss = policy_loss_fn(pol_a, pa_tgt)
-                pb_loss = policy_loss_fn(pol_b, pb_tgt)
-                loss = v_loss + pa_loss + pb_loss
+            # BCELoss requires float32 — compute loss outside autocast
+            v_loss = value_loss_fn(value.float(), vtgt)
+            pa_loss = policy_loss_fn(pol_a.float(), pa_tgt)
+            pb_loss = policy_loss_fn(pol_b.float(), pb_tgt)
+            loss = v_loss + pa_loss + pb_loss
 
             optimizer.zero_grad()
             scaler.scale(loss).backward()
@@ -195,10 +196,10 @@ def train_battle_model(
                 with autocast('cuda', enabled=use_amp):
                     value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-                    vl = value_loss_fn(value, vtgt)
-                    pal = policy_loss_fn(pol_a, pa_tgt)
-                    pbl = policy_loss_fn(pol_b, pb_tgt)
-                    loss = vl + pal + pbl
+                vl = value_loss_fn(value.float(), vtgt)
+                pal = policy_loss_fn(pol_a.float(), pa_tgt)
+                pbl = policy_loss_fn(pol_b.float(), pb_tgt)
+                loss = vl + pal + pbl
 
                 v_loss_sum += loss.item()
                 v_vloss += vl.item()
