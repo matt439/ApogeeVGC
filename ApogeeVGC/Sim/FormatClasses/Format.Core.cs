@@ -14,6 +14,11 @@ public enum FormatId
 {
     // Smogon formats
     Gen9Ou,
+    Gen9DoublesOu,
+
+    // Random formats
+    Gen9RandomBattle,
+    Gen9RandomDoublesBattle,
 
     // Custom formats
     CustomSingles,
@@ -67,12 +72,20 @@ public enum RuleId
     CancelMod,
     HpPercentageMod,
     OverflowStatMod,
+    SleepClauseMod,
+    GravitySleepClause,
+    IllusionLevelMod,
+
+    // Clause rules
+    EvasionAbilitiesClause,
+    SleepMovesClause,
 
     // Level adjustment rules
     AdjustLevelDown,
 
     // VGC-specific rules
     VgcTimer,
+    OpenTeamSheets,
     LimitOneRestricted,
     LimitTwoRestricted,
 

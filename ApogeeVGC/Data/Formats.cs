@@ -23,7 +23,29 @@ public record Formats
         [FormatId.Gen9Ou] = new Format
         {
             Name = "[Gen 9] OU",
-            Ruleset = [RuleId.Standard],
+            Ruleset = [RuleId.Standard, RuleId.EvasionAbilitiesClause, RuleId.SleepMovesClause],
+            Banlist = [],
+        },
+        [FormatId.Gen9DoublesOu] = new Format
+        {
+            Name = "[Gen 9] Doubles OU",
+            GameType = GameType.Doubles,
+            Ruleset = [RuleId.StandardDoubles, RuleId.EvasionAbilitiesClause],
+            Banlist = [],
+        },
+
+        // Random formats
+        [FormatId.Gen9RandomBattle] = new Format
+        {
+            Name = "[Gen 9] Random Battle",
+            Ruleset = [RuleId.Obtainable, RuleId.SpeciesClause, RuleId.HpPercentageMod, RuleId.CancelMod, RuleId.SleepClauseMod, RuleId.IllusionLevelMod],
+            Banlist = [],
+        },
+        [FormatId.Gen9RandomDoublesBattle] = new Format
+        {
+            Name = "[Gen 9] Random Doubles Battle",
+            GameType = GameType.Doubles,
+            Ruleset = [RuleId.Obtainable, RuleId.SpeciesClause, RuleId.HpPercentageMod, RuleId.CancelMod, RuleId.IllusionLevelMod, RuleId.SleepClauseMod],
             Banlist = [],
         },
 
@@ -155,13 +177,13 @@ public record Formats
             },
         },
 
-        // Regulation F (Apr - Aug 2024): All obtainable, 2 restricted
+        // Regulation F (Apr - Aug 2024): All obtainable, no restricted
         [FormatId.Gen9VgcRegulationF] = new Format
         {
             Name = "[Gen 9] VGC 2024 Regulation F",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.LimitTwoRestricted],
-            Banlist = [RuleId.Mythical],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.OpenTeamSheets],
+            Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
             RuleTable = new RuleTable
             {
                 MinTeamSize = 4,
@@ -209,13 +231,13 @@ public record Formats
             },
         },
 
-        // Regulation I (May 2025+): All obtainable, no restricted
+        // Regulation I (May 2025+): All obtainable, 2 restricted
         [FormatId.Gen9VgcRegulationI] = new Format
         {
             Name = "[Gen 9] VGC 2025 Regulation I",
             GameType = GameType.Doubles,
-            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer],
-            Banlist = [RuleId.Mythical, RuleId.RestrictedLegendary],
+            Ruleset = [RuleId.FlatRules, RuleId.VgcTimer, RuleId.LimitTwoRestricted],
+            Banlist = [RuleId.Mythical],
             RuleTable = new RuleTable
             {
                 MinTeamSize = 4,
