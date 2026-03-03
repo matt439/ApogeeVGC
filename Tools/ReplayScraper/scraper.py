@@ -269,6 +269,7 @@ def fetch_all_replays(
 
     success = 0
     failed = 0
+    t_start = time.time()
 
     with ThreadPoolExecutor(max_workers=concurrency) as executor:
         # Process in batches for progress reporting
@@ -286,9 +287,17 @@ def fetch_all_replays(
                     failed += 1
 
             total_done = len(already_fetched) + success + failed
+            done_this_session = success + failed
+            elapsed = time.time() - t_start
+            eta = ""
+            if done_this_session > 0 and elapsed > 0:
+                remaining = len(to_fetch) - done_this_session
+                secs = elapsed / done_this_session * remaining
+                h, m = int(secs // 3600), int(secs % 3600 // 60)
+                eta = f" | ETA {h}h{m:02d}m" if h else f" | ETA {m}m{int(secs % 60):02d}s"
             print(
                 f"  Progress: {total_done}/{len(all_ids)} "
-                f"({success} fetched, {failed} failed this session)",
+                f"({success} fetched, {failed} failed this session){eta}",
                 flush=True,
             )
 
