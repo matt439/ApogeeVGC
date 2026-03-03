@@ -192,6 +192,8 @@ def parse_replay(replay_data: dict) -> dict | None:
 
     # ── Runtime state ──
     active: dict[str, ActivePokemon] = {}  # slot -> ActivePokemon
+    # bench tracks pokemon not currently on field: species -> {hp, max_hp, status, fainted}
+    bench: dict[str, dict[str, dict]] = {"p1": {}, "p2": {}}
     field = FieldState()
     nickname_to_species: dict[str, str] = {}  # "p1a: Lunala" key -> species
     slot_species: dict[str, str] = {}  # slot -> current species
@@ -208,6 +210,7 @@ def parse_replay(replay_data: dict) -> dict | None:
     turn_tera: dict[str, str] = {}
     pending_state: dict | None = None  # state snapshot at turn start
     pending_field: dict | None = None  # field snapshot at turn start
+    pending_bench: dict | None = None  # bench snapshot at turn start
 
     def snapshot_state() -> dict:
         """Capture current active pokemon state."""
@@ -223,6 +226,22 @@ def parse_replay(replay_data: dict) -> dict | None:
                     "fainted": poke.fainted,
                 }
         return active_snapshot
+
+    def snapshot_bench() -> dict[str, list[dict]]:
+        """Capture bench pokemon state for both sides."""
+        result = {}
+        for side in ("p1", "p2"):
+            bench_list = []
+            for species, info in bench[side].items():
+                bench_list.append({
+                    "species": species,
+                    "hp": info["hp"],
+                    "status": info["status"],
+                    "fainted": info["fainted"],
+                })
+            if bench_list:
+                result[side] = bench_list
+        return result
 
     def get_revealed(side: str, species: str) -> RevealedInfo:
         if species not in revealed[side]:
@@ -240,7 +259,7 @@ def parse_replay(replay_data: dict) -> dict | None:
 
     def flush_turn():
         """Save the current turn's data."""
-        nonlocal pending_state, pending_field
+        nonlocal pending_state, pending_field, pending_bench
         if current_turn == 0:
             return
         if pending_state is None:
@@ -259,13 +278,16 @@ def parse_replay(replay_data: dict) -> dict | None:
                 ad["tera"] = a.tera
             actions.append(ad)
 
-        turns.append({
+        turn_data = {
             "turn": current_turn,
             "active": pending_state,
             "field": pending_field or {},
             "actions": actions,
             "faints": list(turn_faints),
-        })
+        }
+        if pending_bench:
+            turn_data["bench"] = pending_bench
+        turns.append(turn_data)
 
     # ── Parse lines ──
     for line in lines:
@@ -321,6 +343,7 @@ def parse_replay(replay_data: dict) -> dict | None:
                 turn_tera = {}
                 pending_state = snapshot_state()
                 pending_field = field.to_dict()
+                pending_bench = snapshot_bench()
 
             # ── Switch / Drag (forced switch) ──
             elif cmd in ("switch", "drag") and len(parts) >= 5:
@@ -331,11 +354,26 @@ def parse_replay(replay_data: dict) -> dict | None:
                 hp, max_hp = parse_hp(hp_str)
                 status = parse_status_from_hp(hp_str)
 
+                side = player_side(slot)
+
+                # Save outgoing pokemon to bench
+                if slot in active and active[slot] is not None:
+                    old = active[slot]
+                    bench[side][old.species] = {
+                        "hp": old.hp,
+                        "max_hp": old.max_hp,
+                        "status": old.status,
+                        "fainted": old.fainted,
+                    }
+
+                # Remove incoming pokemon from bench
+                if species in bench[side]:
+                    del bench[side][species]
+
                 # Track nickname -> species mapping
                 nickname_to_species[f"{slot}: {nickname}"] = species
                 slot_species[slot] = species
 
-                side = player_side(slot)
                 if species not in team_brought.get(side, []):
                     if side not in team_brought:
                         team_brought[side] = []
@@ -427,6 +465,14 @@ def parse_replay(replay_data: dict) -> dict | None:
                 if slot in active:
                     active[slot].hp = 0
                     active[slot].fainted = True
+                    # Move fainted pokemon to bench so it appears in bench snapshots
+                    side = player_side(slot)
+                    bench[side][active[slot].species] = {
+                        "hp": 0,
+                        "max_hp": active[slot].max_hp,
+                        "status": active[slot].status,
+                        "fainted": True,
+                    }
                 turn_faints.append(slot)
 
             # ── Boost / Unboost ──
