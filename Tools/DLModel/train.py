@@ -18,6 +18,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
 from dataset import VGCDataset, build_vocab
@@ -47,6 +48,12 @@ def train(args: argparse.Namespace) -> None:
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Device: {device}')
+
+    if device.type == 'cuda':
+        torch.backends.cudnn.benchmark = True
+
+    use_amp = device.type == 'cuda'
+    scaler = GradScaler('cuda', enabled=use_amp)
 
     # ── Vocab ──
     vocab_path = Path(args.vocab)
@@ -90,12 +97,15 @@ def train(args: argparse.Namespace) -> None:
     val_ds = VGCDataset(val_games, vocab)
     print(f'  {len(val_ds):,} samples ({time.time() - t0:.1f}s)')
 
+    cuda = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
     val_loader = DataLoader(
         val_ds, batch_size=args.batch_size, shuffle=False,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
 
     # ── Model ──
     model = BattleNet(
@@ -136,19 +146,22 @@ def train(args: argparse.Namespace) -> None:
 
         for batch in train_loader:
             sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt = [
-                x.to(device) for x in batch]
+                x.to(device, non_blocking=True) for x in batch]
 
-            value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+            with autocast('cuda', enabled=use_amp):
+                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-            v_loss = value_loss_fn(value, vtgt)
-            p_loss_a = policy_loss_fn(pol_a, pa_tgt)
-            p_loss_b = policy_loss_fn(pol_b, pb_tgt)
-            loss = v_loss + p_loss_a + p_loss_b
+                v_loss = value_loss_fn(value, vtgt)
+                p_loss_a = policy_loss_fn(pol_a, pa_tgt)
+                p_loss_b = policy_loss_fn(pol_b, pb_tgt)
+                loss = v_loss + p_loss_a + p_loss_b
 
             optimizer.zero_grad()
-            loss.backward()
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
 
             train_loss += loss.item()
             train_vloss += v_loss.item()
@@ -173,14 +186,15 @@ def train(args: argparse.Namespace) -> None:
         with torch.no_grad():
             for batch in val_loader:
                 sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt = [
-                    x.to(device) for x in batch]
+                    x.to(device, non_blocking=True) for x in batch]
 
-                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                with autocast('cuda', enabled=use_amp):
+                    value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-                v_loss = value_loss_fn(value, vtgt)
-                p_loss_a = policy_loss_fn(pol_a, pa_tgt)
-                p_loss_b = policy_loss_fn(pol_b, pb_tgt)
-                loss = v_loss + p_loss_a + p_loss_b
+                    v_loss = value_loss_fn(value, vtgt)
+                    p_loss_a = policy_loss_fn(pol_a, pa_tgt)
+                    p_loss_b = policy_loss_fn(pol_b, pb_tgt)
+                    loss = v_loss + p_loss_a + p_loss_b
 
                 val_loss += loss.item()
                 val_vloss += v_loss.item()

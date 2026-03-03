@@ -13,6 +13,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
 import sys
@@ -78,6 +79,12 @@ def train_battle_model(
     if device is None:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+    if device.type == 'cuda':
+        torch.backends.cudnn.benchmark = True
+
+    use_amp = device.type == 'cuda'
+    scaler = GradScaler('cuda', enabled=use_amp)
+
     torch.manual_seed(config.train.seed)
 
     mc = config.model
@@ -134,27 +141,30 @@ def train_battle_model(
         n_batches = 0
 
         for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt in train_loader:
-            sids = sids.to(device)
-            mids = mids.to(device)
-            aids = aids.to(device)
-            iids = iids.to(device)
-            tids = tids.to(device)
-            num = num.to(device)
-            vtgt = vtgt.to(device)
-            pa_tgt = pa_tgt.to(device)
-            pb_tgt = pb_tgt.to(device)
+            sids = sids.to(device, non_blocking=True)
+            mids = mids.to(device, non_blocking=True)
+            aids = aids.to(device, non_blocking=True)
+            iids = iids.to(device, non_blocking=True)
+            tids = tids.to(device, non_blocking=True)
+            num = num.to(device, non_blocking=True)
+            vtgt = vtgt.to(device, non_blocking=True)
+            pa_tgt = pa_tgt.to(device, non_blocking=True)
+            pb_tgt = pb_tgt.to(device, non_blocking=True)
 
-            value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+            with autocast('cuda', enabled=use_amp):
+                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-            v_loss = value_loss_fn(value, vtgt)
-            pa_loss = policy_loss_fn(pol_a, pa_tgt)
-            pb_loss = policy_loss_fn(pol_b, pb_tgt)
-            loss = v_loss + pa_loss + pb_loss
+                v_loss = value_loss_fn(value, vtgt)
+                pa_loss = policy_loss_fn(pol_a, pa_tgt)
+                pb_loss = policy_loss_fn(pol_b, pb_tgt)
+                loss = v_loss + pa_loss + pb_loss
 
             optimizer.zero_grad()
-            loss.backward()
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), tc.grad_clip)
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
 
             t_loss += loss.item()
             t_vloss += v_loss.item()
@@ -172,22 +182,23 @@ def train_battle_model(
 
         with torch.no_grad():
             for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt in val_loader:
-                sids = sids.to(device)
-                mids = mids.to(device)
-                aids = aids.to(device)
-                iids = iids.to(device)
-                tids = tids.to(device)
-                num = num.to(device)
-                vtgt = vtgt.to(device)
-                pa_tgt = pa_tgt.to(device)
-                pb_tgt = pb_tgt.to(device)
+                sids = sids.to(device, non_blocking=True)
+                mids = mids.to(device, non_blocking=True)
+                aids = aids.to(device, non_blocking=True)
+                iids = iids.to(device, non_blocking=True)
+                tids = tids.to(device, non_blocking=True)
+                num = num.to(device, non_blocking=True)
+                vtgt = vtgt.to(device, non_blocking=True)
+                pa_tgt = pa_tgt.to(device, non_blocking=True)
+                pb_tgt = pb_tgt.to(device, non_blocking=True)
 
-                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                with autocast('cuda', enabled=use_amp):
+                    value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-                vl = value_loss_fn(value, vtgt)
-                pal = policy_loss_fn(pol_a, pa_tgt)
-                pbl = policy_loss_fn(pol_b, pb_tgt)
-                loss = vl + pal + pbl
+                    vl = value_loss_fn(value, vtgt)
+                    pal = policy_loss_fn(pol_a, pa_tgt)
+                    pbl = policy_loss_fn(pol_b, pb_tgt)
+                    loss = vl + pal + pbl
 
                 v_loss_sum += loss.item()
                 v_vloss += vl.item()

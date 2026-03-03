@@ -95,7 +95,8 @@ def run_ablation(
         test_ds = TeamPreviewDataset(test_games, vocab, winners_only=config.data.winners_only)
         test_loader = DataLoader(
             test_ds, batch_size=config.train.batch_size,
-            shuffle=False, num_workers=0)
+            shuffle=False, num_workers=0,
+            pin_memory=(device.type == 'cuda'))
 
         checkpoint = torch.load(
             variant_dir / 'model.pt', map_location=device, weights_only=False)

@@ -123,12 +123,15 @@ def make_loaders(
     train_ds = TeamPreviewDataset(train_games, vocab, winners_only=winners_only)
     val_ds = TeamPreviewDataset(val_games, vocab, winners_only=winners_only)
 
+    cuda = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
     val_loader = DataLoader(
         val_ds, batch_size=batch_size, shuffle=False,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
 
     return train_loader, val_loader
 
@@ -145,11 +148,14 @@ def make_battle_loaders(
     train_ds = VGCDataset(train_games, vocab, winners_only=winners_only)
     val_ds = VGCDataset(val_games, vocab, winners_only=winners_only)
 
+    cuda = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
     val_loader = DataLoader(
         val_ds, batch_size=batch_size, shuffle=False,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
 
     return train_loader, val_loader

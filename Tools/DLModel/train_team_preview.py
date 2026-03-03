@@ -16,6 +16,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
 from dataset import build_vocab
@@ -64,6 +65,12 @@ def train(args: argparse.Namespace) -> None:
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Device: {device}')
 
+    if device.type == 'cuda':
+        torch.backends.cudnn.benchmark = True
+
+    use_amp = device.type == 'cuda'
+    scaler = GradScaler('cuda', enabled=use_amp)
+
     # ── Vocab ──
     vocab_path = Path(args.vocab)
     if not vocab_path.exists():
@@ -101,12 +108,15 @@ def train(args: argparse.Namespace) -> None:
     print(f'  {len(train_ds):,} train, {len(val_ds):,} val '
           f'({time.time() - t0:.1f}s)')
 
+    cuda = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
     val_loader = DataLoader(
         val_ds, batch_size=args.batch_size, shuffle=False,
-        num_workers=0, pin_memory=(device.type == 'cuda'))
+        num_workers=4, pin_memory=cuda,
+        persistent_workers=True)
 
     # ── Model ──
     model = TeamPreviewNet(
@@ -145,29 +155,32 @@ def train(args: argparse.Namespace) -> None:
         n_batches = 0
 
         for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in train_loader:
-            sids = sids.to(device)
-            mids = mids.to(device)
-            aids = aids.to(device)
-            iids = iids.to(device)
-            tids = tids.to(device)
-            bring_tgt = bring_tgt.to(device)
-            lead_tgt = lead_tgt.to(device)
+            sids = sids.to(device, non_blocking=True)
+            mids = mids.to(device, non_blocking=True)
+            aids = aids.to(device, non_blocking=True)
+            iids = iids.to(device, non_blocking=True)
+            tids = tids.to(device, non_blocking=True)
+            bring_tgt = bring_tgt.to(device, non_blocking=True)
+            lead_tgt = lead_tgt.to(device, non_blocking=True)
 
-            bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
+            with autocast('cuda', enabled=use_amp):
+                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-            b_loss = bring_loss_fn(bring_pred, bring_tgt)
+                b_loss = bring_loss_fn(bring_pred, bring_tgt)
 
-            # Lead loss only for brought Pokemon (bring_tgt == 1)
-            l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-            l_mask = bring_tgt  # only compute lead loss where brought
-            l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
+                # Lead loss only for brought Pokemon (bring_tgt == 1)
+                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
+                l_mask = bring_tgt  # only compute lead loss where brought
+                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
 
-            loss = b_loss + l_loss
+                loss = b_loss + l_loss
 
             optimizer.zero_grad()
-            loss.backward()
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
 
             t_loss += loss.item()
             t_bloss += b_loss.item()
@@ -187,21 +200,22 @@ def train(args: argparse.Namespace) -> None:
 
         with torch.no_grad():
             for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in val_loader:
-                sids = sids.to(device)
-                mids = mids.to(device)
-                aids = aids.to(device)
-                iids = iids.to(device)
-                tids = tids.to(device)
-                bring_tgt = bring_tgt.to(device)
-                lead_tgt = lead_tgt.to(device)
+                sids = sids.to(device, non_blocking=True)
+                mids = mids.to(device, non_blocking=True)
+                aids = aids.to(device, non_blocking=True)
+                iids = iids.to(device, non_blocking=True)
+                tids = tids.to(device, non_blocking=True)
+                bring_tgt = bring_tgt.to(device, non_blocking=True)
+                lead_tgt = lead_tgt.to(device, non_blocking=True)
 
-                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
+                with autocast('cuda', enabled=use_amp):
+                    bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-                b_loss = bring_loss_fn(bring_pred, bring_tgt)
-                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-                l_mask = bring_tgt
-                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-                loss = b_loss + l_loss
+                    b_loss = bring_loss_fn(bring_pred, bring_tgt)
+                    l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
+                    l_mask = bring_tgt
+                    l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
+                    loss = b_loss + l_loss
 
                 v_loss += loss.item()
                 v_bloss += b_loss.item()

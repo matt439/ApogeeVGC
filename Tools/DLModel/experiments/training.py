@@ -14,6 +14,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
 import sys
@@ -76,6 +77,12 @@ def train_model(
     if device is None:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+    if device.type == 'cuda':
+        torch.backends.cudnn.benchmark = True
+
+    use_amp = device.type == 'cuda'
+    scaler = GradScaler('cuda', enabled=use_amp)
+
     torch.manual_seed(config.train.seed)
 
     mc = config.model
@@ -131,26 +138,29 @@ def train_model(
         n_batches = 0
 
         for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in train_loader:
-            sids = sids.to(device)
-            mids = mids.to(device)
-            aids = aids.to(device)
-            iids = iids.to(device)
-            tids = tids.to(device)
-            bring_tgt = bring_tgt.to(device)
-            lead_tgt = lead_tgt.to(device)
+            sids = sids.to(device, non_blocking=True)
+            mids = mids.to(device, non_blocking=True)
+            aids = aids.to(device, non_blocking=True)
+            iids = iids.to(device, non_blocking=True)
+            tids = tids.to(device, non_blocking=True)
+            bring_tgt = bring_tgt.to(device, non_blocking=True)
+            lead_tgt = lead_tgt.to(device, non_blocking=True)
 
-            bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
+            with autocast('cuda', enabled=use_amp):
+                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-            b_loss = bring_loss_fn(bring_pred, bring_tgt)
-            l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-            l_mask = bring_tgt
-            l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-            loss = b_loss + l_loss
+                b_loss = bring_loss_fn(bring_pred, bring_tgt)
+                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
+                l_mask = bring_tgt
+                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
+                loss = b_loss + l_loss
 
             optimizer.zero_grad()
-            loss.backward()
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), tc.grad_clip)
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
 
             t_loss += loss.item()
             t_bloss += b_loss.item()
@@ -165,21 +175,22 @@ def train_model(
 
         with torch.no_grad():
             for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in val_loader:
-                sids = sids.to(device)
-                mids = mids.to(device)
-                aids = aids.to(device)
-                iids = iids.to(device)
-                tids = tids.to(device)
-                bring_tgt = bring_tgt.to(device)
-                lead_tgt = lead_tgt.to(device)
+                sids = sids.to(device, non_blocking=True)
+                mids = mids.to(device, non_blocking=True)
+                aids = aids.to(device, non_blocking=True)
+                iids = iids.to(device, non_blocking=True)
+                tids = tids.to(device, non_blocking=True)
+                bring_tgt = bring_tgt.to(device, non_blocking=True)
+                lead_tgt = lead_tgt.to(device, non_blocking=True)
 
-                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
+                with autocast('cuda', enabled=use_amp):
+                    bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-                b_loss = bring_loss_fn(bring_pred, bring_tgt)
-                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-                l_mask = bring_tgt
-                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-                loss = b_loss + l_loss
+                    b_loss = bring_loss_fn(bring_pred, bring_tgt)
+                    l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
+                    l_mask = bring_tgt
+                    l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
+                    loss = b_loss + l_loss
 
                 v_loss += loss.item()
                 v_bloss += b_loss.item()

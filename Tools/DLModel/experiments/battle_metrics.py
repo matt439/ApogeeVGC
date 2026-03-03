@@ -82,15 +82,15 @@ def evaluate_battle_comprehensive(
 
     with torch.no_grad():
         for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt in loader:
-            sids = sids.to(device)
-            mids = mids.to(device)
-            aids = aids.to(device)
-            iids = iids.to(device)
-            tids = tids.to(device)
-            num = num.to(device)
-            vtgt_d = vtgt.to(device)
-            pa_tgt_d = pa_tgt.to(device)
-            pb_tgt_d = pb_tgt.to(device)
+            sids = sids.to(device, non_blocking=True)
+            mids = mids.to(device, non_blocking=True)
+            aids = aids.to(device, non_blocking=True)
+            iids = iids.to(device, non_blocking=True)
+            tids = tids.to(device, non_blocking=True)
+            num = num.to(device, non_blocking=True)
+            vtgt_d = vtgt.to(device, non_blocking=True)
+            pa_tgt_d = pa_tgt.to(device, non_blocking=True)
+            pb_tgt_d = pb_tgt.to(device, non_blocking=True)
 
             value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 

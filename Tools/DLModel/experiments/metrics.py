@@ -84,13 +84,13 @@ def evaluate_comprehensive(
 
     with torch.no_grad():
         for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in loader:
-            sids = sids.to(device)
-            mids = mids.to(device)
-            aids = aids.to(device)
-            iids = iids.to(device)
-            tids = tids.to(device)
-            bring_tgt_d = bring_tgt.to(device)
-            lead_tgt_d = lead_tgt.to(device)
+            sids = sids.to(device, non_blocking=True)
+            mids = mids.to(device, non_blocking=True)
+            aids = aids.to(device, non_blocking=True)
+            iids = iids.to(device, non_blocking=True)
+            tids = tids.to(device, non_blocking=True)
+            bring_tgt_d = bring_tgt.to(device, non_blocking=True)
+            lead_tgt_d = lead_tgt.to(device, non_blocking=True)
 
             bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
