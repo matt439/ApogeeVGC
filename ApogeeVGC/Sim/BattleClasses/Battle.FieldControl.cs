@@ -145,7 +145,14 @@ public partial class Battle
         {
             if (!failed)
             {
+                // Return the OLD LastMove to the pool before overwriting
+                ReturnActiveMove(LastMove);
                 LastMove = ActiveMove;
+            }
+            else
+            {
+                // Move failed — return ActiveMove directly to pool
+                ReturnActiveMove(ActiveMove);
             }
             ActiveMove = null;
             ActivePokemon = null;

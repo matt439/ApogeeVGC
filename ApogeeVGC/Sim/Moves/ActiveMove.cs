@@ -23,6 +23,85 @@ public record ActiveMove : Move, IEffect
     internal ActiveMove ShallowClone() => (ActiveMove)MemberwiseClone();
 
     /// <summary>
+    /// Resets all mutable fields of this instance to match the given template.
+    /// Used by the per-Battle <see cref="ActiveMove"/> pool to recycle instances
+    /// instead of allocating via <see cref="MemberwiseClone"/>.
+    /// <para>
+    /// MAINTENANCE: when adding a new settable property to <see cref="HitEffect"/>,
+    /// <see cref="Move"/>, or <see cref="ActiveMove"/>, add a corresponding line here.
+    /// </para>
+    /// </summary>
+    internal void ResetFromTemplate(ActiveMove template)
+    {
+        // --- HitEffect mutable fields ---
+        // Bypass ActiveMove's 'new OnHit' setter (which invalidates _handlerCache)
+        // by writing directly to the base HitEffect.OnHit property.
+        base.OnHit = template.OnHit;
+        Boosts = template.Boosts;
+        VolatileStatus = template.VolatileStatus;
+        SideCondition = template.SideCondition;
+
+        // --- Move mutable fields (restore to template defaults) ---
+        BasePower = template.BasePower;
+        Accuracy = template.Accuracy;
+        Category = template.Category;
+        Type = template.Type;
+        Priority = template.Priority;
+        Target = template.Target;
+        Flags = template.Flags;
+        SelfSwitch = template.SelfSwitch;
+        SpreadHit = template.SpreadHit;
+        MindBlownRecoil = template.MindBlownRecoil;
+        Secondaries = template.Secondaries;
+        Self = template.Self;
+        HasSheerForce = template.HasSheerForce;
+        ForceStab = template.ForceStab;
+        IgnoreAbility = template.IgnoreAbility;
+        IgnoreEvasion = template.IgnoreEvasion;
+        IgnoreImmunity = template.IgnoreImmunity;
+        MultiAccuracy = template.MultiAccuracy;
+        MultiHit = template.MultiHit;
+        MultiHitType = template.MultiHitType;
+        SmartTarget = template.SmartTarget;
+        TracksTarget = template.TracksTarget;
+        OverrideOffensiveStat = template.OverrideOffensiveStat;
+
+        // --- ActiveMove mutable fields (reset to defaults) ---
+        Weather = null;
+        Hit = 0;
+        MoveHitData = null;
+        HitTargets = null;
+        Ability = null;
+        Allies = null;
+        AuraBooster = null;
+        CausedCrashDamage = null;
+        ForceStatus = null;
+        HasAuraBreak = null;
+        HasBounced = null;
+        IsExternal = null;
+        LastHit = null;
+        Magnitude = null;
+        PranksterBooster = null;
+        PranksterBoosted = null;
+        SelfDropped = null;
+        StatusRoll = null;
+        StellarBoosted = null;
+        TotalDamage = null;
+        TypeChangerBoosted = null;
+        WillChangeForme = null;
+        Infiltrates = null;
+        RuinedAtk = null;
+        RuinedDef = null;
+        RuinedSpA = null;
+        RuinedSpD = null;
+        SourceEffect = null;
+        HitEffect = null;
+
+        // Restore shared handler cache from template (must be last)
+        _handlerCache = template._handlerCache;
+    }
+
+    /// <summary>
     /// Creates an ActiveMove from a base Move, leveraging the record copy constructor
     /// to efficiently copy all Move properties instead of manual property-by-property assignment.
     /// </summary>

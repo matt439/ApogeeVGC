@@ -21,12 +21,44 @@ from __future__ import annotations
 
 import argparse
 import json
+import multiprocessing
 import os
 import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+try:
+    import orjson
+
+    def json_loads(b):
+        return orjson.loads(b)
+
+    def json_dumps(obj, **kw):
+        return orjson.dumps(obj).decode()
+
+    def json_dumps_pretty(obj):
+        return orjson.dumps(obj, option=orjson.OPT_INDENT_2).decode()
+except ImportError:
+    def json_loads(b):
+        return json.loads(b)
+
+    def json_dumps(obj, **kw):
+        return json.dumps(obj, ensure_ascii=False)
+
+    def json_dumps_pretty(obj):
+        return json.dumps(obj, indent=2, ensure_ascii=False)
+
+
+# ── Pre-compiled regexes ──────────────────────────────────────────────────────
+
+_RE_RATING = re.compile(
+    r"(.+?)'s rating: (\d+) &rarr; <strong>(\d+)</strong>"
+)
+_RE_FROM_ABILITY = re.compile(r"\[from\] ability: (.+?)(?:\||\[|$)")
+_RE_OF_SLOT = re.compile(r"\[of\] (p[12][ab]): (.+?)(?:\||$)")
+_RE_FROM_ITEM = re.compile(r"\[from\] item: (.+?)(?:\||\[|$)")
 
 
 # ── Data structures ──────────────────────────────────────────────────────────
@@ -619,10 +651,7 @@ def parse_replay(replay_data: dict) -> dict | None:
             elif cmd == "raw" and len(parts) >= 3:
                 raw_text = parts[2].strip()
                 # Parse: "Name's rating: 1305 &rarr; <strong>1333</strong><br />..."
-                m = re.match(
-                    r"(.+?)'s rating: (\d+) &rarr; <strong>(\d+)</strong>",
-                    raw_text,
-                )
+                m = _RE_RATING.match(raw_text)
                 if m:
                     name = m.group(1)
                     rating_before = int(m.group(2))
@@ -636,10 +665,10 @@ def parse_replay(replay_data: dict) -> dict | None:
             # ── Ability from [from] tags (in other events) ──
             # Many events have [from] ability: X at the end
             if "[from] ability:" in line:
-                m = re.search(r"\[from\] ability: (.+?)(?:\||\[|$)", line)
+                m = _RE_FROM_ABILITY.search(line)
                 if m and len(parts) >= 3:
                     # Try to find which pokemon this is about via [of]
-                    of_match = re.search(r"\[of\] (p[12][ab]): (.+?)(?:\||$)", line)
+                    of_match = _RE_OF_SLOT.search(line)
                     if of_match:
                         slot = of_match.group(1)
                         side = player_side(slot)
@@ -648,7 +677,7 @@ def parse_replay(replay_data: dict) -> dict | None:
 
             # ── Item from [from] item: tags ──
             if "[from] item:" in line:
-                m = re.search(r"\[from\] item: (.+?)(?:\||\[|$)", line)
+                m = _RE_FROM_ITEM.search(line)
                 if m and len(parts) >= 3:
                     # The pokemon with the item is the subject of the event
                     try:
@@ -699,7 +728,45 @@ def parse_replay(replay_data: dict) -> dict | None:
     return result
 
 
+# ── Worker for multiprocessing ────────────────────────────────────────────────
+
+_worker_min_rating: int = 0
+
+
+def _init_worker(min_rating: int) -> None:
+    """Initializer for pool workers — stores min_rating in module global."""
+    global _worker_min_rating
+    _worker_min_rating = min_rating
+
+
+def _parse_file(filepath: str) -> tuple[str | None, str]:
+    """Parse a single replay file. Returns (json_line | None, status).
+
+    status is one of: "ok", "skip_rating", "error"
+    Designed to be called from a multiprocessing Pool.
+    """
+    try:
+        with open(filepath, "rb") as f:
+            data = json_loads(f.read())
+
+        if _worker_min_rating > 0:
+            rating = data.get("rating")
+            if rating is None or rating < _worker_min_rating:
+                return None, "skip_rating"
+
+        result = parse_replay(data)
+        if result is None:
+            return None, "error"
+
+        return json_dumps(result) + "\n", "ok"
+
+    except Exception:
+        return None, "error"
+
+
 # ── Batch processing ─────────────────────────────────────────────────────────
+
+_WRITE_BUFFER_SIZE = 4096  # flush to disk every N results
 
 
 def parse_all(
@@ -707,15 +774,16 @@ def parse_all(
     min_rating: int = 0,
     output_path: str | None = None,
     single_file: str | None = None,
+    workers: int | None = None,
 ) -> None:
     if single_file:
         # Parse a single file for debugging
-        with open(single_file, encoding="utf-8") as f:
-            data = json.load(f)
+        with open(single_file, "rb") as f:
+            data = json_loads(f.read())
         result = parse_replay(data)
         if result:
             sys.stdout.reconfigure(encoding="utf-8")
-            print(json.dumps(result, indent=2, ensure_ascii=False))
+            print(json_dumps_pretty(result))
         else:
             print("Failed to parse replay", file=sys.stderr)
         return
@@ -728,43 +796,48 @@ def parse_all(
     if output_path is None:
         output_path = str(Path(__file__).parent / "data" / format_id / "parsed.jsonl")
 
-    files = list(replay_dir.glob("*.json"))
-    print(f"Parsing {len(files)} replays from {replay_dir}")
+    files = [str(f) for f in replay_dir.glob("*.json")]
+    total = len(files)
+    if workers is None:
+        workers = min(multiprocessing.cpu_count(), 16)
+
+    print(f"Parsing {total} replays from {replay_dir}")
     print(f"Output: {output_path}")
+    print(f"Workers: {workers}")
     if min_rating > 0:
         print(f"Min rating filter: {min_rating}")
 
     parsed = 0
     skipped_rating = 0
     skipped_error = 0
+    buf: list[str] = []
 
     with open(output_path, "w", encoding="utf-8") as out:
-        for i, filepath in enumerate(files):
-            try:
-                with open(filepath, encoding="utf-8") as f:
-                    data = json.load(f)
-
-                # Rating filter (on the search metadata rating)
-                if min_rating > 0:
-                    rating = data.get("rating")
-                    if rating is None or rating < min_rating:
-                        skipped_rating += 1
-                        continue
-
-                result = parse_replay(data)
-                if result is None:
+        with multiprocessing.Pool(
+            processes=workers,
+            initializer=_init_worker,
+            initargs=(min_rating,),
+        ) as pool:
+            for i, (line, status) in enumerate(
+                pool.imap_unordered(_parse_file, files, chunksize=256)
+            ):
+                if status == "ok":
+                    buf.append(line)
+                    parsed += 1
+                    if len(buf) >= _WRITE_BUFFER_SIZE:
+                        out.write("".join(buf))
+                        buf.clear()
+                elif status == "skip_rating":
+                    skipped_rating += 1
+                else:
                     skipped_error += 1
-                    continue
 
-                out.write(json.dumps(result, ensure_ascii=False) + "\n")
-                parsed += 1
+                if (i + 1) % 10000 == 0:
+                    print(f"  {i + 1}/{total} processed ({parsed} parsed)")
 
-            except (json.JSONDecodeError, OSError) as e:
-                skipped_error += 1
-                continue
-
-            if (i + 1) % 1000 == 0:
-                print(f"  {i + 1}/{len(files)} processed ({parsed} parsed)")
+            # Flush remaining buffer
+            if buf:
+                out.write("".join(buf))
 
     print(f"\nDone:")
     print(f"  Parsed: {parsed}")
@@ -796,8 +869,14 @@ def main():
         default=None,
         help="Parse a single replay file and print to stdout (for debugging)",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help="Number of parallel workers (default: cpu_count, max 16)",
+    )
     args = parser.parse_args()
-    parse_all(args.format, args.min_rating, args.output, args.single)
+    parse_all(args.format, args.min_rating, args.output, args.single, args.workers)
 
 
 if __name__ == "__main__":

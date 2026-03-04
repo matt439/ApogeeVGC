@@ -143,6 +143,51 @@ public partial class Battle
     /// </summary>
     private readonly Stack<List<Pokemon>> _pokemonListPool = new();
 
+    /// <summary>
+    /// Per-<see cref="MoveId"/> pool of reusable <see cref="ActiveMove"/> instances.
+    /// Eliminates ~900-byte <see cref="object.MemberwiseClone"/> allocations on every move execution.
+    /// Instances are rented via <see cref="RentActiveMove"/> and returned via <see cref="ReturnActiveMove"/>.
+    /// </summary>
+    private readonly Dictionary<MoveId, Stack<ActiveMove>> _activeMovePool = new();
+
+    /// <summary>
+    /// Rents an <see cref="ActiveMove"/> from the per-Battle pool, or creates a new clone
+    /// from the template if none is available. The returned instance has all mutable fields
+    /// reset to match the immutable template.
+    /// </summary>
+    internal ActiveMove RentActiveMove(Move move)
+    {
+        MoveId moveId = move.Id;
+        ActiveMove template = move.AsActiveMove();
+
+        if (_activeMovePool.TryGetValue(moveId, out var stack) && stack.Count > 0)
+        {
+            ActiveMove pooled = stack.Pop();
+            pooled.ResetFromTemplate(template);
+            return pooled;
+        }
+
+        return template.ShallowClone();
+    }
+
+    /// <summary>
+    /// Returns an <see cref="ActiveMove"/> to the per-Battle pool for reuse.
+    /// Accepts null safely (no-op).
+    /// </summary>
+    internal void ReturnActiveMove(ActiveMove? move)
+    {
+        if (move is null) return;
+
+        MoveId moveId = move.Id;
+        if (!_activeMovePool.TryGetValue(moveId, out var stack))
+        {
+            stack = new Stack<ActiveMove>(4);
+            _activeMovePool[moveId] = stack;
+        }
+
+        stack.Push(move);
+    }
+
     internal List<Pokemon> RentPokemonList()
     {
         if (_pokemonListPool.Count > 0)
