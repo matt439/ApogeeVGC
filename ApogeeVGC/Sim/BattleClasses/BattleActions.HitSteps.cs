@@ -23,11 +23,13 @@ public partial class BattleActions
         // Helping Hand always hits all targets
         if (move.Id == MoveId.HelpingHand)
         {
-            return Enumerable.Repeat(BoolIntEmptyUndefinedUnion.FromBool(true), targets.Count)
-                .ToList();
+            var allHit = new List<BoolIntEmptyUndefinedUnion>(targets.Count);
+            for (int i = 0; i < targets.Count; i++)
+                allHit.Add(BoolIntEmptyUndefinedUnion.FromBool(true));
+            return allHit;
         }
 
-        var hitResults = new List<BoolIntEmptyUndefinedUnion>();
+        var hitResults = new List<BoolIntEmptyUndefinedUnion>(targets.Count);
 
         foreach (Pokemon target in targets)
         {
@@ -99,13 +101,17 @@ public partial class BattleActions
         List<RelayVar?> hitResults;
         if (hitResult is ArrayRelayVar arv)
         {
-            hitResults = [];
-            hitResults.AddRange(arv.Values);
+            List<RelayVar> srcValues = arv.Values;
+            hitResults = new List<RelayVar?>(srcValues.Count);
+            for (int i = 0; i < srcValues.Count; i++)
+                hitResults.Add(srcValues[i]);
         }
         else
         {
             // If single result, apply to all targets
-            hitResults = Enumerable.Repeat(hitResult, targets.Count).ToList();
+            hitResults = new List<RelayVar?>(targets.Count);
+            for (int i = 0; i < targets.Count; i++)
+                hitResults.Add(hitResult);
         }
 
         // Check if move completely failed (no successes but at least one explicit failure)
@@ -146,7 +152,7 @@ public partial class BattleActions
         }
 
         // Convert results to BoolIntEmptyUndefinedUnion
-        var convertedResults = new List<BoolIntEmptyUndefinedUnion>();
+        var convertedResults = new List<BoolIntEmptyUndefinedUnion>(hitResults.Count);
         foreach (RelayVar? result in hitResults)
         {
             // If result is NOT_FAIL (null), keep it as undefined

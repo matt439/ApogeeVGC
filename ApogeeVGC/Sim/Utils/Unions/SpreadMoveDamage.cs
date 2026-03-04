@@ -13,7 +13,7 @@ public class SpreadMoveDamage : List<BoolIntUndefinedUnion>
     {
     }
 
-    public SpreadMoveDamage(SpreadMoveDamage other)
+    public SpreadMoveDamage(SpreadMoveDamage other) : base(other.Count)
     {
         foreach (BoolIntUndefinedUnion item in other)
         {

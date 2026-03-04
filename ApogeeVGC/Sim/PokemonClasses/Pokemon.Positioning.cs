@@ -11,7 +11,7 @@ public partial class Pokemon
 {
     public MoveTargets GetMoveTargets(ActiveMove move, Pokemon target)
     {
-        List<Pokemon> targets = [];
+        List<Pokemon> targets = new(4);
 
         switch (move.Target)
         {
@@ -55,7 +55,7 @@ public partial class Pokemon
                 break;
 
             case MoveTarget.Allies:
-                targets = AlliesAndSelf().ToList();
+                AlliesAndSelf().AddTo(targets);
                 break;
 
             default:
@@ -156,7 +156,9 @@ public partial class Pokemon
         if (move.Flags.MustPressure == true)
         {
             // Some moves always trigger Pressure on all foes
-            pressureTargets = Foes().ToList();
+            var foePressure = new List<Pokemon>(2);
+            Foes().AddTo(foePressure);
+            pressureTargets = foePressure;
         }
 
         return new MoveTargets

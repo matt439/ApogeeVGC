@@ -628,7 +628,16 @@ public partial class Battle
         EventId sideEventId = GetSideEventId(eventId);
 
         // Collect all handlers from field-level effects
-        List<EventListener> handlers = [];
+        List<EventListener> handlers;
+        if (_handlerListPool.Count > 0)
+        {
+            handlers = _handlerListPool.Pop();
+            handlers.Clear();
+        }
+        else
+        {
+            handlers = [];
+        }
         FindFieldEventHandlers(handlers, Field, fieldEventId, EventPrefix.None, getKey);
 
         // Collect handlers from sides and active Pokemon
@@ -690,6 +699,8 @@ public partial class Battle
 
         // Execute each handler in order
         int handlerIndex = 0;
+        try
+        {
         while (handlers.Count > 0)
         {
             EventListener handler = handlers[0];
@@ -973,6 +984,12 @@ public partial class Battle
             // Process any faint messages and check if battle has ended
             FaintMessages();
             if (Ended) return;
+        }
+        }
+        finally
+        {
+            handlers.Clear();
+            _handlerListPool.Push(handlers);
         }
 
         // Debug($"FieldEvent {eventId}: Completed processing all handlers");

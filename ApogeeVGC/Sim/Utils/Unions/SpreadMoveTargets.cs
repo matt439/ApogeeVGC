@@ -4,9 +4,12 @@ namespace ApogeeVGC.Sim.Utils.Unions;
 
 public class SpreadMoveTargets : List<PokemonFalseUnion>
 {
+    public SpreadMoveTargets() { }
+    public SpreadMoveTargets(int capacity) : base(capacity) { }
+
     public static SpreadMoveTargets FromPokemonList(List<Pokemon> pokemons)
     {
-        var spreadTargets = new SpreadMoveTargets();
+        var spreadTargets = new SpreadMoveTargets(pokemons.Count);
         for (int i = 0; i < pokemons.Count; i++)
         {
             spreadTargets.Add(new PokemonPokemonUnion(pokemons[i]));
