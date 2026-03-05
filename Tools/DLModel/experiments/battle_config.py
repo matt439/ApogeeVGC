@@ -53,7 +53,7 @@ class BattleExperimentConfig:
             train=TrainConfig(**d.get('train', {})),
             data=DataConfig(**{
                 k: v for k, v in d.get('data', {}).items()
-                if k != 'data_path'
+                if k not in ('data_path', 'winners_only')
             }),
         )
 

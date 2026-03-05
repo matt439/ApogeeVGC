@@ -42,13 +42,33 @@ python -m experiments.preview_run_all --regulation gen9vgc2025regi --train-frac 
 | `--results-root` | `results` | Where to write experiment outputs |
 | `--n-trials` | 100 | Number of Optuna hyperparameter search trials |
 | `--timeout-hours` | 12.0 | Wall-clock limit for hyperparameter search |
-| `--min-rating` | 0 | Minimum player Elo to include games |
 | `--epochs` | 50 | Max training epochs per run |
 | `--patience` | 7 | Early stopping patience |
 | `--train-frac` | 0.7 | Training set fraction |
 | `--val-frac` | 0.15 | Validation set fraction |
 | `--test-frac` | 0.15 | Test set fraction |
 | `--training-strategy` | `winners_only` | `winners_only` trains on winning player's choices only; `all_games` trains on both perspectives |
+| `--tiers` | all tiers | Space-separated list of rating tiers to run: `all 1200+ 1500+` |
+
+## Rating Tier Comparison
+
+The pipeline automatically runs across three rating tiers for rigorous comparison:
+
+| Tier | Filter | Description |
+|------|--------|-------------|
+| `all` | No filter | All parsed games regardless of player rating |
+| `1200+` | Both players >= 1200 | Games between intermediate+ players |
+| `1500+` | Both players >= 1500 | Games between experienced players |
+
+The parser (`Tools/ReplayScraper/parser.py`) generates three pre-filtered data files when run: `parsed.jsonl`, `parsed_1200.jsonl`, and `parsed_1500.jsonl`. Each tier receives its own hyperparameter search, ablation study, baselines, multi-seed evaluation, and figures.
+
+After all tiers complete, a cross-tier statistical comparison is generated with:
+- Welch's t-test between each pair of tiers for all key metrics
+- Cohen's d effect sizes with magnitude classification
+- Grouped bar charts with significance brackets
+- Box plots showing metric distributions per tier
+
+**Output:** `results/<regulation>/rating_comparison/` (preview) or `results/<regulation>/battle/rating_comparison/` (battle)
 
 ## Training Strategy
 
@@ -83,7 +103,7 @@ Uses [Optuna](https://optuna.org/) with Tree-structured Parzen Estimator (TPE) s
 
 **Storage:** Results are stored in an SQLite database (`optuna_study.db`) so the search can be resumed if interrupted. All trials are also exported to `trials.csv` for analysis.
 
-**Output:** `results/<regulation>/hparam_search/best_config.json`
+**Output:** `results/<regulation>/<tier>/hparam_search/best_config.json`
 
 ### Stage 2: Feature Ablation (`ablation`)
 
@@ -99,7 +119,7 @@ Trains the model with progressively more feature groups enabled, using the best 
 
 Each variant is evaluated on the held-out test set with comprehensive metrics.
 
-**Output:** `results/<regulation>/ablation/summary.json`
+**Output:** `results/<regulation>/<tier>/ablation/summary.json`
 
 ### Stage 3: Baselines (`baselines`)
 
@@ -108,7 +128,7 @@ Evaluates two non-learned baselines on the test set for comparison:
 1. **Random** — Uniformly random bring/lead selection, averaged over 100 trials to reduce variance
 2. **Most-popular** — Computes the slot-wise marginal probability of each position being brought/led from the training set, and uses those as constant predictions
 
-**Output:** `results/<regulation>/baselines/random_metrics.json`, `popular_metrics.json`
+**Output:** `results/<regulation>/<tier>/baselines/random_metrics.json`, `popular_metrics.json`
 
 ### Stage 4: Multi-Seed Evaluation (`multiseed`)
 
@@ -116,7 +136,7 @@ Trains the best configuration across 5 random seeds (42, 123, 456, 789, 1024) an
 
 This demonstrates that results are not an artefact of a particular random initialisation or data ordering.
 
-**Output:** `results/<regulation>/multiseed/summary.json`
+**Output:** `results/<regulation>/<tier>/multiseed/summary.json`
 
 ### Stage 5: Figures (`figures`)
 
@@ -131,7 +151,7 @@ Generates thesis-quality visualisations as both PDF (for LaTeX) and PNG:
 | `baseline_comparison` | baselines + multiseed | Bar chart comparing model vs baselines |
 | `multiseed_distribution` | multiseed summary | Box plot of metric distribution across seeds |
 
-**Output:** `results/<regulation>/figures/`
+**Output:** `results/<regulation>/<tier>/figures/`
 
 ## Data Management
 
@@ -326,7 +346,7 @@ python -m experiments.battle_run_all --regulation gen9vgc2025regi --n-trials 3 -
 
 ### CLI Reference
 
-Same flags as Team Preview (`--regulation`, `--stages`, `--data-root`, `--results-root`, `--n-trials`, `--timeout-hours`, `--min-rating`, `--epochs`, `--patience`, `--train-frac`, `--val-frac`, `--test-frac`, `--training-strategy`), with the key difference that `--training-strategy` defaults to `all_games`.
+Same flags as Team Preview (`--regulation`, `--stages`, `--data-root`, `--results-root`, `--n-trials`, `--timeout-hours`, `--epochs`, `--patience`, `--train-frac`, `--val-frac`, `--test-frac`, `--training-strategy`, `--tiers`), with the key difference that `--training-strategy` defaults to `all_games`. The same rating tier comparison (all, 1200+, 1500+) is performed automatically.
 
 ## Pipeline Stages
 
@@ -349,13 +369,13 @@ Same Optuna TPE + median pruner approach as Team Preview. Search space:
 
 Note: batch size is capped at 1024 (no 2048) due to larger per-sample memory from 200 numeric features.
 
-**Output:** `results/<regulation>/battle/hparam_search/best_config.json`
+**Output:** `results/<regulation>/battle/<tier>/hparam_search/best_config.json`
 
 ### Stage 2: Feature Ablation (`ablation`)
 
 Same cumulative feature ablation as Team Preview (species only → full). Each variant uses the best hyperparameters with only `feature_flags` changed.
 
-**Output:** `results/<regulation>/battle/ablation/summary.json`
+**Output:** `results/<regulation>/battle/<tier>/ablation/summary.json`
 
 ### Stage 3: Baselines (`baselines`)
 
@@ -364,13 +384,13 @@ Two non-learned baselines:
 1. **Random** — Value = 0.5 (coin flip), policy = uniform over actions, averaged over 100 trials
 2. **Most-popular** — Value = training set win rate, policy = slot-wise action frequency from training set
 
-**Output:** `results/<regulation>/battle/baselines/random_metrics.json`, `popular_metrics.json`
+**Output:** `results/<regulation>/battle/<tier>/baselines/random_metrics.json`, `popular_metrics.json`
 
 ### Stage 4: Multi-Seed Evaluation (`multiseed`)
 
 Same 5-seed evaluation (42, 123, 456, 789, 1024) as Team Preview.
 
-**Output:** `results/<regulation>/battle/multiseed/summary.json`
+**Output:** `results/<regulation>/battle/<tier>/multiseed/summary.json`
 
 ### Stage 5: Figures (`figures`)
 
@@ -383,7 +403,7 @@ Same 5-seed evaluation (42, 123, 456, 789, 1024) as Team Preview.
 | `baseline_comparison` | Model vs baselines on value accuracy and policy top-1 |
 | `multiseed_distribution` | Box plot of value/policy accuracies across seeds |
 
-**Output:** `results/<regulation>/battle/figures/`
+**Output:** `results/<regulation>/battle/<tier>/figures/`
 
 ## Evaluation Metrics
 

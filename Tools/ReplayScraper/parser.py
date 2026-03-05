@@ -9,11 +9,15 @@ Output per replay:
   - Turn-by-turn: state snapshot at start of each turn + actions taken
   - Revealed info: moves, items, abilities, tera types seen per pokemon
 
+Always generates 3 output files per format, filtered by player rating:
+  - parsed.jsonl      — all games
+  - parsed_1200.jsonl — both players rated >= 1200
+  - parsed_1500.jsonl — both players rated >= 1500
+
 Usage:
   python parser.py                                    # parse all downloaded replays
   python parser.py --format gen9vgc2025regi           # specific format
-  python parser.py --min-rating 1400                  # filter by min avg rating
-  python parser.py --output parsed.jsonl              # custom output path
+  python parser.py --output-dir path/to/dir           # custom output directory
   python parser.py --single path/to/replay.json       # parse one file (debug)
 """
 
@@ -728,40 +732,50 @@ def parse_replay(replay_data: dict) -> dict | None:
     return result
 
 
+# ── Rating tiers ─────────────────────────────────────────────────────────────
+
+RATING_TIERS: list[tuple[str, int]] = [
+    ("all", 0),
+    ("1200+", 1200),
+    ("1500+", 1500),
+]
+
+
+def tier_filename(tier_name: str) -> str:
+    """Return the output filename for a rating tier."""
+    if tier_name == "all":
+        return "parsed.jsonl"
+    return f"parsed_{tier_name.replace('+', '')}.jsonl"
+
+
 # ── Worker for multiprocessing ────────────────────────────────────────────────
 
-_worker_min_rating: int = 0
 
+def _parse_file(filepath: str) -> tuple[str | None, str, int | None]:
+    """Parse a single replay file.
 
-def _init_worker(min_rating: int) -> None:
-    """Initializer for pool workers — stores min_rating in module global."""
-    global _worker_min_rating
-    _worker_min_rating = min_rating
-
-
-def _parse_file(filepath: str) -> tuple[str | None, str]:
-    """Parse a single replay file. Returns (json_line | None, status).
-
-    status is one of: "ok", "skip_rating", "error"
-    Designed to be called from a multiprocessing Pool.
+    Returns (json_line | None, status, min_player_rating | None).
+    status is one of: "ok", "error"
+    min_player_rating is min(p1_rating_before, p2_rating_before) or None.
     """
     try:
         with open(filepath, "rb") as f:
             data = json_loads(f.read())
 
-        if _worker_min_rating > 0:
-            rating = data.get("rating")
-            if rating is None or rating < _worker_min_rating:
-                return None, "skip_rating"
-
         result = parse_replay(data)
         if result is None:
-            return None, "error"
+            return None, "error", None
 
-        return json_dumps(result) + "\n", "ok"
+        # Extract minimum player rating for tier assignment
+        players = result.get("players", {})
+        r1 = players.get("p1", {}).get("rating_before")
+        r2 = players.get("p2", {}).get("rating_before")
+        min_rating = min(r1, r2) if r1 is not None and r2 is not None else None
+
+        return json_dumps(result) + "\n", "ok", min_rating
 
     except Exception:
-        return None, "error"
+        return None, "error", None
 
 
 # ── Batch processing ─────────────────────────────────────────────────────────
@@ -771,8 +785,7 @@ _WRITE_BUFFER_SIZE = 4096  # flush to disk every N results
 
 def parse_all(
     format_id: str,
-    min_rating: int = 0,
-    output_path: str | None = None,
+    output_dir: str | None = None,
     single_file: str | None = None,
     workers: int | None = None,
 ) -> None:
@@ -793,57 +806,77 @@ def parse_all(
         print(f"Replay directory not found: {replay_dir}")
         return
 
-    if output_path is None:
-        output_path = str(Path(__file__).parent / "data" / format_id / "parsed.jsonl")
+    if output_dir is None:
+        output_dir = str(Path(__file__).parent / "data" / format_id)
+
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     files = [str(f) for f in replay_dir.glob("*.json")]
     total = len(files)
     if workers is None:
         workers = min(multiprocessing.cpu_count(), 16)
 
+    # Build output paths for each rating tier
+    tier_paths = {
+        name: out_dir / tier_filename(name) for name, _ in RATING_TIERS
+    }
+
     print(f"Parsing {total} replays from {replay_dir}")
-    print(f"Output: {output_path}")
+    print(f"Output directory: {out_dir}")
+    for name, min_r in RATING_TIERS:
+        print(f"  {name} (min rating {min_r}): {tier_paths[name].name}")
     print(f"Workers: {workers}")
-    if min_rating > 0:
-        print(f"Min rating filter: {min_rating}")
 
     parsed = 0
-    skipped_rating = 0
     skipped_error = 0
-    buf: list[str] = []
+    tier_counts = {name: 0 for name, _ in RATING_TIERS}
+    tier_bufs: dict[str, list[str]] = {name: [] for name, _ in RATING_TIERS}
 
-    with open(output_path, "w", encoding="utf-8") as out:
-        with multiprocessing.Pool(
-            processes=workers,
-            initializer=_init_worker,
-            initargs=(min_rating,),
-        ) as pool:
-            for i, (line, status) in enumerate(
+    # Open all output files
+    tier_files = {
+        name: open(tier_paths[name], "w", encoding="utf-8")
+        for name, _ in RATING_TIERS
+    }
+
+    try:
+        with multiprocessing.Pool(processes=workers) as pool:
+            for i, (line, status, min_player_rating) in enumerate(
                 pool.imap_unordered(_parse_file, files, chunksize=256)
             ):
                 if status == "ok":
-                    buf.append(line)
                     parsed += 1
-                    if len(buf) >= _WRITE_BUFFER_SIZE:
-                        out.write("".join(buf))
-                        buf.clear()
-                elif status == "skip_rating":
-                    skipped_rating += 1
+                    # Write to each tier file where the game qualifies
+                    for name, min_r in RATING_TIERS:
+                        if min_r == 0 or (
+                            min_player_rating is not None
+                            and min_player_rating >= min_r
+                        ):
+                            tier_bufs[name].append(line)
+                            tier_counts[name] += 1
+                            if len(tier_bufs[name]) >= _WRITE_BUFFER_SIZE:
+                                tier_files[name].write(
+                                    "".join(tier_bufs[name]))
+                                tier_bufs[name].clear()
                 else:
                     skipped_error += 1
 
                 if (i + 1) % 10000 == 0:
                     print(f"  {i + 1}/{total} processed ({parsed} parsed)")
 
-            # Flush remaining buffer
-            if buf:
-                out.write("".join(buf))
+            # Flush remaining buffers
+            for name, _ in RATING_TIERS:
+                if tier_bufs[name]:
+                    tier_files[name].write("".join(tier_bufs[name]))
+    finally:
+        for fh in tier_files.values():
+            fh.close()
 
     print(f"\nDone:")
-    print(f"  Parsed: {parsed}")
-    print(f"  Skipped (rating): {skipped_rating}")
+    print(f"  Total parsed: {parsed}")
     print(f"  Skipped (error): {skipped_error}")
-    print(f"  Output: {output_path}")
+    for name, min_r in RATING_TIERS:
+        print(f"  {name}: {tier_counts[name]:,} games → {tier_paths[name]}")
 
 
 def main():
@@ -854,15 +887,9 @@ def main():
         help="Showdown format ID (default: gen9vgc2025regi)",
     )
     parser.add_argument(
-        "--min-rating",
-        type=int,
-        default=0,
-        help="Minimum rating to include (default: 0 = all)",
-    )
-    parser.add_argument(
-        "--output",
+        "--output-dir",
         default=None,
-        help="Output JSONL file path (default: data/<format>/parsed.jsonl)",
+        help="Output directory (default: data/<format>/)",
     )
     parser.add_argument(
         "--single",
@@ -876,7 +903,7 @@ def main():
         help="Number of parallel workers (default: cpu_count, max 16)",
     )
     args = parser.parse_args()
-    parse_all(args.format, args.min_rating, args.output, args.single, args.workers)
+    parse_all(args.format, args.output_dir, args.single, args.workers)
 
 
 if __name__ == "__main__":

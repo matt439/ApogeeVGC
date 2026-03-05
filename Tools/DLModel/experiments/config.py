@@ -41,6 +41,22 @@ class TrainConfig:
     min_rating: int = 0
 
 
+# ── Rating tiers for comparative analysis ──
+
+RATING_TIERS: list[tuple[str, int]] = [
+    ('all', 0),
+    ('1200+', 1200),
+    ('1500+', 1500),
+]
+
+
+def tier_data_filename(tier_name: str) -> str:
+    """Return the parsed data filename for a rating tier."""
+    if tier_name == 'all':
+        return 'parsed.jsonl'
+    return f'parsed_{tier_name.replace("+", "")}.jsonl'
+
+
 @dataclass
 class DataConfig:
     """Data-related configuration."""
@@ -50,10 +66,12 @@ class DataConfig:
     val_frac: float = 0.15
     test_frac: float = 0.15
     training_strategy: str = 'winners_only'  # 'winners_only' or 'all_games'
+    rating_tier: str = 'all'  # 'all', '1200+', '1500+'
 
     @property
     def data_path(self) -> Path:
-        return Path(self.data_root) / self.regulation / 'parsed.jsonl'
+        return (Path(self.data_root) / self.regulation
+                / tier_data_filename(self.rating_tier))
 
     @property
     def winners_only(self) -> bool:
@@ -82,7 +100,7 @@ class ExperimentConfig:
             train=TrainConfig(**d.get('train', {})),
             data=DataConfig(**{
                 k: v for k, v in d.get('data', {}).items()
-                if k != 'data_path'
+                if k not in ('data_path', 'winners_only')
             }),
         )
 

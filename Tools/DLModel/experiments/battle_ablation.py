@@ -22,12 +22,11 @@ from torch.utils.data import DataLoader
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from dataset import VGCDataset
 
 from .battle_config import BattleExperimentConfig, BattleModelConfig, BATTLE_ABLATION_CONFIGS
 from .battle_training import train_battle_model, load_battle_model_from_checkpoint
 from .battle_metrics import evaluate_battle_comprehensive
-from .data import make_battle_loaders
+from .data import build_battle_datasets, build_battle_test_dataset, loaders_from_datasets
 
 
 def run_battle_ablation(
@@ -49,6 +48,16 @@ def run_battle_ablation(
 
     ablation_dir = output_dir / 'ablation'
     results = {}
+
+    # Build datasets once — reuse across all ablation variants
+    winners_only = best_config.data.winners_only
+    print('  Building datasets for ablation...')
+    train_ds, val_ds = build_battle_datasets(
+        train_games, val_games, vocab, winners_only=winners_only,
+        cache_dir=output_dir)
+    test_ds = build_battle_test_dataset(
+        test_games, vocab, winners_only=winners_only, cache_dir=output_dir)
+    print(f'  {len(train_ds):,} train, {len(val_ds):,} val, {len(test_ds):,} test')
 
     for ablation in BATTLE_ABLATION_CONFIGS:
         name = ablation['name']
@@ -75,10 +84,8 @@ def run_battle_ablation(
 
         variant_dir = ablation_dir / name
 
-        train_loader, val_loader = make_battle_loaders(
-            train_games, val_games, vocab,
-            config.train.batch_size, device,
-            winners_only=config.data.winners_only)
+        train_loader, val_loader = loaders_from_datasets(
+            train_ds, val_ds, config.train.batch_size, device)
 
         result = train_battle_model(
             config=config,
@@ -90,7 +97,6 @@ def run_battle_ablation(
         )
 
         # Evaluate on test set
-        test_ds = VGCDataset(test_games, vocab, winners_only=config.data.winners_only)
         test_loader = DataLoader(
             test_ds, batch_size=config.train.batch_size,
             shuffle=False, num_workers=0,

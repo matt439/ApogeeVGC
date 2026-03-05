@@ -5,12 +5,16 @@ train/val/test splits, and constructing DataLoaders.
 Splits are done at the game level (not sample level) to prevent data
 leakage — both player perspectives of the same game stay in the same split.
 Split indices are persisted to JSON so every experiment uses identical data.
+
+Dataset tensors are cached to .pt files so subsequent runs skip the
+expensive JSONL parse + Python encoding loop entirely.
 """
 
 from __future__ import annotations
 
 import json
 import random
+import time
 from pathlib import Path
 
 import torch
@@ -111,41 +115,187 @@ def get_or_build_vocab(data_path: str | Path, output_dir: Path) -> dict:
     return vocab
 
 
-def make_loaders(
+_PREVIEW_TENSOR_ATTRS = [
+    'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
+    'bring_target', 'lead_target', 'value_target',
+]
+
+_BATTLE_TENSOR_ATTRS = [
+    'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
+    'numeric', 'value_targets', 'policy_a', 'policy_b',
+]
+
+
+def _save_dataset_cache(ds, attrs: list[str], path: Path) -> None:
+    """Save a dataset's tensors to a .pt file."""
+    data = {'n': ds.n, 'n_games': getattr(ds, '_n_games', -1)}
+    for attr in attrs:
+        data[attr] = getattr(ds, attr)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(data, path)
+
+
+def _load_preview_cache(path: Path, n_games: int) -> TeamPreviewDataset | None:
+    """Load a cached TeamPreviewDataset, or None if cache is stale."""
+    if not path.exists():
+        return None
+    data = torch.load(path, weights_only=False)
+    if data.get('n_games', -1) != n_games:
+        return None
+    ds = object.__new__(TeamPreviewDataset)
+    ds.n = data['n']
+    for attr in _PREVIEW_TENSOR_ATTRS:
+        setattr(ds, attr, data[attr])
+    return ds
+
+
+def _load_battle_cache(path: Path, n_games: int) -> VGCDataset | None:
+    """Load a cached VGCDataset, or None if cache is stale."""
+    if not path.exists():
+        return None
+    data = torch.load(path, weights_only=False)
+    if data.get('n_games', -1) != n_games:
+        return None
+    ds = object.__new__(VGCDataset)
+    ds.n = data['n']
+    for attr in _BATTLE_TENSOR_ATTRS:
+        setattr(ds, attr, data[attr])
+    return ds
+
+
+def _build_and_cache_preview(
+    games: list[dict], vocab: dict, winners_only: bool, cache_path: Path | None,
+) -> TeamPreviewDataset:
+    ds = TeamPreviewDataset(games, vocab, winners_only=winners_only)
+    ds._n_games = len(games)
+    if cache_path is not None:
+        _save_dataset_cache(ds, _PREVIEW_TENSOR_ATTRS, cache_path)
+    return ds
+
+
+def _build_and_cache_battle(
+    games: list[dict], vocab: dict, winners_only: bool, cache_path: Path | None,
+) -> VGCDataset:
+    ds = VGCDataset(games, vocab, winners_only=winners_only)
+    ds._n_games = len(games)
+    if cache_path is not None:
+        _save_dataset_cache(ds, _BATTLE_TENSOR_ATTRS, cache_path)
+    return ds
+
+
+def build_preview_datasets(
     train_games: list[dict],
     val_games: list[dict],
     vocab: dict,
-    batch_size: int,
-    device: torch.device,
     winners_only: bool = True,
-) -> tuple[DataLoader, DataLoader]:
-    """Build train and val DataLoaders from game lists."""
-    train_ds = TeamPreviewDataset(train_games, vocab, winners_only=winners_only)
-    val_ds = TeamPreviewDataset(val_games, vocab, winners_only=winners_only)
+    cache_dir: Path | None = None,
+) -> tuple[TeamPreviewDataset, TeamPreviewDataset]:
+    """Build TeamPreviewNet datasets (expensive — call once, reuse across trials).
 
-    cuda = device.type == 'cuda'
-    train_loader = DataLoader(
-        train_ds, batch_size=batch_size, shuffle=True,
-        num_workers=0, pin_memory=cuda)
-    val_loader = DataLoader(
-        val_ds, batch_size=batch_size, shuffle=False,
-        num_workers=0, pin_memory=cuda)
+    If cache_dir is provided, tensors are saved to / loaded from .pt files,
+    skipping the JSONL encoding on subsequent runs.
+    """
+    wo_tag = 'wo' if winners_only else 'all'
+    if cache_dir is not None:
+        cd = cache_dir / 'dataset_cache'
+        train_path = cd / f'preview_train_{wo_tag}.pt'
+        val_path = cd / f'preview_val_{wo_tag}.pt'
+        train_ds = _load_preview_cache(train_path, len(train_games))
+        val_ds = _load_preview_cache(val_path, len(val_games))
+        if train_ds is not None and val_ds is not None:
+            print(f'  Loaded cached preview datasets from {cd}')
+            return train_ds, val_ds
 
-    return train_loader, val_loader
+    t0 = time.time()
+    train_cache = (cd / f'preview_train_{wo_tag}.pt') if cache_dir else None
+    val_cache = (cd / f'preview_val_{wo_tag}.pt') if cache_dir else None
+    train_ds = _build_and_cache_preview(train_games, vocab, winners_only, train_cache)
+    val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache)
+    print(f'  Built preview datasets in {time.time() - t0:.1f}s'
+          + (f' (cached to {cd})' if cache_dir else ''))
+    return train_ds, val_ds
 
 
-def make_battle_loaders(
+def build_battle_datasets(
     train_games: list[dict],
     val_games: list[dict],
     vocab: dict,
+    winners_only: bool = False,
+    cache_dir: Path | None = None,
+) -> tuple[VGCDataset, VGCDataset]:
+    """Build BattleNet datasets (expensive — call once, reuse across trials).
+
+    If cache_dir is provided, tensors are saved to / loaded from .pt files,
+    skipping the JSONL encoding on subsequent runs.
+    """
+    wo_tag = 'wo' if winners_only else 'all'
+    if cache_dir is not None:
+        cd = cache_dir / 'dataset_cache'
+        train_path = cd / f'battle_train_{wo_tag}.pt'
+        val_path = cd / f'battle_val_{wo_tag}.pt'
+        train_ds = _load_battle_cache(train_path, len(train_games))
+        val_ds = _load_battle_cache(val_path, len(val_games))
+        if train_ds is not None and val_ds is not None:
+            print(f'  Loaded cached battle datasets from {cd}')
+            return train_ds, val_ds
+
+    t0 = time.time()
+    train_cache = (cd / f'battle_train_{wo_tag}.pt') if cache_dir else None
+    val_cache = (cd / f'battle_val_{wo_tag}.pt') if cache_dir else None
+    train_ds = _build_and_cache_battle(train_games, vocab, winners_only, train_cache)
+    val_ds = _build_and_cache_battle(val_games, vocab, winners_only, val_cache)
+    print(f'  Built battle datasets in {time.time() - t0:.1f}s'
+          + (f' (cached to {cd})' if cache_dir else ''))
+    return train_ds, val_ds
+
+
+def build_preview_test_dataset(
+    test_games: list[dict],
+    vocab: dict,
+    winners_only: bool = True,
+    cache_dir: Path | None = None,
+) -> TeamPreviewDataset:
+    """Build (or load cached) a single TeamPreviewDataset for test evaluation."""
+    wo_tag = 'wo' if winners_only else 'all'
+    if cache_dir is not None:
+        path = cache_dir / 'dataset_cache' / f'preview_test_{wo_tag}.pt'
+        ds = _load_preview_cache(path, len(test_games))
+        if ds is not None:
+            return ds
+    ds = _build_and_cache_preview(
+        test_games, vocab, winners_only,
+        (cache_dir / 'dataset_cache' / f'preview_test_{wo_tag}.pt') if cache_dir else None,
+    )
+    return ds
+
+
+def build_battle_test_dataset(
+    test_games: list[dict],
+    vocab: dict,
+    winners_only: bool = False,
+    cache_dir: Path | None = None,
+) -> VGCDataset:
+    """Build (or load cached) a single VGCDataset for test evaluation."""
+    wo_tag = 'wo' if winners_only else 'all'
+    if cache_dir is not None:
+        path = cache_dir / 'dataset_cache' / f'battle_test_{wo_tag}.pt'
+        ds = _load_battle_cache(path, len(test_games))
+        if ds is not None:
+            return ds
+    ds = _build_and_cache_battle(
+        test_games, vocab, winners_only,
+        (cache_dir / 'dataset_cache' / f'battle_test_{wo_tag}.pt') if cache_dir else None,
+    )
+    return ds
+
+
+def loaders_from_datasets(
+    train_ds,
+    val_ds,
     batch_size: int,
     device: torch.device,
-    winners_only: bool = False,
 ) -> tuple[DataLoader, DataLoader]:
-    """Build train and val DataLoaders for BattleNet from game lists."""
-    train_ds = VGCDataset(train_games, vocab, winners_only=winners_only)
-    val_ds = VGCDataset(val_games, vocab, winners_only=winners_only)
-
+    """Wrap pre-built datasets into DataLoaders (cheap — safe to call per trial)."""
     cuda = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
@@ -153,5 +303,5 @@ def make_battle_loaders(
     val_loader = DataLoader(
         val_ds, batch_size=batch_size, shuffle=False,
         num_workers=0, pin_memory=cuda)
-
     return train_loader, val_loader
+

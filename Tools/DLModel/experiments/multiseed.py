@@ -17,12 +17,11 @@ from torch.utils.data import DataLoader
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from team_preview_dataset import TeamPreviewDataset
 
 from .config import ExperimentConfig, TrainConfig, MULTI_SEED_SEEDS
 from .training import train_model, load_model_from_checkpoint
 from .metrics import evaluate_comprehensive, ComprehensiveMetrics
-from .data import make_loaders
+from .data import build_preview_datasets, build_preview_test_dataset, loaders_from_datasets
 
 
 def run_multiseed(
@@ -46,6 +45,16 @@ def run_multiseed(
 
     multiseed_dir = output_dir / 'multiseed'
     all_metrics: list[ComprehensiveMetrics] = []
+
+    # Build datasets once — reuse across all seeds
+    winners_only = best_config.data.winners_only
+    print('  Building datasets for multiseed...')
+    train_ds, val_ds = build_preview_datasets(
+        train_games, val_games, vocab, winners_only=winners_only,
+        cache_dir=output_dir)
+    test_ds = build_preview_test_dataset(
+        test_games, vocab, winners_only=winners_only, cache_dir=output_dir)
+    print(f'  {len(train_ds):,} train, {len(val_ds):,} val, {len(test_ds):,} test')
 
     for seed in seeds:
         print(f'\n=== Seed: {seed} ===')
@@ -71,10 +80,8 @@ def run_multiseed(
 
         seed_dir = multiseed_dir / f'seed_{seed}'
 
-        train_loader, val_loader = make_loaders(
-            train_games, val_games, vocab,
-            config.train.batch_size, device,
-            winners_only=config.data.winners_only)
+        train_loader, val_loader = loaders_from_datasets(
+            train_ds, val_ds, config.train.batch_size, device)
 
         result = train_model(
             config=config,
@@ -86,7 +93,6 @@ def run_multiseed(
         )
 
         # Evaluate on test set
-        test_ds = TeamPreviewDataset(test_games, vocab, winners_only=config.data.winners_only)
         test_loader = DataLoader(
             test_ds, batch_size=config.train.batch_size,
             shuffle=False, num_workers=0,

@@ -1,17 +1,22 @@
 """
 Main experiment orchestrator.
 
+Runs the full TeamPreviewNet pipeline across all rating tiers (all, 1200+, 1500+)
+for rigorous comparison, then performs cross-tier statistical analysis.
+
 Usage:
   python -m experiments.preview_run_all --regulation gen9vgc2025regi
   python -m experiments.preview_run_all --regulation gen9vgc2025regi --stages hparam ablation
   python -m experiments.preview_run_all --regulation gen9vgc2025regi --n-trials 50 --epochs 50
 
-Stages (in order):
+Stages (in order, run per tier):
   1. hparam    — Optuna hyperparameter search
   2. ablation  — Feature ablation study
   3. baselines — Baseline evaluation
   4. multiseed — Multi-seed evaluation with best config
   5. figures   — Generate thesis figures
+
+After all tiers, a cross-tier statistical comparison is generated.
 """
 
 from __future__ import annotations
@@ -25,111 +30,86 @@ import torch
 from torch.utils.data import DataLoader
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from team_preview_dataset import TeamPreviewDataset
 
-from .config import ExperimentConfig, DataConfig, ModelConfig, TrainConfig
-from .data import load_games, create_splits, get_or_build_vocab, make_loaders
+from .config import (
+    ExperimentConfig, DataConfig, ModelConfig, TrainConfig, RATING_TIERS,
+    tier_data_filename,
+)
+from .data import (
+    load_games, create_splits, get_or_build_vocab,
+    build_preview_datasets, build_preview_test_dataset, loaders_from_datasets,
+)
 from .hparam_search import run_hparam_search
 from .ablation import run_ablation
 from .baselines import evaluate_random_baseline, evaluate_popular_baseline
 from .multiseed import run_multiseed
 from .visualise import generate_all_figures
+from .rating_comparison import run_rating_comparison
 
 
 ALL_STAGES = ['hparam', 'ablation', 'baselines', 'multiseed', 'figures']
 
+PREVIEW_COMPARISON_METRICS = [
+    'bring_set_accuracy', 'bring_overlap_accuracy',
+    'lead_set_accuracy', 'lead_overlap_accuracy',
+    'bring_macro_f1', 'lead_macro_f1',
+]
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Run TeamPreviewNet experimentation pipeline')
-    parser.add_argument(
-        '--regulation', required=True,
-        help='Regulation name (e.g., gen9vgc2025regi)')
-    parser.add_argument(
-        '--stages', nargs='+', default=ALL_STAGES,
-        choices=ALL_STAGES,
-        help='Which stages to run (default: all)')
-    parser.add_argument(
-        '--data-root', default='../ReplayScraper/data',
-        help='Root directory for parsed data')
-    parser.add_argument(
-        '--results-root', default='results',
-        help='Root directory for experiment results')
-    parser.add_argument(
-        '--n-trials', type=int, default=100,
-        help='Number of Optuna trials')
-    parser.add_argument(
-        '--timeout-hours', type=float, default=12.0,
-        help='Max wall-clock time for hparam search (hours)')
-    parser.add_argument(
-        '--min-rating', type=int, default=0,
-        help='Minimum player rating filter')
-    parser.add_argument(
-        '--epochs', type=int, default=50,
-        help='Max training epochs per run')
-    parser.add_argument(
-        '--patience', type=int, default=7,
-        help='Early stopping patience')
-    parser.add_argument(
-        '--train-frac', type=float, default=0.7,
-        help='Training set fraction')
-    parser.add_argument(
-        '--val-frac', type=float, default=0.15,
-        help='Validation set fraction')
-    parser.add_argument(
-        '--test-frac', type=float, default=0.15,
-        help='Test set fraction')
-    parser.add_argument(
-        '--training-strategy', default='winners_only',
-        choices=['winners_only', 'all_games'],
-        help='Training data strategy: winners_only (default) trains on '
-             'winning players only; all_games trains on both perspectives')
-    args = parser.parse_args()
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f'Device: {device}')
-    if device.type == 'cuda':
-        print(f'  GPU: {torch.cuda.get_device_name(0)}')
-        mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
-        print(f'  VRAM: {mem:.1f} GB')
-        print(f'  CUDA: {torch.version.cuda}  |  cuDNN: {torch.backends.cudnn.version()}')
+def run_tier(
+    tier_name: str,
+    min_rating: int,
+    reg: str,
+    args,
+    device: torch.device,
+    results_root: Path,
+    data_root: str,
+    strategy: str,
+    shared_vocab: dict | None = None,
+) -> dict | None:
+    """Run all requested stages for a single rating tier.
 
-    reg = args.regulation
+    Returns the vocab (built from this tier's data or shared).
+    """
     print(f'\n{"=" * 60}')
-    print(f'  Regulation: {reg}')
+    print(f'  Rating Tier: {tier_name} (min rating: {min_rating})')
     print(f'{"=" * 60}')
 
-    strategy = args.training_strategy
     data_config = DataConfig(
         regulation=reg,
-        data_root=args.data_root,
+        data_root=data_root,
         train_frac=args.train_frac,
         val_frac=args.val_frac,
         test_frac=args.test_frac,
         training_strategy=strategy,
+        rating_tier=tier_name,
     )
     winners_only = data_config.winners_only
-    print(f'Training strategy: {strategy}')
 
-    results_dir = Path(args.results_root) / reg
+    results_dir = results_root / tier_name
     results_dir.mkdir(parents=True, exist_ok=True)
 
     # ── Load data ──
     data_path = data_config.data_path
     if not data_path.exists():
-        print(f'Error: {data_path} not found')
-        sys.exit(1)
+        print(f'Error: {data_path} not found — '
+              f'run parser.py first to generate tier files')
+        return None
 
     print(f'Loading games from {data_path}...')
-    games = load_games(data_path, args.min_rating)
+    games = load_games(data_path)
     print(f'  {len(games):,} games loaded')
 
     if len(games) < 100:
-        print('Error: too few games for meaningful experiments')
-        sys.exit(1)
+        print(f'Warning: too few games ({len(games)}) for tier {tier_name}, '
+              f'skipping')
+        return None
 
-    # ── Vocab ──
-    vocab = get_or_build_vocab(data_path, results_dir)
+    # ── Vocab (shared from "all" tier, or build fresh) ──
+    if shared_vocab is not None:
+        vocab = shared_vocab
+    else:
+        vocab = get_or_build_vocab(data_path, results_dir)
     print(f'  Vocab: {vocab["num_species"]} species, '
           f'{vocab["num_moves"]} moves, '
           f'{vocab["num_abilities"]} abilities, '
@@ -150,12 +130,11 @@ def main():
 
     # ── Base config ──
     base_config = ExperimentConfig(
-        name=f'{reg}_base',
+        name=f'{reg}_{tier_name}_base',
         model=ModelConfig(),
         train=TrainConfig(
             epochs=args.epochs,
             patience=args.patience,
-            min_rating=args.min_rating,
         ),
         data=data_config,
     )
@@ -207,10 +186,13 @@ def main():
         baselines_dir = results_dir / 'baselines'
         baselines_dir.mkdir(parents=True, exist_ok=True)
 
-        test_ds = TeamPreviewDataset(test_games, vocab, winners_only=winners_only)
+        test_ds = build_preview_test_dataset(
+            test_games, vocab, winners_only=winners_only, cache_dir=results_dir)
         test_loader = DataLoader(
             test_ds, batch_size=1024, shuffle=False, num_workers=0)
-        train_ds = TeamPreviewDataset(train_games, vocab, winners_only=winners_only)
+        train_ds, _ = build_preview_datasets(
+            train_games, val_games, vocab, winners_only=winners_only,
+            cache_dir=results_dir)
         train_loader = DataLoader(
             train_ds, batch_size=1024, shuffle=False, num_workers=0)
 
@@ -248,6 +230,119 @@ def main():
         print('\n--- Stage 5: Generating Figures ---')
         generate_all_figures(results_dir)
         print(f'  Figures saved to {results_dir / "figures"}')
+
+    return vocab
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Run TeamPreviewNet experimentation pipeline '
+                    'across rating tiers')
+    parser.add_argument(
+        '--regulation', required=True,
+        help='Regulation name (e.g., gen9vgc2025regi)')
+    parser.add_argument(
+        '--stages', nargs='+', default=ALL_STAGES,
+        choices=ALL_STAGES,
+        help='Which stages to run (default: all)')
+    parser.add_argument(
+        '--data-root', default='../ReplayScraper/data',
+        help='Root directory for parsed data')
+    parser.add_argument(
+        '--results-root', default='results',
+        help='Root directory for experiment results')
+    parser.add_argument(
+        '--n-trials', type=int, default=100,
+        help='Number of Optuna trials')
+    parser.add_argument(
+        '--timeout-hours', type=float, default=12.0,
+        help='Max wall-clock time for hparam search (hours)')
+    parser.add_argument(
+        '--epochs', type=int, default=50,
+        help='Max training epochs per run')
+    parser.add_argument(
+        '--patience', type=int, default=7,
+        help='Early stopping patience')
+    parser.add_argument(
+        '--train-frac', type=float, default=0.7,
+        help='Training set fraction')
+    parser.add_argument(
+        '--val-frac', type=float, default=0.15,
+        help='Validation set fraction')
+    parser.add_argument(
+        '--test-frac', type=float, default=0.15,
+        help='Test set fraction')
+    parser.add_argument(
+        '--training-strategy', default='winners_only',
+        choices=['winners_only', 'all_games'],
+        help='Training data strategy: winners_only (default) trains on '
+             'winning players only; all_games trains on both perspectives')
+    parser.add_argument(
+        '--tiers', nargs='+', default=None,
+        help='Rating tiers to run (default: all). '
+             'Options: ' + ', '.join(t[0] for t in RATING_TIERS))
+    args = parser.parse_args()
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f'Device: {device}')
+    if device.type == 'cuda':
+        print(f'  GPU: {torch.cuda.get_device_name(0)}')
+        mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
+        print(f'  VRAM: {mem:.1f} GB')
+        print(f'  CUDA: {torch.version.cuda}  |  cuDNN: {torch.backends.cudnn.version()}')
+
+    reg = args.regulation
+    strategy = args.training_strategy
+    results_root = Path(args.results_root) / reg
+    results_root.mkdir(parents=True, exist_ok=True)
+
+    # Determine which tiers to run
+    if args.tiers:
+        valid_tier_names = {t[0] for t in RATING_TIERS}
+        tiers = [(n, r) for n, r in RATING_TIERS if n in args.tiers]
+        unknown = set(args.tiers) - valid_tier_names
+        if unknown:
+            print(f'Warning: unknown tiers ignored: {unknown}')
+    else:
+        tiers = RATING_TIERS
+
+    print(f'\nRegulation: {reg}')
+    print(f'Training strategy: {strategy}')
+    print(f'Rating tiers: {[t[0] for t in tiers]}')
+
+    # ── Run "all" tier first to build shared vocab ──
+    shared_vocab = None
+    tier_dirs: dict[str, Path] = {}
+
+    for tier_name, min_rating in tiers:
+        vocab = run_tier(
+            tier_name=tier_name,
+            min_rating=min_rating,
+            reg=reg,
+            args=args,
+            device=device,
+            results_root=results_root,
+            data_root=args.data_root,
+            strategy=strategy,
+            shared_vocab=shared_vocab,
+        )
+        if vocab is not None:
+            tier_dirs[tier_name] = results_root / tier_name
+            # Use first tier's vocab as shared vocab for consistency
+            if shared_vocab is None:
+                shared_vocab = vocab
+
+    # ── Cross-tier statistical comparison ──
+    if len(tier_dirs) >= 2 and 'multiseed' in args.stages:
+        print(f'\n{"=" * 60}')
+        print(f'  Cross-Tier Rating Comparison')
+        print(f'{"=" * 60}')
+        run_rating_comparison(
+            results_root=results_root,
+            tier_dirs=tier_dirs,
+            metrics=PREVIEW_COMPARISON_METRICS,
+            model_name='TeamPreviewNet',
+        )
 
     print('\nDone.')
 

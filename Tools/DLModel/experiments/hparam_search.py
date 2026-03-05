@@ -21,7 +21,7 @@ from .config import (
     HPARAM_SEARCH_SPACE,
 )
 from .training import train_model
-from .data import make_loaders
+from .data import build_preview_datasets, loaders_from_datasets
 
 
 def _sample_param(trial: optuna.Trial, name: str, spec: tuple):
@@ -95,6 +95,14 @@ def run_hparam_search(
     search_dir = output_dir / 'hparam_search'
     search_dir.mkdir(parents=True, exist_ok=True)
 
+    # Build datasets once (expensive) — reuse across all trials
+    print('  Building datasets for hparam search...')
+    train_ds, val_ds = build_preview_datasets(
+        train_games, val_games, vocab,
+        winners_only=base_config.data.winners_only,
+        cache_dir=output_dir)
+    print(f'  {len(train_ds):,} train, {len(val_ds):,} val samples')
+
     storage = f'sqlite:///{search_dir / "optuna_study.db"}'
 
     study = optuna.create_study(
@@ -113,10 +121,8 @@ def run_hparam_search(
     def objective(trial: optuna.Trial) -> float:
         config = create_trial_config(trial, base_config)
 
-        train_loader, val_loader = make_loaders(
-            train_games, val_games, vocab,
-            config.train.batch_size, device,
-            winners_only=config.data.winners_only)
+        train_loader, val_loader = loaders_from_datasets(
+            train_ds, val_ds, config.train.batch_size, device)
 
         trial_dir = search_dir / f'trial_{trial.number}'
 
