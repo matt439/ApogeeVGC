@@ -89,6 +89,11 @@ def main():
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Device: {device}')
+    if device.type == 'cuda':
+        print(f'  GPU: {torch.cuda.get_device_name(0)}')
+        mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
+        print(f'  VRAM: {mem:.1f} GB')
+        print(f'  CUDA: {torch.version.cuda}  |  cuDNN: {torch.backends.cudnn.version()}')
 
     reg = args.regulation
     print(f'\n{"=" * 60}')

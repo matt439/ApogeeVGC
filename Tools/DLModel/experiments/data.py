@@ -126,12 +126,10 @@ def make_loaders(
     cuda = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
-        num_workers=2, pin_memory=cuda,
-        persistent_workers=True)
+        num_workers=0, pin_memory=cuda)
     val_loader = DataLoader(
         val_ds, batch_size=batch_size, shuffle=False,
-        num_workers=2, pin_memory=cuda,
-        persistent_workers=True)
+        num_workers=0, pin_memory=cuda)
 
     return train_loader, val_loader
 
@@ -151,11 +149,9 @@ def make_battle_loaders(
     cuda = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
-        num_workers=2, pin_memory=cuda,
-        persistent_workers=True)
+        num_workers=0, pin_memory=cuda)
     val_loader = DataLoader(
         val_ds, batch_size=batch_size, shuffle=False,
-        num_workers=2, pin_memory=cuda,
-        persistent_workers=True)
+        num_workers=0, pin_memory=cuda)
 
     return train_loader, val_loader
