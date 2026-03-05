@@ -2,9 +2,17 @@
 
 ## Terminal 1
 
-ssh -p 29399 root@120.238.149.205 -L 8080:localhost:8080 -i ~/.ssh/id_ed25519
+ssh -p 40346 root@203.121.204.241 -L 8080:localhost:8080 -i ~/.ssh/id_ed25519
 
 mkdir -p /workspace/data/gen9vgc2025regi
+
+## Terminal 2
+
+scp -P 40346 c:/VSProjects/ApogeeVGC/Tools/ReplayScraper/data/gen9vgc2025regi/*.jsonl root@203.121.204.241:/workspace/data/gen9vgc2025regi/
+
+scp -P 40346 -i ~/.ssh/id_ed25519 -r c:/VSProjects/ApogeeVGC/Tools/DLModel root@203.121.204.241:/workspace/DLModel
+
+## Terminal 1
 
 cd /workspace/DLModel
 
@@ -24,9 +32,4 @@ python -m experiments.run_all --regulation gen9vgc2025regi --data-root /workspac
 
 
 
-## Terminal 2
-
-scp -P 29399 c:/VSProjects/ApogeeVGC/Tools/ReplayScraper/data/gen9vgc2025regi/*.jsonl root@120.238.149.205:/workspace/data/gen9vgc2025regi/
-
-scp -P 29399 -i ~/.ssh/id_ed25519 -r c:/VSProjects/ApogeeVGC/Tools/DLModel root@120.238.149.205:/workspace/DLModel
 
