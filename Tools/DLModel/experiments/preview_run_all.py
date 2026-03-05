@@ -2,9 +2,9 @@
 Main experiment orchestrator.
 
 Usage:
-  python -m experiments.run_all --regulation gen9vgc2025regi
-  python -m experiments.run_all --regulation gen9vgc2025regi --stages hparam ablation
-  python -m experiments.run_all --regulation gen9vgc2025regi --n-trials 50 --epochs 50
+  python -m experiments.preview_run_all --regulation gen9vgc2025regi
+  python -m experiments.preview_run_all --regulation gen9vgc2025regi --stages hparam ablation
+  python -m experiments.preview_run_all --regulation gen9vgc2025regi --n-trials 50 --epochs 50
 
 Stages (in order):
   1. hparam    — Optuna hyperparameter search

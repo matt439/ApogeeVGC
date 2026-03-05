@@ -21,13 +21,13 @@ pip install -r requirements.txt
 python -c "import torch; print(torch.cuda.get_device_name(0))"
 
 #### Team Preview full pipeline
-python -m experiments.run_all --regulation gen9vgc2025regi --data-root /workspace/data --results-root /workspace/results
+python -m experiments.preview_run_all --regulation gen9vgc2025regi --data-root /workspace/data --results-root /workspace/results
 
 #### BattleNet full pipeline
 python -m experiments.battle_run_all --regulation gen9vgc2025regi --data-root /workspace/data --results-root /workspace/results
 
 #### Quick smoke test first (to catch errors before burning GPU hours)
-python -m experiments.run_all --regulation gen9vgc2025regi --data-root /workspace/data --n-trials 3 --epochs 5
+python -m experiments.preview_run_all --regulation gen9vgc2025regi --data-root /workspace/data --n-trials 3 --epochs 5
 
 
 

@@ -20,16 +20,16 @@ Academic research requires empirical justification for architectural decisions. 
 cd Tools/DLModel
 
 # Full pipeline for a regulation
-python -m experiments.run_all --regulation gen9vgc2025regi
+python -m experiments.preview_run_all --regulation gen9vgc2025regi
 
 # Run specific stages only
-python -m experiments.run_all --regulation gen9vgc2025regi --stages hparam ablation
+python -m experiments.preview_run_all --regulation gen9vgc2025regi --stages hparam ablation
 
 # Quick test run (reduced compute)
-python -m experiments.run_all --regulation gen9vgc2025regi --n-trials 3 --epochs 5
+python -m experiments.preview_run_all --regulation gen9vgc2025regi --n-trials 3 --epochs 5
 
 # Custom data split ratios
-python -m experiments.run_all --regulation gen9vgc2025regi --train-frac 0.7 --val-frac 0.15 --test-frac 0.15
+python -m experiments.preview_run_all --regulation gen9vgc2025regi --train-frac 0.7 --val-frac 0.15 --test-frac 0.15
 ```
 
 ### CLI Reference
@@ -269,7 +269,7 @@ results/<regulation>/
 | `experiments/ablation.py` | `run_ablation()` → trains all feature-flag variants |
 | `experiments/multiseed.py` | `run_multiseed()` → trains across seeds, computes mean +/- std |
 | `experiments/visualise.py` | `generate_all_figures()` → PDF + PNG plots |
-| `experiments/run_all.py` | CLI orchestrator, `python -m experiments.run_all` |
+| `experiments/preview_run_all.py` | CLI orchestrator, `python -m experiments.preview_run_all` |
 | `experiments/utils.py` | `timer()`, `save_json()`, `load_json()` |
 
 ## Dependencies

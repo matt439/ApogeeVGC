@@ -52,7 +52,7 @@ These are done. Listed for sanity and so you can see how much is behind you.
 - [ ] Figure generation — all 6 thesis-quality plots
 
 ```bash
-python -m experiments.run_all --regulation gen9vgc2025regi --n-trials 100 --min-rating 1300
+python -m experiments.preview_run_all --regulation gen9vgc2025regi --n-trials 100 --min-rating 1300
 ```
 
 **Effort:** ~6–12 hours wall-clock on GPU (mostly unattended). **Risk:** Low — framework is built and tested.
