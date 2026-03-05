@@ -289,22 +289,55 @@ def build_battle_test_dataset(
     return ds
 
 
+class _GPUBatchIter:
+    """Drop-in DataLoader replacement for GPU-resident datasets.
+
+    Yields batches by direct tensor slicing — eliminates all Python
+    per-sample overhead (no __getitem__, no collate_fn, no iterator protocol).
+    """
+    def __init__(self, ds, batch_size: int, shuffle: bool):
+        self.ds = ds
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.attrs = _BATTLE_TENSOR_ATTRS if hasattr(ds, 'numeric') else _PREVIEW_TENSOR_ATTRS
+
+    def __iter__(self):
+        n = len(self.ds)
+        if self.shuffle:
+            perm = torch.randperm(n, device=self.ds.species_ids.device)
+        else:
+            perm = torch.arange(n, device=self.ds.species_ids.device)
+        for start in range(0, n, self.batch_size):
+            idx = perm[start:start + self.batch_size]
+            yield tuple(getattr(self.ds, attr)[idx] for attr in self.attrs)
+
+    def __len__(self):
+        return (len(self.ds) + self.batch_size - 1) // self.batch_size
+
+
 def loaders_from_datasets(
     train_ds,
     val_ds,
     batch_size: int,
     device: torch.device,
-) -> tuple[DataLoader, DataLoader]:
-    """Wrap pre-built datasets into DataLoaders (cheap — safe to call per trial).
+):
+    """Wrap pre-built datasets into batch iterators (cheap — safe to call per trial).
 
-    If CUDA is available, moves the dataset tensors to GPU first so that
-    the training loop avoids per-batch CPU→GPU transfers entirely.
+    If CUDA is available, moves tensors to GPU and returns _GPUBatchIter
+    instances that yield batches via direct tensor slicing (no DataLoader
+    overhead). Falls back to standard DataLoader on CPU.
     """
     if device.type == 'cuda' and hasattr(train_ds, 'to'):
         train_ds.to(device)
         val_ds.to(device)
-    # pin_memory is useless when data is already on GPU
-    pin = device.type == 'cuda' and not _tensors_on_cuda(train_ds)
+
+    if _tensors_on_cuda(train_ds):
+        return (
+            _GPUBatchIter(train_ds, batch_size, shuffle=True),
+            _GPUBatchIter(val_ds, batch_size, shuffle=False),
+        )
+
+    pin = device.type == 'cuda'
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
         num_workers=0, pin_memory=pin)
@@ -312,6 +345,18 @@ def loaders_from_datasets(
         val_ds, batch_size=batch_size, shuffle=False,
         num_workers=0, pin_memory=pin)
     return train_loader, val_loader
+
+
+def make_batch_iter(ds, batch_size: int, device: torch.device, shuffle: bool = False):
+    """Create a batch iterator for a single dataset (e.g. test set).
+
+    Uses _GPUBatchIter when tensors are on CUDA, else DataLoader.
+    """
+    if _tensors_on_cuda(ds):
+        return _GPUBatchIter(ds, batch_size, shuffle=shuffle)
+    return DataLoader(
+        ds, batch_size=batch_size, shuffle=shuffle,
+        num_workers=0, pin_memory=device.type == 'cuda')
 
 
 def _tensors_on_cuda(ds) -> bool:

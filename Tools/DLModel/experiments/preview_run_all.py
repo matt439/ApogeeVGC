@@ -27,7 +27,6 @@ import sys
 from pathlib import Path
 
 import torch
-from torch.utils.data import DataLoader
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -37,7 +36,8 @@ from .config import (
 )
 from .data import (
     load_games, create_splits, get_or_build_vocab,
-    build_preview_datasets, build_preview_test_dataset, loaders_from_datasets,
+    build_preview_datasets, build_preview_test_dataset,
+    loaders_from_datasets, make_batch_iter,
 )
 from .hparam_search import run_hparam_search
 from .ablation import run_ablation
@@ -188,13 +188,15 @@ def run_tier(
 
         test_ds = build_preview_test_dataset(
             test_games, vocab, winners_only=winners_only, cache_dir=results_dir)
-        test_loader = DataLoader(
-            test_ds, batch_size=1024, shuffle=False, num_workers=0)
+        if device.type == 'cuda':
+            test_ds.to(device)
+        test_loader = make_batch_iter(test_ds, 1024, device)
         train_ds, _ = build_preview_datasets(
             train_games, val_games, vocab, winners_only=winners_only,
             cache_dir=results_dir)
-        train_loader = DataLoader(
-            train_ds, batch_size=1024, shuffle=False, num_workers=0)
+        if device.type == 'cuda':
+            train_ds.to(device)
+        train_loader = make_batch_iter(train_ds, 1024, device)
 
         random_m = evaluate_random_baseline(test_loader)
         with open(baselines_dir / 'random_metrics.json', 'w') as f:

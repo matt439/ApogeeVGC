@@ -104,11 +104,11 @@ def evaluate_battle_comprehensive(
             n_batches += 1
 
             all_value_pred.append(value.cpu())
-            all_value_tgt.append(vtgt)
+            all_value_tgt.append(vtgt.cpu())
             all_pa_logits.append(pol_a.cpu())
             all_pb_logits.append(pol_b.cpu())
-            all_pa_tgt.append(pa_tgt)
-            all_pb_tgt.append(pb_tgt)
+            all_pa_tgt.append(pa_tgt.cpu())
+            all_pb_tgt.append(pb_tgt.cpu())
 
     value_pred = torch.cat(all_value_pred).numpy()
     value_tgt = torch.cat(all_value_tgt).numpy()

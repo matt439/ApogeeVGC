@@ -31,13 +31,13 @@ def evaluate_random_battle_baseline(
 
     for batch in loader:
         _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch
-        all_vtgt.append(vtgt.numpy())
+        all_vtgt.append(vtgt.cpu().numpy())
         all_pa_tgt.append(pa_tgt)
         all_pb_tgt.append(pb_tgt)
 
     value_tgt = np.concatenate(all_vtgt)
-    pa_tgt = torch.cat(all_pa_tgt)
-    pb_tgt = torch.cat(all_pb_tgt)
+    pa_tgt = torch.cat(all_pa_tgt).cpu()
+    pb_tgt = torch.cat(all_pb_tgt).cpu()
     n = len(value_tgt)
     num_actions = vocab['num_actions']
 
@@ -101,12 +101,12 @@ def evaluate_popular_battle_baseline(
 
     for batch in train_loader:
         _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch
-        value_sum += vtgt.numpy().sum()
+        value_sum += vtgt.cpu().numpy().sum()
         n_train += vtgt.shape[0]
-        for a in pa_tgt.numpy():
+        for a in pa_tgt.cpu().numpy():
             if a > 0:
                 pa_counts[a] += 1
-        for b in pb_tgt.numpy():
+        for b in pb_tgt.cpu().numpy():
             if b > 0:
                 pb_counts[b] += 1
 
@@ -123,13 +123,13 @@ def evaluate_popular_battle_baseline(
 
     for batch in test_loader:
         _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch
-        all_vtgt.append(vtgt.numpy())
+        all_vtgt.append(vtgt.cpu().numpy())
         all_pa_tgt.append(pa_tgt)
         all_pb_tgt.append(pb_tgt)
 
     value_tgt = np.concatenate(all_vtgt)
-    pa_tgt = torch.cat(all_pa_tgt)
-    pb_tgt = torch.cat(all_pb_tgt)
+    pa_tgt = torch.cat(all_pa_tgt).cpu()
+    pb_tgt = torch.cat(all_pb_tgt).cpu()
     n = len(value_tgt)
 
     # Value accuracy using training win rate as constant prediction

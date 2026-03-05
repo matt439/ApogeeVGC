@@ -13,7 +13,6 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -21,7 +20,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from .config import ExperimentConfig, TrainConfig, MULTI_SEED_SEEDS
 from .training import train_model, load_model_from_checkpoint
 from .metrics import evaluate_comprehensive, ComprehensiveMetrics
-from .data import build_preview_datasets, build_preview_test_dataset, loaders_from_datasets
+from .data import (
+    build_preview_datasets, build_preview_test_dataset,
+    loaders_from_datasets, make_batch_iter,
+)
 
 
 def run_multiseed(
@@ -96,9 +98,8 @@ def run_multiseed(
         )
 
         # Evaluate on test set (tensors already on GPU if CUDA)
-        test_loader = DataLoader(
-            test_ds, batch_size=config.train.batch_size,
-            shuffle=False, num_workers=0, pin_memory=False)
+        test_loader = make_batch_iter(
+            test_ds, config.train.batch_size, device)
 
         checkpoint = torch.load(
             seed_dir / 'model.pt', map_location=device, weights_only=False)

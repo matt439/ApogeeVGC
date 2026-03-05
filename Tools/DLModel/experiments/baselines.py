@@ -30,8 +30,8 @@ def evaluate_random_baseline(
 
     for batch in loader:
         _, _, _, _, _, bring_tgt, lead_tgt, _ = batch
-        all_bring_tgt.append(bring_tgt.numpy())
-        all_lead_tgt.append(lead_tgt.numpy())
+        all_bring_tgt.append(bring_tgt.cpu().numpy())
+        all_lead_tgt.append(lead_tgt.cpu().numpy())
 
     bring_tgt = np.concatenate(all_bring_tgt, axis=0)
     lead_tgt = np.concatenate(all_lead_tgt, axis=0)
@@ -94,8 +94,8 @@ def evaluate_popular_baseline(
 
     for batch in train_loader:
         _, _, _, _, _, bring_tgt, lead_tgt, _ = batch
-        bring_sum += bring_tgt.numpy().sum(axis=0)
-        lead_sum += lead_tgt.numpy().sum(axis=0)
+        bring_sum += bring_tgt.cpu().numpy().sum(axis=0)
+        lead_sum += lead_tgt.cpu().numpy().sum(axis=0)
         n_train += bring_tgt.shape[0]
 
     bring_freq = bring_sum / n_train
@@ -106,8 +106,8 @@ def evaluate_popular_baseline(
 
     for batch in test_loader:
         _, _, _, _, _, bring_tgt, lead_tgt, _ = batch
-        all_bring_tgt.append(bring_tgt.numpy())
-        all_lead_tgt.append(lead_tgt.numpy())
+        all_bring_tgt.append(bring_tgt.cpu().numpy())
+        all_lead_tgt.append(lead_tgt.cpu().numpy())
 
     bring_tgt = np.concatenate(all_bring_tgt, axis=0)
     lead_tgt = np.concatenate(all_lead_tgt, axis=0)

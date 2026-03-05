@@ -104,9 +104,9 @@ def evaluate_comprehensive(
             n_batches += 1
 
             all_bring_pred.append(bring_pred.cpu())
-            all_bring_tgt.append(bring_tgt)
+            all_bring_tgt.append(bring_tgt.cpu())
             all_lead_pred.append(lead_pred.cpu())
-            all_lead_tgt.append(lead_tgt)
+            all_lead_tgt.append(lead_tgt.cpu())
 
     bring_pred_np = torch.cat(all_bring_pred, dim=0).numpy()
     bring_tgt_np = torch.cat(all_bring_tgt, dim=0).numpy()
