@@ -110,11 +110,13 @@ def train_battle_model(
     total_params = sum(p.numel() for p in model.parameters())
 
     # torch.compile fuses GPU ops → fewer kernel launches, higher utilization
-    if hasattr(torch, 'compile') and device.type == 'cuda':
+    # Default inductor backend requires Triton (Linux-only)
+    if (hasattr(torch, 'compile') and device.type == 'cuda'
+            and sys.platform != 'win32'):
         try:
             model = torch.compile(model)
         except Exception:
-            pass  # graceful fallback if compile unavailable
+            pass
 
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=tc.lr, weight_decay=tc.weight_decay)
