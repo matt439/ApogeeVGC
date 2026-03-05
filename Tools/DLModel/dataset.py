@@ -457,6 +457,19 @@ class VGCDataset(Dataset):
                 return none_id
         return none_id
 
+    def to(self, device: torch.device) -> 'VGCDataset':
+        """Move all tensors to the given device (e.g. GPU). Returns self."""
+        self.species_ids = self.species_ids.to(device)
+        self.move_ids = self.move_ids.to(device)
+        self.ability_ids = self.ability_ids.to(device)
+        self.item_ids = self.item_ids.to(device)
+        self.tera_ids = self.tera_ids.to(device)
+        self.numeric = self.numeric.to(device)
+        self.value_targets = self.value_targets.to(device)
+        self.policy_a = self.policy_a.to(device)
+        self.policy_b = self.policy_b.to(device)
+        return self
+
     def __len__(self) -> int:
         return self.n
 

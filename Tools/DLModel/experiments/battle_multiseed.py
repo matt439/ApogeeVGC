@@ -54,6 +54,9 @@ def run_battle_multiseed(
         cache_dir=output_dir)
     test_ds = build_battle_test_dataset(
         test_games, vocab, winners_only=winners_only, cache_dir=output_dir)
+    # Move test set to GPU once — train/val moved by loaders_from_datasets
+    if device.type == 'cuda':
+        test_ds.to(device)
     print(f'  {len(train_ds):,} train, {len(val_ds):,} val, {len(test_ds):,} test')
 
     for seed in seeds:
@@ -92,11 +95,10 @@ def run_battle_multiseed(
             device=device,
         )
 
-        # Evaluate on test set
+        # Evaluate on test set (tensors already on GPU if CUDA)
         test_loader = DataLoader(
             test_ds, batch_size=config.train.batch_size,
-            shuffle=False, num_workers=0,
-            pin_memory=(device.type == 'cuda'))
+            shuffle=False, num_workers=0, pin_memory=False)
 
         checkpoint = torch.load(
             seed_dir / 'model.pt', map_location=device, weights_only=False)

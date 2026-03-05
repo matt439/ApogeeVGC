@@ -164,6 +164,18 @@ class TeamPreviewDataset(Dataset):
         if tera_type:
             self.tera_ids[sample_idx, slot] = tera_map.get(tera_type, te_unk)
 
+    def to(self, device: torch.device) -> 'TeamPreviewDataset':
+        """Move all tensors to the given device (e.g. GPU). Returns self."""
+        self.species_ids = self.species_ids.to(device)
+        self.move_ids = self.move_ids.to(device)
+        self.ability_ids = self.ability_ids.to(device)
+        self.item_ids = self.item_ids.to(device)
+        self.tera_ids = self.tera_ids.to(device)
+        self.bring_target = self.bring_target.to(device)
+        self.lead_target = self.lead_target.to(device)
+        self.value_target = self.value_target.to(device)
+        return self
+
     def __len__(self) -> int:
         return self.n
 

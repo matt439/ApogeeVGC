@@ -59,6 +59,8 @@ def run_ablation(
         cache_dir=output_dir)
     test_ds = build_preview_test_dataset(
         test_games, vocab, winners_only=winners_only, cache_dir=output_dir)
+    if device.type == 'cuda':
+        test_ds.to(device)
     print(f'  {len(train_ds):,} train, {len(val_ds):,} val, {len(test_ds):,} test')
 
     for ablation in ABLATION_CONFIGS:
@@ -98,11 +100,10 @@ def run_ablation(
             device=device,
         )
 
-        # Evaluate on test set
+        # Evaluate on test set (tensors already on GPU if CUDA)
         test_loader = DataLoader(
             test_ds, batch_size=config.train.batch_size,
-            shuffle=False, num_workers=0,
-            pin_memory=(device.type == 'cuda'))
+            shuffle=False, num_workers=0, pin_memory=False)
 
         checkpoint = torch.load(
             variant_dir / 'model.pt', map_location=device, weights_only=False)

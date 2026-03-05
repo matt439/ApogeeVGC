@@ -295,13 +295,28 @@ def loaders_from_datasets(
     batch_size: int,
     device: torch.device,
 ) -> tuple[DataLoader, DataLoader]:
-    """Wrap pre-built datasets into DataLoaders (cheap — safe to call per trial)."""
-    cuda = device.type == 'cuda'
+    """Wrap pre-built datasets into DataLoaders (cheap — safe to call per trial).
+
+    If CUDA is available, moves the dataset tensors to GPU first so that
+    the training loop avoids per-batch CPU→GPU transfers entirely.
+    """
+    if device.type == 'cuda' and hasattr(train_ds, 'to'):
+        train_ds.to(device)
+        val_ds.to(device)
+    # pin_memory is useless when data is already on GPU
+    pin = device.type == 'cuda' and not _tensors_on_cuda(train_ds)
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True,
-        num_workers=0, pin_memory=cuda)
+        num_workers=0, pin_memory=pin)
     val_loader = DataLoader(
         val_ds, batch_size=batch_size, shuffle=False,
-        num_workers=0, pin_memory=cuda)
+        num_workers=0, pin_memory=pin)
     return train_loader, val_loader
+
+
+def _tensors_on_cuda(ds) -> bool:
+    """Check if a dataset's tensors are already on CUDA."""
+    if hasattr(ds, 'species_ids'):
+        return ds.species_ids.is_cuda
+    return False
 
