@@ -146,7 +146,11 @@ def train_battle_model(
 
         # ── Train ──
         model.train()
-        t_loss = t_vloss = t_paloss = t_pbloss = 0.0
+        # Accumulate losses on GPU to avoid per-batch .item() sync
+        t_loss_acc = torch.tensor(0.0, device=device)
+        t_vloss_acc = torch.tensor(0.0, device=device)
+        t_paloss_acc = torch.tensor(0.0, device=device)
+        t_pbloss_acc = torch.tensor(0.0, device=device)
         n_batches = 0
 
         for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt in train_loader:
@@ -176,18 +180,29 @@ def train_battle_model(
             scaler.step(optimizer)
             scaler.update()
 
-            t_loss += loss.item()
-            t_vloss += v_loss.item()
-            t_paloss += pa_loss.item()
-            t_pbloss += pb_loss.item()
+            t_loss_acc += loss.detach()
+            t_vloss_acc += v_loss.detach()
+            t_paloss_acc += pa_loss.detach()
+            t_pbloss_acc += pb_loss.detach()
             n_batches += 1
+
+        # Single GPU→CPU sync per epoch
+        t_loss = t_loss_acc.item()
+        t_vloss = t_vloss_acc.item()
+        t_paloss = t_paloss_acc.item()
+        t_pbloss = t_pbloss_acc.item()
 
         # ── Validate ──
         model.eval()
-        v_loss_sum = v_vloss = v_paloss = v_pbloss = 0.0
-        val_acc_sum = 0.0
-        pa_correct = pa_total = 0
-        pb_correct = pb_total = 0
+        v_loss_acc = torch.tensor(0.0, device=device)
+        v_vloss_acc = torch.tensor(0.0, device=device)
+        v_paloss_acc = torch.tensor(0.0, device=device)
+        v_pbloss_acc = torch.tensor(0.0, device=device)
+        val_acc_acc = torch.tensor(0.0, device=device)
+        pa_correct_acc = torch.tensor(0, dtype=torch.long, device=device)
+        pa_total_acc = torch.tensor(0, dtype=torch.long, device=device)
+        pb_correct_acc = torch.tensor(0, dtype=torch.long, device=device)
+        pb_total_acc = torch.tensor(0, dtype=torch.long, device=device)
         n_vbatches = 0
 
         with torch.no_grad():
@@ -208,27 +223,37 @@ def train_battle_model(
                 vl = value_loss_fn(value.float(), vtgt)
                 pal = policy_loss_fn(pol_a.float(), pa_tgt)
                 pbl = policy_loss_fn(pol_b.float(), pb_tgt)
-                loss = vl + pal + pbl
 
-                v_loss_sum += loss.item()
-                v_vloss += vl.item()
-                v_paloss += pal.item()
-                v_pbloss += pbl.item()
+                v_loss_acc += (vl + pal + pbl).detach()
+                v_vloss_acc += vl.detach()
+                v_paloss_acc += pal.detach()
+                v_pbloss_acc += pbl.detach()
                 n_vbatches += 1
 
                 # Value accuracy
-                val_acc_sum += ((value > 0.5).float() == vtgt).float().mean().item()
+                val_acc_acc += ((value > 0.5).float() == vtgt).float().mean()
 
                 # Policy accuracy (non-padded only)
                 mask_a = pa_tgt > 0
                 if mask_a.any():
-                    pa_correct += (pol_a.argmax(1)[mask_a] == pa_tgt[mask_a]).sum().item()
-                    pa_total += mask_a.sum().item()
+                    pa_correct_acc += (pol_a.argmax(1)[mask_a] == pa_tgt[mask_a]).sum()
+                    pa_total_acc += mask_a.sum()
 
                 mask_b = pb_tgt > 0
                 if mask_b.any():
-                    pb_correct += (pol_b.argmax(1)[mask_b] == pb_tgt[mask_b]).sum().item()
-                    pb_total += mask_b.sum().item()
+                    pb_correct_acc += (pol_b.argmax(1)[mask_b] == pb_tgt[mask_b]).sum()
+                    pb_total_acc += mask_b.sum()
+
+        # Single GPU→CPU sync for validation
+        v_loss_sum = v_loss_acc.item()
+        v_vloss = v_vloss_acc.item()
+        v_paloss = v_paloss_acc.item()
+        v_pbloss = v_pbloss_acc.item()
+        val_acc_sum = val_acc_acc.item()
+        pa_correct = pa_correct_acc.item()
+        pa_total = pa_total_acc.item()
+        pb_correct = pb_correct_acc.item()
+        pb_total = pb_total_acc.item()
 
         if tc.scheduler == 'cosine':
             scheduler.step()

@@ -143,7 +143,10 @@ def train_model(
 
         # ── Train ──
         model.train()
-        t_loss = t_bloss = t_lloss = 0.0
+        # Accumulate losses on GPU to avoid per-batch .item() sync
+        t_loss_acc = torch.tensor(0.0, device=device)
+        t_bloss_acc = torch.tensor(0.0, device=device)
+        t_lloss_acc = torch.tensor(0.0, device=device)
         n_batches = 0
 
         for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in train_loader:
@@ -174,14 +177,21 @@ def train_model(
             scaler.step(optimizer)
             scaler.update()
 
-            t_loss += loss.item()
-            t_bloss += b_loss.item()
-            t_lloss += l_loss.item()
+            t_loss_acc += loss.detach()
+            t_bloss_acc += b_loss.detach()
+            t_lloss_acc += l_loss.detach()
             n_batches += 1
+
+        # Single GPU→CPU sync per epoch
+        t_loss = t_loss_acc.item()
+        t_bloss = t_bloss_acc.item()
+        t_lloss = t_lloss_acc.item()
 
         # ── Validate ──
         model.eval()
-        v_loss = v_bloss = v_lloss = 0.0
+        v_loss_acc = torch.tensor(0.0, device=device)
+        v_bloss_acc = torch.tensor(0.0, device=device)
+        v_lloss_acc = torch.tensor(0.0, device=device)
         bring_acc_sum = lead_acc_sum = 0.0
         n_vbatches = 0
 
@@ -204,18 +214,23 @@ def train_model(
                 l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
                 l_mask = bring_tgt
                 l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-                loss = b_loss + l_loss
 
-                v_loss += loss.item()
-                v_bloss += b_loss.item()
-                v_lloss += l_loss.item()
+                v_loss_acc += (b_loss + l_loss).detach()
+                v_bloss_acc += b_loss.detach()
+                v_lloss_acc += l_loss.detach()
                 n_vbatches += 1
 
+                # These already return Python floats via .item() internally
                 bring_acc_sum += _compute_accuracy(bring_pred, bring_tgt, 4)
 
                 lead_masked = lead_pred.clone()
                 lead_masked[bring_tgt < 0.5] = -1e9
                 lead_acc_sum += _compute_accuracy(lead_masked, lead_tgt, 2)
+
+        # Single GPU→CPU sync for validation losses
+        v_loss = v_loss_acc.item()
+        v_bloss = v_bloss_acc.item()
+        v_lloss = v_lloss_acc.item()
 
         if tc.scheduler == 'cosine':
             scheduler.step()
