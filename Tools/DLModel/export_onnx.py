@@ -56,7 +56,8 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
             pokemon_dim=train_args['pokemon_dim'],
             hidden_dim=train_args['hidden_dim'],
         )
-    model.load_state_dict(checkpoint['model_state_dict'])
+    state_dict = {k.removeprefix('_orig_mod.'): v for k, v in checkpoint['model_state_dict'].items()}
+    model.load_state_dict(state_dict)
     model.eval()
 
     species_ids = torch.zeros(1, 8, dtype=torch.long)
@@ -139,7 +140,8 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
             hidden_dim=train_args['hidden_dim'],
         )
 
-    model.load_state_dict(checkpoint['model_state_dict'])
+    state_dict = {k.removeprefix('_orig_mod.'): v for k, v in checkpoint['model_state_dict'].items()}
+    model.load_state_dict(state_dict)
     model.eval()
 
     species_ids = torch.zeros(1, 12, dtype=torch.long)

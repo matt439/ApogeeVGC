@@ -328,5 +328,6 @@ def load_battle_model_from_checkpoint(
         head_dim=args.get('head_dim', 64),
         feature_flags=args.get('feature_flags'),
     ).to(device)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    state_dict = {k.removeprefix('_orig_mod.'): v for k, v in checkpoint['model_state_dict'].items()}
+    model.load_state_dict(state_dict)
     return model
