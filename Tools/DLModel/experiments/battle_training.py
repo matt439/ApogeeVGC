@@ -13,7 +13,6 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
-from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
 import sys
@@ -81,9 +80,6 @@ def train_battle_model(
 
     if device.type == 'cuda':
         torch.backends.cudnn.benchmark = True
-
-    use_amp = device.type == 'cuda'
-    scaler = GradScaler('cuda', enabled=use_amp)
 
     torch.manual_seed(config.train.seed)
 
@@ -164,21 +160,18 @@ def train_battle_model(
             pa_tgt = pa_tgt.to(device, non_blocking=True)
             pb_tgt = pb_tgt.to(device, non_blocking=True)
 
-            with autocast('cuda', enabled=use_amp):
-                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+            value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-            # BCELoss requires float32 — compute loss outside autocast
-            v_loss = value_loss_fn(value.float(), vtgt)
-            pa_loss = policy_loss_fn(pol_a.float(), pa_tgt)
-            pb_loss = policy_loss_fn(pol_b.float(), pb_tgt)
+            v_loss = value_loss_fn(value, vtgt)
+            pa_loss = policy_loss_fn(pol_a, pa_tgt)
+            pb_loss = policy_loss_fn(pol_b, pb_tgt)
             loss = v_loss + pa_loss + pb_loss
 
-            optimizer.zero_grad()
-            scaler.scale(loss).backward()
-            scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), tc.grad_clip)
-            scaler.step(optimizer)
-            scaler.update()
+            optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            # clip_grad_value_ clips in-place without computing a norm (no sync)
+            torch.nn.utils.clip_grad_value_(model.parameters(), tc.grad_clip)
+            optimizer.step()
 
             t_loss_acc += loss.detach()
             t_vloss_acc += v_loss.detach()
@@ -217,12 +210,11 @@ def train_battle_model(
                 pa_tgt = pa_tgt.to(device, non_blocking=True)
                 pb_tgt = pb_tgt.to(device, non_blocking=True)
 
-                with autocast('cuda', enabled=use_amp):
-                    value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
-                vl = value_loss_fn(value.float(), vtgt)
-                pal = policy_loss_fn(pol_a.float(), pa_tgt)
-                pbl = policy_loss_fn(pol_b.float(), pb_tgt)
+                vl = value_loss_fn(value, vtgt)
+                pal = policy_loss_fn(pol_a, pa_tgt)
+                pbl = policy_loss_fn(pol_b, pb_tgt)
 
                 v_loss_acc += (vl + pal + pbl).detach()
                 v_vloss_acc += vl.detach()
@@ -233,16 +225,16 @@ def train_battle_model(
                 # Value accuracy
                 val_acc_acc += ((value > 0.5).float() == vtgt).float().mean()
 
-                # Policy accuracy (non-padded only)
+                # Policy accuracy (non-padded only) — avoid .any() sync
                 mask_a = pa_tgt > 0
-                if mask_a.any():
-                    pa_correct_acc += (pol_a.argmax(1)[mask_a] == pa_tgt[mask_a]).sum()
-                    pa_total_acc += mask_a.sum()
+                n_a = mask_a.sum()
+                pa_correct_acc += (pol_a.argmax(1)[mask_a] == pa_tgt[mask_a]).sum()
+                pa_total_acc += n_a
 
                 mask_b = pb_tgt > 0
-                if mask_b.any():
-                    pb_correct_acc += (pol_b.argmax(1)[mask_b] == pb_tgt[mask_b]).sum()
-                    pb_total_acc += mask_b.sum()
+                n_b = mask_b.sum()
+                pb_correct_acc += (pol_b.argmax(1)[mask_b] == pb_tgt[mask_b]).sum()
+                pb_total_acc += n_b
 
         # Single GPU→CPU sync for validation
         v_loss_sum = v_loss_acc.item()

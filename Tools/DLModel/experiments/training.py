@@ -14,7 +14,6 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
-from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
 import sys
@@ -79,9 +78,6 @@ def train_model(
 
     if device.type == 'cuda':
         torch.backends.cudnn.benchmark = True
-
-    use_amp = device.type == 'cuda'
-    scaler = GradScaler('cuda', enabled=use_amp)
 
     torch.manual_seed(config.train.seed)
 
@@ -158,24 +154,18 @@ def train_model(
             bring_tgt = bring_tgt.to(device, non_blocking=True)
             lead_tgt = lead_tgt.to(device, non_blocking=True)
 
-            with autocast('cuda', enabled=use_amp):
-                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
+            bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-            # BCELoss requires float32 — compute loss outside autocast
-            bring_pred = bring_pred.float()
-            lead_pred = lead_pred.float()
             b_loss = bring_loss_fn(bring_pred, bring_tgt)
             l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
             l_mask = bring_tgt
             l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
             loss = b_loss + l_loss
 
-            optimizer.zero_grad()
-            scaler.scale(loss).backward()
-            scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), tc.grad_clip)
-            scaler.step(optimizer)
-            scaler.update()
+            optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            torch.nn.utils.clip_grad_value_(model.parameters(), tc.grad_clip)
+            optimizer.step()
 
             t_loss_acc += loss.detach()
             t_bloss_acc += b_loss.detach()
@@ -205,11 +195,8 @@ def train_model(
                 bring_tgt = bring_tgt.to(device, non_blocking=True)
                 lead_tgt = lead_tgt.to(device, non_blocking=True)
 
-                with autocast('cuda', enabled=use_amp):
-                    bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
+                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
 
-                bring_pred = bring_pred.float()
-                lead_pred = lead_pred.float()
                 b_loss = bring_loss_fn(bring_pred, bring_tgt)
                 l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
                 l_mask = bring_tgt
