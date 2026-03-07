@@ -291,7 +291,8 @@ def main():
 
     reg = args.regulation
     strategy = args.training_strategy
-    results_root = Path(args.results_root) / reg
+    # Preview results go under preview/ subdirectory (parallel to battle/)
+    results_root = Path(args.results_root) / reg / 'preview'
     results_root.mkdir(parents=True, exist_ok=True)
 
     # Determine which tiers to run
