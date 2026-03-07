@@ -219,8 +219,8 @@ def _build_parallel(build_fn, games, vocab, winners_only, num_workers, attrs):
 
 
 def _default_num_workers() -> int:
-    """Sensible default: half of CPU cores (at least 1)."""
-    return max((os.cpu_count() or 2) // 2, 1)
+    """Default to all logical cores (at least 1)."""
+    return max(os.cpu_count() or 1, 1)
 
 
 def build_preview_datasets(
@@ -411,8 +411,8 @@ def _try_move_to_gpu(ds, headroom_bytes: int) -> bool:
     return False
 
 
-# 2 GB headroom for model + activations + gradients
-_VRAM_HEADROOM = 2 * 1024**3
+# 512 MB headroom for model + activations + gradients
+_VRAM_HEADROOM = 512 * 1024**2
 
 
 def loaders_from_datasets(
