@@ -189,14 +189,10 @@ def run_tier(
 
         test_ds = build_battle_test_dataset(
             test_games, vocab, winners_only=winners_only, cache_dir=results_dir)
-        if device.type == 'cuda':
-            test_ds.to(device)
         test_loader = make_batch_iter(test_ds, 1024, device)
         train_ds, _ = build_battle_datasets(
             train_games, val_games, vocab, winners_only=winners_only,
             cache_dir=results_dir)
-        if device.type == 'cuda':
-            train_ds.to(device)
         train_loader = make_batch_iter(train_ds, 1024, device)
 
         random_m = evaluate_random_battle_baseline(test_loader, vocab)

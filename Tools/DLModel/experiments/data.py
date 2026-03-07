@@ -13,8 +13,10 @@ expensive JSONL parse + Python encoding loop entirely.
 from __future__ import annotations
 
 import json
+import os
 import random
 import time
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import torch
@@ -183,17 +185,58 @@ def _build_and_cache_battle(
     return ds
 
 
+def _build_preview_chunk(args):
+    """Build a TeamPreviewDataset from a chunk of games (top-level for pickling)."""
+    games, vocab, winners_only = args
+    return TeamPreviewDataset(games, vocab, winners_only=winners_only)
+
+
+def _build_battle_chunk(args):
+    """Build a VGCDataset from a chunk of games (top-level for pickling)."""
+    games, vocab, winners_only = args
+    return VGCDataset(games, vocab, winners_only=winners_only)
+
+
+def _merge_datasets(datasets, attrs):
+    """Merge partial datasets by concatenating their tensors."""
+    merged = object.__new__(type(datasets[0]))
+    for attr in attrs:
+        setattr(merged, attr, torch.cat([getattr(ds, attr) for ds in datasets], dim=0))
+    merged.n = sum(ds.n for ds in datasets)
+    return merged
+
+
+def _build_parallel(build_fn, games, vocab, winners_only, num_workers, attrs):
+    """Build a dataset using multiple worker processes."""
+    chunk_size = (len(games) + num_workers - 1) // num_workers
+    chunks = [games[i:i + chunk_size] for i in range(0, len(games), chunk_size)]
+    args_list = [(chunk, vocab, winners_only) for chunk in chunks]
+
+    with ProcessPoolExecutor(max_workers=num_workers) as pool:
+        datasets = list(pool.map(build_fn, args_list))
+
+    return _merge_datasets(datasets, attrs)
+
+
+def _default_num_workers() -> int:
+    """Sensible default: half of CPU cores (at least 1)."""
+    return max((os.cpu_count() or 2) // 2, 1)
+
+
 def build_preview_datasets(
     train_games: list[dict],
     val_games: list[dict],
     vocab: dict,
     winners_only: bool = True,
     cache_dir: Path | None = None,
+    num_workers: int = 0,
 ) -> tuple[TeamPreviewDataset, TeamPreviewDataset]:
     """Build TeamPreviewNet datasets (expensive — call once, reuse across trials).
 
     If cache_dir is provided, tensors are saved to / loaded from .pt files,
     skipping the JSONL encoding on subsequent runs.
+
+    num_workers > 0 parallelises the build across that many processes.
     """
     wo_tag = 'wo' if winners_only else 'all'
     if cache_dir is not None:
@@ -206,11 +249,24 @@ def build_preview_datasets(
             print(f'  Loaded cached preview datasets from {cd}')
             return train_ds, val_ds
 
+    nw = num_workers if num_workers > 0 else _default_num_workers()
     t0 = time.time()
     train_cache = (cd / f'preview_train_{wo_tag}.pt') if cache_dir else None
     val_cache = (cd / f'preview_val_{wo_tag}.pt') if cache_dir else None
-    train_ds = _build_and_cache_preview(train_games, vocab, winners_only, train_cache)
-    val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache)
+
+    if nw > 1 and len(train_games) >= nw * 10:
+        print(f'  Building preview datasets with {nw} workers...')
+        train_ds = _build_parallel(
+            _build_preview_chunk, train_games, vocab, winners_only,
+            nw, _PREVIEW_TENSOR_ATTRS)
+        train_ds._n_games = len(train_games)
+        if train_cache is not None:
+            _save_dataset_cache(train_ds, _PREVIEW_TENSOR_ATTRS, train_cache)
+        val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache)
+    else:
+        train_ds = _build_and_cache_preview(train_games, vocab, winners_only, train_cache)
+        val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache)
+
     print(f'  Built preview datasets in {time.time() - t0:.1f}s'
           + (f' (cached to {cd})' if cache_dir else ''))
     return train_ds, val_ds
@@ -222,11 +278,14 @@ def build_battle_datasets(
     vocab: dict,
     winners_only: bool = False,
     cache_dir: Path | None = None,
+    num_workers: int = 0,
 ) -> tuple[VGCDataset, VGCDataset]:
     """Build BattleNet datasets (expensive — call once, reuse across trials).
 
     If cache_dir is provided, tensors are saved to / loaded from .pt files,
     skipping the JSONL encoding on subsequent runs.
+
+    num_workers > 0 parallelises the build across that many processes.
     """
     wo_tag = 'wo' if winners_only else 'all'
     if cache_dir is not None:
@@ -239,11 +298,24 @@ def build_battle_datasets(
             print(f'  Loaded cached battle datasets from {cd}')
             return train_ds, val_ds
 
+    nw = num_workers if num_workers > 0 else _default_num_workers()
     t0 = time.time()
     train_cache = (cd / f'battle_train_{wo_tag}.pt') if cache_dir else None
     val_cache = (cd / f'battle_val_{wo_tag}.pt') if cache_dir else None
-    train_ds = _build_and_cache_battle(train_games, vocab, winners_only, train_cache)
-    val_ds = _build_and_cache_battle(val_games, vocab, winners_only, val_cache)
+
+    if nw > 1 and len(train_games) >= nw * 10:
+        print(f'  Building battle datasets with {nw} workers...')
+        train_ds = _build_parallel(
+            _build_battle_chunk, train_games, vocab, winners_only,
+            nw, _BATTLE_TENSOR_ATTRS)
+        train_ds._n_games = len(train_games)
+        if train_cache is not None:
+            _save_dataset_cache(train_ds, _BATTLE_TENSOR_ATTRS, train_cache)
+        val_ds = _build_and_cache_battle(val_games, vocab, winners_only, val_cache)
+    else:
+        train_ds = _build_and_cache_battle(train_games, vocab, winners_only, train_cache)
+        val_ds = _build_and_cache_battle(val_games, vocab, winners_only, val_cache)
+
     print(f'  Built battle datasets in {time.time() - t0:.1f}s'
           + (f' (cached to {cd})' if cache_dir else ''))
     return train_ds, val_ds
@@ -315,6 +387,34 @@ class _GPUBatchIter:
         return (len(self.ds) + self.batch_size - 1) // self.batch_size
 
 
+def _estimate_dataset_bytes(ds) -> int:
+    """Estimate total bytes of a dataset's tensors."""
+    attrs = _BATTLE_TENSOR_ATTRS if hasattr(ds, 'numeric') else _PREVIEW_TENSOR_ATTRS
+    total = 0
+    for attr in attrs:
+        t = getattr(ds, attr)
+        total += t.nelement() * t.element_size()
+    return total
+
+
+def _try_move_to_gpu(ds, headroom_bytes: int) -> bool:
+    """Move dataset to GPU if enough VRAM is available. Returns True if moved."""
+    if not torch.cuda.is_available() or not hasattr(ds, 'to'):
+        return False
+    if _tensors_on_cuda(ds):
+        return True
+    needed = _estimate_dataset_bytes(ds)
+    free, _ = torch.cuda.mem_get_info()
+    if needed < free - headroom_bytes:
+        ds.to(torch.device('cuda'))
+        return True
+    return False
+
+
+# 2 GB headroom for model + activations + gradients
+_VRAM_HEADROOM = 2 * 1024**3
+
+
 def loaders_from_datasets(
     train_ds,
     val_ds,
@@ -323,13 +423,22 @@ def loaders_from_datasets(
 ):
     """Wrap pre-built datasets into batch iterators (cheap — safe to call per trial).
 
-    If CUDA is available, moves tensors to GPU and returns _GPUBatchIter
-    instances that yield batches via direct tensor slicing (no DataLoader
-    overhead). Falls back to standard DataLoader on CPU.
+    Auto-detects available VRAM. If both datasets fit with 2 GB headroom,
+    moves them to GPU and uses _GPUBatchIter (zero-overhead slicing).
+    Otherwise keeps data on CPU with pinned-memory DataLoaders.
     """
     if device.type == 'cuda' and hasattr(train_ds, 'to'):
-        train_ds.to(device)
-        val_ds.to(device)
+        total_bytes = (_estimate_dataset_bytes(train_ds)
+                       + _estimate_dataset_bytes(val_ds))
+        free, _ = torch.cuda.mem_get_info()
+        if total_bytes < free - _VRAM_HEADROOM:
+            train_ds.to(device)
+            val_ds.to(device)
+        else:
+            needed_mb = total_bytes / 1024**2
+            free_mb = free / 1024**2
+            print(f'  Dataset ({needed_mb:.0f} MB) exceeds available VRAM '
+                  f'({free_mb:.0f} MB - 2 GB headroom), keeping on CPU')
 
     if _tensors_on_cuda(train_ds):
         return (
@@ -350,8 +459,11 @@ def loaders_from_datasets(
 def make_batch_iter(ds, batch_size: int, device: torch.device, shuffle: bool = False):
     """Create a batch iterator for a single dataset (e.g. test set).
 
-    Uses _GPUBatchIter when tensors are on CUDA, else DataLoader.
+    Auto-detects VRAM: moves to GPU if it fits, otherwise uses pinned DataLoader.
     """
+    if not _tensors_on_cuda(ds) and device.type == 'cuda':
+        _try_move_to_gpu(ds, _VRAM_HEADROOM)
+
     if _tensors_on_cuda(ds):
         return _GPUBatchIter(ds, batch_size, shuffle=shuffle)
     return DataLoader(

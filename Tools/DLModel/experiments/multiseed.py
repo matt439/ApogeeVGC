@@ -56,9 +56,6 @@ def run_multiseed(
         cache_dir=output_dir)
     test_ds = build_preview_test_dataset(
         test_games, vocab, winners_only=winners_only, cache_dir=output_dir)
-    # Move all to GPU once — eliminates per-batch CPU→GPU transfers
-    if device.type == 'cuda':
-        test_ds.to(device)
     print(f'  {len(train_ds):,} train, {len(val_ds):,} val, {len(test_ds):,} test')
 
     for seed in seeds:

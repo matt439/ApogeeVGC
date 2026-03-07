@@ -61,8 +61,6 @@ def run_ablation(
         cache_dir=output_dir)
     test_ds = build_preview_test_dataset(
         test_games, vocab, winners_only=winners_only, cache_dir=output_dir)
-    if device.type == 'cuda':
-        test_ds.to(device)
     print(f'  {len(train_ds):,} train, {len(val_ds):,} val, {len(test_ds):,} test')
 
     for ablation in ABLATION_CONFIGS:
