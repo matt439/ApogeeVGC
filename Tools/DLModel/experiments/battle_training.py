@@ -81,6 +81,8 @@ def train_battle_model(
 
     if device.type == 'cuda':
         torch.backends.cudnn.benchmark = True
+        # TF32 on Ampere+ GPUs: ~2x faster float32 matmuls, negligible precision loss
+        torch.set_float32_matmul_precision('high')
 
     torch.manual_seed(config.train.seed)
 
@@ -190,10 +192,12 @@ def train_battle_model(
 
             with autocast('cuda', enabled=use_amp):
                 value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
-                v_loss = value_loss_fn(value.float(), vtgt)
-                pa_loss = policy_loss_fn(pol_a.float(), pa_tgt)
-                pb_loss = policy_loss_fn(pol_b.float(), pb_tgt)
-                loss = vw * v_loss + pw * (pa_loss + pb_loss)
+
+            # Losses computed in float32 (BCELoss is unsafe under autocast)
+            v_loss = value_loss_fn(value.float(), vtgt)
+            pa_loss = policy_loss_fn(pol_a.float(), pa_tgt)
+            pb_loss = policy_loss_fn(pol_b.float(), pb_tgt)
+            loss = vw * v_loss + pw * (pa_loss + pb_loss)
 
             optimizer.zero_grad(set_to_none=True)
             scaler.scale(loss).backward()
@@ -257,9 +261,10 @@ def train_battle_model(
 
                 with autocast('cuda', enabled=use_amp):
                     value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
-                    vl = value_loss_fn(value.float(), vtgt)
-                    pal = policy_loss_fn(pol_a.float(), pa_tgt)
-                    pbl = policy_loss_fn(pol_b.float(), pb_tgt)
+
+                vl = value_loss_fn(value.float(), vtgt)
+                pal = policy_loss_fn(pol_a.float(), pa_tgt)
+                pbl = policy_loss_fn(pol_b.float(), pb_tgt)
 
                 v_loss_acc += (vw * vl + pw * (pal + pbl)).detach()
                 v_vloss_acc += vl.detach()
