@@ -33,7 +33,7 @@
   <ItemGroup>
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4.1" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.17.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />
     <PackageReference Include="Spectre.Console" Version="0.53.0" />
   </ItemGroup>
 
@@ -61,8 +61,10 @@
   <!-- MCTS model files - copied to output directory preserving relative path -->
   <ItemGroup>
     <Content Include="..\Tools\DLModel\battle_model.onnx" Link="Tools\DLModel\battle_model.onnx" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\battle_model.onnx')" />
+    <Content Include="..\Tools\DLModel\battle_model.onnx.data" Link="Tools\DLModel\battle_model.onnx.data" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\battle_model.onnx.data')" />
     <Content Include="..\Tools\DLModel\battle_model_vocab.json" Link="Tools\DLModel\battle_model_vocab.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\battle_model_vocab.json')" />
     <Content Include="..\Tools\DLModel\team_preview_model.onnx" Link="Tools\DLModel\team_preview_model.onnx" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\team_preview_model.onnx')" />
+    <Content Include="..\Tools\DLModel\team_preview_model.onnx.data" Link="Tools\DLModel\team_preview_model.onnx.data" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\team_preview_model.onnx.data')" />
   </ItemGroup>
 
 </Project>

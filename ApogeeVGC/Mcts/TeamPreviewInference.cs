@@ -35,7 +35,7 @@ public sealed class TeamPreviewInference : IDisposable
     {
         var sessionOptions = new SessionOptions();
         sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
-        _session = new InferenceSession(onnxModelPath, sessionOptions);
+        _session = new InferenceSession(Path.GetFullPath(onnxModelPath), sessionOptions);
         _vocab = vocab;
     }
 
