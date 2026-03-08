@@ -18,6 +18,9 @@ public enum DriverMode
     // Standalone MCTS (heuristic eval, uniform priors) vs Random evaluation
     MctsStandaloneVsRndEvaluation,
 
+    // MCTS with DL models (policy priors + value eval, no info tracking) vs Random evaluation
+    MctsDlVsRndEvaluation,
+
     // Deterministic regression test — runs fixed battles across formats, prints hash
     DeterministicRegressionTest,
 

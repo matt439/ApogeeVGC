@@ -855,6 +855,207 @@ public partial class Driver
 
     #endregion
 
+    #region MCTS-DL Evaluation
+
+    /// <summary>
+    /// Runs MCTS with DL models (policy priors + value eval, no info tracking) vs Random evaluation.
+    /// </summary>
+    private void RunMctsDLVsRandomEvaluation(FormatId formatId)
+    {
+        string formatLabel = Library.Formats[formatId].Name;
+        Console.WriteLine($"[Driver] Starting MCTS-DL vs Random {formatLabel} Evaluation");
+        Console.WriteLine($"[Driver] Running {MctsDlEvaluationNumTest} battles with {MctsDlNumThreads} threads");
+        Console.WriteLine($"[Driver] MCTS iterations per search: {MctsDlIterations}");
+
+        // Initialize MCTS resources — fail gracefully if model files are missing
+        if (!File.Exists(MctsModelPath))
+        {
+            Console.WriteLine($"[Driver] ERROR: MCTS model not found at: {MctsModelPath}");
+            Console.WriteLine("[Driver] Export the model to ONNX format using Tools/DLModel/export_onnx.py");
+            return;
+        }
+
+        if (!File.Exists(MctsVocabPath))
+        {
+            Console.WriteLine($"[Driver] ERROR: MCTS vocab not found at: {MctsVocabPath}");
+            return;
+        }
+
+        var mctsConfig = new Mcts.MctsConfig
+        {
+            NumIterations = MctsDlIterations,
+        };
+
+        MctsResources.Initialize(MctsModelPath, MctsVocabPath, Library, mctsConfig,
+            teamPreviewModelPath: MctsTeamPreviewModelPath);
+        Console.WriteLine("[Driver] MCTS resources initialized");
+
+        const bool debug = false;
+
+        // Pre-generate teams
+        Console.WriteLine("[Driver] Pre-generating teams...");
+        var battles = new EvaluationBattleInput[MctsDlEvaluationNumTest];
+        for (var i = 0; i < MctsDlEvaluationNumTest; i++)
+        {
+            int baseOffset = i * 5 + 1;
+            int team1Seed = Team1EvalSeed + baseOffset;
+            int team2Seed = Team2EvalSeed + baseOffset + 1;
+
+            var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+
+            battles[i] = new EvaluationBattleInput(
+                team1, team2,
+                team1Seed, team2Seed,
+                PlayerRandom1EvalSeed + baseOffset + 2,
+                PlayerRandom2EvalSeed + baseOffset + 3,
+                BattleEvalSeed + baseOffset + 4);
+        }
+
+        Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
+
+        var stopwatch = Stopwatch.StartNew();
+        var completedBattles = 0;
+
+        var allResults = new List<SimulatorResult>();
+        var allTurns = new List<int>();
+        var allExceptions =
+            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
+                Exception)>();
+
+        var parallelOptions = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = MctsDlNumThreads,
+        };
+
+        Parallel.For(0, MctsDlEvaluationNumTest, parallelOptions,
+            static () => new EvaluationLocalState(),
+            (i, _, localState) =>
+            {
+                EvaluationBattleInput battle = battles[i];
+
+                try
+                {
+                    (SimulatorResult result, int turn) = RunMctsDLBattleDirect(
+                        battle.Team1,
+                        battle.Team2,
+                        battle.Team1Seed,
+                        battle.Team2Seed,
+                        battle.Player1Seed,
+                        battle.Player2Seed,
+                        battle.BattleRandSeed,
+                        formatId,
+                        debug,
+                        mctsConfig);
+
+                    localState.Results.Add(result);
+                    localState.Turns.Add(turn);
+
+                    int completed = Interlocked.Increment(ref completedBattles);
+                    if (completed % 10 == 0)
+                    {
+                        Console.WriteLine($"[Driver] Completed {completed}/{MctsDlEvaluationNumTest} battles");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    localState.Exceptions.Add(
+                        (battle.Team1Seed, battle.Team2Seed, battle.Player1Seed, battle.Player2Seed,
+                            battle.BattleRandSeed, ex));
+
+                    LogExceptionWithAllSeeds(
+                        battle.Team1Seed,
+                        battle.Team2Seed,
+                        battle.Player1Seed,
+                        battle.Player2Seed,
+                        battle.BattleRandSeed,
+                        ex,
+                        nameof(DriverMode.SingleBattleDebug));
+                }
+
+                return localState;
+            },
+            localState =>
+            {
+                lock (allResults)
+                {
+                    allResults.AddRange(localState.Results);
+                    allTurns.AddRange(localState.Turns);
+                    allExceptions.AddRange(localState.Exceptions);
+                }
+            });
+
+        stopwatch.Stop();
+        MctsResources.Shutdown();
+
+        int successfulBattles = allResults.Count;
+        int failedBattles = allExceptions.Count;
+        int mctsWins = allResults.Count(r => r == SimulatorResult.Player1Win);
+        int randomWins = allResults.Count(r => r == SimulatorResult.Player2Win);
+        int ties = allResults.Count(r => r == SimulatorResult.Tie);
+
+        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+
+        StringBuilder sb = new();
+        sb.AppendLine();
+        sb.AppendLine($"MCTS-DL vs Random {formatLabel} Evaluation Results ({MctsDlEvaluationNumTest} battles):");
+        sb.AppendLine($"Format: {formatLabel}");
+        sb.AppendLine($"MCTS Iterations: {MctsDlIterations}");
+        sb.AppendLine($"Git Commit: {GetGitCommitId()}");
+        sb.AppendLine();
+        sb.AppendLine("Execution Summary:");
+        sb.AppendLine($"Successful Battles: {successfulBattles}");
+        sb.AppendLine($"Failed Battles (Exceptions): {failedBattles}");
+        sb.AppendLine($"Total Battles Attempted: {MctsDlEvaluationNumTest}");
+        sb.AppendLine();
+
+        if (failedBattles > 0)
+        {
+            sb.AppendLine("EXCEPTION SUMMARY:");
+            sb.AppendLine("-----------------------------------------------------------");
+            for (var i = 0; i < allExceptions.Count; i++)
+            {
+                (int t1, int t2, int p1, int p2, int b, Exception ex) = allExceptions[i];
+                sb.AppendLine($"Exception #{i + 1}: {ex.GetType().Name}: {ex.Message}");
+                sb.AppendLine($"  Seeds: T1={t1} T2={t2} P1={p1} P2={p2} B={b}");
+            }
+
+            sb.AppendLine("-----------------------------------------------------------");
+            sb.AppendLine();
+        }
+
+        sb.AppendLine("Battle Results:");
+        sb.AppendLine($"MCTS-DL Wins: {mctsWins}");
+        sb.AppendLine($"Random Wins:  {randomWins}");
+        sb.AppendLine($"Ties:         {ties}");
+        if (successfulBattles > 0)
+        {
+            sb.AppendLine($"MCTS-DL Win Rate: {(double)mctsWins / successfulBattles:P2}");
+            sb.AppendLine($"Random Win Rate:  {(double)randomWins / successfulBattles:P2}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("Performance:");
+        sb.AppendLine($"Threads: {MctsDlNumThreads}");
+        sb.AppendLine($@"Total Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
+        sb.AppendLine($"Time per Battle: {totalSeconds / MctsDlEvaluationNumTest * 1000:F1} ms");
+
+        if (allTurns.Count > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine("Turn Statistics:");
+            sb.AppendLine($"Mean: {allTurns.Mean():F2}, Median: {allTurns.Median():F2}");
+            sb.AppendLine($"Min: {allTurns.Minimum()}, Max: {allTurns.Maximum()}");
+        }
+
+        Console.WriteLine(sb.ToString());
+
+        Console.WriteLine("Press Enter key to exit...");
+        Console.ReadLine();
+    }
+
+    #endregion
+
     #region Deterministic Regression Test
 
     /// <summary>

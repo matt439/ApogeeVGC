@@ -36,6 +36,13 @@ public partial class Driver
     private const int MctsStandaloneEvaluationNumTest = 100;
     private const int MctsStandaloneNumThreads = 32;
     private const int MctsStandaloneIterations = 1000;
+
+    // MCTS-DL evaluation settings (DL priors + value, no info tracking)
+    private const int MctsDlEvaluationNumTest = 100;
+    private const int MctsDlNumThreads = 32;
+    private const int MctsDlIterations = 500;
+
+    // Shared model paths
     private const string MctsModelPath = "Tools/DLModel/battle_model.onnx";
     private const string MctsVocabPath = "Tools/DLModel/battle_model_vocab.json";
     private const string MctsTeamPreviewModelPath = "Tools/DLModel/team_preview_model.onnx";
@@ -64,6 +71,9 @@ public partial class Driver
                 break;
             case DriverMode.MctsStandaloneVsRndEvaluation:
                 RunMctsStandaloneVsRandomEvaluation(ActiveFormatId);
+                break;
+            case DriverMode.MctsDlVsRndEvaluation:
+                RunMctsDLVsRandomEvaluation(ActiveFormatId);
                 break;
             case DriverMode.DeterministicRegressionTest:
                 RunDeterministicRegressionTest();

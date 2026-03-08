@@ -7,5 +7,6 @@ public enum PlayerType
     Console,
     Mcts,
     MctsStandalone,
+    MctsDL,
     Greedy,
 }
