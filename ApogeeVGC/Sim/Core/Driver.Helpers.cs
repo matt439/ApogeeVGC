@@ -258,7 +258,8 @@ public partial class Driver
         int player2Seed,
         int battleSeed,
         FormatId formatId,
-        bool debug)
+        bool debug,
+        Mcts.MctsConfig? mctsConfig = null)
     {
         BattleSeedContext? seeds = null;
         if (debug)
@@ -276,6 +277,7 @@ public partial class Driver
                 Team = team1,
                 Seed = new PrngSeed(player1Seed),
                 PrintDebug = debug,
+                MctsConfig = mctsConfig,
             };
 
             PlayerOptions player2Options = new()

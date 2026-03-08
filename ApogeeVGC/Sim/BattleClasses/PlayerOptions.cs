@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Gui;
+using ApogeeVGC.Mcts;
 using ApogeeVGC.Sim.Player;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
@@ -14,4 +15,5 @@ public record PlayerOptions
     public BattleGame? GuiWindow { get; init; } // BattleGame instance for GUI players
     public GuiChoiceCoordinator? GuiChoiceCoordinator { get; init; } // Choice coordinator for thread-safe communication with the GUI
     public bool PrintDebug { get; init; }
+    public MctsConfig? MctsConfig { get; init; } // Optional MCTS configuration for MCTS/MctsStandalone players
 }

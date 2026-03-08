@@ -35,6 +35,7 @@ public partial class Driver
     // Standalone MCTS evaluation settings
     private const int MctsStandaloneEvaluationNumTest = 1000;
     private const int MctsStandaloneNumThreads = 16;
+    private const int MctsStandaloneIterations = 200;
     private const string MctsModelPath = "Tools/DLModel/battle_model.onnx";
     private const string MctsVocabPath = "Tools/DLModel/battle_model_vocab.json";
     private const string MctsTeamPreviewModelPath = "Tools/DLModel/team_preview_model.onnx";

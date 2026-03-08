@@ -683,7 +683,9 @@ public partial class Driver
         string formatLabel = Library.Formats[formatId].Name;
         Console.WriteLine($"[Driver] Starting MCTS-Standalone vs Random {formatLabel} Evaluation");
         Console.WriteLine($"[Driver] Running {MctsStandaloneEvaluationNumTest} battles with {MctsStandaloneNumThreads} threads");
+        Console.WriteLine($"[Driver] MCTS iterations per search: {MctsStandaloneIterations}");
 
+        var mctsConfig = new Mcts.MctsConfig { NumIterations = MctsStandaloneIterations };
         const bool debug = false;
 
         // Pre-generate teams
@@ -739,7 +741,8 @@ public partial class Driver
                         battle.Player2Seed,
                         battle.BattleRandSeed,
                         formatId,
-                        debug);
+                        debug,
+                        mctsConfig);
 
                     localState.Results.Add(result);
                     localState.Turns.Add(turn);
@@ -792,6 +795,7 @@ public partial class Driver
         sb.AppendLine();
         sb.AppendLine($"MCTS-Standalone vs Random {formatLabel} Evaluation Results ({MctsStandaloneEvaluationNumTest} battles):");
         sb.AppendLine($"Format: {formatLabel}");
+        sb.AppendLine($"MCTS Iterations: {MctsStandaloneIterations}");
         sb.AppendLine($"Git Commit: {GetGitCommitId()}");
         sb.AppendLine();
         sb.AppendLine("Execution Summary:");

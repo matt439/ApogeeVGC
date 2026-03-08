@@ -143,7 +143,7 @@ public class SimulatorSync : SimulatorBase
             Player.PlayerType.Mcts => Mcts.PlayerMcts.Create(sideId, options, this),
             Player.PlayerType.MctsStandalone => new Mcts.PlayerMctsStandalone(
                 sideId, options, this,
-                new Mcts.MctsSearchStandalone(new Mcts.MctsConfig())),
+                new Mcts.MctsSearchStandalone(options.MctsConfig ?? new Mcts.MctsConfig())),
             Player.PlayerType.Greedy => new PlayerGreedy(sideId, options, this),
             _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
         };
