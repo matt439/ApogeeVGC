@@ -1,21 +1,25 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Mcts;
 
 /// <summary>
-/// Standalone MCTS search that uses uniform priors and heuristic evaluation.
+/// Standalone MCTS search with full tree depth using Select → Expand → Evaluate → Backpropagate.
 /// No dependency on DL models, vocab, or information tracking.
-/// Iterations run in parallel — Battle.Copy() now clears cached ActiveMove
-/// instances so copies don't share mutable MoveHitData dictionaries.
+/// Uses uniform priors and heuristic leaf evaluation.
 /// </summary>
 public sealed class MctsSearchStandalone(MctsConfig config)
 {
+    private readonly Random _targetRng = new();
+
     /// <summary>
     /// Run MCTS from the given state and return the best action pair.
-    /// Uses uniform priors and heuristic leaf evaluation.
+    /// Builds a multi-depth tree with PUCT selection and heuristic evaluation.
     /// </summary>
     public (LegalAction ActionA, LegalAction? ActionB) Search(
         Battle battle,
@@ -35,27 +39,121 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         // Add Dirichlet noise to root priors for exploration
         AddDirichletNoise(root);
 
-        // Run MCTS iterations in parallel
-        int maxParallelism = config.MaxDegreeOfParallelism ?? Environment.ProcessorCount;
-        Parallel.For(0, config.NumIterations,
-            new ParallelOptions { MaxDegreeOfParallelism = maxParallelism },
-            _ => RunIteration(root, battle, sideId));
+        // Run MCTS iterations — each copies the battle and traverses/expands the tree
+        for (int i = 0; i < config.NumIterations; i++)
+        {
+            Battle sim = battle.Copy();
+            RunIteration(root, sim, sideId);
+        }
 
         // Select the action pair with the most visits
         return SelectBestAction(root);
     }
 
+    /// <summary>
+    /// One MCTS iteration: select down the tree, expand a leaf, evaluate, backpropagate.
+    /// The simulation (battle copy) is advanced as we descend, so only one Copy() per iteration.
+    /// </summary>
+    private float RunIteration(MctsNode node, Battle sim, SideId sideId)
+    {
+        // Terminal node — return cached value
+        if (node.IsTerminal)
+        {
+            node.VisitCount++;
+            return node.TerminalValue;
+        }
+
+        // Select best edge using PUCT
+        MctsEdge? edge = SelectEdge(node);
+        if (edge == null) return 0.5f;
+
+        // Apply our action + random opponent, advance the simulation one turn
+        Side ourSide = sideId == SideId.P1 ? sim.P1 : sim.P2;
+        Side oppSide = sideId == SideId.P1 ? sim.P2 : sim.P1;
+
+        Choice ourChoice = BuildChoice(edge.ActionA, edge.ActionB);
+
+        float leafValue;
+
+        try
+        {
+            ourSide.Choose(ourChoice);
+            oppSide.AutoChoose();
+            sim.CommitChoices();
+        }
+        catch
+        {
+            // Simulation error (e.g. no valid switches available) — treat as neutral
+            leafValue = 0.5f;
+            edge.VisitCount++;
+            edge.TotalValue += leafValue;
+            node.VisitCount++;
+            return leafValue;
+        }
+
+        if (sim.Ended)
+        {
+            // Game ended — terminal value
+            leafValue = GetTerminalValue(sim, sideId);
+
+            // Mark child as terminal so future visits short-circuit
+            edge.Child ??= new MctsNode();
+            edge.Child.IsTerminal = true;
+            edge.Child.TerminalValue = leafValue;
+        }
+        else if (edge.Child is not { IsExpanded: true })
+        {
+            // Leaf node — expand and evaluate
+            edge.Child ??= new MctsNode();
+            ExpandNodeFromBattle(edge.Child, sim, sideId);
+            leafValue = HeuristicEval.Evaluate(sim, sideId);
+        }
+        else
+        {
+            // Internal node — recurse deeper
+            leafValue = RunIteration(edge.Child, sim, sideId);
+        }
+
+        // Backpropagate
+        edge.VisitCount++;
+        edge.TotalValue += leafValue;
+        node.VisitCount++;
+
+        return leafValue;
+    }
+
+    // ── Node creation and expansion ────────────────────────────────────
+
     private static MctsNode CreateRoot(LegalActionSet legalActions)
     {
         var root = new MctsNode { IsExpanded = true };
+        PopulateEdges(root, legalActions);
+        return root;
+    }
 
+    private void ExpandNodeFromBattle(MctsNode node, Battle sim, SideId sideId)
+    {
+        LegalActionSet actions = GetLegalActionsFromBattle(sim, sideId);
+
+        if (actions.SlotA.Count == 0)
+        {
+            // No legal actions — treat as terminal (heuristic eval by caller)
+            node.IsExpanded = true;
+            return;
+        }
+
+        PopulateEdges(node, actions);
+    }
+
+    private static void PopulateEdges(MctsNode node, LegalActionSet legalActions)
+    {
         if (legalActions.SlotB.Count == 0)
         {
             // Single-slot decision
             float uniformPrior = 1f / legalActions.SlotA.Count;
             foreach (LegalAction actionA in legalActions.SlotA)
             {
-                root.Edges.Add(new MctsEdge
+                node.Edges.Add(new MctsEdge
                 {
                     ActionA = actionA,
                     ActionB = null,
@@ -65,7 +163,7 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         }
         else
         {
-            // Joint action space for doubles — enumerate valid combinations
+            // Joint action space for doubles
             foreach (LegalAction actionA in legalActions.SlotA)
             {
                 foreach (LegalAction actionB in legalActions.SlotB)
@@ -78,95 +176,202 @@ public sealed class MctsSearchStandalone(MctsConfig config)
                         continue;
                     }
 
-                    root.Edges.Add(new MctsEdge
+                    node.Edges.Add(new MctsEdge
                     {
                         ActionA = actionA,
                         ActionB = actionB,
-                        PriorP = 1f, // Will be normalized below
+                        PriorP = 1f, // Normalized below
                     });
                 }
             }
 
             // Normalize to uniform
-            if (root.Edges.Count > 0)
+            if (node.Edges.Count > 0)
             {
-                float uniform = 1f / root.Edges.Count;
-                foreach (MctsEdge edge in root.Edges)
+                float uniform = 1f / node.Edges.Count;
+                foreach (MctsEdge edge in node.Edges)
                     edge.PriorP = uniform;
             }
         }
 
-        return root;
+        node.IsExpanded = true;
     }
 
-    private void RunIteration(MctsNode root, Battle battle, SideId sideId)
+    // ── Legal action enumeration from battle state ─────────────────────
+
+    private LegalActionSet GetLegalActionsFromBattle(Battle sim, SideId sideId)
     {
-        MctsEdge? edge = SelectEdge(root);
-        if (edge == null) return;
-
-        float leafValue;
-        try
-        {
-            leafValue = SimulateEdge(edge, battle, sideId);
-        }
-        catch
-        {
-            return;
-        }
-
-        // Thread-safe backpropagation
-        Interlocked.Increment(ref edge._visitCount);
-        InterlockedAddFloat(ref edge._totalValue, leafValue);
-        Interlocked.Increment(ref root._visitCount);
-    }
-
-    private static void InterlockedAddFloat(ref float location, float value)
-    {
-        float initialValue, computedValue;
-        do
-        {
-            initialValue = location;
-            computedValue = initialValue + value;
-        } while (Interlocked.CompareExchange(ref location, computedValue, initialValue) != initialValue);
-    }
-
-    /// <summary>
-    /// Clone the battle, apply the edge's action, auto-choose for opponent,
-    /// advance one turn, and evaluate with heuristic.
-    /// </summary>
-    private static float SimulateEdge(MctsEdge edge, Battle battle, SideId sideId)
-    {
-        Battle sim = battle.Copy();
-
-        // Build our choice from the edge's actions
-        Choice ourChoice = BuildChoice(edge.ActionA, edge.ActionB);
-
         Side ourSide = sideId == SideId.P1 ? sim.P1 : sim.P2;
-        Side oppSide = sideId == SideId.P1 ? sim.P2 : sim.P1;
+        IChoiceRequest? request = ourSide.ActiveRequest;
 
-        ourSide.Choose(ourChoice);
-        oppSide.AutoChoose();
-
-        sim.CommitChoices();
-
-        // Check for terminal state
-        if (sim.Ended)
+        return request switch
         {
-            return GetTerminalValue(sim, sideId);
+            MoveRequest mr => GetLegalActionsForMove(mr),
+            SwitchRequest sr => GetLegalActionsForSwitch(sr),
+            _ => new LegalActionSet { SlotA = [], SlotB = [] },
+        };
+    }
+
+    private LegalActionSet GetLegalActionsForMove(MoveRequest request)
+    {
+        var slotA = request.Active.Count > 0 && request.Active[0] != null
+            ? GetSlotMoveActions(request.Active[0]!, request)
+            : [new LegalAction { VocabIndex = 0, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None }];
+
+        var slotB = request.Active.Count > 1 && request.Active[1] != null
+            ? GetSlotMoveActions(request.Active[1]!, request)
+            : [];
+
+        return new LegalActionSet { SlotA = slotA, SlotB = slotB };
+    }
+
+    private List<LegalAction> GetSlotMoveActions(PokemonMoveRequestData pokemonRequest, MoveRequest request)
+    {
+        var actions = new List<LegalAction>();
+
+        MoveType? teraType = pokemonRequest.CanTerastallize switch
+        {
+            MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+            _ => null,
+        };
+
+        var megaEvo = pokemonRequest.CanMegaEvo;
+
+        foreach (PokemonMoveData move in pokemonRequest.Moves)
+        {
+            if (IsDisabled(move.Disabled)) continue;
+
+            int targetLoc = GetTargetLocation(move.Move.Target);
+
+            actions.Add(new LegalAction
+            {
+                VocabIndex = 0,
+                ChoiceType = ChoiceType.Move,
+                MoveId = move.Id,
+                TargetLoc = targetLoc,
+            });
+
+            if (teraType.HasValue)
+            {
+                actions.Add(new LegalAction
+                {
+                    VocabIndex = 0,
+                    ChoiceType = ChoiceType.Move,
+                    MoveId = move.Id,
+                    TargetLoc = targetLoc,
+                    Terastallize = teraType,
+                });
+            }
+
+            if (megaEvo.HasValue)
+            {
+                actions.Add(new LegalAction
+                {
+                    VocabIndex = 0,
+                    ChoiceType = ChoiceType.Move,
+                    MoveId = move.Id,
+                    TargetLoc = targetLoc,
+                    Mega = megaEvo,
+                });
+            }
         }
 
-        // Evaluate with heuristic
-        return HeuristicEval.Evaluate(sim, sideId);
+        // Add switch actions (if not trapped)
+        if (pokemonRequest.Trapped != true)
+        {
+            AddSwitchActions(actions, request.Side);
+        }
+
+        // Fallback: Struggle
+        if (actions.Count == 0 && pokemonRequest.Moves.Length > 0)
+        {
+            PokemonMoveData firstMove = pokemonRequest.Moves[0];
+            actions.Add(new LegalAction
+            {
+                VocabIndex = 0,
+                ChoiceType = ChoiceType.Move,
+                MoveId = firstMove.Id,
+                TargetLoc = GetTargetLocation(firstMove.Move.Target),
+            });
+        }
+
+        if (actions.Count == 0)
+        {
+            actions.Add(new LegalAction
+                { VocabIndex = 0, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+        }
+
+        return actions;
     }
 
-    private static float GetTerminalValue(Battle sim, SideId sideId)
+    private static LegalActionSet GetLegalActionsForSwitch(SwitchRequest request)
     {
-        if (string.IsNullOrEmpty(sim.Winner))
-            return 0.5f;
+        bool slotANeeds = request.ForceSwitch.Count > 0 && request.ForceSwitch[0];
+        bool slotBNeeds = request.ForceSwitch.Count > 1 && request.ForceSwitch[1];
 
-        string ourName = (sideId == SideId.P1 ? sim.P1 : sim.P2).Name;
-        return sim.Winner.Equals(ourName, StringComparison.OrdinalIgnoreCase) ? 1.0f : 0.0f;
+        var slotAActions = new List<LegalAction>();
+        var slotBActions = new List<LegalAction>();
+
+        if (slotANeeds)
+        {
+            AddSwitchActions(slotAActions, request.Side);
+            if (slotAActions.Count == 0)
+                slotAActions.Add(new LegalAction
+                    { VocabIndex = 0, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+        }
+        else if (slotBNeeds)
+        {
+            slotAActions.Add(new LegalAction
+                { VocabIndex = 0, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+        }
+
+        if (slotBNeeds)
+        {
+            AddSwitchActions(slotBActions, request.Side);
+            if (slotBActions.Count == 0)
+                slotBActions.Add(new LegalAction
+                    { VocabIndex = 0, ChoiceType = ChoiceType.Pass, MoveId = MoveId.None });
+        }
+
+        return new LegalActionSet { SlotA = slotAActions, SlotB = slotBActions };
     }
+
+    private static void AddSwitchActions(List<LegalAction> actions, SideRequestData sideData)
+    {
+        for (int i = 0; i < sideData.Pokemon.Count; i++)
+        {
+            PokemonSwitchRequestData pokemon = sideData.Pokemon[i];
+            if (pokemon.Active || pokemon.Condition == ConditionId.Fainted || pokemon.Reviving)
+                continue;
+
+            actions.Add(new LegalAction
+            {
+                VocabIndex = 0,
+                ChoiceType = ChoiceType.Switch,
+                MoveId = MoveId.None,
+                SwitchIndex = i,
+            });
+        }
+    }
+
+    private int GetTargetLocation(MoveTarget targetType)
+    {
+        return targetType switch
+        {
+            MoveTarget.Normal or MoveTarget.Any or MoveTarget.AdjacentFoe
+                => _targetRng.Next(1, 3),
+            MoveTarget.AdjacentAlly
+                => -_targetRng.Next(1, 3),
+            MoveTarget.AdjacentAllyOrSelf
+                => -_targetRng.Next(1, 3),
+            _ => 0,
+        };
+    }
+
+    private static bool IsDisabled(MoveIdBoolUnion? disabled) =>
+        disabled is not null && disabled.IsTrue();
+
+    // ── PUCT selection ─────────────────────────────────────────────────
 
     private MctsEdge? SelectEdge(MctsNode node)
     {
@@ -176,13 +381,13 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         float bestScore = float.NegativeInfinity;
         int parentVisits = node.VisitCount;
 
-        foreach (MctsEdge t in node.Edges)
+        foreach (MctsEdge edge in node.Edges)
         {
-            float score = PuctScore(t, parentVisits);
+            float score = PuctScore(edge, parentVisits);
             if (score > bestScore)
             {
                 bestScore = score;
-                best = t;
+                best = edge;
             }
         }
 
@@ -197,17 +402,19 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         return exploitation + exploration;
     }
 
+    // ── Result selection ───────────────────────────────────────────────
+
     private static (LegalAction, LegalAction?) SelectBestAction(MctsNode root)
     {
         MctsEdge? best = null;
         int bestVisits = -1;
 
-        foreach (MctsEdge t in root.Edges)
+        foreach (MctsEdge edge in root.Edges)
         {
-            if (t.VisitCount > bestVisits)
+            if (edge.VisitCount > bestVisits)
             {
-                bestVisits = t.VisitCount;
-                best = t;
+                bestVisits = edge.VisitCount;
+                best = edge;
             }
         }
 
@@ -217,9 +424,17 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         return (best.ActionA, best.ActionB);
     }
 
-    /// <summary>
-    /// Build a Choice from action pair without depending on ActionMapper.
-    /// </summary>
+    private static float GetTerminalValue(Battle sim, SideId sideId)
+    {
+        if (string.IsNullOrEmpty(sim.Winner))
+            return 0.5f;
+
+        string ourName = (sideId == SideId.P1 ? sim.P1 : sim.P2).Name;
+        return sim.Winner.Equals(ourName, StringComparison.OrdinalIgnoreCase) ? 1.0f : 0.0f;
+    }
+
+    // ── Choice building ────────────────────────────────────────────────
+
     private static Choice BuildChoice(LegalAction slotA, LegalAction? slotB)
     {
         var actions = new List<ChosenAction> { BuildChosenAction(slotA) };
@@ -243,16 +458,18 @@ public sealed class MctsSearchStandalone(MctsConfig config)
             ChoiceType.Switch => new ChosenAction
             {
                 Choice = ChoiceType.Switch,
-                MoveId = Sim.Moves.MoveId.None,
+                MoveId = MoveId.None,
                 Index = action.SwitchIndex,
             },
             _ => new ChosenAction
             {
                 Choice = ChoiceType.Pass,
-                MoveId = Sim.Moves.MoveId.None,
+                MoveId = MoveId.None,
             },
         };
     }
+
+    // ── Dirichlet noise ────────────────────────────────────────────────
 
     private void AddDirichletNoise(MctsNode root)
     {
@@ -261,7 +478,7 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         float epsilon = config.DirichletEpsilon;
         float[] noise = SampleDirichlet(root.Edges.Count, config.DirichletAlpha);
 
-        for (var i = 0; i < root.Edges.Count; i++)
+        for (int i = 0; i < root.Edges.Count; i++)
         {
             root.Edges[i].PriorP = (1 - epsilon) * root.Edges[i].PriorP + epsilon * noise[i];
         }
@@ -271,9 +488,9 @@ public sealed class MctsSearchStandalone(MctsConfig config)
     {
         Random rng = Random.Shared;
         var samples = new float[n];
-        var sum = 0f;
+        float sum = 0f;
 
-        for (var i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             samples[i] = SampleGamma(rng, alpha);
             sum += samples[i];
@@ -281,7 +498,7 @@ public sealed class MctsSearchStandalone(MctsConfig config)
 
         if (sum > 0f)
         {
-            for (var i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
                 samples[i] /= sum;
         }
 
@@ -293,7 +510,7 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         if (alpha < 1f)
         {
             float sample = SampleGamma(rng, alpha + 1f);
-            var u = (float)rng.NextDouble();
+            float u = (float)rng.NextDouble();
             return sample * MathF.Pow(u, 1f / alpha);
         }
 
@@ -310,12 +527,12 @@ public sealed class MctsSearchStandalone(MctsConfig config)
             } while (v <= 0f);
 
             v = v * v * v;
-            var u = (float)rng.NextDouble();
+            float u2 = (float)rng.NextDouble();
 
-            if (u < 1f - 0.0331f * (x * x) * (x * x))
+            if (u2 < 1f - 0.0331f * (x * x) * (x * x))
                 return d * v;
 
-            if (MathF.Log(u) < 0.5f * x * x + d * (1f - v + MathF.Log(v)))
+            if (MathF.Log(u2) < 0.5f * x * x + d * (1f - v + MathF.Log(v)))
                 return d * v;
         }
     }
