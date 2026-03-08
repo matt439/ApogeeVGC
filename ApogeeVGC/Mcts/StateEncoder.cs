@@ -158,11 +158,11 @@ public sealed class StateEncoder(Vocab vocab)
     {
         if (p == null) return; // All zeros for empty/fainted slot
 
-        // [0] HP fraction
+        // [0] HP fraction (0..1) — training data uses percentage/100
         feat[off] = p.MaxHp > 0 ? (float)p.Hp / p.MaxHp : 0f;
 
-        // [1] Fainted
-        feat[off + 1] = p.Fainted ? 1f : 0f;
+        // [1] Fainted (or HP == 0)
+        feat[off + 1] = (p.Fainted || p.Hp == 0) ? 1f : 0f;
 
         // [2..8] Status one-hot (7 slots)
         feat[off + 2 + GetStatusIndex(p.Status)] = 1f;
@@ -191,11 +191,11 @@ public sealed class StateEncoder(Vocab vocab)
     {
         if (p == null) return; // All zeros — includes present=0
 
-        // [0] HP fraction
+        // [0] HP fraction (0..1) — training data uses percentage/100
         feat[off] = p.MaxHp > 0 ? (float)p.Hp / p.MaxHp : 0f;
 
-        // [1] Fainted
-        feat[off + 1] = p.Fainted ? 1f : 0f;
+        // [1] Fainted (or HP == 0)
+        feat[off + 1] = (p.Fainted || p.Hp == 0) ? 1f : 0f;
 
         // [2..8] Status one-hot (7 slots)
         feat[off + 2 + GetStatusIndex(p.Status)] = 1f;
