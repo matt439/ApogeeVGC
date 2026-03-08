@@ -8,5 +8,6 @@ public enum PlayerType
     Mcts,
     MctsStandalone,
     MctsDL,
+    DLGreedy,
     Greedy,
 }

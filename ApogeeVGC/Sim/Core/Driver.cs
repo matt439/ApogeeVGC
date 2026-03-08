@@ -40,7 +40,11 @@ public partial class Driver
     // MCTS-DL evaluation settings (DL priors + value, no info tracking)
     private const int MctsDlEvaluationNumTest = 100;
     private const int MctsDlNumThreads = 32;
-    private const int MctsDlIterations = 500;
+    private const int MctsDlIterations = 1000;
+
+    // DL-Greedy evaluation settings (argmax policy, no search)
+    private const int DlGreedyEvaluationNumTest = 1000;
+    private const int DlGreedyNumThreads = 32;
 
     // Shared model paths
     private const string MctsModelPath = "Tools/DLModel/battle_model.onnx";
@@ -74,6 +78,9 @@ public partial class Driver
                 break;
             case DriverMode.MctsDlVsRndEvaluation:
                 RunMctsDLVsRandomEvaluation(ActiveFormatId);
+                break;
+            case DriverMode.DlGreedyVsRndEvaluation:
+                RunDLGreedyVsRandomEvaluation(ActiveFormatId);
                 break;
             case DriverMode.DeterministicRegressionTest:
                 RunDeterministicRegressionTest();

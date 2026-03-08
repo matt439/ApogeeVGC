@@ -384,6 +384,73 @@ public partial class Driver
     }
 
     /// <summary>
+    /// Runs a battle with DL-Greedy (Player 1) vs Random (Player 2) directly on the calling thread.
+    /// Pure model inference, no search — picks the highest-probability policy action each turn.
+    /// </summary>
+    private (SimulatorResult Result, int Turn) RunDLGreedyBattleDirect(
+        List<PokemonSet> team1,
+        List<PokemonSet> team2,
+        int team1Seed,
+        int team2Seed,
+        int player1Seed,
+        int player2Seed,
+        int battleSeed,
+        FormatId formatId,
+        bool debug)
+    {
+        BattleSeedContext? seeds = null;
+        if (debug)
+        {
+            seeds = new BattleSeedContext(team1Seed, team2Seed, player1Seed, player2Seed, battleSeed);
+            CurrentBattleSeeds = seeds;
+        }
+
+        try
+        {
+            PlayerOptions player1Options = new()
+            {
+                Type = Player.PlayerType.DLGreedy,
+                Name = "DL-Greedy",
+                Team = team1,
+                Seed = new PrngSeed(player1Seed),
+                PrintDebug = debug,
+            };
+
+            PlayerOptions player2Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Random",
+                Team = team2,
+                Seed = new PrngSeed(player2Seed),
+                PrintDebug = debug,
+            };
+
+            BattleOptions battleOptions = new()
+            {
+                Id = formatId,
+                Player1Options = player1Options,
+                Player2Options = player2Options,
+                Debug = debug,
+                Sync = true,
+                Seed = new PrngSeed(battleSeed),
+                MaxTurns = 5000,
+            };
+
+            var simulator = new SimulatorSync();
+            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+            return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
+        }
+        catch (Exception ex) when (seeds is not null && EnrichExceptionWithSeeds(ex, seeds))
+        {
+            throw;
+        }
+        finally
+        {
+            if (debug) CurrentBattleSeeds = null;
+        }
+    }
+
+    /// <summary>
     /// Helper method to log exception details with all seed reproduction instructions (including team seeds).
     /// </summary>
     private void LogExceptionWithAllSeeds(

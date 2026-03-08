@@ -21,6 +21,9 @@ public enum DriverMode
     // MCTS with DL models (policy priors + value eval, no info tracking) vs Random evaluation
     MctsDlVsRndEvaluation,
 
+    // DL-Greedy (argmax policy, no search) vs Random — isolates model quality from search
+    DlGreedyVsRndEvaluation,
+
     // Deterministic regression test — runs fixed battles across formats, prints hash
     DeterministicRegressionTest,
 

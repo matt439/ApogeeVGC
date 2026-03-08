@@ -267,7 +267,8 @@ public sealed class MctsSearchDL(MctsConfig config, ModelInference model, Action
             node.IsExpanded = true;
         }
 
-        // Return value network evaluation
+        // Log and return value network evaluation
+        MctsLogger.LogValue(output.Value);
         return output.Value;
     }
 
