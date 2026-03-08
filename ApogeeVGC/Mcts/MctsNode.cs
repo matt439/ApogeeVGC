@@ -62,11 +62,14 @@ public sealed class MctsNode
     public int VisitCount { get => _visitCount; set => _visitCount = value; }
 
     /// <summary>Whether this node's edges have been populated.</summary>
-    public bool IsExpanded { get; set; }
+    public volatile bool IsExpanded;
 
     /// <summary>Whether this is a terminal game state (win/loss/draw).</summary>
-    public bool IsTerminal { get; set; }
+    public volatile bool IsTerminal;
 
     /// <summary>Value of a terminal state (1=win, 0=loss).</summary>
     public float TerminalValue { get; set; }
+
+    /// <summary>Lock for thread-safe node expansion.</summary>
+    public readonly object ExpandLock = new();
 }

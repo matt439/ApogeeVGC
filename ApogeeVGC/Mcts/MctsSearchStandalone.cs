@@ -12,10 +12,11 @@ namespace ApogeeVGC.Mcts;
 /// Standalone MCTS search with full tree depth using Select → Expand → Evaluate → Backpropagate.
 /// No dependency on DL models, vocab, or information tracking.
 /// Uses uniform priors and heuristic leaf evaluation.
+/// Iterations run in parallel with locked node expansion and atomic backpropagation.
 /// </summary>
 public sealed class MctsSearchStandalone(MctsConfig config)
 {
-    private readonly Random _targetRng = new();
+    private readonly ThreadLocal<Random> _targetRng = new(() => new Random());
 
     /// <summary>
     /// Run MCTS from the given state and return the best action pair.
@@ -39,12 +40,15 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         // Add Dirichlet noise to root priors for exploration
         AddDirichletNoise(root);
 
-        // Run MCTS iterations — each copies the battle and traverses/expands the tree
-        for (int i = 0; i < config.NumIterations; i++)
-        {
-            Battle sim = battle.Copy();
-            RunIteration(root, sim, sideId);
-        }
+        // Run MCTS iterations in parallel
+        int maxParallelism = config.MaxDegreeOfParallelism ?? Environment.ProcessorCount;
+        Parallel.For(0, config.NumIterations,
+            new ParallelOptions { MaxDegreeOfParallelism = maxParallelism },
+            _ =>
+            {
+                Battle sim = battle.Copy();
+                RunIteration(root, sim, sideId);
+            });
 
         // Select the action pair with the most visits
         return SelectBestAction(root);
@@ -53,13 +57,14 @@ public sealed class MctsSearchStandalone(MctsConfig config)
     /// <summary>
     /// One MCTS iteration: select down the tree, expand a leaf, evaluate, backpropagate.
     /// The simulation (battle copy) is advanced as we descend, so only one Copy() per iteration.
+    /// Thread-safe: uses locked expansion and atomic backpropagation.
     /// </summary>
     private float RunIteration(MctsNode node, Battle sim, SideId sideId)
     {
         // Terminal node — return cached value
         if (node.IsTerminal)
         {
-            node.VisitCount++;
+            Interlocked.Increment(ref node._visitCount);
             return node.TerminalValue;
         }
 
@@ -85,9 +90,9 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         {
             // Simulation error (e.g. no valid switches available) — treat as neutral
             leafValue = 0.5f;
-            edge.VisitCount++;
-            edge.TotalValue += leafValue;
-            node.VisitCount++;
+            Interlocked.Increment(ref edge._visitCount);
+            InterlockedAddFloat(ref edge._totalValue, leafValue);
+            Interlocked.Increment(ref node._visitCount);
             return leafValue;
         }
 
@@ -97,15 +102,24 @@ public sealed class MctsSearchStandalone(MctsConfig config)
             leafValue = GetTerminalValue(sim, sideId);
 
             // Mark child as terminal so future visits short-circuit
-            edge.Child ??= new MctsNode();
-            edge.Child.IsTerminal = true;
-            edge.Child.TerminalValue = leafValue;
+            lock (node.ExpandLock)
+            {
+                edge.Child ??= new MctsNode();
+                edge.Child.IsTerminal = true;
+                edge.Child.TerminalValue = leafValue;
+            }
         }
         else if (edge.Child is not { IsExpanded: true })
         {
-            // Leaf node — expand and evaluate
-            edge.Child ??= new MctsNode();
-            ExpandNodeFromBattle(edge.Child, sim, sideId);
+            // Leaf node — expand with lock and evaluate
+            lock (node.ExpandLock)
+            {
+                if (edge.Child is not { IsExpanded: true })
+                {
+                    edge.Child ??= new MctsNode();
+                    ExpandNodeFromBattle(edge.Child, sim, sideId);
+                }
+            }
             leafValue = HeuristicEval.Evaluate(sim, sideId);
         }
         else
@@ -114,12 +128,22 @@ public sealed class MctsSearchStandalone(MctsConfig config)
             leafValue = RunIteration(edge.Child, sim, sideId);
         }
 
-        // Backpropagate
-        edge.VisitCount++;
-        edge.TotalValue += leafValue;
-        node.VisitCount++;
+        // Backpropagate with atomic operations
+        Interlocked.Increment(ref edge._visitCount);
+        InterlockedAddFloat(ref edge._totalValue, leafValue);
+        Interlocked.Increment(ref node._visitCount);
 
         return leafValue;
+    }
+
+    private static void InterlockedAddFloat(ref float location, float value)
+    {
+        float initialValue, computedValue;
+        do
+        {
+            initialValue = location;
+            computedValue = initialValue + value;
+        } while (Interlocked.CompareExchange(ref location, computedValue, initialValue) != initialValue);
     }
 
     // ── Node creation and expansion ────────────────────────────────────
@@ -359,11 +383,11 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         return targetType switch
         {
             MoveTarget.Normal or MoveTarget.Any or MoveTarget.AdjacentFoe
-                => _targetRng.Next(1, 3),
+                => _targetRng.Value!.Next(1, 3),
             MoveTarget.AdjacentAlly
-                => -_targetRng.Next(1, 3),
+                => -_targetRng.Value!.Next(1, 3),
             MoveTarget.AdjacentAllyOrSelf
-                => -_targetRng.Next(1, 3),
+                => -_targetRng.Value!.Next(1, 3),
             _ => 0,
         };
     }
