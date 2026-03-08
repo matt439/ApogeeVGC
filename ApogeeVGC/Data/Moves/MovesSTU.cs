@@ -3930,7 +3930,7 @@ public partial record Moves
                 {
                     if (battle.Field.Terrain != ConditionId.None && source.IsGrounded() == true)
                     {
-                        move.BasePower *= 2;
+                        move.BasePower = 100;
                         battle.Debug("BP doubled in Terrain");
                     }
                 }),

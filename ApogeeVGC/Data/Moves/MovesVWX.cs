@@ -459,7 +459,7 @@ public partial record Moves
                         ConditionId.RainDance or ConditionId.PrimordialSea or
                         ConditionId.Sandstorm or ConditionId.Snowscape)
                     {
-                        move.BasePower *= 2;
+                        move.BasePower = 100;
                     }
 
                     battle.Debug($"BP: {move.BasePower}");
