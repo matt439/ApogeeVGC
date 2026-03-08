@@ -24,6 +24,10 @@ public partial class Driver
     private const int RandomEvaluationNumTest = 200000;
     private const int NumThreads = 16;
 
+    // Greedy evaluation settings
+    private const int GreedyEvaluationNumTest = 200000;
+    private const int GreedyNumThreads = 16;
+
     // MCTS evaluation settings
     private const int MctsEvaluationNumTest = 1000;
     private const int MctsNumThreads = 4;
@@ -49,6 +53,9 @@ public partial class Driver
                 break;
             case DriverMode.MctsVsRndEvaluation:
                 RunMctsVsRandomEvaluation(ActiveFormatId);
+                break;
+            case DriverMode.GreedyVsRndEvaluation:
+                RunGreedyVsRandomEvaluation(ActiveFormatId);
                 break;
             case DriverMode.DeterministicRegressionTest:
                 RunDeterministicRegressionTest();
