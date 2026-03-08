@@ -15,6 +15,9 @@ public enum DriverMode
     // Greedy vs Random evaluation
     GreedyVsRndEvaluation,
 
+    // Standalone MCTS (heuristic eval, uniform priors) vs Random evaluation
+    MctsStandaloneVsRndEvaluation,
+
     // Deterministic regression test — runs fixed battles across formats, prints hash
     DeterministicRegressionTest,
 
