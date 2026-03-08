@@ -61,7 +61,8 @@
   <!-- MCTS model files - copied to output directory preserving relative path -->
   <ItemGroup>
     <Content Include="..\Tools\DLModel\battle_model.onnx" Link="Tools\DLModel\battle_model.onnx" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\battle_model.onnx')" />
-    <Content Include="..\Tools\DLModel\vocab.json" Link="Tools\DLModel\vocab.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\vocab.json')" />
+    <Content Include="..\Tools\DLModel\battle_model_vocab.json" Link="Tools\DLModel\battle_model_vocab.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\battle_model_vocab.json')" />
+    <Content Include="..\Tools\DLModel\team_preview_model.onnx" Link="Tools\DLModel\team_preview_model.onnx" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Tools\DLModel\team_preview_model.onnx')" />
   </ItemGroup>
 
 </Project>

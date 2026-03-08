@@ -327,7 +327,8 @@ public partial class Driver
             return;
         }
 
-        MctsResources.Initialize(MctsModelPath, MctsVocabPath, Library);
+        MctsResources.Initialize(MctsModelPath, MctsVocabPath, Library,
+            teamPreviewModelPath: MctsTeamPreviewModelPath);
         Console.WriteLine("[Driver] MCTS resources initialized");
 
         const bool debug = false;

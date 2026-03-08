@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
@@ -52,7 +53,7 @@ public sealed class PlayerMcts(
 
         return choiceRequest switch
         {
-            TeamPreviewRequest tpr => GetTeamPreviewChoice(tpr),
+            TeamPreviewRequest tpr => GetTeamPreviewChoice(tpr, perspectiveFactory),
             MoveRequest or SwitchRequest => GetSearchChoice(choiceRequest, perspectiveFactory),
             _ => throw new NotImplementedException(
                 $"Request type {choiceRequest.GetType().Name} not implemented for MCTS player"),
@@ -108,9 +109,83 @@ public sealed class PlayerMcts(
     }
 
     /// <summary>
-    /// Team preview: random ordering for now. Team preview model can be integrated later.
+    /// Team preview: uses the TeamPreviewNet model if available, otherwise falls back to random.
+    /// The model outputs bring scores (which 4 Pokemon to bring) and lead scores (which 2 to lead).
     /// </summary>
-    private Choice GetTeamPreviewChoice(TeamPreviewRequest request)
+    private Choice GetTeamPreviewChoice(TeamPreviewRequest request, Func<BattlePerspective> perspectiveFactory)
+    {
+        TeamPreviewInference? previewModel = MctsResources.TeamPreviewModel;
+        if (previewModel == null)
+            return GetRandomTeamPreviewChoice(request);
+
+        BattlePerspective perspective = perspectiveFactory();
+        TeamPreviewOutput output = previewModel.Evaluate(perspective);
+
+        int teamSize = request.Side.Pokemon.Count;
+        int bringCount = request.MaxChosenTeamSize ?? 4;
+
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerMcts] Team preview model scores for {SideId}:");
+            for (int i = 0; i < teamSize; i++)
+                Console.WriteLine($"  [{i}] {request.Side.Pokemon[i].Details}: bring={output.BringScores[i]:F3} lead={output.LeadScores[i]:F3}");
+        }
+
+        // Select top bringCount Pokemon by bring score
+        var bringIndices = Enumerable.Range(0, teamSize)
+            .OrderByDescending(i => output.BringScores[i])
+            .Take(bringCount)
+            .ToList();
+
+        // Among brought Pokemon, select top 2 by lead score as leads
+        var leadIndices = bringIndices
+            .OrderByDescending(i => output.LeadScores[i])
+            .Take(2)
+            .ToHashSet();
+
+        // Build ordering: leads first, then remaining brought, then unbrought
+        var brought = new HashSet<int>(bringIndices);
+        var ordered = new List<int>();
+
+        // Leads first (ordered by lead score descending)
+        ordered.AddRange(bringIndices.Where(i => leadIndices.Contains(i))
+            .OrderByDescending(i => output.LeadScores[i]));
+
+        // Remaining brought (ordered by bring score descending)
+        ordered.AddRange(bringIndices.Where(i => !leadIndices.Contains(i))
+            .OrderByDescending(i => output.BringScores[i]));
+
+        // Unbrought Pokemon last
+        for (int i = 0; i < teamSize; i++)
+        {
+            if (!brought.Contains(i))
+                ordered.Add(i);
+        }
+
+        Debug.Assert(ordered.Count == teamSize);
+
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerMcts] Team preview order: [{string.Join(", ", ordered)}]");
+            Console.WriteLine($"  Bringing: {string.Join(", ", bringIndices.Select(i => request.Side.Pokemon[i].Details))}");
+            Console.WriteLine($"  Leading:  {string.Join(", ", ordered.Take(2).Select(i => request.Side.Pokemon[i].Details))}");
+        }
+
+        // Build Choice: map each original index to its new position
+        var actions = ordered.Select((originalIndex, newPosition) => new ChosenAction
+        {
+            Choice = ChoiceType.Team,
+            Pokemon = null,
+            MoveId = MoveId.None,
+            Index = newPosition,
+            TargetLoc = originalIndex,
+            Priority = -newPosition,
+        }).ToList();
+
+        return new Choice { Actions = actions };
+    }
+
+    private Choice GetRandomTeamPreviewChoice(TeamPreviewRequest request)
     {
         if (PrintDebug)
             Console.WriteLine($"[PlayerMcts] Generating random team preview choice for {SideId}");

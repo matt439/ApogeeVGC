@@ -9,6 +9,7 @@ namespace ApogeeVGC.Mcts;
 public static class MctsResources
 {
     private static ModelInference? _model;
+    private static TeamPreviewInference? _teamPreviewModel;
     private static Vocab? _vocab;
     private static StateEncoder? _encoder;
     private static Library? _library;
@@ -18,6 +19,11 @@ public static class MctsResources
     public static ModelInference Model => _model
                                           ?? throw new InvalidOperationException(
                                               "MctsResources not initialized. Call Initialize() first.");
+
+    /// <summary>
+    /// Team preview model, or null if no team preview ONNX file was provided.
+    /// </summary>
+    public static TeamPreviewInference? TeamPreviewModel => _teamPreviewModel;
 
     public static Vocab Vocab => _vocab
                                  ?? throw new InvalidOperationException(
@@ -40,13 +46,21 @@ public static class MctsResources
     /// <param name="vocabPath">Path to the battle_model_vocab.json file.</param>
     /// <param name="library">Game data library for species/move lookups.</param>
     /// <param name="config">Optional MCTS configuration. Uses defaults if null.</param>
-    public static void Initialize(string modelPath, string vocabPath, Library library, MctsConfig? config = null)
+    /// <param name="teamPreviewModelPath">Optional path to team_preview_model.onnx. If null or missing, team preview falls back to random.</param>
+    public static void Initialize(string modelPath, string vocabPath, Library library, MctsConfig? config = null,
+        string? teamPreviewModelPath = null)
     {
         _library = library;
         _vocab = Vocab.Load(vocabPath, library);
         _encoder = new StateEncoder(_vocab);
         _model = new ModelInference(modelPath, _encoder);
         Config = config ?? new MctsConfig();
+
+        if (teamPreviewModelPath != null && File.Exists(teamPreviewModelPath))
+        {
+            _teamPreviewModel = new TeamPreviewInference(teamPreviewModelPath, _vocab);
+        }
+
         IsInitialized = true;
     }
 
@@ -57,6 +71,8 @@ public static class MctsResources
     {
         _model?.Dispose();
         _model = null;
+        _teamPreviewModel?.Dispose();
+        _teamPreviewModel = null;
         _vocab = null;
         _encoder = null;
         _library = null;

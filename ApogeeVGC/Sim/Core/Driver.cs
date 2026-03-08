@@ -28,7 +28,8 @@ public partial class Driver
     private const int MctsEvaluationNumTest = 1000;
     private const int MctsNumThreads = 4;
     private const string MctsModelPath = "Tools/DLModel/battle_model.onnx";
-    private const string MctsVocabPath = "Tools/DLModel/vocab.json";
+    private const string MctsVocabPath = "Tools/DLModel/battle_model_vocab.json";
+    private const string MctsTeamPreviewModelPath = "Tools/DLModel/team_preview_model.onnx";
 
     // !! EDIT THIS to change the format for all driver modes (except DeterministicRegressionTest) !!
     private const FormatId ActiveFormatId = FormatId.Gen9VgcRegulationI;
