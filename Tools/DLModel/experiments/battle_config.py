@@ -93,6 +93,8 @@ BATTLE_HPARAM_SEARCH_SPACE = {
     # Phase 2 architecture improvements
     'norm_type':         ('categorical', ['layer', 'batch']),
     'use_residual':      ('categorical', [True, False]),
+    # Phase 3 training efficiency
+    'grad_clip_type':    ('categorical', ['norm', 'value']),
 }
 
 # ── Ablation configurations (cumulative feature addition) ──

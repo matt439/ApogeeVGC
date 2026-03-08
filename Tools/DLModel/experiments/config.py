@@ -47,6 +47,10 @@ class TrainConfig:
     policy_weight: float = 1.0         # Weight for policy loss in combined loss
     warmup_frac: float = 0.0           # Fraction of total steps for LR warmup (0.0 = off)
 
+    # Phase 3 training efficiency
+    use_amp: bool = True               # Mixed precision training (auto-disabled on CPU)
+    grad_clip_type: str = 'norm'       # 'norm' (clip_grad_norm_) or 'value' (clip_grad_value_)
+
 
 # ── Rating tiers for comparative analysis ──
 

@@ -13,6 +13,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
 import sys
@@ -116,6 +117,10 @@ def train_battle_model(
         except Exception:
             pass
 
+    # AMP (mixed precision) — auto-disabled on CPU
+    use_amp = getattr(tc, 'use_amp', True) and device.type == 'cuda'
+    scaler = GradScaler('cuda', enabled=use_amp)
+
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=tc.lr, weight_decay=tc.weight_decay)
 
@@ -134,6 +139,7 @@ def train_battle_model(
     vw = tc.value_weight
     pw = tc.policy_weight
     vs = tc.value_smoothing
+    clip_type = getattr(tc, 'grad_clip_type', 'norm')
 
     best_val_loss = float('inf')
     best_epoch = 0
@@ -182,17 +188,20 @@ def train_battle_model(
                 uncertainty = vs * (1.0 - tp)
                 vtgt = vtgt * (1.0 - uncertainty) + 0.5 * uncertainty
 
-            value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
-
-            v_loss = value_loss_fn(value, vtgt)
-            pa_loss = policy_loss_fn(pol_a, pa_tgt)
-            pb_loss = policy_loss_fn(pol_b, pb_tgt)
-            loss = vw * v_loss + pw * (pa_loss + pb_loss)
+            with autocast('cuda', enabled=use_amp):
+                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                v_loss = value_loss_fn(value.float(), vtgt)
+                pa_loss = policy_loss_fn(pol_a.float(), pa_tgt)
+                pb_loss = policy_loss_fn(pol_b.float(), pb_tgt)
+                loss = vw * v_loss + pw * (pa_loss + pb_loss)
 
             optimizer.zero_grad(set_to_none=True)
-            loss.backward()
-            # clip_grad_value_ clips in-place without computing a norm (no sync)
-            torch.nn.utils.clip_grad_value_(model.parameters(), tc.grad_clip)
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            if clip_type == 'norm':
+                torch.nn.utils.clip_grad_norm_(model.parameters(), tc.grad_clip)
+            else:
+                torch.nn.utils.clip_grad_value_(model.parameters(), tc.grad_clip)
 
             # LR warmup: linearly scale LR during warmup phase
             if warmup_steps > 0 and global_step < warmup_steps:
@@ -200,7 +209,8 @@ def train_battle_model(
                 for pg in optimizer.param_groups:
                     pg['lr'] = tc.lr * warmup_scale
 
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
             global_step += 1
 
             t_loss_acc += loss.detach()
@@ -245,11 +255,11 @@ def train_battle_model(
                     uncertainty = vs * (1.0 - tp)
                     vtgt = vtgt * (1.0 - uncertainty) + 0.5 * uncertainty
 
-                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
-
-                vl = value_loss_fn(value, vtgt)
-                pal = policy_loss_fn(pol_a, pa_tgt)
-                pbl = policy_loss_fn(pol_b, pb_tgt)
+                with autocast('cuda', enabled=use_amp):
+                    value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                    vl = value_loss_fn(value.float(), vtgt)
+                    pal = policy_loss_fn(pol_a.float(), pa_tgt)
+                    pbl = policy_loss_fn(pol_b.float(), pb_tgt)
 
                 v_loss_acc += (vw * vl + pw * (pal + pbl)).detach()
                 v_vloss_acc += vl.detach()

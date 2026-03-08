@@ -60,6 +60,7 @@ def create_battle_trial_config(
         value_weight=_sample_param(trial, 'value_weight', space['value_weight']),
         policy_weight=_sample_param(trial, 'policy_weight', space['policy_weight']),
         warmup_frac=_sample_param(trial, 'warmup_frac', space['warmup_frac']),
+        grad_clip_type=_sample_param(trial, 'grad_clip_type', space['grad_clip_type']),
     )
 
     return BattleExperimentConfig(
