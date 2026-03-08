@@ -138,6 +138,27 @@ class BattleNet(nn.Module):
         return value, policy_a, policy_b
 
 
+class _TrunkBlock(nn.Module):
+    """Single trunk MLP block with optional residual connection."""
+
+    def __init__(self, in_dim: int, out_dim: int, norm_type: str,
+                 dropout: float, use_residual: bool):
+        super().__init__()
+        self.linear = nn.Linear(in_dim, out_dim)
+        self.norm = (nn.LayerNorm(out_dim) if norm_type == 'layer'
+                     else nn.BatchNorm1d(out_dim))
+        self.act = nn.ReLU()
+        self.drop = nn.Dropout(dropout)
+        # Residual only when dimensions match
+        self.residual = use_residual and (in_dim == out_dim)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        out = self.drop(self.act(self.norm(self.linear(x))))
+        if self.residual:
+            out = out + x
+        return out
+
+
 class BattleNetV2(nn.Module):
     """Parameterised BattleNet for experimentation.
 
@@ -146,11 +167,13 @@ class BattleNetV2(nn.Module):
     All inputs are always accepted (ONNX compatibility) but disabled
     feature groups are ignored internally.
 
-    New parameters (all backward-compatible with V1 defaults):
+    Parameters (all backward-compatible with V1 defaults):
       num_trunk_layers: int  — number of trunk MLP blocks (default 3)
       trunk_dropout: float   — dropout rate in trunk (default 0.3)
       head_dim: int          — intermediate dimension in output heads (default 64)
       feature_flags: dict    — which feature groups are active (default all True)
+      norm_type: str         — 'layer' (LayerNorm) or 'batch' (BatchNorm1d)
+      use_residual: bool     — add skip connections in same-dim trunk layers
     """
 
     def __init__(
@@ -169,6 +192,8 @@ class BattleNetV2(nn.Module):
         trunk_dropout: float = 0.3,
         head_dim: int = 64,
         feature_flags: dict | None = None,
+        norm_type: str = 'layer',
+        use_residual: bool = True,
     ):
         super().__init__()
 
@@ -208,20 +233,16 @@ class BattleNetV2(nn.Module):
             nn.ReLU(),
         )
 
-        # ── Trunk (variable depth) ──
-        trunk_layers: list[nn.Module] = []
+        # ── Trunk (variable depth with optional residual + norm choice) ──
+        trunk_blocks: list[nn.Module] = []
         in_dim = NUM_SPECIES_SLOTS * pokemon_dim + NUMERIC_DIM
         for i in range(num_trunk_layers):
             out_dim = hidden_dim // 2 if i == num_trunk_layers - 1 else hidden_dim
             drop = trunk_dropout * 0.67 if i == num_trunk_layers - 1 else trunk_dropout
-            trunk_layers.extend([
-                nn.Linear(in_dim, out_dim),
-                nn.BatchNorm1d(out_dim),
-                nn.ReLU(),
-                nn.Dropout(drop),
-            ])
+            trunk_blocks.append(_TrunkBlock(
+                in_dim, out_dim, norm_type, drop, use_residual))
             in_dim = out_dim
-        self.trunk = nn.Sequential(*trunk_layers)
+        self.trunk = nn.Sequential(*trunk_blocks)
 
         # ── Output heads ──
         self.value_head = nn.Sequential(

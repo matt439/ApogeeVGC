@@ -41,6 +41,8 @@ def create_battle_trial_config(
         num_trunk_layers=_sample_param(trial, 'num_trunk_layers', space['num_trunk_layers']),
         trunk_dropout=_sample_param(trial, 'trunk_dropout', space['trunk_dropout']),
         head_dim=_sample_param(trial, 'head_dim', space['head_dim']),
+        norm_type=_sample_param(trial, 'norm_type', space['norm_type']),
+        use_residual=_sample_param(trial, 'use_residual', space['use_residual']),
     )
 
     train_cfg = TrainConfig(

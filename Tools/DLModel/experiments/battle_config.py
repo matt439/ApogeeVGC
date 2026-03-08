@@ -27,6 +27,9 @@ class BattleModelConfig:
     feature_flags: dict = field(default_factory=lambda: {
         'moves': True, 'abilities': True, 'items': True, 'tera': True,
     })
+    # Phase 2 architecture improvements
+    norm_type: str = 'layer'       # 'layer' (LayerNorm) or 'batch' (BatchNorm1d)
+    use_residual: bool = True      # skip connections in same-dim trunk layers
 
 
 @dataclass
@@ -87,6 +90,9 @@ BATTLE_HPARAM_SEARCH_SPACE = {
     'value_weight':      ('float', 0.5, 3.0),
     'policy_weight':     ('float', 0.5, 2.0),
     'warmup_frac':       ('float', 0.0, 0.15),
+    # Phase 2 architecture improvements
+    'norm_type':         ('categorical', ['layer', 'batch']),
+    'use_residual':      ('categorical', [True, False]),
 }
 
 # ── Ablation configurations (cumulative feature addition) ──

@@ -42,6 +42,8 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
             trunk_dropout=train_args.get('trunk_dropout', 0.3),
             head_dim=train_args.get('head_dim', 64),
             feature_flags=train_args.get('feature_flags'),
+            norm_type=train_args.get('norm_type', 'batch'),
+            use_residual=train_args.get('use_residual', False),
         )
     else:
         model = BattleNet(

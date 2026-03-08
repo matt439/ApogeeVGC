@@ -101,6 +101,8 @@ def train_battle_model(
         trunk_dropout=mc.trunk_dropout,
         head_dim=mc.head_dim,
         feature_flags=mc.feature_flags,
+        norm_type=getattr(mc, 'norm_type', 'layer'),
+        use_residual=getattr(mc, 'use_residual', True),
     ).to(device)
 
     total_params = sum(p.numel() for p in model.parameters())
@@ -335,6 +337,8 @@ def train_battle_model(
                     'trunk_dropout': mc.trunk_dropout,
                     'head_dim': mc.head_dim,
                     'feature_flags': mc.feature_flags,
+                    'norm_type': getattr(mc, 'norm_type', 'layer'),
+                    'use_residual': getattr(mc, 'use_residual', True),
                 },
             }, model_path)
         else:
@@ -377,6 +381,9 @@ def load_battle_model_from_checkpoint(
         trunk_dropout=args.get('trunk_dropout', 0.3),
         head_dim=args.get('head_dim', 64),
         feature_flags=args.get('feature_flags'),
+        # V1 checkpoints lack these — default to 'batch'/False for backward compat
+        norm_type=args.get('norm_type', 'batch'),
+        use_residual=args.get('use_residual', False),
     ).to(device)
     state_dict = {k.removeprefix('_orig_mod.'): v for k, v in checkpoint['model_state_dict'].items()}
     model.load_state_dict(state_dict)
