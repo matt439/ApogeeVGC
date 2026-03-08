@@ -45,10 +45,13 @@ public sealed class StateEncoder(Vocab vocab)
         PokemonPerspective? oppActiveB = opponentSide.Active.Count > 1 ? opponentSide.Active[1] : null;
 
         // Active slots: species + per-pokemon features + numeric
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 0, myActiveA);
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 1, myActiveB);
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 2, oppActiveA);
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 3, oppActiveB);
+        // Own slots: full info (moves, ability, item, tera)
+        EncodeOwnSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 0, myActiveA);
+        EncodeOwnSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 1, myActiveB);
+        // Opponent slots: species + tera only (matches training data where ability/item/moves
+        // are unknown or progressively revealed — we zero them to match the training distribution)
+        EncodeOpponentSlot(speciesIds, teraIds, 2, oppActiveA);
+        EncodeOpponentSlot(speciesIds, teraIds, 3, oppActiveB);
 
         // Encode active numeric features
         EncodeActive(numeric, 0, myActiveA);
@@ -66,10 +69,10 @@ public sealed class StateEncoder(Vocab vocab)
         PokemonPerspective? oppBench0 = oppBench.Count > 0 ? oppBench[0] : null;
         PokemonPerspective? oppBench1 = oppBench.Count > 1 ? oppBench[1] : null;
 
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 4, myBench0);
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 5, myBench1);
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 6, oppBench0);
-        EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 7, oppBench1);
+        EncodeOwnSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 4, myBench0);
+        EncodeOwnSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 5, myBench1);
+        EncodeOpponentSlot(speciesIds, teraIds, 6, oppBench0);
+        EncodeOpponentSlot(speciesIds, teraIds, 7, oppBench1);
 
         // Encode bench numeric features
         const int benchOffset = 4 * ActiveDim; // 140
@@ -98,7 +101,11 @@ public sealed class StateEncoder(Vocab vocab)
         };
     }
 
-    private void EncodeSlot(
+    /// <summary>
+    /// Encode an own-team slot with full information (moves, ability, item, tera).
+    /// Matches Python fill_own() which uses end-of-game revealed data.
+    /// </summary>
+    private void EncodeOwnSlot(
         long[] speciesIds, long[] moveIds, long[] abilityIds,
         long[] itemIds, long[] teraIds, int slot, PokemonPerspective? p)
     {
@@ -114,6 +121,22 @@ public sealed class StateEncoder(Vocab vocab)
         abilityIds[slot] = vocab.GetAbilityIndex(p.Ability);
         itemIds[slot] = vocab.GetItemIndex(p.Item);
         teraIds[slot] = vocab.GetTeraTypeIndex(p.TeraType);
+    }
+
+    /// <summary>
+    /// Encode an opponent slot with limited information: species and tera type only.
+    /// Matches Python fill_opp() where ability_ids, item_ids, and move_ids stay at 0
+    /// (opponent abilities/items are never revealed in training data, and moves are only
+    /// progressively revealed — we leave them at 0 to match the training distribution).
+    /// </summary>
+    private void EncodeOpponentSlot(
+        long[] speciesIds, long[] teraIds, int slot, PokemonPerspective? p)
+    {
+        if (p == null) return;
+
+        speciesIds[slot] = vocab.GetSpeciesIndex(p.Species);
+        teraIds[slot] = vocab.GetTeraTypeIndex(p.TeraType);
+        // move_ids, ability_ids, item_ids left at 0 (default) to match training
     }
 
     private static List<PokemonPerspective> GetBenchPokemon(IReadOnlyList<PokemonPerspective> pokemon)
