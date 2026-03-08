@@ -79,6 +79,13 @@ public record MoveAction : IAction
         return _cachedActiveMove ??= Move.ToActiveMove();
     }
 
+    /// <summary>
+    /// Clears the cached ActiveMove so the next <see cref="GetOrCreateActiveMove"/> call
+    /// creates a fresh instance. Must be called after copying via <c>with</c> to avoid
+    /// sharing mutable ActiveMove state (e.g. MoveHitData) between battle copies.
+    /// </summary>
+    internal void ClearCachedActiveMove() => _cachedActiveMove = null;
+
     // To satisfy IPriorityComparison
     public int SubOrder => 0;
     public int EffectOrder => 0;

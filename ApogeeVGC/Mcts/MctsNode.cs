@@ -19,6 +19,9 @@ public sealed class MctsConfig
 
     /// <summary>Fraction of Dirichlet noise mixed into root priors.</summary>
     public float DirichletEpsilon { get; init; } = 0.25f;
+
+    /// <summary>Max threads for parallel MCTS iterations. null = Environment.ProcessorCount.</summary>
+    public int? MaxDegreeOfParallelism { get; init; }
 }
 
 /// <summary>
@@ -32,17 +35,19 @@ public sealed class MctsEdge
     /// <summary>Prior probability P(s,a) from the policy network.</summary>
     public float PriorP { get; set; }
 
-    /// <summary>Sum of backed-up values W(s,a).</summary>
-    public float TotalValue { get; set; }
+    /// <summary>Sum of backed-up values W(s,a). Public field for Interlocked access.</summary>
+    public float _totalValue;
+    public float TotalValue { get => _totalValue; set => _totalValue = value; }
 
-    /// <summary>Visit count N(s,a).</summary>
-    public int VisitCount { get; set; }
+    /// <summary>Visit count N(s,a). Public field for Interlocked access.</summary>
+    public int _visitCount;
+    public int VisitCount { get => _visitCount; set => _visitCount = value; }
 
     /// <summary>Child node (lazily expanded).</summary>
     public MctsNode? Child { get; set; }
 
     /// <summary>Mean action value Q(s,a) = W(s,a) / N(s,a).</summary>
-    public float Q => VisitCount > 0 ? TotalValue / VisitCount : 0f;
+    public float Q => _visitCount > 0 ? _totalValue / _visitCount : 0f;
 }
 
 /// <summary>
@@ -52,8 +57,9 @@ public sealed class MctsNode
 {
     public List<MctsEdge> Edges { get; } = [];
 
-    /// <summary>Total visits to this node N(s).</summary>
-    public int VisitCount { get; set; }
+    /// <summary>Total visits to this node N(s). Public field for Interlocked access.</summary>
+    public int _visitCount;
+    public int VisitCount { get => _visitCount; set => _visitCount = value; }
 
     /// <summary>Whether this node's edges have been populated.</summary>
     public bool IsExpanded { get; set; }

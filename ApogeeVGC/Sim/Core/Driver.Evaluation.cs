@@ -685,7 +685,11 @@ public partial class Driver
         Console.WriteLine($"[Driver] Running {MctsStandaloneEvaluationNumTest} battles with {MctsStandaloneNumThreads} threads");
         Console.WriteLine($"[Driver] MCTS iterations per search: {MctsStandaloneIterations}");
 
-        var mctsConfig = new Mcts.MctsConfig { NumIterations = MctsStandaloneIterations };
+        var mctsConfig = new Mcts.MctsConfig
+        {
+            NumIterations = MctsStandaloneIterations,
+            MaxDegreeOfParallelism = MctsStandaloneNumThreads,
+        };
         const bool debug = false;
 
         // Pre-generate teams

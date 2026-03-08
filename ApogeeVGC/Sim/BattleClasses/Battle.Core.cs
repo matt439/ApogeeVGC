@@ -638,13 +638,7 @@ public partial class Battle
     {
         return action switch
         {
-            MoveAction ma => ma with
-            {
-                Pokemon = pokemonMap.TryGetValue(ma.Pokemon, out var mp) ? mp : ma.Pokemon,
-                OriginalTarget = ma.OriginalTarget is not null
-                    ? EffectState.RemapPokemon(ma.OriginalTarget, pokemonMap)
-                    : null,
-            },
+            MoveAction ma => RemapMoveAction(ma, pokemonMap),
             SwitchAction sa => sa with
             {
                 Pokemon = pokemonMap.TryGetValue(sa.Pokemon, out var sp) ? sp : sa.Pokemon,
@@ -663,6 +657,23 @@ public partial class Battle
             },
             _ => action,
         };
+    }
+
+    /// <summary>
+    /// Remaps a MoveAction's Pokemon references and clears the cached ActiveMove
+    /// to prevent sharing mutable MoveHitData state between battle copies.
+    /// </summary>
+    private static MoveAction RemapMoveAction(MoveAction ma, Dictionary<Pokemon, Pokemon> pokemonMap)
+    {
+        var copy = ma with
+        {
+            Pokemon = pokemonMap.TryGetValue(ma.Pokemon, out var mp) ? mp : ma.Pokemon,
+            OriginalTarget = ma.OriginalTarget is not null
+                ? EffectState.RemapPokemon(ma.OriginalTarget, pokemonMap)
+                : null,
+        };
+        copy.ClearCachedActiveMove();
+        return copy;
     }
 
     /// <summary>

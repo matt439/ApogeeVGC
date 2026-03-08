@@ -8,6 +8,8 @@ namespace ApogeeVGC.Mcts;
 /// <summary>
 /// Standalone MCTS search that uses uniform priors and heuristic evaluation.
 /// No dependency on DL models, vocab, or information tracking.
+/// Iterations run in parallel — Battle.Copy() now clears cached ActiveMove
+/// instances so copies don't share mutable MoveHitData dictionaries.
 /// </summary>
 public sealed class MctsSearchStandalone(MctsConfig config)
 {
@@ -33,12 +35,11 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         // Add Dirichlet noise to root priors for exploration
         AddDirichletNoise(root);
 
-        // Run MCTS iterations with forward simulation
-        SideId opponentId = sideId == SideId.P1 ? SideId.P2 : SideId.P1;
-        for (var i = 0; i < config.NumIterations; i++)
-        {
-            RunIteration(root, battle, sideId, opponentId);
-        }
+        // Run MCTS iterations in parallel
+        int maxParallelism = config.MaxDegreeOfParallelism ?? Environment.ProcessorCount;
+        Parallel.For(0, config.NumIterations,
+            new ParallelOptions { MaxDegreeOfParallelism = maxParallelism },
+            _ => RunIteration(root, battle, sideId));
 
         // Select the action pair with the most visits
         return SelectBestAction(root);
@@ -98,7 +99,7 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         return root;
     }
 
-    private void RunIteration(MctsNode root, Battle battle, SideId sideId, SideId opponentId)
+    private void RunIteration(MctsNode root, Battle battle, SideId sideId)
     {
         MctsEdge? edge = SelectEdge(root);
         if (edge == null) return;
@@ -110,13 +111,23 @@ public sealed class MctsSearchStandalone(MctsConfig config)
         }
         catch
         {
-            // If simulation fails (e.g. invalid state in clone), skip this iteration
             return;
         }
 
-        edge.VisitCount++;
-        edge.TotalValue += leafValue;
-        root.VisitCount++;
+        // Thread-safe backpropagation
+        Interlocked.Increment(ref edge._visitCount);
+        InterlockedAddFloat(ref edge._totalValue, leafValue);
+        Interlocked.Increment(ref root._visitCount);
+    }
+
+    private static void InterlockedAddFloat(ref float location, float value)
+    {
+        float initialValue, computedValue;
+        do
+        {
+            initialValue = location;
+            computedValue = initialValue + value;
+        } while (Interlocked.CompareExchange(ref location, computedValue, initialValue) != initialValue);
     }
 
     /// <summary>
