@@ -12,6 +12,7 @@ expensive JSONL parse + Python encoding loop entirely.
 
 from __future__ import annotations
 
+import gc
 import json
 import os
 import random
@@ -397,12 +398,19 @@ def _estimate_dataset_bytes(ds) -> int:
     return total
 
 
+def _free_gpu_cache() -> None:
+    """Release unreferenced GPU memory so VRAM checks see true availability."""
+    gc.collect()
+    torch.cuda.empty_cache()
+
+
 def _try_move_to_gpu(ds, headroom_bytes: int) -> bool:
     """Move dataset to GPU if enough VRAM is available. Returns True if moved."""
     if not torch.cuda.is_available() or not hasattr(ds, 'to'):
         return False
     if _tensors_on_cuda(ds):
         return True
+    _free_gpu_cache()
     needed = _estimate_dataset_bytes(ds)
     free, _ = torch.cuda.mem_get_info()
     if needed < free - headroom_bytes:
@@ -428,6 +436,7 @@ def loaders_from_datasets(
     Otherwise keeps data on CPU with pinned-memory DataLoaders.
     """
     if device.type == 'cuda' and hasattr(train_ds, 'to'):
+        _free_gpu_cache()
         total_bytes = (_estimate_dataset_bytes(train_ds)
                        + _estimate_dataset_bytes(val_ds))
         free, _ = torch.cuda.mem_get_info()
@@ -437,8 +446,10 @@ def loaders_from_datasets(
         else:
             needed_mb = total_bytes / 1024**2
             free_mb = free / 1024**2
+            headroom_mb = _VRAM_HEADROOM / 1024**2
             print(f'  Dataset ({needed_mb:.0f} MB) exceeds available VRAM '
-                  f'({free_mb:.0f} MB - 2 GB headroom), keeping on CPU')
+                  f'({free_mb:.0f} MB free, {headroom_mb:.0f} MB headroom), '
+                  f'keeping on CPU')
 
     if _tensors_on_cuda(train_ds):
         return (
