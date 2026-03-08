@@ -30,7 +30,7 @@ def evaluate_random_battle_baseline(
     all_pb_tgt = []
 
     for batch in loader:
-        _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch
+        _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch[:9]
         all_vtgt.append(vtgt.cpu().numpy())
         all_pa_tgt.append(pa_tgt)
         all_pb_tgt.append(pb_tgt)
@@ -100,7 +100,7 @@ def evaluate_popular_battle_baseline(
     n_train = 0
 
     for batch in train_loader:
-        _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch
+        _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch[:9]
         value_sum += vtgt.cpu().numpy().sum()
         n_train += vtgt.shape[0]
         for a in pa_tgt.cpu().numpy():
@@ -122,7 +122,7 @@ def evaluate_popular_battle_baseline(
     all_pb_tgt = []
 
     for batch in test_loader:
-        _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch
+        _, _, _, _, _, _, vtgt, pa_tgt, pb_tgt = batch[:9]
         all_vtgt.append(vtgt.cpu().numpy())
         all_pa_tgt.append(pa_tgt)
         all_pb_tgt.append(pb_tgt)

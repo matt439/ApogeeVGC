@@ -146,7 +146,7 @@ def train(args: argparse.Namespace) -> None:
 
         for batch in train_loader:
             sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt = [
-                x.to(device, non_blocking=True) for x in batch]
+                x.to(device, non_blocking=True) for x in batch[:9]]
 
             with autocast('cuda', enabled=use_amp):
                 value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
@@ -186,7 +186,7 @@ def train(args: argparse.Namespace) -> None:
         with torch.no_grad():
             for batch in val_loader:
                 sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt = [
-                    x.to(device, non_blocking=True) for x in batch]
+                    x.to(device, non_blocking=True) for x in batch[:9]]
 
                 with autocast('cuda', enabled=use_amp):
                     value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)

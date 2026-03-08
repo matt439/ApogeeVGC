@@ -53,6 +53,11 @@ def create_battle_trial_config(
         scheduler=base_config.train.scheduler,
         seed=base_config.train.seed,
         min_rating=base_config.train.min_rating,
+        label_smoothing=_sample_param(trial, 'label_smoothing', space['label_smoothing']),
+        value_smoothing=_sample_param(trial, 'value_smoothing', space['value_smoothing']),
+        value_weight=_sample_param(trial, 'value_weight', space['value_weight']),
+        policy_weight=_sample_param(trial, 'policy_weight', space['policy_weight']),
+        warmup_frac=_sample_param(trial, 'warmup_frac', space['warmup_frac']),
     )
 
     return BattleExperimentConfig(

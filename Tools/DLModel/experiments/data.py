@@ -125,7 +125,7 @@ _PREVIEW_TENSOR_ATTRS = [
 
 _BATTLE_TENSOR_ATTRS = [
     'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
-    'numeric', 'value_targets', 'policy_a', 'policy_b',
+    'numeric', 'value_targets', 'policy_a', 'policy_b', 'turn_progress',
 ]
 
 
@@ -158,6 +158,9 @@ def _load_battle_cache(path: Path, n_games: int) -> VGCDataset | None:
         return None
     data = torch.load(path, weights_only=False)
     if data.get('n_games', -1) != n_games:
+        return None
+    # Invalidate cache if it lacks turn_progress (added in Phase 1)
+    if 'turn_progress' not in data:
         return None
     ds = object.__new__(VGCDataset)
     ds.n = data['n']

@@ -81,6 +81,12 @@ BATTLE_HPARAM_SEARCH_SPACE = {
     'lr':                ('loguniform', 1e-4, 5e-3),
     'weight_decay':      ('loguniform', 1e-6, 1e-3),
     'batch_size':        ('categorical', [1024, 2048, 4096, 8192]),
+    # Phase 1 training improvements
+    'label_smoothing':   ('float', 0.0, 0.2),
+    'value_smoothing':   ('float', 0.0, 0.5),
+    'value_weight':      ('float', 0.5, 3.0),
+    'policy_weight':     ('float', 0.5, 2.0),
+    'warmup_frac':       ('float', 0.0, 0.15),
 }
 
 # ── Ablation configurations (cumulative feature addition) ──

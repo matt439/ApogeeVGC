@@ -81,7 +81,9 @@ def evaluate_battle_comprehensive(
     n_batches = 0
 
     with torch.no_grad():
-        for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt in loader:
+        for batch in loader:
+            # Support both 9-element (legacy) and 10-element (with turn_progress) batches
+            sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt = batch[:9]
             sids = sids.to(device, non_blocking=True)
             mids = mids.to(device, non_blocking=True)
             aids = aids.to(device, non_blocking=True)

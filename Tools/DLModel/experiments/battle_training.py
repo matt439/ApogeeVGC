@@ -125,7 +125,13 @@ def train_battle_model(
             optimizer, patience=3, factor=0.5)
 
     value_loss_fn = nn.BCELoss()
-    policy_loss_fn = nn.CrossEntropyLoss(ignore_index=0)
+    policy_loss_fn = nn.CrossEntropyLoss(ignore_index=0,
+                                          label_smoothing=tc.label_smoothing)
+
+    # Loss weighting
+    vw = tc.value_weight
+    pw = tc.policy_weight
+    vs = tc.value_smoothing
 
     best_val_loss = float('inf')
     best_epoch = 0
@@ -134,6 +140,11 @@ def train_battle_model(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     model_path = output_dir / 'model.pt'
+
+    # LR warmup setup
+    total_steps = tc.epochs * len(train_loader)
+    warmup_steps = int(total_steps * tc.warmup_frac)
+    global_step = 0
 
     t_start = time.time()
 
@@ -149,7 +160,7 @@ def train_battle_model(
         t_pbloss_acc = torch.tensor(0.0, device=device)
         n_batches = 0
 
-        for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt in train_loader:
+        for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt, tp in train_loader:
             sids = sids.to(device, non_blocking=True)
             mids = mids.to(device, non_blocking=True)
             aids = aids.to(device, non_blocking=True)
@@ -159,19 +170,36 @@ def train_battle_model(
             vtgt = vtgt.to(device, non_blocking=True)
             pa_tgt = pa_tgt.to(device, non_blocking=True)
             pb_tgt = pb_tgt.to(device, non_blocking=True)
+            tp = tp.to(device, non_blocking=True)
+
+            # Apply turn-dependent value smoothing:
+            # Smoothed target = hard_target * (1 - smoothing * (1 - progress)) + 0.5 * smoothing * (1 - progress)
+            # At turn_progress=1.0 (final turn): target unchanged
+            # At turn_progress=0.0 (first turn): target pulled toward 0.5
+            if vs > 0:
+                uncertainty = vs * (1.0 - tp)
+                vtgt = vtgt * (1.0 - uncertainty) + 0.5 * uncertainty
 
             value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
             v_loss = value_loss_fn(value, vtgt)
             pa_loss = policy_loss_fn(pol_a, pa_tgt)
             pb_loss = policy_loss_fn(pol_b, pb_tgt)
-            loss = v_loss + pa_loss + pb_loss
+            loss = vw * v_loss + pw * (pa_loss + pb_loss)
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             # clip_grad_value_ clips in-place without computing a norm (no sync)
             torch.nn.utils.clip_grad_value_(model.parameters(), tc.grad_clip)
+
+            # LR warmup: linearly scale LR during warmup phase
+            if warmup_steps > 0 and global_step < warmup_steps:
+                warmup_scale = (global_step + 1) / warmup_steps
+                for pg in optimizer.param_groups:
+                    pg['lr'] = tc.lr * warmup_scale
+
             optimizer.step()
+            global_step += 1
 
             t_loss_acc += loss.detach()
             t_vloss_acc += v_loss.detach()
@@ -199,7 +227,7 @@ def train_battle_model(
         n_vbatches = 0
 
         with torch.no_grad():
-            for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt in val_loader:
+            for sids, mids, aids, iids, tids, num, vtgt, pa_tgt, pb_tgt, tp in val_loader:
                 sids = sids.to(device, non_blocking=True)
                 mids = mids.to(device, non_blocking=True)
                 aids = aids.to(device, non_blocking=True)
@@ -209,6 +237,11 @@ def train_battle_model(
                 vtgt = vtgt.to(device, non_blocking=True)
                 pa_tgt = pa_tgt.to(device, non_blocking=True)
                 pb_tgt = pb_tgt.to(device, non_blocking=True)
+                tp = tp.to(device, non_blocking=True)
+
+                if vs > 0:
+                    uncertainty = vs * (1.0 - tp)
+                    vtgt = vtgt * (1.0 - uncertainty) + 0.5 * uncertainty
 
                 value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
 
@@ -216,7 +249,7 @@ def train_battle_model(
                 pal = policy_loss_fn(pol_a, pa_tgt)
                 pbl = policy_loss_fn(pol_b, pb_tgt)
 
-                v_loss_acc += (vl + pal + pbl).detach()
+                v_loss_acc += (vw * vl + pw * (pal + pbl)).detach()
                 v_vloss_acc += vl.detach()
                 v_paloss_acc += pal.detach()
                 v_pbloss_acc += pbl.detach()

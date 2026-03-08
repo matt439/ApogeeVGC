@@ -247,6 +247,7 @@ class VGCDataset(Dataset):
         self.value_targets = torch.zeros(n, dtype=torch.float32)
         self.policy_a = torch.zeros(n, dtype=torch.long)
         self.policy_b = torch.zeros(n, dtype=torch.long)
+        self.turn_progress = torch.zeros(n, dtype=torch.float32)  # turn / max_turn per game
 
         def fill_own(idx: int, slot: int, species: str,
                      side_revealed: dict) -> None:
@@ -291,7 +292,10 @@ class VGCDataset(Dataset):
             }
             prog_tera: dict[str, dict[str, str]] = {'p1': {}, 'p2': {}}
 
-            for turn in game.get('turns', []):
+            game_turns = game.get('turns', [])
+            max_turn = max(len(game_turns), 1)
+
+            for turn in game_turns:
                 active = turn.get('active', {})
 
                 # Update last-known from active slots
@@ -400,6 +404,10 @@ class VGCDataset(Dataset):
                     self.value_targets[idx] = (
                         1.0 if winner == perspective else 0.0)
 
+                    # ── Turn progress (for value smoothing) ──
+                    turn_num = turn.get('turn', 1)
+                    self.turn_progress[idx] = min(turn_num / max_turn, 1.0)
+
                     # ── Policy targets ──
                     actions = turn.get('actions', [])
                     self.policy_a[idx] = self._action_id(
@@ -435,6 +443,7 @@ class VGCDataset(Dataset):
         self.value_targets = self.value_targets[:idx]
         self.policy_a = self.policy_a[:idx]
         self.policy_b = self.policy_b[:idx]
+        self.turn_progress = self.turn_progress[:idx]
         self.n = idx
 
     @staticmethod
@@ -468,6 +477,7 @@ class VGCDataset(Dataset):
         self.value_targets = self.value_targets.to(device)
         self.policy_a = self.policy_a.to(device)
         self.policy_b = self.policy_b.to(device)
+        self.turn_progress = self.turn_progress.to(device)
         return self
 
     def __len__(self) -> int:
@@ -484,4 +494,5 @@ class VGCDataset(Dataset):
             self.value_targets[idx],
             self.policy_a[idx],
             self.policy_b[idx],
+            self.turn_progress[idx],
         )
