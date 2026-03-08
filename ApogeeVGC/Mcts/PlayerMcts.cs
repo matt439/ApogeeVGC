@@ -127,7 +127,7 @@ public sealed class PlayerMcts(
         if (PrintDebug)
         {
             Console.WriteLine($"[PlayerMcts] Team preview model scores for {SideId}:");
-            for (int i = 0; i < teamSize; i++)
+            for (var i = 0; i < teamSize; i++)
                 Console.WriteLine($"  [{i}] {request.Side.Pokemon[i].Details}: bring={output.BringScores[i]:F3} lead={output.LeadScores[i]:F3}");
         }
 
@@ -156,7 +156,7 @@ public sealed class PlayerMcts(
             .OrderByDescending(i => output.BringScores[i]));
 
         // Unbrought Pokemon last
-        for (int i = 0; i < teamSize; i++)
+        for (var i = 0; i < teamSize; i++)
         {
             if (!brought.Contains(i))
                 ordered.Add(i);

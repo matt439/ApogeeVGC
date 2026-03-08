@@ -52,13 +52,13 @@ public sealed class TeamPreviewInference : IDisposable
         var teraIds = new long[NumSlots];
 
         // Encode my 6 Pokemon (slots 0..5)
-        IReadOnlyList<PokemonPerspective> myPokemon = perspective.PlayerSide.Pokemon;
-        for (int i = 0; i < myPokemon.Count && i < 6; i++)
+        var myPokemon = perspective.PlayerSide.Pokemon;
+        for (var i = 0; i < myPokemon.Count && i < 6; i++)
             EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, i, myPokemon[i]);
 
         // Encode opponent's 6 Pokemon (slots 6..11)
-        IReadOnlyList<PokemonPerspective> oppPokemon = perspective.OpponentSide.Pokemon;
-        for (int i = 0; i < oppPokemon.Count && i < 6; i++)
+        var oppPokemon = perspective.OpponentSide.Pokemon;
+        for (var i = 0; i < oppPokemon.Count && i < 6; i++)
             EncodeSlot(speciesIds, moveIds, abilityIds, itemIds, teraIds, 6 + i, oppPokemon[i]);
 
         // Create tensors
@@ -92,9 +92,9 @@ public sealed class TeamPreviewInference : IDisposable
     {
         speciesIds[slot] = _vocab.GetSpeciesIndex(p.Species);
 
-        IReadOnlyList<MoveSlot> moves = p.MoveSlots;
+        var moves = p.MoveSlots;
         int moveBase = slot * NumMovesPerSlot;
-        for (int j = 0; j < moves.Count && j < NumMovesPerSlot; j++)
+        for (var j = 0; j < moves.Count && j < NumMovesPerSlot; j++)
             moveIds[moveBase + j] = _vocab.GetMoveEmbedIndex(moves[j].Move);
 
         abilityIds[slot] = _vocab.GetAbilityIndex(p.Ability);

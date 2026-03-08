@@ -241,7 +241,7 @@ public sealed class Vocab
             var enumIndex = (int)mt;
             if (enumIndex >= 0 && enumIndex < moveTypeCount)
             {
-                string name = mt.ToString();
+                var name = mt.ToString();
                 if (teraNameToIndex.TryGetValue(name, out int vocabIdx))
                     moveTypeToTeraVocabIndex[enumIndex] = vocabIdx;
             }

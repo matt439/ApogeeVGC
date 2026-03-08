@@ -106,9 +106,9 @@ public sealed class StateEncoder(Vocab vocab)
 
         speciesIds[slot] = vocab.GetSpeciesIndex(p.Species);
 
-        IReadOnlyList<MoveSlot> moves = p.MoveSlots;
+        var moves = p.MoveSlots;
         int moveBase = slot * NumMoveSlotsPerPokemon;
-        for (int j = 0; j < moves.Count && j < NumMoveSlotsPerPokemon; j++)
+        for (var j = 0; j < moves.Count && j < NumMoveSlotsPerPokemon; j++)
             moveIds[moveBase + j] = vocab.GetMoveEmbedIndex(moves[j].Move);
 
         abilityIds[slot] = vocab.GetAbilityIndex(p.Ability);
