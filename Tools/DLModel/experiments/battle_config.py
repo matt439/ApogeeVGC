@@ -83,7 +83,7 @@ BATTLE_HPARAM_SEARCH_SPACE = {
     'head_dim':          ('categorical', [32, 64, 96, 128]),
     'lr':                ('loguniform', 1e-4, 5e-3),
     'weight_decay':      ('loguniform', 1e-6, 1e-3),
-    'batch_size':        ('categorical', [2048, 4096, 8192, 16384]),
+    'batch_size':        ('categorical', [4096, 8192, 16384, 32768]),
     # Phase 1 training improvements
     'label_smoothing':   ('float', 0.0, 0.2),
     'value_smoothing':   ('float', 0.0, 0.5),

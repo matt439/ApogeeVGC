@@ -287,7 +287,7 @@ def main():
         '--min-rating', type=int, default=0,
         help='Minimum player rating filter (0 = all)')
     parser.add_argument('--epochs', type=int, default=30)
-    parser.add_argument('--batch-size', type=int, default=4096)
+    parser.add_argument('--batch-size', type=int, default=16384)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--embed-dim', type=int, default=32)
     parser.add_argument('--feat-embed-dim', type=int, default=16)
