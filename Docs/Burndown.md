@@ -118,39 +118,36 @@ python -m experiments.battle_run_all --regulation gen9vgc2025regi --n-trials 100
 
 ---
 
-## Phase 3 — Quick-Input Interface (Weeks 3–5)
+## Phase 3 — Showdown Live Assist (Weeks 3–5)
 
-**Goal:** Build the bridge between Pokemon Scarlet on Switch and the AI. Enables live ladder testing.
+**Goal:** Build a live bridge to Pokemon Showdown battles in the browser. Showdown pushes battle state via WebSocket — we intercept it, run inference, and display recommendations as an overlay. No manual state entry needed.
 
-### 3.1 Design Input Scheme
-- [ ] Map all battle actions to keyboard shortcuts (species selection, move selection, switch targets)
-- [ ] Design the flow: team preview input → per-turn state input → AI recommends action
-- [ ] Decide minimum viable input: what *must* the human enter each turn?
-  - Active species (maybe auto-tracked after team preview)
-  - HP% for all visible Pokemon
-  - Status conditions, boosts, field state
-  - Opponent's revealed moves/items/abilities (for info model)
+### 3.1 Showdown Integration (Tools/LiveAssist/)
+- [x] `live_parser.py` — incremental state tracker adapted from parser.py, handles protocol lines + `|request|` JSON
+- [x] `live_encoder.py` — numpy port of dataset.py encoding, Showdown ID normalization, action masking from `|request|`
+- [x] `server.py` — WebSocket server on localhost:9876, ONNX inference (battle + team preview), rich terminal display
+- [x] `overlay.user.js` — Tampermonkey userscript: hooks `PS.receive()`, captures `|request|`, renders overlay with recommendations
 
-### 3.2 Implement Interface
-- [ ] Console-based or lightweight GUI (Spectre.Console already in deps — use it)
-- [ ] Team preview phase: input both teams → model recommends bring/lead
-- [ ] Battle phase: input current state → MCTS runs → display recommended action
-- [ ] Track game state across turns (auto-fill what hasn't changed)
+### 3.2 Integration Testing
+- [ ] Verify protocol lines flow correctly from Showdown → server → state tracker
+- [ ] Verify `|request|` parsing produces correct action masks and own-team encoding
+- [ ] Confirm ONNX inference produces sensible recommendations on live battle state
+- [ ] Test team preview phase (bring/lead scores display correctly)
+- [ ] Test full battle flow across multiple turns, verify state tracking matches visible battle
 
-**Effort:** 3–5 days. **Risk:** Medium — UX/speed is the concern, not the AI logic.
+### 3.3 Play Test Games
+- [ ] Play ~10 Showdown ladder games with live assist running
+- [ ] Verify overlay updates reliably each turn without lag
+- [ ] Note any state desync issues (e.g. form changes, Ally Switch, edge cases)
+- [ ] Iterate on any issues found
 
-### 3.3 Test Input Speed
-- [ ] Practice entering battle states against AI/friend battles
-- [ ] Measure time per turn input — must fit within Scarlet's 45-second turn timer (with margin)
-- [ ] Iterate on shortcuts if too slow
-
-**Effort:** 1–2 days. **Risk:** Medium — if too slow, may need OCR assist for HP bars.
+**Effort:** 2–3 days (integration built, mostly testing). **Risk:** Low — architecture is straightforward, protocol is well-understood.
 
 ---
 
-## Phase 4 — Ranked Ladder Testing (Weeks 5–8)
+## Phase 4 — Showdown Ranked Ladder Testing (Weeks 5–8)
 
-**Goal:** Collect the data that tests the thesis hypothesis.
+**Goal:** Collect the data that tests the thesis hypothesis. Play on the Showdown ladder with live assist.
 
 ### 4.1 Preparation
 - [ ] Select a meta team from replay analysis (don't build a custom team — reduces confounds)
@@ -160,14 +157,14 @@ python -m experiments.battle_run_all --regulation gen9vgc2025regi --n-trials 100
 ### 4.2 Play Ranked Games
 - [ ] Target ~200 games minimum (power analysis says 200 for 60% win rate detection)
 - [ ] Log every game: starting rating, ending rating, win/loss, number of turns
-- [ ] Play in focused sessions (fatigue affects input accuracy)
+- [ ] Play in focused sessions (fatigue affects accuracy)
 
-**Effort:** 200 games × ~15 min each = ~50 hours of play over 3 weeks. **Risk:** High — this is the most time-consuming phase and depends on input interface working well.
+**Effort:** 200 games × ~10 min each = ~33 hours of play over 3 weeks. **Risk:** Medium — Showdown integration eliminates manual input bottleneck.
 
 ### 4.3 Handle Edge Cases During Play
 - [ ] Note games where AI recommendation was overridden and why
-- [ ] Note games where input error occurred (wrong HP%, missed status)
-- [ ] Categorise losses (bad matchup, AI error, input error, timer pressure)
+- [ ] Note any state desync or overlay issues during play
+- [ ] Categorise losses (bad matchup, AI error, state tracking error)
 
 ---
 
@@ -188,9 +185,9 @@ python -m experiments.battle_run_all --regulation gen9vgc2025regi --n-trials 100
 - [ ] Effect sizes for each component (how much does policy prior add? how much does search add?)
 
 ### 5.3 Failure Analysis
-- [ ] Categorise losses by type (matchup, prediction error, input error, timer)
+- [ ] Categorise losses by type (matchup, prediction error, state desync)
 - [ ] Identify systematic weaknesses (specific Pokemon/moves the AI handles poorly)
-- [ ] Decision time distribution — did any games time out?
+- [ ] Check for any state tracking issues (form changes, edge cases)
 
 **Effort:** 3–5 days. **Risk:** Low — it's analysis, not engineering.
 
@@ -240,7 +237,7 @@ python -m experiments.battle_run_all --regulation gen9vgc2025regi --n-trials 100
 If you're running behind, cut in this order (least important first):
 
 1. **Reduce ladder games** — 100 games instead of 200 (wider confidence intervals but still publishable)
-2. **Skip quick-input interface** — report only simulation results (no live evaluation). Weaker thesis but still valid — the AI system + simulation evaluation is a complete contribution
+2. **Skip Showdown live evaluation** — report only simulation results (no live evaluation). Weaker thesis but still valid — the AI system + simulation evaluation is a complete contribution
 3. **Simplify player variant evaluation** — just Random vs Full MCTS (skip intermediate variants). Loses the clean ablation but keeps the main result
 4. **Skip BattleNet ablation** — if GPU time is limited, run hparam + multiseed only (skip ablation and baselines). You still get the core results
 
@@ -255,8 +252,8 @@ If you're running behind, cut in this order (least important first):
 | 1 | 3–9 Mar | vast.ai setup + TeamPreview experiments | TeamPreview pipeline complete |
 | 2 | 10–16 Mar | BattleNet experiments + start player variants | BattleNet pipeline complete |
 | 3 | 17–23 Mar | Player variant evaluation + export models | All experiment numbers in hand |
-| 4 | 24–30 Mar | Quick-input interface v1 | Can input a battle state and get AI recommendation |
-| 5 | 31 Mar–6 Apr | Polish interface + practice + unassisted baseline | Interface fast enough for live play |
+| 4 | 24–30 Mar | Showdown live assist integration testing | Live assist working end-to-end on Showdown |
+| 5 | 31 Mar–6 Apr | Play test games + unassisted baseline | Overlay reliable, baseline rating established |
 | 6 | 7–13 Apr | Start ladder games + start writing Ch 1–3 | ~50 games played, intro drafted |
 | 7 | 14–20 Apr | Continue ladder games + writing | ~100 games played, lit review drafted |
 | 8 | 21–27 Apr | Continue ladder games + Ch 4–6 writing | ~150 games played, system design + methodology drafted |
@@ -265,6 +262,22 @@ If you're running behind, cut in this order (least important first):
 | 11 | 12–18 May | Full draft to supervisor, begin revisions | Supervisor feedback received |
 | 12 | 19–25 May | Final revisions and polish | Thesis complete |
 | -- | 29 May | **SUBMIT** | |
+
+---
+
+## Stretch Goal — Scarlet/Violet Console Interface
+
+**Goal:** If time permits, build a manual-input interface for use with Pokemon Scarlet on Switch (where Showdown's WebSocket protocol isn't available).
+
+- [ ] Console-based UI (Spectre.Console) for entering battle state manually
+- [ ] Team preview phase: input both teams → model recommends bring/lead
+- [ ] Battle phase: input current state each turn → AI recommends action
+- [ ] Track game state across turns (auto-fill what hasn't changed)
+- [ ] Test input speed — must fit within Scarlet's 45-second turn timer
+
+**Prerequisite:** Showdown ladder testing complete. Only attempt if ahead of schedule.
+
+**Effort:** 3–5 days. **Risk:** Medium — the 45-second timer is tight for manual entry; may need OCR assist for HP bars.
 
 ---
 

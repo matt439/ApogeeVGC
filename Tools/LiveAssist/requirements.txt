@@ -1,0 +1,4 @@
+websockets
+onnxruntime
+numpy
+rich
