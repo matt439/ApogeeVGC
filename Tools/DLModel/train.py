@@ -125,12 +125,13 @@ def train(args: argparse.Namespace) -> None:
     print(f'Model: {total_params:,} parameters')
 
     # torch.compile fuses GPU ops → fewer kernel launches, higher utilization
-    if hasattr(torch, 'compile') and device.type == 'cuda':
+    # Requires Triton (Linux/Mac only); skipped on Windows
+    import sys as _sys
+    if (hasattr(torch, 'compile') and device.type == 'cuda'
+            and _sys.platform != 'win32'):
         try:
-            import sys as _sys
-            backend = 'inductor' if _sys.platform != 'win32' else 'cudagraphs'
-            model = torch.compile(model, backend=backend)
-            print(f'Model compiled with torch.compile (backend={backend})')
+            model = torch.compile(model)
+            print('Model compiled with torch.compile')
         except Exception:
             pass
 

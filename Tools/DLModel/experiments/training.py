@@ -104,10 +104,11 @@ def train_model(
     total_params = sum(p.numel() for p in model.parameters())
 
     # torch.compile fuses GPU ops → fewer kernel launches, higher utilization
-    if hasattr(torch, 'compile') and device.type == 'cuda':
+    # Requires Triton (Linux/Mac only); skipped on Windows
+    if (hasattr(torch, 'compile') and device.type == 'cuda'
+            and sys.platform != 'win32'):
         try:
-            backend = 'inductor' if sys.platform != 'win32' else 'cudagraphs'
-            model = torch.compile(model, backend=backend)
+            model = torch.compile(model)
         except Exception:
             pass
 
