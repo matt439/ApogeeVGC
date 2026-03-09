@@ -91,6 +91,14 @@ public partial class Driver
             case DriverMode.SingleBattleDebug:
                 RunSingleBattleDebug(ActiveFormatId);
                 break;
+            case DriverMode.Gen5RngVerification:
+                RunGen5RngVerification();
+                break;
+            case DriverMode.EquivalenceTest:
+                RunEquivalenceTest(
+                    "Tools/EquivalenceTest/battle_output.fixture.json",
+                    "Tools/EquivalenceTest/battle_output.log");
+                break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
