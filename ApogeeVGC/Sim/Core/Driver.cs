@@ -82,8 +82,8 @@ public partial class Driver
             case DriverMode.DlGreedyVsRndEvaluation:
                 RunDLGreedyVsRandomEvaluation(ActiveFormatId);
                 break;
-            case DriverMode.LiveAssist:
-                RunLiveAssist(ActiveFormatId);
+            case DriverMode.ShowdownAssist:
+                RunShowdownAssist(ActiveFormatId);
                 break;
             case DriverMode.DeterministicRegressionTest:
                 RunDeterministicRegressionTest();

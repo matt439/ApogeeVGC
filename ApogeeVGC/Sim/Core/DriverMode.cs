@@ -24,8 +24,8 @@ public enum DriverMode
     // DL-Greedy (argmax policy, no search) vs Random — isolates model quality from search
     DlGreedyVsRndEvaluation,
 
-    // Live assist — manual state input, DL model recommends actions for real-game play
-    LiveAssist,
+    // Showdown live assist — WebSocket server for Tampermonkey overlay, policy + value inference
+    ShowdownAssist,
 
     // Deterministic regression test — runs fixed battles across formats, prints hash
     DeterministicRegressionTest,
