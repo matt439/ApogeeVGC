@@ -111,11 +111,12 @@ def train_battle_model(
     total_params = sum(p.numel() for p in model.parameters())
 
     # torch.compile fuses GPU ops → fewer kernel launches, higher utilization
-    # Default inductor backend requires Triton (Linux-only)
-    if (hasattr(torch, 'compile') and device.type == 'cuda'
-            and sys.platform != 'win32'):
+    if hasattr(torch, 'compile') and device.type == 'cuda':
         try:
-            model = torch.compile(model)
+            # inductor backend requires Triton (not available on Windows);
+            # fall back to cudagraphs which reduces kernel launch overhead
+            backend = 'inductor' if sys.platform != 'win32' else 'cudagraphs'
+            model = torch.compile(model, backend=backend)
         except Exception:
             pass
 

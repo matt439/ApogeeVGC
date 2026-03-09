@@ -51,6 +51,7 @@ def train(args: argparse.Namespace) -> None:
 
     if device.type == 'cuda':
         torch.backends.cudnn.benchmark = True
+        torch.set_float32_matmul_precision('high')
 
     use_amp = device.type == 'cuda'
     scaler = GradScaler('cuda', enabled=use_amp)
@@ -122,6 +123,16 @@ def train(args: argparse.Namespace) -> None:
     ).to(device)
     total_params = sum(p.numel() for p in model.parameters())
     print(f'Model: {total_params:,} parameters')
+
+    # torch.compile fuses GPU ops → fewer kernel launches, higher utilization
+    if hasattr(torch, 'compile') and device.type == 'cuda':
+        try:
+            import sys as _sys
+            backend = 'inductor' if _sys.platform != 'win32' else 'cudagraphs'
+            model = torch.compile(model, backend=backend)
+            print(f'Model compiled with torch.compile (backend={backend})')
+        except Exception:
+            pass
 
     optimizer = torch.optim.Adam(
         model.parameters(), lr=args.lr, weight_decay=1e-5)
@@ -275,7 +286,7 @@ def main():
         '--min-rating', type=int, default=0,
         help='Minimum player rating filter (0 = all)')
     parser.add_argument('--epochs', type=int, default=30)
-    parser.add_argument('--batch-size', type=int, default=512)
+    parser.add_argument('--batch-size', type=int, default=4096)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--embed-dim', type=int, default=32)
     parser.add_argument('--feat-embed-dim', type=int, default=16)

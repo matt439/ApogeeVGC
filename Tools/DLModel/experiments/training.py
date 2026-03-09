@@ -78,6 +78,7 @@ def train_model(
 
     if device.type == 'cuda':
         torch.backends.cudnn.benchmark = True
+        torch.set_float32_matmul_precision('high')
 
     torch.manual_seed(config.train.seed)
 
@@ -103,11 +104,10 @@ def train_model(
     total_params = sum(p.numel() for p in model.parameters())
 
     # torch.compile fuses GPU ops → fewer kernel launches, higher utilization
-    # Default inductor backend requires Triton (Linux-only)
-    if (hasattr(torch, 'compile') and device.type == 'cuda'
-            and sys.platform != 'win32'):
+    if hasattr(torch, 'compile') and device.type == 'cuda':
         try:
-            model = torch.compile(model)
+            backend = 'inductor' if sys.platform != 'win32' else 'cudagraphs'
+            model = torch.compile(model, backend=backend)
         except Exception:
             pass
 
