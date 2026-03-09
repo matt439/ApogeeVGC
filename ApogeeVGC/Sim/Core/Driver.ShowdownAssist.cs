@@ -17,13 +17,13 @@ public partial class Driver
         using var battleModel = new ModelInference(MctsModelPath, encoder);
         using var previewModel = new TeamPreviewInference(MctsTeamPreviewModelPath, vocab);
 
-        // Policy-only mode for now; MCTS requires a Battle object from the simulator
-        // which we don't have in live Showdown games. Set mctsConfig to null.
-        MctsConfig? mctsConfig = null;
+        // MCTS enabled: shadow battle constructed from Showdown protocol
+        var mctsConfig = new MctsConfig { NumIterations = 200 };
 
         var server = new ShowdownServer(
             Library, vocab, battleModel, previewModel,
             mctsConfig,
+            formatId,
             host: "localhost",
             port: 9876);
 

@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
@@ -586,6 +587,143 @@ public partial class Side
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Parse a Showdown-format decision string and apply it.
+    /// Format: "move MOVEID [TARGET] [mega|terastallize], switch SLOT" (comma-separated per active slot)
+    /// Examples: "move fakeout 1, move protect", "switch 3, move thunderbolt -1"
+    /// Also supports "pass" for forced passes.
+    /// </summary>
+    public bool Choose(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return EmitChoiceError("Can't choose: empty input");
+
+        string[] parts = input.Split(',');
+
+        foreach (string raw in parts)
+        {
+            string part = raw.Trim();
+            if (string.IsNullOrEmpty(part)) continue;
+
+            string[] tokens = part.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string command = tokens[0].ToLowerInvariant();
+
+            switch (command)
+            {
+                case "move":
+                {
+                    if (tokens.Length < 2)
+                        return EmitChoiceError("Can't move: no move specified");
+
+                    // Parse event type from trailing tokens (mega, terastallize)
+                    var eventType = EventType.None;
+                    int tokenCount = tokens.Length;
+                    string lastToken = tokens[^1].ToLowerInvariant();
+                    if (lastToken is "mega" or "megaevo")
+                    {
+                        eventType = EventType.MegaEvo;
+                        tokenCount--;
+                    }
+                    else if (lastToken is "terastallize" or "tera")
+                    {
+                        eventType = EventType.Terastallize;
+                        tokenCount--;
+                    }
+
+                    // Parse target location (last numeric token before event type)
+                    int targetLoc = 0;
+                    if (tokenCount >= 3 && int.TryParse(tokens[tokenCount - 1], out int target))
+                    {
+                        targetLoc = target;
+                        tokenCount--;
+                    }
+
+                    // Remaining tokens[1..tokenCount) form the move specifier
+                    string moveSpec = string.Join("", tokens[1..tokenCount])
+                        .ToLowerInvariant();
+
+                    // Try as 1-based move index first
+                    if (int.TryParse(moveSpec, out int moveIndex))
+                    {
+                        if (!ChooseMove((MoveIdIntUnion)moveIndex, targetLoc, eventType))
+                            return false;
+                    }
+                    else
+                    {
+                        // Resolve move name to MoveId via library
+                        MoveId moveId = ResolveMoveFromShowdownName(moveSpec);
+                        if (moveId == MoveId.None)
+                            return EmitChoiceError($"Can't move: unknown move '{moveSpec}'");
+
+                        if (!ChooseMove((MoveIdIntUnion)moveId, targetLoc, eventType))
+                            return false;
+                    }
+                    break;
+                }
+
+                case "switch":
+                {
+                    if (tokens.Length < 2)
+                        return EmitChoiceError("Can't switch: no slot specified");
+
+                    // Switch target is a 1-based team slot index
+                    if (int.TryParse(tokens[1], out int slot))
+                    {
+                        var result = ChooseSwitch((PokemonIntUnion)slot);
+                        if (!result.IsTrue())
+                            return false;
+                    }
+                    else
+                    {
+                        return EmitChoiceError($"Can't switch: invalid slot '{tokens[1]}'");
+                    }
+                    break;
+                }
+
+                case "pass":
+                {
+                    var result = ChoosePass();
+                    if (!result.IsTrue())
+                        return false;
+                    break;
+                }
+
+                case "team":
+                {
+                    // Team preview: "team 1234" or "team 1,2,3,4"
+                    string teamData = tokens.Length >= 2 ? tokens[1] : "";
+                    if (!ChooseTeam(teamData))
+                        return false;
+                    break;
+                }
+
+                default:
+                    return EmitChoiceError($"Can't choose: unknown command '{command}'");
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Resolve a Showdown-format move name (lowercase, no special chars) to a MoveId.
+    /// Uses the same normalization as Showdown's toID() function.
+    /// </summary>
+    private MoveId ResolveMoveFromShowdownName(string showdownName)
+    {
+        // Strip to alphanumeric lowercase (same as Showdown's toID)
+        string normalized = Regex.Replace(showdownName.ToLowerInvariant(), @"[^a-z0-9]", "");
+
+        foreach (var (id, move) in Battle.Library.Moves)
+        {
+            string moveShowdownId = Regex.Replace(move.Name.ToLowerInvariant(), @"[^a-z0-9]", "");
+            if (moveShowdownId == normalized)
+                return id;
+        }
+
+        return MoveId.None;
     }
 
     public bool ChooseShift()

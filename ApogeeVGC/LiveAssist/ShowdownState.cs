@@ -74,6 +74,27 @@ public sealed class ShowdownState
     // Last request
     public JsonDocument? LastRequest { get; private set; }
 
+    // --- Shadow Battle: choice inference ---
+    // Tracks inferred choices for each active slot during the current turn.
+    // Key: slot like "p1a", "p1b". Value: inferred action for that slot.
+    private readonly Dictionary<string, InferredAction> _turnActions = new();
+
+    // Tracks HP values observed this turn for post-sim correction.
+    // Key: slot like "p1a". Value: (hp, maxHp) as reported by protocol.
+    private readonly Dictionary<string, (int Hp, int MaxHp)> _observedHp = new();
+
+    // Track which slots had forced switches this turn (from |drag| or faint replacement)
+    private readonly HashSet<string> _forcedSwitchSlots = new();
+
+    // Team order chosen at team preview (e.g. "1,2,3,4" for each side)
+    private readonly Dictionary<string, string> _teamOrder = new()
+    {
+        ["p1"] = "", ["p2"] = "",
+    };
+
+    // Callback invoked on |turn| boundary to advance the shadow battle
+    public event Action<int>? OnTurnBoundary;
+
     private static readonly Regex ReFromAbility = new(@"\[from\] ability: (.+?)(?:\||\[|$)");
     private static readonly Regex ReOfSlot = new(@"\[of\] (p[12][ab]): (.+?)(?:\||$)");
     private static readonly Regex ReFromItem = new(@"\[from\] item: (.+?)(?:\||\[|$)");
@@ -174,6 +195,17 @@ public sealed class ShowdownState
             ? tt.GetString() ?? "" : "";
         bool active = poke.TryGetProperty("active", out JsonElement act) && act.GetBoolean();
 
+        // Parse computed stats: {atk, def, spa, spd, spe}
+        var stats = new Dictionary<string, int>();
+        if (poke.TryGetProperty("stats", out JsonElement statsEl))
+        {
+            foreach (JsonProperty prop in statsEl.EnumerateObject())
+            {
+                if (prop.Value.TryGetInt32(out int statVal))
+                    stats[prop.Name] = statVal;
+            }
+        }
+
         return new OwnTeamPokemon
         {
             Species = species,
@@ -188,6 +220,7 @@ public sealed class ShowdownState
             Fainted = fainted,
             Active = active,
             Level = level,
+            Stats = stats,
         };
     }
 
@@ -458,12 +491,23 @@ public sealed class ShowdownState
             }
 
             case "turn" when parts.Length >= 3:
-                CurrentTurn = int.Parse(parts[2].Trim());
+            {
+                int newTurn = int.Parse(parts[2].Trim());
+                // Fire turn boundary event before updating turn counter.
+                // This allows the shadow battle to advance using the current turn's inferred actions.
+                if (CurrentTurn > 0)
+                    OnTurnBoundary?.Invoke(CurrentTurn);
+                CurrentTurn = newTurn;
                 Phase = "battle";
                 break;
+            }
 
-            case "switch" or "drag" when parts.Length >= 5:
-                HandleSwitch(parts);
+            case "switch" when parts.Length >= 5:
+                HandleSwitch(parts, forced: false);
+                break;
+
+            case "drag" when parts.Length >= 5:
+                HandleSwitch(parts, forced: true);
                 break;
 
             case "move" when parts.Length >= 4:
@@ -598,7 +642,7 @@ public sealed class ShowdownState
         }
     }
 
-    private void HandleSwitch(string[] parts)
+    private void HandleSwitch(string[] parts, bool forced)
     {
         ParseSlot(parts[2].Trim(), out string slot, out string nickname);
         ParseSpeciesDetail(parts[3].Trim(), out string species, out _);
@@ -620,6 +664,24 @@ public sealed class ShowdownState
         // Track nickname
         _nicknameToSpecies[$"{slot}: {nickname}"] = species;
         _slotSpecies[slot] = species;
+
+        // Shadow battle: record inferred switch action
+        if (forced)
+        {
+            _forcedSwitchSlots.Add(slot);
+        }
+        else if (!_turnActions.ContainsKey(slot))
+        {
+            int teamSlot = FindTeamSlot(side, species);
+            _turnActions[slot] = new InferredAction
+            {
+                IsSwitch = true,
+                SwitchSlot = teamSlot,
+            };
+        }
+
+        // Record observed HP for post-sim correction
+        _observedHp[slot] = (hp, maxHp);
 
         // Create new tracked pokemon
         var tracked = new TrackedPokemon
@@ -644,6 +706,34 @@ public sealed class ShowdownState
         RevealedData r = GetRevealed(side, species);
         if (!r.Moves.Contains(moveName))
             r.Moves.Add(moveName);
+
+        // Shadow battle: record inferred move action (only if not already recorded this turn)
+        if (!_turnActions.ContainsKey(slot) && !_forcedSwitchSlots.Contains(slot))
+        {
+            // Determine target location from protocol target field
+            int targetLoc = 0;
+            if (parts.Length >= 5)
+            {
+                string targetStr = parts[4].Trim();
+                // Target format: "p2a: Nickname" or "[spread]" etc.
+                if (targetStr.Length >= 3 && targetStr[0] == 'p' &&
+                    char.IsDigit(targetStr[1]) && char.IsLetter(targetStr[2]))
+                {
+                    string targetSlot = targetStr[..3]; // e.g. "p2a"
+                    targetLoc = InferTargetLoc(slot, targetSlot);
+                }
+            }
+
+            // Convert move name to showdown ID format
+            string showdownMove = Regex.Replace(moveName.ToLowerInvariant(), @"[^a-z0-9]", "");
+
+            _turnActions[slot] = new InferredAction
+            {
+                IsSwitch = false,
+                MoveName = showdownMove,
+                TargetLoc = targetLoc,
+            };
+        }
     }
 
     private void HandleHpChange(string[] parts)
@@ -659,6 +749,9 @@ public sealed class ShowdownState
             if (status != null) p.Status = _resolver.ResolveStatus(status);
             if (hp == 0) p.Fainted = true;
         }
+
+        // Shadow battle: record observed HP for post-sim correction
+        _observedHp[slot] = (hp, maxHp);
     }
 
     private void HandleFaint(string[] parts)
@@ -706,6 +799,10 @@ public sealed class ShowdownState
         _teraUsed.Add(side);
         string species = ResolveSpecies(slot, nickname);
         GetRevealed(side, species).TeraType = teraType;
+
+        // Shadow battle: mark the inferred action as having tera
+        if (_turnActions.TryGetValue(slot, out InferredAction? action))
+            action.Tera = true;
     }
 
     private void HandleWeather(string[] parts, string line)
@@ -1098,6 +1195,162 @@ public sealed class ShowdownState
             return parts[1];
         return null;
     }
+
+    // --- Shadow Battle: public accessors ---
+    // Note: OwnTeam is already exposed above as a public property.
+
+    /// <summary>Team preview species per side. Key: "p1"/"p2".</summary>
+    public IReadOnlyDictionary<string, List<string>> TeamPreview => _teamPreview;
+
+    /// <summary>Active pokemon per slot. Key: "p1a", "p2b", etc.</summary>
+    public IReadOnlyDictionary<string, TrackedPokemon> ActivePokemon => _active;
+
+    /// <summary>Bench pokemon per side. Key: side -> species -> TrackedPokemon.</summary>
+    public IReadOnlyDictionary<string, Dictionary<string, TrackedPokemon>> BenchPokemon => _bench;
+
+    /// <summary>Revealed opponent info. Key: side -> species -> RevealedData.</summary>
+    public IReadOnlyDictionary<string, Dictionary<string, RevealedData>> Revealed => _revealed;
+
+    /// <summary>Which sides have used tera. Values: "p1", "p2".</summary>
+    public IReadOnlySet<string> TeraUsed => _teraUsed;
+
+    /// <summary>Current weather condition.</summary>
+    public ConditionId Weather => _weather;
+
+    /// <summary>Current terrain condition.</summary>
+    public ConditionId Terrain => _terrain;
+
+    /// <summary>Whether trick room is active.</summary>
+    public bool TrickRoom => _trickRoom;
+
+    /// <summary>Side conditions per side. Key: "p1"/"p2".</summary>
+    public IReadOnlyDictionary<string, HashSet<ConditionId>> SideConditions => _sideConditions;
+
+    /// <summary>The ShowdownNameResolver for external use.</summary>
+    public ShowdownNameResolver Resolver => _resolver;
+
+    /// <summary>Team order chosen at team preview per side.</summary>
+    public IReadOnlyDictionary<string, string> TeamOrder => _teamOrder;
+
+    // --- Shadow Battle: choice inference methods ---
+
+    /// <summary>
+    /// Build a Showdown-format choice string for the given side from inferred turn actions.
+    /// Returns e.g. "move fakeout 1, move protect" or "switch 3, move thunderbolt 1"
+    /// Returns null if no actions were inferred for this side.
+    /// </summary>
+    public string? BuildChoiceString(string side)
+    {
+        string slotA = $"{side}a";
+        string slotB = $"{side}b";
+
+        var choices = new List<string>();
+
+        if (_turnActions.TryGetValue(slotA, out InferredAction? actionA))
+            choices.Add(FormatInferredAction(actionA));
+        else if (_active.TryGetValue(slotA, out TrackedPokemon? pA) && !pA.Fainted)
+            choices.Add("pass"); // Active but no action observed — forced pass
+
+        if (_turnActions.TryGetValue(slotB, out InferredAction? actionB))
+            choices.Add(FormatInferredAction(actionB));
+        else if (_active.TryGetValue(slotB, out TrackedPokemon? pB) && !pB.Fainted)
+            choices.Add("pass"); // Active but no action observed — forced pass
+
+        return choices.Count > 0 ? string.Join(", ", choices) : null;
+    }
+
+    private static string FormatInferredAction(InferredAction action)
+    {
+        if (action.IsSwitch)
+            return $"switch {action.SwitchSlot}";
+
+        string result = $"move {action.MoveName}";
+        if (action.TargetLoc != 0)
+            result += $" {action.TargetLoc}";
+        if (action.Tera)
+            result += " terastallize";
+        return result;
+    }
+
+    /// <summary>
+    /// Get observed HP values this turn for post-sim correction.
+    /// Key: slot. Value: (hp, maxHp).
+    /// </summary>
+    public IReadOnlyDictionary<string, (int Hp, int MaxHp)> GetObservedHp() => _observedHp;
+
+    /// <summary>
+    /// Clear turn action tracking for the next turn.
+    /// </summary>
+    public void ClearTurnActions()
+    {
+        _turnActions.Clear();
+        _observedHp.Clear();
+        _forcedSwitchSlots.Clear();
+    }
+
+    /// <summary>
+    /// Record the team order chosen during team preview.
+    /// Called by ShowdownServer when it sees the team preview choice.
+    /// </summary>
+    public void SetTeamOrder(string side, string order)
+    {
+        _teamOrder[side] = order;
+    }
+
+    /// <summary>
+    /// Map a protocol target identifier (e.g. "p2a: Flutter Mane") to a target location
+    /// relative to the source slot.
+    /// In doubles: 1 = foe left (slot a), 2 = foe right (slot b),
+    ///            -1 = self/ally left, -2 = ally right
+    /// </summary>
+    private static int InferTargetLoc(string sourceSlot, string targetSlot)
+    {
+        string sourceSide = sourceSlot[..2]; // "p1" or "p2"
+        string targetSide = targetSlot[..2];
+        char targetPos = targetSlot[2]; // 'a' or 'b'
+
+        if (sourceSide != targetSide)
+        {
+            // Targeting opponent
+            return targetPos == 'a' ? 1 : 2;
+        }
+        else
+        {
+            // Targeting ally or self
+            return targetPos == 'a' ? -1 : -2;
+        }
+    }
+
+    /// <summary>
+    /// Find the 1-based team slot index of a pokemon by species name for a given side.
+    /// Uses team preview order if available, otherwise searches own team.
+    /// </summary>
+    private int FindTeamSlot(string side, string species)
+    {
+        if (side == MySide)
+        {
+            for (int i = 0; i < _ownTeam.Count; i++)
+            {
+                if (string.Equals(_ownTeam[i].Species, species, StringComparison.OrdinalIgnoreCase))
+                    return i + 1; // 1-based
+            }
+        }
+        else
+        {
+            // Opponent team — use team preview order
+            var preview = _teamPreview.GetValueOrDefault(side);
+            if (preview != null)
+            {
+                for (int i = 0; i < preview.Count; i++)
+                {
+                    if (string.Equals(preview[i], species, StringComparison.OrdinalIgnoreCase))
+                        return i + 1;
+                }
+            }
+        }
+
+        return 1; // Fallback
+    }
 }
 
 /// <summary>
@@ -1137,6 +1390,9 @@ public sealed class OwnTeamPokemon
     public bool Fainted { get; init; }
     public bool Active { get; init; }
     public int Level { get; init; } = 50;
+
+    /// <summary>Computed stats from |request| JSON: {atk, def, spa, spd, spe}.</summary>
+    public Dictionary<string, int> Stats { get; init; } = new();
 }
 
 /// <summary>
@@ -1157,6 +1413,27 @@ public readonly struct ActionRecommendation
 {
     public string Action { get; init; }
     public float Prob { get; init; }
+}
+
+/// <summary>
+/// An action inferred from Showdown protocol output for shadow battle choice replay.
+/// </summary>
+public sealed class InferredAction
+{
+    /// <summary>True if this is a switch action, false for a move.</summary>
+    public bool IsSwitch { get; init; }
+
+    /// <summary>Showdown-format move name (lowercase, no special chars). Only for moves.</summary>
+    public string MoveName { get; init; } = "";
+
+    /// <summary>Target location for moves in doubles (1=foe left, 2=foe right, -1=ally left, -2=ally right, 0=no target).</summary>
+    public int TargetLoc { get; init; }
+
+    /// <summary>Whether the player terastallized with this action.</summary>
+    public bool Tera { get; set; }
+
+    /// <summary>1-based team slot index for switches.</summary>
+    public int SwitchSlot { get; init; }
 }
 
 /// <summary>

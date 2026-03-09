@@ -5,6 +5,10 @@ using System.Text.Json;
 using ApogeeVGC.Data;
 using ApogeeVGC.Mcts;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.LiveAssist;
 
@@ -20,6 +24,7 @@ public sealed class ShowdownServer
     private readonly TeamPreviewInference _previewModel;
     private readonly ActionMapper _actionMapper;
     private readonly MctsSearch? _mctsSearch;
+    private readonly FormatId _formatId;
     private readonly string _host;
     private readonly int _port;
 
@@ -29,6 +34,7 @@ public sealed class ShowdownServer
         ModelInference battleModel,
         TeamPreviewInference previewModel,
         MctsConfig? mctsConfig,
+        FormatId formatId,
         string host = "localhost",
         int port = 9876)
     {
@@ -37,6 +43,7 @@ public sealed class ShowdownServer
         _battleModel = battleModel;
         _previewModel = previewModel;
         _actionMapper = new ActionMapper(vocab);
+        _formatId = formatId;
         _host = host;
         _port = port;
 
@@ -91,7 +98,21 @@ public sealed class ShowdownServer
     private async Task HandleClientAsync(WebSocket ws, CancellationToken ct)
     {
         var state = new ShowdownState(_library);
+        var shadowBattle = _mctsSearch != null ? new ShadowBattle(_library, _formatId) : null;
+        bool shadowInitialized = false;
         byte[] buffer = new byte[64 * 1024]; // 64KB buffer for large messages
+
+        // Wire up turn boundary event to advance the shadow battle
+        if (shadowBattle != null)
+        {
+            state.OnTurnBoundary += turn =>
+            {
+                string? p1Choice = state.BuildChoiceString("p1");
+                string? p2Choice = state.BuildChoiceString("p2");
+                shadowBattle.AdvanceTurn(p1Choice, p2Choice, state);
+                state.ClearTurnActions();
+            };
+        }
 
         try
         {
@@ -138,12 +159,19 @@ public sealed class ShowdownServer
 
                             if (state.Phase == "teampreview")
                             {
+                                // Initialize shadow battle on first team preview request
+                                if (shadowBattle != null && !shadowInitialized)
+                                {
+                                    shadowBattle.Initialize(state);
+                                    shadowInitialized = true;
+                                }
+
                                 string response = HandleTeamPreview(state);
                                 await SendAsync(ws, response, ct);
                             }
                             else if (state.Phase == "battle")
                             {
-                                string response = HandleBattle(state);
+                                string response = HandleBattle(state, shadowBattle);
                                 await SendAsync(ws, response, ct);
                             }
                             break;
@@ -211,7 +239,75 @@ public sealed class ShowdownServer
         }
     }
 
-    private string HandleBattle(ShowdownState state)
+    private string HandleBattle(ShowdownState state, ShadowBattle? shadowBattle)
+    {
+        // Try MCTS if shadow battle is available
+        if (_mctsSearch != null && shadowBattle?.GetBattle() is Battle battle)
+        {
+            try
+            {
+                return HandleBattleMcts(state, battle);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Apogee] MCTS failed, falling back to policy: {ex.Message}");
+            }
+        }
+
+        // Policy-only fallback
+        return HandleBattlePolicyOnly(state);
+    }
+
+    private string HandleBattleMcts(ShowdownState state, Battle battle)
+    {
+        BattlePerspective perspective = state.BuildPerspective();
+        SideId sideId = state.MySide == "p1" ? SideId.P1 : SideId.P2;
+
+        // Get the request from the shadow battle's side
+        Side ourSide = sideId == SideId.P1 ? battle.P1 : battle.P2;
+        IChoiceRequest? request = ourSide.ActiveRequest;
+
+        if (request == null)
+        {
+            Console.WriteLine("[Apogee] No request from shadow battle, falling back to policy");
+            return HandleBattlePolicyOnly(state);
+        }
+
+        var (actionA, actionB) = _mctsSearch.Search(battle, sideId, request, perspective);
+
+        // Format the MCTS result
+        string actionAStr = _vocab.GetActionKey(actionA.VocabIndex);
+        string? actionBStr = actionB != null ? _vocab.GetActionKey(actionB.Value.VocabIndex) : null;
+
+        // Get value from model for display
+        ModelOutput output = _battleModel.Evaluate(perspective);
+        float value = output.Value;
+
+        // Display in terminal
+        float pct = value * 100;
+        string color = pct >= 55 ? "+" : pct >= 45 ? "~" : "-";
+        Console.WriteLine($"\n--- Turn {state.CurrentTurn} [MCTS] --- Win: {pct:F1}% [{color}]");
+        Console.WriteLine($"  Best A: {actionAStr}");
+        if (actionBStr != null)
+            Console.WriteLine($"  Best B: {actionBStr}");
+
+        // Build response with MCTS recommendations
+        var slotA = new List<object> { new { action = actionAStr, prob = 1.0f } };
+        var slotB = actionBStr != null
+            ? new List<object> { new { action = actionBStr, prob = 1.0f } }
+            : new List<object>();
+
+        return JsonSerializer.Serialize(new
+        {
+            type = "recommendation",
+            value,
+            mode = "mcts",
+            slotA,
+            slotB,
+        });
+    }
+
+    private string HandleBattlePolicyOnly(ShowdownState state)
     {
         try
         {
@@ -235,7 +331,7 @@ public sealed class ShowdownServer
             // Display in terminal
             float pct = value * 100;
             string color = pct >= 55 ? "+" : pct >= 45 ? "~" : "-";
-            Console.WriteLine($"\n--- Turn {state.CurrentTurn} --- Win: {pct:F1}% [{color}]");
+            Console.WriteLine($"\n--- Turn {state.CurrentTurn} [Policy] --- Win: {pct:F1}% [{color}]");
 
             Console.WriteLine("  Slot A:");
             foreach (ActionRecommendation a in slotAActions)
@@ -253,6 +349,7 @@ public sealed class ShowdownServer
             {
                 type = "recommendation",
                 value,
+                mode = "policy",
                 slotA = slotAActions.Select(a => new { action = a.Action, prob = a.Prob }),
                 slotB = slotBActions.Select(a => new { action = a.Action, prob = a.Prob }),
             });
