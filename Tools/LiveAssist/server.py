@@ -6,7 +6,13 @@ maintains battle state, runs ONNX inference, and sends recommendations
 back to the overlay. Also displays a rich terminal UI.
 
 Usage:
-    python server.py --vocab path/to/vocab.json --battle-model path/to/battle.onnx --preview-model path/to/preview.onnx
+    python server.py gen9vgc2025regi
+    python server.py gen9vgc2025regi --port 9876
+
+Files are resolved relative to the repo root (Tools/DLModel/):
+    vocab:         Tools/DLModel/battle_model_vocab.json
+    battle model:  Tools/DLModel/battle_model.onnx
+    preview model: Tools/DLModel/team_preview_model.onnx
 """
 
 from __future__ import annotations
@@ -15,6 +21,7 @@ import argparse
 import asyncio
 import json
 import sys
+from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
@@ -262,29 +269,50 @@ class LiveAssistServer:
             console.print(f"[red]Battle inference error: {e}[/red]")
 
 
+def resolve_paths(format_id: str) -> tuple[Path, Path, Path]:
+    """Resolve vocab, battle model, and preview model paths from a format ID.
+
+    Looks in Tools/DLModel/ relative to the repo root (two levels up from this file).
+    """
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    dl_dir = repo_root / "Tools" / "DLModel"
+
+    vocab_path = dl_dir / "battle_model_vocab.json"
+    battle_path = dl_dir / "battle_model.onnx"
+    preview_path = dl_dir / "team_preview_model.onnx"
+
+    for name, path in [("Vocab", vocab_path), ("Battle model", battle_path), ("Preview model", preview_path)]:
+        if not path.exists():
+            console.print(f"[red]{name} not found: {path}[/red]")
+            sys.exit(1)
+
+    return vocab_path, battle_path, preview_path
+
+
 async def main():
     parser = argparse.ArgumentParser(description="Live Assist WebSocket Server")
-    parser.add_argument("--vocab", required=True, help="Path to vocab JSON")
-    parser.add_argument("--battle-model", required=True, help="Path to battle ONNX model")
-    parser.add_argument("--preview-model", required=True, help="Path to team preview ONNX model")
+    parser.add_argument("format", help="Showdown format ID (e.g. gen9vgc2025regi)")
     parser.add_argument("--host", default="localhost")
     parser.add_argument("--port", type=int, default=9876)
     args = parser.parse_args()
 
+    vocab_path, battle_path, preview_path = resolve_paths(args.format)
+
     console.print(Panel.fit(
-        "[bold]Apogee VGC Live Assist[/bold]\n"
+        f"[bold]Apogee VGC Live Assist[/bold]\n"
+        f"Format: {args.format}\n"
         f"Listening on ws://{args.host}:{args.port}",
         border_style="blue",
     ))
 
     console.print("Loading models...")
-    encoder = LiveEncoder(args.vocab)
+    encoder = LiveEncoder(str(vocab_path))
 
     session_opts = ort.SessionOptions()
     session_opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 
-    battle_session = ort.InferenceSession(args.battle_model, session_opts)
-    preview_session = ort.InferenceSession(args.preview_model, session_opts)
+    battle_session = ort.InferenceSession(str(battle_path), session_opts)
+    preview_session = ort.InferenceSession(str(preview_path), session_opts)
     console.print("[green]Models loaded[/green]")
 
     server = LiveAssistServer(encoder, battle_session, preview_session)

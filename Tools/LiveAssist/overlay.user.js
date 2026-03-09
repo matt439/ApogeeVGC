@@ -1,11 +1,16 @@
 // ==UserScript==
 // @name         Apogee VGC Live Assist
 // @namespace    apogee-vgc
-// @version      1.0
+// @version      1.1
 // @description  Bridges Pokemon Showdown battles to the Apogee VGC AI server
 // @match        https://play.pokemonshowdown.com/*
+// @match        http://play.pokemonshowdown.com/*
 // @match        https://replay.pokemonshowdown.com/*
+// @match        http://replay.pokemonshowdown.com/*
+// @match        http://psim.us/*
+// @match        https://psim.us/*
 // @grant        none
+// @run-at       document-start
 // ==/UserScript==
 
 (function () {
@@ -14,36 +19,36 @@
     const WS_URL = 'ws://localhost:9876';
     const RECONNECT_DELAY = 3000;
 
-    let ws = null;
+    let apogeeWs = null;
     let overlay = null;
     let connected = false;
 
-    // ── WebSocket connection ────────────────────────────────────────────────
+    // ── Apogee WebSocket connection ─────────────────────────────────────────
 
-    function connect() {
-        if (ws && ws.readyState <= 1) return;
+    function connectApogee() {
+        if (apogeeWs && apogeeWs.readyState <= 1) return;
 
-        ws = new WebSocket(WS_URL);
+        apogeeWs = new WebSocket(WS_URL);
 
-        ws.onopen = () => {
+        apogeeWs.onopen = () => {
             connected = true;
             updateStatus('Connected', 'lime');
             console.log('[Apogee] Connected to server');
         };
 
-        ws.onclose = () => {
+        apogeeWs.onclose = () => {
             connected = false;
             updateStatus('Disconnected', '#ff4444');
             console.log('[Apogee] Disconnected, reconnecting...');
-            setTimeout(connect, RECONNECT_DELAY);
+            setTimeout(connectApogee, RECONNECT_DELAY);
         };
 
-        ws.onerror = () => {
+        apogeeWs.onerror = () => {
             connected = false;
             updateStatus('Error', '#ff4444');
         };
 
-        ws.onmessage = (event) => {
+        apogeeWs.onmessage = (event) => {
             try {
                 const msg = JSON.parse(event.data);
                 handleServerMessage(msg);
@@ -54,61 +59,99 @@
     }
 
     function send(data) {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify(data));
+        if (apogeeWs && apogeeWs.readyState === WebSocket.OPEN) {
+            apogeeWs.send(JSON.stringify(data));
         }
     }
 
-    // ── Hook into Showdown ──────────────────────────────────────────────────
+    // ── Intercept Showdown's WebSocket via constructor hook ──────────────────
+    //
+    // We patch the WebSocket constructor BEFORE Showdown's JS loads (run-at: document-start).
+    // Every WebSocket created by Showdown goes through our wrapper. We attach an
+    // onmessage listener to forward battle messages to our server.
+    //
+    // This avoids needing access to the PS global (which is module-scoped).
 
-    function hookShowdown() {
-        // Wait for PS to be available
-        if (typeof PS === 'undefined') {
-            setTimeout(hookShowdown, 500);
-            return;
-        }
+    const OrigWebSocket = window.WebSocket;
 
-        // Hook PS.receive() to intercept all incoming messages
-        const origReceive = PS.receive.bind(PS);
-        PS.receive = function (msg) {
-            // Forward battle messages to our server
-            if (msg.startsWith('>battle-')) {
-                send({ type: 'battle', data: msg });
-            }
-            origReceive(msg);
-        };
+    window.WebSocket = function (...args) {
+        const socket = new OrigWebSocket(...args);
+        const url = args[0] || '';
 
-        // Also watch for request updates on battle rooms
-        // PS.rooms is a Map of room ID -> Room object
-        const checkRooms = setInterval(() => {
-            if (!PS.rooms) return;
+        // Only intercept Showdown's connection (sim.smogon.com or similar)
+        if (url.includes('sim') || url.includes('showdown') || url.includes('psim')) {
+            console.log('[Apogee] Intercepted Showdown WebSocket:', url);
 
-            for (const [id, room] of PS.rooms) {
-                if (!id.startsWith('battle-')) continue;
-                if (room._apogeeHooked) continue;
+            socket.addEventListener('message', (event) => {
+                const raw = '' + event.data;
 
-                // Hook the room's receiveLine to catch |request| messages
-                room._apogeeHooked = true;
-                const origReceiveLine = room.receiveLine.bind(room);
-                room.receiveLine = function (args) {
-                    origReceiveLine(args);
-
-                    // After Showdown processes the line, check for request updates
-                    if (args[0] === 'request' && room.request) {
-                        send({
-                            type: 'request',
-                            room: id,
-                            data: room.request,
-                        });
+                // SockJS wraps messages in frames:
+                //   'o' = open, 'h' = heartbeat, 'c[...]' = close
+                //   'a["msg1","msg2"]' = array of messages
+                // Unwrap SockJS framing to get the actual protocol messages.
+                let messages = [];
+                if (raw.startsWith('a[')) {
+                    try {
+                        messages = JSON.parse(raw.slice(1));
+                    } catch (e) {
+                        return;
                     }
-                };
+                } else if (raw.startsWith('>') || raw.startsWith('|')) {
+                    // Raw protocol (non-SockJS connection)
+                    messages = [raw];
+                } else {
+                    // SockJS control frames (o, h, c) — ignore
+                    return;
+                }
 
-                console.log(`[Apogee] Hooked battle room: ${id}`);
-            }
-        }, 1000);
+                for (const msg of messages) {
+                    // Battle protocol messages start with >battle-
+                    if (msg.startsWith('>battle-')) {
+                        console.log('[Apogee] Battle message, length:', msg.length);
+                        send({ type: 'battle', data: msg });
+                    }
 
-        console.log('[Apogee] Hooked PS.receive()');
-    }
+                    // |request| lines contain own-team data + legal actions
+                    if (msg.includes('|request|')) {
+                        const lines = msg.split('\n');
+                        for (const line of lines) {
+                            if (line.startsWith('|request|')) {
+                                const jsonStr = line.slice('|request|'.length);
+                                if (jsonStr) {
+                                    try {
+                                        const request = JSON.parse(jsonStr);
+                                        let room = '';
+                                        if (msg.startsWith('>')) {
+                                            room = msg.slice(1, msg.indexOf('\n'));
+                                        }
+                                        console.log('[Apogee] Request intercepted for', room);
+                                        send({
+                                            type: 'request',
+                                            room: room,
+                                            data: request,
+                                        });
+                                    } catch (e) {
+                                        console.error('[Apogee] Failed to parse request:', e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        return socket;
+    };
+
+    // Preserve prototype chain so instanceof checks still work
+    window.WebSocket.prototype = OrigWebSocket.prototype;
+    window.WebSocket.CONNECTING = OrigWebSocket.CONNECTING;
+    window.WebSocket.OPEN = OrigWebSocket.OPEN;
+    window.WebSocket.CLOSING = OrigWebSocket.CLOSING;
+    window.WebSocket.CLOSED = OrigWebSocket.CLOSED;
+
+    console.log('[Apogee] WebSocket constructor patched');
 
     // ── Handle server messages ──────────────────────────────────────────────
 
@@ -132,7 +175,7 @@
             <div id="apogee-header">
                 <span id="apogee-title">Apogee VGC</span>
                 <span id="apogee-status">Connecting...</span>
-                <button id="apogee-minimize">−</button>
+                <button id="apogee-minimize">\u2212</button>
             </div>
             <div id="apogee-content">
                 <div id="apogee-value"></div>
@@ -258,7 +301,7 @@
             const content = document.getElementById('apogee-content');
             const btn = document.getElementById('apogee-minimize');
             content.classList.toggle('hidden');
-            btn.textContent = content.classList.contains('hidden') ? '+' : '−';
+            btn.textContent = content.classList.contains('hidden') ? '+' : '\u2212';
         });
 
         // Dragging
@@ -304,7 +347,6 @@
         const content = document.getElementById('apogee-content');
         if (!content) return;
 
-        // Value bar
         const valuePct = (msg.value * 100).toFixed(1);
         const valueColor = msg.value >= 0.55 ? '#4caf50' : msg.value >= 0.45 ? '#ffc107' : '#f44336';
 
@@ -323,7 +365,6 @@
             for (const a of (actions || [])) {
                 const pct = (a.prob * 100).toFixed(1);
                 const cls = a.prob >= 0.5 ? 'top' : a.prob >= 0.2 ? 'mid' : 'low';
-                // Clean up action name for display
                 const name = a.action.replace('move:', '').replace('switch:', 'Switch ');
                 html += `<div class="apogee-action ${cls}">
                     <span>${name}</span>
@@ -343,7 +384,6 @@
 
         let html = '<div id="apogee-slots"><div class="apogee-slot-title">Team Preview</div>';
 
-        // Sort by bring score descending
         const pokemon = (msg.pokemon || []).sort((a, b) => b.bringScore - a.bringScore);
 
         for (const p of pokemon) {
@@ -364,16 +404,17 @@
 
     // ── Initialize ──────────────────────────────────────────────────────────
 
-    function init() {
+    // WebSocket hook is already active (runs at document-start).
+    // Overlay + server connection start when DOM is ready.
+    function initUI() {
+        console.log('[Apogee] Initializing UI on:', window.location.href);
         createOverlay();
-        connect();
-        hookShowdown();
+        connectApogee();
     }
 
-    // Wait for page load
-    if (document.readyState === 'complete') {
-        init();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initUI);
     } else {
-        window.addEventListener('load', init);
+        initUI();
     }
 })();
