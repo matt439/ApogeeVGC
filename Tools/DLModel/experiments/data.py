@@ -223,8 +223,8 @@ def _build_parallel(build_fn, games, vocab, winners_only, num_workers, attrs):
 
 
 def _default_num_workers() -> int:
-    """Default to all logical cores (at least 1)."""
-    return max(os.cpu_count() or 1, 1)
+    """Default to logical cores, capped at 16 to avoid fd exhaustion."""
+    return min(max(os.cpu_count() or 1, 1), 32)
 
 
 def build_preview_datasets(
