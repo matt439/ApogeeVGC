@@ -26,11 +26,11 @@ public partial class Driver
 
     // Greedy evaluation settings
     private const int GreedyEvaluationNumTest = 200000;
-    private const int GreedyNumThreads = 16;
+    private const int GreedyNumThreads = 32;
 
     // MCTS evaluation settings
     private const int MctsEvaluationNumTest = 1000;
-    private const int MctsNumThreads = 4;
+    private const int MctsNumThreads = 32;
 
     // Standalone MCTS evaluation settings
     private const int MctsStandaloneEvaluationNumTest = 100;
@@ -81,6 +81,9 @@ public partial class Driver
                 break;
             case DriverMode.DlGreedyVsRndEvaluation:
                 RunDLGreedyVsRandomEvaluation(ActiveFormatId);
+                break;
+            case DriverMode.LiveAssist:
+                RunLiveAssist(ActiveFormatId);
                 break;
             case DriverMode.DeterministicRegressionTest:
                 RunDeterministicRegressionTest();
