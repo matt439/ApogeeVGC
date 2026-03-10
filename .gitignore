@@ -373,3 +373,5 @@ Tools/DLModel/results/
 
 # Windows reserved device name
 NUL
+# Equivalence test batch temp files
+Tools/EquivalenceTest/batch_temp/
