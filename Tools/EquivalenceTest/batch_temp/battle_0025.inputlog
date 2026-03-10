@@ -1,26 +1,49 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"176,327,478,779"}
->player p1 {"name":"Player1","team":"Cacturne||LifeOrb|WaterAbsorb|knockoff,suckerpunch,spikyshield,leafstorm||85,85,85,85,85,85|M|||91|,,,,,Dark]Typhlosion|TyphlosionHisui|ChoiceSpecs|Blaze|heatwave,focusblast,eruption,shadowball||85,,85,85,85,85|F|,0,,,,||77|,,,,,Fire]Orthworm||Leftovers|EarthEater|bodypress,heavyslam,irondefense,protect||85,85,85,85,85,85|M|||88|,,,,,Electric]Excadrill||AssaultVest|MoldBreaker|highhorsepower,rockslide,rapidspin,ironhead||85,85,85,85,85,85|F|||82|,,,,,Flying]Manaphy||SitrusBerry|Hydration|scald,tailglow,energyball,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass]Scovillain||ChoiceSpecs|Chlorophyll|fireblast,energyball,leafstorm,burningjealousy||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel"}
->player p2 {"name":"Player2","team":"Chesnaught||Leftovers|Bulletproof|spikyshield,irondefense,leechseed,bodypress||85,,85,85,85,85|F|,0,,,,||86|,,,,,Steel]Tentacruel||AssaultVest|ClearBody|hydropump,sludgebomb,icywind,acidspray||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Lanturn||AssaultVest|VoltAbsorb|icebeam,electroweb,scald,voltswitch||85,,85,85,85,85|M|,0,,,,||87|,,,,,Flying]Jolteon||LifeOrb|VoltAbsorb|terablast,thunderbolt,calmmind,protect||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Torterra||WhiteHerb|ShellArmor|headlongrush,rockslide,protect,shellsmash||85,85,85,85,85,85|M|||81|,,,,,Rock]Mamoswine||LifeOrb|ThickFat|protect,iciclecrash,highhorsepower,iceshard||85,85,85,85,85,85|F|||82|,,,,,Ice"}
->p1 move leafstorm +2, move eruption
->p2 move irondefense, move acidspray +2
+>player p1 {"name":"Player1","team":"Sinistcha|SinistchaMasterpiece|Leftovers|Hospitality|calmmind,protect,shadowball,matchagotcha||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Great Tusk||AssaultVest|Protosynthesis|closecombat,headlongrush,knockoff,icespinner||85,85,85,85,85,85|N|||81|,,,,,Fire]Hariyama||FlameOrb|Guts|fakeout,closecombat,knockoff,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Espathra||LifeOrb|SpeedBoost|dazzlinggleam,shadowball,protect,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Zapdos||SitrusBerry|Static|thunderbolt,tailwind,roost,hurricane||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Minun||SitrusBerry|VoltAbsorb|encore,superfang,nuzzle,thunderbolt||85,85,85,85,85,85|M|||91|,,,,,Flying"}
+>player p2 {"name":"Player2","team":"Giratina||Leftovers|Pressure|shadowball,calmmind,protect,aurasphere||85,,85,85,85,85|N|,0,,,,||76|,,,,,Fairy]Drifblim||SitrusBerry|Unburden|strengthsap,willowisp,tailwind,shadowball||85,,85,85,85,85|F|,0,,,,||85|,,,,,Ground]Milotic||SitrusBerry|Competitive|dragontail,icywind,recover,scald||85,85,85,85,85,85|M|||81|,,,,,Steel]Arcanine|ArcanineHisui|HeavyDutyBoots|Intimidate|protect,rockslide,flareblitz,willowisp||85,85,85,85,85,85|M|||79|,,,,,Grass]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fire]Furret||SitrusBerry|Frisk|bodyslam,knockoff,helpinghand,followme||85,85,85,85,85,85|M|||98|,,,,,Ghost"}
+>p1 move shadowball +1, move knockoff +2
+>p2 move calmmind, move shadowball +2
+>p1 move protect, move knockoff +1
+>p2 move aurasphere +1, move shadowball +1
+>p1 move shadowball +1, move closecombat +2
+>p2 move shadowball +1, move shadowball +2
+>p1 switch 5, pass
+>p1 move hurricane +2, move headlongrush +1
+>p2 move calmmind, move willowisp +1
+>p2 switch 3, switch 4
+>p1 move roost, move closecombat +2
+>p2 move dragontail +1, move rockslide
+>p1 move fakeout +1, move icespinner +2
+>p2 move recover, move willowisp +2
+>p1 move closecombat +1, move knockoff +1
+>p2 move recover, move rockslide
+>p1 move facade +2, move closecombat +1
+>p2 move dragontail +2, move rockslide
 >p2 switch 5, pass
->p1 move knockoff +1, move eruption
->p2 move shellsmash, move acidspray +1
->p2 switch 4, switch 6
->p1 move spikyshield, move eruption
->p2 move protect, move iceshard +2
->p1 move spikyshield, move eruption
->p2 move thunderbolt +1, move protect
->p1 switch 6, pass
->p1 move fireblast +2, move eruption
->p2 move terablast +1, move protect
->p2 switch 3, pass
->p1 move fireblast +2, move eruption
->p2 move scald +2, pass
->p1 pass, switch 5
->p1 move fireblast +1, move protect
->p2 move electroweb, pass
->p1 move fireblast +2, move protect
->p2 move icebeam +2, pass
->p1 move fireblast +2, move protect
->p2 move icebeam +2, pass
+>p1 move closecombat +2, move headlongrush +1
+>p2 move icespinner +1, move flareblitz +1
+>p1 switch 6, switch 4
+>p2 pass, switch 6
+>p1 move encore +2, move protect
+>p2 move icespinner +1, move bodyslam +1
+>p1 move encore +2, move dazzlinggleam
+>p2 move icespinner +1, move bodyslam +2
+>p1 move nuzzle +2, move shadowball +2
+>p2 pass, move bodyslam +2
+>p1 pass, switch 3
+>p1 move thunderbolt +1, move roost
+>p2 pass, move bodyslam +2
+>p1 move nuzzle +1, move roost
+>p2 pass, move followme
+>p1 move encore +2, move roost
+>p2 pass, move knockoff +1
+>p1 move encore +2, move hurricane +2
+>p2 pass, move followme
+>p1 move nuzzle +2, move roost
+>p2 pass, move followme
+>p1 move nuzzle +1, move hurricane +2
+>p2 pass, move bodyslam +2
+>p1 move nuzzle +2, move thunderbolt +1
+>p2 pass, move followme
+>p1 move superfang +1, move hurricane +2
+>p2 pass, move followme

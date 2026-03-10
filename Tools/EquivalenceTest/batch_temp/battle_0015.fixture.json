@@ -3,19 +3,85 @@
   "seed": "106,197,288,469",
   "p1Seed": "625,665,735,835",
   "p2Seed": "935,975,1075,1145",
-  "p1TeamPacked": "Goodra||AssaultVest|SapSipper|dracometeor,scald,fireblast,thunderbolt||85,,85,85,85,85|F|,0,,,,||86|,,,,,Fire]Ogerpon|OgerponHearthflame|HearthflameMask|MoldBreaker|swordsdance,ivycudgel,spikyshield,powerwhip||85,85,85,85,85,85|F|||74|,,,,,Fire]Eelektross||ChoiceSpecs|Levitate|thunderbolt,uturn,gigadrain,flamethrower||85,85,85,85,85,85|M|||86|,,,,,Poison]Meowstic||LightClay|Prankster|reflect,psychic,lightscreen,fakeout||85,85,85,85,85,85|M|||88|,,,,,Steel]Jumpluff|||Infiltrator|encore,acrobatics,tailwind,sleeppowder||85,85,85,85,85,85|F|||92|,,,,,Steel]Dugtrio||LifeOrb|ArenaTrap|stompingtantrum,protect,helpinghand,rockslide||85,85,85,85,85,85|F|||91|,,,,,Fire",
-  "p2TeamPacked": "Heracross||ChoiceBand|Moxie|closecombat,rockslide,knockoff,megahorn||85,85,85,85,85,85|F|||82|,,,,,Bug]Espeon||LifeOrb|MagicBounce|protect,psychic,shadowball,alluringvoice||85,,85,85,85,85|F|,0,,,,||84|,,,,,Fairy]Magnezone||SitrusBerry|MagnetPull|protect,flashcannon,thunderbolt,electroweb||85,,85,85,85,85|N|,0,,,,||84|,,,,,Flying]Chandelure||LifeOrb|FlashFire|shadowball,protect,energyball,heatwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Grass]Shaymin||SitrusBerry|NaturalCure|earthpower,tailwind,seedflare,synthesis||85,,85,85,85,85|N|,0,,,,||81|,,,,,Steel]Mudsdale||ChestoBerry|Stamina|highhorsepower,stoneedge,bodypress,rest||85,85,85,85,85,85|M|||84|,,,,,Fighting",
+  "p1TeamPacked": "Appletun||Leftovers|ThickFat|protect,dragonpulse,appleacid,leechseed||85,,85,85,85,85|M|,0,,,,||92|,,,,,Steel]Minior|MiniorIndigo|WhiteHerb|ShieldsDown|shellsmash,acrobatics,rockslide,protect||69,85,85,85,85,85|N|||83|,,,,,Flying]Vespiquen||Leftovers|Unnerve|toxicspikes,roost,hurricane,pollenpuff||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel]Skuntank||LifeOrb|Aftermath|taunt,gunkshot,fireblast,knockoff||85,85,85,85,85,85|M|||85|,,,,,Dark]Granbull||AssaultVest|Intimidate|superfang,closecombat,playrough,stompingtantrum||85,85,85,85,85,85|M|||88|,,,,,Steel]Mimikyu||LifeOrb|Disguise|playrough,shadowsneak,shadowclaw,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost",
+  "p2TeamPacked": "Lugia||Leftovers|Multiscale|calmmind,aeroblast,earthpower,recover||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Beartic||LifeOrb|SlushRush|iciclecrash,closecombat,protect,aquajet||85,85,85,85,85,85|F|||91|,,,,,Fighting]Cinccino||LoadedDice|Technician|tripleaxel,protect,tailslap,bulletseed||85,85,85,85,85,85|F|||85|,,,,,Ice]Weavile||ChoiceBand|Pickpocket|tripleaxel,iceshard,lowkick,knockoff||85,85,85,85,85,85|F|||81|,,,,,Fighting]Ampharos||SitrusBerry|Static|dragontail,helpinghand,electroweb,thunderbolt||85,85,85,85,85,85|M|||86|,,,,,Flying]Annihilape||Leftovers|Defiant|drainpunch,bulkup,ragefist,protect||85,85,85,85,85,85|M|||77|,,,,,Fire",
   "p1Team": [
     {
-      "name": "Goodra",
-      "species": "Goodra",
-      "item": "Assault Vest",
-      "ability": "Sap Sipper",
+      "name": "Appletun",
+      "species": "Appletun",
+      "item": "Leftovers",
+      "ability": "Thick Fat",
       "moves": [
-        "Draco Meteor",
-        "Scald",
-        "Fire Blast",
-        "Thunderbolt"
+        "Protect",
+        "Dragon Pulse",
+        "Apple Acid",
+        "Leech Seed"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Minior",
+      "species": "Minior-Indigo",
+      "item": "White Herb",
+      "ability": "Shields Down",
+      "moves": [
+        "Shell Smash",
+        "Acrobatics",
+        "Rock Slide",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 69,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Vespiquen",
+      "species": "Vespiquen",
+      "item": "Leftovers",
+      "ability": "Unnerve",
+      "moves": [
+        "Toxic Spikes",
+        "Roost",
+        "Hurricane",
+        "Pollen Puff"
       ],
       "nature": "",
       "evs": {
@@ -35,53 +101,23 @@
         "spd": 31,
         "spe": 31
       },
-      "level": 86,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Fire"
+      "teraType": "Steel"
     },
     {
-      "name": "Ogerpon",
-      "species": "Ogerpon-Hearthflame",
-      "item": "Hearthflame Mask",
-      "ability": "Mold Breaker",
+      "name": "Skuntank",
+      "species": "Skuntank",
+      "item": "Life Orb",
+      "ability": "Aftermath",
       "moves": [
-        "Swords Dance",
-        "Ivy Cudgel",
-        "Spiky Shield",
-        "Power Whip"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "F",
-      "level": 74,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Fire"
-    },
-    {
-      "name": "Eelektross",
-      "species": "Eelektross",
-      "item": "Choice Specs",
-      "ability": "Levitate",
-      "moves": [
-        "Thunderbolt",
-        "U-turn",
-        "Giga Drain",
-        "Flamethrower"
+        "Taunt",
+        "Gunk Shot",
+        "Fire Blast",
+        "Knock Off"
       ],
       "nature": "",
       "evs": {
@@ -93,24 +129,24 @@
         "spe": 85
       },
       "gender": "M",
-      "level": 86,
+      "level": 85,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Poison"
+      "teraType": "Dark"
     },
     {
-      "name": "Meowstic",
-      "species": "Meowstic",
-      "item": "Light Clay",
-      "ability": "Prankster",
+      "name": "Granbull",
+      "species": "Granbull",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
       "moves": [
-        "Reflect",
-        "Psychic",
-        "Light Screen",
-        "Fake Out"
+        "Super Fang",
+        "Close Combat",
+        "Play Rough",
+        "Stomping Tantrum"
       ],
       "nature": "",
       "evs": {
@@ -131,75 +167,15 @@
       "teraType": "Steel"
     },
     {
-      "name": "Jumpluff",
-      "species": "Jumpluff",
-      "item": "",
-      "ability": "Infiltrator",
-      "moves": [
-        "Encore",
-        "Acrobatics",
-        "Tailwind",
-        "Sleep Powder"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "F",
-      "level": 92,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Steel"
-    },
-    {
-      "name": "Dugtrio",
-      "species": "Dugtrio",
+      "name": "Mimikyu",
+      "species": "Mimikyu",
       "item": "Life Orb",
-      "ability": "Arena Trap",
+      "ability": "Disguise",
       "moves": [
-        "Stomping Tantrum",
-        "Protect",
-        "Helping Hand",
-        "Rock Slide"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "F",
-      "level": 91,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Fire"
-    }
-  ],
-  "p2Team": [
-    {
-      "name": "Heracross",
-      "species": "Heracross",
-      "item": "Choice Band",
-      "ability": "Moxie",
-      "moves": [
-        "Close Combat",
-        "Rock Slide",
-        "Knock Off",
-        "Megahorn"
+        "Play Rough",
+        "Shadow Sneak",
+        "Shadow Claw",
+        "Swords Dance"
       ],
       "nature": "",
       "evs": {
@@ -217,166 +193,144 @@
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Bug"
-    },
+      "teraType": "Ghost"
+    }
+  ],
+  "p2Team": [
     {
-      "name": "Espeon",
-      "species": "Espeon",
-      "item": "Life Orb",
-      "ability": "Magic Bounce",
+      "name": "Lugia",
+      "species": "Lugia",
+      "item": "Leftovers",
+      "ability": "Multiscale",
       "moves": [
-        "Protect",
-        "Psychic",
-        "Shadow Ball",
-        "Alluring Voice"
+        "Calm Mind",
+        "Aeroblast",
+        "Earth Power",
+        "Recover"
       ],
       "nature": "",
       "evs": {
         "hp": 85,
         "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 71,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Beartic",
+      "species": "Beartic",
+      "item": "Life Orb",
+      "ability": "Slush Rush",
+      "moves": [
+        "Icicle Crash",
+        "Close Combat",
+        "Protect",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
         "def": 85,
         "spa": 85,
         "spd": 85,
         "spe": 85
       },
       "gender": "F",
-      "ivs": {
-        "hp": 31,
-        "atk": 0,
-        "def": 31,
-        "spa": 31,
-        "spd": 31,
-        "spe": 31
-      },
-      "level": 84,
+      "level": 91,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Fairy"
+      "teraType": "Fighting"
     },
     {
-      "name": "Magnezone",
-      "species": "Magnezone",
-      "item": "Sitrus Berry",
-      "ability": "Magnet Pull",
+      "name": "Cinccino",
+      "species": "Cinccino",
+      "item": "Loaded Dice",
+      "ability": "Technician",
       "moves": [
+        "Triple Axel",
         "Protect",
-        "Flash Cannon",
-        "Thunderbolt",
-        "Electroweb"
+        "Tail Slap",
+        "Bullet Seed"
       ],
       "nature": "",
       "evs": {
         "hp": 85,
-        "atk": 0,
+        "atk": 85,
         "def": 85,
         "spa": 85,
         "spd": 85,
         "spe": 85
       },
-      "gender": "N",
-      "ivs": {
-        "hp": 31,
-        "atk": 0,
-        "def": 31,
-        "spa": 31,
-        "spd": 31,
-        "spe": 31
-      },
-      "level": 84,
+      "gender": "F",
+      "level": 85,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Flying"
+      "teraType": "Ice"
     },
     {
-      "name": "Chandelure",
-      "species": "Chandelure",
-      "item": "Life Orb",
-      "ability": "Flash Fire",
+      "name": "Weavile",
+      "species": "Weavile",
+      "item": "Choice Band",
+      "ability": "Pickpocket",
       "moves": [
-        "Shadow Ball",
-        "Protect",
-        "Energy Ball",
-        "Heat Wave"
+        "Triple Axel",
+        "Ice Shard",
+        "Low Kick",
+        "Knock Off"
       ],
       "nature": "",
       "evs": {
         "hp": 85,
-        "atk": 0,
+        "atk": 85,
         "def": 85,
         "spa": 85,
         "spd": 85,
         "spe": 85
       },
-      "gender": "M",
-      "ivs": {
-        "hp": 31,
-        "atk": 0,
-        "def": 31,
-        "spa": 31,
-        "spd": 31,
-        "spe": 31
-      },
+      "gender": "F",
       "level": 81,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Grass"
+      "teraType": "Fighting"
     },
     {
-      "name": "Shaymin",
-      "species": "Shaymin",
+      "name": "Ampharos",
+      "species": "Ampharos",
       "item": "Sitrus Berry",
-      "ability": "Natural Cure",
+      "ability": "Static",
       "moves": [
-        "Earth Power",
-        "Tailwind",
-        "Seed Flare",
-        "Synthesis"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 0,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "N",
-      "ivs": {
-        "hp": 31,
-        "atk": 0,
-        "def": 31,
-        "spa": 31,
-        "spd": 31,
-        "spe": 31
-      },
-      "level": 81,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Steel"
-    },
-    {
-      "name": "Mudsdale",
-      "species": "Mudsdale",
-      "item": "Chesto Berry",
-      "ability": "Stamina",
-      "moves": [
-        "High Horsepower",
-        "Stone Edge",
-        "Body Press",
-        "Rest"
+        "Dragon Tail",
+        "Helping Hand",
+        "Electroweb",
+        "Thunderbolt"
       ],
       "nature": "",
       "evs": {
@@ -388,53 +342,86 @@
         "spe": 85
       },
       "gender": "M",
-      "level": 84,
+      "level": 86,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Fighting"
+      "teraType": "Flying"
+    },
+    {
+      "name": "Annihilape",
+      "species": "Annihilape",
+      "item": "Leftovers",
+      "ability": "Defiant",
+      "moves": [
+        "Drain Punch",
+        "Bulk Up",
+        "Rage Fist",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
     }
   ],
   "inputLog": [
     ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"106,197,288,469\"}",
-    ">player p1 {\"name\":\"Player1\",\"team\":\"Goodra||AssaultVest|SapSipper|dracometeor,scald,fireblast,thunderbolt||85,,85,85,85,85|F|,0,,,,||86|,,,,,Fire]Ogerpon|OgerponHearthflame|HearthflameMask|MoldBreaker|swordsdance,ivycudgel,spikyshield,powerwhip||85,85,85,85,85,85|F|||74|,,,,,Fire]Eelektross||ChoiceSpecs|Levitate|thunderbolt,uturn,gigadrain,flamethrower||85,85,85,85,85,85|M|||86|,,,,,Poison]Meowstic||LightClay|Prankster|reflect,psychic,lightscreen,fakeout||85,85,85,85,85,85|M|||88|,,,,,Steel]Jumpluff|||Infiltrator|encore,acrobatics,tailwind,sleeppowder||85,85,85,85,85,85|F|||92|,,,,,Steel]Dugtrio||LifeOrb|ArenaTrap|stompingtantrum,protect,helpinghand,rockslide||85,85,85,85,85,85|F|||91|,,,,,Fire\"}",
-    ">player p2 {\"name\":\"Player2\",\"team\":\"Heracross||ChoiceBand|Moxie|closecombat,rockslide,knockoff,megahorn||85,85,85,85,85,85|F|||82|,,,,,Bug]Espeon||LifeOrb|MagicBounce|protect,psychic,shadowball,alluringvoice||85,,85,85,85,85|F|,0,,,,||84|,,,,,Fairy]Magnezone||SitrusBerry|MagnetPull|protect,flashcannon,thunderbolt,electroweb||85,,85,85,85,85|N|,0,,,,||84|,,,,,Flying]Chandelure||LifeOrb|FlashFire|shadowball,protect,energyball,heatwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Grass]Shaymin||SitrusBerry|NaturalCure|earthpower,tailwind,seedflare,synthesis||85,,85,85,85,85|N|,0,,,,||81|,,,,,Steel]Mudsdale||ChestoBerry|Stamina|highhorsepower,stoneedge,bodypress,rest||85,85,85,85,85,85|M|||84|,,,,,Fighting\"}",
-    ">p1 move fireblast +2, move ivycudgel +2",
-    ">p2 move megahorn +2, move psychic +2",
-    ">p1 pass, switch 4",
-    ">p1 move thunderbolt +1, move lightscreen",
-    ">p2 move megahorn +2, move protect",
-    ">p1 move scald +2, move psychic +1",
-    ">p2 move megahorn +1, move psychic +2",
-    ">p1 switch 6, pass",
-    ">p1 move helpinghand -2, move fakeout +1",
-    ">p2 move megahorn +2, move alluringvoice +1",
-    ">p1 pass, switch 5",
-    ">p1 move protect, move encore +2",
-    ">p2 move megahorn +1, move shadowball +2",
-    ">p1 move stompingtantrum +1, move encore +2",
-    ">p2 move megahorn +2, move psychic +1",
-    ">p2 switch 6, switch 5",
-    ">p1 move protect, move tailwind",
-    ">p2 move bodypress +2, move tailwind",
-    ">p1 move rockslide, move acrobatics +2",
-    ">p2 move rest, move tailwind",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Appletun||Leftovers|ThickFat|protect,dragonpulse,appleacid,leechseed||85,,85,85,85,85|M|,0,,,,||92|,,,,,Steel]Minior|MiniorIndigo|WhiteHerb|ShieldsDown|shellsmash,acrobatics,rockslide,protect||69,85,85,85,85,85|N|||83|,,,,,Flying]Vespiquen||Leftovers|Unnerve|toxicspikes,roost,hurricane,pollenpuff||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel]Skuntank||LifeOrb|Aftermath|taunt,gunkshot,fireblast,knockoff||85,85,85,85,85,85|M|||85|,,,,,Dark]Granbull||AssaultVest|Intimidate|superfang,closecombat,playrough,stompingtantrum||85,85,85,85,85,85|M|||88|,,,,,Steel]Mimikyu||LifeOrb|Disguise|playrough,shadowsneak,shadowclaw,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Lugia||Leftovers|Multiscale|calmmind,aeroblast,earthpower,recover||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Beartic||LifeOrb|SlushRush|iciclecrash,closecombat,protect,aquajet||85,85,85,85,85,85|F|||91|,,,,,Fighting]Cinccino||LoadedDice|Technician|tripleaxel,protect,tailslap,bulletseed||85,85,85,85,85,85|F|||85|,,,,,Ice]Weavile||ChoiceBand|Pickpocket|tripleaxel,iceshard,lowkick,knockoff||85,85,85,85,85,85|F|||81|,,,,,Fighting]Ampharos||SitrusBerry|Static|dragontail,helpinghand,electroweb,thunderbolt||85,85,85,85,85,85|M|||86|,,,,,Flying]Annihilape||Leftovers|Defiant|drainpunch,bulkup,ragefist,protect||85,85,85,85,85,85|M|||77|,,,,,Fire\"}",
+    ">p1 move appleacid +2, move shellsmash",
+    ">p2 move recover, move protect",
+    ">p1 move dragonpulse +1, move shellsmash",
+    ">p2 move calmmind, move iciclecrash +2",
+    ">p1 pass, switch 6",
+    ">p1 move protect, move shadowsneak +2",
+    ">p2 move earthpower +1, move aquajet +1",
+    ">p1 move leechseed +2, move shadowsneak +1",
+    ">p2 move aeroblast +2, move iciclecrash +1",
+    ">p1 switch 4, pass",
+    ">p1 move fireblast +1, move playrough +1",
+    ">p2 move earthpower +1, move protect",
+    ">p1 move taunt +1, move shadowclaw +2",
+    ">p2 move recover, move closecombat +1",
     ">p1 switch 3, pass",
-    ">p1 move flamethrower +2, move sleeppowder +2",
-    ">p2 move stoneedge +2, move earthpower +2",
+    ">p1 move toxicspikes, move swordsdance",
+    ">p2 move aeroblast +2, move protect",
+    ">p1 move toxicspikes, move shadowsneak +1",
+    ">p2 move earthpower +1, move closecombat +1",
+    ">p1 pass, switch 5",
     ">p2 pass, switch 3",
-    ">p1 move flamethrower +1, move tailwind",
-    ">p2 move rest, move thunderbolt +1",
-    ">p1 move flamethrower +2, move acrobatics +2",
-    ">p2 move highhorsepower +1, move electroweb",
-    ">p1 move flamethrower +2, pass",
-    ">p2 move rest, move electroweb",
+    ">p1 move roost, move playrough +2",
+    ">p2 move aeroblast +1, move protect",
+    ">p1 move hurricane +2, move playrough +1",
+    ">p2 move aeroblast +1, move bulletseed +1",
+    ">p1 move hurricane +2, move stompingtantrum +2",
+    ">p2 move earthpower +2, move protect",
+    ">p2 pass, switch 5",
+    ">p1 move hurricane +1, move superfang +2",
+    ">p2 move calmmind, move thunderbolt +1",
+    ">p1 pass, move stompingtantrum +2",
+    ">p2 move recover, move electroweb",
+    ">p1 pass, move stompingtantrum +1",
+    ">p2 move aeroblast +2, move dragontail +2",
     ">p2 pass, switch 4",
-    ">p1 move flamethrower +2, pass",
-    ">p2 move highhorsepower +2, move energyball +2",
-    ">p1 move flamethrower +2, pass",
-    ">p2 move stoneedge +2, move energyball +1"
+    ">p1 pass, move playrough +1",
+    ">p2 move recover, move lowkick +1",
+    ">p1 pass, move superfang +2",
+    ">p2 move aeroblast +2, move lowkick +2"
   ]
 }

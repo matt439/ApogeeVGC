@@ -1,40 +1,41 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"365,678,991,1616"}
->player p1 {"name":"Player1","team":"Necrozma|NecrozmaDawnWings|PowerHerb|PrismArmor|meteorbeam,trickroom,photongeyser,moongeistbeam||85,,85,85,85,|N|,0,,,,0||74|,,,,,Dark]Sawsbuck|SawsbuckWinter|LifeOrb|SapSipper|highhorsepower,swordsdance,hornleech,doubleedge||85,85,85,85,85,85|F|||91|,,,,,Normal]Magnezone||AssaultVest|MagnetPull|electroweb,thunderbolt,voltswitch,flashcannon||85,,85,85,85,85|N|,0,,,,||84|,,,,,Flying]Rotom|RotomWash|SitrusBerry|Levitate|hydropump,thunderbolt,protect,electroweb||85,,85,85,85,85|N|,0,,,,||83|,,,,,Electric]Gliscor||ToxicOrb|PoisonHeal|dualwingbeat,tailwind,protect,highhorsepower||85,85,85,85,85,85|F|||81|,,,,,Water]Cresselia||SitrusBerry|Levitate|icywind,psychic,lunarblessing,helpinghand||85,,85,85,85,85|F|,0,,,,||80|,,,,,Poison"}
->player p2 {"name":"Player2","team":"Zekrom||ClearAmulet|Teravolt|dragonclaw,dragondance,boltstrike,protect||85,85,85,85,85,85|N|||74|,,,,,Dragon]Dondozo||AssaultVest|Unaware|heavyslam,bodypress,avalanche,wavecrash||85,85,85,85,85,85|M|||85|,,,,,Steel]Venomoth||LifeOrb|TintedLens|sludgebomb,quiverdance,bugbuzz,protect||85,,85,85,85,85|F|,0,,,,||90|,,,,,Water]Seviper||LifeOrb|ShedSkin|flamethrower,knockoff,protect,gunkshot||85,85,85,85,85,85|M|||96|,,,,,Fire]Hitmonchan||SitrusBerry|InnerFocus|closecombat,poisonjab,coaching,fakeout||85,85,85,85,85,85|M|||90|,,,,,Poison]Torkoal||SitrusBerry|Drought|solarbeam,willowisp,protect,fireblast||85,,85,85,85,85|F|,0,,,,||86|,,,,,Dragon"}
->p1 move trickroom, move doubleedge +1
->p2 move dragonclaw +2, move avalanche +2
->p1 move meteorbeam +1, move swordsdance
->p2 move protect, move wavecrash +1
->p1 move moongeistbeam +1, move doubleedge +2
->p2 move protect, move bodypress +2
->p1 pass, switch 6
->p1 move trickroom, move psychic +1
->p2 move protect, move heavyslam +2
->p1 move moongeistbeam +1, move helpinghand -1
->p2 move boltstrike +1, move bodypress +2
+>player p1 {"name":"Player1","team":"Milotic||SitrusBerry|Competitive|scald,dragontail,protect,icywind||85,85,85,85,85,85|M|||81|,,,,,Grass]Banette||LifeOrb|Frisk|gunkshot,shadowsneak,poltergeist,protect||85,85,85,85,85,85|F|||94|,,,,,Poison]Exeggutor||SitrusBerry|Harvest|protect,psychic,leafstorm,trickroom||85,,85,85,85,|F|,0,,,,0||87|,,,,,Poison]Squawkabilly||LifeOrb|Intimidate|doubleedge,bravebird,quickattack,protect||85,85,85,85,85,85|M|||91|,,,,,Flying]Porygon-Z||LifeOrb|Adaptability|protect,terablast,shadowball,nastyplot||85,,85,85,85,85|N|,0,,,,||84|,,,,,Fighting]Beartic||LifeOrb|SwiftSwim|iciclecrash,protect,aquajet,closecombat||85,85,85,85,85,85|F|||91|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Garganacl||Leftovers|PurifyingSalt|stealthrock,protect,recover,saltcure||85,85,85,85,85,85|F|||81|,,,,,Ghost]Dedenne||SitrusBerry|CheekPouch|helpinghand,thunderbolt,nuzzle,dazzlinggleam||85,85,85,85,85,85|F|||85|,,,,,Flying]Qwilfish|QwilfishHisui|Eviolite|Intimidate|icywind,throatchop,toxicspikes,gunkshot||85,85,85,85,85,85|M|||82|,,,,,Flying]Palossand||Leftovers|WaterCompaction|earthpower,shadowball,protect,shoreup||85,,85,85,85,85|M|,0,,,,||90|,,,,,Water]Oinkologne||ChoiceBand|ThickFat|doubleedge,highhorsepower,lashout,bodyslam||85,85,85,85,85,85|M|||92|,,,,,Ghost]Medicham||ChoiceScarf|PurePower|icepunch,closecombat,zenheadbutt,poisonjab||85,85,85,85,85,85|M|||86|,,,,,Fire"}
+>p1 move scald +1, move poltergeist +1
+>p2 move stealthrock, move dazzlinggleam
+>p1 move protect, move gunkshot +2
+>p2 move recover, move dazzlinggleam
+>p2 pass, switch 6
+>p1 move protect, move shadowsneak +1
+>p2 move protect, move poisonjab +1
+>p1 move icywind, move shadowsneak +1
+>p2 move protect, move poisonjab +2
+>p1 move dragontail +1, move gunkshot +2
+>p2 move saltcure +2, move poisonjab +2
+>p1 switch 4, switch 6
+>p1 move quickattack +2, move closecombat +2
+>p2 move doubleedge +1, move poisonjab +2
 >p1 switch 5, pass
->p1 move protect, move helpinghand -1
->p2 move dragondance, move heavyslam +2
->p1 move protect, move icywind
->p2 move dragonclaw +2, move wavecrash +1
->p2 switch 4, pass
->p1 move dualwingbeat +2, move helpinghand -1
->p2 move knockoff +2, move wavecrash +1
->p1 move dualwingbeat +2, move lunarblessing
->p2 move knockoff +1, move wavecrash +2
+>p2 switch 4, switch 5
+>p1 move protect, move protect
+>p2 move protect, move protect
+>p1 move terablast +1, move aquajet +1
+>p2 move earthpower +2, move recover
 >p1 pass, switch 3
->p1 move dualwingbeat +1, move thunderbolt +2
->p2 move knockoff +1, move heavyslam +1
->p1 switch 4, pass
+>p1 move protect, move psychic +1
+>p2 move earthpower +1, move stealthrock
+>p1 move terablast +2, move psychic +1
+>p2 move protect, move stealthrock
+>p1 move nastyplot, move protect
+>p2 move shadowball +1, move saltcure +1
+>p1 move nastyplot, move psychic +2
+>p2 move earthpower +1, move protect
+>p1 pass, move trickroom
+>p2 move shoreup, move protect
+>p1 pass, move leafstorm +2
+>p2 move shoreup, move stealthrock
 >p2 pass, switch 3
->p1 move thunderbolt +1, move thunderbolt +1
->p2 move protect, move quiverdance
->p1 move hydropump +1, move thunderbolt +2
->p2 move flamethrower +2, move bugbuzz +2
->p2 switch 6, pass
->p1 move electroweb, move flashcannon +2
->p2 move protect, move bugbuzz +2
->p1 move electroweb, pass
->p2 move solarbeam +2, move protect
->p1 move hydropump +2, pass
->p2 move willowisp +2, move sludgebomb +2
+>p1 pass, move psychic +2
+>p2 move shoreup, move toxicspikes
+>p1 pass, move trickroom
+>p2 move shadowball +2, move throatchop +1

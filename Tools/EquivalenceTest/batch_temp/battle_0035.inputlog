@@ -1,42 +1,65 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"246,457,668,1089"}
->player p1 {"name":"Player1","team":"Rhyperior||ChoiceBand|SolidRock|highhorsepower,rockslide,megahorn,icepunch||85,85,85,85,85,85|M|||82|,,,,,Water]Cacturne||LifeOrb|WaterAbsorb|leafstorm,knockoff,suckerpunch,spikyshield||85,85,85,85,85,85|F|||91|,,,,,Poison]Skarmory||Leftovers|Sturdy|irondefense,bravebird,bodypress,roost||85,85,85,85,85,85|M|||85|,,,,,Fighting]Azelf||LifeOrb|Levitate|protect,psychic,dazzlinggleam,nastyplot||85,,85,85,85,85|N|,0,,,,||83|,,,,,Fairy]Cetitan||LifeOrb|SheerForce|iceshard,highhorsepower,iciclecrash,liquidation||85,85,85,85,85,85|F|||83|,,,,,Ground]Pikachu|PikachuUnova|LightBall|LightningRod|fakeout,protect,knockoff,volttackle||85,85,85,85,85,85|F|||94|,,,,,Grass"}
->player p2 {"name":"Player2","team":"Forretress||ChoiceBand|Sturdy|bodypress,ironhead,explosion,lunge||85,85,85,85,85,85|F|||90|,,,,,Fire]Copperajah||AssaultVest|HeavyMetal|heavyslam,stoneedge,heatcrash,highhorsepower||85,85,85,85,85,85|F|||86|,,,,,Fire]Lugia||Leftovers|Multiscale|aeroblast,earthpower,recover,calmmind||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Miraidon||LifeOrb|HadronEngine|protect,dragonpulse,voltswitch,electrodrift||85,,85,85,85,85|N|,0,,,,||65|,,,,,Electric]Drifblim||SitrusBerry|Unburden|willowisp,strengthsap,tailwind,shadowball||85,,85,85,85,85|M|,0,,,,||85|,,,,,Fairy]Galvantula||SitrusBerry|CompoundEyes|thunder,bugbuzz,stickyweb,voltswitch||85,,85,85,85,85|F|,0,,,,||85|,,,,,Electric"}
->p1 move highhorsepower +1, move leafstorm +2
->p2 move explosion, move heatcrash +1
->p2 switch 4, switch 6
->p1 move highhorsepower +1, move spikyshield
->p2 move voltswitch +1, move thunder +2
+>player p1 {"name":"Player1","team":"Gliscor||ToxicOrb|PoisonHeal|toxicspikes,dualwingbeat,highhorsepower,protect||85,85,85,85,85,85|F|||81|,,,,,Water]Flareon||ToxicOrb|Guts|quickattack,facade,flareblitz,protect||85,85,85,85,85,85|F|||90|,,,,,Normal]Raichu|RaichuAlola|ChoiceSpecs|SurgeSurfer|alluringvoice,psychic,thunderbolt,voltswitch||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fairy]Lapras||SitrusBerry|WaterAbsorb|freezedry,lifedew,muddywater,icywind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Dodrio||ChoiceBand|EarlyBird|bravebird,drillrun,quickattack,doubleedge||85,85,85,85,85,85|M|||85|,,,,,Ground]Iron Valiant||LifeOrb|QuarkDrive|encore,dazzlinggleam,protect,closecombat||85,85,85,85,85,85|N|||79|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Veluza||ChoiceBand|Sharpness|psychocut,nightslash,aquajet,aquacutter||85,85,85,85,85,85|F|||88|,,,,,Dark]Magnezone||SitrusBerry|MagnetPull|protect,flashcannon,electroweb,thunderbolt||85,,85,85,85,85|N|,0,,,,||84|,,,,,Flying]Snorlax||WikiBerry|Gluttony|yawn,helpinghand,highhorsepower,bodyslam||85,85,85,85,85,85|M|||84|,,,,,Ghost]Oricorio|OricorioPomPom|Leftovers|Dancer|quiverdance,protect,revelationdance,airslash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Lycanroc|LycanrocMidnight|ChoiceBand|NoGuard|rockslide,knockoff,closecombat,stoneedge||85,85,85,85,85,85|M|||84|,,,,,Fighting]Gliscor||ToxicOrb|PoisonHeal|knockoff,dualwingbeat,highhorsepower,protect||85,85,85,85,85,85|F|||81|,,,,,Water"}
+>p1 move protect, move protect
+>p2 move aquajet +2, move electroweb
+>p1 move highhorsepower +1, move protect
+>p2 move aquajet +2, move protect
+>p1 move highhorsepower +1, move flareblitz +2
+>p2 move aquajet +2, move flashcannon +1
+>p1 pass, switch 3
+>p1 move highhorsepower +1, move alluringvoice +1
+>p2 move aquajet +2, move flashcannon +2
 >p2 switch 3, pass
->p1 move highhorsepower +2, move leafstorm +2
->p2 move calmmind, move stickyweb
+>p1 move protect, move alluringvoice +1
+>p2 move yawn +2, move electroweb
+>p1 move protect, move alluringvoice +1
+>p2 move highhorsepower +2, move thunderbolt +1
+>p1 pass, switch 4
+>p1 move toxicspikes, move freezedry +1
+>p2 move highhorsepower +2, move protect
+>p1 move dualwingbeat +1, move icywind
+>p2 move bodyslam +1, move thunderbolt +1
+>p1 move protect, move icywind
+>p2 move highhorsepower +1, move electroweb
+>p1 move protect, move lifedew
+>p2 move highhorsepower +2, move protect
+>p1 move highhorsepower +1, move muddywater
+>p2 move helpinghand -2, move protect
+>p2 switch 5, pass
+>p1 move highhorsepower +2, move muddywater
+>p2 move stoneedge +1, move thunderbolt +2
+>p2 pass, switch 4
+>p1 move highhorsepower +2, move lifedew
+>p2 move stoneedge +2, move airslash +2
 >p1 pass, switch 5
->p2 pass, switch 5
->p1 move highhorsepower +1, move liquidation +1
->p2 move aeroblast +2, move tailwind
->p1 move highhorsepower +1, move highhorsepower +2
->p2 move recover, move strengthsap +2
->p1 move highhorsepower +1, move iceshard +2
->p2 move earthpower +2, move tailwind
->p1 move highhorsepower +1, move iciclecrash +1
->p2 move calmmind, move strengthsap +1
->p1 move highhorsepower +1, move liquidation +2
->p2 move recover, move tailwind
->p1 move highhorsepower +1, move highhorsepower +1
->p2 move aeroblast +1, move strengthsap +1
->p1 move highhorsepower +1, move iciclecrash +1
->p2 move calmmind, move strengthsap +2
->p1 move highhorsepower +1, move iciclecrash +1
->p2 move aeroblast +1, move tailwind
->p1 move highhorsepower +1, move highhorsepower +1
->p2 pass, move willowisp +1
->p1 switch 4, pass
->p1 move nastyplot, move highhorsepower +2
->p2 pass, move willowisp +1
->p1 move protect, move iciclecrash +2
->p2 pass, move willowisp +1
->p1 move protect, move iceshard +1
->p2 pass, move willowisp +2
->p1 move protect, move iceshard +2
->p2 pass, move tailwind
->p1 move dazzlinggleam, move iceshard +2
->p2 pass, move shadowball +2
+>p1 move protect, move drillrun +1
+>p2 move stoneedge +2, move quiverdance
+>p2 switch 6, pass
+>p1 move toxicspikes, move drillrun +1
+>p2 move knockoff +1, move quiverdance
+>p1 move protect, move drillrun +1
+>p2 move knockoff +2, move revelationdance +1
+>p1 move toxicspikes, move bravebird +1
+>p2 move highhorsepower +1, move revelationdance +1
+>p1 move highhorsepower +1, move drillrun +2
+>p2 move dualwingbeat +2, move airslash +2
+>p1 pass, switch 6
+>p1 move highhorsepower +2, move encore +2
+>p2 move knockoff +1, move quiverdance
+>p1 move highhorsepower +2, move protect
+>p2 move knockoff +1, move quiverdance
+>p1 move toxicspikes, move encore +1
+>p2 move highhorsepower +2, move quiverdance
+>p1 move protect, move dazzlinggleam
+>p2 move knockoff +2, move quiverdance
+>p1 move dualwingbeat +1, move closecombat +2
+>p2 move knockoff +2, move quiverdance
+>p1 move highhorsepower +2, move closecombat +1
+>p2 move knockoff +1, move quiverdance
+>p1 move dualwingbeat +1, move protect
+>p2 move dualwingbeat +1, move revelationdance +2
+>p1 move highhorsepower +1, move protect
+>p2 move knockoff +1, move airslash +1
+>p1 pass, move protect
+>p2 move dualwingbeat +2, move revelationdance +1

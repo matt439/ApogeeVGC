@@ -1,61 +1,42 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"8,15,22,35"}
->player p1 {"name":"Player1","team":"Latias||SoulDew|Levitate|mistball,protect,calmmind,dragonpulse||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Miraidon||ChoiceSpecs|HadronEngine|dracometeor,overheat,voltswitch,electrodrift||85,,85,85,85,85|N|,0,,,,||65|,,,,,Electric]Weavile||ChoiceBand|Pickpocket|knockoff,tripleaxel,lowkick,iceshard||85,85,85,85,85,85|F|||81|,,,,,Fighting]Incineroar||HeavyDutyBoots|Intimidate|knockoff,partingshot,fakeout,flareblitz||85,85,85,85,85,85|M|||78|,,,,,Water]Sinistcha||RockyHelmet|Hospitality|lifedew,matchagotcha,ragepowder,trickroom||85,,85,85,85,|N|,0,,,,0||81|,,,,,Fairy]Gyarados||SitrusBerry|Intimidate|helpinghand,waterfall,icywind,taunt||85,85,85,85,85,85|F|||80|,,,,,Ground"}
->player p2 {"name":"Player2","team":"Whimsicott||SitrusBerry|Prankster|tailwind,encore,taunt,moonblast||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fire]Cobalion||Leftovers|Justified|protect,heavyslam,bodypress,irondefense||85,85,85,85,85,85|N|||79|,,,,,Water]Kleavor||LifeOrb|Sharpness|stoneaxe,tailwind,xscissor,protect||85,85,85,85,85,85|M|||79|,,,,,Bug]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Water]Persian||SilkScarf|Technician|icywind,knockoff,fakeout,doubleedge||85,85,85,85,85,85|F|||92|,,,,,Normal]Flareon||ToxicOrb|Guts|facade,quickattack,protect,flareblitz||85,85,85,85,85,85|F|||90|,,,,,Normal"}
->p1 move protect, move dracometeor +2
->p2 move taunt +1, move irondefense
->p1 move protect, move dracometeor +2
->p2 move tailwind, move protect
->p1 move dragonpulse +2, move dracometeor +1
->p2 move taunt +2, move heavyslam +1
->p1 move calmmind, move dracometeor +2
->p2 move tailwind, move heavyslam +1
->p1 switch 6, pass
->p1 move taunt +1, move dracometeor +2
->p2 move encore +2, move irondefense
->p1 move icywind, move dracometeor +2
->p2 move moonblast +2, move heavyslam +2
->p1 move taunt +1, move dracometeor +1
->p2 move moonblast +2, move bodypress +1
+>player p1 {"name":"Player1","team":"Altaria||SitrusBerry|NaturalCure|bravebird,dracometeor,willowisp,tailwind||85,85,85,85,85,85|F|||91|,,,,,Steel]Iron Valiant||LifeOrb|QuarkDrive|protect,dazzlinggleam,knockoff,closecombat||85,85,85,85,85,85|N|||79|,,,,,Fairy]Sneasler||WhiteHerb|Unburden|swordsdance,direclaw,closecombat,protect||85,85,85,85,85,85|M|||77|,,,,,Poison]Kingdra||LifeOrb|SwiftSwim|dracometeor,raindance,protect,wavecrash||85,85,85,85,85,85|F|||85|,,,,,Water]Ogerpon||LifeOrb|Defiant|knockoff,superpower,ivycudgel,spikyshield||85,85,85,85,85,85|F|||78|,,,,,Grass]Electivire||AssaultVest|MotorDrive|icepunch,wildcharge,electroweb,knockoff||85,85,85,85,85,85|M|||86|,,,,,Flying"}
+>player p2 {"name":"Player2","team":"Metagross||AssaultVest|ClearBody|heavyslam,psychicfangs,knockoff,stompingtantrum||85,85,85,85,85,85|N|||80|,,,,,Dark]Shiftry||FocusSash|WindRider|knockoff,tailwind,leafblade,fakeout||85,85,85,85,85,85|M|||84|,,,,,Ghost]Volcanion||AssaultVest|WaterAbsorb|steameruption,heatwave,sludgebomb,earthpower||85,,85,85,85,85|N|,0,,,,||75|,,,,,Ground]Wugtrio||ChoiceBand|Gooey|aquajet,throatchop,liquidation,stompingtantrum||85,85,85,85,85,85|F|||92|,,,,,Dark]Toedscruel||SitrusBerry|MyceliumMight|knockoff,earthpower,spore,ragepowder||85,85,85,85,85,85|M|||87|,,,,,Water]Electrode||SitrusBerry|Static|voltswitch,helpinghand,thunderbolt,electroweb||85,,85,85,85,85|N|,0,,,,||89|,,,,,Flying"}
+>p1 move tailwind, move closecombat +2
+>p2 move psychicfangs +1, move leafblade +1
+>p1 move dracometeor +1, move protect
+>p2 move psychicfangs +1, move tailwind
+>p1 move willowisp +2, move dazzlinggleam
+>p2 move knockoff +1, move tailwind
+>p2 pass, switch 5
+>p1 move tailwind, move closecombat +1
+>p2 move heavyslam +2, move ragepowder
+>p1 pass, switch 6
+>p1 move willowisp +2, move knockoff +2
+>p2 move psychicfangs +2, move ragepowder
+>p1 move bravebird +1, move icepunch +1
+>p2 move knockoff +2, move knockoff +1
+>p1 move tailwind, move icepunch +1
+>p2 move knockoff +2, move knockoff +1
+>p2 switch 3, pass
+>p1 move tailwind, move wildcharge +2
+>p2 move earthpower +2, move earthpower +2
 >p1 pass, switch 4
->p1 move icywind, move fakeout +2
->p2 move moonblast +2, move bodypress +2
->p1 move icywind, move fakeout +2
->p2 move moonblast +1, move protect
->p1 move waterfall +2, move fakeout +1
->p2 move encore +1, move irondefense
->p1 move icywind, move fakeout +1
->p2 move encore +2, move protect
->p1 move icywind, move fakeout +2
->p2 move taunt +1, move bodypress +2
->p1 pass, switch 5
->p1 move waterfall +1, move matchagotcha
->p2 move encore +2, move protect
->p2 switch 5, pass
->p1 move icywind, move matchagotcha
->p2 move fakeout +2, move protect
->p1 move icywind, move lifedew
->p2 move fakeout +1, move protect
->p1 move taunt +1, move lifedew
->p2 move fakeout +2, move protect
->p1 move taunt +1, move matchagotcha
->p2 move doubleedge +2, move heavyslam +2
->p2 pass, switch 3
->p1 move waterfall +1, move ragepowder
->p2 move doubleedge +1, move xscissor +2
->p2 switch 4, pass
->p1 move taunt +1, move matchagotcha
->p2 move trickroom, move tailwind
->p1 move waterfall +2, move ragepowder
->p2 move matchagotcha, move protect
->p1 move taunt +1, move matchagotcha
->p2 move matchagotcha, move xscissor +2
->p1 pass, switch 3
->p1 move icywind, move knockoff +2
->p2 move matchagotcha, move protect
->p1 move helpinghand -2, move knockoff +2
->p2 move trickroom, move stoneaxe +1
+>p1 move willowisp +1, move protect
+>p2 move steameruption +2, move earthpower +2
 >p2 pass, switch 6
->p1 move waterfall +2, move knockoff +2
->p2 move trickroom, move flareblitz +1
->p1 pass, move knockoff +2
->p2 move matchagotcha, move protect
+>p1 move willowisp +2, move wavecrash +2
+>p2 move steameruption +2, move voltswitch +1
+>p2 pass, switch 4
+>p1 switch 5, pass
+>p1 move superpower +2, move raindance
+>p2 move steameruption +1, move aquajet +2
+>p1 move superpower +1, move protect
+>p2 move sludgebomb +1, move aquajet +1
+>p1 switch 3, pass
+>p1 move direclaw +1, move dracometeor +2
+>p2 move heatwave, move aquajet +2
+>p2 pass, switch 4
+>p1 move direclaw +1, pass
+>p2 move sludgebomb +1, move thunderbolt +2
+>p1 move closecombat +2, pass
+>p2 move steameruption +1, move voltswitch +2

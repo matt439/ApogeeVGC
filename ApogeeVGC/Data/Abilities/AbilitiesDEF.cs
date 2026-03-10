@@ -837,12 +837,6 @@ public partial record Abilities
                     NoTrace = true,
                     Breakable = true,
                 },
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) =>
-                {
-                    // Trigger the weather check to potentially change forme
-                    // This is implemented via OnStart which calls OnWeatherChange
-                }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     // Trigger the weather change event to potentially change forme
@@ -869,7 +863,7 @@ public partial record Abilities
                                 message: "[msg]");
                         }
                     }
-                }),
+                }, -2),
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (!pokemon.IsActive ||
@@ -1080,12 +1074,6 @@ public partial record Abilities
                     NoEntrain = true,
                     NoTrace = true,
                 },
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) =>
-                {
-                    // Trigger the weather check to potentially change forme
-                    // This is implemented via OnStart which calls OnWeatherChange
-                }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
@@ -1105,7 +1093,7 @@ public partial record Abilities
                     {
                         pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
                     }
-                }),
+                }, -2),
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||

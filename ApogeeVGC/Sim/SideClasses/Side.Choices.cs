@@ -469,9 +469,6 @@ public partial class Side
             }
 
             Choice.ForcedSwitchesLeft--;
-
-            // Clear the switch flag so IsChoiceDone() knows this Pokemon's switch has been handled
-            pokemon.SwitchFlag = false;
         }
 
         // Step 11: Record the switch

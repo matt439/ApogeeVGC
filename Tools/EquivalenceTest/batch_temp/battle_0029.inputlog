@@ -1,40 +1,59 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"204,379,554,903"}
->player p1 {"name":"Player1","team":"Pecharunt||SitrusBerry|PoisonPuppeteer|malignantchain,shadowball,poisongas,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dark]Mienshao||ChoiceBand|InnerFocus|knockoff,tripleaxel,uturn,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Excadrill||AssaultVest|MoldBreaker|highhorsepower,ironhead,rockslide,rapidspin||85,85,85,85,85,85|M|||82|,,,,,Flying]Whiscash||SitrusBerry|Oblivious|icywind,highhorsepower,protect,muddywater||85,85,85,85,85,85|F|||88|,,,,,Fire]Chandelure||ChoiceScarf|FlashFire|shadowball,heatwave,trick,energyball||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Breloom||FocusSash|Technician|closecombat,bulletseed,machpunch,spore||85,85,85,85,85,85|F|||84|,,,,,Fighting"}
->player p2 {"name":"Player2","team":"Oinkologne|OinkologneF|ChoiceBand|ThickFat|bodyslam,doubleedge,lashout,highhorsepower||85,85,85,85,85,85|F|||92|,,,,,Normal]Mienshao||ChoiceBand|InnerFocus|tripleaxel,knockoff,closecombat,uturn||85,85,85,85,85,85|M|||84|,,,,,Steel]Scovillain||SitrusBerry|Chlorophyll|ragepowder,energyball,fireblast,willowisp||85,,85,85,85,85|F|,0,,,,||90|,,,,,Fire]Lucario||LifeOrb|InnerFocus|protect,flashcannon,closecombat,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Milotic||SitrusBerry|Competitive|dragontail,scald,icywind,recover||85,85,85,85,85,85|M|||81|,,,,,Steel]Houndoom||LifeOrb|FlashFire|heatwave,protect,nastyplot,darkpulse||85,,85,85,85,85|M|,0,,,,||86|,,,,,Grass"}
->p1 move poisongas, move uturn +2
->p2 move doubleedge +2, move knockoff +1
->p1 pass, switch 5
->p1 move poisongas, move energyball +1
->p2 move doubleedge +2, move knockoff +1
->p1 switch 4, pass
->p1 move icywind, move energyball +2
->p2 move doubleedge +2, move knockoff +2
->p1 pass, switch 3
->p2 pass, switch 3
->p1 move highhorsepower +1, move rockslide
->p2 move doubleedge +2, move fireblast +2
->p2 switch 4, pass
->p1 move highhorsepower +2, move rapidspin +2
->p2 move closecombat +2, move fireblast +2
->p1 pass, switch 6
->p1 move protect, move spore +2
->p2 move closecombat +1, move energyball +2
->p1 move icywind, move closecombat +2
->p2 move protect, move ragepowder
->p2 pass, switch 6
->p1 move muddywater, move spore +2
->p2 move extremespeed +2, move protect
->p1 move highhorsepower +2, move machpunch +2
->p2 move closecombat +1, move heatwave
+>player p1 {"name":"Player1","team":"Sandslash|SandslashAlola|AssaultVest|SlushRush|ironhead,drillrun,tripleaxel,iceshard||85,85,85,85,85,85|M|||91|,,,,,Water]Ribombee||LifeOrb|ShieldDust|dazzlinggleam,protect,terablast,quiverdance||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ground]Dewgong||SitrusBerry|ThickFat|fakeout,hydropump,icywind,encore||85,85,85,85,85,85|F|||91|,,,,,Grass]Flygon||LoadedDice|Levitate|tailwind,protect,scaleshot,earthpower||85,85,85,85,85,85|F|||83|,,,,,Steel]Mimikyu||LifeOrb|Disguise|shadowclaw,playrough,shadowsneak,swordsdance||85,85,85,85,85,85|M|||82|,,,,,Ghost]Donphan||AssaultVest|Sturdy|rapidspin,iceshard,highhorsepower,stoneedge||85,85,85,85,85,85|M|||87|,,,,,Dragon"}
+>player p2 {"name":"Player2","team":"Cramorant||SitrusBerry|GulpMissile|protect,tailwind,surf,bravebird||85,85,85,85,85,85|M|||86|,,,,,Ground]Ho-Oh||SitrusBerry|Regenerator|bravebird,sacredfire,protect,tailwind||85,85,85,85,85,85|N|||70|,,,,,Ground]Metagross||AssaultVest|ClearBody|heavyslam,stompingtantrum,psychicfangs,bulletpunch||85,85,85,85,85,85|N|||80|,,,,,Water]Giratina||ChestoBerry|Pressure|breakingswipe,thunderwave,rest,shadowball||85,85,85,85,85,85|N|||76|,,,,,Fairy]Regidrago||ChoiceScarf|DragonsMaw|earthpower,dracometeor,dragonclaw,dragonenergy||85,85,85,85,85,85|N|||74|,,,,,Dragon]Revavroom||LifeOrb|Filter|partingshot,ironhead,protect,gunkshot||85,85,85,85,85,85|F|||84|,,,,,Water"}
+>p1 move iceshard +2, move protect
+>p2 move bravebird +1, move tailwind
+>p1 move tripleaxel +2, move dazzlinggleam
+>p2 move bravebird +1, move tailwind
+>p1 move ironhead +2, move protect
+>p2 move bravebird +2, move tailwind
+>p2 pass, switch 5
+>p1 move tripleaxel +2, move terablast +2
+>p2 move protect, move dragonclaw +2
+>p1 move tripleaxel +1, move terablast +2
+>p2 move surf, move dragonclaw +1
+>p1 move tripleaxel +2, move quiverdance
+>p2 move surf, move dragonclaw +1
 >p1 switch 5, pass
->p1 move tripleaxel +1, pass
->p2 move protect, move darkpulse +1
->p1 move tripleaxel +1, pass
->p2 move protect, move darkpulse +2
->p2 switch 5, pass
->p1 move tripleaxel +1, pass
->p2 move recover, pass
->p1 move tripleaxel +2, pass
->p2 move dragontail +2, pass
->p1 move tripleaxel +1, pass
->p2 move icywind, pass
+>p1 move playrough +1, move dazzlinggleam
+>p2 move protect, move dragonclaw +1
+>p2 pass, switch 4
+>p1 move shadowclaw +2, move quiverdance
+>p2 move bravebird +2, move shadowball +1
+>p1 pass, switch 6
+>p1 move swordsdance, move stoneedge +2
+>p2 move protect, move breakingswipe
+>p1 move shadowclaw +1, move rapidspin +2
+>p2 move tailwind, move shadowball +2
+>p2 switch 6, pass
+>p1 move playrough +1, move iceshard +1
+>p2 move protect, move breakingswipe
+>p1 move shadowclaw +2, move rapidspin +2
+>p2 move ironhead +1, move shadowball +1
+>p1 switch 4, pass
+>p1 move earthpower +1, move rapidspin +2
+>p2 move partingshot +1, move thunderwave +2
+>p2 switch 3, pass
+>p1 move protect, move highhorsepower +2
+>p2 move heavyslam +1, move rest
+>p1 move protect, move iceshard +2
+>p2 move stompingtantrum +2, move rest
+>p1 move earthpower +1, move stoneedge +1
+>p2 move stompingtantrum +2, move shadowball +2
+>p1 move tailwind, move highhorsepower +1
+>p2 move bulletpunch +2, move breakingswipe
+>p1 pass, switch 3
+>p1 move earthpower +1, move fakeout +2
+>p2 move bulletpunch +1, move thunderwave +1
+>p1 move earthpower +1, move encore +1
+>p2 move bulletpunch +1, move shadowball +1
+>p1 move tailwind, move icywind
+>p2 pass, move thunderwave +1
+>p1 move protect, move fakeout +2
+>p2 pass, move thunderwave +1
+>p1 move protect, move fakeout +2
+>p2 pass, move thunderwave +1
+>p1 move earthpower +1, move icywind
+>p2 pass, move thunderwave +1
+>p1 move earthpower +1, move icywind
+>p2 pass, move breakingswipe

@@ -404,7 +404,7 @@ public partial class Driver
             }
 
             // Level
-            int level = mon.TryGetProperty("level", out JsonElement lvl) ? lvl.GetInt32() : 50;
+            int level = mon.TryGetProperty("level", out JsonElement lvl) ? lvl.GetInt32() : 100;
 
             // Tera type
             MoveType teraType = default;
@@ -427,6 +427,9 @@ public partial class Driver
                 };
             }
 
+            // Shiny
+            bool shiny = mon.TryGetProperty("shiny", out JsonElement shinyElem) && shinyElem.GetBoolean();
+
             sets.Add(new PokemonSet
             {
                 Name = mon.TryGetProperty("name", out JsonElement nameElem)
@@ -441,6 +444,7 @@ public partial class Driver
                 Level = level,
                 TeraType = teraType,
                 Gender = gender,
+                Shiny = shiny,
             });
         }
 

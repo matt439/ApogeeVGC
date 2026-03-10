@@ -1,56 +1,33 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"50,93,136,221"}
->player p1 {"name":"Player1","team":"Enamorus||LifeOrb|Contrary|superpower,tailwind,protect,playrough||85,85,85,85,85,85|F|||79|,,,,,Fighting]Mismagius||LifeOrb|Levitate|dazzlinggleam,taunt,shadowball,protect||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy]Yanmega||LifeOrb|SpeedBoost|protect,bugbuzz,airslash,terablast||85,,85,85,85,85|F|,0,,,,||84|,,,,,Ground]Flygon||SitrusBerry|Levitate|tailwind,earthpower,breakingswipe,protect||85,85,85,85,85,85|F|||83|,,,,,Steel]Grimmsnarl||SitrusBerry|Prankster|spiritbreak,thunderwave,suckerpunch,fakeout||85,85,85,85,85,85|M|||82|,,,,,Steel]Duraludon||Eviolite|Stalwart|snarl,irondefense,flashcannon,bodypress||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fighting"}
->player p2 {"name":"Player2","team":"Palafin||ChoiceBand|ZerotoHero|flipturn,closecombat,jetpunch,wavecrash||85,85,85,85,85,85|F|||79|,,,,,Water]Spiritomb||SitrusBerry|Infiltrator|foulplay,snarl,trickroom,willowisp||85,,85,85,85,|M|,0,,,,0||89|,,,,,Steel]Bombirdier||LifeOrb|RockyPayload|knockoff,rockslide,protect,bravebird||85,85,85,85,85,85|F|||84|,,,,,Rock]Muk||AssaultVest|PoisonTouch|knockoff,poisonjab,icepunch,shadowsneak||85,85,85,85,85,85|F|||86|,,,,,Dark]Revavroom||LifeOrb|Filter|gunkshot,partingshot,ironhead,protect||85,85,85,85,85,85|M|||84|,,,,,Flying]Electrode|ElectrodeHisui|SitrusBerry|Aftermath|electroweb,leafstorm,thunderbolt,taunt||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel"}
->p1 move protect, move taunt +1
->p2 move jetpunch +1, move willowisp +1
->p1 move playrough +2, move protect
->p2 move jetpunch +2, move trickroom
->p1 move superpower +1, move protect
->p2 move jetpunch +2, move foulplay +1
->p1 move tailwind, move shadowball +1
->p2 move jetpunch +2, move trickroom
+>player p1 {"name":"Player1","team":"Glimmora||FocusSash|ToxicDebris|spikyshield,sludgebomb,mortalspin,earthpower||85,85,85,85,85,85|F|||77|,,,,,Grass]Reuniclus||LifeOrb|MagicGuard|psychic,focusblast,shadowball,trickroom||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fighting]Azelf||ChoiceSpecs|Levitate|fireblast,psychic,uturn,dazzlinggleam||85,85,85,85,85,85|N|||83|,,,,,Fire]Swanna||SitrusBerry|Hydration|tailwind,hydropump,knockoff,bravebird||85,85,85,85,85,85|M|||87|,,,,,Ground]Rayquaza||LifeOrb|AirLock|swordsdance,dragonascent,extremespeed,earthquake||85,85,85,85,85,85|N|||75|,,,,,Normal]Iron Valiant||LifeOrb|QuarkDrive|closecombat,protect,moonblast,encore||85,85,85,85,85,85|N|||79|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Pachirisu||SitrusBerry|VoltAbsorb|thunderbolt,nuzzle,followme,encore||85,85,85,85,85,85|M|||93|,,,,,Flying]Toucannon||SitrusBerry|KeenEye|bravebird,protect,knockoff,tailwind||85,85,85,85,85,85|F|||87|,,,,,Steel]Blaziken||LifeOrb|SpeedBoost|closecombat,protect,overheat,stoneedge||85,85,85,85,85,85|M|||79|,,,,,Stellar]Arceus|ArceusFighting|FistPlate|Multitype|irondefense,snarl,bodypress,recover||85,,85,85,85,85|N|,0,,,,||71|,,,,,Steel]Ceruledge||LifeOrb|WeakArmor|shadowsneak,bitterblade,poltergeist,swordsdance||85,85,85,85,85,85|F|||80|,,,,,Grass]Haxorus||LoadedDice|Unnerve|ironhead,swordsdance,scaleshot,closecombat||85,85,85,85,85,85|M|||84|,,,,,Fighting"}
+>p1 move mortalspin, move focusblast +1
+>p2 move thunderbolt +2, move bravebird +2
+>p1 move mortalspin, move shadowball +2
+>p2 move nuzzle +2, move tailwind
+>p1 move sludgebomb +1, move trickroom
+>p2 move followme, move tailwind
 >p2 switch 6, pass
->p1 move playrough +2, move protect
->p2 move electroweb, move foulplay +2
->p2 pass, switch 5
->p1 move protect, move protect
->p2 move thunderbolt +1, move ironhead +2
->p1 move protect, move dazzlinggleam
->p2 move electroweb, move protect
->p1 switch 3, pass
->p1 move terablast +2, move taunt +2
->p2 move electroweb, move ironhead +1
->p1 pass, switch 5
->p1 move protect, move fakeout +2
->p2 move taunt +2, move gunkshot +1
->p1 move protect, move spiritbreak +2
->p2 move electroweb, move partingshot +1
->p2 pass, switch 3
->p1 switch 6, pass
->p1 move flashcannon +2, move suckerpunch +2
->p2 move leafstorm +1, move protect
->p1 move irondefense, move spiritbreak +1
->p2 move leafstorm +1, move rockslide
->p1 move flashcannon +2, move suckerpunch +2
->p2 move electroweb, move knockoff +2
->p2 pass, switch 3
->p1 move snarl, move thunderwave +2
->p2 move taunt +1, move gunkshot +1
->p1 move bodypress +2, move suckerpunch +2
->p2 move taunt +2, move partingshot +2
->p1 move bodypress +2, move fakeout +1
->p2 move thunderbolt +2, move gunkshot +2
->p2 pass, switch 4
->p1 move irondefense, move spiritbreak +2
->p2 move electroweb, move shadowsneak +1
->p1 move snarl, move suckerpunch +2
->p2 move thunderbolt +2, move icepunch +2
+>p1 move sludgebomb +1, move trickroom
+>p2 move swordsdance, move bravebird +2
 >p1 pass, switch 4
->p1 move flashcannon +2, move protect
->p2 move thunderbolt +1, move shadowsneak +2
->p1 move snarl, move breakingswipe
->p2 move taunt +2, move knockoff +1
->p1 move irondefense, move breakingswipe
->p2 move thunderbolt +1, move icepunch +2
->p1 move flashcannon +2, move earthpower +1
->p2 move leafstorm +2, pass
+>p1 move mortalspin, move knockoff +2
+>p2 move scaleshot +1, move tailwind
+>p1 switch 3, pass
+>p1 move uturn +2, move tailwind
+>p2 move swordsdance, move tailwind
+>p1 switch 6, pass
+>p2 pass, switch 5
+>p1 move encore +2, move knockoff +2
+>p2 move ironhead +1, move bitterblade +2
+>p1 switch 5, pass
+>p1 move swordsdance, move bravebird +2
+>p2 move swordsdance, move bitterblade +2
+>p2 pass, switch 4
+>p1 move swordsdance, move knockoff +2
+>p2 move swordsdance, move snarl
+>p2 switch 3, pass
+>p1 move earthquake, move bravebird +1
+>p2 move stoneedge +1, move irondefense
+>p1 move earthquake, move bravebird +1
+>p2 pass, move snarl

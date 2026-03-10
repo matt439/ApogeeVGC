@@ -472,15 +472,13 @@ public partial record Abilities
                 Name = "Hospitality",
                 Num = 299,
                 Rating = 0.0,
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     foreach (Pokemon ally in pokemon.AdjacentAllies())
                     {
                         battle.Heal(ally.BaseMaxHp / 4, ally, pokemon);
                     }
-                }),
+                }, -2),
             },
             [AbilityId.HugePower] = new()
             {
@@ -529,8 +527,11 @@ public partial record Abilities
                 Num = 55,
                 Rating = 3.5,
                 // OnModifyAtkPriority = 5
-                // Note: In TS this uses this.modify() directly instead of chainModify
-                OnModifyAtk = OnModifyAtkEventInfo.Create((_, atk, _, _, _) => (int)(atk * 1.5), 5),
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
+                {
+                    battle.ChainModify(1.5);
+                    return new VoidReturn();
+                }, 5),
                 // OnSourceModifyAccuracyPriority = -1
                 OnSourceModifyAccuracy = OnSourceModifyAccuracyEventInfo.Create(
                     (battle, accuracy, _, _, move) =>
@@ -625,8 +626,6 @@ public partial record Abilities
                     Breakable = true,
                     NoTransform = true,
                 },
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.Field.IsWeather([ConditionId.Snowscape]) &&
@@ -639,7 +638,7 @@ public partial record Abilities
                         battle.EffectState.Busted = false;
                         pokemon.FormeChange(SpecieId.Eiscue, battle.Effect, true);
                     }
-                }),
+                }, -2),
                 // OnDamagePriority = 1
                 OnDamage = OnDamageEventInfo.Create((battle, _, target, _, effect) =>
                 {

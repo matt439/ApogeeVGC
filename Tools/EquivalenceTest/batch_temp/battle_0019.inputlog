@@ -1,47 +1,26 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"134,249,364,593"}
->player p1 {"name":"Player1","team":"Drednaw||WhiteHerb|ShellArmor|liquidation,shellsmash,rockslide,protect||85,85,85,85,85,85|F|||83|,,,,,Water]Noivern||LifeOrb|Frisk|dracometeor,tailwind,flamethrower,hurricane||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon]Corviknight||Leftovers|MirrorArmor|bravebird,irondefense,bodypress,tailwind||85,85,85,85,85,85|F|||80|,,,,,Fighting]Lilligant||LifeOrb|Chlorophyll|energyball,alluringvoice,quiverdance,pollenpuff||85,,85,85,85,85|F|,0,,,,||88|,,,,,Steel]Golurk||AssaultVest|NoGuard|dynamicpunch,poltergeist,highhorsepower,stoneedge||85,85,85,85,85,85|N|||86|,,,,,Fairy]Florges||Leftovers|FlowerVeil|protect,synthesis,calmmind,dazzlinggleam||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel"}
->player p2 {"name":"Player2","team":"Rillaboom||AssaultVest|GrassySurge|woodhammer,highhorsepower,grassyglide,fakeout||85,85,85,85,85,85|F|||81|,,,,,Grass]Slither Wing||LifeOrb|Protosynthesis|firstimpression,flareblitz,closecombat,uturn||85,85,85,85,85,85|N|||83|,,,,,Fire]Electabuzz||Eviolite|Static|protect,followme,electroweb,thunderbolt||85,,85,85,85,85|F|,0,,,,||84|,,,,,Grass]Jirachi||ChoiceScarf|SereneGrace|psychic,ironhead,thunderbolt,uturn||85,85,85,85,85,85|N|||80|,,,,,Steel]Tauros|TaurosPaldeaBlaze|ChoiceBand|Intimidate|closecombat,flareblitz,stoneedge,wildcharge||85,85,85,85,85,85|M|||79|,,,,,Fire]Lapras||SitrusBerry|WaterAbsorb|icywind,lifedew,freezedry,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground"}
->p1 move liquidation +1, move hurricane +2
->p2 move highhorsepower +2, move closecombat +2
->p2 pass, switch 6
->p1 move liquidation +1, move dracometeor +1
->p2 move woodhammer +1, move icywind
->p1 switch 5, switch 3
->p1 move stoneedge +1, move tailwind
->p2 move woodhammer +2, move icywind
+>player p1 {"name":"Player1","team":"Great Tusk||AssaultVest|Protosynthesis|headlongrush,rockslide,closecombat,rapidspin||85,85,85,85,85,85|N|||81|,,,,,Fire]Rampardos||ChoiceScarf|SheerForce|firepunch,headsmash,rockslide,stompingtantrum||85,85,85,85,85,85|F|||87|,,,,,Rock]Hydreigon||LifeOrb|Levitate|darkpulse,protect,snarl,dracometeor||85,,85,85,85,85|M|,0,,,,||82|,,,,,Poison]Slaking||ChoiceBand|Truant|highhorsepower,doubleedge,knockoff,gigaimpact||85,85,85,85,85,85|M|||89|,,,,,Ghost]Flygon||SitrusBerry|Levitate|earthpower,breakingswipe,tailwind,protect||85,85,85,85,85,85|M|||83|,,,,,Steel]Comfey||SitrusBerry|Triage|floralhealing,helpinghand,drainingkiss,tailwind||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Hatterene||LifeOrb|MagicBounce|mysticalfire,dazzlinggleam,psychic,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fire]Dragonite||LifeOrb|InnerFocus|dracometeor,tailwind,terablast,lowkick||85,85,85,85,85,85|F|||82|,,,,,Flying]Mabosstiff||ChoiceBand|Intimidate|psychicfangs,crunch,playrough,wildcharge||85,85,85,85,85,85|F|||84|,,,,,Fairy]Typhlosion||ChoiceScarf|FlashFire|eruption,heatwave,scorchingsands,fireblast||85,,85,85,85,85|F|,0,,,,||79|,,,,,Fire]Cramorant||SitrusBerry|GulpMissile|surf,bravebird,tailwind,protect||85,85,85,85,85,85|M|||86|,,,,,Ground]Bruxish||LifeOrb|StrongJaw|psychicfangs,protect,wavecrash,crunch||85,85,85,85,85,85|F|||86|,,,,,Psychic"}
+>p1 move rockslide, move rockslide
+>p2 move trickroom, move terablast +1
+>p2 pass, switch 5
+>p1 move rockslide, move rockslide
+>p2 move mysticalfire +1, move protect
+>p2 switch 3, pass
+>p1 move headlongrush +1, move rockslide
+>p2 move psychicfangs +1, move tailwind
+>p1 switch 5, pass
+>p1 move protect, move rockslide
+>p2 move psychicfangs +1, move bravebird +1
 >p2 switch 4, pass
->p1 move highhorsepower +1, move tailwind
->p2 move ironhead +1, move lifedew
->p1 move stoneedge +1, move bodypress +1
->p2 move ironhead +2, move lifedew
->p1 move stoneedge +1, move bodypress +1
->p2 move ironhead +1, move freezedry +2
->p1 move dynamicpunch +2, move bodypress +1
->p2 move ironhead +2, move freezedry +2
->p1 move highhorsepower +2, move bodypress +1
->p2 move ironhead +1, move lifedew
->p1 move highhorsepower +2, move bodypress +2
->p2 move ironhead +1, move freezedry +2
->p1 switch 4, pass
->p1 move alluringvoice +1, move bravebird +1
->p2 move ironhead +1, move lifedew
->p1 move energyball +1, move tailwind
->p2 move ironhead +1, move lifedew
->p1 move alluringvoice +1, move irondefense
->p2 move ironhead +1, move muddywater
->p1 switch 6, pass
->p1 move calmmind, move bodypress +1
->p2 move ironhead +1, move lifedew
->p1 move synthesis, move irondefense
->p2 move ironhead +1, move icywind
->p1 move synthesis, move irondefense
->p2 move ironhead +2, move lifedew
->p1 move dazzlinggleam, move bodypress +1
->p2 move ironhead +2, move muddywater
->p2 switch 5, pass
->p1 move synthesis, pass
->p2 move stoneedge +2, move lifedew
->p1 move calmmind, pass
->p2 move stoneedge +2, move icywind
->p1 move calmmind, pass
->p2 move stoneedge +1, move freezedry +1
+>p1 move tailwind, move rockslide
+>p2 move heatwave, move bravebird +1
+>p2 pass, switch 6
+>p1 move protect, move rockslide
+>p2 move heatwave, move protect
+>p1 move tailwind, move rockslide
+>p2 pass, move crunch +2
+>p1 move tailwind, move rockslide
+>p2 pass, move protect
+>p1 move tailwind, move rockslide
+>p2 pass, move wavecrash +2

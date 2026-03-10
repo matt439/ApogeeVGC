@@ -1,49 +1,53 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"239,444,649,1058"}
->player p1 {"name":"Player1","team":"Minior|MiniorYellow|WhiteHerb|ShieldsDown|shellsmash,acrobatics,rockslide,protect||69,85,85,85,85,85|N|||83|,,,,,Flying]Munkidori||AssaultVest|ToxicChain|fakeout,psychic,sludgebomb,uturn||85,85,85,85,85,85|M|||80|,,,,,Fighting]Klefki||SitrusBerry|Prankster|foulplay,dazzlinggleam,spikes,thunderwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Flying]Landorus||LifeOrb|SheerForce|protect,rockslide,sludgebomb,earthpower||85,85,85,85,85,85|M|||75|,,,,,Ground]Gastrodon||SitrusBerry|StormDrain|muddywater,yawn,icywind,earthpower||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Oranguru||SitrusBerry|InnerFocus|hypervoice,instruct,trickroom,psychic||85,,85,85,85,|F|,0,,,,0||90|,,,,,Fairy"}
->player p2 {"name":"Player2","team":"Blissey||SitrusBerry|Healer|softboiled,thunderwave,helpinghand,hypervoice||85,,85,85,85,85|F|,0,,,,||96|,,,,,Ghost]Skuntank||LifeOrb|Aftermath|poisongas,knockoff,gunkshot,protect||85,85,85,85,85,85|M|||85|,,,,,Flying]Munkidori||LifeOrb|ToxicChain|psychic,protect,sludgebomb,focusblast||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fighting]Gyarados||ClearAmulet|Intimidate|protect,waterfall,dragondance,terablast||85,85,85,85,85,85|M|||80|,,,,,Flying]Scrafty||SitrusBerry|Intimidate|knockoff,fakeout,coaching,closecombat||85,85,85,85,85,85|M|||83|,,,,,Poison]Gothitelle||SitrusBerry|ShadowTag|helpinghand,fakeout,trickroom,psychic||85,85,85,85,85,|M|,,,,,0||90|,,,,,Dark"}
->p1 move acrobatics +1, move sludgebomb +1
->p2 move hypervoice, move poisongas
->p1 move shellsmash, move fakeout +2
->p2 move hypervoice, move protect
->p1 move acrobatics +2, move fakeout +1
->p2 move helpinghand -2, move gunkshot +2
->p1 pass, switch 4
->p1 move shellsmash, move rockslide
->p2 move softboiled, move knockoff +2
->p2 pass, switch 3
->p1 move rockslide, move sludgebomb +1
->p2 move thunderwave +1, move sludgebomb +2
->p2 switch 6, pass
->p1 move rockslide, move sludgebomb +1
->p2 move trickroom, move protect
+>player p1 {"name":"Player1","team":"Quagsire||SitrusBerry|Unaware|icywind,liquidation,highhorsepower,recover||85,85,85,85,85,85|F|||91|,,,,,Steel]Ho-Oh||SitrusBerry|Regenerator|bravebird,earthpower,sacredfire,tailwind||85,85,85,85,85,85|N|||70|,,,,,Ground]Pincurchin||SitrusBerry|ElectricSurge|scald,electroweb,recover,thunderbolt||85,,85,85,85,85|M|,0,,,,||97|,,,,,Grass]Altaria||SitrusBerry|NaturalCure|bravebird,willowisp,roost,tailwind||85,85,85,85,85,85|M|||91|,,,,,Steel]Kingambit||SitrusBerry|Defiant|ironhead,suckerpunch,swordsdance,protect||85,85,85,85,85,85|F|||77|,,,,,Flying]Cetitan||LifeOrb|SheerForce|iceshard,iciclecrash,highhorsepower,protect||85,85,85,85,85,85|M|||83|,,,,,Ground"}
+>player p2 {"name":"Player2","team":"Cyclizar||SitrusBerry|Regenerator|breakingswipe,shedtail,doubleedge,knockoff||85,85,85,85,85,85|M|||87|,,,,,Poison]Salamence||LifeOrb|Intimidate|dracometeor,tailwind,dualwingbeat,protect||85,85,85,85,85,85|F|||80|,,,,,Dragon]Mudsdale||ChestoBerry|Stamina|rest,bodypress,heavyslam,highhorsepower||85,85,85,85,85,85|M|||84|,,,,,Fighting]Meowstic|MeowsticF|LifeOrb|Competitive|thunderbolt,psychic,protect,darkpulse||85,,85,85,85,85|F|,0,,,,||89|,,,,,Dark]Hatterene||LifeOrb|MagicBounce|psychic,trickroom,dazzlinggleam,mysticalfire||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fairy]Lanturn||AssaultVest|VoltAbsorb|icebeam,scald,voltswitch,electroweb||85,,85,85,85,85|M|,0,,,,||87|,,,,,Flying"}
+>p1 move liquidation +1, move sacredfire +1
+>p2 move doubleedge +2, move dualwingbeat +2
+>p1 move recover, move bravebird +1
+>p2 move breakingswipe, move dualwingbeat +2
 >p1 pass, switch 6
->p1 move shellsmash, move hypervoice
->p2 move helpinghand -2, move protect
->p1 move shellsmash, move psychic +1
->p2 move fakeout +1, move psychic +2
->p1 move shellsmash, move hypervoice
->p2 move psychic +1, move focusblast +1
->p1 switch 3, pass
->p2 pass, switch 5
->p1 move spikes, move trickroom
->p2 move helpinghand -2, move closecombat +1
->p1 move foulplay +2, move instruct +1
->p2 move psychic +2, move coaching -1
->p1 move thunderwave +2, move trickroom
->p2 move trickroom, move coaching -1
+>p1 move highhorsepower +1, move iciclecrash +1
+>p2 move shedtail, move dracometeor +2
+>p2 switch 6, pass
+>p1 move liquidation +2, move iciclecrash +1
+>p2 move icebeam +1, move protect
+>p1 move icywind, move protect
+>p2 move icebeam +1, move dracometeor +1
+>p1 switch 4, pass
+>p1 move bravebird +2, move protect
+>p2 move electroweb, move protect
+>p1 move willowisp +2, move protect
+>p2 move icebeam +1, move protect
+>p1 move tailwind, move protect
+>p2 move electroweb, move tailwind
+>p1 move bravebird +2, move protect
+>p2 move voltswitch +2, move dracometeor +2
+>p2 switch 4, pass
 >p1 pass, switch 5
->p1 move dazzlinggleam, move muddywater
->p2 move psychic +2, move knockoff +2
->p2 pass, switch 4
->p1 move thunderwave +2, move muddywater
->p2 move psychic +1, move terablast +1
->p1 move dazzlinggleam, move yawn +1
->p2 pass, move dragondance
->p1 move dazzlinggleam, move icywind
->p2 pass, move protect
->p1 move dazzlinggleam, move earthpower +1
->p2 pass, move protect
->p1 move spikes, move icywind
->p2 pass, move terablast +1
->p1 move dazzlinggleam, move muddywater
->p2 pass, move waterfall +1
+>p2 pass, switch 3
+>p1 move willowisp +1, move ironhead +2
+>p2 move protect, move bodypress +2
+>p1 move bravebird +1, move swordsdance
+>p2 move thunderbolt +1, move heavyslam +1
+>p1 switch 3, pass
+>p1 move scald +1, move ironhead +1
+>p2 move darkpulse +2, move rest
+>p2 switch 5, pass
+>p1 move thunderbolt +2, move ironhead +1
+>p2 move trickroom, move heavyslam +2
+>p2 switch 6, pass
+>p1 move thunderbolt +1, move suckerpunch +2
+>p2 move knockoff +1, move bodypress +1
+>p1 move electroweb, move protect
+>p2 move knockoff +1, move highhorsepower +2
+>p1 move electroweb, move suckerpunch +1
+>p2 move doubleedge +2, move heavyslam +2
+>p2 switch 4, pass
+>p1 move electroweb, move protect
+>p2 move voltswitch +1, move highhorsepower +2
+>p1 move recover, move suckerpunch +1
+>p2 move icebeam +1, move heavyslam +1
+>p1 pass, move protect
+>p2 move scald +2, move highhorsepower +1
+>p1 pass, move swordsdance
+>p2 move scald +1, move highhorsepower +1

@@ -1,35 +1,36 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"393,730,1067,1740"}
->player p1 {"name":"Player1","team":"Grumpig||LifeOrb|ThickFat|earthpower,nastyplot,psychic,dazzlinggleam||85,,85,85,85,85|M|,0,,,,||91|,,,,,Fairy]Plusle||LifeOrb|LightningRod|nastyplot,thunderbolt,alluringvoice,protect||85,,85,85,85,85|M|,0,,,,||92|,,,,,Flying]Serperior||LifeOrb|Contrary|dragonpulse,protect,leafstorm,knockoff||85,85,85,85,85,85|F|||80|,,,,,Dragon]Iron Jugulis||BoosterEnergy|QuarkDrive|hurricane,darkpulse,tailwind,earthpower||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ground]Shaymin|ShayminSky|LifeOrb|SereneGrace|earthpower,protect,airslash,seedflare||85,,85,85,85,85|N|,0,,,,||77|,,,,,Water]Electabuzz||Eviolite|Static|electroweb,followme,thunderbolt,knockoff||85,85,85,85,85,85|F|||84|,,,,,Flying"}
->player p2 {"name":"Player2","team":"Hydrapple||ChoiceSpecs|Regenerator|gigadrain,earthpower,dracometeor,leafstorm||85,,85,85,85,85|M|,0,,,,||85|,,,,,Steel]Magmar||Eviolite|FlameBody|willowisp,heatwave,followme,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass]Rampardos||ChoiceScarf|SheerForce|firepunch,stompingtantrum,headsmash,rockslide||85,85,85,85,85,85|F|||87|,,,,,Rock]Darkrai||LifeOrb|BadDreams|darkpulse,substitute,protect,sludgebomb||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Oinkologne||SitrusBerry|ThickFat|protect,yawn,helpinghand,doubleedge||85,85,85,85,85,85|M|||92|,,,,,Normal]Mienshao||ChoiceBand|InnerFocus|knockoff,tripleaxel,closecombat,uturn||85,85,85,85,85,85|F|||84|,,,,,Steel"}
->p1 move psychic +2, move thunderbolt +1
->p2 move earthpower +1, move willowisp +2
->p1 move dazzlinggleam, move protect
->p2 move earthpower +2, move protect
->p1 move nastyplot, move thunderbolt +1
->p2 move earthpower +1, move heatwave
->p1 move earthpower +1, move alluringvoice +2
->p2 move earthpower +2, move willowisp +2
->p1 pass, switch 6
->p1 move psychic +1, move electroweb
->p2 move earthpower +1, move willowisp +1
->p2 switch 6, pass
->p1 move psychic +2, move knockoff +1
->p2 move tripleaxel +2, move willowisp +1
->p1 switch 5, pass
+>player p1 {"name":"Player1","team":"Wigglytuff||SitrusBerry|Competitive|helpinghand,dazzlinggleam,encore,icywind||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Klawf||ChoiceBand|Regenerator|knockoff,crabhammer,highhorsepower,rockslide||85,85,85,85,85,85|F|||91|,,,,,Ground]Zoroark||LifeOrb|Illusion|flamethrower,sludgebomb,knockoff,protect||85,85,85,85,85,85|F|||84|,,,,,Poison]Venusaur||LifeOrb|Overgrow|sludgebomb,protect,knockoff,leafstorm||85,85,85,85,85,85|F|||86|,,,,,Water]Serperior||LifeOrb|Contrary|protect,leafstorm,glare,terablast||85,85,85,85,85,85|F|||80|,,,,,Rock]Kingambit||SitrusBerry|Defiant|ironhead,kowtowcleave,protect,suckerpunch||85,85,85,85,85,85|F|||77|,,,,,Fire"}
+>player p2 {"name":"Player2","team":"Spiritomb||SitrusBerry|Infiltrator|icywind,willowisp,foulplay,helpinghand||85,,85,85,85,85|F|,0,,,,||89|,,,,,Steel]Hoopa||LifeOrb|Magician|protect,focusblast,hyperspacehole,shadowball||85,,85,85,85,85|N|,0,,,,||86|,,,,,Fighting]Cresselia||SitrusBerry|Levitate|thunderwave,psychic,lunarblessing,helpinghand||85,,85,85,85,85|F|,0,,,,||80|,,,,,Poison]Ambipom||SilkScarf|Technician|knockoff,doubleedge,fakeout,protect||85,85,85,85,85,85|M|||87|,,,,,Normal]Virizion||SitrusBerry|Justified|protect,coaching,leafstorm,closecombat||85,85,85,85,85,85|N|||86|,,,,,Rock]Kingdra||LifeOrb|SwiftSwim|protect,muddywater,dracometeor,raindance||85,,85,85,85,85|F|,0,,,,||85|,,,,,Water"}
+>p1 move encore +2, move crabhammer +1
+>p2 move icywind, move protect
+>p1 move helpinghand -2, move crabhammer +2
+>p2 move icywind, move hyperspacehole +2
 >p2 pass, switch 4
->p1 move earthpower +1, move knockoff +2
->p2 move closecombat +2, move sludgebomb +1
->p1 switch 4, pass
->p1 move hurricane +1, move electroweb
->p2 move tripleaxel +1, move darkpulse +1
+>p1 move encore +1, move crabhammer +2
+>p2 move helpinghand -2, move doubleedge +2
+>p1 move dazzlinggleam, move crabhammer +1
+>p2 move helpinghand -2, move protect
+>p2 switch 6, pass
+>p1 move icywind, move crabhammer +2
+>p2 move muddywater, move fakeout +1
+>p1 pass, switch 6
+>p1 move icywind, move ironhead +2
+>p2 move dracometeor +2, move knockoff +2
+>p2 switch 3, switch 5
+>p1 move icywind, move suckerpunch +1
+>p2 move thunderwave +2, move coaching -1
+>p1 move encore +2, move suckerpunch +1
+>p2 move thunderwave +1, move leafstorm +1
+>p1 move icywind, move ironhead +1
+>p2 move helpinghand -2, move leafstorm +1
+>p1 move encore +2, move ironhead +1
+>p2 move lunarblessing, move leafstorm +2
+>p1 move icywind, move ironhead +2
+>p2 move lunarblessing, move leafstorm +1
+>p1 move encore +2, move kowtowcleave +1
+>p2 move thunderwave +1, move protect
+>p1 move encore +1, move protect
+>p2 pass, move leafstorm +1
 >p1 switch 3, pass
->p1 move leafstorm +1, move knockoff +2
->p2 move tripleaxel +2, move protect
->p1 move dragonpulse +2, move thunderbolt +2
->p2 move knockoff +2, move darkpulse +2
->p2 pass, switch 5
->p1 move leafstorm +1, pass
->p2 move knockoff +2, move doubleedge +1
->p2 switch 3, pass
->p1 move leafstorm +1, pass
->p2 move firepunch +1, move helpinghand -1
+>p1 move sludgebomb +2, move kowtowcleave +2
+>p2 pass, move leafstorm +1

@@ -1,34 +1,38 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"29,54,79,128"}
->player p1 {"name":"Player1","team":"Ninetales|NinetalesAlola|LightClay|SnowWarning|auroraveil,moonblast,protect,blizzard||85,,85,85,85,85|M|,0,,,,||75|,,,,,Water]Mienshao||FocusSash|Regenerator|fakeout,uturn,knockoff,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Hoopa||ChoiceScarf|Magician|focusblast,trick,hyperspacehole,shadowball||85,,85,85,85,85|N|,0,,,,||86|,,,,,Fighting]Tsareena||AssaultVest|QueenlyMajesty|knockoff,rapidspin,powerwhip,highjumpkick||85,85,85,85,85,85|F|||85|,,,,,Fighting]Noivern||SitrusBerry|Frisk|protect,hurricane,flamethrower,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fire]Gothitelle||SitrusBerry|ShadowTag|trickroom,fakeout,helpinghand,psychic||85,85,85,85,85,|M|,,,,,0||90|,,,,,Dark"}
->player p2 {"name":"Player2","team":"Swampert||AssaultVest|Torrent|muddywater,highhorsepower,flipturn,icywind||85,85,85,85,85,85|M|||82|,,,,,Steel]Weavile||LifeOrb|Pickpocket|protect,tripleaxel,knockoff,iceshard||85,85,85,85,85,85|M|||81|,,,,,Dark]Gothitelle||SitrusBerry|ShadowTag|healpulse,fakeout,trickroom,psychic||85,85,85,85,85,|F|,,,,,0||90|,,,,,Dark]Iron Leaves||BoosterEnergy|QuarkDrive|protect,closecombat,leafblade,psyblade||85,85,85,85,85,85|N|||81|,,,,,Psychic]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fairy]Scovillain||ChoiceSpecs|Chlorophyll|energyball,leafstorm,burningjealousy,fireblast||85,,85,85,85,85|M|,0,,,,||90|,,,,,Fire"}
->p1 move blizzard, move knockoff +2
->p2 move highhorsepower +2, move knockoff +1
->p1 move moonblast +2, move closecombat +1
->p2 move icywind, move iceshard +2
->p1 pass, switch 3
->p1 move blizzard, move hyperspacehole +1
->p2 move icywind, move knockoff +2
->p1 pass, switch 6
->p2 switch 6, switch 3
->p1 move blizzard, move psychic +2
->p2 move fireblast +2, move trickroom
->p1 move auroraveil, move fakeout +1
->p2 move fireblast +1, move trickroom
->p1 switch 4, pass
->p1 move highjumpkick +1, move fakeout +2
->p2 move fireblast +1, move trickroom
->p1 move powerwhip +2, move psychic +2
->p2 move fireblast +1, move trickroom
->p1 switch 5, pass
->p1 move flamethrower +1, move trickroom
->p2 move fireblast +1, move fakeout +1
->p1 move hurricane +1, move helpinghand -1
->p2 move fireblast +2, move fakeout +1
+>player p1 {"name":"Player1","team":"Krookodile||ChoiceScarf|Intimidate|gunkshot,highhorsepower,rockslide,knockoff||85,85,85,85,85,85|M|||80|,,,,,Ground]Shiftry||FocusSash|WindRider|fakeout,tailwind,leafblade,knockoff||85,85,85,85,85,85|M|||84|,,,,,Ghost]Blaziken||LifeOrb|SpeedBoost|heatwave,vacuumwave,protect,closecombat||85,85,85,85,85,85|M|||79|,,,,,Fighting]Zekrom||ClearAmulet|Teravolt|protect,boltstrike,dragondance,dragonclaw||85,85,85,85,85,85|N|||74|,,,,,Grass]Carbink||Leftovers|ClearBody|moonblast,bodypress,trickroom,irondefense||85,,85,85,85,|N|,0,,,,0||88|,,,,,Fighting]Milotic||SitrusBerry|Competitive|icywind,recover,scald,protect||85,,85,85,85,85|F|,0,,,,||81|,,,,,Grass"}
+>player p2 {"name":"Player2","team":"Maushold||WideLens|Technician|followme,populationbomb,encore,protect||85,85,85,85,85,85|N|||79|,,,,,Ghost]Golurk||AssaultVest|NoGuard|stoneedge,dynamicpunch,poltergeist,highhorsepower||85,85,85,85,85,85|N|||86|,,,,,Fighting]Avalugg||Leftovers|Sturdy|protect,recover,avalanche,bodypress||85,85,85,85,85,85|F|||92|,,,,,Water]Kilowattrel||FocusSash|Competitive|tailwind,hurricane,thunderbolt,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Flying]Magearna||AssaultVest|SoulHeart|flashcannon,aurasphere,fleurcannon,dazzlinggleam||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Manaphy||SitrusBerry|Hydration|protect,tailglow,scald,energyball||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass"}
+>p1 move gunkshot +2, move knockoff +2
+>p2 move populationbomb +2, move dynamicpunch +1
+>p1 move gunkshot +1, move knockoff +1
+>p2 move populationbomb +1, move poltergeist +1
+>p1 switch 3, pass
 >p2 switch 4, pass
->p1 move hurricane +2, move fakeout +1
->p2 move leafblade +2, move trickroom
+>p1 move vacuumwave +2, move leafblade +1
+>p2 move protect, move stoneedge +1
+>p1 move closecombat +1, move fakeout +2
+>p2 move hurricane +2, move dynamicpunch +2
+>p1 pass, switch 4
+>p1 move vacuumwave +1, move protect
+>p2 move thunderbolt +1, move highhorsepower +1
+>p1 switch 6, pass
+>p1 move recover, move dragondance
+>p2 move hurricane +2, move poltergeist +1
+>p1 move icywind, move dragondance
+>p2 move protect, move stoneedge +1
 >p2 pass, switch 5
->p1 move flamethrower +2, pass
->p2 move psyblade +2, move protect
->p1 move hurricane +1, pass
->p2 move protect, move dracometeor +1
+>p1 move scald +2, move protect
+>p2 move protect, move aurasphere +2
+>p1 move protect, move dragondance
+>p2 move thunderbolt +2, move aurasphere +2
+>p1 move icywind, move boltstrike +1
+>p2 move tailwind, move aurasphere +1
+>p2 switch 6, pass
+>p1 move icywind, move dragondance
+>p2 move energyball +1, move flashcannon +2
+>p1 pass, switch 5
+>p1 move protect, move trickroom
+>p2 move tailglow, move flashcannon +2
+>p1 move protect, pass
+>p2 move energyball +2, move fleurcannon +2
+>p1 move scald +2, pass
+>p2 move energyball +2, move fleurcannon +2

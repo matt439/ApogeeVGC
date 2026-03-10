@@ -191,7 +191,7 @@ public partial class Battle
         }
         else if (args.Any(arg => FormatArg(arg) == "[still]"))
         {
-            // If no animation plays, hide the target (index 4) to prevent information leak
+            // If no animation plays, the target should never be known
             string[] parts = Log[LastMoveLine].Split('|');
             if (parts.Length > 4)
             {

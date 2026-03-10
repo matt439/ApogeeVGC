@@ -2169,7 +2169,6 @@ public partial record Abilities
                 Name = "Unnerve",
                 Rating = 1.0,
                 Num = 127,
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, 1),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.EffectState.Unnerved ?? false) return;
@@ -2178,7 +2177,7 @@ public partial record Abilities
                         battle.Add("-ability", pokemon, "Unnerve");
                     }
                     battle.EffectState.Unnerved = true;
-                }),
+                }, 1),
                 OnEnd = OnEndEventInfo.Create((battle, _) => { battle.EffectState.Unnerved = false; }),
                 OnFoeTryEatItem = OnFoeTryEatItemEventInfo.Create((battle, _, _) =>
                     BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false))),

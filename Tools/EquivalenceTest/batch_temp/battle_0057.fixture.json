@@ -3,96 +3,30 @@
   "seed": "400,743,1086,1771",
   "p1Seed": "2347,2471,2709,3061",
   "p2Seed": "3413,3537,3889,4127",
-  "p1TeamPacked": "Empoleon||SitrusBerry|Competitive|flashcannon,protect,hydropump,icywind||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Araquanid||SitrusBerry|WaterBubble|liquidation,hydropump,stickyweb,protect||85,85,85,85,85,85|F|||84|,,,,,Water]Mewtwo||LifeOrb|Unnerve|protect,aurasphere,fireblast,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fire]Electrode|ElectrodeHisui|AssaultVest|Static|voltswitch,electroweb,thunderbolt,energyball||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Articuno||SitrusBerry|Pressure|roost,tailwind,bravebird,icebeam||85,85,85,85,85,85|N|||82|,,,,,Ground]Metagross||WeaknessPolicy|ClearBody|heavyslam,psychicfangs,agility,protect||85,85,85,85,85,85|N|||80|,,,,,Dragon",
-  "p2TeamPacked": "Ninetales||LifeOrb|Drought|solarbeam,protect,fireblast,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Moltres||SitrusBerry|FlameBody|protect,heatwave,bravebird,tailwind||85,85,85,85,85,85|N|||79|,,,,,Ground]Venomoth||LifeOrb|TintedLens|sludgebomb,bugbuzz,protect,quiverdance||85,,85,85,85,85|M|,0,,,,||90|,,,,,Water]Dedenne||SitrusBerry|CheekPouch|dazzlinggleam,nuzzle,thunderbolt,helpinghand||85,85,85,85,85,85|M|||85|,,,,,Electric]Hariyama||FlameOrb|Guts|knockoff,fakeout,closecombat,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Gliscor||ToxicOrb|PoisonHeal|swordsdance,protect,facade,earthquake||85,85,85,85,85,85|F|||81|,,,,,Normal",
+  "p1TeamPacked": "Vileplume||SitrusBerry|EffectSpore|sludgebomb,strengthsap,pollenpuff,stunspore||85,,85,85,85,85|F|,0,,,,||89|,,,,,Steel]Regigigas||Leftovers|SlowStart|thunderwave,doubleedge,knockoff,protect||85,85,85,85,85,85|N|||86|,,,,,Fairy]Houndoom||LifeOrb|Unnerve|darkpulse,nastyplot,protect,heatwave||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ghost]Regirock||Leftovers|ClearBody|stoneedge,thunderwave,bodypress,irondefense||85,85,85,85,85,85|N|||82|,,,,,Fighting]Dachsbun||SitrusBerry|WellBakedBody|yawn,helpinghand,bodypress,playrough||85,85,85,85,85,85|F|||90|,,,,,Steel]Electrode||LifeOrb|Static|protect,thunderbolt,voltswitch,terablast||85,,85,85,85,85|N|,0,,,,||89|,,,,,Ice",
+  "p2TeamPacked": "Oranguru||SitrusBerry|InnerFocus|instruct,psychic,hypervoice,trickroom||85,,85,85,85,|F|,0,,,,0||90|,,,,,Fairy]Medicham||FocusSash|PurePower|fakeout,icepunch,closecombat,zenheadbutt||85,85,85,85,85,85|M|||86|,,,,,Fighting]Thundurus|ThundurusTherian|LifeOrb|VoltAbsorb|terablast,wildboltstorm,nastyplot,protect||85,,85,85,85,85|M|,0,,,,||78|,,,,,Flying]Politoed||SitrusBerry|Drizzle|icywind,encore,hypnosis,muddywater||85,,85,85,85,85|M|,0,,,,||82|,,,,,Grass]Golem|GolemAlola|ChoiceBand|Galvanize|rockslide,highhorsepower,explosion,doubleedge||85,85,85,85,85,85|F|||88|,,,,,Ground]Rampardos||ChoiceScarf|SheerForce|headsmash,rockslide,stompingtantrum,firepunch||85,85,85,85,85,85|F|||87|,,,,,Rock",
   "p1Team": [
     {
-      "name": "Empoleon",
-      "species": "Empoleon",
+      "name": "Vileplume",
+      "species": "Vileplume",
       "item": "Sitrus Berry",
-      "ability": "Competitive",
+      "ability": "Effect Spore",
       "moves": [
-        "Flash Cannon",
-        "Protect",
-        "Hydro Pump",
-        "Icy Wind"
+        "Sludge Bomb",
+        "Strength Sap",
+        "Pollen Puff",
+        "Stun Spore"
       ],
       "nature": "",
       "evs": {
         "hp": 85,
         "atk": 0,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "M",
-      "ivs": {
-        "hp": 31,
-        "atk": 0,
-        "def": 31,
-        "spa": 31,
-        "spd": 31,
-        "spe": 31
-      },
-      "level": 83,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Flying"
-    },
-    {
-      "name": "Araquanid",
-      "species": "Araquanid",
-      "item": "Sitrus Berry",
-      "ability": "Water Bubble",
-      "moves": [
-        "Liquidation",
-        "Hydro Pump",
-        "Sticky Web",
-        "Protect"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
         "def": 85,
         "spa": 85,
         "spd": 85,
         "spe": 85
       },
       "gender": "F",
-      "level": 84,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Water"
-    },
-    {
-      "name": "Mewtwo",
-      "species": "Mewtwo",
-      "item": "Life Orb",
-      "ability": "Unnerve",
-      "moves": [
-        "Protect",
-        "Aura Sphere",
-        "Fire Blast",
-        "Psystrike"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 0,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "N",
       "ivs": {
         "hp": 31,
         "atk": 0,
@@ -101,44 +35,7 @@
         "spd": 31,
         "spe": 31
       },
-      "level": 73,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Fire"
-    },
-    {
-      "name": "Electrode",
-      "species": "Electrode-Hisui",
-      "item": "Assault Vest",
-      "ability": "Static",
-      "moves": [
-        "Volt Switch",
-        "Electroweb",
-        "Thunderbolt",
-        "Energy Ball"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 0,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "N",
-      "ivs": {
-        "hp": 31,
-        "atk": 0,
-        "def": 31,
-        "spa": 31,
-        "spd": 31,
-        "spe": 31
-      },
-      "level": 88,
+      "level": 89,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
@@ -147,43 +44,14 @@
       "teraType": "Steel"
     },
     {
-      "name": "Articuno",
-      "species": "Articuno",
-      "item": "Sitrus Berry",
-      "ability": "Pressure",
+      "name": "Regigigas",
+      "species": "Regigigas",
+      "item": "Leftovers",
+      "ability": "Slow Start",
       "moves": [
-        "Roost",
-        "Tailwind",
-        "Brave Bird",
-        "Ice Beam"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "N",
-      "level": 82,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Ground"
-    },
-    {
-      "name": "Metagross",
-      "species": "Metagross",
-      "item": "Weakness Policy",
-      "ability": "Clear Body",
-      "moves": [
-        "Heavy Slam",
-        "Psychic Fangs",
-        "Agility",
+        "Thunder Wave",
+        "Double-Edge",
+        "Knock Off",
         "Protect"
       ],
       "nature": "",
@@ -196,25 +64,23 @@
         "spe": 85
       },
       "gender": "N",
-      "level": 80,
+      "level": 86,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Dragon"
-    }
-  ],
-  "p2Team": [
+      "teraType": "Fairy"
+    },
     {
-      "name": "Ninetales",
-      "species": "Ninetales",
+      "name": "Houndoom",
+      "species": "Houndoom",
       "item": "Life Orb",
-      "ability": "Drought",
+      "ability": "Unnerve",
       "moves": [
-        "Solar Beam",
+        "Dark Pulse",
+        "Nasty Plot",
         "Protect",
-        "Fire Blast",
         "Heat Wave"
       ],
       "nature": "",
@@ -235,24 +101,24 @@
         "spd": 31,
         "spe": 31
       },
-      "level": 79,
+      "level": 86,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Fire"
+      "teraType": "Ghost"
     },
     {
-      "name": "Moltres",
-      "species": "Moltres",
-      "item": "Sitrus Berry",
-      "ability": "Flame Body",
+      "name": "Regirock",
+      "species": "Regirock",
+      "item": "Leftovers",
+      "ability": "Clear Body",
       "moves": [
-        "Protect",
-        "Heat Wave",
-        "Brave Bird",
-        "Tailwind"
+        "Stone Edge",
+        "Thunder Wave",
+        "Body Press",
+        "Iron Defense"
       ],
       "nature": "",
       "evs": {
@@ -264,24 +130,158 @@
         "spe": 85
       },
       "gender": "N",
-      "level": 79,
+      "level": 82,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Ground"
+      "teraType": "Fighting"
     },
     {
-      "name": "Venomoth",
-      "species": "Venomoth",
-      "item": "Life Orb",
-      "ability": "Tinted Lens",
+      "name": "Dachsbun",
+      "species": "Dachsbun",
+      "item": "Sitrus Berry",
+      "ability": "Well-Baked Body",
       "moves": [
-        "Sludge Bomb",
-        "Bug Buzz",
+        "Yawn",
+        "Helping Hand",
+        "Body Press",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Electrode",
+      "species": "Electrode",
+      "item": "Life Orb",
+      "ability": "Static",
+      "moves": [
         "Protect",
-        "Quiver Dance"
+        "Thunderbolt",
+        "Volt Switch",
+        "Tera Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Oranguru",
+      "species": "Oranguru",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Instruct",
+        "Psychic",
+        "Hyper Voice",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Medicham",
+      "species": "Medicham",
+      "item": "Focus Sash",
+      "ability": "Pure Power",
+      "moves": [
+        "Fake Out",
+        "Ice Punch",
+        "Close Combat",
+        "Zen Headbutt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Thundurus",
+      "species": "Thundurus-Therian",
+      "item": "Life Orb",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Tera Blast",
+        "Wildbolt Storm",
+        "Nasty Plot",
+        "Protect"
       ],
       "nature": "",
       "evs": {
@@ -301,82 +301,61 @@
         "spd": 31,
         "spe": 31
       },
-      "level": 90,
+      "level": 78,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Water"
+      "teraType": "Flying"
     },
     {
-      "name": "Dedenne",
-      "species": "Dedenne",
+      "name": "Politoed",
+      "species": "Politoed",
       "item": "Sitrus Berry",
-      "ability": "Cheek Pouch",
+      "ability": "Drizzle",
       "moves": [
-        "Dazzling Gleam",
-        "Nuzzle",
-        "Thunderbolt",
-        "Helping Hand"
+        "Icy Wind",
+        "Encore",
+        "Hypnosis",
+        "Muddy Water"
       ],
       "nature": "",
       "evs": {
         "hp": 85,
-        "atk": 85,
+        "atk": 0,
         "def": 85,
         "spa": 85,
         "spd": 85,
         "spe": 85
       },
       "gender": "M",
-      "level": 85,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Electric"
-    },
-    {
-      "name": "Hariyama",
-      "species": "Hariyama",
-      "item": "Flame Orb",
-      "ability": "Guts",
-      "moves": [
-        "Knock Off",
-        "Fake Out",
-        "Close Combat",
-        "Facade"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
       },
-      "gender": "M",
-      "level": 85,
+      "level": 82,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Normal"
+      "teraType": "Grass"
     },
     {
-      "name": "Gliscor",
-      "species": "Gliscor",
-      "item": "Toxic Orb",
-      "ability": "Poison Heal",
+      "name": "Golem",
+      "species": "Golem-Alola",
+      "item": "Choice Band",
+      "ability": "Galvanize",
       "moves": [
-        "Swords Dance",
-        "Protect",
-        "Facade",
-        "Earthquake"
+        "Rock Slide",
+        "High Horsepower",
+        "Explosion",
+        "Double-Edge"
       ],
       "nature": "",
       "evs": {
@@ -388,47 +367,73 @@
         "spe": 85
       },
       "gender": "F",
-      "level": 81,
+      "level": 88,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Normal"
+      "teraType": "Ground"
+    },
+    {
+      "name": "Rampardos",
+      "species": "Rampardos",
+      "item": "Choice Scarf",
+      "ability": "Sheer Force",
+      "moves": [
+        "Head Smash",
+        "Rock Slide",
+        "Stomping Tantrum",
+        "Fire Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
     }
   ],
   "inputLog": [
     ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"400,743,1086,1771\"}",
-    ">player p1 {\"name\":\"Player1\",\"team\":\"Empoleon||SitrusBerry|Competitive|flashcannon,protect,hydropump,icywind||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Araquanid||SitrusBerry|WaterBubble|liquidation,hydropump,stickyweb,protect||85,85,85,85,85,85|F|||84|,,,,,Water]Mewtwo||LifeOrb|Unnerve|protect,aurasphere,fireblast,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fire]Electrode|ElectrodeHisui|AssaultVest|Static|voltswitch,electroweb,thunderbolt,energyball||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Articuno||SitrusBerry|Pressure|roost,tailwind,bravebird,icebeam||85,85,85,85,85,85|N|||82|,,,,,Ground]Metagross||WeaknessPolicy|ClearBody|heavyslam,psychicfangs,agility,protect||85,85,85,85,85,85|N|||80|,,,,,Dragon\"}",
-    ">player p2 {\"name\":\"Player2\",\"team\":\"Ninetales||LifeOrb|Drought|solarbeam,protect,fireblast,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Moltres||SitrusBerry|FlameBody|protect,heatwave,bravebird,tailwind||85,85,85,85,85,85|N|||79|,,,,,Ground]Venomoth||LifeOrb|TintedLens|sludgebomb,bugbuzz,protect,quiverdance||85,,85,85,85,85|M|,0,,,,||90|,,,,,Water]Dedenne||SitrusBerry|CheekPouch|dazzlinggleam,nuzzle,thunderbolt,helpinghand||85,85,85,85,85,85|M|||85|,,,,,Electric]Hariyama||FlameOrb|Guts|knockoff,fakeout,closecombat,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Gliscor||ToxicOrb|PoisonHeal|swordsdance,protect,facade,earthquake||85,85,85,85,85,85|F|||81|,,,,,Normal\"}",
-    ">p1 move icywind, move stickyweb",
-    ">p2 move protect, move heatwave",
-    ">p1 move icywind, move hydropump +2",
-    ">p2 move protect, move tailwind",
-    ">p1 move flashcannon +1, move liquidation +2",
-    ">p2 move heatwave, move tailwind",
-    ">p2 pass, switch 6",
-    ">p1 move icywind, move protect",
-    ">p2 move fireblast +2, move facade +1",
-    ">p1 move hydropump +2, move protect",
-    ">p2 move solarbeam +2, move earthquake",
-    ">p2 switch 3, switch 4",
-    ">p1 move protect, move protect",
-    ">p2 move quiverdance, move dazzlinggleam",
-    ">p1 move icywind, move protect",
-    ">p2 move quiverdance, move thunderbolt +1",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Vileplume||SitrusBerry|EffectSpore|sludgebomb,strengthsap,pollenpuff,stunspore||85,,85,85,85,85|F|,0,,,,||89|,,,,,Steel]Regigigas||Leftovers|SlowStart|thunderwave,doubleedge,knockoff,protect||85,85,85,85,85,85|N|||86|,,,,,Fairy]Houndoom||LifeOrb|Unnerve|darkpulse,nastyplot,protect,heatwave||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ghost]Regirock||Leftovers|ClearBody|stoneedge,thunderwave,bodypress,irondefense||85,85,85,85,85,85|N|||82|,,,,,Fighting]Dachsbun||SitrusBerry|WellBakedBody|yawn,helpinghand,bodypress,playrough||85,85,85,85,85,85|F|||90|,,,,,Steel]Electrode||LifeOrb|Static|protect,thunderbolt,voltswitch,terablast||85,,85,85,85,85|N|,0,,,,||89|,,,,,Ice\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Oranguru||SitrusBerry|InnerFocus|instruct,psychic,hypervoice,trickroom||85,,85,85,85,|F|,0,,,,0||90|,,,,,Fairy]Medicham||FocusSash|PurePower|fakeout,icepunch,closecombat,zenheadbutt||85,85,85,85,85,85|M|||86|,,,,,Fighting]Thundurus|ThundurusTherian|LifeOrb|VoltAbsorb|terablast,wildboltstorm,nastyplot,protect||85,,85,85,85,85|M|,0,,,,||78|,,,,,Flying]Politoed||SitrusBerry|Drizzle|icywind,encore,hypnosis,muddywater||85,,85,85,85,85|M|,0,,,,||82|,,,,,Grass]Golem|GolemAlola|ChoiceBand|Galvanize|rockslide,highhorsepower,explosion,doubleedge||85,85,85,85,85,85|F|||88|,,,,,Ground]Rampardos||ChoiceScarf|SheerForce|headsmash,rockslide,stompingtantrum,firepunch||85,85,85,85,85,85|F|||87|,,,,,Rock\"}",
+    ">p1 move stunspore +2, move thunderwave +1",
+    ">p2 move psychic +1, move closecombat +1",
+    ">p1 move sludgebomb +2, move protect",
+    ">p2 move trickroom, move zenheadbutt +2",
+    ">p1 move stunspore +2, move doubleedge +2",
+    ">p2 move hypervoice, move zenheadbutt +2",
+    ">p1 switch 5, pass",
+    ">p2 pass, switch 5",
+    ">p1 move helpinghand -2, move doubleedge +2",
+    ">p2 move psychic +1, move doubleedge +1",
+    ">p1 switch 4, pass",
+    ">p1 move thunderwave +2, move doubleedge +2",
+    ">p2 move trickroom, move doubleedge +1",
+    ">p1 move bodypress +1, move protect",
+    ">p2 move trickroom, move doubleedge +1",
     ">p1 switch 6, pass",
-    ">p1 move protect, move protect",
-    ">p2 move bugbuzz +2, move helpinghand -1",
-    ">p1 pass, switch 5",
-    ">p1 move protect, move tailwind",
-    ">p2 move quiverdance, move nuzzle +2",
-    ">p1 move agility, move bravebird +1",
-    ">p2 move quiverdance, move nuzzle +2",
-    ">p2 switch 5, pass",
-    ">p1 move psychicfangs +1, move icebeam +2",
-    ">p2 move facade +2, move nuzzle +1",
-    ">p1 move heavyslam +2, move icebeam +2",
-    ">p2 move fakeout +1, move thunderbolt +2"
+    ">p1 move terablast +1, move protect",
+    ">p2 move hypervoice, move doubleedge +1",
+    ">p1 switch 3, pass",
+    ">p2 pass, switch 6",
+    ">p1 move nastyplot, move doubleedge +1",
+    ">p2 move trickroom, move rockslide",
+    ">p1 move protect, move thunderwave +1",
+    ">p2 move trickroom, move rockslide",
+    ">p1 move protect, move doubleedge +2",
+    ">p2 move hypervoice, move rockslide"
   ]
 }

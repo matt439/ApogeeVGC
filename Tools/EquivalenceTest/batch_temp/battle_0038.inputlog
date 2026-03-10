@@ -1,33 +1,41 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"267,496,725,1182"}
->player p1 {"name":"Player1","team":"Noctowl||LifeOrb|TintedLens|hurricane,hypervoice,tailwind,protect||85,,85,85,85,85|F|,0,,,,||91|,,,,,Normal]Entei||ChoiceBand|InnerFocus|sacredfire,extremespeed,flareblitz,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal]Glimmora||SitrusBerry|ToxicDebris|spikyshield,powergem,mortalspin,sludgebomb||85,85,85,85,85,85|M|||77|,,,,,Grass]Inteleon||ChoiceSpecs|Torrent|scald,icebeam,hydropump,muddywater||85,,85,85,85,85|M|,0,,,,||78|,,,,,Water]Empoleon||SitrusBerry|Competitive|icywind,yawn,hydropump,flashcannon||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Gallade||ChoiceScarf|Sharpness|sacredsword,nightslash,psychocut,trick||85,85,85,85,85,85|M|||80|,,,,,Dark"}
->player p2 {"name":"Player2","team":"Murkrow||Eviolite|Prankster|protect,haze,tailwind,bravebird||85,85,85,85,85,85|M|||90|,,,,,Steel]Glalie||SitrusBerry|InnerFocus|helpinghand,freezedry,foulplay,icywind||85,,85,85,85,85|F|,0,,,,||94|,,,,,Poison]Roaring Moon||BoosterEnergy|Protosynthesis|breakingswipe,acrobatics,knockoff,protect||85,85,85,85,85,85|N|||76|,,,,,Flying]Jirachi||SitrusBerry|SereneGrace|ironhead,thunderwave,uturn,lifedew||85,85,85,85,85,85|N|||80|,,,,,Dark]Clodsire||Leftovers|Unaware|recover,highhorsepower,gunkshot,toxicspikes||85,85,85,85,85,85|M|||87|,,,,,Flying]Cetitan||LifeOrb|SheerForce|highhorsepower,iciclecrash,liquidation,iceshard||85,85,85,85,85,85|M|||83|,,,,,Water"}
->p1 move hurricane +1, move flareblitz +1
->p2 move bravebird +1, move helpinghand -1
->p2 switch 4, pass
->p1 move tailwind, move flareblitz +2
->p2 move uturn +1, move foulplay +1
->p2 switch 5, pass
+>player p1 {"name":"Player1","team":"Vigoroth||Eviolite|VitalSpirit|icywind,knockoff,doubleedge,slackoff||85,85,85,85,85,85|F|||91|,,,,,Ghost]Tatsugiri||AssaultVest|StormDrain|icywind,muddywater,rapidspin,dracometeor||85,85,85,85,85,85|F|||84|,,,,,Fire]Beartic||LifeOrb|SlushRush|closecombat,iciclecrash,protect,aquajet||85,85,85,85,85,85|M|||91|,,,,,Fighting]Jumpluff|||Infiltrator|tailwind,strengthsap,ragepowder,acrobatics||85,85,85,85,85,85|M|||92|,,,,,Steel]Sunflora||LifeOrb|Chlorophyll|leafstorm,protect,sludgebomb,dazzlinggleam||85,,85,85,85,85|M|,0,,,,|||,,,,,Fairy]Weezing||SitrusBerry|Levitate|clearsmog,gunkshot,fireblast,poisongas||85,85,85,85,85,85|F|||91|,,,,,Dark"}
+>player p2 {"name":"Player2","team":"Galvantula||SitrusBerry|CompoundEyes|bugbuzz,thunder,voltswitch,stickyweb||85,,85,85,85,85|F|,0,,,,||85|,,,,,Electric]Bombirdier||LifeOrb|RockyPayload|knockoff,protect,rockslide,bravebird||85,85,85,85,85,85|F|||84|,,,,,Rock]Banette||LifeOrb|Frisk|poltergeist,shadowsneak,protect,gunkshot||85,85,85,85,85,85|M|||94|,,,,,Ghost]Murkrow||Eviolite|Prankster|tailwind,bravebird,protect,haze||85,85,85,85,85,85|F|||90|,,,,,Ghost]Regigigas||Leftovers|SlowStart|bodyslam,substitute,knockoff,protect||85,85,85,85,85,85|N|||86|,,,,,Fairy]Mienshao||FocusSash|Regenerator|closecombat,knockoff,fakeout,uturn||85,85,85,85,85,85|M|||84|,,,,,Dark"}
+>p1 move slackoff, move muddywater
+>p2 move stickyweb, move protect
+>p1 move doubleedge +2, move icywind
+>p2 move thunder +1, move rockslide
+>p1 move doubleedge +2, move dracometeor +2
+>p2 move voltswitch +2, move bravebird +1
+>p2 switch 6, switch 5
+>p1 move slackoff, move muddywater
+>p2 move knockoff +2, move knockoff +1
+>p1 move slackoff, move rapidspin +2
+>p2 move closecombat +1, move knockoff +1
+>p1 switch 4, switch 5
+>p1 move ragepowder, move dazzlinggleam
+>p2 move closecombat +2, move bodyslam +2
+>p1 move tailwind, move protect
+>p2 move closecombat +2, move substitute
+>p1 move ragepowder, move sludgebomb +1
+>p2 move knockoff +1, move substitute
+>p2 switch 3, pass
+>p1 move tailwind, move sludgebomb +2
+>p2 move gunkshot +1, move knockoff +1
 >p1 switch 3, pass
->p2 pass, switch 6
->p1 move mortalspin, move flareblitz +2
->p2 move gunkshot +2, move liquidation +2
->p1 pass, switch 6
->p2 pass, switch 3
->p1 move sludgebomb +2, move psychocut +2
->p2 move recover, move protect
->p1 move sludgebomb +2, move psychocut +2
->p2 move gunkshot +1, move breakingswipe
->p1 move mortalspin, move psychocut +2
->p2 move toxicspikes, move breakingswipe
->p1 move spikyshield, move psychocut +1
->p2 move gunkshot +2, move knockoff +2
->p1 pass, switch 4
->p1 move sludgebomb +1, move scald +1
->p2 move recover, move breakingswipe
->p2 switch 5, pass
->p1 move spikyshield, move scald +1
->p2 move thunderwave +1, pass
->p1 move spikyshield, move scald +1
->p2 move thunderwave +1, pass
->p1 move mortalspin, move scald +2
->p2 move ironhead +1, pass
+>p1 move iciclecrash +1, move sludgebomb +1
+>p2 move poltergeist +2, move bodyslam +1
+>p2 switch 4, pass
+>p1 move protect, move sludgebomb +1
+>p2 move bravebird +1, move protect
+>p1 move closecombat +2, move protect
+>p2 move bravebird +1, move protect
+>p1 switch 6, pass
+>p1 move gunkshot +2, move leafstorm +2
+>p2 move bravebird +1, move knockoff +1
+>p1 move clearsmog +2, move sludgebomb +2
+>p2 move haze, move knockoff +1
+>p1 move poisongas, move sludgebomb +2
+>p2 move protect, pass
+>p1 move poisongas, move dazzlinggleam
+>p2 move haze, pass

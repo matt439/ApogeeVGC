@@ -1,64 +1,48 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"197,366,535,872"}
->player p1 {"name":"Player1","team":"Conkeldurr||AssaultVest|IronFist|knockoff,machpunch,icepunch,drainpunch||85,85,85,85,85,85|M|||81|,,,,,Steel]Revavroom||LifeOrb|Filter|ironhead,protect,gunkshot,partingshot||85,85,85,85,85,85|F|||84|,,,,,Water]Latias||SoulDew|Levitate|mistball,dragonpulse,aurasphere,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Whimsicott||SitrusBerry|Prankster|moonblast,tailwind,encore,helpinghand||85,,85,85,85,85|M|,0,,,,||80|,,,,,Ghost]Falinks||LifeOrb|Defiant|closecombat,ironhead,rockslide,noretreat||85,85,85,85,85,85|N|||87|,,,,,Steel]Entei||ChoiceBand|InnerFocus|extremespeed,flareblitz,sacredfire,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal"}
->player p2 {"name":"Player2","team":"Raikou||SitrusBerry|InnerFocus|thunderwave,scald,thunderbolt,protect||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Shaymin||SitrusBerry|NaturalCure|earthpower,tailwind,seedflare,synthesis||85,,85,85,85,85|N|,0,,,,||81|,,,,,Ground]Mismagius||LifeOrb|Levitate|shadowball,mysticalfire,thunderbolt,taunt||85,,85,85,85,85|F|,0,,,,||88|,,,,,Electric]Dewgong||SitrusBerry|ThickFat|fakeout,encore,hydropump,icywind||85,85,85,85,85,85|F|||91|,,,,,Grass]Farigiraf||LifeOrb|ArmorTail|psychic,hypervoice,trickroom,protect||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fairy]Toedscruel||SitrusBerry|MyceliumMight|ragepowder,knockoff,earthpower,spore||85,85,85,85,85,85|F|||87|,,,,,Water"}
->p1 move knockoff +2, move gunkshot +1
->p2 move protect, move tailwind
->p1 move knockoff +2, move protect
->p2 move thunderbolt +1, move seedflare +1
->p1 move icepunch +1, move ironhead +1
->p2 move thunderbolt +1, move earthpower +1
->p1 switch 4, pass
->p1 move moonblast +2, move ironhead +2
->p2 move thunderbolt +1, move synthesis
->p1 move tailwind, move gunkshot +2
->p2 move thunderwave +1, move seedflare +1
->p2 pass, switch 6
->p1 move tailwind, move partingshot +1
->p2 move scald +2, move knockoff +2
->p1 pass, switch 5
->p1 move encore +2, move closecombat +2
->p2 move thunderwave +1, move spore +2
->p1 move encore +1, move rockslide
->p2 move scald +2, move knockoff +2
->p1 move encore +2, move closecombat +2
->p2 move scald +1, move knockoff +1
->p1 move helpinghand -2, move ironhead +1
->p2 move thunderwave +2, move spore +2
->p1 move helpinghand -2, move closecombat +2
->p2 move protect, move knockoff +1
->p1 move encore +1, move ironhead +2
->p2 move protect, move spore +1
->p2 pass, switch 4
->p1 move encore +2, move noretreat
->p2 move protect, move encore +2
->p1 pass, switch 5
->p1 move helpinghand -2, move protect
->p2 move scald +1, move encore +2
->p1 move encore +2, move protect
->p2 move scald +2, move hydropump +1
->p1 switch 3, pass
->p1 move mistball +1, move gunkshot +2
->p2 move protect, move encore +1
->p1 move mistball +2, move protect
->p2 move thunderbolt +2, move encore +1
->p1 move mistball +1, move protect
->p2 move thunderbolt +2, move encore +2
->p1 move mistball +1, move protect
->p2 move scald +1, move encore +2
+>player p1 {"name":"Player1","team":"Heatran||LifeOrb|FlashFire|protect,flashcannon,earthpower,heatwave||85,,85,85,85,85|M|,0,,,,||78|,,,,,Fairy]Oricorio|OricorioSensu|SitrusBerry|Dancer|hurricane,tailwind,revelationdance,protect||85,,85,85,85,85|F|,0,,,,||87|,,,,,Ground]Honchkrow||LifeOrb|Moxie|heatwave,suckerpunch,bravebird,protect||85,85,85,85,85,85|M|||85|,,,,,Flying]Politoed||SitrusBerry|Drizzle|helpinghand,icywind,muddywater,hypnosis||85,,85,85,85,85|M|,0,,,,||82|,,,,,Grass]Rhyperior||ChoiceBand|SolidRock|megahorn,icepunch,rockslide,highhorsepower||85,85,85,85,85,85|M|||82|,,,,,Dragon]Lucario||ChoiceBand|InnerFocus|meteormash,rockslide,extremespeed,closecombat||85,85,85,85,85,85|F|||86|,,,,,Normal"}
+>player p2 {"name":"Player2","team":"Sandslash|SandslashAlola|AssaultVest|SlushRush|iceshard,ironhead,drillrun,tripleaxel||85,85,85,85,85,85|F|||91|,,,,,Water]Malamar||SitrusBerry|Contrary|knockoff,superpower,psychocut,protect||85,85,85,85,85,85|M|||80|,,,,,Fighting]Carbink||Leftovers|ClearBody|bodypress,irondefense,moonblast,trickroom||85,,85,85,85,|N|,0,,,,0||88|,,,,,Fighting]Uxie||SitrusBerry|Levitate|mysticalpower,stealthrock,encore,thunderwave||85,,85,85,85,85|N|,0,,,,||85|,,,,,Steel]Poliwrath||AssaultVest|WaterAbsorb|icywind,closecombat,liquidation,knockoff||85,85,85,85,85,85|M|||90|,,,,,Steel]Oricorio|OricorioSensu|Leftovers|Dancer|protect,quiverdance,revelationdance,airslash||85,,85,85,85,85|M|,0,,,,||87|,,,,,Ground"}
+>p1 move flashcannon +2, move hurricane +1
+>p2 move ironhead +1, move protect
+>p1 move heatwave, move protect
+>p2 move ironhead +2, move psychocut +2
 >p2 switch 5, pass
->p1 move mistball +1, move protect
->p2 move trickroom, move encore +2
->p1 move aurasphere +1, move protect
->p2 move hypervoice, move encore +2
->p1 move protect, move gunkshot +2
->p2 move hypervoice, move icywind
->p1 pass, switch 6
->p2 pass, switch 3
->p1 move protect, move stompingtantrum +2
->p2 move protect, move taunt +1
->p1 move dragonpulse +2, move stompingtantrum +1
->p2 move protect, move thunderbolt +1
->p1 move aurasphere +2, move stompingtantrum +2
->p2 move trickroom, move thunderbolt +2
->p1 move mistball +1, move stompingtantrum +2
->p2 move hypervoice, move shadowball +2
+>p1 move protect, move tailwind
+>p2 move closecombat +1, move protect
+>p1 move earthpower +2, move revelationdance +2
+>p2 move icywind, move knockoff +1
+>p1 move protect, move protect
+>p2 move liquidation +2, move psychocut +1
+>p1 move flashcannon +1, move hurricane +2
+>p2 move icywind, move protect
+>p1 move earthpower +2, move tailwind
+>p2 move liquidation +1, move psychocut +1
+>p1 switch 6, pass
+>p1 move rockslide, move revelationdance +2
+>p2 move knockoff +1, move psychocut +1
+>p2 pass, switch 4
+>p1 move extremespeed +1, move tailwind
+>p2 move liquidation +1, move mysticalpower +2
+>p1 move extremespeed +1, move tailwind
+>p2 move liquidation +1, move encore +2
+>p1 switch 4, pass
+>p1 move helpinghand -2, move tailwind
+>p2 move knockoff +2, move stealthrock
+>p1 pass, switch 5
+>p1 move icywind, move rockslide
+>p2 move liquidation +2, move thunderwave +1
+>p1 pass, switch 3
+>p1 move helpinghand -2, move heatwave
+>p2 move closecombat +1, move mysticalpower +2
+>p1 move helpinghand -2, move suckerpunch +2
+>p2 move icywind, move encore +1
+>p1 move helpinghand -2, move bravebird +2
+>p2 move liquidation +2, move encore +2
+>p1 move helpinghand -2, move suckerpunch +1
+>p2 move closecombat +1, move thunderwave +1
+>p2 switch 6, pass
+>p1 move helpinghand -2, pass
+>p2 move quiverdance, move encore +2
+>p1 move hypnosis +1, pass
+>p2 move quiverdance, move stealthrock
+>p1 move muddywater, pass
+>p2 move revelationdance +2, move stealthrock

@@ -247,13 +247,11 @@ public partial record Abilities
                 Name = "Mimicry",
                 Num = 250,
                 Rating = 0.0,
-                // OnSwitchInPriority = -1
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -1),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState,
                         pokemon);
-                }),
+                }, -1),
                 OnTerrainChange = OnTerrainChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     ConditionId terrain = battle.Field.Terrain;

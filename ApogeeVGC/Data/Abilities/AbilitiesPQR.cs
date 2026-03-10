@@ -595,13 +595,11 @@ public partial record Abilities
                 Num = 281,
                 Rating = 3.0,
                 Condition = ConditionId.Protosynthesis,
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.WeatherChange, battle.Effect, battle.EffectState,
                         pokemon);
-                }),
+                }, -2),
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     // Protosynthesis is not affected by Utility Umbrella
@@ -751,13 +749,11 @@ public partial record Abilities
                 Num = 282,
                 Rating = 3.0,
                 Condition = ConditionId.QuarkDrive,
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState,
                         pokemon);
-                }),
+                }, -2),
                 OnTerrainChange = OnTerrainChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];

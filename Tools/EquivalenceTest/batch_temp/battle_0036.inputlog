@@ -1,67 +1,88 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"253,470,687,1120"}
->player p1 {"name":"Player1","team":"Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,earthpower,yawn,recover||85,,85,85,85,85|F|,0,,,,||82|,,,,,Fire]Klefki||SitrusBerry|Prankster|spikes,foulplay,dazzlinggleam,thunderwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Water]Goodra||SitrusBerry|SapSipper|thunderbolt,protect,dracometeor,fireblast||85,,85,85,85,85|F|,0,,,,||86|,,,,,Fire]Bastiodon||Leftovers|Sturdy|wideguard,bodypress,irondefense,foulplay||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting]Landorus|LandorusTherian|AssaultVest|Intimidate|uturn,stoneedge,stompingtantrum,terablast||85,85,85,85,85,85|M|||77|,,,,,Flying]Raikou||Leftovers|InnerFocus|thunderbolt,protect,scald,calmmind||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water"}
->player p2 {"name":"Player2","team":"Oricorio|OricorioPomPom|Leftovers|Dancer|protect,revelationdance,airslash,quiverdance||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Raikou||LifeOrb|InnerFocus|scald,voltswitch,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Dachsbun||SitrusBerry|WellBakedBody|snarl,howl,bodypress,playrough||85,85,85,85,85,85|M|||90|,,,,,Steel]Gholdengo||SitrusBerry|GoodasGold|shadowball,protect,nastyplot,makeitrain||85,,85,85,85,85|N|,0,,,,||78|,,,,,Steel]Chesnaught||Leftovers|Bulletproof|irondefense,bodypress,leechseed,spikyshield||85,,85,85,85,85|M|,0,,,,||86|,,,,,Fire]Shaymin||SitrusBerry|NaturalCure|synthesis,earthpower,tailwind,seedflare||85,,85,85,85,85|N|,0,,,,||81|,,,,,Steel"}
->p1 move yawn +1, move spikes
->p2 move protect, move thunderbolt +1
->p1 move icebeam +2, move foulplay +1
->p2 move protect, move thunderbolt +1
->p1 move icebeam +1, move foulplay +1
->p2 move airslash +2, move scald +2
->p1 move recover, move foulplay +2
->p2 move revelationdance +1, move voltswitch +2
->p2 pass, switch 6
->p1 move yawn +2, move foulplay +2
->p2 move airslash +1, move synthesis
->p1 move yawn +1, move thunderwave +2
->p2 move revelationdance +1, move seedflare +1
->p1 move recover, move spikes
->p2 move revelationdance +1, move seedflare +1
->p1 move earthpower +1, move foulplay +2
->p2 move protect, move tailwind
->p1 move recover, move foulplay +2
->p2 move airslash +2, move seedflare +1
->p1 move icebeam +1, move spikes
->p2 move revelationdance +2, move tailwind
->p2 switch 6, pass
->p1 move recover, move foulplay +2
->p2 move voltswitch +1, move synthesis
->p1 move recover, move dazzlinggleam
->p2 move voltswitch +2, move tailwind
->p2 switch 5, pass
->p1 move yawn +2, move thunderwave +1
->p2 move leechseed +1, move earthpower +1
->p1 move yawn +2, move spikes
->p2 move irondefense, move tailwind
->p1 move yawn +1, move foulplay +2
->p2 move bodypress +2, move synthesis
->p1 pass, switch 5
->p1 move recover, move stompingtantrum +2
->p2 move bodypress +2, move earthpower +2
->p1 move icebeam +2, move stoneedge +2
->p2 move leechseed +1, move synthesis
->p2 pass, switch 5
->p1 move earthpower +1, move stompingtantrum +2
->p2 move leechseed +2, move scald +2
+>player p1 {"name":"Player1","team":"Oinkologne|OinkologneF|SitrusBerry|ThickFat|doubleedge,protect,yawn,helpinghand||85,85,85,85,85,85|F|||92|,,,,,Normal]Rhydon||Eviolite|LightningRod|helpinghand,protect,highhorsepower,rockslide||85,85,85,85,85,85|F|||86|,,,,,Grass]Wigglytuff||SitrusBerry|Competitive|helpinghand,icywind,encore,dazzlinggleam||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Umbreon||SitrusBerry|InnerFocus|moonlight,foulplay,helpinghand,thunderwave||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Necrozma||Leftovers|PrismArmor|protect,earthpower,photongeyser,calmmind||85,,85,85,85,85|N|,0,,,,||80|,,,,,Steel]Blaziken||LifeOrb|SpeedBoost|knockoff,protect,overheat,closecombat||85,85,85,85,85,85|M|||79|,,,,,Stellar"}
+>player p2 {"name":"Player2","team":"Eternatus||Leftovers|Pressure|cosmicpower,dynamaxcannon,recover,flamethrower||85,,85,85,85,85|N|,0,,,,||70|,,,,,Dragon]Lokix||LifeOrb|TintedLens|uturn,firstimpression,suckerpunch,protect||85,85,85,85,85,85|M|||88|,,,,,Bug]Groudon||SitrusBerry|Drought|stoneedge,thunderwave,precipiceblades,heatcrash||85,85,85,85,85,85|N|||69|,,,,,Fire]Regigigas||Leftovers|SlowStart|substitute,knockoff,protect,bodyslam||85,85,85,85,85,85|N|||86|,,,,,Fairy]Chien-Pao||LifeOrb|SwordofRuin|iciclecrash,protect,suckerpunch,sacredsword||85,85,85,85,85,85|N|||75|,,,,,Ghost]Excadrill||LifeOrb|MoldBreaker|swordsdance,highhorsepower,protect,ironhead||85,85,85,85,85,85|F|||82|,,,,,Ground"}
+>p1 move doubleedge +1, move protect
+>p2 move cosmicpower, move protect
+>p1 move doubleedge +2, move helpinghand -1
+>p2 move cosmicpower, move protect
+>p1 move protect, move helpinghand -1
+>p2 move recover, move uturn +2
 >p2 pass, switch 3
->p1 move earthpower +1, move uturn +2
->p2 move irondefense, move playrough +2
->p1 pass, switch 3
->p1 move icebeam +1, move thunderbolt +2
->p2 move bodypress +1, move bodypress +1
->p2 switch 4, pass
->p1 move yawn +2, move fireblast +2
->p2 move nastyplot, move playrough +1
->p1 move icebeam +1, move dracometeor +1
->p2 move shadowball +1, move howl
+>p1 move helpinghand -2, move highhorsepower +1
+>p2 move cosmicpower, move heatcrash +2
+>p1 move helpinghand -2, move protect
+>p2 move recover, move stoneedge +1
+>p1 move yawn +2, move rockslide
+>p2 move cosmicpower, move heatcrash +2
+>p1 move protect, move rockslide
+>p2 move dynamaxcannon +1, move stoneedge +1
+>p1 move doubleedge +2, move protect
+>p2 move flamethrower +1, move precipiceblades
+>p1 move yawn +1, move helpinghand -1
+>p2 move flamethrower +1, move stoneedge +2
+>p1 move helpinghand -2, move protect
+>p2 move flamethrower +1, move thunderwave +1
+>p1 move yawn +1, move rockslide
+>p2 move cosmicpower, move thunderwave +2
+>p1 move protect, move helpinghand -1
+>p2 move recover, move precipiceblades
+>p1 move yawn +1, move helpinghand -1
+>p2 move dynamaxcannon +1, move precipiceblades
 >p1 switch 6, pass
->p1 move scald +2, move thunderbolt +2
->p2 move protect, move howl
->p1 move protect, move protect
->p2 move makeitrain, move bodypress +2
->p1 move calmmind, move dracometeor +1
->p2 move nastyplot, move playrough +2
->p1 pass, switch 4
->p1 move protect, move bodypress +2
->p2 move protect, move playrough +2
->p1 move thunderbolt +1, move foulplay +2
->p2 move protect, pass
+>p1 move protect, move highhorsepower +2
+>p2 move recover, move stoneedge +1
+>p1 move knockoff +1, move highhorsepower +1
+>p2 move dynamaxcannon +2, move thunderwave +1
+>p1 move overheat +1, move rockslide
+>p2 move recover, move stoneedge +2
+>p2 pass, switch 5
+>p1 move overheat +1, move rockslide
+>p2 move recover, move iciclecrash +2
+>p1 move protect, move highhorsepower +2
+>p2 move flamethrower +2, move sacredsword +2
+>p1 pass, switch 3
+>p1 move closecombat +2, move dazzlinggleam
+>p2 move dynamaxcannon +1, move iciclecrash +1
+>p1 switch 4, pass
+>p2 pass, switch 3
+>p1 move thunderwave +2, move icywind
+>p2 move flamethrower +1, move firstimpression +1
+>p2 pass, switch 4
+>p1 move moonlight, move dazzlinggleam
+>p2 move dynamaxcannon +1, move protect
+>p1 move foulplay +2, move icywind
+>p2 move cosmicpower, move knockoff +2
+>p1 move moonlight, move helpinghand -1
+>p2 move recover, move bodyslam +1
+>p1 move foulplay +1, move helpinghand -1
+>p2 move cosmicpower, move bodyslam +2
+>p1 move moonlight, move dazzlinggleam
+>p2 move cosmicpower, move knockoff +1
+>p1 move helpinghand -2, move helpinghand -1
+>p2 move flamethrower +1, move substitute
+>p1 move helpinghand -2, move helpinghand -1
+>p2 move cosmicpower, move bodyslam +2
+>p1 move foulplay +2, move icywind
+>p2 move dynamaxcannon +2, move substitute
+>p1 move moonlight, move dazzlinggleam
+>p2 move dynamaxcannon +2, move knockoff +1
+>p1 move helpinghand -2, move dazzlinggleam
+>p2 move recover, move knockoff +1
+>p1 move foulplay +2, move encore +2
+>p2 move cosmicpower, move substitute
+>p1 move foulplay +1, move icywind
+>p2 move recover, move substitute
+>p1 move moonlight, move dazzlinggleam
+>p2 move dynamaxcannon +2, move substitute
+>p2 pass, switch 6
+>p1 move foulplay +1, move dazzlinggleam
+>p2 move flamethrower +1, move highhorsepower +2
+>p1 pass, switch 5
+>p1 move thunderwave +1, move calmmind
+>p2 move cosmicpower, move swordsdance
+>p1 move thunderwave +2, move earthpower +1
+>p2 move flamethrower +2, move ironhead +1
+>p1 pass, move photongeyser +1
+>p2 move cosmicpower, move protect
+>p1 pass, move photongeyser +1
+>p2 move flamethrower +2, move ironhead +1

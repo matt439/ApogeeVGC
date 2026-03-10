@@ -1,32 +1,31 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"169,314,459,748"}
->player p1 {"name":"Player1","team":"Delibird||ChoiceBand|Hustle|foulplay,bravebird,icespinner,iceshard||85,85,85,85,85,85|M||||,,,,,Ice]Mimikyu||LifeOrb|Disguise|playrough,protect,shadowsneak,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost]Mandibuzz||SitrusBerry|Overcoat|tailwind,foulplay,uturn,snarl||85,85,85,85,85,85|F|||85|,,,,,Steel]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,flipturn,protect||85,85,85,85,85,85|M|||79|,,,,,Water]Magcargo||LifeOrb|WeakArmor|powergem,shellsmash,heatwave,protect||85,,85,85,85,85|M|,0,,,,||93|,,,,,Fire]Haxorus||LifeOrb|Unnerve|protect,dragonclaw,firstimpression,ironhead||85,85,85,85,85,85|F|||84|,,,,,Steel"}
->player p2 {"name":"Player2","team":"Mesprit||ChoiceScarf|Levitate|uturn,thunderbolt,psychic,icebeam||85,85,85,85,85,85|N|||86|,,,,,Electric]Latios||ChoiceSpecs|Levitate|trick,lusterpurge,dracometeor,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|fakeout,volttackle,encore,knockoff||85,85,85,85,85,85|M|||94|,,,,,Grass]Avalugg||Leftovers|Sturdy|recover,bodypress,avalanche,protect||85,85,85,85,85,85|M|||92|,,,,,Poison]Camerupt||SitrusBerry|SolidRock|heatwave,protect,earthpower,willowisp||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Zangoose||ToxicOrb|ToxicBoost|knockoff,protect,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Ghost"}
->p1 move iceshard +2, move shadowsneak +1
->p2 move icebeam +1, move lusterpurge +2
->p1 move iceshard +2, move playrough +2
->p2 move icebeam +2, move lusterpurge +2
->p1 pass, switch 3
->p1 move iceshard +1, move tailwind
->p2 move icebeam +1, move lusterpurge +2
->p1 move iceshard +1, move uturn +2
->p2 move icebeam +1, move lusterpurge +2
->p1 pass, switch 5
+>player p1 {"name":"Player1","team":"Cinccino||LoadedDice|Technician|tripleaxel,tailslap,bulletseed,protect||85,85,85,85,85,85|M|||85|,,,,,Grass]Conkeldurr||FlameOrb|Guts|protect,machpunch,closecombat,knockoff||85,85,85,85,85,85|M|||81|,,,,,Dark]Umbreon||SitrusBerry|InnerFocus|snarl,foulplay,helpinghand,thunderwave||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Frosmoth||HeavyDutyBoots|IceScales|quiverdance,protect,icebeam,bugbuzz||85,,85,85,85,85|F|,0,,,,||86|,,,,,Ground]Weavile||ChoiceBand|Pickpocket|lowkick,tripleaxel,knockoff,iceshard||85,85,85,85,85,85|M|||81|,,,,,Ghost]Squawkabilly|SquawkabillyBlue|LifeOrb|Intimidate|quickattack,doubleedge,bravebird,protect||85,85,85,85,85,85|F|||91|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Uxie||SitrusBerry|Levitate|thunderwave,helpinghand,mysticalpower,encore||85,,85,85,85,85|N|,0,,,,||85|,,,,,Dark]Infernape||FocusSash|Blaze|closecombat,overheat,knockoff,fakeout||85,85,85,85,85,85|M|||82|,,,,,Fighting]Froslass||WideLens|CursedBody|icywind,protect,tripleaxel,poltergeist||85,85,85,85,85,85|F|||88|,,,,,Ghost]Glastrier||AssaultVest|ChillingNeigh|heavyslam,closecombat,iciclecrash,highhorsepower||85,85,85,85,85,85|N|||80|,,,,,Steel]Meloetta||LifeOrb|SereneGrace|calmmind,focusblast,hypervoice,psychic||85,,85,85,85,85|N|,0,,,,||80|,,,,,Fighting]Gouging Fire||ClearAmulet|Protosynthesis|dragonclaw,heatcrash,burningbulwark,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire"}
+>p1 move bulletseed +1, move closecombat +2
+>p2 move mysticalpower +2, move fakeout +2
+>p1 move tailslap +2, move protect
+>p2 move mysticalpower +2, move fakeout +1
+>p1 move tripleaxel +1, move knockoff +1
+>p2 move helpinghand -2, move overheat +1
 >p1 switch 6, pass
->p2 pass, switch 3
->p1 move dragonclaw +1, move shellsmash
->p2 move icebeam +1, move encore +1
->p2 switch 4, pass
->p1 move dragonclaw +2, move heatwave
->p2 move bodypress +1, move encore +1
+>p1 move doubleedge +2, move knockoff +1
+>p2 move thunderwave +1, move overheat +2
+>p1 pass, switch 4
+>p2 pass, switch 4
+>p1 move quickattack +2, move quiverdance
+>p2 move helpinghand -2, move heavyslam +2
+>p1 pass, switch 5
+>p1 move protect, move lowkick +1
+>p2 move thunderwave +2, move iciclecrash +2
+>p1 move doubleedge +1, move lowkick +1
+>p2 move thunderwave +1, move closecombat +1
+>p1 move bravebird +1, move lowkick +2
+>p2 move mysticalpower +2, move highhorsepower +1
+>p1 switch 3, pass
 >p2 switch 6, switch 5
->p1 move dragonclaw +1, move shellsmash
->p2 move facade +1, move protect
->p1 move dragonclaw +1, move shellsmash
->p2 move facade +2, move earthpower +1
->p1 switch 4, pass
->p1 move jetpunch +1, move shellsmash
->p2 pass, move protect
->p1 move jetpunch +1, move protect
->p2 pass, move heatwave
->p1 move flipturn +2, move protect
->p2 pass, move willowisp +1
+>p1 move thunderwave +2, move lowkick +1
+>p2 move dragondance, move calmmind
+>p1 move thunderwave +2, move lowkick +2
+>p2 move dragonclaw +1, move hypervoice
+>p1 move thunderwave +2, pass
+>p2 move burningbulwark, move focusblast +2

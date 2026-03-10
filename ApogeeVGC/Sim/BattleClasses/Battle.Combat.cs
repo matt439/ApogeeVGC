@@ -527,7 +527,7 @@ public partial class Battle
                         // Use -setboost for moves that set boosts to maximum
                         Add("-setboost", target, boostId.ConvertToString(),
                             target.Boosts.GetBoost(boostId),
-                            "[from]", PartFuncUnion.FromIEffect(effect!));
+                            $"[from] {effect!.FullName}");
                     }
                     else if (effect is not null)
                     {

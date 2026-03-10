@@ -122,8 +122,8 @@ public partial class Pokemon
         {
             if (effect != null)
             {
-                Battle.Add("-transform", this, pokemon, "[from]",
-                    PartFuncUnion.FromIEffect(effect));
+                Battle.Add("-transform", this, pokemon,
+                    $"[from] {effect.FullName}");
             }
             else
             {

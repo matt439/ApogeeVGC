@@ -398,10 +398,6 @@ public partial record Abilities
                 Name = "As One (Glastrier)",
                 Num = 266,
                 Rating = 3.5,
-                //OnSwitchInPriority = 1,
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { },
-                    1
-                ),
                 OnStart = OnStartEventInfo.Create(
                     (battle, pokemon) =>
                     {
@@ -442,10 +438,6 @@ public partial record Abilities
                 Name = "As One (Spectrier)",
                 Num = 267,
                 Rating = 3.5,
-                //OnSwitchInPriority = 1,
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { },
-                    1
-                ),
                 OnStart = OnStartEventInfo.Create(
                     (battle, pokemon) =>
                     {

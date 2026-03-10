@@ -580,9 +580,9 @@ public partial class Pokemon : IPriorityComparison
         // Determine the full name to display (real or illusion)
         var fullname = Illusion != null ? Illusion.Fullname : Fullname;
 
-        // Use slot identifier (p2a) when possible, matching Showdown's protocol format.
-        // Even fainted Pokemon that were on field should keep their slot identifier.
-        return Position >= 0 ? GetSlot() + fullname[2..] : fullname;
+        // Use slot identifier (p2a) for active Pokemon only, matching Showdown's isActive check.
+        // Fainted/benched Pokemon use fullname format (e.g. "p2: Kleavor" without slot letter).
+        return IsActive ? GetSlot() + fullname[2..] : fullname;
     }
 
     public PokemonDetails GetUpdatedDetails(int? level = null)

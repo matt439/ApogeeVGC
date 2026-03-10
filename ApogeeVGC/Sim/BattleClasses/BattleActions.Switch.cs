@@ -178,7 +178,7 @@ public partial class BattleActions
             if (sourceEffect != null)
             {
                 Battle.AddWithPerspective(preSwitchPerspective, isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails,
-                    $"[from] {sourceEffect.EffectStateId}");
+                    $"[from] {sourceEffect.Name}");
             }
             else
             {

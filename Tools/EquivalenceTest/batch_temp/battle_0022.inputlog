@@ -1,34 +1,67 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"155,288,421,686"}
->player p1 {"name":"Player1","team":"Honchkrow||LifeOrb|Moxie|protect,bravebird,suckerpunch,heatwave||85,85,85,85,85,85|M|||85|,,,,,Flying]Raichu|RaichuAlola|ChoiceSpecs|SurgeSurfer|thunderbolt,psychic,focusblast,voltswitch||85,,85,85,85,85|F|,0,,,,||89|,,,,,Electric]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fairy]Camerupt||SitrusBerry|SolidRock|earthpower,heatwave,willowisp,stealthrock||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Hydrapple||AssaultVest|Regenerator|earthpower,ficklebeam,pollenpuff,leafstorm||85,,85,85,85,85|M|,0,,,,||85|,,,,,Steel]Probopass||ChestoBerry|MagnetPull|rest,bodypress,irondefense,flashcannon||85,,85,85,85,85|M|,0,,,,||90|,,,,,Fighting"}
->player p2 {"name":"Player2","team":"Latios||SoulDew|Levitate|dracometeor,lusterpurge,protect,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Dragon]Spectrier||LifeOrb|GrimNeigh|protect,nastyplot,terablast,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fighting]Great Tusk||SitrusBerry|Protosynthesis|protect,rockslide,closecombat,headlongrush||85,85,85,85,85,85|N|||81|,,,,,Ground]Lilligant||LifeOrb|Chlorophyll|pollenpuff,energyball,quiverdance,sleeppowder||85,,85,85,85,85|F|,0,,,,||88|,,,,,Steel]Ariados||RockyHelmet|Swarm|megahorn,ragepowder,stickyweb,protect||85,85,85,85,85,85|F||||,,,,,Dark]Reuniclus||LifeOrb|MagicGuard|shadowball,focusblast,trickroom,psychic||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fighting"}
->p1 move protect, move psychic +1
->p2 move lusterpurge +2, move protect
->p1 move protect, move psychic +2
->p2 move lusterpurge +2, move protect
->p2 pass, switch 4
->p1 move bravebird +2, move psychic +1
->p2 move lusterpurge +2, move quiverdance
+>player p1 {"name":"Player1","team":"Dipplin||Eviolite|StickyHold|recover,syrupbomb,dragonpulse,pollenpuff||85,,85,85,85,85|F|,0,,,,||92|,,,,,Steel]Murkrow||Eviolite|Prankster|taunt,bravebird,protect,tailwind||85,85,85,85,85,85|M|||90|,,,,,Steel]Metagross||WeaknessPolicy|ClearBody|psychicfangs,stompingtantrum,heavyslam,agility||85,85,85,85,85,85|N|||80|,,,,,Dragon]Mudsdale||ChestoBerry|Stamina|rest,bodypress,highhorsepower,heavyslam||85,85,85,85,85,85|F|||84|,,,,,Fighting]Illumise||SitrusBerry|Prankster|thunderwave,encore,tailwind,strugglebug||85,,85,85,85,85|F|,0,,,,||83|,,,,,Water]Coalossal||SitrusBerry|FlameBody|incinerate,stoneedge,heatwave,protect||85,85,85,85,85,85|M|||90|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Rotom|RotomHeat|SitrusBerry|Levitate|overheat,thunderbolt,protect,electroweb||85,,85,85,85,85|N|,0,,,,||84|,,,,,Electric]Eternatus||PowerHerb|Pressure|fireblast,dynamaxcannon,protect,meteorbeam||85,,85,85,85,85|N|,0,,,,||70|,,,,,Dragon]Blaziken||LifeOrb|SpeedBoost|stoneedge,protect,closecombat,overheat||85,85,85,85,85,85|F|||79|,,,,,Stellar]Ursaluna|UrsalunaBloodmoon|AssaultVest|MindsEye|vacuumwave,bloodmoon,earthpower,hypervoice||85,,85,85,85,85|M|,0,,,,||78|,,,,,Normal]Uxie||SitrusBerry|Levitate|stealthrock,thunderwave,mysticalpower,helpinghand||85,,85,85,85,85|N|,0,,,,||85|,,,,,Dark]Spidops||SitrusBerry|Stakeout|lunge,stickyweb,knockoff,circlethrow||85,85,85,85,85,85|F||||,,,,,Water"}
+>p1 move dragonpulse +1, move tailwind
+>p2 move protect, move fireblast +1
+>p1 move recover, move tailwind
+>p2 move thunderbolt +2, move fireblast +1
+>p1 move pollenpuff +1, move bravebird +2
+>p2 move protect, move protect
+>p1 move pollenpuff +1, move tailwind
+>p2 move protect, move meteorbeam +1
+>p1 move recover, move tailwind
+>p2 move overheat +2, move dynamaxcannon +2
 >p1 pass, switch 5
->p2 pass, switch 6
->p1 move suckerpunch +1, move ficklebeam +1
->p2 move dracometeor +2, move shadowball +2
->p2 switch 3, pass
->p1 move protect, move leafstorm +1
->p2 move rockslide, move psychic +2
->p1 move bravebird +2, move ficklebeam +2
->p2 move rockslide, move trickroom
->p1 move protect, move pollenpuff +2
->p2 move rockslide, move focusblast +1
->p1 pass, switch 3
->p1 move suckerpunch +1, move rockslide
->p2 move closecombat +2, move shadowball +1
+>p1 move pollenpuff +1, move encore +2
+>p2 move protect, move dynamaxcannon +1
 >p1 switch 4, pass
+>p1 move heavyslam +1, move tailwind
+>p2 move electroweb, move dynamaxcannon +2
+>p1 move highhorsepower +1, move encore +1
+>p2 move overheat +1, move protect
+>p1 move rest, move thunderwave +2
+>p2 move electroweb, move protect
+>p1 move heavyslam +2, move strugglebug
+>p2 move electroweb, move fireblast +1
+>p1 move heavyslam +2, move tailwind
+>p2 move overheat +1, move fireblast +1
+>p1 move rest, move thunderwave +1
+>p2 move electroweb, move dynamaxcannon +2
+>p1 pass, switch 3
+>p1 move bodypress +1, move psychicfangs +1
+>p2 move electroweb, move dynamaxcannon +2
+>p2 switch 6, pass
+>p1 move heavyslam +2, move psychicfangs +2
+>p2 move circlethrow +1, move protect
+>p1 move heatwave, move psychicfangs +1
+>p2 move lunge +1, move protect
+>p1 move heatwave, move stompingtantrum +1
+>p2 move circlethrow +1, move protect
+>p2 switch 3, pass
+>p1 move incinerate, move psychicfangs +1
+>p2 move overheat +1, move dynamaxcannon +2
+>p2 switch 4, pass
+>p1 move heatwave, move heavyslam +2
+>p2 move bloodmoon +1, move dynamaxcannon +2
+>p1 move stoneedge +2, move agility
+>p2 move vacuumwave +1, move fireblast +2
+>p1 pass, switch 6
 >p2 pass, switch 5
->p1 move earthpower +1, move protect
->p2 move closecombat +2, move megahorn +1
->p1 move earthpower +2, move rockslide
->p2 pass, move ragepowder
->p1 move willowisp +2, move rockslide
->p2 pass, move ragepowder
->p1 move willowisp +2, move rockslide
->p2 pass, move ragepowder
+>p1 move protect, move heavyslam +2
+>p2 move vacuumwave +1, move stealthrock
+>p1 move incinerate, move heavyslam +1
+>p2 move earthpower +2, move stealthrock
+>p1 move protect, move rest
+>p2 move vacuumwave +2, move stealthrock
+>p1 move protect, move highhorsepower +2
+>p2 move bloodmoon +1, move thunderwave +2
+>p1 move stoneedge +1, move heavyslam +1
+>p2 move vacuumwave +1, move helpinghand -1
+>p1 move stoneedge +1, move highhorsepower +1
+>p2 move vacuumwave +1, move helpinghand -1
+>p1 pass, move heavyslam +1
+>p2 move bloodmoon +2, move helpinghand -1
+>p1 pass, move bodypress +2
+>p2 pass, move thunderwave +2
+>p1 pass, move highhorsepower +2
+>p2 pass, move mysticalpower +2
