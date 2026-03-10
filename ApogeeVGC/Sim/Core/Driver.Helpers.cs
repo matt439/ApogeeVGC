@@ -516,7 +516,7 @@ public partial class Driver
     private static void LogInnerExceptions(Exception ex)
     {
         Exception? inner = ex.InnerException;
-        int depth = 1;
+        var depth = 1;
         while (inner != null)
         {
             Console.WriteLine();

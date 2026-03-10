@@ -1305,7 +1305,7 @@ public partial class Driver
 
             int p1Wins = 0, p2Wins = 0, ties = 0, exceptions = 0;
 
-            for (int i = 0; i < battlesPerFormat; i++)
+            for (var i = 0; i < battlesPerFormat; i++)
             {
                 // Deterministic seed derivation — same seeds produce same results
                 int baseOffset = i * 5 + 1;

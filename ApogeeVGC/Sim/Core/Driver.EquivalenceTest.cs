@@ -29,7 +29,7 @@ public partial class Driver
         // Test raw next() values
         var rng = new Gen5Rng(seed);
         Console.WriteLine("=== Raw next() values (100) ===");
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             uint val = rng.Next();
             Console.WriteLine($"{i}: {val}");
@@ -38,7 +38,7 @@ public partial class Driver
         // Test random(N) via Prng wrapper
         var prng = new Prng(PrngSeed.FromGen5(seed));
         Console.WriteLine("\n=== random(256) values (100) ===");
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             int val = prng.Random(256);
             Console.WriteLine($"{i}: {val}");
@@ -47,7 +47,7 @@ public partial class Driver
         // Test random(min, max)
         var prng2 = new Prng(PrngSeed.FromGen5(seed));
         Console.WriteLine("\n=== random(10, 20) values (50) ===");
-        for (int i = 0; i < 50; i++)
+        for (var i = 0; i < 50; i++)
         {
             int val = prng2.Random(10, 20);
             Console.WriteLine($"{i}: {val}");
@@ -65,6 +65,15 @@ public partial class Driver
     /// </summary>
     public void RunEquivalenceTest(string fixturePath, string showdownLogPath)
     {
+        // Resolve paths relative to the solution root (walk up from bin output dir)
+        // This handles both `dotnet run` (CWD = project root) and running the built exe
+        if (!File.Exists(fixturePath))
+        {
+            string solutionRoot = FindSolutionRoot(AppContext.BaseDirectory);
+            fixturePath = Path.Combine(solutionRoot, fixturePath);
+            showdownLogPath = Path.Combine(solutionRoot, showdownLogPath);
+        }
+
         Console.WriteLine($"[Equivalence] Loading fixture: {fixturePath}");
         Console.WriteLine($"[Equivalence] Loading Showdown log: {showdownLogPath}");
 
@@ -87,8 +96,8 @@ public partial class Driver
 
         // Parse teams
         var resolver = new ShowdownNameResolver(Library);
-        PokemonSet[] p1Team = ParseShowdownTeam(root.GetProperty("p1Team"), resolver);
-        PokemonSet[] p2Team = ParseShowdownTeam(root.GetProperty("p2Team"), resolver);
+        var p1Team = ParseShowdownTeam(root.GetProperty("p1Team"), resolver);
+        var p2Team = ParseShowdownTeam(root.GetProperty("p2Team"), resolver);
 
         Console.WriteLine($"[Equivalence] Format: {formatId}, Seed: {gen5Seed}");
         Console.WriteLine($"[Equivalence] P1 team: {string.Join(", ", p1Team.Select(p => p.Name))}");
@@ -139,18 +148,18 @@ public partial class Driver
         // Battle.Start() sets up the first request, then we feed choices
         // and call CommitChoices(), which runs TurnLoop and may generate
         // new requests (forced switches after fainting, etc.)
-        int choicesApplied = 0;
+        var choicesApplied = 0;
         while (!battle.Ended && battle.RequestState != RequestState.None)
         {
             // Feed choices for both sides from the input log
             // Feed choices from the queue, handling the case where one side
             // is already done (e.g. no forced switch needed)
-            bool madeProgress = true;
+            var madeProgress = true;
             while (choices.Count > 0 && !battle.AllChoicesDone() && madeProgress)
             {
                 madeProgress = false;
                 // Scan through queued choices to find ones we can apply
-                int scanned = 0;
+                var scanned = 0;
                 int total = choices.Count;
                 while (scanned < total && !battle.AllChoicesDone())
                 {
@@ -158,7 +167,7 @@ public partial class Driver
                     scanned++;
 
                     Side? side = null;
-                    string choice = "";
+                    var choice = "";
                     if (line.StartsWith("p1 "))
                     {
                         side = battle.P1;
@@ -213,7 +222,7 @@ public partial class Driver
 
         // Find first mismatch and dump context around it
         int firstMismatchIdx = -1;
-        for (int d = 0; d < Math.Min(csharpFiltered.Count, showdownFiltered.Count); d++)
+        for (var d = 0; d < Math.Min(csharpFiltered.Count, showdownFiltered.Count); d++)
         {
             if (csharpFiltered[d] != showdownFiltered[d]) { firstMismatchIdx = d; break; }
         }
@@ -243,11 +252,11 @@ public partial class Driver
         }
 
         // Compare
-        int matches = 0;
-        int mismatches = 0;
+        var matches = 0;
+        var mismatches = 0;
         int maxLines = Math.Max(csharpFiltered.Count, showdownFiltered.Count);
 
-        for (int i = 0; i < maxLines; i++)
+        for (var i = 0; i < maxLines; i++)
         {
             string csLine = i < csharpFiltered.Count ? csharpFiltered[i] : "(missing)";
             string sdLine = i < showdownFiltered.Count ? showdownFiltered[i] : "(missing)";
@@ -274,6 +283,10 @@ public partial class Driver
             Console.WriteLine("[Equivalence] PASS — protocols are identical!");
         else
             Console.WriteLine("[Equivalence] FAIL — protocols diverge");
+
+        // press Enter to exit so we can review the output
+        Console.WriteLine("Press Enter key to exit...");
+        Console.ReadLine();
     }
 
     /// <summary>
@@ -402,7 +415,7 @@ public partial class Driver
             }
 
             // Gender
-            GenderId gender = GenderId.N;
+            var gender = GenderId.N;
             if (mon.TryGetProperty("gender", out JsonElement genderElem))
             {
                 string g = genderElem.GetString() ?? "";
@@ -443,4 +456,21 @@ public partial class Driver
         "gen9randomdoublesbattle" => FormatId.Gen9RandomDoublesBattle,
         _ => throw new ArgumentException($"Unknown format: {formatId}"),
     };
+
+    /// <summary>
+    /// Walk up from a directory to find the solution root (contains .sln file).
+    /// </summary>
+    private static string FindSolutionRoot(string startDir)
+    {
+        string dir = startDir;
+        while (dir != null)
+        {
+            if (Directory.GetFiles(dir, "*.sln").Length > 0)
+                return dir;
+            dir = Directory.GetParent(dir)?.FullName!;
+        }
+
+        throw new DirectoryNotFoundException(
+            $"Could not find solution root (containing *.sln) starting from {startDir}");
+    }
 }
