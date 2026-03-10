@@ -99,6 +99,9 @@ public partial class Driver
                     "Tools/EquivalenceTest/battle_output.fixture.json",
                     "Tools/EquivalenceTest/battle_output.log");
                 break;
+            case DriverMode.EquivalenceBatchTest:
+                RunEquivalenceBatchTest();
+                break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
