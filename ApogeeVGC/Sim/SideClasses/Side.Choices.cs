@@ -600,6 +600,12 @@ public partial class Side
         if (string.IsNullOrWhiteSpace(input))
             return EmitChoiceError("Can't choose: empty input");
 
+        // Clear any previous/stale choice state before parsing new input.
+        // This matches Showdown's choose() which calls clearChoice() first.
+        // Important because IsChoiceDone() -> GetChoiceIndex() may have auto-passed
+        // fainted Pokemon as a side effect.
+        ClearChoice();
+
         string[] parts = input.Split(',');
 
         foreach (string raw in parts)

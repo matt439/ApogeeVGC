@@ -18,7 +18,7 @@ public partial class BattleActions
         // Validate the Pokemon exists and is not already active
         if (pokemon.IsActive)
         {
-            Battle.Hint("A switch failed because the Pokémon trying to switch in is already in.");
+            Battle.Hint("A switch failed because the Pokï¿½mon trying to switch in is already in.");
             return false;
         }
 
@@ -32,7 +32,7 @@ public partial class BattleActions
 
         // Handle initial switch-in where Active[pos] is null
         Pokemon? oldActive = side.Active[pos];
-        Pokemon? unfaintedActive = oldActive?.Hp > 0 ? oldActive : null;
+        Pokemon? unfaintedActive = (oldActive is { Fainted: false, Hp: > 0 }) ? oldActive : null;
 
         if (unfaintedActive != null)
         {

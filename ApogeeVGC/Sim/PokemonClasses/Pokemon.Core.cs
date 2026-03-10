@@ -537,6 +537,7 @@ public partial class Pokemon : IPriorityComparison
         Details = new PokemonDetails
         {
             Id = source.Details.Id,
+            DisplayName = source.Details.DisplayName,
             Level = source.Details.Level,
             Gender = source.Details.Gender,
             Shiny = source.Details.Shiny,
@@ -577,11 +578,11 @@ public partial class Pokemon : IPriorityComparison
     public override string ToString()
     {
         // Determine the full name to display (real or illusion)
-        var fullname = Illusion != null ? Illusion.Fullname : FullName;
+        var fullname = Illusion != null ? Illusion.Fullname : Fullname;
 
-        // If active, combine slot identifier with name (skip first 2 chars of fullname)
-        // Otherwise just return the full name
-        return IsActive ? GetSlot() + fullname[2..] : fullname;
+        // Use slot identifier (p2a) when possible, matching Showdown's protocol format.
+        // Even fainted Pokemon that were on field should keep their slot identifier.
+        return Position >= 0 ? GetSlot() + fullname[2..] : fullname;
     }
 
     public PokemonDetails GetUpdatedDetails(int? level = null)
@@ -600,6 +601,7 @@ public partial class Pokemon : IPriorityComparison
         var details = new PokemonDetails
         {
             Id = id,
+            DisplayName = Battle.Library.Species[id].Name,
             Level = displayLevel,
             Gender = Gender,
             Shiny = Set.Shiny,
@@ -724,10 +726,20 @@ public partial class Pokemon : IPriorityComparison
             }
         }
 
-        // Append status condition if present
+        // Append status condition if present (using Showdown protocol abbreviations)
         if (Status != ConditionId.None)
         {
-            string statusSuffix = string.Concat(" ", Status.ToString());
+            string statusAbbr = Status switch
+            {
+                ConditionId.Burn => "brn",
+                ConditionId.Paralysis => "par",
+                ConditionId.Poison => "psn",
+                ConditionId.Toxic => "tox",
+                ConditionId.Sleep => "slp",
+                ConditionId.Freeze => "frz",
+                _ => Status.ToString().ToLowerInvariant(),
+            };
+            string statusSuffix = string.Concat(" ", statusAbbr);
             secretStr = string.Concat(secretStr, statusSuffix);
             sharedStr = string.Concat(sharedStr, statusSuffix);
         }

@@ -6,7 +6,7 @@ namespace ApogeeVGC.Sim.Actions;
 public record ResidualAction : IAction
 {
     public ActionId Choice => ActionId.Residual;
-    public IntFalseUnion Order => int.MaxValue;
+    public IntFalseUnion Order => 300; // Showdown: orders.residual = 300
     public int Priority => 0;
     public int Speed => 0;
     public int SubOrder => 0;

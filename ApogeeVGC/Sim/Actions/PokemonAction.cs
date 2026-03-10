@@ -31,5 +31,5 @@ public record PokemonAction : IAction
 
     public int SubOrder => 0;
     public int EffectOrder => 0;
-    public IntFalseUnion Order => int.MaxValue;
+    public IntFalseUnion Order { get; init; } = IntFalseUnion.FromFalse();
 }

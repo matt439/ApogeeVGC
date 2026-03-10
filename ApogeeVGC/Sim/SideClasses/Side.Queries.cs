@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.PokemonClasses;
+using System.Linq;
 
 namespace ApogeeVGC.Sim.SideClasses;
 

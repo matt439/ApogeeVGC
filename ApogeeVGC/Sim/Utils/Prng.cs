@@ -22,6 +22,9 @@ public class Prng
     private Rng? _dotnetRng;
     private Gen5Rng? _gen5Rng;
 
+    /// <summary>Access the underlying Gen5Rng (null if in .NET mode).</summary>
+    public Gen5Rng? Gen5 => _gen5Rng;
+
     public Prng(PrngSeed? seed)
     {
         if (seed?.Gen5Seed is { } gen5Seed)
@@ -62,7 +65,8 @@ public class Prng
         {
             // Match Showdown: Math.floor(result * from / 2**32)
             uint result = _gen5Rng.Next();
-            return (int)(result * (ulong)max >> 32);
+            int val = (int)(result * (ulong)max >> 32);
+            return val;
         }
         return _dotnetRng!.Next(max);
     }
@@ -76,7 +80,8 @@ public class Prng
         {
             // Match Showdown: Math.floor(result * (to - from) / 2**32) + from
             uint result = _gen5Rng.Next();
-            return (int)(result * (ulong)(max - min) >> 32) + min;
+            int val = (int)(result * (ulong)(max - min) >> 32) + min;
+            return val;
         }
         return _dotnetRng!.Next(min, max);
     }

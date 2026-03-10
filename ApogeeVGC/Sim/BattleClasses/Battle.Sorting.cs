@@ -247,7 +247,7 @@ public partial class Battle
         }
 
         // Get the Pokemon's action speed (factors in speed stat, paralysis, etc.)
-        // The other Action types have constant speed values so do not need to be set.
+        // Matches Showdown: if (!action.pokemon) action.speed = 1; else action.speed = pokemon.getActionSpeed();
         switch (action)
         {
             case SwitchAction switchAction:
@@ -256,6 +256,11 @@ public partial class Battle
             case PokemonAction pokemonAction:
                 pokemonAction.Speed = pokemonAction.Pokemon.GetActionSpeed();
                 return pokemonAction;
+            case RunSwitchAction runSwitchAction:
+                return runSwitchAction with
+                {
+                    Speed = runSwitchAction.Pokemon?.GetActionSpeed() ?? 1,
+                };
             default:
                 return action;
         }
@@ -374,9 +379,13 @@ public partial class Battle
     private int CalculateDefaultSubOrder(EventListenerWithoutPriority listener)
     {
         // Effect type hierarchy for subOrder
+        // Matches Showdown's resolvePriority logic:
+        //   Condition: isSlotCondition→3, target instanceof Pokemon→2, else→5
+        //   Weather/Format/Rule/Ruleset: 5
+        //   Ability: 7, Item: 8
         int subOrder = listener.Effect.EffectType switch
         {
-            EffectType.Condition => 2,
+            EffectType.Condition => 5, // Default for conditions (field conditions, etc.)
             EffectType.Weather => 5,
             EffectType.Format => 5,
             EffectType.Rule => 5,
@@ -386,17 +395,23 @@ public partial class Battle
             _ => 0,
         };
 
-        // Refine for conditions
-        if (listener.Effect.EffectType == EffectType.Condition && listener.State?.Target != null)
+        // Refine for conditions based on target type
+        // Showdown: isSlotCondition→3, target instanceof Pokemon→2, else→5
+        if (listener.Effect.EffectType == EffectType.Condition)
         {
-            subOrder = listener.State.Target switch
+            if (listener.State?.IsSlotCondition == true)
             {
-                SideEffectStateTarget when listener.State.IsSlotCondition ==
-                                           true => 3, // Slot condition
-                SideEffectStateTarget => 4, // Side condition
-                FieldEffectStateTarget => 5, // Field condition
-                _ => subOrder,
-            };
+                subOrder = 3; // Slot condition (e.g., Wish)
+            }
+            else if (listener.State?.Target is PokemonEffectStateTarget)
+            {
+                subOrder = 2; // Volatile/status on a Pokemon
+            }
+            else if (listener.State?.Target is SideEffectStateTarget)
+            {
+                subOrder = 4; // Side condition (e.g., Stealth Rock)
+            }
+            // else: stays at 5 (field conditions like Trick Room, or null target)
         }
 
         // Special abilities

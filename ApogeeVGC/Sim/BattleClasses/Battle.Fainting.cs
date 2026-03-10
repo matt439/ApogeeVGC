@@ -182,12 +182,6 @@ public partial class Battle
             );
         }
 
-        // Check for fainted Pokemon and set their switch flags
-        CheckFainted();
-
-        // Flush events so faint messages are sent before switch requests
-        FlushEvents();
-
         return false;
     }
 

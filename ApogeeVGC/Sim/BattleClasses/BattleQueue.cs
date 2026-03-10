@@ -155,8 +155,12 @@ public class BattleQueue(Battle battle)
                     case SwitchAction sa:
                         currentAction = sa with { Order = order };
                         break;
-                    case PokemonAction:
-                        break; // PokemonAction.Order returns int.MaxValue
+                    case RunSwitchAction rsa:
+                        currentAction = rsa with { Order = order };
+                        break;
+                    case PokemonAction pa:
+                        currentAction = pa with { Order = order };
+                        break;
                 }
             }
             else

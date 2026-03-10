@@ -65,7 +65,7 @@ public partial class BattleActions
 
    if (!hitResult)
      {
-// Move failed preliminary checks — only show "-fail" for explicit false,
+// Move failed preliminary checks ï¿½ only show "-fail" for explicit false,
 // not for NullRelayVar (TS null = "failed silently")
 if (tryResult is BoolRelayVar { Value: false } ||
        prepareHitResult1 is BoolRelayVar { Value: false } ||
@@ -142,7 +142,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
         // Add spread move attribute to battle log if applicable
         if (Battle.DisplayUi && move.SpreadHit == true)
         {
-            Battle.AttrLastMove($"[spread] {string.Join(",", targets.Select(p => p.Position))}");
+            Battle.AttrLastMove($"[spread] {string.Join(",", targets.Select(p => p.GetSlot().ToString()))}");
         }
 
         return moveResult;

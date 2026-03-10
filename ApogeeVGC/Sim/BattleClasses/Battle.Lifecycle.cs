@@ -754,21 +754,14 @@ public partial class Battle
         FaintMessages();
         if (Ended) return true;
 
-        // Cancel queued actions for all fainted Pokemon
-        foreach (Side side in Sides)
+        // Switching (fainted pokemon, U-turn, Baton Pass, etc)
+        // In Gen 4+, faint replacement switches only happen when the queue is empty
+        // (all remaining turn actions execute first before requesting switches)
+        if (Queue.Peek() == null)
         {
-            // Create snapshot to avoid collection modification during enumeration
-            Pokemon?[] activeSnapshot = [.. side.Active];
-            foreach (Pokemon? pokemon in activeSnapshot)
-            {
-                if (pokemon?.Fainted == true)
-                {
-                    Queue.CancelAction(pokemon);
-                }
-            }
+            CheckFainted();
         }
 
-        // Switching (fainted pokemon, U-turn, Baton Pass, etc)
         if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
         {
             return false;

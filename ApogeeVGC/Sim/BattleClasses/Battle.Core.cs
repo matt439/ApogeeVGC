@@ -468,11 +468,11 @@ public partial class Battle
     public EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot,
         int? duration)
     {
-        // Use the first overload to handle basic initialization and effect ordering
-        // Pass the source Pokemon wrapped in EffectStateTarget for effect ordering purposes
-        EffectStateTarget? targetWrapper =
-            source != null ? new PokemonEffectStateTarget(source) : null;
-        EffectState state = InitEffectState(id, effectOrder: null, target: targetWrapper);
+        // Matches Showdown's initEffectState({id, source, sourceSlot, duration}).
+        // The source Pokemon is NOT the target — target is set separately by callers
+        // that need it (e.g., addVolatile sets target: pokemon, addSideCondition sets
+        // target: side). Field conditions like Trick Room don't set target at all.
+        EffectState state = InitEffectState(id, effectOrder: null, target: null);
 
         // Add the additional properties specific to this overload
         state.Source = source;

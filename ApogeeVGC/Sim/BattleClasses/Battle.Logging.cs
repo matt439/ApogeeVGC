@@ -401,8 +401,9 @@ public partial class Battle
             DoublePart d => d.Value.ToString("F"),
             BoolPart b => b.Value.ToString().ToLowerInvariant(),
             PokemonPart p => p.Pokemon.ToString(),
-            SidePart s => s.Side.Id.GetSideIdName(),
+            SidePart s => $"{s.Side.Id.GetSideIdName()}: {s.Side.Name}",
             MovePart m => m.Move.Name,
+            EffectPart e when e.Effect is Condition c => GetProtocolEffectName(c) ?? c.Name,
             EffectPart e => e.Effect.Name,
             UndefinedPart => "undefined",
             _ => string.Empty,
@@ -435,17 +436,20 @@ public partial class Battle
     /// <param name="source">The Pokemon that caused the damage (optional)</param>
     /// <param name="effect">The effect that caused the damage (optional)</param>
     private void PrintDamageMessage(Pokemon target, int damageAmount, Pokemon? source,
-        Condition? effect)
+        IEffect? effect)
     {
         if (!DisplayUi) return;
 
-        // Get the effect name, converting "tox" to "psn" for display
-        string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
+        // Get the effect name, converting condition names to protocol abbreviations
+        string? effectName = GetProtocolEffectName(effect);
 
         // Add damage amount tag for parser
         string damageTag = $"[dmg]{damageAmount}";
 
-        switch (effect?.Id)
+        // Check for special condition cases
+        ConditionId? conditionId = effect is Condition cond ? cond.Id : null;
+
+        switch (conditionId)
         {
             case ConditionId.PartiallyTrapped:
                 // Get the source effect from the volatile condition
@@ -517,24 +521,25 @@ public partial class Battle
         }
         else if (effect != null && effect.EffectType != EffectType.Format)
         {
-            // Healing from a specific effect
-            string effectName = effect switch
+            if (effect.EffectType == EffectType.Move)
             {
-                Condition { FullName: "tox" } => "psn",
-                Condition condition => condition.FullName,
-                Item item => $"item: {item.Name}",
-                Ability ability => $"ability: {ability.Name}",
-                _ => effect.Name
-            };
-
-            if (source != null && source != target)
-            {
-                Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}",
-                    $"[of] {source}");
+                // Move heals (e.g. Strength Sap) show no [from] attribution
+                Add("-heal", target, healthFunc, $"[heal]{healAmount}");
             }
             else
             {
-                Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
+                // Healing from a specific effect (item, ability, condition)
+                string effectName = GetProtocolEffectName(effect)!;
+
+                if (source != null && source != target)
+                {
+                    Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}",
+                        $"[of] {source}");
+                }
+                else
+                {
+                    Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
+                }
             }
         }
         else
@@ -542,6 +547,31 @@ public partial class Battle
             // Simple heal with no effect
             Add("-heal", target, healthFunc, $"[heal]{healAmount}");
         }
+    }
+
+    /// <summary>
+    /// Converts an effect's name to Showdown protocol abbreviation.
+    /// Status conditions use abbreviations (brn, par, psn, slp, frz, tox).
+    /// </summary>
+    private static string? GetProtocolEffectName(IEffect? effect)
+    {
+        if (effect == null) return null;
+        if (effect is Condition condition)
+        {
+            return condition.Id switch
+            {
+                ConditionId.Burn => "brn",
+                ConditionId.Paralysis => "par",
+                ConditionId.Poison => "psn",
+                ConditionId.Toxic => "tox",
+                ConditionId.Sleep => "slp",
+                ConditionId.Freeze => "frz",
+                _ => condition.FullName,
+            };
+        }
+        if (effect is Item item) return item.FullName;
+        if (effect is Ability ability) return $"ability: {ability.Name}";
+        return effect.Name;
     }
 
     /// <summary>

@@ -120,6 +120,10 @@ public static class EventHandlerInfoMapper
                 [EventId.WeatherChange] = e => e.OnWeatherChange,
                 [EventId.WeatherModifyDamage] = e => e.OnWeatherModifyDamage,
 
+                // Item-specific event handlers (only fired via SingleEvent on items)
+                [EventId.Eat] = e => (e as Item)?.OnEat,
+                [EventId.Use] = e => (e as Item)?.OnUse,
+
                 // Condition/Item-specific lifecycle event handlers
                 // Abilities use AbilityEventMethodsMap (checked first), so these only match Conditions and Items
                 [EventId.Start] = e => e switch

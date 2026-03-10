@@ -6,7 +6,7 @@ namespace ApogeeVGC.Sim.Actions;
 public record BeforeTurnAction : IAction
 {
     public ActionId Choice => ActionId.BeforeTurn;
-    public IntFalseUnion Order => int.MaxValue;
+    public IntFalseUnion Order => 4; // Showdown: orders.beforeTurn = 4
     public int Priority => 0;
     public int Speed => 0;
     public int SubOrder => 0;

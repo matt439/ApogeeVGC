@@ -83,7 +83,8 @@ public partial class BattleActions
         basePower = Battle.ClampIntRange(basePower.Value.ToInt(), 1, null);
 
         // Calculate critical hit ratio (Gen 7+ logic, used in Gen 9)
-        var critRatio = move.CritRatio ?? 0;
+        // Default critRatio is 1 (same as Showdown: Number(data.critRatio) || 1)
+        var critRatio = move.CritRatio ?? 1;
         var critRatioEvent = Battle.RunEvent(EventId.ModifyCritRatio, source,
             RunEventSource.FromNullablePokemon(target), move, critRatio);
 
@@ -256,7 +257,7 @@ public partial class BattleActions
             RunEventSource.FromNullablePokemon(source), move, IntRelayVar.Get(defense));
         defense = modifyDefResult is IntRelayVar defIrv ? defIrv.Value : defense;
 
-        // Calculate base damage using the standard Pokémon damage formula
+        // Calculate base damage using the standard Pokï¿½mon damage formula
         // int(int(int(2 * L / 5 + 2) * A * P / D) / 50)
         var baseDamage = Battle.Trunc(
             Battle.Trunc(
@@ -468,19 +469,19 @@ public partial class BattleActions
     /// context for its damage, unlike the regular damage formula (though this only comes up
     /// for base damage).
     /// </summary>
-    /// <param name="pokemon">The confused Pokémon hitting itself</param>
+    /// <param name="pokemon">The confused Pokï¿½mon hitting itself</param>
     /// <param name="basePower">Base power of the confusion damage (typically 40)</param>
     /// <returns>The calculated damage amount (minimum 1)</returns>
     public int GetConfusionDamage(Pokemon pokemon, int basePower)
     {
-        // Get the Pokémon's attack and defense stats with current boosts applied
+        // Get the Pokï¿½mon's attack and defense stats with current boosts applied
         var attack =
             pokemon.CalculateStat(StatIdExceptHp.Atk, pokemon.Boosts.GetBoost(BoostId.Atk));
         var defense =
             pokemon.CalculateStat(StatIdExceptHp.Def, pokemon.Boosts.GetBoost(BoostId.Def));
         var level = pokemon.Level;
 
-        // Calculate base damage using the standard Pokémon damage formula
+        // Calculate base damage using the standard Pokï¿½mon damage formula
         // Formula: ((2 * level / 5 + 2) * basePower * attack / defense) / 50 + 2
         // Each step is truncated to match game behavior
         var baseDamage = Battle.Trunc(

@@ -14,12 +14,12 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class Battle
 {
     /// <summary>
-    /// Applies damage to a single Pokémon.
+    /// Applies damage to a single Pokï¿½mon.
     /// This is a convenience wrapper around SpreadDamage for single-target damage.
     /// </summary>
     /// <param name="damage">Amount of damage to deal</param>
-    /// <param name="target">Target Pokémon (defaults to event target)</param>
-    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
+    /// <param name="target">Target Pokï¿½mon (defaults to event target)</param>
+    /// <param name="source">Source Pokï¿½mon causing the damage (defaults to event source)</param>
     /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
     /// <param name="instafaint">If true, immediately processes fainting instead of queueing it</param>
     /// <returns>
@@ -68,21 +68,27 @@ public partial class Battle
 
         var retVals = new SpreadMoveDamage();
 
-        // Convert effect to Condition
+        // Convert effect to Condition for game logic (event running, status checks)
         Condition? effectCondition;
+        // Keep original IEffect for logging (items, abilities need proper attribution)
+        IEffect? effectForLogging;
         switch (effect)
         {
             case EffectBattleDamageEffect ebde:
                 effectCondition = ebde.Effect as Condition;
+                effectForLogging = ebde.Effect;
                 break;
             case DrainBattleDamageEffect:
                 effectCondition = Library.Conditions[ConditionId.Drain];
+                effectForLogging = effectCondition;
                 break;
             case RecoilBattleDamageEffect:
                 effectCondition = Library.Conditions[ConditionId.Recoil];
+                effectForLogging = effectCondition;
                 break;
             case null:
                 effectCondition = null;
+                effectForLogging = null;
                 break;
             default:
                 throw new InvalidOperationException("Unknown BattleDamageEffect type.");
@@ -184,12 +190,12 @@ public partial class Battle
 
             // Log damage messages with the actual damage amount
             Debug($"[SpreadDamage] Calling PrintDamageMessage for {target.Name}, damage={targetDamage}");
-            PrintDamageMessage(target, targetDamage, source, effectCondition);
+            PrintDamageMessage(target, targetDamage, source, effectForLogging ?? effectCondition);
 
             // Handle drain for moves (Gen 9 uses rounding)
             if (effect is EffectBattleDamageEffect { Effect: ActiveMove move })
             {
-                if (targetDamage > 0 && effectCondition?.EffectType == EffectType.Move &&
+                if (targetDamage > 0 && move.EffectType == EffectType.Move &&
                     move.Drain != null && source != null)
                 {
                     int drainAmount = Trunc(Math.Round(targetDamage * move.Drain.Value.Item1 /
@@ -225,13 +231,13 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Applies damage directly to a Pokémon without triggering the Damage event.
+    /// Applies damage directly to a Pokï¿½mon without triggering the Damage event.
     /// Used for recoil damage, struggle damage, confusion damage, and other effects
     /// that should bypass normal damage modification abilities/items.
     /// </summary>
     /// <param name="damage">Amount of damage to deal</param>
-    /// <param name="target">Target Pokémon (defaults to event target)</param>
-    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
+    /// <param name="target">Target Pokï¿½mon (defaults to event target)</param>
+    /// <param name="source">Source Pokï¿½mon causing the damage (defaults to event source)</param>
     /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
     /// <returns>The actual amount of damage dealt (0 if target has no HP or damage was 0)</returns>
     public int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null,
@@ -381,7 +387,7 @@ public partial class Battle
 
         if (target is null)
         {
-            throw new InvalidOperationException("Target Pokémon is null.");
+            throw new InvalidOperationException("Target Pokï¿½mon is null.");
         }
 
         // Apply healing to target
@@ -417,7 +423,7 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Modifies a Pokémon's stat stages (boosts) during battle.
+    /// Modifies a Pokï¿½mon's stat stages (boosts) during battle.
     /// 
     /// Process:
     /// 1. Validates the target has HP and is active

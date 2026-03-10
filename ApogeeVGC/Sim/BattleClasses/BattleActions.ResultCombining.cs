@@ -41,8 +41,9 @@ public partial class BattleActions
         int leftPriority = GetBattleActionsPriority(left);
         int rightPriority = GetBattleActionsPriority(right);
 
-        // If left has higher priority, return it
-        if (leftPriority < rightPriority)
+        // If left has lower priority (higher index = more concrete), return it
+        // Matches Showdown: indexOf(typeof left) > indexOf(typeof right) → return left
+        if (leftPriority > rightPriority)
         {
             return left;
         }

@@ -5,7 +5,7 @@ namespace ApogeeVGC.Sim.Actions;
 
 public record RunSwitchAction : IAction
 {
-    public IntFalseUnion Order => int.MaxValue;
+    public IntFalseUnion Order { get; init; } = IntFalseUnion.FromFalse();
     public int Priority { get; init; }
     public int Speed { get; init; }
     public int SubOrder { get; init; }

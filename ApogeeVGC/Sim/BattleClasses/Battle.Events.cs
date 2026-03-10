@@ -172,11 +172,10 @@ public partial class Battle
             Event = parentEvent;
         }
 
-        // If handler returned null and no relayVar was explicitly provided,
-        // return null instead of the default BoolRelayVar.True.
-        // This matches pokemon-showdown's singleEvent behavior where undefined
-        // handler returns propagate as undefined, not as a truthy default.
-        return returnVal ?? (hasRelayVar ? relayVar : null);
+        // If handler returned null (TS undefined), return relayVar (defaults to true).
+        // This matches pokemon-showdown's singleEvent (line 651): returnVal === undefined ? relayVar : returnVal
+        // where relayVar defaults to true (line 594) when not explicitly provided.
+        return returnVal ?? relayVar;
     }
 
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null,

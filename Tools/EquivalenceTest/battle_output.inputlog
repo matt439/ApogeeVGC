@@ -1,0 +1,35 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"1,2,3,4"}
+>player p1 {"name":"Player1","team":"Keldeo|KeldeoResolute|ChoiceSpecs|Justified|muddywater,hydropump,secretsword,vacuumwave||85,,85,85,85,85|N|,0,,,,||78|,,,,,Water]Mienshao||ChoiceBand|InnerFocus|tripleaxel,closecombat,knockoff,uturn||85,85,85,85,85,85|M|||84|,,,,,Steel]Darkrai||LifeOrb|BadDreams|protect,darkpulse,sludgebomb,substitute||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Uxie||SitrusBerry|Levitate|mysticalpower,thunderwave,stealthrock,helpinghand||85,,85,85,85,85|N|,0,,,,||85|,,,,,Steel]Electivire||AssaultVest|MotorDrive|wildcharge,knockoff,icepunch,voltswitch||85,85,85,85,85,85|M|||86|,,,,,Flying]Dusknoir||LifeOrb|Frisk|trickroom,leechlife,poltergeist,protect||85,85,85,85,85,|M|,,,,,0||89|,,,,,Dark"}
+>player p2 {"name":"Player2","team":"Brute Bonnet||RockyHelmet|Protosynthesis|spore,suckerpunch,seedbomb,ragepowder||85,85,85,85,85,85|N|||80|,,,,,Poison]Drifblim||SitrusBerry|Unburden|strengthsap,shadowball,willowisp,tailwind||85,,85,85,85,85|M|,0,,,,||85|,,,,,Fairy]Swanna||SitrusBerry|Hydration|hydropump,bravebird,knockoff,tailwind||85,85,85,85,85,85|M|||87|,,,,,Ground]Veluza||ChoiceBand|Sharpness|psychocut,aquajet,aquacutter,nightslash||85,85,85,85,85,85|M|||88|,,,,,Water]Infernape||FocusSash|Blaze|closecombat,knockoff,overheat,fakeout||85,85,85,85,85,85|F|||82|,,,,,Fighting]Froslass||WideLens|CursedBody|protect,icywind,poltergeist,tripleaxel||85,85,85,85,85,85|F|||88|,,,,,Water"}
+>p1 move hydropump +2, move closecombat +1
+>p2 move suckerpunch +2, move strengthsap +1
+>p2 switch 6, pass
+>p1 move hydropump +1, move closecombat +2
+>p2 move poltergeist +1, move strengthsap +2
+>p1 move hydropump +1, move closecombat +2
+>p2 move protect, move willowisp +1
+>p1 move hydropump +2, move closecombat +2
+>p2 move icywind, move tailwind
+>p1 move hydropump +2, move closecombat +1
+>p2 move poltergeist +2, move shadowball +2
+>p1 switch 3, switch 6
+>p1 move substitute, move leechlife +2
+>p2 move icywind, move shadowball +2
+>p1 move darkpulse +1, move trickroom
+>p2 move tripleaxel +1, move tailwind
+>p2 switch 3, pass
+>p1 move sludgebomb +2, move poltergeist +2
+>p2 move knockoff +2, move shadowball +2
+>p1 switch 4, switch 5
+>p2 pass, switch 4
+>p1 move thunderwave +2, move voltswitch +1
+>p2 move hydropump +1, move nightslash +2
+>p2 switch 5, pass
+>p1 move helpinghand -2, move icepunch +1
+>p2 move closecombat +1, move nightslash +2
+>p1 move stealthrock, move wildcharge +1
+>p2 move fakeout +1, move nightslash +1
+>p1 move thunderwave +2, move wildcharge +1
+>p2 pass, move nightslash +2
+>p1 move thunderwave +2, pass
+>p2 pass, move nightslash +2

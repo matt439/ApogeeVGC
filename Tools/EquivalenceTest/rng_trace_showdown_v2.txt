@@ -1,0 +1,242 @@
+[RNG#1] raw=2030470262 caller=PRNG.random
+  -> random(100) = 47
+[RNG#2] raw=3793892072 caller=PRNG.random
+  -> random(24) = 21
+[RNG#3] raw=2851743046 caller=PRNG.random
+  -> random(16) = 10
+[RNG#4] raw=574702432 caller=PRNG.random
+  -> random(100) = 13
+[RNG#5] raw=3620926519 caller=PRNG.random
+  -> random(24) = 20
+[RNG#6] raw=2468984361 caller=PRNG.random
+  -> random(16) = 9
+[RNG#7] raw=4121665136 caller=PRNG.random
+  -> random(100) = 95
+[RNG#8] raw=1670872321 caller=PRNG.random
+  -> random(100) = 38
+[RNG#9] raw=3334870608 caller=PRNG.random
+  -> random(24) = 18
+[RNG#10] raw=3556944531 caller=PRNG.random
+  -> random(16) = 13
+[RNG#11] raw=465610318 caller=PRNG.random
+  -> random(100) = 10
+[RNG#12] raw=965678468 caller=PRNG.random
+  -> random(100) = 22
+[RNG#13] raw=270333586 caller=PRNG.random
+  -> random(100) = 6
+[RNG#14] raw=3615859060 caller=PRNG.random
+  -> random(24) = 20
+[RNG#15] raw=1369590262 caller=PRNG.random
+  -> random(16) = 5
+[RNG#16] raw=3684755315 caller=PRNG.random
+  -> random(100) = 85
+[RNG#17] raw=604892614 caller=PRNG.random
+  -> random(100) = 14
+[RNG#18] raw=4022611215 caller=PRNG.random
+  -> random(1,3) = 2
+[RNG#19] raw=630540104 caller=PRNG.random
+  -> random(2) = 0
+[RNG#20] raw=84059166 caller=PRNG.random
+  -> random(2) = 0
+[RNG#21] raw=2028659572 caller=PRNG.random
+  -> random(100) = 47
+[RNG#22] raw=2126884272 caller=PRNG.random
+  -> random(100) = 49
+[RNG#23] raw=3364923756 caller=PRNG.random
+  -> random(24) = 18
+[RNG#24] raw=2048826045 caller=PRNG.random
+  -> random(16) = 7
+[RNG#25] raw=1176702841 caller=PRNG.random
+  -> random(24) = 6
+[RNG#26] raw=3679846461 caller=PRNG.random
+  -> random(16) = 13
+[RNG#27] raw=3549433714 caller=PRNG.random
+  -> random(100) = 82
+[RNG#28] raw=3244670038 caller=PRNG.random
+  -> random(100) = 75
+[RNG#29] raw=2175320053 caller=PRNG.random
+  -> random(100) = 50
+[RNG#30] raw=849491237 caller=PRNG.random
+  -> random(24) = 4
+[RNG#31] raw=3779565983 caller=PRNG.random
+  -> random(16) = 14
+[RNG#32] raw=2243071149 caller=PRNG.random
+  -> random(100) = 52
+[RNG#33] raw=4065436464 caller=PRNG.random
+  -> random(24) = 22
+[RNG#34] raw=408917616 caller=PRNG.random
+  -> random(16) = 1
+[RNG#35] raw=4093071397 caller=PRNG.random
+  -> random(100) = 95
+[RNG#36] raw=2256153550 caller=PRNG.random
+  -> random(1) = 0
+[RNG#37] raw=1103511184 caller=PRNG.random
+  -> random(100) = 25
+[RNG#38] raw=2970934260 caller=PRNG.random
+  -> random(24) = 16
+[RNG#39] raw=290057490 caller=PRNG.random
+  -> random(16) = 1
+[RNG#40] raw=1698248446 caller=PRNG.random
+  -> random(2) = 0
+[RNG#41] raw=2443024608 caller=PRNG.random
+  -> random(100) = 56
+[RNG#42] raw=2516615605 caller=PRNG.random
+  -> random(24) = 14
+[RNG#43] raw=4057459217 caller=PRNG.random
+  -> random(16) = 15
+[RNG#44] raw=1504293385 caller=PRNG.random
+  -> random(100) = 35
+[RNG#45] raw=831772952 caller=PRNG.random
+  -> random(2) = 0
+[RNG#46] raw=3397713759 caller=PRNG.random
+  -> random(100) = 79
+[RNG#47] raw=58174970 caller=PRNG.random
+  -> random(100) = 1
+[RNG#48] raw=3024180618 caller=PRNG.random
+  -> random(24) = 16
+[RNG#49] raw=2577121549 caller=PRNG.random
+  -> random(16) = 9
+[RNG#50] raw=2817215737 caller=PRNG.random
+  -> random(24) = 15
+[RNG#51] raw=243670234 caller=PRNG.random
+  -> random(16) = 0
+[RNG#52] raw=177615586 caller=PRNG.random
+  -> random(100) = 4
+[RNG#53] raw=486682350 caller=PRNG.random
+  -> random(100) = 11
+[RNG#54] raw=894538112 caller=PRNG.random
+  -> random(100) = 20
+[RNG#55] raw=3002469269 caller=PRNG.random
+  -> random(24) = 16
+[RNG#56] raw=63757723 caller=PRNG.random
+  -> random(16) = 0
+[RNG#57] raw=1408059051 caller=PRNG.random
+  -> random(100) = 32
+[RNG#58] raw=3142869095 caller=PRNG.random
+  -> random(24) = 17
+[RNG#59] raw=1958632948 caller=PRNG.random
+  -> random(16) = 7
+[RNG#60] raw=2004404973 caller=PRNG.random
+  -> random(100) = 46
+[RNG#61] raw=2977154916 caller=PRNG.random
+  -> random(24) = 16
+[RNG#62] raw=132387900 caller=PRNG.random
+  -> random(16) = 0
+[RNG#63] raw=1590007430 caller=PRNG.random
+  -> random(100) = 37
+[RNG#64] raw=1789461918 caller=PRNG.random
+  -> random(24) = 9
+[RNG#65] raw=4107763283 caller=PRNG.random
+  -> random(16) = 15
+[RNG#66] raw=4035189549 caller=PRNG.random
+  -> random(100) = 93
+[RNG#67] raw=836260674 caller=PRNG.random
+  -> random(24) = 4
+[RNG#68] raw=2476551503 caller=PRNG.random
+  -> random(16) = 9
+[RNG#69] raw=2161279504 caller=PRNG.random
+  -> random(100) = 50
+[RNG#70] raw=730177272 caller=PRNG.random
+  -> random(10) = 1
+[RNG#71] raw=3847132085 caller=PRNG.random
+  -> random(100) = 89
+[RNG#72] raw=1653149473 caller=PRNG.random
+  -> random(24) = 9
+[RNG#73] raw=457837693 caller=PRNG.random
+  -> random(16) = 1
+[RNG#74] raw=1102346648 caller=PRNG.random
+  -> random(100) = 25
+[RNG#75] raw=3462362586 caller=PRNG.random
+  -> random(100) = 80
+[RNG#76] raw=905601403 caller=PRNG.random
+  -> random(24) = 5
+[RNG#77] raw=29536417 caller=PRNG.random
+  -> random(16) = 0
+[RNG#78] raw=3239885666 caller=PRNG.random
+  -> random(1) = 0
+[RNG#79] raw=1703647446 caller=PRNG.random
+  -> random(100) = 39
+[RNG#80] raw=3875784682 caller=PRNG.random
+  -> random(24) = 21
+[RNG#81] raw=3002890778 caller=PRNG.random
+  -> random(16) = 11
+[RNG#82] raw=3407999789 caller=PRNG.random
+  -> random(100) = 79
+[RNG#83] raw=1157370098 caller=PRNG.random
+  -> random(100) = 26
+[RNG#84] raw=559779291 caller=PRNG.random
+  -> random(8) = 1
+[RNG#85] raw=1951731558 caller=PRNG.random
+  -> random(16) = 7
+[RNG#86] raw=326921807 caller=PRNG.random
+  -> random(100) = 7
+[RNG#87] raw=805591442 caller=PRNG.random
+  -> random(100) = 18
+[RNG#88] raw=4183384464 caller=PRNG.random
+  -> random(24) = 23
+[RNG#89] raw=3018419369 caller=PRNG.random
+  -> random(16) = 11
+[RNG#90] raw=895465757 caller=PRNG.random
+  -> random(4) = 0
+[RNG#91] raw=999508176 caller=PRNG.random
+  -> random(100) = 23
+[RNG#92] raw=3973708623 caller=PRNG.random
+  -> random(24) = 22
+[RNG#93] raw=2102760340 caller=PRNG.random
+  -> random(16) = 7
+[RNG#94] raw=2673144448 caller=PRNG.random
+  -> random(100) = 62
+[RNG#95] raw=1849460741 caller=PRNG.random
+  -> random(100) = 43
+[RNG#96] raw=114905571 caller=PRNG.random
+  -> random(24) = 0
+[RNG#97] raw=725081277 caller=PRNG.random
+  -> random(16) = 2
+[RNG#98] raw=2033459801 caller=PRNG.random
+  -> random(100) = 47
+[RNG#99] raw=1924437326 caller=PRNG.random
+  -> random(2) = 0
+[RNG#100] raw=2716197904 caller=PRNG.random
+  -> random(4) = 2
+[RNG#101] raw=297684998 caller=PRNG.random
+  -> random(100) = 6
+[RNG#102] raw=3256386512 caller=PRNG.random
+  -> random(8) = 6
+[RNG#103] raw=3094605560 caller=PRNG.random
+  -> random(16) = 11
+[RNG#104] raw=3134810372 caller=PRNG.random
+  -> random(2) = 1
+[RNG#105] raw=1486934909 caller=PRNG.random
+  -> random(100) = 34
+[RNG#106] raw=4114997013 caller=PRNG.random
+  -> random(24) = 22
+[RNG#107] raw=666739522 caller=PRNG.random
+  -> random(16) = 2
+[RNG#108] raw=3472944984 caller=PRNG.random
+  -> random(1) = 0
+[RNG#109] raw=1434616575 caller=PRNG.random
+  -> random(100) = 33
+[RNG#110] raw=2866092574 caller=PRNG.random
+  -> random(24) = 16
+[RNG#111] raw=2341763102 caller=PRNG.random
+  -> random(16) = 8
+[RNG#112] raw=3138071806 caller=PRNG.random
+  -> random(100) = 73
+[RNG#113] raw=2327408024 caller=PRNG.random
+  -> random(1) = 0
+[RNG#114] raw=572031605 caller=PRNG.random
+  -> random(4) = 0
+[RNG#115] raw=4037140444 caller=PRNG.random
+  -> random(100) = 93
+[RNG#116] raw=2967630307 caller=PRNG.random
+  -> random(1) = 0
+[RNG#117] raw=4069341488 caller=PRNG.random
+  -> random(4) = 3
+[RNG#118] raw=844241905 caller=PRNG.random
+  -> random(100) = 19
+[RNG#119] raw=2467275817 caller=PRNG.random
+  -> random(8) = 4
+[RNG#120] raw=3419788621 caller=PRNG.random
+  -> random(16) = 12
+
+Total RNG calls: 120

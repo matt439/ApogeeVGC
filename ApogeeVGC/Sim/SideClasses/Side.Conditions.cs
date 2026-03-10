@@ -37,8 +37,8 @@ public partial class Side
             return restartResult is BoolRelayVar { Value: true };
         }
 
-        // Step 4: Create EffectState
-        EffectState effectState = Battle.InitEffectState(status.Id, source, source.GetSlot(), status.Duration);
+        // Step 4: Create EffectState (target is this Side, matching Showdown's {target: this})
+        EffectState effectState = Battle.InitEffectState(status.Id, this, source, source.GetSlot(), false, status.Duration);
 
         // Step 5: Duration callback
         if (status.DurationCallback != null)
@@ -162,9 +162,8 @@ public partial class Side
             return restartResult is BoolRelayVar { Value: true };
         }
 
-        // Step 5: Create EffectState
-        EffectState conditionState = Battle.InitEffectState(status.Id, source, source.GetSlot(), status.Duration);
-        conditionState.IsSlotCondition = true;
+        // Step 5: Create EffectState (target is this Side, matching Showdown's {target: this})
+        EffectState conditionState = Battle.InitEffectState(status.Id, this, source, source.GetSlot(), true, status.Duration);
 
         // Step 6: Duration callback
         if (status.DurationCallback != null)

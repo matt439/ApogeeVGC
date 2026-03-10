@@ -442,6 +442,12 @@ public partial class BattleActions
         // Build move message attributes
         string moveName = activeMove.Name;
 
+        // Log move usage to battle log (before getMoveTargets, matching Showdown order)
+        if (Battle.DisplayUi)
+        {
+            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, target?.ToString() ?? pokemon.ToString());
+        }
+
         // Handle no target
         if (target == null)
         {
@@ -455,7 +461,7 @@ public partial class BattleActions
             return false;
         }
 
-        // Get move targets for Pressure PP deduction
+        // Get move targets (may retarget via Follow Me, Rage Powder, etc.)
         Pokemon.MoveTargets moveTargets = pokemon.GetMoveTargets(activeMove, target);
         var targets = moveTargets.Targets;
         var pressureTargets = moveTargets.PressureTargets;
@@ -513,12 +519,6 @@ public partial class BattleActions
         // Run UseMoveMessage event
         Battle.SingleEvent(EventId.UseMoveMessage, activeMove, null, pokemon,
             SingleEventSource.FromNullablePokemon(target), activeMove);
-
-        // Log move usage to battle log
-        if (Battle.DisplayUi)
-        {
-            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, target?.ToString() ?? pokemon.ToString());
-        }
 
         // Set default ignoreImmunity for Status moves
         activeMove.IgnoreImmunity ??= activeMove.Category == MoveCategory.Status;

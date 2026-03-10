@@ -157,7 +157,7 @@ public partial class BattleActions
         {
             // If result is NOT_FAIL (null), keep it as undefined
             // Otherwise convert to boolean (default false if not a boolean)
-            if (result is UndefinedRelayVar or null)
+            if (result is UndefinedRelayVar or NullRelayVar or null)
             {
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
             }

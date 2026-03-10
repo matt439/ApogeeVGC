@@ -403,11 +403,10 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnTryHitPriority = 3,
-                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
+                // OnTryHit params: (battle, source=attacker, target=protector, move)
+                // C# convention: GetSourceOrTargetPokemon() → source, GetTargetOrSourcePokemon() → target
+                OnTryHit = OnTryHitEventInfo.Create((battle, source, target, move) =>
                     {
-                        battle.Debug(
-                            $"[Protect.OnTryHit] CALLED! Target={target.Name}, Source={source.Name}, Move={move.Name}, HasProtectFlag={move.Flags.Protect ?? false}");
-
                         if (!(move.Flags.Protect ?? false))
                         {
                             return new VoidReturn();
@@ -426,14 +425,10 @@ public partial record Conditions
                         if (lockedMove is not null &&
                             source.Volatiles[ConditionId.LockedMove].Duration == 2)
                         {
-                            // TS uses `delete source.volatiles['lockedmove']` which bypasses OnEnd.
-                            // Use DeleteVolatile (not RemoveVolatile) to avoid triggering
-                            // LockedMove's OnEnd handler (which would cause confusion).
                             source.DeleteVolatile(ConditionId.LockedMove);
                         }
 
-                        battle.Debug("[Protect.OnTryHit] Returning Empty (block move)");
-                        return new Empty(); // in place of Battle.NOT_FAIL ("")
+                        return null; // NOT_FAIL — blocks move without showing fail message
                     },
                     3),
             },

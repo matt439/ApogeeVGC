@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
@@ -105,7 +106,7 @@ public partial class Driver
         {
             Id = fmtId,
             Sync = true,
-            DisplayUi = false,
+            DisplayUi = true,
             Seed = PrngSeed.FromGen5(gen5Seed),
             Player1Options = new PlayerOptions
             {
@@ -121,32 +122,79 @@ public partial class Driver
         };
 
         var battle = new Battle(battleOptions, Library);
+
         battle.Start();
 
-        // Replay choices from input log
-        int choicesApplied = 0;
+        // Parse choice entries from input log (skip start/player setup lines)
+        var choices = new Queue<string>();
         foreach (string logEntry in inputLog)
         {
             if (!logEntry.StartsWith(">")) continue;
-            string line = logEntry[1..]; // strip leading >
+            string line = logEntry[1..];
+            if (line.StartsWith("start") || line.StartsWith("player")) continue;
+            choices.Enqueue(line);
+        }
 
-            if (line.StartsWith("p1 "))
+        // Replay choices using the same loop pattern as SimulatorSync:
+        // Battle.Start() sets up the first request, then we feed choices
+        // and call CommitChoices(), which runs TurnLoop and may generate
+        // new requests (forced switches after fainting, etc.)
+        int choicesApplied = 0;
+        while (!battle.Ended && battle.RequestState != RequestState.None)
+        {
+            // Feed choices for both sides from the input log
+            // Feed choices from the queue, handling the case where one side
+            // is already done (e.g. no forced switch needed)
+            bool madeProgress = true;
+            while (choices.Count > 0 && !battle.AllChoicesDone() && madeProgress)
             {
-                string choice = line[3..];
-                battle.P1.Choose(choice);
-                choicesApplied++;
-            }
-            else if (line.StartsWith("p2 "))
-            {
-                string choice = line[3..];
-                battle.P2.Choose(choice);
-                choicesApplied++;
+                madeProgress = false;
+                // Scan through queued choices to find ones we can apply
+                int scanned = 0;
+                int total = choices.Count;
+                while (scanned < total && !battle.AllChoicesDone())
+                {
+                    string line = choices.Dequeue();
+                    scanned++;
+
+                    Side? side = null;
+                    string choice = "";
+                    if (line.StartsWith("p1 "))
+                    {
+                        side = battle.P1;
+                        choice = line[3..];
+                    }
+                    else if (line.StartsWith("p2 "))
+                    {
+                        side = battle.P2;
+                        choice = line[3..];
+                    }
+
+                    if (side is not null && !side.IsChoiceDone())
+                    {
+                        bool ok = side.Choose(choice);
+                        if (!ok)
+                            Console.WriteLine($"  [T{battle.Turn}] {side.Id} choice rejected: {choice} (State={battle.RequestState})");
+                        choicesApplied++;
+                        madeProgress = true;
+                    }
+                    else if (side is not null && side.IsChoiceDone())
+                    {
+                        // Side is already done — re-enqueue for later
+                        choices.Enqueue(line);
+                    }
+                    // else: skip unknown lines
+                }
             }
 
-            // After both sides have chosen, commit
             if (battle.AllChoicesDone())
             {
                 battle.CommitChoices();
+            }
+            else
+            {
+                Console.WriteLine($"  [T{battle.Turn}] Stuck: not all choices done, {choices.Count} entries remain (State={battle.RequestState})");
+                break;
             }
         }
 
@@ -162,6 +210,37 @@ public partial class Driver
         var showdownFiltered = FilterProtocolLines(showdownLines);
 
         Console.WriteLine($"[Equivalence] Filtered: C# {csharpFiltered.Count} lines, Showdown {showdownFiltered.Count} lines");
+
+        // Find first mismatch and dump context around it
+        int firstMismatchIdx = -1;
+        for (int d = 0; d < Math.Min(csharpFiltered.Count, showdownFiltered.Count); d++)
+        {
+            if (csharpFiltered[d] != showdownFiltered[d]) { firstMismatchIdx = d; break; }
+        }
+        if (firstMismatchIdx >= 0)
+        {
+            int start = Math.Max(0, firstMismatchIdx - 3);
+            int end = Math.Min(Math.Min(csharpFiltered.Count, showdownFiltered.Count), firstMismatchIdx + 10);
+            Console.WriteLine($"\n=== Context around first mismatch (line {firstMismatchIdx}) ===");
+            for (int d = start; d < end; d++)
+            {
+                string marker = d == firstMismatchIdx ? ">>>" : "   ";
+                Console.WriteLine($"  {marker} C# [{d}]: {csharpFiltered[d]}");
+                Console.WriteLine($"  {marker} SD [{d}]: {showdownFiltered[d]}");
+            }
+        }
+        else if (csharpFiltered.Count < showdownFiltered.Count)
+        {
+            // C# ended early — show the last few C# lines and what SD expects next
+            Console.WriteLine($"\n=== C# ended early (has {csharpFiltered.Count} vs SD {showdownFiltered.Count}) ===");
+            int start = Math.Max(0, csharpFiltered.Count - 5);
+            Console.WriteLine("  Last C# lines:");
+            for (int d = start; d < csharpFiltered.Count; d++)
+                Console.WriteLine($"    [{d}]: {csharpFiltered[d]}");
+            Console.WriteLine("  Next SD lines:");
+            for (int d = csharpFiltered.Count; d < Math.Min(showdownFiltered.Count, csharpFiltered.Count + 10); d++)
+                Console.WriteLine($"    [{d}]: {showdownFiltered[d]}");
+        }
 
         // Compare
         int matches = 0;
@@ -207,22 +286,32 @@ public partial class Driver
         foreach (string line in lines)
         {
             if (string.IsNullOrWhiteSpace(line)) continue;
+            if (!line.StartsWith("|")) continue;
+            if (line == "|") continue;
 
-            // Skip channel/split markers and meta-protocol
+            // Skip metadata/cosmetic lines
+            if (line.StartsWith("|t:|")) continue;
             if (line.StartsWith("|split|")) continue;
             if (line.StartsWith("|upkeep")) continue;
-            if (line == "|") continue;
+            if (line.StartsWith("|gametype|")) continue;
+            if (line.StartsWith("|player|")) continue;
+            if (line.StartsWith("|gen|")) continue;
+            if (line.StartsWith("|tier|")) continue;
+            if (line.StartsWith("|rule|")) continue;
+            if (line.StartsWith("|teamsize|")) continue;
+            if (line.StartsWith("|-anim|")) continue;
+
+            // Skip non-game-state lines from Showdown's omniscient stream
             if (line.StartsWith("update")) continue;
             if (line.StartsWith("sideupdate")) continue;
 
-            // Skip animation-only lines
-            if (line.StartsWith("|-anim|")) continue;
+            // Strip C#-only tags: [dmg]N, [heal]N (these are parser hints not in Showdown output)
+            string cleaned = System.Text.RegularExpressions.Regex.Replace(line, @"\|\[dmg\]\d+", "");
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\|\[heal\]\d+", "");
+            // Remove trailing pipe if stripping left one
+            cleaned = cleaned.TrimEnd('|');
 
-            // Include game-state lines
-            if (line.StartsWith("|") || line.StartsWith("|-"))
-            {
-                result.Add(line);
-            }
+            result.Add(cleaned);
         }
         return result;
     }
@@ -351,6 +440,7 @@ public partial class Driver
         "gen9vgc2024regh" => FormatId.Gen9VgcRegulationH,
         "gen9vgc2024regi" or "gen9vgc2025regi" => FormatId.Gen9VgcRegulationI,
         "gen9vgcmega" => FormatId.Gen9VgcMega,
+        "gen9randomdoublesbattle" => FormatId.Gen9RandomDoublesBattle,
         _ => throw new ArgumentException($"Unknown format: {formatId}"),
     };
 }

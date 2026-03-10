@@ -194,10 +194,12 @@ public partial class Pokemon
         }
         else if (!isTransform)
         {
-            // Not a transform - update HP values but preserve HP ratio
+            // Not a transform - update HP values and preserve HP ratio
+            // Matches Showdown: hp = (hp === maxhp) ? newMaxHP : Math.round(hp * newMaxHP / maxhp)
             BaseMaxHp = stats.Hp;
-            MaxHp = stats.Hp;
-            Hp = stats.Hp;
+            int newMaxHp = stats.Hp;
+            Hp = (Hp == MaxHp) ? newMaxHp : (int)Math.Round((double)Hp * newMaxHp / MaxHp);
+            MaxHp = newMaxHp;
         }
         // else: isTransform == true, don't change HP values
 

@@ -20,8 +20,12 @@ const path = require('path');
 const fs = require('fs');
 
 // Showdown must be built first: cd pokemon-showdown && node build
-const showdownPath = path.resolve(__dirname, '../../pokemon-showdown');
-const simPath = path.join(showdownPath, '.sim-dist');
+// Try sibling of ApogeeVGC repo first, then sibling within repo
+const showdownPath = fs.existsSync(path.resolve(__dirname, '../../../pokemon-showdown'))
+    ? path.resolve(__dirname, '../../../pokemon-showdown')
+    : path.resolve(__dirname, '../../pokemon-showdown');
+// Showdown builds to dist/sim/ (not .sim-dist)
+const simPath = path.join(showdownPath, 'dist', 'sim');
 
 if (!fs.existsSync(simPath)) {
     console.error(`ERROR: Showdown not built. Run: cd ${showdownPath} && node build`);
