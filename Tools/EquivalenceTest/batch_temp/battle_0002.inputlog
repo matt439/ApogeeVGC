@@ -1,0 +1,34 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"15,28,41,66"}
+>player p1 {"name":"Player1","team":"Espathra||LifeOrb|SpeedBoost|dazzlinggleam,protect,luminacrash,shadowball||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Polteageist||WhiteHerb|CursedBody|shadowball,terablast,shellsmash,protect||85,,85,85,85,85|N|,0,,,,||85|,,,,,Fighting]Plusle||LifeOrb|LightningRod|protect,thunderbolt,nastyplot,alluringvoice||85,,85,85,85,85|M|,0,,,,||92|,,,,,Flying]Deoxys|DeoxysAttack|LifeOrb|Pressure|extremespeed,superpower,psychoboost,protect||85,85,85,85,85,85|N|||79|,,,,,Stellar]Feraligatr||LifeOrb|SheerForce|icepunch,dragondance,protect,liquidation||85,85,85,85,85,85|F|||82|,,,,,Water]Scrafty||SitrusBerry|Intimidate|closecombat,fakeout,coaching,knockoff||85,85,85,85,85,85|M|||83|,,,,,Poison"}
+>player p2 {"name":"Player2","team":"Hitmonchan||AssaultVest|InnerFocus|knockoff,poisonjab,fakeout,closecombat||85,85,85,85,85,85|M|||90|,,,,,Poison]Blastoise||WhiteHerb|Torrent|muddywater,protect,shellsmash,dragonpulse||85,,85,85,85,85|F|,0,,,,||83|,,,,,Dragon]Kilowattrel||FocusSash|Competitive|tailwind,protect,hurricane,thunderbolt||85,,85,85,85,85|F|,0,,,,||80|,,,,,Flying]Vivillon|VivillonContinental|FocusSash|CompoundEyes|pollenpuff,hurricane,sleeppowder,protect||85,,85,85,85,85|M|,0,,,,||88|,,,,,Flying]Garchomp||LoadedDice|RoughSkin|scaleshot,protect,earthquake,swordsdance||85,85,85,85,85,85|M|||77|,,,,,Dragon]Spectrier||LifeOrb|GrimNeigh|shadowball,terablast,nastyplot,protect||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy"}
+>p1 move luminacrash +2, move shadowball +1
+>p2 move knockoff +2, move muddywater
+>p1 pass, switch 3
+>p1 move shadowball +1, move alluringvoice +2
+>p2 move fakeout +2, move protect
+>p1 move protect, move thunderbolt +2
+>p2 move poisonjab +1, move dragonpulse +2
+>p2 pass, switch 3
+>p1 move dazzlinggleam, move thunderbolt +2
+>p2 move knockoff +1, move thunderbolt +1
+>p1 switch 5, pass
+>p2 pass, switch 4
+>p1 move liquidation +1, move alluringvoice +1
+>p2 move poisonjab +1, move hurricane +1
+>p2 switch 6, pass
+>p1 move liquidation +1, move thunderbolt +1
+>p2 move protect, move hurricane +1
+>p1 switch 4, pass
+>p1 move extremespeed +1, move nastyplot
+>p2 move shadowball +2, move hurricane +2
+>p1 pass, switch 6
+>p1 move protect, move closecombat +1
+>p2 move nastyplot, move protect
+>p1 move superpower +1, move knockoff +2
+>p2 move shadowball +2, move protect
+>p1 move extremespeed +1, move knockoff +1
+>p2 move protect, move hurricane +1
+>p1 pass, move closecombat +2
+>p2 move shadowball +2, move pollenpuff +1
+>p1 pass, move fakeout +1
+>p2 move nastyplot, move hurricane +2

@@ -1,0 +1,467 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "8,15,22,35",
+  "p1Seed": "51,63,77,93",
+  "p2Seed": "109,121,137,151",
+  "p1TeamPacked": "Raikou||LifeOrb|InnerFocus|thunderbolt,voltswitch,protect,scald||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Arceus|ArceusWater|SplashPlate|Multitype|willowisp,judgment,tailwind,snarl||85,,85,85,85,85|N|,0,,,,||72|,,,,,Steel]Gastrodon||SitrusBerry|StormDrain|yawn,icywind,muddywater,earthpower||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Electabuzz||Eviolite|Static|thunderbolt,protect,electroweb,followme||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass]Umbreon||SitrusBerry|InnerFocus|snarl,thunderwave,moonlight,foulplay||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Great Tusk||SitrusBerry|Protosynthesis|protect,icespinner,headlongrush,closecombat||85,85,85,85,85,85|N|||81|,,,,,Ground",
+  "p2TeamPacked": "Jolteon||LifeOrb|VoltAbsorb|calmmind,protect,thunderbolt,terablast||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Ogerpon|OgerponCornerstone|CornerstoneMask|Sturdy|spikyshield,ivycudgel,hornleech,followme||85,85,85,85,85,85|F|||75|,,,,,Rock]Quaquaval||LifeOrb|Moxie|tripleaxel,protect,closecombat,aquastep||85,85,85,85,85,85|F|||82|,,,,,Water]Seviper||LifeOrb|ShedSkin|protect,flamethrower,knockoff,gunkshot||85,85,85,85,85,85|F|||96|,,,,,Poison]Toxtricity|ToxtricityLowKey|ChoiceSpecs|PunkRock|sludgebomb,voltswitch,overdrive,psychicnoise||85,,85,85,85,85|F|,0,,,,||82|,,,,,Flying]Dragapult||ChoiceBand|ClearBody|dragondarts,dragonclaw,uturn,phantomforce||85,85,85,85,85,85|F|||79|,,,,,Dragon",
+  "p1Team": [
+    {
+      "name": "Raikou",
+      "species": "Raikou",
+      "item": "Life Orb",
+      "ability": "Inner Focus",
+      "moves": [
+        "Thunderbolt",
+        "Volt Switch",
+        "Protect",
+        "Scald"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Arceus",
+      "species": "Arceus-Water",
+      "item": "Splash Plate",
+      "ability": "Multitype",
+      "moves": [
+        "Will-O-Wisp",
+        "Judgment",
+        "Tailwind",
+        "Snarl"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 72,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Gastrodon",
+      "species": "Gastrodon",
+      "item": "Sitrus Berry",
+      "ability": "Storm Drain",
+      "moves": [
+        "Yawn",
+        "Icy Wind",
+        "Muddy Water",
+        "Earth Power"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Electabuzz",
+      "species": "Electabuzz",
+      "item": "Eviolite",
+      "ability": "Static",
+      "moves": [
+        "Thunderbolt",
+        "Protect",
+        "Electroweb",
+        "Follow Me"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Umbreon",
+      "species": "Umbreon",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Snarl",
+        "Thunder Wave",
+        "Moonlight",
+        "Foul Play"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Great Tusk",
+      "species": "Great Tusk",
+      "item": "Sitrus Berry",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Protect",
+        "Ice Spinner",
+        "Headlong Rush",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Jolteon",
+      "species": "Jolteon",
+      "item": "Life Orb",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Calm Mind",
+        "Protect",
+        "Thunderbolt",
+        "Tera Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Ogerpon",
+      "species": "Ogerpon-Cornerstone",
+      "item": "Cornerstone Mask",
+      "ability": "Sturdy",
+      "moves": [
+        "Spiky Shield",
+        "Ivy Cudgel",
+        "Horn Leech",
+        "Follow Me"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Quaquaval",
+      "species": "Quaquaval",
+      "item": "Life Orb",
+      "ability": "Moxie",
+      "moves": [
+        "Triple Axel",
+        "Protect",
+        "Close Combat",
+        "Aqua Step"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Seviper",
+      "species": "Seviper",
+      "item": "Life Orb",
+      "ability": "Shed Skin",
+      "moves": [
+        "Protect",
+        "Flamethrower",
+        "Knock Off",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 96,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Toxtricity",
+      "species": "Toxtricity-Low-Key",
+      "item": "Choice Specs",
+      "ability": "Punk Rock",
+      "moves": [
+        "Sludge Bomb",
+        "Volt Switch",
+        "Overdrive",
+        "Psychic Noise"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Dragapult",
+      "species": "Dragapult",
+      "item": "Choice Band",
+      "ability": "Clear Body",
+      "moves": [
+        "Dragon Darts",
+        "Dragon Claw",
+        "U-turn",
+        "Phantom Force"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"8,15,22,35\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Raikou||LifeOrb|InnerFocus|thunderbolt,voltswitch,protect,scald||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Arceus|ArceusWater|SplashPlate|Multitype|willowisp,judgment,tailwind,snarl||85,,85,85,85,85|N|,0,,,,||72|,,,,,Steel]Gastrodon||SitrusBerry|StormDrain|yawn,icywind,muddywater,earthpower||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Electabuzz||Eviolite|Static|thunderbolt,protect,electroweb,followme||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass]Umbreon||SitrusBerry|InnerFocus|snarl,thunderwave,moonlight,foulplay||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Great Tusk||SitrusBerry|Protosynthesis|protect,icespinner,headlongrush,closecombat||85,85,85,85,85,85|N|||81|,,,,,Ground\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Jolteon||LifeOrb|VoltAbsorb|calmmind,protect,thunderbolt,terablast||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Ogerpon|OgerponCornerstone|CornerstoneMask|Sturdy|spikyshield,ivycudgel,hornleech,followme||85,85,85,85,85,85|F|||75|,,,,,Rock]Quaquaval||LifeOrb|Moxie|tripleaxel,protect,closecombat,aquastep||85,85,85,85,85,85|F|||82|,,,,,Water]Seviper||LifeOrb|ShedSkin|protect,flamethrower,knockoff,gunkshot||85,85,85,85,85,85|F|||96|,,,,,Poison]Toxtricity|ToxtricityLowKey|ChoiceSpecs|PunkRock|sludgebomb,voltswitch,overdrive,psychicnoise||85,,85,85,85,85|F|,0,,,,||82|,,,,,Flying]Dragapult||ChoiceBand|ClearBody|dragondarts,dragonclaw,uturn,phantomforce||85,85,85,85,85,85|F|||79|,,,,,Dragon\"}",
+    ">p1 move scald +2, move snarl",
+    ">p2 move thunderbolt +1, move spikyshield",
+    ">p1 move voltswitch +1, move willowisp +2",
+    ">p2 move protect, move ivycudgel +1",
+    ">p1 move protect, move judgment +1",
+    ">p2 move thunderbolt +1, move ivycudgel +2",
+    ">p1 move scald +2, move snarl",
+    ">p2 move thunderbolt +1, move spikyshield",
+    ">p1 move scald +1, move tailwind",
+    ">p2 move protect, move spikyshield",
+    ">p1 move scald +1, move judgment +1",
+    ">p2 move protect, move followme",
+    ">p2 pass, switch 6",
+    ">p1 move voltswitch +1, move judgment +2",
+    ">p2 move thunderbolt +1, move uturn +2",
+    ">p2 pass, switch 4",
+    ">p1 move protect, move snarl",
+    ">p2 move terablast +2, move flamethrower +1",
+    ">p1 move voltswitch +2, move judgment +2",
+    ">p2 move thunderbolt +2, move protect",
+    ">p1 move voltswitch +2, move snarl",
+    ">p2 move thunderbolt +1, move knockoff +2",
+    ">p1 switch 6, switch 5",
+    ">p1 move closecombat +1, move moonlight",
+    ">p2 move terablast +1, move gunkshot +1",
+    ">p2 switch 4, switch 5",
+    ">p1 move icespinner +1, move foulplay +1",
+    ">p2 move dragonclaw +2, move sludgebomb +1",
+    ">p2 switch 3, pass",
+    ">p1 move headlongrush +1, move thunderwave +1",
+    ">p2 move closecombat +2, move sludgebomb +1",
+    ">p1 switch 4, switch 3",
+    ">p1 move thunderbolt +1, move icywind",
+    ">p2 move protect, move sludgebomb +1",
+    ">p1 move electroweb, move yawn +1",
+    ">p2 move closecombat +2, move sludgebomb +1",
+    ">p1 pass, move icywind",
+    ">p2 pass, move sludgebomb +2",
+    ">p1 pass, move yawn +2",
+    ">p2 pass, move sludgebomb +1",
+    ">p1 pass, move icywind",
+    ">p2 pass, move sludgebomb +1",
+    ">p1 pass, move yawn +1",
+    ">p2 pass, move sludgebomb +2",
+    ">p1 pass, move earthpower +1",
+    ">p2 pass, move sludgebomb +2"
+  ]
+}

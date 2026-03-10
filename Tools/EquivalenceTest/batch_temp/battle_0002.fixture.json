@@ -1,0 +1,452 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "15,28,41,66",
+  "p1Seed": "92,106,124,146",
+  "p2Seed": "168,182,204,222",
+  "p1TeamPacked": "Espathra||LifeOrb|SpeedBoost|dazzlinggleam,protect,luminacrash,shadowball||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Polteageist||WhiteHerb|CursedBody|shadowball,terablast,shellsmash,protect||85,,85,85,85,85|N|,0,,,,||85|,,,,,Fighting]Plusle||LifeOrb|LightningRod|protect,thunderbolt,nastyplot,alluringvoice||85,,85,85,85,85|M|,0,,,,||92|,,,,,Flying]Deoxys|DeoxysAttack|LifeOrb|Pressure|extremespeed,superpower,psychoboost,protect||85,85,85,85,85,85|N|||79|,,,,,Stellar]Feraligatr||LifeOrb|SheerForce|icepunch,dragondance,protect,liquidation||85,85,85,85,85,85|F|||82|,,,,,Water]Scrafty||SitrusBerry|Intimidate|closecombat,fakeout,coaching,knockoff||85,85,85,85,85,85|M|||83|,,,,,Poison",
+  "p2TeamPacked": "Hitmonchan||AssaultVest|InnerFocus|knockoff,poisonjab,fakeout,closecombat||85,85,85,85,85,85|M|||90|,,,,,Poison]Blastoise||WhiteHerb|Torrent|muddywater,protect,shellsmash,dragonpulse||85,,85,85,85,85|F|,0,,,,||83|,,,,,Dragon]Kilowattrel||FocusSash|Competitive|tailwind,protect,hurricane,thunderbolt||85,,85,85,85,85|F|,0,,,,||80|,,,,,Flying]Vivillon|VivillonContinental|FocusSash|CompoundEyes|pollenpuff,hurricane,sleeppowder,protect||85,,85,85,85,85|M|,0,,,,||88|,,,,,Flying]Garchomp||LoadedDice|RoughSkin|scaleshot,protect,earthquake,swordsdance||85,85,85,85,85,85|M|||77|,,,,,Dragon]Spectrier||LifeOrb|GrimNeigh|shadowball,terablast,nastyplot,protect||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy",
+  "p1Team": [
+    {
+      "name": "Espathra",
+      "species": "Espathra",
+      "item": "Life Orb",
+      "ability": "Speed Boost",
+      "moves": [
+        "Dazzling Gleam",
+        "Protect",
+        "Lumina Crash",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Polteageist",
+      "species": "Polteageist",
+      "item": "White Herb",
+      "ability": "Cursed Body",
+      "moves": [
+        "Shadow Ball",
+        "Tera Blast",
+        "Shell Smash",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Plusle",
+      "species": "Plusle",
+      "item": "Life Orb",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Protect",
+        "Thunderbolt",
+        "Nasty Plot",
+        "Alluring Voice"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Deoxys",
+      "species": "Deoxys-Attack",
+      "item": "Life Orb",
+      "ability": "Pressure",
+      "moves": [
+        "Extreme Speed",
+        "Superpower",
+        "Psycho Boost",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Stellar"
+    },
+    {
+      "name": "Feraligatr",
+      "species": "Feraligatr",
+      "item": "Life Orb",
+      "ability": "Sheer Force",
+      "moves": [
+        "Ice Punch",
+        "Dragon Dance",
+        "Protect",
+        "Liquidation"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Scrafty",
+      "species": "Scrafty",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Close Combat",
+        "Fake Out",
+        "Coaching",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Hitmonchan",
+      "species": "Hitmonchan",
+      "item": "Assault Vest",
+      "ability": "Inner Focus",
+      "moves": [
+        "Knock Off",
+        "Poison Jab",
+        "Fake Out",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Blastoise",
+      "species": "Blastoise",
+      "item": "White Herb",
+      "ability": "Torrent",
+      "moves": [
+        "Muddy Water",
+        "Protect",
+        "Shell Smash",
+        "Dragon Pulse"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Kilowattrel",
+      "species": "Kilowattrel",
+      "item": "Focus Sash",
+      "ability": "Competitive",
+      "moves": [
+        "Tailwind",
+        "Protect",
+        "Hurricane",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Vivillon",
+      "species": "Vivillon-Continental",
+      "item": "Focus Sash",
+      "ability": "Compound Eyes",
+      "moves": [
+        "Pollen Puff",
+        "Hurricane",
+        "Sleep Powder",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Garchomp",
+      "species": "Garchomp",
+      "item": "Loaded Dice",
+      "ability": "Rough Skin",
+      "moves": [
+        "Scale Shot",
+        "Protect",
+        "Earthquake",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Spectrier",
+      "species": "Spectrier",
+      "item": "Life Orb",
+      "ability": "Grim Neigh",
+      "moves": [
+        "Shadow Ball",
+        "Tera Blast",
+        "Nasty Plot",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"15,28,41,66\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Espathra||LifeOrb|SpeedBoost|dazzlinggleam,protect,luminacrash,shadowball||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Polteageist||WhiteHerb|CursedBody|shadowball,terablast,shellsmash,protect||85,,85,85,85,85|N|,0,,,,||85|,,,,,Fighting]Plusle||LifeOrb|LightningRod|protect,thunderbolt,nastyplot,alluringvoice||85,,85,85,85,85|M|,0,,,,||92|,,,,,Flying]Deoxys|DeoxysAttack|LifeOrb|Pressure|extremespeed,superpower,psychoboost,protect||85,85,85,85,85,85|N|||79|,,,,,Stellar]Feraligatr||LifeOrb|SheerForce|icepunch,dragondance,protect,liquidation||85,85,85,85,85,85|F|||82|,,,,,Water]Scrafty||SitrusBerry|Intimidate|closecombat,fakeout,coaching,knockoff||85,85,85,85,85,85|M|||83|,,,,,Poison\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Hitmonchan||AssaultVest|InnerFocus|knockoff,poisonjab,fakeout,closecombat||85,85,85,85,85,85|M|||90|,,,,,Poison]Blastoise||WhiteHerb|Torrent|muddywater,protect,shellsmash,dragonpulse||85,,85,85,85,85|F|,0,,,,||83|,,,,,Dragon]Kilowattrel||FocusSash|Competitive|tailwind,protect,hurricane,thunderbolt||85,,85,85,85,85|F|,0,,,,||80|,,,,,Flying]Vivillon|VivillonContinental|FocusSash|CompoundEyes|pollenpuff,hurricane,sleeppowder,protect||85,,85,85,85,85|M|,0,,,,||88|,,,,,Flying]Garchomp||LoadedDice|RoughSkin|scaleshot,protect,earthquake,swordsdance||85,85,85,85,85,85|M|||77|,,,,,Dragon]Spectrier||LifeOrb|GrimNeigh|shadowball,terablast,nastyplot,protect||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy\"}",
+    ">p1 move luminacrash +2, move shadowball +1",
+    ">p2 move knockoff +2, move muddywater",
+    ">p1 pass, switch 3",
+    ">p1 move shadowball +1, move alluringvoice +2",
+    ">p2 move fakeout +2, move protect",
+    ">p1 move protect, move thunderbolt +2",
+    ">p2 move poisonjab +1, move dragonpulse +2",
+    ">p2 pass, switch 3",
+    ">p1 move dazzlinggleam, move thunderbolt +2",
+    ">p2 move knockoff +1, move thunderbolt +1",
+    ">p1 switch 5, pass",
+    ">p2 pass, switch 4",
+    ">p1 move liquidation +1, move alluringvoice +1",
+    ">p2 move poisonjab +1, move hurricane +1",
+    ">p2 switch 6, pass",
+    ">p1 move liquidation +1, move thunderbolt +1",
+    ">p2 move protect, move hurricane +1",
+    ">p1 switch 4, pass",
+    ">p1 move extremespeed +1, move nastyplot",
+    ">p2 move shadowball +2, move hurricane +2",
+    ">p1 pass, switch 6",
+    ">p1 move protect, move closecombat +1",
+    ">p2 move nastyplot, move protect",
+    ">p1 move superpower +1, move knockoff +2",
+    ">p2 move shadowball +2, move protect",
+    ">p1 move extremespeed +1, move knockoff +1",
+    ">p2 move protect, move hurricane +1",
+    ">p1 pass, move closecombat +2",
+    ">p2 move shadowball +2, move pollenpuff +1",
+    ">p1 pass, move fakeout +1",
+    ">p2 move nastyplot, move hurricane +2"
+  ]
+}

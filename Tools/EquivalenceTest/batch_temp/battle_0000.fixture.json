@@ -1,0 +1,439 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "1,2,3,4",
+  "p1Seed": "10,20,30,40",
+  "p2Seed": "50,60,70,80",
+  "p1TeamPacked": "Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,dragonclaw,heatcrash,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Florges||Leftovers|FlowerVeil|synthesis,protect,dazzlinggleam,calmmind||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Arceus|ArceusFairy|PixiePlate|Multitype|judgment,snarl,icywind,willowisp||85,,85,85,85,85|N|,0,,,,||70|,,,,,Steel]Squawkabilly|SquawkabillyBlue|LifeOrb|Intimidate|protect,quickattack,bravebird,doubleedge||85,85,85,85,85,85|M|||91|,,,,,Flying]Braviary|BraviaryHisui|Leftovers|TintedLens|hurricane,calmmind,protect,esperwing||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Veluza||ChoiceBand|Sharpness|nightslash,psychocut,aquajet,aquacutter||85,85,85,85,85,85|F|||88|,,,,,Psychic",
+  "p2TeamPacked": "Pincurchin||SitrusBerry|ElectricSurge|scald,recover,electroweb,thunderbolt||85,,85,85,85,85|M|,0,,,,||97|,,,,,Water]Dialga||SitrusBerry|Telepathy|protect,fireblast,dracometeor,heavyslam||85,85,85,85,85,85|N|||74|,,,,,Dragon]Scrafty||AssaultVest|Intimidate|snarl,fakeout,closecombat,knockoff||85,85,85,85,85,85|F|||83|,,,,,Poison]Blastoise||SitrusBerry|Torrent|icywind,flipturn,wavecrash,yawn||85,85,85,85,85,85|M|||83|,,,,,Grass]Barraskewda||ChoiceBand|PropellerTail|poisonjab,waterfall,closecombat,flipturn||85,85,85,85,85,85|M|||85|,,,,,Fighting]Ogerpon||ChoiceBand|Defiant|knockoff,uturn,superpower,ivycudgel||85,85,85,85,85,85|F|||78|,,,,,Grass",
+  "p1Team": [
+    {
+      "name": "Gouging Fire",
+      "species": "Gouging Fire",
+      "item": "Clear Amulet",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Burning Bulwark",
+        "Dragon Claw",
+        "Heat Crash",
+        "Dragon Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Florges",
+      "species": "Florges",
+      "item": "Leftovers",
+      "ability": "Flower Veil",
+      "moves": [
+        "Synthesis",
+        "Protect",
+        "Dazzling Gleam",
+        "Calm Mind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Arceus",
+      "species": "Arceus-Fairy",
+      "item": "Pixie Plate",
+      "ability": "Multitype",
+      "moves": [
+        "Judgment",
+        "Snarl",
+        "Icy Wind",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 70,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Squawkabilly",
+      "species": "Squawkabilly-Blue",
+      "item": "Life Orb",
+      "ability": "Intimidate",
+      "moves": [
+        "Protect",
+        "Quick Attack",
+        "Brave Bird",
+        "Double-Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Braviary",
+      "species": "Braviary-Hisui",
+      "item": "Leftovers",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Hurricane",
+        "Calm Mind",
+        "Protect",
+        "Esper Wing"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Veluza",
+      "species": "Veluza",
+      "item": "Choice Band",
+      "ability": "Sharpness",
+      "moves": [
+        "Night Slash",
+        "Psycho Cut",
+        "Aqua Jet",
+        "Aqua Cutter"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Pincurchin",
+      "species": "Pincurchin",
+      "item": "Sitrus Berry",
+      "ability": "Electric Surge",
+      "moves": [
+        "Scald",
+        "Recover",
+        "Electroweb",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 97,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Dialga",
+      "species": "Dialga",
+      "item": "Sitrus Berry",
+      "ability": "Telepathy",
+      "moves": [
+        "Protect",
+        "Fire Blast",
+        "Draco Meteor",
+        "Heavy Slam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Scrafty",
+      "species": "Scrafty",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Snarl",
+        "Fake Out",
+        "Close Combat",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Blastoise",
+      "species": "Blastoise",
+      "item": "Sitrus Berry",
+      "ability": "Torrent",
+      "moves": [
+        "Icy Wind",
+        "Flip Turn",
+        "Wave Crash",
+        "Yawn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Barraskewda",
+      "species": "Barraskewda",
+      "item": "Choice Band",
+      "ability": "Propeller Tail",
+      "moves": [
+        "Poison Jab",
+        "Waterfall",
+        "Close Combat",
+        "Flip Turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Ogerpon",
+      "species": "Ogerpon",
+      "item": "Choice Band",
+      "ability": "Defiant",
+      "moves": [
+        "Knock Off",
+        "U-turn",
+        "Superpower",
+        "Ivy Cudgel"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"1,2,3,4\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,dragonclaw,heatcrash,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Florges||Leftovers|FlowerVeil|synthesis,protect,dazzlinggleam,calmmind||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Arceus|ArceusFairy|PixiePlate|Multitype|judgment,snarl,icywind,willowisp||85,,85,85,85,85|N|,0,,,,||70|,,,,,Steel]Squawkabilly|SquawkabillyBlue|LifeOrb|Intimidate|protect,quickattack,bravebird,doubleedge||85,85,85,85,85,85|M|||91|,,,,,Flying]Braviary|BraviaryHisui|Leftovers|TintedLens|hurricane,calmmind,protect,esperwing||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Veluza||ChoiceBand|Sharpness|nightslash,psychocut,aquajet,aquacutter||85,85,85,85,85,85|F|||88|,,,,,Psychic\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Pincurchin||SitrusBerry|ElectricSurge|scald,recover,electroweb,thunderbolt||85,,85,85,85,85|M|,0,,,,||97|,,,,,Water]Dialga||SitrusBerry|Telepathy|protect,fireblast,dracometeor,heavyslam||85,85,85,85,85,85|N|||74|,,,,,Dragon]Scrafty||AssaultVest|Intimidate|snarl,fakeout,closecombat,knockoff||85,85,85,85,85,85|F|||83|,,,,,Poison]Blastoise||SitrusBerry|Torrent|icywind,flipturn,wavecrash,yawn||85,85,85,85,85,85|M|||83|,,,,,Grass]Barraskewda||ChoiceBand|PropellerTail|poisonjab,waterfall,closecombat,flipturn||85,85,85,85,85,85|M|||85|,,,,,Fighting]Ogerpon||ChoiceBand|Defiant|knockoff,uturn,superpower,ivycudgel||85,85,85,85,85,85|F|||78|,,,,,Grass\"}",
+    ">p1 move dragondance, move protect",
+    ">p2 move recover, move dracometeor +1",
+    ">p1 switch 4, pass",
+    ">p1 move protect, move synthesis",
+    ">p2 move scald +1, move heavyslam +2",
+    ">p1 move doubleedge +2, move dazzlinggleam",
+    ">p2 move recover, move protect",
+    ">p1 move protect, move synthesis",
+    ">p2 move recover, move dracometeor +1",
+    ">p1 move protect, move dazzlinggleam",
+    ">p2 move electroweb, move fireblast +2",
+    ">p1 move quickattack +1, move dazzlinggleam",
+    ">p2 move thunderbolt +1, move fireblast +2",
+    ">p1 switch 6, pass",
+    ">p1 move psychocut +1, move dazzlinggleam",
+    ">p2 move recover, move heavyslam +2",
+    ">p2 switch 5, pass",
+    ">p1 move psychocut +2, move dazzlinggleam",
+    ">p2 move closecombat +2, move fireblast +2",
+    ">p1 pass, switch 5",
+    ">p1 move psychocut +2, move esperwing +2",
+    ">p2 move closecombat +1, move dracometeor +2",
+    ">p2 switch 3, switch 4",
+    ">p1 move psychocut +1, move protect",
+    ">p2 move fakeout +2, move wavecrash +1",
+    ">p1 move psychocut +1, move protect",
+    ">p2 move fakeout +1, move flipturn +2",
+    ">p2 pass, switch 6",
+    ">p1 move psychocut +1, move protect",
+    ">p2 move closecombat +1, move knockoff +2",
+    ">p1 move psychocut +1, move hurricane +1",
+    ">p2 move knockoff +2, move knockoff +1",
+    ">p1 switch 3, pass",
+    ">p1 move icywind, move esperwing +1",
+    ">p2 move fakeout +2, move knockoff +2",
+    ">p1 move judgment +1, pass",
+    ">p2 move knockoff +1, move knockoff +2",
+    ">p2 switch 6, pass",
+    ">p1 move snarl, pass",
+    ">p2 move icywind, move knockoff +1",
+    ">p1 move snarl, pass",
+    ">p2 move icywind, move knockoff +1"
+  ]
+}
