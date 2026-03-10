@@ -1,0 +1,451 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "414,769,1124,1833",
+  "p1Seed": "2429,2557,2803,3167",
+  "p2Seed": "3531,3659,4023,4269",
+  "p1TeamPacked": "Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,dragonclaw,heatcrash,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Azumarill||ChoiceBand|HugePower|playrough,aquajet,superpower,liquidation||85,85,85,85,85,85|F|||83|,,,,,Water]Bombirdier||LifeOrb|RockyPayload|knockoff,protect,rockslide,bravebird||85,85,85,85,85,85|F|||84|,,,,,Rock]Frosmoth||HeavyDutyBoots|IceScales|icebeam,bugbuzz,quiverdance,protect||85,,85,85,85,85|M|,0,,,,||86|,,,,,Water]Plusle||LifeOrb|LightningRod|alluringvoice,protect,nastyplot,thunderbolt||85,,85,85,85,85|F|,0,,,,||92|,,,,,Flying]Trevenant||SitrusBerry|Harvest|trickroom,protect,poltergeist,woodhammer||85,85,85,85,85,|M|,,,,,0||88|,,,,,Water",
+  "p2TeamPacked": "Leafeon||LifeOrb|Chlorophyll|synthesis,leafblade,swordsdance,doubleedge||85,85,85,85,85,85|M|||90|,,,,,Normal]Ribombee||FocusSash|ShieldDust|protect,pollenpuff,tailwind,moonblast||85,,85,85,85,85|F|,0,,,,||86|,,,,,Steel]Mesprit||LifeOrb|Levitate|dazzlinggleam,nastyplot,psychic,thunderbolt||85,,85,85,85,85|N|,0,,,,||86|,,,,,Psychic]Kilowattrel||LifeOrb|Competitive|hurricane,protect,tailwind,thunderbolt||85,,85,85,85,85|M|,0,,,,||80|,,,,,Steel]Farigiraf||SitrusBerry|ArmorTail|psychic,trickroom,hypervoice,nastyplot||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fairy]Articuno||SitrusBerry|Pressure|icebeam,protect,tailwind,bravebird||85,85,85,85,85,85|N|||82|,,,,,Steel",
+  "p1Team": [
+    {
+      "name": "Gouging Fire",
+      "species": "Gouging Fire",
+      "item": "Clear Amulet",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Burning Bulwark",
+        "Dragon Claw",
+        "Heat Crash",
+        "Dragon Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Azumarill",
+      "species": "Azumarill",
+      "item": "Choice Band",
+      "ability": "Huge Power",
+      "moves": [
+        "Play Rough",
+        "Aqua Jet",
+        "Superpower",
+        "Liquidation"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Bombirdier",
+      "species": "Bombirdier",
+      "item": "Life Orb",
+      "ability": "Rocky Payload",
+      "moves": [
+        "Knock Off",
+        "Protect",
+        "Rock Slide",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Frosmoth",
+      "species": "Frosmoth",
+      "item": "Heavy-Duty Boots",
+      "ability": "Ice Scales",
+      "moves": [
+        "Ice Beam",
+        "Bug Buzz",
+        "Quiver Dance",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Plusle",
+      "species": "Plusle",
+      "item": "Life Orb",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Alluring Voice",
+        "Protect",
+        "Nasty Plot",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Trevenant",
+      "species": "Trevenant",
+      "item": "Sitrus Berry",
+      "ability": "Harvest",
+      "moves": [
+        "Trick Room",
+        "Protect",
+        "Poltergeist",
+        "Wood Hammer"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Leafeon",
+      "species": "Leafeon",
+      "item": "Life Orb",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Synthesis",
+        "Leaf Blade",
+        "Swords Dance",
+        "Double-Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Ribombee",
+      "species": "Ribombee",
+      "item": "Focus Sash",
+      "ability": "Shield Dust",
+      "moves": [
+        "Protect",
+        "Pollen Puff",
+        "Tailwind",
+        "Moonblast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Mesprit",
+      "species": "Mesprit",
+      "item": "Life Orb",
+      "ability": "Levitate",
+      "moves": [
+        "Dazzling Gleam",
+        "Nasty Plot",
+        "Psychic",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Kilowattrel",
+      "species": "Kilowattrel",
+      "item": "Life Orb",
+      "ability": "Competitive",
+      "moves": [
+        "Hurricane",
+        "Protect",
+        "Tailwind",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Farigiraf",
+      "species": "Farigiraf",
+      "item": "Sitrus Berry",
+      "ability": "Armor Tail",
+      "moves": [
+        "Psychic",
+        "Trick Room",
+        "Hyper Voice",
+        "Nasty Plot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Articuno",
+      "species": "Articuno",
+      "item": "Sitrus Berry",
+      "ability": "Pressure",
+      "moves": [
+        "Ice Beam",
+        "Protect",
+        "Tailwind",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"414,769,1124,1833\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,dragonclaw,heatcrash,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Azumarill||ChoiceBand|HugePower|playrough,aquajet,superpower,liquidation||85,85,85,85,85,85|F|||83|,,,,,Water]Bombirdier||LifeOrb|RockyPayload|knockoff,protect,rockslide,bravebird||85,85,85,85,85,85|F|||84|,,,,,Rock]Frosmoth||HeavyDutyBoots|IceScales|icebeam,bugbuzz,quiverdance,protect||85,,85,85,85,85|M|,0,,,,||86|,,,,,Water]Plusle||LifeOrb|LightningRod|alluringvoice,protect,nastyplot,thunderbolt||85,,85,85,85,85|F|,0,,,,||92|,,,,,Flying]Trevenant||SitrusBerry|Harvest|trickroom,protect,poltergeist,woodhammer||85,85,85,85,85,|M|,,,,,0||88|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Leafeon||LifeOrb|Chlorophyll|synthesis,leafblade,swordsdance,doubleedge||85,85,85,85,85,85|M|||90|,,,,,Normal]Ribombee||FocusSash|ShieldDust|protect,pollenpuff,tailwind,moonblast||85,,85,85,85,85|F|,0,,,,||86|,,,,,Steel]Mesprit||LifeOrb|Levitate|dazzlinggleam,nastyplot,psychic,thunderbolt||85,,85,85,85,85|N|,0,,,,||86|,,,,,Psychic]Kilowattrel||LifeOrb|Competitive|hurricane,protect,tailwind,thunderbolt||85,,85,85,85,85|M|,0,,,,||80|,,,,,Steel]Farigiraf||SitrusBerry|ArmorTail|psychic,trickroom,hypervoice,nastyplot||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fairy]Articuno||SitrusBerry|Pressure|icebeam,protect,tailwind,bravebird||85,85,85,85,85,85|N|||82|,,,,,Steel\"}",
+    ">p1 move heatcrash +2, move liquidation +1",
+    ">p2 move doubleedge +1, move tailwind",
+    ">p1 move dragonclaw +2, move liquidation +2",
+    ">p2 move swordsdance, move pollenpuff +2",
+    ">p2 pass, switch 5",
+    ">p1 move heatcrash +1, move liquidation +2",
+    ">p2 move synthesis, move nastyplot",
+    ">p1 move burningbulwark, move liquidation +1",
+    ">p2 move leafblade +1, move psychic +1",
+    ">p1 move dragonclaw +1, move liquidation +1",
+    ">p2 move doubleedge +2, move trickroom",
+    ">p2 switch 3, switch 4",
+    ">p1 move dragondance, move liquidation +1",
+    ">p2 move dazzlinggleam, move hurricane +2",
+    ">p1 move dragondance, move liquidation +1",
+    ">p2 move dazzlinggleam, move protect",
+    ">p1 switch 4, switch 6",
+    ">p1 move protect, move protect",
+    ">p2 move thunderbolt +2, move hurricane +2",
+    ">p1 move quiverdance, move poltergeist +2",
+    ">p2 move dazzlinggleam, move tailwind",
+    ">p1 move icebeam +1, move protect",
+    ">p2 move psychic +2, move hurricane +1",
+    ">p2 switch 6, pass",
+    ">p1 move quiverdance, move trickroom",
+    ">p2 move icebeam +2, move protect",
+    ">p1 move icebeam +2, move poltergeist +1",
+    ">p2 move icebeam +1, move tailwind",
+    ">p1 move icebeam +1, move protect",
+    ">p2 move tailwind, pass"
+  ]
+}

@@ -1,0 +1,509 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "253,470,687,1120",
+  "p1Seed": "1486,1568,1722,1948",
+  "p2Seed": "2174,2256,2482,2636",
+  "p1TeamPacked": "Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,earthpower,yawn,recover||85,,85,85,85,85|F|,0,,,,||82|,,,,,Fire]Klefki||SitrusBerry|Prankster|spikes,foulplay,dazzlinggleam,thunderwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Water]Goodra||SitrusBerry|SapSipper|thunderbolt,protect,dracometeor,fireblast||85,,85,85,85,85|F|,0,,,,||86|,,,,,Fire]Bastiodon||Leftovers|Sturdy|wideguard,bodypress,irondefense,foulplay||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting]Landorus|LandorusTherian|AssaultVest|Intimidate|uturn,stoneedge,stompingtantrum,terablast||85,85,85,85,85,85|M|||77|,,,,,Flying]Raikou||Leftovers|InnerFocus|thunderbolt,protect,scald,calmmind||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water",
+  "p2TeamPacked": "Oricorio|OricorioPomPom|Leftovers|Dancer|protect,revelationdance,airslash,quiverdance||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Raikou||LifeOrb|InnerFocus|scald,voltswitch,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Dachsbun||SitrusBerry|WellBakedBody|snarl,howl,bodypress,playrough||85,85,85,85,85,85|M|||90|,,,,,Steel]Gholdengo||SitrusBerry|GoodasGold|shadowball,protect,nastyplot,makeitrain||85,,85,85,85,85|N|,0,,,,||78|,,,,,Steel]Chesnaught||Leftovers|Bulletproof|irondefense,bodypress,leechseed,spikyshield||85,,85,85,85,85|M|,0,,,,||86|,,,,,Fire]Shaymin||SitrusBerry|NaturalCure|synthesis,earthpower,tailwind,seedflare||85,,85,85,85,85|N|,0,,,,||81|,,,,,Steel",
+  "p1Team": [
+    {
+      "name": "Gastrodon",
+      "species": "Gastrodon-East",
+      "item": "Leftovers",
+      "ability": "Storm Drain",
+      "moves": [
+        "Ice Beam",
+        "Earth Power",
+        "Yawn",
+        "Recover"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Klefki",
+      "species": "Klefki",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Spikes",
+        "Foul Play",
+        "Dazzling Gleam",
+        "Thunder Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Goodra",
+      "species": "Goodra",
+      "item": "Sitrus Berry",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Thunderbolt",
+        "Protect",
+        "Draco Meteor",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Bastiodon",
+      "species": "Bastiodon",
+      "item": "Leftovers",
+      "ability": "Sturdy",
+      "moves": [
+        "Wide Guard",
+        "Body Press",
+        "Iron Defense",
+        "Foul Play"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Landorus",
+      "species": "Landorus-Therian",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "U-turn",
+        "Stone Edge",
+        "Stomping Tantrum",
+        "Tera Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Raikou",
+      "species": "Raikou",
+      "item": "Leftovers",
+      "ability": "Inner Focus",
+      "moves": [
+        "Thunderbolt",
+        "Protect",
+        "Scald",
+        "Calm Mind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Oricorio",
+      "species": "Oricorio-Pom-Pom",
+      "item": "Leftovers",
+      "ability": "Dancer",
+      "moves": [
+        "Protect",
+        "Revelation Dance",
+        "Air Slash",
+        "Quiver Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Raikou",
+      "species": "Raikou",
+      "item": "Life Orb",
+      "ability": "Inner Focus",
+      "moves": [
+        "Scald",
+        "Volt Switch",
+        "Protect",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Dachsbun",
+      "species": "Dachsbun",
+      "item": "Sitrus Berry",
+      "ability": "Well-Baked Body",
+      "moves": [
+        "Snarl",
+        "Howl",
+        "Body Press",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Gholdengo",
+      "species": "Gholdengo",
+      "item": "Sitrus Berry",
+      "ability": "Good as Gold",
+      "moves": [
+        "Shadow Ball",
+        "Protect",
+        "Nasty Plot",
+        "Make It Rain"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Chesnaught",
+      "species": "Chesnaught",
+      "item": "Leftovers",
+      "ability": "Bulletproof",
+      "moves": [
+        "Iron Defense",
+        "Body Press",
+        "Leech Seed",
+        "Spiky Shield"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Shaymin",
+      "species": "Shaymin",
+      "item": "Sitrus Berry",
+      "ability": "Natural Cure",
+      "moves": [
+        "Synthesis",
+        "Earth Power",
+        "Tailwind",
+        "Seed Flare"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"253,470,687,1120\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,earthpower,yawn,recover||85,,85,85,85,85|F|,0,,,,||82|,,,,,Fire]Klefki||SitrusBerry|Prankster|spikes,foulplay,dazzlinggleam,thunderwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Water]Goodra||SitrusBerry|SapSipper|thunderbolt,protect,dracometeor,fireblast||85,,85,85,85,85|F|,0,,,,||86|,,,,,Fire]Bastiodon||Leftovers|Sturdy|wideguard,bodypress,irondefense,foulplay||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting]Landorus|LandorusTherian|AssaultVest|Intimidate|uturn,stoneedge,stompingtantrum,terablast||85,85,85,85,85,85|M|||77|,,,,,Flying]Raikou||Leftovers|InnerFocus|thunderbolt,protect,scald,calmmind||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Oricorio|OricorioPomPom|Leftovers|Dancer|protect,revelationdance,airslash,quiverdance||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Raikou||LifeOrb|InnerFocus|scald,voltswitch,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Dachsbun||SitrusBerry|WellBakedBody|snarl,howl,bodypress,playrough||85,85,85,85,85,85|M|||90|,,,,,Steel]Gholdengo||SitrusBerry|GoodasGold|shadowball,protect,nastyplot,makeitrain||85,,85,85,85,85|N|,0,,,,||78|,,,,,Steel]Chesnaught||Leftovers|Bulletproof|irondefense,bodypress,leechseed,spikyshield||85,,85,85,85,85|M|,0,,,,||86|,,,,,Fire]Shaymin||SitrusBerry|NaturalCure|synthesis,earthpower,tailwind,seedflare||85,,85,85,85,85|N|,0,,,,||81|,,,,,Steel\"}",
+    ">p1 move yawn +1, move spikes",
+    ">p2 move protect, move thunderbolt +1",
+    ">p1 move icebeam +2, move foulplay +1",
+    ">p2 move protect, move thunderbolt +1",
+    ">p1 move icebeam +1, move foulplay +1",
+    ">p2 move airslash +2, move scald +2",
+    ">p1 move recover, move foulplay +2",
+    ">p2 move revelationdance +1, move voltswitch +2",
+    ">p2 pass, switch 6",
+    ">p1 move yawn +2, move foulplay +2",
+    ">p2 move airslash +1, move synthesis",
+    ">p1 move yawn +1, move thunderwave +2",
+    ">p2 move revelationdance +1, move seedflare +1",
+    ">p1 move recover, move spikes",
+    ">p2 move revelationdance +1, move seedflare +1",
+    ">p1 move earthpower +1, move foulplay +2",
+    ">p2 move protect, move tailwind",
+    ">p1 move recover, move foulplay +2",
+    ">p2 move airslash +2, move seedflare +1",
+    ">p1 move icebeam +1, move spikes",
+    ">p2 move revelationdance +2, move tailwind",
+    ">p2 switch 6, pass",
+    ">p1 move recover, move foulplay +2",
+    ">p2 move voltswitch +1, move synthesis",
+    ">p1 move recover, move dazzlinggleam",
+    ">p2 move voltswitch +2, move tailwind",
+    ">p2 switch 5, pass",
+    ">p1 move yawn +2, move thunderwave +1",
+    ">p2 move leechseed +1, move earthpower +1",
+    ">p1 move yawn +2, move spikes",
+    ">p2 move irondefense, move tailwind",
+    ">p1 move yawn +1, move foulplay +2",
+    ">p2 move bodypress +2, move synthesis",
+    ">p1 pass, switch 5",
+    ">p1 move recover, move stompingtantrum +2",
+    ">p2 move bodypress +2, move earthpower +2",
+    ">p1 move icebeam +2, move stoneedge +2",
+    ">p2 move leechseed +1, move synthesis",
+    ">p2 pass, switch 5",
+    ">p1 move earthpower +1, move stompingtantrum +2",
+    ">p2 move leechseed +2, move scald +2",
+    ">p2 pass, switch 3",
+    ">p1 move earthpower +1, move uturn +2",
+    ">p2 move irondefense, move playrough +2",
+    ">p1 pass, switch 3",
+    ">p1 move icebeam +1, move thunderbolt +2",
+    ">p2 move bodypress +1, move bodypress +1",
+    ">p2 switch 4, pass",
+    ">p1 move yawn +2, move fireblast +2",
+    ">p2 move nastyplot, move playrough +1",
+    ">p1 move icebeam +1, move dracometeor +1",
+    ">p2 move shadowball +1, move howl",
+    ">p1 switch 6, pass",
+    ">p1 move scald +2, move thunderbolt +2",
+    ">p2 move protect, move howl",
+    ">p1 move protect, move protect",
+    ">p2 move makeitrain, move bodypress +2",
+    ">p1 move calmmind, move dracometeor +1",
+    ">p2 move nastyplot, move playrough +2",
+    ">p1 pass, switch 4",
+    ">p1 move protect, move bodypress +2",
+    ">p2 move protect, move playrough +2",
+    ">p1 move thunderbolt +1, move foulplay +2",
+    ">p2 move protect, pass"
+  ]
+}

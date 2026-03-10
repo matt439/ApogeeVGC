@@ -1,0 +1,448 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "428,795,1162,1895",
+  "p1Seed": "2511,2643,2897,3273",
+  "p2Seed": "3649,3781,4157,4411",
+  "p1TeamPacked": "Coalossal||SitrusBerry|FlameBody|heatwave,stealthrock,stoneedge,willowisp||85,85,85,85,85,85|F|||90|,,,,,Water]Incineroar||HeavyDutyBoots|Intimidate|fakeout,flareblitz,partingshot,knockoff||85,85,85,85,85,85|F|||78|,,,,,Water]Noctowl||LifeOrb|TintedLens|protect,tailwind,hypervoice,hurricane||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Regieleki||Magnet|Transistor|protect,terablast,electroweb,thunderbolt||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ice]Sceptile||WhiteHerb|Unburden|focusblast,protect,leafstorm,breakingswipe||85,85,85,85,85,85|M|||88|,,,,,Water]Brute Bonnet||RockyHelmet|Protosynthesis|ragepowder,seedbomb,suckerpunch,spore||85,85,85,85,85,85|N|||80|,,,,,Poison",
+  "p2TeamPacked": "Scrafty||SitrusBerry|Intimidate|knockoff,coaching,fakeout,closecombat||85,85,85,85,85,85|F|||83|,,,,,Poison]Phione||Leftovers|Hydration|takeheart,protect,icebeam,scald||85,,85,85,85,85|N|,0,,,,||90|,,,,,Steel]Exeggutor|ExeggutorAlola|SitrusBerry|Harvest|woodhammer,flamethrower,trickroom,dracometeor||85,85,85,85,85,|F|,,,,,0||87|,,,,,Fire]Oricorio|OricorioSensu|Leftovers|Dancer|revelationdance,quiverdance,airslash,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Fighting]Furret||SitrusBerry|Frisk|bodyslam,protect,helpinghand,followme||85,85,85,85,85,85|F|||98|,,,,,Ghost]Iron Bundle||BoosterEnergy|QuarkDrive|freezedry,hydropump,protect,icywind||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dragon",
+  "p1Team": [
+    {
+      "name": "Coalossal",
+      "species": "Coalossal",
+      "item": "Sitrus Berry",
+      "ability": "Flame Body",
+      "moves": [
+        "Heat Wave",
+        "Stealth Rock",
+        "Stone Edge",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Incineroar",
+      "species": "Incineroar",
+      "item": "Heavy-Duty Boots",
+      "ability": "Intimidate",
+      "moves": [
+        "Fake Out",
+        "Flare Blitz",
+        "Parting Shot",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Noctowl",
+      "species": "Noctowl",
+      "item": "Life Orb",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Protect",
+        "Tailwind",
+        "Hyper Voice",
+        "Hurricane"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Regieleki",
+      "species": "Regieleki",
+      "item": "Magnet",
+      "ability": "Transistor",
+      "moves": [
+        "Protect",
+        "Tera Blast",
+        "Electroweb",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Sceptile",
+      "species": "Sceptile",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Focus Blast",
+        "Protect",
+        "Leaf Storm",
+        "Breaking Swipe"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Brute Bonnet",
+      "species": "Brute Bonnet",
+      "item": "Rocky Helmet",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Rage Powder",
+        "Seed Bomb",
+        "Sucker Punch",
+        "Spore"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Scrafty",
+      "species": "Scrafty",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Knock Off",
+        "Coaching",
+        "Fake Out",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Phione",
+      "species": "Phione",
+      "item": "Leftovers",
+      "ability": "Hydration",
+      "moves": [
+        "Take Heart",
+        "Protect",
+        "Ice Beam",
+        "Scald"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Exeggutor",
+      "species": "Exeggutor-Alola",
+      "item": "Sitrus Berry",
+      "ability": "Harvest",
+      "moves": [
+        "Wood Hammer",
+        "Flamethrower",
+        "Trick Room",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Oricorio",
+      "species": "Oricorio-Sensu",
+      "item": "Leftovers",
+      "ability": "Dancer",
+      "moves": [
+        "Revelation Dance",
+        "Quiver Dance",
+        "Air Slash",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Furret",
+      "species": "Furret",
+      "item": "Sitrus Berry",
+      "ability": "Frisk",
+      "moves": [
+        "Body Slam",
+        "Protect",
+        "Helping Hand",
+        "Follow Me"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 98,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Iron Bundle",
+      "species": "Iron Bundle",
+      "item": "Booster Energy",
+      "ability": "Quark Drive",
+      "moves": [
+        "Freeze-Dry",
+        "Hydro Pump",
+        "Protect",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"428,795,1162,1895\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Coalossal||SitrusBerry|FlameBody|heatwave,stealthrock,stoneedge,willowisp||85,85,85,85,85,85|F|||90|,,,,,Water]Incineroar||HeavyDutyBoots|Intimidate|fakeout,flareblitz,partingshot,knockoff||85,85,85,85,85,85|F|||78|,,,,,Water]Noctowl||LifeOrb|TintedLens|protect,tailwind,hypervoice,hurricane||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Regieleki||Magnet|Transistor|protect,terablast,electroweb,thunderbolt||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ice]Sceptile||WhiteHerb|Unburden|focusblast,protect,leafstorm,breakingswipe||85,85,85,85,85,85|M|||88|,,,,,Water]Brute Bonnet||RockyHelmet|Protosynthesis|ragepowder,seedbomb,suckerpunch,spore||85,85,85,85,85,85|N|||80|,,,,,Poison\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Scrafty||SitrusBerry|Intimidate|knockoff,coaching,fakeout,closecombat||85,85,85,85,85,85|F|||83|,,,,,Poison]Phione||Leftovers|Hydration|takeheart,protect,icebeam,scald||85,,85,85,85,85|N|,0,,,,||90|,,,,,Steel]Exeggutor|ExeggutorAlola|SitrusBerry|Harvest|woodhammer,flamethrower,trickroom,dracometeor||85,85,85,85,85,|F|,,,,,0||87|,,,,,Fire]Oricorio|OricorioSensu|Leftovers|Dancer|revelationdance,quiverdance,airslash,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Fighting]Furret||SitrusBerry|Frisk|bodyslam,protect,helpinghand,followme||85,85,85,85,85,85|F|||98|,,,,,Ghost]Iron Bundle||BoosterEnergy|QuarkDrive|freezedry,hydropump,protect,icywind||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dragon\"}",
+    ">p1 move stealthrock, move fakeout +1",
+    ">p2 move knockoff +2, move takeheart",
+    ">p1 move heatwave, move fakeout +2",
+    ">p2 move coaching -2, move takeheart",
+    ">p1 move heatwave, move knockoff +1",
+    ">p2 move fakeout +1, move scald +1",
+    ">p1 switch 3, pass",
+    ">p1 move tailwind, move partingshot +1",
+    ">p2 move closecombat +1, move takeheart",
+    ">p1 pass, switch 4",
+    ">p1 move tailwind, move terablast +1",
+    ">p2 move knockoff +2, move icebeam +2",
+    ">p1 pass, switch 6",
+    ">p1 move hurricane +2, move ragepowder",
+    ">p2 move knockoff +1, move takeheart",
+    ">p1 move hurricane +1, move spore +1",
+    ">p2 move closecombat +1, move icebeam +1",
+    ">p2 switch 5, pass",
+    ">p1 move hypervoice, move spore +1",
+    ">p2 move helpinghand -2, move takeheart",
+    ">p1 move protect, move ragepowder",
+    ">p2 move protect, move icebeam +1",
+    ">p1 pass, switch 5",
+    ">p1 move protect, move focusblast +1",
+    ">p2 move bodyslam +2, move icebeam +2",
+    ">p1 pass, switch 4",
+    ">p2 switch 4, pass",
+    ">p1 move hurricane +1, move partingshot +1",
+    ">p2 move airslash +2, move scald +1",
+    ">p1 pass, move knockoff +2",
+    ">p2 move revelationdance +1, move protect",
+    ">p1 pass, move knockoff +1",
+    ">p2 move revelationdance +2, move takeheart",
+    ">p1 pass, move knockoff +1",
+    ">p2 move protect, move icebeam +2"
+  ]
+}

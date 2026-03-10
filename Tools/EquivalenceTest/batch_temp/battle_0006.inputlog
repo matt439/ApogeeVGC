@@ -1,0 +1,40 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"43,80,117,190"}
+>player p1 {"name":"Player1","team":"Victreebel||LifeOrb|Chlorophyll|suckerpunch,sludgebomb,powerwhip,protect||85,85,85,85,85,85|M|||91|,,,,,Grass]Staraptor||LifeOrb|Intimidate|closecombat,doubleedge,bravebird,protect||85,85,85,85,85,85|F|||82|,,,,,Fighting]Kommo-o||ThroatSpray|Bulletproof|clangoroussoul,protect,clangingscales,ironhead||85,85,85,85,85,85|F|||79|,,,,,Steel]Kyurem||LoadedDice|Pressure|scaleshot,protect,earthpower,iciclespear||85,85,85,85,85,85|N|||77|,,,,,Fairy]Ariados||RockyHelmet|Insomnia|ragepowder,protect,stickyweb,megahorn||85,85,85,85,85,85|M||||,,,,,Dark]Lycanroc||LifeOrb|SandRush|protect,closecombat,drillrun,rockslide||85,85,85,85,85,85|M|||85|,,,,,Fighting"}
+>player p2 {"name":"Player2","team":"Klawf||LifeOrb|Regenerator|knockoff,protect,crabhammer,rockslide||85,85,85,85,85,85|F|||91|,,,,,Water]Gardevoir||ChoiceScarf|Trace|psychic,mysticalfire,dazzlinggleam,trick||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fairy]Moltres|MoltresGalar|SitrusBerry|Berserk|fierywrath,tailwind,nastyplot,hurricane||85,,85,85,85,85|N|,0,,,,||74|,,,,,Dark]Rotom|RotomHeat|SitrusBerry|Levitate|overheat,electroweb,thunderbolt,protect||85,,85,85,85,85|N|,0,,,,||84|,,,,,Steel]Granbull||AssaultVest|Intimidate|stompingtantrum,superfang,closecombat,playrough||85,85,85,85,85,85|F|||88|,,,,,Steel]Bombirdier||ChoiceBand|RockyPayload|bravebird,knockoff,rockslide,suckerpunch||85,85,85,85,85,85|F|||84|,,,,,Rock"}
+>p1 move protect, move closecombat +1
+>p2 move crabhammer +1, move trick +2
+>p1 move protect, move closecombat +1
+>p2 move knockoff +1, move dazzlinggleam
+>p1 pass, switch 4
+>p1 move suckerpunch +1, move earthpower +1
+>p2 move knockoff +2, move mysticalfire +1
+>p1 switch 6, pass
+>p2 switch 4, pass
+>p1 move protect, move protect
+>p2 move overheat +2, move mysticalfire +1
+>p1 move rockslide, move protect
+>p2 move overheat +2, move mysticalfire +1
+>p1 move closecombat +2, move scaleshot +1
+>p2 move thunderbolt +2, move dazzlinggleam
+>p1 switch 3, switch 5
+>p2 pass, switch 5
+>p1 move protect, move protect
+>p2 move thunderbolt +2, move stompingtantrum +2
+>p1 move clangoroussoul, move stickyweb
+>p2 move overheat +1, move stompingtantrum +1
+>p1 move protect, move stickyweb
+>p2 move protect, move stompingtantrum +2
+>p1 move protect, move protect
+>p2 move protect, move stompingtantrum +1
+>p1 move protect, move megahorn +2
+>p2 move electroweb, move superfang +1
+>p1 move protect, move stickyweb
+>p2 move overheat +2, move stompingtantrum +2
+>p1 move clangoroussoul, move protect
+>p2 move thunderbolt +2, move closecombat +1
+>p1 pass, move ragepowder
+>p2 move thunderbolt +2, move superfang +1
+>p1 pass, move protect
+>p2 move protect, move superfang +1
+>p1 pass, move stickyweb
+>p2 move thunderbolt +2, move stompingtantrum +2

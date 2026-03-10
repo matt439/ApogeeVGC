@@ -1,0 +1,46 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"386,717,1048,1709"}
+>player p1 {"name":"Player1","team":"Gogoat||AssaultVest|SapSipper|leafstorm,hornleech,highhorsepower,doubleedge||85,85,85,85,85,85|M|||90|,,,,,Normal]Pyroar||LifeOrb|Unnerve|willowisp,protect,hypervoice,heatwave||85,,85,85,85,85|F|,0,,,,||83|,,,,,Water]Cinccino||LoadedDice|Technician|tailslap,knockoff,protect,tripleaxel||85,85,85,85,85,85|M|||85|,,,,,Ice]Espeon||LifeOrb|MagicBounce|protect,dazzlinggleam,shadowball,psychic||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fairy]Muk||SitrusBerry|PoisonTouch|knockoff,shadowsneak,toxicspikes,gunkshot||85,85,85,85,85,85|M|||86|,,,,,Dark]Veluza||ChoiceBand|Sharpness|nightslash,aquacutter,aquajet,psychocut||85,85,85,85,85,85|F|||88|,,,,,Psychic"}
+>player p2 {"name":"Player2","team":"Meganium||SitrusBerry|Overgrow|encore,knockoff,energyball,healpulse||85,85,85,85,85,85|F|||91|,,,,,Poison]Raging Bolt||Leftovers|Protosynthesis|thunderclap,protect,dragonpulse,calmmind||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Heracross||ChoiceScarf|Moxie|rockslide,knockoff,megahorn,closecombat||85,85,85,85,85,85|F|||82|,,,,,Bug]Hitmonlee||WhiteHerb|Unburden|protect,poisonjab,closecombat,knockoff||85,85,85,85,85,85|M|||86|,,,,,Poison]Banette||LifeOrb|Frisk|poltergeist,protect,gunkshot,shadowsneak||85,85,85,85,85,85|F|||94|,,,,,Poison]Iron Crown||ChoiceSpecs|QuarkDrive|tachyoncutter,psychic,voltswitch,focusblast||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting"}
+>p1 move leafstorm +1, move protect
+>p2 move knockoff +2, move calmmind
+>p1 move highhorsepower +1, move heatwave
+>p2 move knockoff +2, move dragonpulse +1
+>p1 move highhorsepower +2, move willowisp +2
+>p2 move encore +2, move calmmind
+>p1 move hornleech +1, move willowisp +2
+>p2 move encore +1, move thunderclap +2
+>p2 switch 5, pass
+>p1 move highhorsepower +2, move willowisp +2
+>p2 move poltergeist +1, move thunderclap +1
+>p1 switch 5, pass
+>p1 move knockoff +1, move willowisp +2
+>p2 move gunkshot +1, move calmmind
+>p1 move knockoff +1, move willowisp +2
+>p2 move shadowsneak +1, move dragonpulse +1
+>p2 switch 3, pass
+>p1 move knockoff +1, move willowisp +1
+>p2 move rockslide, move dragonpulse +1
+>p1 switch 4, switch 6
+>p1 move dazzlinggleam, move psychocut +1
+>p2 move rockslide, move protect
+>p2 switch 6, pass
+>p1 move shadowball +2, move psychocut +1
+>p2 move focusblast +1, move calmmind
+>p1 move psychic +2, move psychocut +1
+>p2 move focusblast +2, move protect
+>p1 move protect, move psychocut +2
+>p2 move focusblast +2, move calmmind
+>p2 pass, switch 4
+>p1 move psychic +2, move psychocut +1
+>p2 move focusblast +2, move protect
+>p1 move dazzlinggleam, move psychocut +2
+>p2 move focusblast +2, move poisonjab +2
+>p1 pass, switch 3
+>p1 move psychic +2, move tripleaxel +2
+>p2 move focusblast +2, move protect
+>p1 move shadowball +2, pass
+>p2 move focusblast +2, move knockoff +2
+>p1 move protect, pass
+>p2 move focusblast +1, pass
+>p1 move dazzlinggleam, pass
+>p2 move struggle, pass

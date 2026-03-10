@@ -1,0 +1,438 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "512,951,1390,2267",
+  "p1Seed": "3003,3159,3461,3909",
+  "p2Seed": "4357,4513,4961,5263",
+  "p1TeamPacked": "Inteleon||ChoiceSpecs|Torrent|icebeam,muddywater,scald,hydropump||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Hariyama||FlameOrb|Guts|closecombat,fakeout,knockoff,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Dipplin||Eviolite|StickyHold|dragonpulse,pollenpuff,recover,syrupbomb||85,,85,85,85,85|M|,0,,,,||92|,,,,,Steel]Ceruledge||LifeOrb|WeakArmor|protect,poltergeist,swordsdance,bitterblade||85,85,85,85,85,85|M|||80|,,,,,Fire]Lunala||PowerHerb|ShadowShield|moonblast,meteorbeam,moongeistbeam,protect||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Pincurchin||SitrusBerry|ElectricSurge|thunderbolt,electroweb,recover,scald||85,,85,85,85,85|M|,0,,,,||97|,,,,,Water",
+  "p2TeamPacked": "Trevenant||SitrusBerry|Harvest|trickroom,woodhammer,protect,poltergeist||85,85,85,85,85,|M|,,,,,0||88|,,,,,Water]Bombirdier||ChoiceBand|RockyPayload|bravebird,rockslide,knockoff,suckerpunch||85,85,85,85,85,85|M|||84|,,,,,Rock]Volbeat||SitrusBerry|Prankster|lunge,tailwind,encore,thunderwave||85,85,85,85,85,85|M|||82|,,,,,Water]Sceptile||WhiteHerb|Unburden|leafstorm,breakingswipe,focusblast,protect||85,85,85,85,85,85|F|||88|,,,,,Water]Rampardos||ChoiceScarf|SheerForce|headsmash,firepunch,rockslide,stompingtantrum||85,85,85,85,85,85|F|||87|,,,,,Rock]Tyranitar||ClearAmulet|SandStream|highhorsepower,knockoff,dragondance,stoneedge||85,85,85,85,85,85|M|||81|,,,,,Ghost",
+  "p1Team": [
+    {
+      "name": "Inteleon",
+      "species": "Inteleon",
+      "item": "Choice Specs",
+      "ability": "Torrent",
+      "moves": [
+        "Ice Beam",
+        "Muddy Water",
+        "Scald",
+        "Hydro Pump"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Hariyama",
+      "species": "Hariyama",
+      "item": "Flame Orb",
+      "ability": "Guts",
+      "moves": [
+        "Close Combat",
+        "Fake Out",
+        "Knock Off",
+        "Facade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Dipplin",
+      "species": "Dipplin",
+      "item": "Eviolite",
+      "ability": "Sticky Hold",
+      "moves": [
+        "Dragon Pulse",
+        "Pollen Puff",
+        "Recover",
+        "Syrup Bomb"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Ceruledge",
+      "species": "Ceruledge",
+      "item": "Life Orb",
+      "ability": "Weak Armor",
+      "moves": [
+        "Protect",
+        "Poltergeist",
+        "Swords Dance",
+        "Bitter Blade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Lunala",
+      "species": "Lunala",
+      "item": "Power Herb",
+      "ability": "Shadow Shield",
+      "moves": [
+        "Moonblast",
+        "Meteor Beam",
+        "Moongeist Beam",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 71,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Pincurchin",
+      "species": "Pincurchin",
+      "item": "Sitrus Berry",
+      "ability": "Electric Surge",
+      "moves": [
+        "Thunderbolt",
+        "Electroweb",
+        "Recover",
+        "Scald"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 97,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Trevenant",
+      "species": "Trevenant",
+      "item": "Sitrus Berry",
+      "ability": "Harvest",
+      "moves": [
+        "Trick Room",
+        "Wood Hammer",
+        "Protect",
+        "Poltergeist"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Bombirdier",
+      "species": "Bombirdier",
+      "item": "Choice Band",
+      "ability": "Rocky Payload",
+      "moves": [
+        "Brave Bird",
+        "Rock Slide",
+        "Knock Off",
+        "Sucker Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Volbeat",
+      "species": "Volbeat",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Lunge",
+        "Tailwind",
+        "Encore",
+        "Thunder Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Sceptile",
+      "species": "Sceptile",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Leaf Storm",
+        "Breaking Swipe",
+        "Focus Blast",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Rampardos",
+      "species": "Rampardos",
+      "item": "Choice Scarf",
+      "ability": "Sheer Force",
+      "moves": [
+        "Head Smash",
+        "Fire Punch",
+        "Rock Slide",
+        "Stomping Tantrum"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Tyranitar",
+      "species": "Tyranitar",
+      "item": "Clear Amulet",
+      "ability": "Sand Stream",
+      "moves": [
+        "High Horsepower",
+        "Knock Off",
+        "Dragon Dance",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"512,951,1390,2267\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Inteleon||ChoiceSpecs|Torrent|icebeam,muddywater,scald,hydropump||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Hariyama||FlameOrb|Guts|closecombat,fakeout,knockoff,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Dipplin||Eviolite|StickyHold|dragonpulse,pollenpuff,recover,syrupbomb||85,,85,85,85,85|M|,0,,,,||92|,,,,,Steel]Ceruledge||LifeOrb|WeakArmor|protect,poltergeist,swordsdance,bitterblade||85,85,85,85,85,85|M|||80|,,,,,Fire]Lunala||PowerHerb|ShadowShield|moonblast,meteorbeam,moongeistbeam,protect||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Pincurchin||SitrusBerry|ElectricSurge|thunderbolt,electroweb,recover,scald||85,,85,85,85,85|M|,0,,,,||97|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Trevenant||SitrusBerry|Harvest|trickroom,woodhammer,protect,poltergeist||85,85,85,85,85,|M|,,,,,0||88|,,,,,Water]Bombirdier||ChoiceBand|RockyPayload|bravebird,rockslide,knockoff,suckerpunch||85,85,85,85,85,85|M|||84|,,,,,Rock]Volbeat||SitrusBerry|Prankster|lunge,tailwind,encore,thunderwave||85,85,85,85,85,85|M|||82|,,,,,Water]Sceptile||WhiteHerb|Unburden|leafstorm,breakingswipe,focusblast,protect||85,85,85,85,85,85|F|||88|,,,,,Water]Rampardos||ChoiceScarf|SheerForce|headsmash,firepunch,rockslide,stompingtantrum||85,85,85,85,85,85|F|||87|,,,,,Rock]Tyranitar||ClearAmulet|SandStream|highhorsepower,knockoff,dragondance,stoneedge||85,85,85,85,85,85|M|||81|,,,,,Ghost\"}",
+    ">p1 move icebeam +2, move closecombat +2",
+    ">p2 move woodhammer +1, move rockslide",
+    ">p1 switch 4, pass",
+    ">p2 pass, switch 5",
+    ">p1 move bitterblade +2, move knockoff +1",
+    ">p2 move poltergeist +2, move stompingtantrum +2",
+    ">p2 switch 3, pass",
+    ">p1 move swordsdance, move fakeout +2",
+    ">p2 move tailwind, move stompingtantrum +2",
+    ">p1 move swordsdance, move knockoff +2",
+    ">p2 move tailwind, move stompingtantrum +1",
+    ">p1 pass, switch 6",
+    ">p1 move poltergeist +2, move thunderbolt +1",
+    ">p2 move encore +2, move rockslide",
+    ">p1 switch 5, pass",
+    ">p1 move moongeistbeam +1, move electroweb",
+    ">p2 move encore +1, move stompingtantrum +1",
+    ">p2 switch 6, switch 4",
+    ">p1 move moonblast +2, move thunderbolt +2",
+    ">p2 move highhorsepower +2, move protect",
+    ">p1 pass, switch 3",
+    ">p1 move moongeistbeam +2, move recover",
+    ">p2 move dragondance, move protect",
+    ">p1 move protect, move dragonpulse +1",
+    ">p2 move stoneedge +2, move leafstorm +1",
+    ">p1 move protect, move recover",
+    ">p2 move dragondance, move focusblast +2",
+    ">p1 move moongeistbeam +2, move dragonpulse +2",
+    ">p2 move stoneedge +2, move breakingswipe",
+    ">p1 move moongeistbeam +1, move recover",
+    ">p2 move knockoff +2, pass",
+    ">p1 move moonblast +1, pass",
+    ">p2 move knockoff +1, pass"
+  ]
+}

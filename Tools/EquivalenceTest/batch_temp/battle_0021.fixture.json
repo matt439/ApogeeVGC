@@ -1,0 +1,462 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "148,275,402,655",
+  "p1Seed": "871,923,1017,1153",
+  "p2Seed": "1289,1341,1477,1571",
+  "p1TeamPacked": "Luvdisc||SitrusBerry|SwiftSwim|charm,endeavor,icywind,hydropump||85,,85,85,85,85|F|,0,,,,|||,,,,,Dragon]Keldeo|KeldeoResolute|LifeOrb|Justified|protect,vacuumwave,secretsword,muddywater||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting]Golem|GolemAlola|SitrusBerry|Galvanize|rockslide,protect,highhorsepower,doubleedge||85,85,85,85,85,85|F|||88|,,,,,Ground]Flareon||ToxicOrb|Guts|quickattack,facade,flareblitz,protect||85,85,85,85,85,85|M|||90|,,,,,Normal]Rotom|RotomFan|SitrusBerry|Levitate|willowisp,protect,thunderbolt,airslash||85,,85,85,85,85|N|,0,,,,||85|,,,,,Electric]Honchkrow||LifeOrb|Moxie|bravebird,suckerpunch,protect,tailwind||85,85,85,85,85,85|M|||85|,,,,,Flying",
+  "p2TeamPacked": "Regieleki||Magnet|Transistor|thunderbolt,electroweb,protect,voltswitch||85,,85,85,85,85|N|,0,,,,||79|,,,,,Electric]Lilligant||LifeOrb|Chlorophyll|gigadrain,quiverdance,protect,terablast||85,,85,85,85,85|F|,0,,,,||88|,,,,,Rock]Kilowattrel||LifeOrb|Competitive|hurricane,protect,thunderbolt,tailwind||85,,85,85,85,85|M|,0,,,,||80|,,,,,Steel]Perrserker||ChoiceBand|ToughClaws|knockoff,closecombat,uturn,ironhead||85,85,85,85,85,85|F|||88|,,,,,Fighting]Ariados||RockyHelmet|Swarm|ragepowder,stickyweb,protect,megahorn||85,85,85,85,85,85|M||||,,,,,Steel]Porygon2||Eviolite|Download|triattack,recover,thunderbolt,icywind||85,,85,85,85,85|N|,0,,,,||82|,,,,,Electric",
+  "p1Team": [
+    {
+      "name": "Luvdisc",
+      "species": "Luvdisc",
+      "item": "Sitrus Berry",
+      "ability": "Swift Swim",
+      "moves": [
+        "Charm",
+        "Endeavor",
+        "Icy Wind",
+        "Hydro Pump"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Keldeo",
+      "species": "Keldeo-Resolute",
+      "item": "Life Orb",
+      "ability": "Justified",
+      "moves": [
+        "Protect",
+        "Vacuum Wave",
+        "Secret Sword",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Golem",
+      "species": "Golem-Alola",
+      "item": "Sitrus Berry",
+      "ability": "Galvanize",
+      "moves": [
+        "Rock Slide",
+        "Protect",
+        "High Horsepower",
+        "Double-Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Flareon",
+      "species": "Flareon",
+      "item": "Toxic Orb",
+      "ability": "Guts",
+      "moves": [
+        "Quick Attack",
+        "Facade",
+        "Flare Blitz",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Rotom",
+      "species": "Rotom-Fan",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "moves": [
+        "Will-O-Wisp",
+        "Protect",
+        "Thunderbolt",
+        "Air Slash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Honchkrow",
+      "species": "Honchkrow",
+      "item": "Life Orb",
+      "ability": "Moxie",
+      "moves": [
+        "Brave Bird",
+        "Sucker Punch",
+        "Protect",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Regieleki",
+      "species": "Regieleki",
+      "item": "Magnet",
+      "ability": "Transistor",
+      "moves": [
+        "Thunderbolt",
+        "Electroweb",
+        "Protect",
+        "Volt Switch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Lilligant",
+      "species": "Lilligant",
+      "item": "Life Orb",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Giga Drain",
+        "Quiver Dance",
+        "Protect",
+        "Tera Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Kilowattrel",
+      "species": "Kilowattrel",
+      "item": "Life Orb",
+      "ability": "Competitive",
+      "moves": [
+        "Hurricane",
+        "Protect",
+        "Thunderbolt",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Perrserker",
+      "species": "Perrserker",
+      "item": "Choice Band",
+      "ability": "Tough Claws",
+      "moves": [
+        "Knock Off",
+        "Close Combat",
+        "U-turn",
+        "Iron Head"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Ariados",
+      "species": "Ariados",
+      "item": "Rocky Helmet",
+      "ability": "Swarm",
+      "moves": [
+        "Rage Powder",
+        "Sticky Web",
+        "Protect",
+        "Megahorn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Porygon2",
+      "species": "Porygon2",
+      "item": "Eviolite",
+      "ability": "Download",
+      "moves": [
+        "Tri Attack",
+        "Recover",
+        "Thunderbolt",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"148,275,402,655\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Luvdisc||SitrusBerry|SwiftSwim|charm,endeavor,icywind,hydropump||85,,85,85,85,85|F|,0,,,,|||,,,,,Dragon]Keldeo|KeldeoResolute|LifeOrb|Justified|protect,vacuumwave,secretsword,muddywater||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting]Golem|GolemAlola|SitrusBerry|Galvanize|rockslide,protect,highhorsepower,doubleedge||85,85,85,85,85,85|F|||88|,,,,,Ground]Flareon||ToxicOrb|Guts|quickattack,facade,flareblitz,protect||85,85,85,85,85,85|M|||90|,,,,,Normal]Rotom|RotomFan|SitrusBerry|Levitate|willowisp,protect,thunderbolt,airslash||85,,85,85,85,85|N|,0,,,,||85|,,,,,Electric]Honchkrow||LifeOrb|Moxie|bravebird,suckerpunch,protect,tailwind||85,85,85,85,85,85|M|||85|,,,,,Flying\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Regieleki||Magnet|Transistor|thunderbolt,electroweb,protect,voltswitch||85,,85,85,85,85|N|,0,,,,||79|,,,,,Electric]Lilligant||LifeOrb|Chlorophyll|gigadrain,quiverdance,protect,terablast||85,,85,85,85,85|F|,0,,,,||88|,,,,,Rock]Kilowattrel||LifeOrb|Competitive|hurricane,protect,thunderbolt,tailwind||85,,85,85,85,85|M|,0,,,,||80|,,,,,Steel]Perrserker||ChoiceBand|ToughClaws|knockoff,closecombat,uturn,ironhead||85,85,85,85,85,85|F|||88|,,,,,Fighting]Ariados||RockyHelmet|Swarm|ragepowder,stickyweb,protect,megahorn||85,85,85,85,85,85|M||||,,,,,Steel]Porygon2||Eviolite|Download|triattack,recover,thunderbolt,icywind||85,,85,85,85,85|N|,0,,,,||82|,,,,,Electric\"}",
+    ">p1 move charm +1, move secretsword +1",
+    ">p2 move electroweb, move protect",
+    ">p1 move icywind, move vacuumwave +1",
+    ">p2 move voltswitch +1, move protect",
+    ">p2 switch 6, pass",
+    ">p1 move icywind, move muddywater",
+    ">p2 move triattack +2, move protect",
+    ">p1 pass, switch 3",
+    ">p1 move hydropump +1, move doubleedge +1",
+    ">p2 move recover, move terablast +1",
+    ">p1 move hydropump +1, move protect",
+    ">p2 move triattack +2, move quiverdance",
+    ">p1 move charm +2, move rockslide",
+    ">p2 move icywind, move protect",
+    ">p1 move endeavor +2, move protect",
+    ">p2 move recover, move gigadrain +2",
+    ">p1 move charm +2, move highhorsepower +1",
+    ">p2 move thunderbolt +1, move quiverdance",
+    ">p1 switch 5, pass",
+    ">p1 move airslash +1, move highhorsepower +1",
+    ">p2 move icywind, move quiverdance",
+    ">p1 move airslash +1, move protect",
+    ">p2 move icywind, move gigadrain +2",
+    ">p2 switch 5, pass",
+    ">p1 move willowisp +2, move doubleedge +2",
+    ">p2 move protect, move quiverdance",
+    ">p2 pass, switch 4",
+    ">p1 move airslash +2, move protect",
+    ">p2 move ragepowder, move knockoff +1",
+    ">p1 move willowisp +2, move highhorsepower +1",
+    ">p2 move megahorn +1, move knockoff +1",
+    ">p1 switch 6, pass",
+    ">p1 move tailwind, move doubleedge +2",
+    ">p2 move megahorn +2, move knockoff +1",
+    ">p1 move protect, move doubleedge +2",
+    ">p2 move ragepowder, move knockoff +1",
+    ">p2 switch 3, pass",
+    ">p1 move protect, move highhorsepower +2",
+    ">p2 move protect, move knockoff +2",
+    ">p1 move protect, move highhorsepower +2",
+    ">p2 move protect, pass",
+    ">p1 move tailwind, move doubleedge +2",
+    ">p2 move tailwind, pass"
+  ]
+}

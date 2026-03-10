@@ -1,0 +1,430 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "421,782,1143,1864",
+  "p1Seed": "2470,2600,2850,3220",
+  "p2Seed": "3590,3720,4090,4340",
+  "p1TeamPacked": "Snorlax||ChoiceBand|ThickFat|crunch,heatcrash,highhorsepower,bodyslam||85,85,85,85,85,85|M|||84|,,,,,Ground]Lapras||SitrusBerry|WaterAbsorb|protect,freezedry,muddywater,icywind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Mesprit||ChoiceSpecs|Levitate|psychic,thunderbolt,uturn,icebeam||85,85,85,85,85,85|N|||86|,,,,,Electric]Lycanroc|LycanrocMidnight|ChoiceScarf|NoGuard|closecombat,stoneedge,knockoff,rockslide||85,85,85,85,85,85|M|||84|,,,,,Fighting]Glimmora||PowerHerb|ToxicDebris|earthpower,spikyshield,sludgebomb,meteorbeam||85,,85,85,85,85|M|,0,,,,||77|,,,,,Ground]Rotom|RotomMow|SitrusBerry|Levitate|electroweb,thunderbolt,leafstorm,protect||85,,85,85,85,85|N|,0,,,,||86|,,,,,Steel",
+  "p2TeamPacked": "Inteleon||ChoiceSpecs|Torrent|scald,muddywater,hydropump,icebeam||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Tauros|TaurosPaldeaCombat|SitrusBerry|Intimidate|bulkup,protect,ragingbull,stoneedge||85,85,85,85,85,85|M|||82|,,,,,Steel]Gliscor||ToxicOrb|PoisonHeal|facade,swordsdance,protect,earthquake||85,85,85,85,85,85|M|||81|,,,,,Normal]Lucario||ChoiceBand|InnerFocus|meteormash,closecombat,rockslide,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Entei||ChoiceBand|InnerFocus|extremespeed,stompingtantrum,sacredfire,flareblitz||85,85,85,85,85,85|N|||77|,,,,,Normal]Leavanny||LifeOrb|Swarm|protect,leafblade,stickyweb,lunge||85,85,85,85,85,85|M|||91|,,,,,Rock",
+  "p1Team": [
+    {
+      "name": "Snorlax",
+      "species": "Snorlax",
+      "item": "Choice Band",
+      "ability": "Thick Fat",
+      "moves": [
+        "Crunch",
+        "Heat Crash",
+        "High Horsepower",
+        "Body Slam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Lapras",
+      "species": "Lapras",
+      "item": "Sitrus Berry",
+      "ability": "Water Absorb",
+      "moves": [
+        "Protect",
+        "Freeze-Dry",
+        "Muddy Water",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Mesprit",
+      "species": "Mesprit",
+      "item": "Choice Specs",
+      "ability": "Levitate",
+      "moves": [
+        "Psychic",
+        "Thunderbolt",
+        "U-turn",
+        "Ice Beam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Lycanroc",
+      "species": "Lycanroc-Midnight",
+      "item": "Choice Scarf",
+      "ability": "No Guard",
+      "moves": [
+        "Close Combat",
+        "Stone Edge",
+        "Knock Off",
+        "Rock Slide"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Glimmora",
+      "species": "Glimmora",
+      "item": "Power Herb",
+      "ability": "Toxic Debris",
+      "moves": [
+        "Earth Power",
+        "Spiky Shield",
+        "Sludge Bomb",
+        "Meteor Beam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Rotom",
+      "species": "Rotom-Mow",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "moves": [
+        "Electroweb",
+        "Thunderbolt",
+        "Leaf Storm",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Inteleon",
+      "species": "Inteleon",
+      "item": "Choice Specs",
+      "ability": "Torrent",
+      "moves": [
+        "Scald",
+        "Muddy Water",
+        "Hydro Pump",
+        "Ice Beam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Tauros",
+      "species": "Tauros-Paldea-Combat",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Bulk Up",
+        "Protect",
+        "Raging Bull",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Gliscor",
+      "species": "Gliscor",
+      "item": "Toxic Orb",
+      "ability": "Poison Heal",
+      "moves": [
+        "Facade",
+        "Swords Dance",
+        "Protect",
+        "Earthquake"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Lucario",
+      "species": "Lucario",
+      "item": "Choice Band",
+      "ability": "Inner Focus",
+      "moves": [
+        "Meteor Mash",
+        "Close Combat",
+        "Rock Slide",
+        "Extreme Speed"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Entei",
+      "species": "Entei",
+      "item": "Choice Band",
+      "ability": "Inner Focus",
+      "moves": [
+        "Extreme Speed",
+        "Stomping Tantrum",
+        "Sacred Fire",
+        "Flare Blitz"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Leavanny",
+      "species": "Leavanny",
+      "item": "Life Orb",
+      "ability": "Swarm",
+      "moves": [
+        "Protect",
+        "Leaf Blade",
+        "Sticky Web",
+        "Lunge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"421,782,1143,1864\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Snorlax||ChoiceBand|ThickFat|crunch,heatcrash,highhorsepower,bodyslam||85,85,85,85,85,85|M|||84|,,,,,Ground]Lapras||SitrusBerry|WaterAbsorb|protect,freezedry,muddywater,icywind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Mesprit||ChoiceSpecs|Levitate|psychic,thunderbolt,uturn,icebeam||85,85,85,85,85,85|N|||86|,,,,,Electric]Lycanroc|LycanrocMidnight|ChoiceScarf|NoGuard|closecombat,stoneedge,knockoff,rockslide||85,85,85,85,85,85|M|||84|,,,,,Fighting]Glimmora||PowerHerb|ToxicDebris|earthpower,spikyshield,sludgebomb,meteorbeam||85,,85,85,85,85|M|,0,,,,||77|,,,,,Ground]Rotom|RotomMow|SitrusBerry|Levitate|electroweb,thunderbolt,leafstorm,protect||85,,85,85,85,85|N|,0,,,,||86|,,,,,Steel\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Inteleon||ChoiceSpecs|Torrent|scald,muddywater,hydropump,icebeam||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Tauros|TaurosPaldeaCombat|SitrusBerry|Intimidate|bulkup,protect,ragingbull,stoneedge||85,85,85,85,85,85|M|||82|,,,,,Steel]Gliscor||ToxicOrb|PoisonHeal|facade,swordsdance,protect,earthquake||85,85,85,85,85,85|M|||81|,,,,,Normal]Lucario||ChoiceBand|InnerFocus|meteormash,closecombat,rockslide,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Entei||ChoiceBand|InnerFocus|extremespeed,stompingtantrum,sacredfire,flareblitz||85,85,85,85,85,85|N|||77|,,,,,Normal]Leavanny||LifeOrb|Swarm|protect,leafblade,stickyweb,lunge||85,85,85,85,85,85|M|||91|,,,,,Rock\"}",
+    ">p1 move crunch +2, move muddywater",
+    ">p2 move icebeam +1, move stoneedge +2",
+    ">p1 move crunch +2, move muddywater",
+    ">p2 move icebeam +1, move bulkup",
+    ">p1 move crunch +2, move icywind",
+    ">p2 move icebeam +1, move bulkup",
+    ">p2 pass, switch 3",
+    ">p1 move crunch +1, move icywind",
+    ">p2 move icebeam +2, move protect",
+    ">p2 switch 4, pass",
+    ">p1 move crunch +2, move freezedry +2",
+    ">p2 move closecombat +2, move earthquake",
+    ">p1 pass, switch 3",
+    ">p2 switch 6, pass",
+    ">p1 move crunch +1, move icebeam +1",
+    ">p2 move stickyweb, move protect",
+    ">p1 move crunch +2, move icebeam +2",
+    ">p2 move lunge +2, move facade +1",
+    ">p1 pass, switch 6",
+    ">p2 switch 5, pass",
+    ">p1 move crunch +1, move electroweb",
+    ">p2 move sacredfire +1, move earthquake",
+    ">p1 switch 4, switch 5",
+    ">p1 move knockoff +2, move sludgebomb +1",
+    ">p2 move sacredfire +1, move earthquake",
+    ">p1 move knockoff +1, pass",
+    ">p2 pass, move facade +2",
+    ">p1 move knockoff +2, pass",
+    ">p2 pass, move facade +2",
+    ">p1 move knockoff +1, pass",
+    ">p2 pass, move swordsdance",
+    ">p1 move knockoff +1, pass",
+    ">p2 pass, move facade +2"
+  ]
+}

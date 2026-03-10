@@ -1,0 +1,424 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "519,964,1409,2298",
+  "p1Seed": "3044,3202,3508,3962",
+  "p2Seed": "4416,4574,5028,5334",
+  "p1TeamPacked": "Crawdaunt||LifeOrb|Adaptability|crabhammer,aquajet,protect,knockoff||85,85,85,85,85,85|F|||87|,,,,,Water]Ursaluna|UrsalunaBloodmoon|AssaultVest|MindsEye|earthpower,bloodmoon,hypervoice,vacuumwave||85,,85,85,85,85|M|,0,,,,||78|,,,,,Normal]Medicham||LifeOrb|PurePower|closecombat,protect,zenheadbutt,bulletpunch||85,85,85,85,85,85|F|||86|,,,,,Fire]Eiscue||SitrusBerry|IceFace|liquidation,bellydrum,icespinner,protect||85,85,85,85,85,85|F|||89|,,,,,Water]Jumpluff|||Infiltrator|encore,acrobatics,tailwind,sleeppowder||85,85,85,85,85,85|F|||92|,,,,,Steel]Zapdos|ZapdosGalar|ChoiceBand|Defiant|closecombat,thunderouskick,bravebird,uturn||85,85,85,85,85,85|N|||77|,,,,,Fighting",
+  "p2TeamPacked": "Breloom||FocusSash|Technician|spore,machpunch,bulletseed,protect||85,85,85,85,85,85|F|||84|,,,,,Fighting]Gogoat||AssaultVest|SapSipper|highhorsepower,hornleech,leafstorm,doubleedge||85,85,85,85,85,85|F|||90|,,,,,Normal]Bombirdier||ChoiceBand|RockyPayload|bravebird,rockslide,suckerpunch,knockoff||85,85,85,85,85,85|F|||84|,,,,,Rock]Hariyama||AssaultVest|ThickFat|bulletpunch,fakeout,heavyslam,closecombat||85,85,85,85,85,85|M|||85|,,,,,Steel]Clefable||RockyHelmet|Unaware|followme,moonblast,moonlight,helpinghand||85,,85,85,85,85|M|,0,,,,||87|,,,,,Water]Mimikyu||LifeOrb|Disguise|playrough,shadowclaw,shadowsneak,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost",
+  "p1Team": [
+    {
+      "name": "Crawdaunt",
+      "species": "Crawdaunt",
+      "item": "Life Orb",
+      "ability": "Adaptability",
+      "moves": [
+        "Crabhammer",
+        "Aqua Jet",
+        "Protect",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Ursaluna",
+      "species": "Ursaluna-Bloodmoon",
+      "item": "Assault Vest",
+      "ability": "Mind's Eye",
+      "moves": [
+        "Earth Power",
+        "Blood Moon",
+        "Hyper Voice",
+        "Vacuum Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Medicham",
+      "species": "Medicham",
+      "item": "Life Orb",
+      "ability": "Pure Power",
+      "moves": [
+        "Close Combat",
+        "Protect",
+        "Zen Headbutt",
+        "Bullet Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Eiscue",
+      "species": "Eiscue",
+      "item": "Sitrus Berry",
+      "ability": "Ice Face",
+      "moves": [
+        "Liquidation",
+        "Belly Drum",
+        "Ice Spinner",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Jumpluff",
+      "species": "Jumpluff",
+      "item": "",
+      "ability": "Infiltrator",
+      "moves": [
+        "Encore",
+        "Acrobatics",
+        "Tailwind",
+        "Sleep Powder"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Zapdos",
+      "species": "Zapdos-Galar",
+      "item": "Choice Band",
+      "ability": "Defiant",
+      "moves": [
+        "Close Combat",
+        "Thunderous Kick",
+        "Brave Bird",
+        "U-turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Breloom",
+      "species": "Breloom",
+      "item": "Focus Sash",
+      "ability": "Technician",
+      "moves": [
+        "Spore",
+        "Mach Punch",
+        "Bullet Seed",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Gogoat",
+      "species": "Gogoat",
+      "item": "Assault Vest",
+      "ability": "Sap Sipper",
+      "moves": [
+        "High Horsepower",
+        "Horn Leech",
+        "Leaf Storm",
+        "Double-Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Bombirdier",
+      "species": "Bombirdier",
+      "item": "Choice Band",
+      "ability": "Rocky Payload",
+      "moves": [
+        "Brave Bird",
+        "Rock Slide",
+        "Sucker Punch",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Hariyama",
+      "species": "Hariyama",
+      "item": "Assault Vest",
+      "ability": "Thick Fat",
+      "moves": [
+        "Bullet Punch",
+        "Fake Out",
+        "Heavy Slam",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Clefable",
+      "species": "Clefable",
+      "item": "Rocky Helmet",
+      "ability": "Unaware",
+      "moves": [
+        "Follow Me",
+        "Moonblast",
+        "Moonlight",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Mimikyu",
+      "species": "Mimikyu",
+      "item": "Life Orb",
+      "ability": "Disguise",
+      "moves": [
+        "Play Rough",
+        "Shadow Claw",
+        "Shadow Sneak",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"519,964,1409,2298\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Crawdaunt||LifeOrb|Adaptability|crabhammer,aquajet,protect,knockoff||85,85,85,85,85,85|F|||87|,,,,,Water]Ursaluna|UrsalunaBloodmoon|AssaultVest|MindsEye|earthpower,bloodmoon,hypervoice,vacuumwave||85,,85,85,85,85|M|,0,,,,||78|,,,,,Normal]Medicham||LifeOrb|PurePower|closecombat,protect,zenheadbutt,bulletpunch||85,85,85,85,85,85|F|||86|,,,,,Fire]Eiscue||SitrusBerry|IceFace|liquidation,bellydrum,icespinner,protect||85,85,85,85,85,85|F|||89|,,,,,Water]Jumpluff|||Infiltrator|encore,acrobatics,tailwind,sleeppowder||85,85,85,85,85,85|F|||92|,,,,,Steel]Zapdos|ZapdosGalar|ChoiceBand|Defiant|closecombat,thunderouskick,bravebird,uturn||85,85,85,85,85,85|N|||77|,,,,,Fighting\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Breloom||FocusSash|Technician|spore,machpunch,bulletseed,protect||85,85,85,85,85,85|F|||84|,,,,,Fighting]Gogoat||AssaultVest|SapSipper|highhorsepower,hornleech,leafstorm,doubleedge||85,85,85,85,85,85|F|||90|,,,,,Normal]Bombirdier||ChoiceBand|RockyPayload|bravebird,rockslide,suckerpunch,knockoff||85,85,85,85,85,85|F|||84|,,,,,Rock]Hariyama||AssaultVest|ThickFat|bulletpunch,fakeout,heavyslam,closecombat||85,85,85,85,85,85|M|||85|,,,,,Steel]Clefable||RockyHelmet|Unaware|followme,moonblast,moonlight,helpinghand||85,,85,85,85,85|M|,0,,,,||87|,,,,,Water]Mimikyu||LifeOrb|Disguise|playrough,shadowclaw,shadowsneak,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost\"}",
+    ">p1 move protect, move hypervoice",
+    ">p2 move spore +1, move hornleech +2",
+    ">p1 move crabhammer +1, move earthpower +1",
+    ">p2 move protect, move hornleech +2",
+    ">p1 pass, switch 5",
+    ">p1 move knockoff +2, move encore +2",
+    ">p2 move spore +1, move highhorsepower +2",
+    ">p1 move crabhammer +2, move encore +2",
+    ">p2 move protect, move hornleech +1",
+    ">p1 move protect, move tailwind",
+    ">p2 move spore +1, move hornleech +1",
+    ">p1 move knockoff +1, move tailwind",
+    ">p2 move machpunch +2, move doubleedge +1",
+    ">p1 switch 3, pass",
+    ">p1 move protect, move sleeppowder +2",
+    ">p2 move machpunch +2, move leafstorm +2",
+    ">p1 move protect, move encore +2",
+    ">p2 move bulletseed +2, move doubleedge +2",
+    ">p1 move protect, move tailwind",
+    ">p2 move bulletseed +1, move leafstorm +2",
+    ">p1 move zenheadbutt +2, move encore +2",
+    ">p2 move bulletseed +2, move leafstorm +1",
+    ">p1 switch 4, pass",
+    ">p1 move icespinner +2, move acrobatics +2",
+    ">p2 move bulletseed +1, move highhorsepower +2",
+    ">p2 switch 6, switch 5",
+    ">p1 move bellydrum, move acrobatics +1",
+    ">p2 move playrough +1, move moonlight",
+    ">p1 move liquidation +1, move sleeppowder +2",
+    ">p2 move shadowclaw +1, move moonlight",
+    ">p2 switch 3, pass",
+    ">p1 move icespinner +1, move encore +1",
+    ">p2 move suckerpunch +1, move moonblast +2",
+    ">p2 switch 4, pass",
+    ">p1 move liquidation +2, move acrobatics +1",
+    ">p2 move fakeout +1, move moonlight",
+    ">p1 move bellydrum, move tailwind",
+    ">p2 move closecombat +2, move moonlight",
+    ">p1 move icespinner +1, move acrobatics +2",
+    ">p2 move fakeout +2, move moonlight",
+    ">p1 pass, switch 6",
+    ">p1 move icespinner +1, move uturn +1",
+    ">p2 pass, move moonblast +1"
+  ]
+}

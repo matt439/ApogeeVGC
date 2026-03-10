@@ -1,0 +1,47 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"288,535,782,1275"}
+>player p1 {"name":"Player1","team":"Froslass||WideLens|CursedBody|tripleaxel,poltergeist,icywind,willowisp||85,85,85,85,85,85|F|||88|,,,,,Water]Umbreon||SitrusBerry|InnerFocus|thunderwave,snarl,foulplay,helpinghand||85,,85,85,85,85|F|,0,,,,||85|,,,,,Poison]Indeedee|IndeedeeF|SitrusBerry|PsychicSurge|psychic,helpinghand,followme,healpulse||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Vespiquen||Leftovers|Unnerve|toxicspikes,pollenpuff,hurricane,roost||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel]Iron Bundle||BoosterEnergy|QuarkDrive|protect,hydropump,icywind,freezedry||85,,85,85,85,85|N|,0,,,,||78|,,,,,Water]Lumineon||SitrusBerry|StormDrain|tailwind,encore,hydropump,helpinghand||85,,85,85,85,85|M|,0,,,,||92|,,,,,Fire"}
+>player p2 {"name":"Player2","team":"Arboliva||LifeOrb|SeedSower|pollenpuff,energyball,protect,hypervoice||85,,85,85,85,85|M|,0,,,,||88|,,,,,Normal]Regigigas||Leftovers|SlowStart|bodyslam,protect,knockoff,substitute||85,85,85,85,85,85|N|||86|,,,,,Ghost]Clefable||LifeOrb|MagicGuard|fireblast,icywind,moonblast,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Steel]Arceus|ArceusRock|StonePlate|Multitype|recover,earthpower,judgment,calmmind||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ground]Pikachu||LightBall|LightningRod|encore,volttackle,knockoff,fakeout||85,85,85,85,85,85|M|||94|,,,,,Electric]Noivern||LifeOrb|Frisk|flamethrower,protect,hurricane,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon"}
+>p1 move icywind, move thunderwave +2
+>p2 move energyball +2, move protect
+>p1 move willowisp +1, move snarl
+>p2 move energyball +2, move knockoff +2
+>p1 move icywind, move thunderwave +1
+>p2 move hypervoice, move protect
+>p1 move poltergeist +2, move helpinghand -1
+>p2 move pollenpuff +2, move substitute
+>p1 pass, switch 3
+>p1 move tripleaxel +2, move helpinghand -1
+>p2 move protect, move protect
+>p1 move willowisp +1, move helpinghand -1
+>p2 move energyball +2, move protect
+>p2 switch 3, pass
+>p1 move icywind, move psychic +1
+>p2 move protect, move knockoff +2
+>p1 pass, switch 5
+>p1 move poltergeist +1, move protect
+>p2 move icywind, move knockoff +1
+>p1 move poltergeist +1, move freezedry +1
+>p2 move fireblast +2, move bodyslam +2
+>p2 switch 4, pass
+>p1 move willowisp +1, move protect
+>p2 move calmmind, move bodyslam +2
+>p1 move poltergeist +1, move hydropump +2
+>p2 move earthpower +2, move protect
+>p1 pass, switch 4
+>p1 move willowisp +2, move toxicspikes
+>p2 move recover, move substitute
+>p1 move icywind, move roost
+>p2 move recover, move knockoff +1
+>p1 switch 6, pass
+>p1 move encore +1, move roost
+>p2 move recover, move knockoff +1
+>p1 move hydropump +2, move hurricane +2
+>p2 move recover, move bodyslam +2
+>p1 move encore +2, move toxicspikes
+>p2 move recover, move bodyslam +2
+>p1 move encore +2, move hurricane +2
+>p2 move earthpower +2, move bodyslam +2
+>p1 move encore +1, move hurricane +2
+>p2 move calmmind, move bodyslam +1
+>p1 move encore +2, move pollenpuff +2
+>p2 move earthpower +1, move bodyslam +2

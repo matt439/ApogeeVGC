@@ -1,0 +1,434 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "204,379,554,903",
+  "p1Seed": "1199,1267,1393,1577",
+  "p2Seed": "1761,1829,2013,2139",
+  "p1TeamPacked": "Pecharunt||SitrusBerry|PoisonPuppeteer|malignantchain,shadowball,poisongas,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dark]Mienshao||ChoiceBand|InnerFocus|knockoff,tripleaxel,uturn,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Excadrill||AssaultVest|MoldBreaker|highhorsepower,ironhead,rockslide,rapidspin||85,85,85,85,85,85|M|||82|,,,,,Flying]Whiscash||SitrusBerry|Oblivious|icywind,highhorsepower,protect,muddywater||85,85,85,85,85,85|F|||88|,,,,,Fire]Chandelure||ChoiceScarf|FlashFire|shadowball,heatwave,trick,energyball||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Breloom||FocusSash|Technician|closecombat,bulletseed,machpunch,spore||85,85,85,85,85,85|F|||84|,,,,,Fighting",
+  "p2TeamPacked": "Oinkologne|OinkologneF|ChoiceBand|ThickFat|bodyslam,doubleedge,lashout,highhorsepower||85,85,85,85,85,85|F|||92|,,,,,Normal]Mienshao||ChoiceBand|InnerFocus|tripleaxel,knockoff,closecombat,uturn||85,85,85,85,85,85|M|||84|,,,,,Steel]Scovillain||SitrusBerry|Chlorophyll|ragepowder,energyball,fireblast,willowisp||85,,85,85,85,85|F|,0,,,,||90|,,,,,Fire]Lucario||LifeOrb|InnerFocus|protect,flashcannon,closecombat,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Milotic||SitrusBerry|Competitive|dragontail,scald,icywind,recover||85,85,85,85,85,85|M|||81|,,,,,Steel]Houndoom||LifeOrb|FlashFire|heatwave,protect,nastyplot,darkpulse||85,,85,85,85,85|M|,0,,,,||86|,,,,,Grass",
+  "p1Team": [
+    {
+      "name": "Pecharunt",
+      "species": "Pecharunt",
+      "item": "Sitrus Berry",
+      "ability": "Poison Puppeteer",
+      "moves": [
+        "Malignant Chain",
+        "Shadow Ball",
+        "Poison Gas",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Mienshao",
+      "species": "Mienshao",
+      "item": "Choice Band",
+      "ability": "Inner Focus",
+      "moves": [
+        "Knock Off",
+        "Triple Axel",
+        "U-turn",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Excadrill",
+      "species": "Excadrill",
+      "item": "Assault Vest",
+      "ability": "Mold Breaker",
+      "moves": [
+        "High Horsepower",
+        "Iron Head",
+        "Rock Slide",
+        "Rapid Spin"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Whiscash",
+      "species": "Whiscash",
+      "item": "Sitrus Berry",
+      "ability": "Oblivious",
+      "moves": [
+        "Icy Wind",
+        "High Horsepower",
+        "Protect",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Chandelure",
+      "species": "Chandelure",
+      "item": "Choice Scarf",
+      "ability": "Flash Fire",
+      "moves": [
+        "Shadow Ball",
+        "Heat Wave",
+        "Trick",
+        "Energy Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Breloom",
+      "species": "Breloom",
+      "item": "Focus Sash",
+      "ability": "Technician",
+      "moves": [
+        "Close Combat",
+        "Bullet Seed",
+        "Mach Punch",
+        "Spore"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Oinkologne",
+      "species": "Oinkologne-F",
+      "item": "Choice Band",
+      "ability": "Thick Fat",
+      "moves": [
+        "Body Slam",
+        "Double-Edge",
+        "Lash Out",
+        "High Horsepower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Mienshao",
+      "species": "Mienshao",
+      "item": "Choice Band",
+      "ability": "Inner Focus",
+      "moves": [
+        "Triple Axel",
+        "Knock Off",
+        "Close Combat",
+        "U-turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Scovillain",
+      "species": "Scovillain",
+      "item": "Sitrus Berry",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Rage Powder",
+        "Energy Ball",
+        "Fire Blast",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Lucario",
+      "species": "Lucario",
+      "item": "Life Orb",
+      "ability": "Inner Focus",
+      "moves": [
+        "Protect",
+        "Flash Cannon",
+        "Close Combat",
+        "Extreme Speed"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Milotic",
+      "species": "Milotic",
+      "item": "Sitrus Berry",
+      "ability": "Competitive",
+      "moves": [
+        "Dragon Tail",
+        "Scald",
+        "Icy Wind",
+        "Recover"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Houndoom",
+      "species": "Houndoom",
+      "item": "Life Orb",
+      "ability": "Flash Fire",
+      "moves": [
+        "Heat Wave",
+        "Protect",
+        "Nasty Plot",
+        "Dark Pulse"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"204,379,554,903\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Pecharunt||SitrusBerry|PoisonPuppeteer|malignantchain,shadowball,poisongas,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dark]Mienshao||ChoiceBand|InnerFocus|knockoff,tripleaxel,uturn,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Excadrill||AssaultVest|MoldBreaker|highhorsepower,ironhead,rockslide,rapidspin||85,85,85,85,85,85|M|||82|,,,,,Flying]Whiscash||SitrusBerry|Oblivious|icywind,highhorsepower,protect,muddywater||85,85,85,85,85,85|F|||88|,,,,,Fire]Chandelure||ChoiceScarf|FlashFire|shadowball,heatwave,trick,energyball||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Breloom||FocusSash|Technician|closecombat,bulletseed,machpunch,spore||85,85,85,85,85,85|F|||84|,,,,,Fighting\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Oinkologne|OinkologneF|ChoiceBand|ThickFat|bodyslam,doubleedge,lashout,highhorsepower||85,85,85,85,85,85|F|||92|,,,,,Normal]Mienshao||ChoiceBand|InnerFocus|tripleaxel,knockoff,closecombat,uturn||85,85,85,85,85,85|M|||84|,,,,,Steel]Scovillain||SitrusBerry|Chlorophyll|ragepowder,energyball,fireblast,willowisp||85,,85,85,85,85|F|,0,,,,||90|,,,,,Fire]Lucario||LifeOrb|InnerFocus|protect,flashcannon,closecombat,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Milotic||SitrusBerry|Competitive|dragontail,scald,icywind,recover||85,85,85,85,85,85|M|||81|,,,,,Steel]Houndoom||LifeOrb|FlashFire|heatwave,protect,nastyplot,darkpulse||85,,85,85,85,85|M|,0,,,,||86|,,,,,Grass\"}",
+    ">p1 move poisongas, move uturn +2",
+    ">p2 move doubleedge +2, move knockoff +1",
+    ">p1 pass, switch 5",
+    ">p1 move poisongas, move energyball +1",
+    ">p2 move doubleedge +2, move knockoff +1",
+    ">p1 switch 4, pass",
+    ">p1 move icywind, move energyball +2",
+    ">p2 move doubleedge +2, move knockoff +2",
+    ">p1 pass, switch 3",
+    ">p2 pass, switch 3",
+    ">p1 move highhorsepower +1, move rockslide",
+    ">p2 move doubleedge +2, move fireblast +2",
+    ">p2 switch 4, pass",
+    ">p1 move highhorsepower +2, move rapidspin +2",
+    ">p2 move closecombat +2, move fireblast +2",
+    ">p1 pass, switch 6",
+    ">p1 move protect, move spore +2",
+    ">p2 move closecombat +1, move energyball +2",
+    ">p1 move icywind, move closecombat +2",
+    ">p2 move protect, move ragepowder",
+    ">p2 pass, switch 6",
+    ">p1 move muddywater, move spore +2",
+    ">p2 move extremespeed +2, move protect",
+    ">p1 move highhorsepower +2, move machpunch +2",
+    ">p2 move closecombat +1, move heatwave",
+    ">p1 switch 5, pass",
+    ">p1 move tripleaxel +1, pass",
+    ">p2 move protect, move darkpulse +1",
+    ">p1 move tripleaxel +1, pass",
+    ">p2 move protect, move darkpulse +2",
+    ">p2 switch 5, pass",
+    ">p1 move tripleaxel +1, pass",
+    ">p2 move recover, pass",
+    ">p1 move tripleaxel +2, pass",
+    ">p2 move dragontail +2, pass",
+    ">p1 move tripleaxel +1, pass",
+    ">p2 move icywind, pass"
+  ]
+}

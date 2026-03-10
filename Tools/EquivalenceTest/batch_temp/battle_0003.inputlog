@@ -1,0 +1,55 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"22,41,60,97"}
+>player p1 {"name":"Player1","team":"Toxicroak||FocusSash|DrySkin|suckerpunch,gunkshot,fakeout,closecombat||85,85,85,85,85,85|M|||85|,,,,,Fighting]Flutter Mane||ChoiceSpecs|Protosynthesis|icywind,dazzlinggleam,shadowball,moonblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy]Wigglytuff||SitrusBerry|Competitive|thunderwave,helpinghand,dazzlinggleam,encore||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Staraptor||LifeOrb|Intimidate|protect,quickattack,closecombat,bravebird||85,85,85,85,85,85|M|||82|,,,,,Fighting]Heracross||FlameOrb|Guts|protect,knockoff,facade,closecombat||85,85,85,85,85,85|F|||82|,,,,,Normal]Altaria||SitrusBerry|NaturalCure|bravebird,willowisp,tailwind,roost||85,85,85,85,85,85|F|||91|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Cacturne||LifeOrb|WaterAbsorb|leafstorm,suckerpunch,knockoff,spikyshield||85,85,85,85,85,85|M|||91|,,,,,Dark]Arbok||SitrusBerry|Intimidate|gunkshot,glare,toxicspikes,knockoff||85,85,85,85,85,85|F|||88|,,,,,Dark]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,protect,flipturn||85,85,85,85,85,85|M|||79|,,,,,Water]Diancie||SitrusBerry|ClearBody|protect,bodypress,diamondstorm,trickroom||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Electrode|ElectrodeHisui|SitrusBerry|Soundproof|electroweb,thunderbolt,energyball,taunt||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Tinkaton||SitrusBerry|OwnTempo|gigatonhammer,fakeout,playrough,stealthrock||85,85,85,85,85,85|F|||82|,,,,,Water"}
+>p1 move closecombat +1, move dazzlinggleam
+>p2 move knockoff +1, move toxicspikes
+>p2 switch 5, pass
+>p1 move fakeout +2, move dazzlinggleam
+>p2 move taunt +2, move toxicspikes
+>p1 move closecombat +1, move dazzlinggleam
+>p2 move electroweb, move knockoff +2
+>p1 move fakeout +1, move icywind
+>p2 move electroweb, move glare +2
+>p2 switch 6, pass
+>p1 move suckerpunch +2, move moonblast +2
+>p2 move stealthrock, move glare +1
+>p1 move fakeout +2, move moonblast +2
+>p2 move playrough +1, move gunkshot +1
+>p1 switch 3, switch 6
+>p1 move helpinghand -2, move roost
+>p2 move fakeout +1, move toxicspikes
+>p1 move thunderwave +2, move willowisp +2
+>p2 move stealthrock, move glare +2
+>p1 move thunderwave +2, move willowisp +2
+>p2 move fakeout +1, move glare +2
+>p1 move thunderwave +1, move roost
+>p2 move stealthrock, move toxicspikes
+>p1 move helpinghand -2, move bravebird +1
+>p2 move gigatonhammer +1, move toxicspikes
+>p1 switch 4, pass
+>p1 move protect, move tailwind
+>p2 move playrough +2, move gunkshot +1
+>p1 move bravebird +1, move tailwind
+>p2 move playrough +1, move glare +2
+>p1 move quickattack +2, move tailwind
+>p2 move fakeout +1, move toxicspikes
+>p2 pass, switch 3
+>p1 move quickattack +2, move willowisp +1
+>p2 move gigatonhammer +2, move flipturn +1
+>p2 pass, switch 4
+>p1 move quickattack +1, move roost
+>p2 move gigatonhammer +1, move bodypress +2
+>p1 switch 5, pass
+>p1 move knockoff +2, move willowisp +1
+>p2 move stealthrock, move bodypress +1
+>p1 move facade +1, move willowisp +2
+>p2 move stealthrock, move protect
+>p1 move protect, move willowisp +2
+>p2 move playrough +2, move bodypress +1
+>p1 move closecombat +1, move tailwind
+>p2 move playrough +1, move trickroom
+>p2 switch 4, pass
+>p1 move protect, move roost
+>p2 move protect, move protect
+>p1 pass, move willowisp +1
+>p2 move jetpunch +2, move diamondstorm

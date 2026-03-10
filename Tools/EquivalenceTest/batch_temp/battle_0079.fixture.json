@@ -1,0 +1,429 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "554,1029,1504,2453",
+  "p1Seed": "3249,3417,3743,4227",
+  "p2Seed": "4711,4879,5363,5689",
+  "p1TeamPacked": "Magmortar||ChoiceScarf|FlameBody|focusblast,thunderbolt,heatwave,fireblast||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass]Oricorio|OricorioPomPom|Leftovers|Dancer|revelationdance,airslash,quiverdance,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Swalot||MagoBerry|Gluttony|helpinghand,toxicspikes,knockoff,gunkshot||85,85,85,85,85,85|M|||90|,,,,,Dark]Ambipom||SilkScarf|Technician|protect,doubleedge,fakeout,knockoff||85,85,85,85,85,85|M|||87|,,,,,Normal]Kingdra||LifeOrb|SwiftSwim|raindance,muddywater,dracometeor,protect||85,,85,85,85,85|F|,0,,,,||85|,,,,,Water]Garchomp||LoadedDice|RoughSkin|earthquake,protect,scaleshot,swordsdance||85,85,85,85,85,85|M|||77|,,,,,Fire",
+  "p2TeamPacked": "Solgaleo||AssaultVest|FullMetalBody|sunsteelstrike,closecombat,psychicfangs,knockoff||85,85,85,85,85,85|N|||74|,,,,,Fighting]Leafeon||LifeOrb|Chlorophyll|leafblade,doubleedge,swordsdance,knockoff||85,85,85,85,85,85|F|||90|,,,,,Normal]Golurk||AssaultVest|NoGuard|poltergeist,highhorsepower,stoneedge,dynamicpunch||85,85,85,85,85,85|N|||86|,,,,,Fighting]Scovillain||ChoiceScarf|Chlorophyll|burningjealousy,leafstorm,fireblast,energyball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Grass]Malamar||SitrusBerry|Contrary|trickroom,knockoff,protect,superpower||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Ceruledge||LifeOrb|WeakArmor|protect,swordsdance,bitterblade,poltergeist||85,85,85,85,85,85|M|||80|,,,,,Grass",
+  "p1Team": [
+    {
+      "name": "Magmortar",
+      "species": "Magmortar",
+      "item": "Choice Scarf",
+      "ability": "Flame Body",
+      "moves": [
+        "Focus Blast",
+        "Thunderbolt",
+        "Heat Wave",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Oricorio",
+      "species": "Oricorio-Pom-Pom",
+      "item": "Leftovers",
+      "ability": "Dancer",
+      "moves": [
+        "Revelation Dance",
+        "Air Slash",
+        "Quiver Dance",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Swalot",
+      "species": "Swalot",
+      "item": "Mago Berry",
+      "ability": "Gluttony",
+      "moves": [
+        "Helping Hand",
+        "Toxic Spikes",
+        "Knock Off",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Ambipom",
+      "species": "Ambipom",
+      "item": "Silk Scarf",
+      "ability": "Technician",
+      "moves": [
+        "Protect",
+        "Double-Edge",
+        "Fake Out",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Kingdra",
+      "species": "Kingdra",
+      "item": "Life Orb",
+      "ability": "Swift Swim",
+      "moves": [
+        "Rain Dance",
+        "Muddy Water",
+        "Draco Meteor",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Garchomp",
+      "species": "Garchomp",
+      "item": "Loaded Dice",
+      "ability": "Rough Skin",
+      "moves": [
+        "Earthquake",
+        "Protect",
+        "Scale Shot",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Solgaleo",
+      "species": "Solgaleo",
+      "item": "Assault Vest",
+      "ability": "Full Metal Body",
+      "moves": [
+        "Sunsteel Strike",
+        "Close Combat",
+        "Psychic Fangs",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Leafeon",
+      "species": "Leafeon",
+      "item": "Life Orb",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Leaf Blade",
+        "Double-Edge",
+        "Swords Dance",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Golurk",
+      "species": "Golurk",
+      "item": "Assault Vest",
+      "ability": "No Guard",
+      "moves": [
+        "Poltergeist",
+        "High Horsepower",
+        "Stone Edge",
+        "Dynamic Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Scovillain",
+      "species": "Scovillain",
+      "item": "Choice Scarf",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Burning Jealousy",
+        "Leaf Storm",
+        "Fire Blast",
+        "Energy Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Malamar",
+      "species": "Malamar",
+      "item": "Sitrus Berry",
+      "ability": "Contrary",
+      "moves": [
+        "Trick Room",
+        "Knock Off",
+        "Protect",
+        "Superpower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Ceruledge",
+      "species": "Ceruledge",
+      "item": "Life Orb",
+      "ability": "Weak Armor",
+      "moves": [
+        "Protect",
+        "Swords Dance",
+        "Bitter Blade",
+        "Poltergeist"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"554,1029,1504,2453\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Magmortar||ChoiceScarf|FlameBody|focusblast,thunderbolt,heatwave,fireblast||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass]Oricorio|OricorioPomPom|Leftovers|Dancer|revelationdance,airslash,quiverdance,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Swalot||MagoBerry|Gluttony|helpinghand,toxicspikes,knockoff,gunkshot||85,85,85,85,85,85|M|||90|,,,,,Dark]Ambipom||SilkScarf|Technician|protect,doubleedge,fakeout,knockoff||85,85,85,85,85,85|M|||87|,,,,,Normal]Kingdra||LifeOrb|SwiftSwim|raindance,muddywater,dracometeor,protect||85,,85,85,85,85|F|,0,,,,||85|,,,,,Water]Garchomp||LoadedDice|RoughSkin|earthquake,protect,scaleshot,swordsdance||85,85,85,85,85,85|M|||77|,,,,,Fire\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Solgaleo||AssaultVest|FullMetalBody|sunsteelstrike,closecombat,psychicfangs,knockoff||85,85,85,85,85,85|N|||74|,,,,,Fighting]Leafeon||LifeOrb|Chlorophyll|leafblade,doubleedge,swordsdance,knockoff||85,85,85,85,85,85|F|||90|,,,,,Normal]Golurk||AssaultVest|NoGuard|poltergeist,highhorsepower,stoneedge,dynamicpunch||85,85,85,85,85,85|N|||86|,,,,,Fighting]Scovillain||ChoiceScarf|Chlorophyll|burningjealousy,leafstorm,fireblast,energyball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Grass]Malamar||SitrusBerry|Contrary|trickroom,knockoff,protect,superpower||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Ceruledge||LifeOrb|WeakArmor|protect,swordsdance,bitterblade,poltergeist||85,85,85,85,85,85|M|||80|,,,,,Grass\"}",
+    ">p1 move heatwave, move protect",
+    ">p2 move knockoff +2, move leafblade +1",
+    ">p1 move heatwave, move revelationdance +2",
+    ">p2 move knockoff +1, move leafblade +1",
+    ">p2 switch 6, switch 5",
+    ">p1 move heatwave, move quiverdance",
+    ">p2 move bitterblade +2, move knockoff +2",
+    ">p1 pass, switch 4",
+    ">p1 move heatwave, move fakeout +2",
+    ">p2 move poltergeist +2, move trickroom",
+    ">p1 move heatwave, move fakeout +2",
+    ">p2 move bitterblade +1, move knockoff +1",
+    ">p2 pass, switch 4",
+    ">p1 move heatwave, move fakeout +1",
+    ">p2 move swordsdance, move fireblast +1",
+    ">p1 move heatwave, move fakeout +2",
+    ">p2 move protect, move fireblast +1",
+    ">p1 move heatwave, move knockoff +1",
+    ">p2 move protect, move fireblast +1",
+    ">p2 switch 3, pass",
+    ">p1 move heatwave, move fakeout +1",
+    ">p2 move dynamicpunch +2, pass",
+    ">p1 move heatwave, move knockoff +1",
+    ">p2 move poltergeist +2, pass"
+  ]
+}

@@ -1,0 +1,50 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"687,1276,1865,3042"}
+>player p1 {"name":"Player1","team":"Golurk||LifeOrb|NoGuard|highhorsepower,poltergeist,dynamicpunch,protect||85,85,85,85,85,85|N|||86|,,,,,Fighting]Excadrill||LifeOrb|MoldBreaker|highhorsepower,protect,ironhead,swordsdance||85,85,85,85,85,85|M|||82|,,,,,Flying]Cinderace||LifeOrb|Blaze|gunkshot,pyroball,protect,highjumpkick||85,85,85,85,85,85|M|||82|,,,,,Fighting]Forretress||ChoiceBand|Sturdy|lunge,ironhead,explosion,bodypress||85,85,85,85,85,85|M|||90|,,,,,Fighting]Raikou||LifeOrb|InnerFocus|voltswitch,thunderbolt,protect,scald||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Glaceon||BlunderPolicy|IceBody|protect,mudshot,blizzard,freezedry||85,,85,85,85,85|F|,0,,,,||86|,,,,,Ground"}
+>player p2 {"name":"Player2","team":"Vikavolt||SitrusBerry|Levitate|thunderbolt,bugbuzz,stickyweb,protect||85,,85,85,85,85|F|,0,,,,||84|,,,,,Electric]Samurott||LifeOrb|Torrent|swordsdance,liquidation,protect,knockoff||85,85,85,85,85,85|F|||89|,,,,,Fire]Tropius||SitrusBerry|Harvest|tailwind,hurricane,protect,energyball||85,,85,85,85,85|F|,0,,,,||94|,,,,,Steel]Sawsbuck|SawsbuckAutumn|LifeOrb|SapSipper|swordsdance,doubleedge,hornleech,protect||85,85,85,85,85,85|F|||91|,,,,,Normal]Kommo-o||Leftovers|Bulletproof|throatchop,irondefense,protect,bodypress||85,85,85,85,85,85|F|||79|,,,,,Steel]Granbull||AssaultVest|Intimidate|playrough,closecombat,stompingtantrum,superfang||85,85,85,85,85,85|M|||88|,,,,,Steel"}
+>p1 move dynamicpunch +1, move protect
+>p2 move stickyweb, move liquidation +1
+>p1 switch 5, pass
+>p1 move protect, move ironhead +2
+>p2 move bugbuzz +2, move knockoff +2
+>p1 move scald +1, move ironhead +2
+>p2 move protect, move protect
+>p1 move voltswitch +2, move highhorsepower +1
+>p2 move bugbuzz +2, move liquidation +2
+>p1 switch 6, pass
+>p1 pass, switch 3
+>p2 pass, switch 4
+>p1 move blizzard, move gunkshot +1
+>p2 move stickyweb, move swordsdance
+>p1 move freezedry +1, move pyroball +2
+>p2 move protect, move doubleedge +2
+>p1 pass, switch 4
+>p2 pass, switch 6
+>p1 move blizzard, move lunge +1
+>p2 move thunderbolt +1, move stompingtantrum +1
+>p2 switch 3, pass
+>p1 move freezedry +1, move lunge +2
+>p2 move protect, move stompingtantrum +2
+>p1 move mudshot +1, move lunge +1
+>p2 move protect, move closecombat +1
+>p1 switch 6, pass
+>p1 move protect, move lunge +1
+>p2 move protect, move playrough +1
+>p1 move voltswitch +2, move lunge +1
+>p2 move tailwind, move stompingtantrum +2
+>p2 pass, switch 5
+>p1 move protect, move lunge +1
+>p2 move energyball +1, move protect
+>p1 move scald +2, move lunge +2
+>p2 move tailwind, move bodypress +1
+>p1 move scald +2, move lunge +2
+>p2 move tailwind, move protect
+>p1 move thunderbolt +1, move lunge +2
+>p2 move energyball +2, move throatchop +1
+>p1 move thunderbolt +2, move lunge +2
+>p2 move protect, move throatchop +2
+>p1 pass, move lunge +2
+>p2 move tailwind, move protect
+>p1 pass, move lunge +1
+>p2 move energyball +2, move protect
+>p1 pass, move lunge +1
+>p2 move hurricane +2, move bodypress +2

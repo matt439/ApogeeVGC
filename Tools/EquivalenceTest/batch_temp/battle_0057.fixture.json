@@ -1,0 +1,434 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "400,743,1086,1771",
+  "p1Seed": "2347,2471,2709,3061",
+  "p2Seed": "3413,3537,3889,4127",
+  "p1TeamPacked": "Empoleon||SitrusBerry|Competitive|flashcannon,protect,hydropump,icywind||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Araquanid||SitrusBerry|WaterBubble|liquidation,hydropump,stickyweb,protect||85,85,85,85,85,85|F|||84|,,,,,Water]Mewtwo||LifeOrb|Unnerve|protect,aurasphere,fireblast,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fire]Electrode|ElectrodeHisui|AssaultVest|Static|voltswitch,electroweb,thunderbolt,energyball||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Articuno||SitrusBerry|Pressure|roost,tailwind,bravebird,icebeam||85,85,85,85,85,85|N|||82|,,,,,Ground]Metagross||WeaknessPolicy|ClearBody|heavyslam,psychicfangs,agility,protect||85,85,85,85,85,85|N|||80|,,,,,Dragon",
+  "p2TeamPacked": "Ninetales||LifeOrb|Drought|solarbeam,protect,fireblast,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Moltres||SitrusBerry|FlameBody|protect,heatwave,bravebird,tailwind||85,85,85,85,85,85|N|||79|,,,,,Ground]Venomoth||LifeOrb|TintedLens|sludgebomb,bugbuzz,protect,quiverdance||85,,85,85,85,85|M|,0,,,,||90|,,,,,Water]Dedenne||SitrusBerry|CheekPouch|dazzlinggleam,nuzzle,thunderbolt,helpinghand||85,85,85,85,85,85|M|||85|,,,,,Electric]Hariyama||FlameOrb|Guts|knockoff,fakeout,closecombat,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Gliscor||ToxicOrb|PoisonHeal|swordsdance,protect,facade,earthquake||85,85,85,85,85,85|F|||81|,,,,,Normal",
+  "p1Team": [
+    {
+      "name": "Empoleon",
+      "species": "Empoleon",
+      "item": "Sitrus Berry",
+      "ability": "Competitive",
+      "moves": [
+        "Flash Cannon",
+        "Protect",
+        "Hydro Pump",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Araquanid",
+      "species": "Araquanid",
+      "item": "Sitrus Berry",
+      "ability": "Water Bubble",
+      "moves": [
+        "Liquidation",
+        "Hydro Pump",
+        "Sticky Web",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Mewtwo",
+      "species": "Mewtwo",
+      "item": "Life Orb",
+      "ability": "Unnerve",
+      "moves": [
+        "Protect",
+        "Aura Sphere",
+        "Fire Blast",
+        "Psystrike"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Electrode",
+      "species": "Electrode-Hisui",
+      "item": "Assault Vest",
+      "ability": "Static",
+      "moves": [
+        "Volt Switch",
+        "Electroweb",
+        "Thunderbolt",
+        "Energy Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Articuno",
+      "species": "Articuno",
+      "item": "Sitrus Berry",
+      "ability": "Pressure",
+      "moves": [
+        "Roost",
+        "Tailwind",
+        "Brave Bird",
+        "Ice Beam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Metagross",
+      "species": "Metagross",
+      "item": "Weakness Policy",
+      "ability": "Clear Body",
+      "moves": [
+        "Heavy Slam",
+        "Psychic Fangs",
+        "Agility",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Ninetales",
+      "species": "Ninetales",
+      "item": "Life Orb",
+      "ability": "Drought",
+      "moves": [
+        "Solar Beam",
+        "Protect",
+        "Fire Blast",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Moltres",
+      "species": "Moltres",
+      "item": "Sitrus Berry",
+      "ability": "Flame Body",
+      "moves": [
+        "Protect",
+        "Heat Wave",
+        "Brave Bird",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Venomoth",
+      "species": "Venomoth",
+      "item": "Life Orb",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Sludge Bomb",
+        "Bug Buzz",
+        "Protect",
+        "Quiver Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Dedenne",
+      "species": "Dedenne",
+      "item": "Sitrus Berry",
+      "ability": "Cheek Pouch",
+      "moves": [
+        "Dazzling Gleam",
+        "Nuzzle",
+        "Thunderbolt",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Hariyama",
+      "species": "Hariyama",
+      "item": "Flame Orb",
+      "ability": "Guts",
+      "moves": [
+        "Knock Off",
+        "Fake Out",
+        "Close Combat",
+        "Facade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Gliscor",
+      "species": "Gliscor",
+      "item": "Toxic Orb",
+      "ability": "Poison Heal",
+      "moves": [
+        "Swords Dance",
+        "Protect",
+        "Facade",
+        "Earthquake"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"400,743,1086,1771\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Empoleon||SitrusBerry|Competitive|flashcannon,protect,hydropump,icywind||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Araquanid||SitrusBerry|WaterBubble|liquidation,hydropump,stickyweb,protect||85,85,85,85,85,85|F|||84|,,,,,Water]Mewtwo||LifeOrb|Unnerve|protect,aurasphere,fireblast,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fire]Electrode|ElectrodeHisui|AssaultVest|Static|voltswitch,electroweb,thunderbolt,energyball||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Articuno||SitrusBerry|Pressure|roost,tailwind,bravebird,icebeam||85,85,85,85,85,85|N|||82|,,,,,Ground]Metagross||WeaknessPolicy|ClearBody|heavyslam,psychicfangs,agility,protect||85,85,85,85,85,85|N|||80|,,,,,Dragon\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Ninetales||LifeOrb|Drought|solarbeam,protect,fireblast,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Moltres||SitrusBerry|FlameBody|protect,heatwave,bravebird,tailwind||85,85,85,85,85,85|N|||79|,,,,,Ground]Venomoth||LifeOrb|TintedLens|sludgebomb,bugbuzz,protect,quiverdance||85,,85,85,85,85|M|,0,,,,||90|,,,,,Water]Dedenne||SitrusBerry|CheekPouch|dazzlinggleam,nuzzle,thunderbolt,helpinghand||85,85,85,85,85,85|M|||85|,,,,,Electric]Hariyama||FlameOrb|Guts|knockoff,fakeout,closecombat,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Gliscor||ToxicOrb|PoisonHeal|swordsdance,protect,facade,earthquake||85,85,85,85,85,85|F|||81|,,,,,Normal\"}",
+    ">p1 move icywind, move stickyweb",
+    ">p2 move protect, move heatwave",
+    ">p1 move icywind, move hydropump +2",
+    ">p2 move protect, move tailwind",
+    ">p1 move flashcannon +1, move liquidation +2",
+    ">p2 move heatwave, move tailwind",
+    ">p2 pass, switch 6",
+    ">p1 move icywind, move protect",
+    ">p2 move fireblast +2, move facade +1",
+    ">p1 move hydropump +2, move protect",
+    ">p2 move solarbeam +2, move earthquake",
+    ">p2 switch 3, switch 4",
+    ">p1 move protect, move protect",
+    ">p2 move quiverdance, move dazzlinggleam",
+    ">p1 move icywind, move protect",
+    ">p2 move quiverdance, move thunderbolt +1",
+    ">p1 switch 6, pass",
+    ">p1 move protect, move protect",
+    ">p2 move bugbuzz +2, move helpinghand -1",
+    ">p1 pass, switch 5",
+    ">p1 move protect, move tailwind",
+    ">p2 move quiverdance, move nuzzle +2",
+    ">p1 move agility, move bravebird +1",
+    ">p2 move quiverdance, move nuzzle +2",
+    ">p2 switch 5, pass",
+    ">p1 move psychicfangs +1, move icebeam +2",
+    ">p2 move facade +2, move nuzzle +1",
+    ">p1 move heavyslam +2, move icebeam +2",
+    ">p2 move fakeout +1, move thunderbolt +2"
+  ]
+}

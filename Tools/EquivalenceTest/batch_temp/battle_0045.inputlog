@@ -1,0 +1,31 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"316,587,858,1399"}
+>player p1 {"name":"Player1","team":"Solgaleo||WeaknessPolicy|FullMetalBody|closecombat,sunsteelstrike,flamecharge,protect||85,85,85,85,85,85|N|||74|,,,,,Fire]Noctowl||LifeOrb|TintedLens|protect,tailwind,hurricane,hypervoice||85,,85,85,85,85|M|,0,,,,||91|,,,,,Normal]Raging Bolt||AssaultVest|Protosynthesis|thunderbolt,dracometeor,snarl,thunderclap||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Revavroom||LifeOrb|Filter|highhorsepower,protect,gunkshot,ironhead||85,85,85,85,85,85|M|||84|,,,,,Ground]Tauros|TaurosPaldeaCombat|ChoiceBand|Intimidate|closecombat,ironhead,stoneedge,highhorsepower||85,85,85,85,85,85|M|||82|,,,,,Steel]Grumpig||LifeOrb|ThickFat|earthpower,psychic,nastyplot,protect||85,,85,85,85,85|M|,0,,,,||91|,,,,,Ground"}
+>player p2 {"name":"Player2","team":"Terrakion||LifeOrb|Justified|stoneedge,rockslide,closecombat,protect||85,85,85,85,85,85|N|||78|,,,,,Rock]Houndoom||LifeOrb|FlashFire|protect,darkpulse,heatwave,suckerpunch||85,85,85,85,85,85|F|||86|,,,,,Ghost]Gogoat||AssaultVest|SapSipper|hornleech,highhorsepower,doubleedge,leafstorm||85,85,85,85,85,85|F|||90|,,,,,Normal]Cinccino||LoadedDice|Technician|protect,tripleaxel,tailslap,knockoff||85,85,85,85,85,85|F|||85|,,,,,Ice]Walking Wake||LifeOrb|Protosynthesis|dracometeor,flamethrower,hydropump,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fire]Ceruledge||LifeOrb|WeakArmor|swordsdance,shadowsneak,poltergeist,bitterblade||85,85,85,85,85,85|M|||80|,,,,,Grass"}
+>p1 move sunsteelstrike +2, move hypervoice
+>p2 move rockslide, move protect
+>p1 move flamecharge +2, move hypervoice
+>p2 move stoneedge +2, move darkpulse +2
+>p1 switch 6, switch 5
+>p1 move psychic +1, move ironhead +1
+>p2 move rockslide, move suckerpunch +1
+>p2 switch 4, pass
+>p1 move psychic +1, move ironhead +1
+>p2 move knockoff +1, move suckerpunch +1
+>p1 switch 4, pass
+>p1 move highhorsepower +1, move ironhead +1
+>p2 move protect, move protect
+>p1 move ironhead +1, move stoneedge +2
+>p2 move knockoff +2, move suckerpunch +1
+>p2 pass, switch 6
+>p1 move gunkshot +1, move ironhead +1
+>p2 move tripleaxel +1, move bitterblade +1
+>p1 switch 3, pass
+>p2 switch 3, pass
+>p1 move snarl, move ironhead +1
+>p2 move highhorsepower +1, move bitterblade +2
+>p1 move dracometeor +1, move closecombat +2
+>p2 move hornleech +1, move swordsdance
+>p1 move thunderclap +1, move highhorsepower +1
+>p2 move highhorsepower +1, move bitterblade +2
+>p1 move snarl, pass
+>p2 move leafstorm +1, move bitterblade +1

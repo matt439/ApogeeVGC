@@ -1,0 +1,35 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"393,730,1067,1740"}
+>player p1 {"name":"Player1","team":"Grumpig||LifeOrb|ThickFat|earthpower,nastyplot,psychic,dazzlinggleam||85,,85,85,85,85|M|,0,,,,||91|,,,,,Fairy]Plusle||LifeOrb|LightningRod|nastyplot,thunderbolt,alluringvoice,protect||85,,85,85,85,85|M|,0,,,,||92|,,,,,Flying]Serperior||LifeOrb|Contrary|dragonpulse,protect,leafstorm,knockoff||85,85,85,85,85,85|F|||80|,,,,,Dragon]Iron Jugulis||BoosterEnergy|QuarkDrive|hurricane,darkpulse,tailwind,earthpower||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ground]Shaymin|ShayminSky|LifeOrb|SereneGrace|earthpower,protect,airslash,seedflare||85,,85,85,85,85|N|,0,,,,||77|,,,,,Water]Electabuzz||Eviolite|Static|electroweb,followme,thunderbolt,knockoff||85,85,85,85,85,85|F|||84|,,,,,Flying"}
+>player p2 {"name":"Player2","team":"Hydrapple||ChoiceSpecs|Regenerator|gigadrain,earthpower,dracometeor,leafstorm||85,,85,85,85,85|M|,0,,,,||85|,,,,,Steel]Magmar||Eviolite|FlameBody|willowisp,heatwave,followme,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass]Rampardos||ChoiceScarf|SheerForce|firepunch,stompingtantrum,headsmash,rockslide||85,85,85,85,85,85|F|||87|,,,,,Rock]Darkrai||LifeOrb|BadDreams|darkpulse,substitute,protect,sludgebomb||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Oinkologne||SitrusBerry|ThickFat|protect,yawn,helpinghand,doubleedge||85,85,85,85,85,85|M|||92|,,,,,Normal]Mienshao||ChoiceBand|InnerFocus|knockoff,tripleaxel,closecombat,uturn||85,85,85,85,85,85|F|||84|,,,,,Steel"}
+>p1 move psychic +2, move thunderbolt +1
+>p2 move earthpower +1, move willowisp +2
+>p1 move dazzlinggleam, move protect
+>p2 move earthpower +2, move protect
+>p1 move nastyplot, move thunderbolt +1
+>p2 move earthpower +1, move heatwave
+>p1 move earthpower +1, move alluringvoice +2
+>p2 move earthpower +2, move willowisp +2
+>p1 pass, switch 6
+>p1 move psychic +1, move electroweb
+>p2 move earthpower +1, move willowisp +1
+>p2 switch 6, pass
+>p1 move psychic +2, move knockoff +1
+>p2 move tripleaxel +2, move willowisp +1
+>p1 switch 5, pass
+>p2 pass, switch 4
+>p1 move earthpower +1, move knockoff +2
+>p2 move closecombat +2, move sludgebomb +1
+>p1 switch 4, pass
+>p1 move hurricane +1, move electroweb
+>p2 move tripleaxel +1, move darkpulse +1
+>p1 switch 3, pass
+>p1 move leafstorm +1, move knockoff +2
+>p2 move tripleaxel +2, move protect
+>p1 move dragonpulse +2, move thunderbolt +2
+>p2 move knockoff +2, move darkpulse +2
+>p2 pass, switch 5
+>p1 move leafstorm +1, pass
+>p2 move knockoff +2, move doubleedge +1
+>p2 switch 3, pass
+>p1 move leafstorm +1, pass
+>p2 move firepunch +1, move helpinghand -1

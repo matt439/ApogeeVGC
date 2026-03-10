@@ -1,0 +1,31 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"211,392,573,934"}
+>player p1 {"name":"Player1","team":"Seviper||LifeOrb|ShedSkin|gunkshot,knockoff,glare,protect||85,85,85,85,85,85|F|||96|,,,,,Poison]Vileplume||SitrusBerry|EffectSpore|stunspore,sludgebomb,strengthsap,pollenpuff||85,,85,85,85,85|M|,0,,,,||89|,,,,,Water]Archaludon||PowerHerb|Stamina|flashcannon,protect,electroshot,dragonpulse||85,,85,85,85,85|M|,0,,,,||77|,,,,,Flying]Blaziken||LifeOrb|SpeedBoost|heatwave,vacuumwave,protect,closecombat||85,85,85,85,85,85|F|||79|,,,,,Fighting]Manaphy||SitrusBerry|Hydration|tailglow,energyball,icebeam,scald||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass]Krookodile||LifeOrb|Intimidate|protect,highhorsepower,gunkshot,knockoff||85,85,85,85,85,85|F|||80|,,,,,Poison"}
+>player p2 {"name":"Player2","team":"Hawlucha||WhiteHerb|Unburden|protect,swordsdance,bravebird,closecombat||85,85,85,85,85,85|M|||84|,,,,,Fire]Slowbro||LifeOrb|Regenerator|icebeam,psychic,scald,trickroom||85,,85,85,85,|F|,0,,,,0||88|,,,,,Water]Slowking|SlowkingGalar|LifeOrb|Regenerator|sludgebomb,fireblast,psychic,trickroom||85,,85,85,85,|F|,0,,,,0||86|,,,,,Dark]Torterra||WhiteHerb|Overgrow|rockslide,headlongrush,woodhammer,shellsmash||85,85,85,85,85,85|M|||81|,,,,,Rock]Electabuzz||Eviolite|Static|followme,protect,thunderbolt,electroweb||85,,85,85,85,85|F|,0,,,,||84|,,,,,Flying]Zangoose||ToxicOrb|ToxicBoost|protect,facade,knockoff,feint||85,85,85,85,85,85|F|||87|,,,,,Normal"}
+>p1 move gunkshot +2, move strengthsap +1
+>p2 move bravebird +2, move trickroom
+>p1 move protect, move stunspore +1
+>p2 move closecombat +2, move psychic +2
+>p1 pass, switch 4
+>p2 pass, switch 5
+>p1 move protect, move heatwave
+>p2 move bravebird +2, move electroweb
+>p2 switch 6, pass
+>p1 move protect, move protect
+>p2 move protect, move followme
+>p1 move gunkshot +2, move protect
+>p2 move knockoff +2, move thunderbolt +2
+>p2 pass, switch 3
+>p1 move protect, move closecombat +1
+>p2 move knockoff +1, move fireblast +2
+>p1 pass, switch 6
+>p2 switch 4, pass
+>p1 move protect, move knockoff +1
+>p2 move woodhammer +2, move trickroom
+>p1 pass, switch 3
+>p1 move protect, move protect
+>p2 move rockslide, move sludgebomb +2
+>p1 move protect, move dragonpulse +1
+>p2 move headlongrush +2, move fireblast +1
+>p1 pass, switch 5
+>p1 move knockoff +2, move icebeam +1
+>p2 move shellsmash, move sludgebomb +2

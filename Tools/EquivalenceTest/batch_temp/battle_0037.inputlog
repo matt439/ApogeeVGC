@@ -1,0 +1,48 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"260,483,706,1151"}
+>player p1 {"name":"Player1","team":"Plusle||SitrusBerry|LightningRod|thunderbolt,superfang,encore,nuzzle||85,85,85,85,85,85|F|||92|,,,,,Flying]Tornadus||SitrusBerry|Prankster|tailwind,taunt,protect,bleakwindstorm||85,,85,85,85,85|M|,0,,,,||77|,,,,,Steel]Ampharos||SitrusBerry|Static|electroweb,helpinghand,dragontail,thunderbolt||85,85,85,85,85,85|F|||86|,,,,,Flying]Regigigas||Leftovers|SlowStart|bodyslam,knockoff,protect,substitute||85,85,85,85,85,85|N|||86|,,,,,Fairy]Grafaiai||AssaultVest|PoisonTouch|knockoff,uturn,superfang,gunkshot||85,85,85,85,85,85|M|||88|,,,,,Dark]Greninja|GreninjaBond|LifeOrb|BattleBond|gunkshot,hydropump,protect,darkpulse||85,85,85,85,85,85|M|||83|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Lurantis||AssaultVest|Contrary|superpower,pollenpuff,leafstorm,leafblade||85,85,85,85,85,85|F|||85|,,,,,Fighting]Hitmontop||SitrusBerry|Intimidate|tripleaxel,fakeout,coaching,closecombat||85,85,85,85,85,85|M|||88|,,,,,Steel]Pecharunt||SitrusBerry|PoisonPuppeteer|poisongas,shadowball,malignantchain,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dark]Spidops||SitrusBerry|Stakeout|lunge,stickyweb,uturn,knockoff||85,85,85,85,85,85|M||||,,,,,Water]Pelipper||SitrusBerry|Drizzle|muddywater,hurricane,protect,tailwind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Metagross||WeaknessPolicy|ClearBody|heavyslam,agility,psychicfangs,stompingtantrum||85,85,85,85,85,85|N|||80|,,,,,Dragon"}
+>p1 move superfang +1, move taunt +1
+>p2 move pollenpuff +1, move coaching -1
+>p1 move thunderbolt +1, move tailwind
+>p2 move superpower +2, move closecombat +1
+>p1 switch 3, pass
+>p1 move dragontail +2, move taunt +1
+>p2 move leafstorm +2, move fakeout +2
+>p1 move dragontail +2, move taunt +2
+>p2 move leafblade +2, move tailwind
+>p1 move dragontail +1, move tailwind
+>p2 move superpower +1, move psychicfangs +2
+>p1 move electroweb, move protect
+>p2 move leafstorm +1, move agility
+>p1 switch 6, pass
+>p1 move gunkshot +2, move taunt +2
+>p2 move superpower +2, move agility
+>p1 pass, switch 4
+>p1 move hydropump +2, move bodyslam +2
+>p2 move superpower +2, move psychicfangs +2
+>p1 move hydropump +2, move knockoff +2
+>p2 move pollenpuff +2, move stompingtantrum +1
+>p2 pass, switch 3
+>p1 move gunkshot +1, move substitute
+>p2 move pollenpuff +2, move protect
+>p2 switch 4, pass
+>p1 move darkpulse +2, move protect
+>p2 move lunge +2, move protect
+>p2 pass, switch 5
+>p1 move hydropump +1, move bodyslam +1
+>p2 move stickyweb, move fakeout +2
+>p1 move protect, move bodyslam +2
+>p2 move uturn +2, move fakeout +2
+>p2 switch 6, pass
+>p1 move darkpulse +1, move protect
+>p2 move muddywater, move tripleaxel +2
+>p2 switch 6, pass
+>p1 move protect, move knockoff +1
+>p2 move uturn +1, move fakeout +1
+>p1 move hydropump +1, move knockoff +1
+>p2 move knockoff +1, move tripleaxel +1
+>p1 switch 5, pass
+>p1 move superfang +2, move substitute
+>p2 pass, move fakeout +1
+>p1 move superfang +2, move bodyslam +1
+>p2 pass, move fakeout +1

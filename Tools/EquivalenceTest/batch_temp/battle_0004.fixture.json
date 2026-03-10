@@ -1,0 +1,441 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "29,54,79,128",
+  "p1Seed": "174,192,218,252",
+  "p2Seed": "286,304,338,364",
+  "p1TeamPacked": "Ninetales|NinetalesAlola|LightClay|SnowWarning|auroraveil,moonblast,protect,blizzard||85,,85,85,85,85|M|,0,,,,||75|,,,,,Water]Mienshao||FocusSash|Regenerator|fakeout,uturn,knockoff,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Hoopa||ChoiceScarf|Magician|focusblast,trick,hyperspacehole,shadowball||85,,85,85,85,85|N|,0,,,,||86|,,,,,Fighting]Tsareena||AssaultVest|QueenlyMajesty|knockoff,rapidspin,powerwhip,highjumpkick||85,85,85,85,85,85|F|||85|,,,,,Fighting]Noivern||SitrusBerry|Frisk|protect,hurricane,flamethrower,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fire]Gothitelle||SitrusBerry|ShadowTag|trickroom,fakeout,helpinghand,psychic||85,85,85,85,85,|M|,,,,,0||90|,,,,,Dark",
+  "p2TeamPacked": "Swampert||AssaultVest|Torrent|muddywater,highhorsepower,flipturn,icywind||85,85,85,85,85,85|M|||82|,,,,,Steel]Weavile||LifeOrb|Pickpocket|protect,tripleaxel,knockoff,iceshard||85,85,85,85,85,85|M|||81|,,,,,Dark]Gothitelle||SitrusBerry|ShadowTag|healpulse,fakeout,trickroom,psychic||85,85,85,85,85,|F|,,,,,0||90|,,,,,Dark]Iron Leaves||BoosterEnergy|QuarkDrive|protect,closecombat,leafblade,psyblade||85,85,85,85,85,85|N|||81|,,,,,Psychic]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fairy]Scovillain||ChoiceSpecs|Chlorophyll|energyball,leafstorm,burningjealousy,fireblast||85,,85,85,85,85|M|,0,,,,||90|,,,,,Fire",
+  "p1Team": [
+    {
+      "name": "Ninetales",
+      "species": "Ninetales-Alola",
+      "item": "Light Clay",
+      "ability": "Snow Warning",
+      "moves": [
+        "Aurora Veil",
+        "Moonblast",
+        "Protect",
+        "Blizzard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Mienshao",
+      "species": "Mienshao",
+      "item": "Focus Sash",
+      "ability": "Regenerator",
+      "moves": [
+        "Fake Out",
+        "U-turn",
+        "Knock Off",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Hoopa",
+      "species": "Hoopa",
+      "item": "Choice Scarf",
+      "ability": "Magician",
+      "moves": [
+        "Focus Blast",
+        "Trick",
+        "Hyperspace Hole",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Tsareena",
+      "species": "Tsareena",
+      "item": "Assault Vest",
+      "ability": "Queenly Majesty",
+      "moves": [
+        "Knock Off",
+        "Rapid Spin",
+        "Power Whip",
+        "High Jump Kick"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Noivern",
+      "species": "Noivern",
+      "item": "Sitrus Berry",
+      "ability": "Frisk",
+      "moves": [
+        "Protect",
+        "Hurricane",
+        "Flamethrower",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Gothitelle",
+      "species": "Gothitelle",
+      "item": "Sitrus Berry",
+      "ability": "Shadow Tag",
+      "moves": [
+        "Trick Room",
+        "Fake Out",
+        "Helping Hand",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Swampert",
+      "species": "Swampert",
+      "item": "Assault Vest",
+      "ability": "Torrent",
+      "moves": [
+        "Muddy Water",
+        "High Horsepower",
+        "Flip Turn",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Weavile",
+      "species": "Weavile",
+      "item": "Life Orb",
+      "ability": "Pickpocket",
+      "moves": [
+        "Protect",
+        "Triple Axel",
+        "Knock Off",
+        "Ice Shard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Gothitelle",
+      "species": "Gothitelle",
+      "item": "Sitrus Berry",
+      "ability": "Shadow Tag",
+      "moves": [
+        "Heal Pulse",
+        "Fake Out",
+        "Trick Room",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Iron Leaves",
+      "species": "Iron Leaves",
+      "item": "Booster Energy",
+      "ability": "Quark Drive",
+      "moves": [
+        "Protect",
+        "Close Combat",
+        "Leaf Blade",
+        "Psyblade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Ditto",
+      "species": "Ditto",
+      "item": "Sitrus Berry",
+      "ability": "Imposter",
+      "moves": [
+        "Transform"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 97,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Scovillain",
+      "species": "Scovillain",
+      "item": "Choice Specs",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Energy Ball",
+        "Leaf Storm",
+        "Burning Jealousy",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"29,54,79,128\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Ninetales|NinetalesAlola|LightClay|SnowWarning|auroraveil,moonblast,protect,blizzard||85,,85,85,85,85|M|,0,,,,||75|,,,,,Water]Mienshao||FocusSash|Regenerator|fakeout,uturn,knockoff,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Hoopa||ChoiceScarf|Magician|focusblast,trick,hyperspacehole,shadowball||85,,85,85,85,85|N|,0,,,,||86|,,,,,Fighting]Tsareena||AssaultVest|QueenlyMajesty|knockoff,rapidspin,powerwhip,highjumpkick||85,85,85,85,85,85|F|||85|,,,,,Fighting]Noivern||SitrusBerry|Frisk|protect,hurricane,flamethrower,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fire]Gothitelle||SitrusBerry|ShadowTag|trickroom,fakeout,helpinghand,psychic||85,85,85,85,85,|M|,,,,,0||90|,,,,,Dark\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Swampert||AssaultVest|Torrent|muddywater,highhorsepower,flipturn,icywind||85,85,85,85,85,85|M|||82|,,,,,Steel]Weavile||LifeOrb|Pickpocket|protect,tripleaxel,knockoff,iceshard||85,85,85,85,85,85|M|||81|,,,,,Dark]Gothitelle||SitrusBerry|ShadowTag|healpulse,fakeout,trickroom,psychic||85,85,85,85,85,|F|,,,,,0||90|,,,,,Dark]Iron Leaves||BoosterEnergy|QuarkDrive|protect,closecombat,leafblade,psyblade||85,85,85,85,85,85|N|||81|,,,,,Psychic]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fairy]Scovillain||ChoiceSpecs|Chlorophyll|energyball,leafstorm,burningjealousy,fireblast||85,,85,85,85,85|M|,0,,,,||90|,,,,,Fire\"}",
+    ">p1 move blizzard, move knockoff +2",
+    ">p2 move highhorsepower +2, move knockoff +1",
+    ">p1 move moonblast +2, move closecombat +1",
+    ">p2 move icywind, move iceshard +2",
+    ">p1 pass, switch 3",
+    ">p1 move blizzard, move hyperspacehole +1",
+    ">p2 move icywind, move knockoff +2",
+    ">p1 pass, switch 6",
+    ">p2 switch 6, switch 3",
+    ">p1 move blizzard, move psychic +2",
+    ">p2 move fireblast +2, move trickroom",
+    ">p1 move auroraveil, move fakeout +1",
+    ">p2 move fireblast +1, move trickroom",
+    ">p1 switch 4, pass",
+    ">p1 move highjumpkick +1, move fakeout +2",
+    ">p2 move fireblast +1, move trickroom",
+    ">p1 move powerwhip +2, move psychic +2",
+    ">p2 move fireblast +1, move trickroom",
+    ">p1 switch 5, pass",
+    ">p1 move flamethrower +1, move trickroom",
+    ">p2 move fireblast +1, move fakeout +1",
+    ">p1 move hurricane +1, move helpinghand -1",
+    ">p2 move fireblast +2, move fakeout +1",
+    ">p2 switch 4, pass",
+    ">p1 move hurricane +2, move fakeout +1",
+    ">p2 move leafblade +2, move trickroom",
+    ">p2 pass, switch 5",
+    ">p1 move flamethrower +2, pass",
+    ">p2 move psyblade +2, move protect",
+    ">p1 move hurricane +1, pass",
+    ">p2 move protect, move dracometeor +1"
+  ]
+}

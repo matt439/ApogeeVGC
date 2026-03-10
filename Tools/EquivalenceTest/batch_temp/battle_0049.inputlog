@@ -1,0 +1,47 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"344,639,934,1523"}
+>player p1 {"name":"Player1","team":"Hawlucha||WhiteHerb|Unburden|closecombat,protect,bravebird,swordsdance||85,85,85,85,85,85|F|||84|,,,,,Fire]Delibird||ChoiceBand|Hustle|iceshard,bravebird,icespinner,drillrun||85,85,85,85,85,85|M||||,,,,,Ice]Dialga||SitrusBerry|Telepathy|thunderwave,heavyslam,dracometeor,protect||85,85,85,85,85,85|N|||74|,,,,,Flying]Sawsbuck|SawsbuckSummer|LifeOrb|SapSipper|doubleedge,hornleech,protect,swordsdance||85,85,85,85,85,85|F|||91|,,,,,Normal]Wyrdeer||LifeOrb|Intimidate|earthpower,trickroom,doubleedge,psychic||85,85,85,85,85,|F|,,,,,0||85|,,,,,Ground]Espathra||LifeOrb|SpeedBoost|protect,dazzlinggleam,shadowball,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Deoxys||LifeOrb|Pressure|extremespeed,protect,psychoboost,superpower||85,85,85,85,85,85|N|||79|,,,,,Stellar]Weavile||FocusSash|Pickpocket|fakeout,iceshard,knockoff,tripleaxel||85,85,85,85,85,85|M|||81|,,,,,Ice]Umbreon||SitrusBerry|InnerFocus|thunderwave,moonlight,foulplay,snarl||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Dewgong||SitrusBerry|ThickFat|fakeout,icywind,encore,hydropump||85,85,85,85,85,85|M|||91|,,,,,Grass]Lanturn||AssaultVest|VoltAbsorb|voltswitch,icebeam,electroweb,scald||85,,85,85,85,85|F|,0,,,,||87|,,,,,Flying]Reshiram||LifeOrb|Turboblaze|protect,blueflare,heatwave,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire"}
+>p1 move closecombat +1, move iceshard +1
+>p2 move superpower +1, move fakeout +1
+>p1 move swordsdance, move iceshard +2
+>p2 move protect, move knockoff +1
+>p1 move protect, move iceshard +1
+>p2 move protect, move iceshard +2
+>p1 move swordsdance, move iceshard +2
+>p2 move psychoboost +1, move iceshard +1
+>p1 switch 5, switch 4
+>p1 move trickroom, move protect
+>p2 move extremespeed +1, move iceshard +1
+>p1 move psychic +2, move hornleech +1
+>p2 move psychoboost +2, move iceshard +1
+>p2 switch 4, pass
+>p1 move doubleedge +2, move protect
+>p2 move icywind, move knockoff +1
+>p2 pass, switch 3
+>p1 move doubleedge +1, move protect
+>p2 move icywind, move thunderwave +1
+>p1 switch 6, pass
+>p1 move dazzlinggleam, move hornleech +2
+>p2 move encore +1, move moonlight
+>p1 move luminacrash +2, move hornleech +2
+>p2 move icywind, move foulplay +2
+>p1 pass, switch 3
+>p1 move luminacrash +1, move thunderwave +1
+>p2 move icywind, move snarl
+>p1 move dazzlinggleam, move protect
+>p2 move hydropump +2, move snarl
+>p2 switch 5, pass
+>p1 pass, move thunderwave +1
+>p2 move icebeam +2, move moonlight
+>p1 pass, move protect
+>p2 move scald +2, move thunderwave +1
+>p1 pass, move thunderwave +2
+>p2 move scald +2, move thunderwave +2
+>p1 pass, move protect
+>p2 move electroweb, move snarl
+>p1 pass, move dracometeor +2
+>p2 move icebeam +2, move snarl
+>p1 pass, move thunderwave +1
+>p2 move electroweb, move moonlight
+>p1 pass, move thunderwave +1
+>p2 move voltswitch +2, move moonlight

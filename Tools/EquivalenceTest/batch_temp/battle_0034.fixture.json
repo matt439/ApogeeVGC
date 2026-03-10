@@ -1,0 +1,459 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "239,444,649,1058",
+  "p1Seed": "1404,1482,1628,1842",
+  "p2Seed": "2056,2134,2348,2494",
+  "p1TeamPacked": "Minior|MiniorYellow|WhiteHerb|ShieldsDown|shellsmash,acrobatics,rockslide,protect||69,85,85,85,85,85|N|||83|,,,,,Flying]Munkidori||AssaultVest|ToxicChain|fakeout,psychic,sludgebomb,uturn||85,85,85,85,85,85|M|||80|,,,,,Fighting]Klefki||SitrusBerry|Prankster|foulplay,dazzlinggleam,spikes,thunderwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Flying]Landorus||LifeOrb|SheerForce|protect,rockslide,sludgebomb,earthpower||85,85,85,85,85,85|M|||75|,,,,,Ground]Gastrodon||SitrusBerry|StormDrain|muddywater,yawn,icywind,earthpower||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Oranguru||SitrusBerry|InnerFocus|hypervoice,instruct,trickroom,psychic||85,,85,85,85,|F|,0,,,,0||90|,,,,,Fairy",
+  "p2TeamPacked": "Blissey||SitrusBerry|Healer|softboiled,thunderwave,helpinghand,hypervoice||85,,85,85,85,85|F|,0,,,,||96|,,,,,Ghost]Skuntank||LifeOrb|Aftermath|poisongas,knockoff,gunkshot,protect||85,85,85,85,85,85|M|||85|,,,,,Flying]Munkidori||LifeOrb|ToxicChain|psychic,protect,sludgebomb,focusblast||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fighting]Gyarados||ClearAmulet|Intimidate|protect,waterfall,dragondance,terablast||85,85,85,85,85,85|M|||80|,,,,,Flying]Scrafty||SitrusBerry|Intimidate|knockoff,fakeout,coaching,closecombat||85,85,85,85,85,85|M|||83|,,,,,Poison]Gothitelle||SitrusBerry|ShadowTag|helpinghand,fakeout,trickroom,psychic||85,85,85,85,85,|M|,,,,,0||90|,,,,,Dark",
+  "p1Team": [
+    {
+      "name": "Minior",
+      "species": "Minior-Yellow",
+      "item": "White Herb",
+      "ability": "Shields Down",
+      "moves": [
+        "Shell Smash",
+        "Acrobatics",
+        "Rock Slide",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 69,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Munkidori",
+      "species": "Munkidori",
+      "item": "Assault Vest",
+      "ability": "Toxic Chain",
+      "moves": [
+        "Fake Out",
+        "Psychic",
+        "Sludge Bomb",
+        "U-turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Klefki",
+      "species": "Klefki",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Foul Play",
+        "Dazzling Gleam",
+        "Spikes",
+        "Thunder Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Landorus",
+      "species": "Landorus",
+      "item": "Life Orb",
+      "ability": "Sheer Force",
+      "moves": [
+        "Protect",
+        "Rock Slide",
+        "Sludge Bomb",
+        "Earth Power"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Gastrodon",
+      "species": "Gastrodon",
+      "item": "Sitrus Berry",
+      "ability": "Storm Drain",
+      "moves": [
+        "Muddy Water",
+        "Yawn",
+        "Icy Wind",
+        "Earth Power"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Oranguru",
+      "species": "Oranguru",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Hyper Voice",
+        "Instruct",
+        "Trick Room",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Blissey",
+      "species": "Blissey",
+      "item": "Sitrus Berry",
+      "ability": "Healer",
+      "moves": [
+        "Soft-Boiled",
+        "Thunder Wave",
+        "Helping Hand",
+        "Hyper Voice"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 96,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Skuntank",
+      "species": "Skuntank",
+      "item": "Life Orb",
+      "ability": "Aftermath",
+      "moves": [
+        "Poison Gas",
+        "Knock Off",
+        "Gunk Shot",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Munkidori",
+      "species": "Munkidori",
+      "item": "Life Orb",
+      "ability": "Toxic Chain",
+      "moves": [
+        "Psychic",
+        "Protect",
+        "Sludge Bomb",
+        "Focus Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Gyarados",
+      "species": "Gyarados",
+      "item": "Clear Amulet",
+      "ability": "Intimidate",
+      "moves": [
+        "Protect",
+        "Waterfall",
+        "Dragon Dance",
+        "Tera Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Scrafty",
+      "species": "Scrafty",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Knock Off",
+        "Fake Out",
+        "Coaching",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Gothitelle",
+      "species": "Gothitelle",
+      "item": "Sitrus Berry",
+      "ability": "Shadow Tag",
+      "moves": [
+        "Helping Hand",
+        "Fake Out",
+        "Trick Room",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"239,444,649,1058\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Minior|MiniorYellow|WhiteHerb|ShieldsDown|shellsmash,acrobatics,rockslide,protect||69,85,85,85,85,85|N|||83|,,,,,Flying]Munkidori||AssaultVest|ToxicChain|fakeout,psychic,sludgebomb,uturn||85,85,85,85,85,85|M|||80|,,,,,Fighting]Klefki||SitrusBerry|Prankster|foulplay,dazzlinggleam,spikes,thunderwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Flying]Landorus||LifeOrb|SheerForce|protect,rockslide,sludgebomb,earthpower||85,85,85,85,85,85|M|||75|,,,,,Ground]Gastrodon||SitrusBerry|StormDrain|muddywater,yawn,icywind,earthpower||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Oranguru||SitrusBerry|InnerFocus|hypervoice,instruct,trickroom,psychic||85,,85,85,85,|F|,0,,,,0||90|,,,,,Fairy\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Blissey||SitrusBerry|Healer|softboiled,thunderwave,helpinghand,hypervoice||85,,85,85,85,85|F|,0,,,,||96|,,,,,Ghost]Skuntank||LifeOrb|Aftermath|poisongas,knockoff,gunkshot,protect||85,85,85,85,85,85|M|||85|,,,,,Flying]Munkidori||LifeOrb|ToxicChain|psychic,protect,sludgebomb,focusblast||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fighting]Gyarados||ClearAmulet|Intimidate|protect,waterfall,dragondance,terablast||85,85,85,85,85,85|M|||80|,,,,,Flying]Scrafty||SitrusBerry|Intimidate|knockoff,fakeout,coaching,closecombat||85,85,85,85,85,85|M|||83|,,,,,Poison]Gothitelle||SitrusBerry|ShadowTag|helpinghand,fakeout,trickroom,psychic||85,85,85,85,85,|M|,,,,,0||90|,,,,,Dark\"}",
+    ">p1 move acrobatics +1, move sludgebomb +1",
+    ">p2 move hypervoice, move poisongas",
+    ">p1 move shellsmash, move fakeout +2",
+    ">p2 move hypervoice, move protect",
+    ">p1 move acrobatics +2, move fakeout +1",
+    ">p2 move helpinghand -2, move gunkshot +2",
+    ">p1 pass, switch 4",
+    ">p1 move shellsmash, move rockslide",
+    ">p2 move softboiled, move knockoff +2",
+    ">p2 pass, switch 3",
+    ">p1 move rockslide, move sludgebomb +1",
+    ">p2 move thunderwave +1, move sludgebomb +2",
+    ">p2 switch 6, pass",
+    ">p1 move rockslide, move sludgebomb +1",
+    ">p2 move trickroom, move protect",
+    ">p1 pass, switch 6",
+    ">p1 move shellsmash, move hypervoice",
+    ">p2 move helpinghand -2, move protect",
+    ">p1 move shellsmash, move psychic +1",
+    ">p2 move fakeout +1, move psychic +2",
+    ">p1 move shellsmash, move hypervoice",
+    ">p2 move psychic +1, move focusblast +1",
+    ">p1 switch 3, pass",
+    ">p2 pass, switch 5",
+    ">p1 move spikes, move trickroom",
+    ">p2 move helpinghand -2, move closecombat +1",
+    ">p1 move foulplay +2, move instruct +1",
+    ">p2 move psychic +2, move coaching -1",
+    ">p1 move thunderwave +2, move trickroom",
+    ">p2 move trickroom, move coaching -1",
+    ">p1 pass, switch 5",
+    ">p1 move dazzlinggleam, move muddywater",
+    ">p2 move psychic +2, move knockoff +2",
+    ">p2 pass, switch 4",
+    ">p1 move thunderwave +2, move muddywater",
+    ">p2 move psychic +1, move terablast +1",
+    ">p1 move dazzlinggleam, move yawn +1",
+    ">p2 pass, move dragondance",
+    ">p1 move dazzlinggleam, move icywind",
+    ">p2 pass, move protect",
+    ">p1 move dazzlinggleam, move earthpower +1",
+    ">p2 pass, move protect",
+    ">p1 move spikes, move icywind",
+    ">p2 pass, move terablast +1",
+    ">p1 move dazzlinggleam, move muddywater",
+    ">p2 pass, move waterfall +1"
+  ]
+}

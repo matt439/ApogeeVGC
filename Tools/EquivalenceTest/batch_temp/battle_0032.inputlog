@@ -1,0 +1,63 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"225,418,611,996"}
+>player p1 {"name":"Player1","team":"Beartic||LifeOrb|SlushRush|closecombat,iciclecrash,protect,aquajet||85,85,85,85,85,85|F|||91|,,,,,Fighting]Basculin||MysticWater|Adaptability|aquajet,flipturn,wavecrash,protect||85,85,85,85,85,85|F|||87|,,,,,Water]Hypno||SitrusBerry|InnerFocus|lowsweep,psychic,encore,helpinghand||85,85,85,85,85,85|M|||95|,,,,,Dark]Toxicroak||FocusSash|DrySkin|gunkshot,suckerpunch,closecombat,protect||85,85,85,85,85,85|F|||85|,,,,,Dark]Forretress||ChestoBerry|Sturdy|irondefense,bodypress,rest,ironhead||85,85,85,85,85,85|M|||90|,,,,,Fire]Exeggutor|ExeggutorAlola|SitrusBerry|Harvest|woodhammer,protect,flamethrower,dracometeor||85,85,85,85,85,85|F|||87|,,,,,Fire"}
+>player p2 {"name":"Player2","team":"Volbeat||SitrusBerry|Prankster|lunge,tailwind,encore,thunderwave||85,85,85,85,85,85|M|||82|,,,,,Water]Tentacruel||AssaultVest|ClearBody|sludgebomb,hydropump,knockoff,icywind||85,85,85,85,85,85|M|||85|,,,,,Grass]Mienshao||AssaultVest|Regenerator|uturn,fakeout,knockoff,closecombat||85,85,85,85,85,85|M|||84|,,,,,Steel]Kyurem|KyuremBlack|ClearAmulet|Teravolt|fusionbolt,iciclespear,dragondance,protect||85,85,85,85,85,85|N|||75|,,,,,Electric]Stonjourner||LifeOrb|PowerSpot|highhorsepower,stoneedge,rockpolish,heatcrash||85,85,85,85,85,85|M|||88|,,,,,Rock]Iron Boulder||BoosterEnergy|QuarkDrive|closecombat,mightycleave,protect,zenheadbutt||85,85,85,85,85,85|N|||77|,,,,,Fighting"}
+>p1 move aquajet +2, move flipturn +1
+>p2 move tailwind, move sludgebomb +2
+>p1 pass, switch 4
+>p1 move closecombat +1, move closecombat +2
+>p2 move encore +2, move sludgebomb +1
+>p1 move protect, move protect
+>p2 move thunderwave +2, move sludgebomb +2
+>p1 move aquajet +1, move suckerpunch +1
+>p2 move encore +2, move hydropump +1
+>p1 switch 3, pass
+>p1 move helpinghand -2, move protect
+>p2 move thunderwave +1, move icywind
+>p1 move lowsweep +2, move protect
+>p2 move thunderwave +2, move icywind
+>p1 move lowsweep +1, move gunkshot +2
+>p2 move lunge +2, move knockoff +1
+>p1 move helpinghand -2, move protect
+>p2 move thunderwave +1, move sludgebomb +2
+>p1 move lowsweep +2, move closecombat +1
+>p2 move tailwind, move icywind
+>p2 switch 3, pass
+>p1 move psychic +1, move protect
+>p2 move fakeout +2, move knockoff +1
+>p1 move helpinghand -2, move protect
+>p2 move uturn +1, move hydropump +2
+>p2 switch 6, pass
+>p1 switch 5, pass
+>p1 move bodypress +1, move protect
+>p2 move closecombat +2, move icywind
+>p1 move irondefense, move closecombat +2
+>p2 move protect, move icywind
+>p2 pass, switch 5
+>p1 move irondefense, move gunkshot +2
+>p2 move mightycleave +1, move highhorsepower +2
+>p1 pass, switch 6
+>p1 move rest, move dracometeor +2
+>p2 move zenheadbutt +2, move highhorsepower +2
+>p2 pass, switch 4
+>p1 move rest, move protect
+>p2 move closecombat +2, move dragondance
+>p1 move bodypress +1, move protect
+>p2 move zenheadbutt +2, move iciclespear +2
+>p2 switch 6, pass
+>p1 move irondefense, move woodhammer +1
+>p2 move fakeout +2, move iciclespear +1
+>p1 move ironhead +1, move protect
+>p2 move fakeout +2, move fusionbolt +2
+>p1 move irondefense, move woodhammer +1
+>p2 move fakeout +1, move iciclespear +2
+>p1 pass, switch 4
+>p1 move ironhead +1, move protect
+>p2 move knockoff +2, move iciclespear +1
+>p1 move rest, move flipturn +2
+>p2 pass, move protect
+>p1 move ironhead +1, move flipturn +2
+>p2 pass, move iciclespear +1
+>p1 move rest, pass
+>p2 pass, move fusionbolt +2
+>p1 move bodypress +2, pass
+>p2 pass, move fusionbolt +1

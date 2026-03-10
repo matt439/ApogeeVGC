@@ -1,0 +1,460 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "666,1237,1808,2949",
+  "p1Seed": "3905,4105,4495,5075",
+  "p2Seed": "5655,5855,6435,6825",
+  "p1TeamPacked": "Arceus|ArceusSteel|IronPlate|Multitype|icywind,judgment,taunt,willowisp||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ghost]Altaria||SitrusBerry|NaturalCure|bravebird,willowisp,tailwind,roost||85,85,85,85,85,85|M|||91|,,,,,Steel]Venusaur||LifeOrb|Overgrow|knockoff,leafstorm,protect,sludgebomb||85,85,85,85,85,85|M|||86|,,,,,Dark]Darkrai||LifeOrb|BadDreams|substitute,protect,darkpulse,sludgebomb||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Rabsca||SitrusBerry|Synchronize|revivalblessing,psychic,trickroom,bugbuzz||85,,85,85,85,|F|,0,,,,0||87|,,,,,Steel]Qwilfish||SitrusBerry|Intimidate|flipturn,icywind,gunkshot,taunt||85,85,85,85,85,85|M|||87|,,,,,Grass",
+  "p2TeamPacked": "Greninja|GreninjaBond|LifeOrb|BattleBond|icebeam,darkpulse,protect,hydropump||85,,85,85,85,85|M|,0,,,,||83|,,,,,Water]Mew||LifeOrb|Synchronize|batonpass,nastyplot,psychic,fireblast||85,,85,85,85,85|N|,0,,,,||84|,,,,,Fairy]Basculegion||ChoiceScarf|Adaptability|flipturn,lastrespects,wavecrash,aquajet||85,85,85,85,85,85|M|||69|,,,,,Ghost]Magmortar||ChoiceScarf|FlameBody|thunderbolt,fireblast,heatwave,focusblast||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fighting]Granbull||AssaultVest|Intimidate|closecombat,playrough,stompingtantrum,superfang||85,85,85,85,85,85|M|||88|,,,,,Steel]Emboar||ChoiceScarf|Reckless|closecombat,wildcharge,flareblitz,knockoff||85,85,85,85,85,85|F|||85|,,,,,Dark",
+  "p1Team": [
+    {
+      "name": "Arceus",
+      "species": "Arceus-Steel",
+      "item": "Iron Plate",
+      "ability": "Multitype",
+      "moves": [
+        "Icy Wind",
+        "Judgment",
+        "Taunt",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Altaria",
+      "species": "Altaria",
+      "item": "Sitrus Berry",
+      "ability": "Natural Cure",
+      "moves": [
+        "Brave Bird",
+        "Will-O-Wisp",
+        "Tailwind",
+        "Roost"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Venusaur",
+      "species": "Venusaur",
+      "item": "Life Orb",
+      "ability": "Overgrow",
+      "moves": [
+        "Knock Off",
+        "Leaf Storm",
+        "Protect",
+        "Sludge Bomb"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Darkrai",
+      "species": "Darkrai",
+      "item": "Life Orb",
+      "ability": "Bad Dreams",
+      "moves": [
+        "Substitute",
+        "Protect",
+        "Dark Pulse",
+        "Sludge Bomb"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Rabsca",
+      "species": "Rabsca",
+      "item": "Sitrus Berry",
+      "ability": "Synchronize",
+      "moves": [
+        "Revival Blessing",
+        "Psychic",
+        "Trick Room",
+        "Bug Buzz"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Qwilfish",
+      "species": "Qwilfish",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Flip Turn",
+        "Icy Wind",
+        "Gunk Shot",
+        "Taunt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Greninja",
+      "species": "Greninja-Bond",
+      "item": "Life Orb",
+      "ability": "Battle Bond",
+      "moves": [
+        "Ice Beam",
+        "Dark Pulse",
+        "Protect",
+        "Hydro Pump"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Mew",
+      "species": "Mew",
+      "item": "Life Orb",
+      "ability": "Synchronize",
+      "moves": [
+        "Baton Pass",
+        "Nasty Plot",
+        "Psychic",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Basculegion",
+      "species": "Basculegion",
+      "item": "Choice Scarf",
+      "ability": "Adaptability",
+      "moves": [
+        "Flip Turn",
+        "Last Respects",
+        "Wave Crash",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 69,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Magmortar",
+      "species": "Magmortar",
+      "item": "Choice Scarf",
+      "ability": "Flame Body",
+      "moves": [
+        "Thunderbolt",
+        "Fire Blast",
+        "Heat Wave",
+        "Focus Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Granbull",
+      "species": "Granbull",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Close Combat",
+        "Play Rough",
+        "Stomping Tantrum",
+        "Super Fang"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Emboar",
+      "species": "Emboar",
+      "item": "Choice Scarf",
+      "ability": "Reckless",
+      "moves": [
+        "Close Combat",
+        "Wild Charge",
+        "Flare Blitz",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"666,1237,1808,2949\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Arceus|ArceusSteel|IronPlate|Multitype|icywind,judgment,taunt,willowisp||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ghost]Altaria||SitrusBerry|NaturalCure|bravebird,willowisp,tailwind,roost||85,85,85,85,85,85|M|||91|,,,,,Steel]Venusaur||LifeOrb|Overgrow|knockoff,leafstorm,protect,sludgebomb||85,85,85,85,85,85|M|||86|,,,,,Dark]Darkrai||LifeOrb|BadDreams|substitute,protect,darkpulse,sludgebomb||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Rabsca||SitrusBerry|Synchronize|revivalblessing,psychic,trickroom,bugbuzz||85,,85,85,85,|F|,0,,,,0||87|,,,,,Steel]Qwilfish||SitrusBerry|Intimidate|flipturn,icywind,gunkshot,taunt||85,85,85,85,85,85|M|||87|,,,,,Grass\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Greninja|GreninjaBond|LifeOrb|BattleBond|icebeam,darkpulse,protect,hydropump||85,,85,85,85,85|M|,0,,,,||83|,,,,,Water]Mew||LifeOrb|Synchronize|batonpass,nastyplot,psychic,fireblast||85,,85,85,85,85|N|,0,,,,||84|,,,,,Fairy]Basculegion||ChoiceScarf|Adaptability|flipturn,lastrespects,wavecrash,aquajet||85,85,85,85,85,85|M|||69|,,,,,Ghost]Magmortar||ChoiceScarf|FlameBody|thunderbolt,fireblast,heatwave,focusblast||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fighting]Granbull||AssaultVest|Intimidate|closecombat,playrough,stompingtantrum,superfang||85,85,85,85,85,85|M|||88|,,,,,Steel]Emboar||ChoiceScarf|Reckless|closecombat,wildcharge,flareblitz,knockoff||85,85,85,85,85,85|F|||85|,,,,,Dark\"}",
+    ">p1 move judgment +1, move tailwind",
+    ">p2 move icebeam +1, move fireblast +2",
+    ">p1 move taunt +2, move willowisp +1",
+    ">p2 move protect, move psychic +2",
+    ">p1 move icywind, move tailwind",
+    ">p2 move icebeam +1, move psychic +1",
+    ">p1 move taunt +1, move willowisp +2",
+    ">p2 move icebeam +1, move psychic +2",
+    ">p1 move judgment +2, move roost",
+    ">p2 move darkpulse +1, move batonpass",
+    ">p2 pass, switch 4",
+    ">p1 move willowisp +1, move roost",
+    ">p2 move hydropump +1, move focusblast +1",
+    ">p1 switch 3, pass",
+    ">p1 move sludgebomb +2, move roost",
+    ">p2 move icebeam +2, move focusblast +1",
+    ">p1 pass, switch 5",
+    ">p1 move knockoff +2, move revivalblessing",
+    ">p2 move hydropump +1, move focusblast +2",
+    ">p1 pass, switch 5",
+    ">p2 switch 5, pass",
+    ">p1 move protect, move psychic +1",
+    ">p2 move playrough +2, move fireblast +1",
+    ">p1 move leafstorm +1, move psychic +2",
+    ">p2 move superfang +2, move thunderbolt +2",
+    ">p2 switch 3, switch 4",
+    ">p1 move sludgebomb +1, move psychic +1",
+    ">p2 move flipturn +2, move nastyplot",
+    ">p2 switch 6, pass",
+    ">p2 switch 6, pass",
+    ">p1 move protect, move psychic +2",
+    ">p2 move flipturn +1, move batonpass",
+    ">p1 move protect, move psychic +1",
+    ">p2 move flipturn +2, move nastyplot",
+    ">p1 move knockoff +2, move bugbuzz +2",
+    ">p2 move flipturn +2, move nastyplot",
+    ">p1 switch 6, switch 5",
+    ">p1 move taunt +2, move willowisp +2",
+    ">p2 move flipturn +2, pass",
+    ">p1 move gunkshot +1, move tailwind",
+    ">p2 move flipturn +2, pass",
+    ">p1 move icywind, move roost",
+    ">p2 move flipturn +1, pass",
+    ">p1 move icywind, move roost",
+    ">p2 move flipturn +2, pass",
+    ">p1 move icywind, move bravebird +1",
+    ">p2 move flipturn +2, pass"
+  ]
+}

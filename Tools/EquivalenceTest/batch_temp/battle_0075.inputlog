@@ -1,0 +1,40 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"526,977,1428,2329"}
+>player p1 {"name":"Player1","team":"Forretress||ChoiceBand|Sturdy|ironhead,explosion,bodypress,lunge||85,85,85,85,85,85|F|||90|,,,,,Fighting]Lugia||Leftovers|Multiscale|earthpower,aeroblast,calmmind,recover||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Slither Wing||LifeOrb|Protosynthesis|closecombat,firstimpression,uturn,wildcharge||85,85,85,85,85,85|N|||83|,,,,,Bug]Qwilfish||SitrusBerry|Intimidate|thunderwave,flipturn,taunt,gunkshot||85,85,85,85,85,85|M|||87|,,,,,Grass]Donphan||AssaultVest|Sturdy|stoneedge,knockoff,rapidspin,highhorsepower||85,85,85,85,85,85|F|||87|,,,,,Dragon]Hydreigon||LifeOrb|Levitate|dracometeor,darkpulse,snarl,protect||85,,85,85,85,85|M|,0,,,,||82|,,,,,Dragon"}
+>player p2 {"name":"Player2","team":"Toxicroak||FocusSash|DrySkin|fakeout,closecombat,protect,gunkshot||85,85,85,85,85,85|M|||85|,,,,,Poison]Iron Jugulis||LifeOrb|QuarkDrive|darkpulse,taunt,hurricane,tailwind||85,,85,85,85,85|N|,0,,,,||79|,,,,,Flying]Basculegion|BasculegionF|ChoiceScarf|Adaptability|lastrespects,wavecrash,flipturn,muddywater||85,85,85,85,85,85|F|||72|,,,,,Ghost]Klefki||SitrusBerry|Prankster|foulplay,thunderwave,dazzlinggleam,spikes||85,,85,85,85,85|M|,0,,,,||81|,,,,,Flying]Scyther||Eviolite|Technician|tailwind,protect,dualwingbeat,bugbite||85,85,85,85,85,85|M|||80|,,,,,Steel]Scream Tail||SitrusBerry|Protosynthesis|thunderwave,playrough,stealthrock,disable||85,85,85,85,85,85|N|||82|,,,,,Steel"}
+>p1 move ironhead +2, move earthpower +1
+>p2 move closecombat +2, move darkpulse +1
+>p1 move ironhead +1, move recover
+>p2 move fakeout +2, move taunt +2
+>p2 switch 4, pass
+>p1 move ironhead +2, move earthpower +2
+>p2 move thunderwave +2, move taunt +1
+>p2 pass, switch 3
+>p1 move ironhead +2, move aeroblast +1
+>p2 move spikes, move flipturn +2
+>p2 pass, switch 5
+>p1 move ironhead +1, move calmmind
+>p2 move foulplay +1, move protect
+>p1 move ironhead +1, move calmmind
+>p2 move thunderwave +2, move bugbite +2
+>p2 switch 6, pass
+>p1 move ironhead +2, move aeroblast +2
+>p2 move thunderwave +1, move protect
+>p1 move ironhead +1, move aeroblast +2
+>p2 move playrough +1, move tailwind
+>p2 pass, switch 5
+>p1 move ironhead +2, move recover
+>p2 move disable +2, move muddywater
+>p1 switch 3, pass
+>p1 move firstimpression +2, move calmmind
+>p2 move thunderwave +1, move muddywater
+>p1 move firstimpression +1, move calmmind
+>p2 move disable +1, move muddywater
+>p1 move wildcharge +1, move earthpower +1
+>p2 move disable +2, move muddywater
+>p1 switch 6, pass
+>p1 move darkpulse +2, move earthpower +1
+>p2 move playrough +2, move muddywater
+>p1 move dracometeor +1, move recover
+>p2 move disable +2, pass
+>p1 move snarl, move aeroblast +2
+>p2 move disable +2, pass

@@ -1,0 +1,44 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"505,938,1371,2236"}
+>player p1 {"name":"Player1","team":"Garchomp||LoadedDice|RoughSkin|protect,swordsdance,earthquake,scaleshot||85,85,85,85,85,85|F|||77|,,,,,Dragon]Pelipper||SitrusBerry|Drizzle|wideguard,hurricane,tailwind,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Venusaur||LifeOrb|Overgrow|sludgebomb,knockoff,protect,leafstorm||85,85,85,85,85,85|M|||86|,,,,,Dark]Probopass||Leftovers|MagnetPull|irondefense,bodypress,flashcannon,thunderwave||85,,85,85,85,85|F|,0,,,,||90|,,,,,Fighting]Slowking||LifeOrb|Regenerator|scald,trickroom,fireblast,icebeam||85,,85,85,85,|M|,0,,,,0||88|,,,,,Fire]Iron Hands||Leftovers|QuarkDrive|drainpunch,protect,swordsdance,thunderpunch||85,85,85,85,85,85|N|||77|,,,,,Fire"}
+>player p2 {"name":"Player2","team":"Sawsbuck|SawsbuckSummer|LifeOrb|SapSipper|protect,swordsdance,hornleech,doubleedge||85,85,85,85,85,85|F|||91|,,,,,Normal]Gumshoos||ChoiceBand|Adaptability|doubleedge,knockoff,uturn,stompingtantrum||85,85,85,85,85,85|M|||93|,,,,,Normal]Entei||ChoiceBand|InnerFocus|sacredfire,flareblitz,extremespeed,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal]Dachsbun||SitrusBerry|WellBakedBody|helpinghand,bodypress,yawn,playrough||85,85,85,85,85,85|F|||90|,,,,,Steel]Dragonite||ChoiceBand|InnerFocus|ironhead,dragonclaw,stompingtantrum,extremespeed||85,85,85,85,85,85|F|||82|,,,,,Normal]Iron Boulder||BoosterEnergy|QuarkDrive|protect,swordsdance,closecombat,mightycleave||85,85,85,85,85,85|N|||77|,,,,,Fighting"}
+>p1 move swordsdance, move wideguard
+>p2 move protect, move stompingtantrum +2
+>p1 move swordsdance, move tailwind
+>p2 move hornleech +1, move stompingtantrum +1
+>p1 switch 3, pass
+>p1 move knockoff +1, move muddywater
+>p2 move hornleech +1, move stompingtantrum +1
+>p1 move knockoff +1, move tailwind
+>p2 move protect, move stompingtantrum +1
+>p1 move sludgebomb +1, move hurricane +1
+>p2 move protect, move stompingtantrum +1
+>p2 switch 5, switch 6
+>p1 move knockoff +1, move hurricane +2
+>p2 move ironhead +2, move closecombat +1
+>p1 switch 4, pass
+>p1 move bodypress +1, move muddywater
+>p2 move ironhead +2, move protect
+>p1 move bodypress +1, move hurricane +2
+>p2 move ironhead +2, move swordsdance
+>p1 move flashcannon +1, move muddywater
+>p2 move ironhead +1, move closecombat +2
+>p2 pass, switch 3
+>p1 move thunderwave +1, move wideguard
+>p2 move ironhead +1, move stompingtantrum +1
+>p1 switch 5, pass
+>p1 move trickroom, move muddywater
+>p2 move ironhead +1, move stompingtantrum +1
+>p1 move fireblast +2, move wideguard
+>p2 move ironhead +2, move stompingtantrum +1
+>p1 move scald +2, move hurricane +2
+>p2 move ironhead +2, move stompingtantrum +1
+>p1 switch 6, pass
+>p2 switch 4, pass
+>p1 move thunderpunch +1, move muddywater
+>p2 move playrough +2, pass
+>p1 move swordsdance, move wideguard
+>p2 move bodypress +1, pass
+>p1 move swordsdance, move hurricane +2
+>p2 move bodypress +2, pass
+>p1 move drainpunch +1, pass
+>p2 move yawn +2, pass

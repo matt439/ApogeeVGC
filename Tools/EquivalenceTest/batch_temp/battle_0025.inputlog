@@ -1,0 +1,26 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"176,327,478,779"}
+>player p1 {"name":"Player1","team":"Cacturne||LifeOrb|WaterAbsorb|knockoff,suckerpunch,spikyshield,leafstorm||85,85,85,85,85,85|M|||91|,,,,,Dark]Typhlosion|TyphlosionHisui|ChoiceSpecs|Blaze|heatwave,focusblast,eruption,shadowball||85,,85,85,85,85|F|,0,,,,||77|,,,,,Fire]Orthworm||Leftovers|EarthEater|bodypress,heavyslam,irondefense,protect||85,85,85,85,85,85|M|||88|,,,,,Electric]Excadrill||AssaultVest|MoldBreaker|highhorsepower,rockslide,rapidspin,ironhead||85,85,85,85,85,85|F|||82|,,,,,Flying]Manaphy||SitrusBerry|Hydration|scald,tailglow,energyball,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass]Scovillain||ChoiceSpecs|Chlorophyll|fireblast,energyball,leafstorm,burningjealousy||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Chesnaught||Leftovers|Bulletproof|spikyshield,irondefense,leechseed,bodypress||85,,85,85,85,85|F|,0,,,,||86|,,,,,Steel]Tentacruel||AssaultVest|ClearBody|hydropump,sludgebomb,icywind,acidspray||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Lanturn||AssaultVest|VoltAbsorb|icebeam,electroweb,scald,voltswitch||85,,85,85,85,85|M|,0,,,,||87|,,,,,Flying]Jolteon||LifeOrb|VoltAbsorb|terablast,thunderbolt,calmmind,protect||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Torterra||WhiteHerb|ShellArmor|headlongrush,rockslide,protect,shellsmash||85,85,85,85,85,85|M|||81|,,,,,Rock]Mamoswine||LifeOrb|ThickFat|protect,iciclecrash,highhorsepower,iceshard||85,85,85,85,85,85|F|||82|,,,,,Ice"}
+>p1 move leafstorm +2, move eruption
+>p2 move irondefense, move acidspray +2
+>p2 switch 5, pass
+>p1 move knockoff +1, move eruption
+>p2 move shellsmash, move acidspray +1
+>p2 switch 4, switch 6
+>p1 move spikyshield, move eruption
+>p2 move protect, move iceshard +2
+>p1 move spikyshield, move eruption
+>p2 move thunderbolt +1, move protect
+>p1 switch 6, pass
+>p1 move fireblast +2, move eruption
+>p2 move terablast +1, move protect
+>p2 switch 3, pass
+>p1 move fireblast +2, move eruption
+>p2 move scald +2, pass
+>p1 pass, switch 5
+>p1 move fireblast +1, move protect
+>p2 move electroweb, pass
+>p1 move fireblast +2, move protect
+>p2 move icebeam +2, pass
+>p1 move fireblast +2, move protect
+>p2 move icebeam +2, pass

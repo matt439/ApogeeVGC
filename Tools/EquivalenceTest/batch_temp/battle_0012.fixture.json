@@ -1,0 +1,451 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "85,158,231,376",
+  "p1Seed": "502,536,594,676",
+  "p2Seed": "758,792,874,932",
+  "p1TeamPacked": "Sinistcha|SinistchaMasterpiece|Leftovers|Hospitality|calmmind,matchagotcha,protect,shadowball||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Kyogre||ChoiceScarf|Drizzle|waterspout,icebeam,thunder,originpulse||85,,85,85,85,85|N|,0,,,,||65|,,,,,Water]Heatran||SitrusBerry|FlashFire|terablast,heatwave,flashcannon,protect||85,,85,85,85,85|M|,0,,,,||78|,,,,,Grass]Poliwrath||SitrusBerry|WaterAbsorb|closecombat,liquidation,knockoff,coaching||85,85,85,85,85,85|M|||90|,,,,,Fire]Krookodile||LifeOrb|Intimidate|gunkshot,knockoff,highhorsepower,protect||85,85,85,85,85,85|M|||80|,,,,,Dark]Flutter Mane||ChoiceSpecs|Protosynthesis|dazzlinggleam,shadowball,icywind,moonblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy",
+  "p2TeamPacked": "Rotom||LifeOrb|Levitate|protect,thunderbolt,shadowball,nastyplot||85,,85,85,85,85|N|,0,,,,||90|,,,,,Electric]Reuniclus||LifeOrb|MagicGuard|psychic,protect,focusblast,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fighting]Sandy Shocks||SitrusBerry|Protosynthesis|earthpower,thunderbolt,stealthrock,electroweb||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ground]Sandaconda||SitrusBerry|ShedSkin|highhorsepower,glare,stoneedge,rest||85,85,85,85,85,85|F|||88|,,,,,Dragon]Ludicolo||AssaultVest|SwiftSwim|hydropump,icywind,leafstorm,fakeout||85,85,85,85,85,85|F|||89|,,,,,Poison]Mesprit||LifeOrb|Levitate|nastyplot,protect,psychic,dazzlinggleam||85,,85,85,85,85|N|,0,,,,||86|,,,,,Fairy",
+  "p1Team": [
+    {
+      "name": "Sinistcha",
+      "species": "Sinistcha-Masterpiece",
+      "item": "Leftovers",
+      "ability": "Hospitality",
+      "moves": [
+        "Calm Mind",
+        "Matcha Gotcha",
+        "Protect",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Kyogre",
+      "species": "Kyogre",
+      "item": "Choice Scarf",
+      "ability": "Drizzle",
+      "moves": [
+        "Water Spout",
+        "Ice Beam",
+        "Thunder",
+        "Origin Pulse"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 65,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Heatran",
+      "species": "Heatran",
+      "item": "Sitrus Berry",
+      "ability": "Flash Fire",
+      "moves": [
+        "Tera Blast",
+        "Heat Wave",
+        "Flash Cannon",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Poliwrath",
+      "species": "Poliwrath",
+      "item": "Sitrus Berry",
+      "ability": "Water Absorb",
+      "moves": [
+        "Close Combat",
+        "Liquidation",
+        "Knock Off",
+        "Coaching"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Krookodile",
+      "species": "Krookodile",
+      "item": "Life Orb",
+      "ability": "Intimidate",
+      "moves": [
+        "Gunk Shot",
+        "Knock Off",
+        "High Horsepower",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Flutter Mane",
+      "species": "Flutter Mane",
+      "item": "Choice Specs",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Dazzling Gleam",
+        "Shadow Ball",
+        "Icy Wind",
+        "Moonblast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Rotom",
+      "species": "Rotom",
+      "item": "Life Orb",
+      "ability": "Levitate",
+      "moves": [
+        "Protect",
+        "Thunderbolt",
+        "Shadow Ball",
+        "Nasty Plot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Reuniclus",
+      "species": "Reuniclus",
+      "item": "Life Orb",
+      "ability": "Magic Guard",
+      "moves": [
+        "Psychic",
+        "Protect",
+        "Focus Blast",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Sandy Shocks",
+      "species": "Sandy Shocks",
+      "item": "Sitrus Berry",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Earth Power",
+        "Thunderbolt",
+        "Stealth Rock",
+        "Electroweb"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Sandaconda",
+      "species": "Sandaconda",
+      "item": "Sitrus Berry",
+      "ability": "Shed Skin",
+      "moves": [
+        "High Horsepower",
+        "Glare",
+        "Stone Edge",
+        "Rest"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Ludicolo",
+      "species": "Ludicolo",
+      "item": "Assault Vest",
+      "ability": "Swift Swim",
+      "moves": [
+        "Hydro Pump",
+        "Icy Wind",
+        "Leaf Storm",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Mesprit",
+      "species": "Mesprit",
+      "item": "Life Orb",
+      "ability": "Levitate",
+      "moves": [
+        "Nasty Plot",
+        "Protect",
+        "Psychic",
+        "Dazzling Gleam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"85,158,231,376\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Sinistcha|SinistchaMasterpiece|Leftovers|Hospitality|calmmind,matchagotcha,protect,shadowball||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Kyogre||ChoiceScarf|Drizzle|waterspout,icebeam,thunder,originpulse||85,,85,85,85,85|N|,0,,,,||65|,,,,,Water]Heatran||SitrusBerry|FlashFire|terablast,heatwave,flashcannon,protect||85,,85,85,85,85|M|,0,,,,||78|,,,,,Grass]Poliwrath||SitrusBerry|WaterAbsorb|closecombat,liquidation,knockoff,coaching||85,85,85,85,85,85|M|||90|,,,,,Fire]Krookodile||LifeOrb|Intimidate|gunkshot,knockoff,highhorsepower,protect||85,85,85,85,85,85|M|||80|,,,,,Dark]Flutter Mane||ChoiceSpecs|Protosynthesis|dazzlinggleam,shadowball,icywind,moonblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Rotom||LifeOrb|Levitate|protect,thunderbolt,shadowball,nastyplot||85,,85,85,85,85|N|,0,,,,||90|,,,,,Electric]Reuniclus||LifeOrb|MagicGuard|psychic,protect,focusblast,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fighting]Sandy Shocks||SitrusBerry|Protosynthesis|earthpower,thunderbolt,stealthrock,electroweb||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ground]Sandaconda||SitrusBerry|ShedSkin|highhorsepower,glare,stoneedge,rest||85,85,85,85,85,85|F|||88|,,,,,Dragon]Ludicolo||AssaultVest|SwiftSwim|hydropump,icywind,leafstorm,fakeout||85,85,85,85,85,85|F|||89|,,,,,Poison]Mesprit||LifeOrb|Levitate|nastyplot,protect,psychic,dazzlinggleam||85,,85,85,85,85|N|,0,,,,||86|,,,,,Fairy\"}",
+    ">p1 move matchagotcha, move waterspout",
+    ">p2 move protect, move focusblast +1",
+    ">p1 move protect, move waterspout",
+    ">p2 move thunderbolt +1, move psychic +1",
+    ">p2 pass, switch 3",
+    ">p1 move protect, move waterspout",
+    ">p2 move nastyplot, move thunderbolt +1",
+    ">p2 switch 5, switch 6",
+    ">p1 move shadowball +2, move waterspout",
+    ">p2 move fakeout +2, move psychic +1",
+    ">p1 move protect, move waterspout",
+    ">p2 move leafstorm +2, move dazzlinggleam",
+    ">p1 pass, switch 5",
+    ">p1 move calmmind, move gunkshot +1",
+    ">p2 move fakeout +2, move dazzlinggleam",
+    ">p1 move calmmind, move gunkshot +1",
+    ">p2 move icywind, move protect",
+    ">p2 switch 4, pass",
+    ">p1 move shadowball +2, move protect",
+    ">p2 move rest, move dazzlinggleam",
+    ">p1 move matchagotcha, move protect",
+    ">p2 move stoneedge +2, pass"
+  ]
+}

@@ -1,0 +1,480 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "288,535,782,1275",
+  "p1Seed": "1691,1783,1957,2213",
+  "p2Seed": "2469,2561,2817,2991",
+  "p1TeamPacked": "Froslass||WideLens|CursedBody|tripleaxel,poltergeist,icywind,willowisp||85,85,85,85,85,85|F|||88|,,,,,Water]Umbreon||SitrusBerry|InnerFocus|thunderwave,snarl,foulplay,helpinghand||85,,85,85,85,85|F|,0,,,,||85|,,,,,Poison]Indeedee|IndeedeeF|SitrusBerry|PsychicSurge|psychic,helpinghand,followme,healpulse||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Vespiquen||Leftovers|Unnerve|toxicspikes,pollenpuff,hurricane,roost||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel]Iron Bundle||BoosterEnergy|QuarkDrive|protect,hydropump,icywind,freezedry||85,,85,85,85,85|N|,0,,,,||78|,,,,,Water]Lumineon||SitrusBerry|StormDrain|tailwind,encore,hydropump,helpinghand||85,,85,85,85,85|M|,0,,,,||92|,,,,,Fire",
+  "p2TeamPacked": "Arboliva||LifeOrb|SeedSower|pollenpuff,energyball,protect,hypervoice||85,,85,85,85,85|M|,0,,,,||88|,,,,,Normal]Regigigas||Leftovers|SlowStart|bodyslam,protect,knockoff,substitute||85,85,85,85,85,85|N|||86|,,,,,Ghost]Clefable||LifeOrb|MagicGuard|fireblast,icywind,moonblast,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Steel]Arceus|ArceusRock|StonePlate|Multitype|recover,earthpower,judgment,calmmind||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ground]Pikachu||LightBall|LightningRod|encore,volttackle,knockoff,fakeout||85,85,85,85,85,85|M|||94|,,,,,Electric]Noivern||LifeOrb|Frisk|flamethrower,protect,hurricane,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon",
+  "p1Team": [
+    {
+      "name": "Froslass",
+      "species": "Froslass",
+      "item": "Wide Lens",
+      "ability": "Cursed Body",
+      "moves": [
+        "Triple Axel",
+        "Poltergeist",
+        "Icy Wind",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Umbreon",
+      "species": "Umbreon",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Thunder Wave",
+        "Snarl",
+        "Foul Play",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Indeedee",
+      "species": "Indeedee-F",
+      "item": "Sitrus Berry",
+      "ability": "Psychic Surge",
+      "moves": [
+        "Psychic",
+        "Helping Hand",
+        "Follow Me",
+        "Heal Pulse"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Vespiquen",
+      "species": "Vespiquen",
+      "item": "Leftovers",
+      "ability": "Unnerve",
+      "moves": [
+        "Toxic Spikes",
+        "Pollen Puff",
+        "Hurricane",
+        "Roost"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Iron Bundle",
+      "species": "Iron Bundle",
+      "item": "Booster Energy",
+      "ability": "Quark Drive",
+      "moves": [
+        "Protect",
+        "Hydro Pump",
+        "Icy Wind",
+        "Freeze-Dry"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Lumineon",
+      "species": "Lumineon",
+      "item": "Sitrus Berry",
+      "ability": "Storm Drain",
+      "moves": [
+        "Tailwind",
+        "Encore",
+        "Hydro Pump",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Arboliva",
+      "species": "Arboliva",
+      "item": "Life Orb",
+      "ability": "Seed Sower",
+      "moves": [
+        "Pollen Puff",
+        "Energy Ball",
+        "Protect",
+        "Hyper Voice"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Regigigas",
+      "species": "Regigigas",
+      "item": "Leftovers",
+      "ability": "Slow Start",
+      "moves": [
+        "Body Slam",
+        "Protect",
+        "Knock Off",
+        "Substitute"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Clefable",
+      "species": "Clefable",
+      "item": "Life Orb",
+      "ability": "Magic Guard",
+      "moves": [
+        "Fire Blast",
+        "Icy Wind",
+        "Moonblast",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Arceus",
+      "species": "Arceus-Rock",
+      "item": "Stone Plate",
+      "ability": "Multitype",
+      "moves": [
+        "Recover",
+        "Earth Power",
+        "Judgment",
+        "Calm Mind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Pikachu",
+      "species": "Pikachu",
+      "item": "Light Ball",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Encore",
+        "Volt Tackle",
+        "Knock Off",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Noivern",
+      "species": "Noivern",
+      "item": "Life Orb",
+      "ability": "Frisk",
+      "moves": [
+        "Flamethrower",
+        "Protect",
+        "Hurricane",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"288,535,782,1275\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Froslass||WideLens|CursedBody|tripleaxel,poltergeist,icywind,willowisp||85,85,85,85,85,85|F|||88|,,,,,Water]Umbreon||SitrusBerry|InnerFocus|thunderwave,snarl,foulplay,helpinghand||85,,85,85,85,85|F|,0,,,,||85|,,,,,Poison]Indeedee|IndeedeeF|SitrusBerry|PsychicSurge|psychic,helpinghand,followme,healpulse||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Vespiquen||Leftovers|Unnerve|toxicspikes,pollenpuff,hurricane,roost||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel]Iron Bundle||BoosterEnergy|QuarkDrive|protect,hydropump,icywind,freezedry||85,,85,85,85,85|N|,0,,,,||78|,,,,,Water]Lumineon||SitrusBerry|StormDrain|tailwind,encore,hydropump,helpinghand||85,,85,85,85,85|M|,0,,,,||92|,,,,,Fire\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Arboliva||LifeOrb|SeedSower|pollenpuff,energyball,protect,hypervoice||85,,85,85,85,85|M|,0,,,,||88|,,,,,Normal]Regigigas||Leftovers|SlowStart|bodyslam,protect,knockoff,substitute||85,85,85,85,85,85|N|||86|,,,,,Ghost]Clefable||LifeOrb|MagicGuard|fireblast,icywind,moonblast,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Steel]Arceus|ArceusRock|StonePlate|Multitype|recover,earthpower,judgment,calmmind||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ground]Pikachu||LightBall|LightningRod|encore,volttackle,knockoff,fakeout||85,85,85,85,85,85|M|||94|,,,,,Electric]Noivern||LifeOrb|Frisk|flamethrower,protect,hurricane,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon\"}",
+    ">p1 move icywind, move thunderwave +2",
+    ">p2 move energyball +2, move protect",
+    ">p1 move willowisp +1, move snarl",
+    ">p2 move energyball +2, move knockoff +2",
+    ">p1 move icywind, move thunderwave +1",
+    ">p2 move hypervoice, move protect",
+    ">p1 move poltergeist +2, move helpinghand -1",
+    ">p2 move pollenpuff +2, move substitute",
+    ">p1 pass, switch 3",
+    ">p1 move tripleaxel +2, move helpinghand -1",
+    ">p2 move protect, move protect",
+    ">p1 move willowisp +1, move helpinghand -1",
+    ">p2 move energyball +2, move protect",
+    ">p2 switch 3, pass",
+    ">p1 move icywind, move psychic +1",
+    ">p2 move protect, move knockoff +2",
+    ">p1 pass, switch 5",
+    ">p1 move poltergeist +1, move protect",
+    ">p2 move icywind, move knockoff +1",
+    ">p1 move poltergeist +1, move freezedry +1",
+    ">p2 move fireblast +2, move bodyslam +2",
+    ">p2 switch 4, pass",
+    ">p1 move willowisp +1, move protect",
+    ">p2 move calmmind, move bodyslam +2",
+    ">p1 move poltergeist +1, move hydropump +2",
+    ">p2 move earthpower +2, move protect",
+    ">p1 pass, switch 4",
+    ">p1 move willowisp +2, move toxicspikes",
+    ">p2 move recover, move substitute",
+    ">p1 move icywind, move roost",
+    ">p2 move recover, move knockoff +1",
+    ">p1 switch 6, pass",
+    ">p1 move encore +1, move roost",
+    ">p2 move recover, move knockoff +1",
+    ">p1 move hydropump +2, move hurricane +2",
+    ">p2 move recover, move bodyslam +2",
+    ">p1 move encore +2, move toxicspikes",
+    ">p2 move recover, move bodyslam +2",
+    ">p1 move encore +2, move hurricane +2",
+    ">p2 move earthpower +2, move bodyslam +2",
+    ">p1 move encore +1, move hurricane +2",
+    ">p2 move calmmind, move bodyslam +1",
+    ">p1 move encore +2, move pollenpuff +2",
+    ">p2 move earthpower +1, move bodyslam +2"
+  ]
+}

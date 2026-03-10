@@ -1,0 +1,53 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"309,574,839,1368"}
+>player p1 {"name":"Player1","team":"Venomoth||LifeOrb|TintedLens|protect,bugbuzz,quiverdance,sludgebomb||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel]Gastrodon||SitrusBerry|StormDrain|icywind,earthpower,muddywater,helpinghand||85,,85,85,85,85|F|,0,,,,||82|,,,,,Fire]Orthworm||SitrusBerry|EarthEater|heavyslam,bodypress,helpinghand,shedtail||85,85,85,85,85,85|F|||88|,,,,,Electric]Tauros|TaurosPaldeaCombat|SitrusBerry|Intimidate|ragingbull,bulkup,stoneedge,protect||85,85,85,85,85,85|M|||82|,,,,,Steel]Ho-Oh||SitrusBerry|Regenerator|earthpower,tailwind,bravebird,sacredfire||85,85,85,85,85,85|N|||70|,,,,,Ground]Dudunsparce|DudunsparceThreeSegment|SitrusBerry|Rattled|earthpower,boomburst,protect,helpinghand||85,,85,85,85,85|F|,0,,,,||86|,,,,,Ghost"}
+>player p2 {"name":"Player2","team":"Jirachi||SitrusBerry|SereneGrace|ironhead,lifedew,thunderwave,protect||85,85,85,85,85,85|N|||80|,,,,,Dark]Lunala||SitrusBerry|ShadowShield|wideguard,tailwind,willowisp,moongeistbeam||85,,85,85,85,85|N|,0,,,,||71|,,,,,Dark]Gumshoos||ChoiceBand|Adaptability|uturn,stompingtantrum,knockoff,doubleedge||85,85,85,85,85,85|F|||93|,,,,,Normal]Thundurus|ThundurusTherian|LifeOrb|VoltAbsorb|protect,nastyplot,terablast,wildboltstorm||85,,85,85,85,85|M|,0,,,,||78|,,,,,Flying]Lucario||LifeOrb|InnerFocus|closecombat,protect,extremespeed,flashcannon||85,85,85,85,85,85|M|||86|,,,,,Normal]Lilligant|LilligantHisui|LifeOrb|Hustle|closecombat,sleeppowder,victorydance,leafblade||85,85,85,85,85,85|F|||84|,,,,,Steel"}
+>p1 move protect, move helpinghand -1
+>p2 move ironhead +2, move tailwind
+>p1 move sludgebomb +2, move icywind
+>p2 move protect, move willowisp +2
+>p1 move bugbuzz +2, move earthpower +2
+>p2 move thunderwave +1, move willowisp +1
+>p1 move bugbuzz +2, move muddywater
+>p2 move ironhead +2, move tailwind
+>p2 pass, switch 3
+>p1 move protect, move icywind
+>p2 move thunderwave +2, move uturn +2
+>p2 pass, switch 6
+>p1 move bugbuzz +2, move muddywater
+>p2 move thunderwave +1, move closecombat +2
+>p1 pass, switch 5
+>p2 pass, switch 5
+>p1 move protect, move bravebird +1
+>p2 move ironhead +1, move extremespeed +2
+>p1 move quiverdance, move tailwind
+>p2 move lifedew, move extremespeed +2
+>p1 move quiverdance, move bravebird +1
+>p2 move thunderwave +1, move protect
+>p1 move sludgebomb +2, move earthpower +1
+>p2 move lifedew, move closecombat +2
+>p1 pass, switch 4
+>p1 move sludgebomb +1, move protect
+>p2 move ironhead +1, move flashcannon +2
+>p1 move bugbuzz +1, move ragingbull +2
+>p2 move protect, move flashcannon +2
+>p2 pass, switch 4
+>p1 move quiverdance, move bulkup
+>p2 move lifedew, move nastyplot
+>p1 move protect, move ragingbull +1
+>p2 move lifedew, move wildboltstorm
+>p1 pass, switch 3
+>p1 move protect, move heavyslam +2
+>p2 move ironhead +1, move wildboltstorm
+>p1 switch 6, pass
+>p1 move boomburst, move helpinghand -1
+>p2 move thunderwave +1, move protect
+>p1 move helpinghand -2, move helpinghand -1
+>p2 move ironhead +1, move wildboltstorm
+>p1 move protect, pass
+>p2 move protect, move nastyplot
+>p1 move protect, pass
+>p2 move ironhead +1, move nastyplot
+>p1 move protect, pass
+>p2 move thunderwave +2, move protect
+>p1 move earthpower +2, pass
+>p2 move lifedew, move wildboltstorm

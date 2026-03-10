@@ -1,0 +1,441 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "680,1263,1846,3011",
+  "p1Seed": "3987,4191,4589,5181",
+  "p2Seed": "5773,5977,6569,6967",
+  "p1TeamPacked": "Sandy Shocks||LifeOrb|Protosynthesis|earthpower,stealthrock,thunderbolt,voltswitch||85,,85,85,85,85|N|,0,,,,||79|,,,,,Electric]Calyrex||SitrusBerry|Unnerve|psychic,leafstorm,encore,helpinghand||85,,85,85,85,85|N|,0,,,,||94|,,,,,Steel]Sableye||SitrusBerry|Prankster|fakeout,foulplay,quash,willowisp||85,85,85,85,85,85|F|||92|,,,,,Poison]Iron Treads||AssaultVest|QuarkDrive|ironhead,knockoff,rapidspin,highhorsepower||85,85,85,85,85,85|N|||81|,,,,,Flying]Salamence||LifeOrb|Intimidate|tailwind,dualwingbeat,dracometeor,fireblast||85,85,85,85,85,85|F|||80|,,,,,Flying]Empoleon||AssaultVest|Competitive|icywind,flashcannon,hydropump,knockoff||85,85,85,85,85,85|M|||83|,,,,,Grass",
+  "p2TeamPacked": "Klefki||SitrusBerry|Prankster|spikes,dazzlinggleam,thunderwave,foulplay||85,,85,85,85,85|M|,0,,,,||81|,,,,,Flying]Brambleghast||LifeOrb|WindRider|poltergeist,shadowsneak,protect,powerwhip||85,85,85,85,85,85|M|||86|,,,,,Steel]Leavanny||SitrusBerry|Swarm|pollenpuff,knockoff,stickyweb,leafblade||85,85,85,85,85,85|M|||91|,,,,,Rock]Jolteon||LifeOrb|VoltAbsorb|terablast,calmmind,thunderbolt,protect||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Giratina|GiratinaOrigin|GriseousCore|Levitate|shadowforce,dracometeor,poltergeist,protect||85,85,85,85,85,85|N|||74|,,,,,Poison]Politoed||ChoiceScarf|Drizzle|hydropump,icebeam,weatherball,muddywater||85,,85,85,85,85|F|,0,,,,||82|,,,,,Water",
+  "p1Team": [
+    {
+      "name": "Sandy Shocks",
+      "species": "Sandy Shocks",
+      "item": "Life Orb",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Earth Power",
+        "Stealth Rock",
+        "Thunderbolt",
+        "Volt Switch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Calyrex",
+      "species": "Calyrex",
+      "item": "Sitrus Berry",
+      "ability": "Unnerve",
+      "moves": [
+        "Psychic",
+        "Leaf Storm",
+        "Encore",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Sableye",
+      "species": "Sableye",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Fake Out",
+        "Foul Play",
+        "Quash",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Iron Treads",
+      "species": "Iron Treads",
+      "item": "Assault Vest",
+      "ability": "Quark Drive",
+      "moves": [
+        "Iron Head",
+        "Knock Off",
+        "Rapid Spin",
+        "High Horsepower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Salamence",
+      "species": "Salamence",
+      "item": "Life Orb",
+      "ability": "Intimidate",
+      "moves": [
+        "Tailwind",
+        "Dual Wingbeat",
+        "Draco Meteor",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Empoleon",
+      "species": "Empoleon",
+      "item": "Assault Vest",
+      "ability": "Competitive",
+      "moves": [
+        "Icy Wind",
+        "Flash Cannon",
+        "Hydro Pump",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Klefki",
+      "species": "Klefki",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Spikes",
+        "Dazzling Gleam",
+        "Thunder Wave",
+        "Foul Play"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Brambleghast",
+      "species": "Brambleghast",
+      "item": "Life Orb",
+      "ability": "Wind Rider",
+      "moves": [
+        "Poltergeist",
+        "Shadow Sneak",
+        "Protect",
+        "Power Whip"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Leavanny",
+      "species": "Leavanny",
+      "item": "Sitrus Berry",
+      "ability": "Swarm",
+      "moves": [
+        "Pollen Puff",
+        "Knock Off",
+        "Sticky Web",
+        "Leaf Blade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Jolteon",
+      "species": "Jolteon",
+      "item": "Life Orb",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Tera Blast",
+        "Calm Mind",
+        "Thunderbolt",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Giratina",
+      "species": "Giratina-Origin",
+      "item": "Griseous Core",
+      "ability": "Levitate",
+      "moves": [
+        "Shadow Force",
+        "Draco Meteor",
+        "Poltergeist",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Politoed",
+      "species": "Politoed",
+      "item": "Choice Scarf",
+      "ability": "Drizzle",
+      "moves": [
+        "Hydro Pump",
+        "Ice Beam",
+        "Weather Ball",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"680,1263,1846,3011\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Sandy Shocks||LifeOrb|Protosynthesis|earthpower,stealthrock,thunderbolt,voltswitch||85,,85,85,85,85|N|,0,,,,||79|,,,,,Electric]Calyrex||SitrusBerry|Unnerve|psychic,leafstorm,encore,helpinghand||85,,85,85,85,85|N|,0,,,,||94|,,,,,Steel]Sableye||SitrusBerry|Prankster|fakeout,foulplay,quash,willowisp||85,85,85,85,85,85|F|||92|,,,,,Poison]Iron Treads||AssaultVest|QuarkDrive|ironhead,knockoff,rapidspin,highhorsepower||85,85,85,85,85,85|N|||81|,,,,,Flying]Salamence||LifeOrb|Intimidate|tailwind,dualwingbeat,dracometeor,fireblast||85,85,85,85,85,85|F|||80|,,,,,Flying]Empoleon||AssaultVest|Competitive|icywind,flashcannon,hydropump,knockoff||85,85,85,85,85,85|M|||83|,,,,,Grass\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Klefki||SitrusBerry|Prankster|spikes,dazzlinggleam,thunderwave,foulplay||85,,85,85,85,85|M|,0,,,,||81|,,,,,Flying]Brambleghast||LifeOrb|WindRider|poltergeist,shadowsneak,protect,powerwhip||85,85,85,85,85,85|M|||86|,,,,,Steel]Leavanny||SitrusBerry|Swarm|pollenpuff,knockoff,stickyweb,leafblade||85,85,85,85,85,85|M|||91|,,,,,Rock]Jolteon||LifeOrb|VoltAbsorb|terablast,calmmind,thunderbolt,protect||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Giratina|GiratinaOrigin|GriseousCore|Levitate|shadowforce,dracometeor,poltergeist,protect||85,85,85,85,85,85|N|||74|,,,,,Poison]Politoed||ChoiceScarf|Drizzle|hydropump,icebeam,weatherball,muddywater||85,,85,85,85,85|F|,0,,,,||82|,,,,,Water\"}",
+    ">p1 move stealthrock, move psychic +1",
+    ">p2 move dazzlinggleam, move shadowsneak +2",
+    ">p1 move voltswitch +2, move encore +2",
+    ">p2 move dazzlinggleam, move poltergeist +1",
+    ">p1 switch 6, pass",
+    ">p1 move hydropump +2, move leafstorm +2",
+    ">p2 move foulplay +1, move poltergeist +1",
+    ">p1 switch 3, pass",
+    ">p1 move fakeout +2, move encore +2",
+    ">p2 move thunderwave +1, move poltergeist +2",
+    ">p1 move foulplay +2, move leafstorm +2",
+    ">p2 move foulplay +2, move poltergeist +2",
+    ">p2 pass, switch 3",
+    ">p1 move fakeout +2, move psychic +2",
+    ">p2 move dazzlinggleam, move knockoff +1",
+    ">p1 move quash +1, move encore +2",
+    ">p2 move dazzlinggleam, move leafblade +2",
+    ">p1 switch 4, switch 6",
+    ">p1 move rapidspin +2, move voltswitch +1",
+    ">p2 move foulplay +2, move stickyweb",
+    ">p1 pass, switch 5",
+    ">p1 move rapidspin +1, move tailwind",
+    ">p2 move spikes, move knockoff +2",
+    ">p1 move ironhead +2, move dualwingbeat +2",
+    ">p2 move dazzlinggleam, move leafblade +2",
+    ">p1 pass, switch 5",
+    ">p1 move rapidspin +1, move stealthrock",
+    ">p2 move dazzlinggleam, move leafblade +2",
+    ">p1 move knockoff +1, pass",
+    ">p2 move thunderwave +1, move leafblade +1",
+    ">p1 move highhorsepower +2, pass",
+    ">p2 move spikes, move knockoff +1",
+    ">p1 move highhorsepower +2, pass",
+    ">p2 move foulplay +1, move leafblade +1",
+    ">p1 move rapidspin +1, pass",
+    ">p2 move dazzlinggleam, move leafblade +1"
+  ]
+}

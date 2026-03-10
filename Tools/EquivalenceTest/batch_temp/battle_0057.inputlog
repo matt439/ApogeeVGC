@@ -1,0 +1,32 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"400,743,1086,1771"}
+>player p1 {"name":"Player1","team":"Empoleon||SitrusBerry|Competitive|flashcannon,protect,hydropump,icywind||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Araquanid||SitrusBerry|WaterBubble|liquidation,hydropump,stickyweb,protect||85,85,85,85,85,85|F|||84|,,,,,Water]Mewtwo||LifeOrb|Unnerve|protect,aurasphere,fireblast,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fire]Electrode|ElectrodeHisui|AssaultVest|Static|voltswitch,electroweb,thunderbolt,energyball||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Articuno||SitrusBerry|Pressure|roost,tailwind,bravebird,icebeam||85,85,85,85,85,85|N|||82|,,,,,Ground]Metagross||WeaknessPolicy|ClearBody|heavyslam,psychicfangs,agility,protect||85,85,85,85,85,85|N|||80|,,,,,Dragon"}
+>player p2 {"name":"Player2","team":"Ninetales||LifeOrb|Drought|solarbeam,protect,fireblast,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Moltres||SitrusBerry|FlameBody|protect,heatwave,bravebird,tailwind||85,85,85,85,85,85|N|||79|,,,,,Ground]Venomoth||LifeOrb|TintedLens|sludgebomb,bugbuzz,protect,quiverdance||85,,85,85,85,85|M|,0,,,,||90|,,,,,Water]Dedenne||SitrusBerry|CheekPouch|dazzlinggleam,nuzzle,thunderbolt,helpinghand||85,85,85,85,85,85|M|||85|,,,,,Electric]Hariyama||FlameOrb|Guts|knockoff,fakeout,closecombat,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Gliscor||ToxicOrb|PoisonHeal|swordsdance,protect,facade,earthquake||85,85,85,85,85,85|F|||81|,,,,,Normal"}
+>p1 move icywind, move stickyweb
+>p2 move protect, move heatwave
+>p1 move icywind, move hydropump +2
+>p2 move protect, move tailwind
+>p1 move flashcannon +1, move liquidation +2
+>p2 move heatwave, move tailwind
+>p2 pass, switch 6
+>p1 move icywind, move protect
+>p2 move fireblast +2, move facade +1
+>p1 move hydropump +2, move protect
+>p2 move solarbeam +2, move earthquake
+>p2 switch 3, switch 4
+>p1 move protect, move protect
+>p2 move quiverdance, move dazzlinggleam
+>p1 move icywind, move protect
+>p2 move quiverdance, move thunderbolt +1
+>p1 switch 6, pass
+>p1 move protect, move protect
+>p2 move bugbuzz +2, move helpinghand -1
+>p1 pass, switch 5
+>p1 move protect, move tailwind
+>p2 move quiverdance, move nuzzle +2
+>p1 move agility, move bravebird +1
+>p2 move quiverdance, move nuzzle +2
+>p2 switch 5, pass
+>p1 move psychicfangs +1, move icebeam +2
+>p2 move facade +2, move nuzzle +1
+>p1 move heavyslam +2, move icebeam +2
+>p2 move fakeout +1, move thunderbolt +2

@@ -1,0 +1,430 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "505,938,1371,2236",
+  "p1Seed": "2962,3116,3414,3856",
+  "p2Seed": "4298,4452,4894,5192",
+  "p1TeamPacked": "Garchomp||LoadedDice|RoughSkin|protect,swordsdance,earthquake,scaleshot||85,85,85,85,85,85|F|||77|,,,,,Dragon]Pelipper||SitrusBerry|Drizzle|wideguard,hurricane,tailwind,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Venusaur||LifeOrb|Overgrow|sludgebomb,knockoff,protect,leafstorm||85,85,85,85,85,85|M|||86|,,,,,Dark]Probopass||Leftovers|MagnetPull|irondefense,bodypress,flashcannon,thunderwave||85,,85,85,85,85|F|,0,,,,||90|,,,,,Fighting]Slowking||LifeOrb|Regenerator|scald,trickroom,fireblast,icebeam||85,,85,85,85,|M|,0,,,,0||88|,,,,,Fire]Iron Hands||Leftovers|QuarkDrive|drainpunch,protect,swordsdance,thunderpunch||85,85,85,85,85,85|N|||77|,,,,,Fire",
+  "p2TeamPacked": "Sawsbuck|SawsbuckSummer|LifeOrb|SapSipper|protect,swordsdance,hornleech,doubleedge||85,85,85,85,85,85|F|||91|,,,,,Normal]Gumshoos||ChoiceBand|Adaptability|doubleedge,knockoff,uturn,stompingtantrum||85,85,85,85,85,85|M|||93|,,,,,Normal]Entei||ChoiceBand|InnerFocus|sacredfire,flareblitz,extremespeed,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal]Dachsbun||SitrusBerry|WellBakedBody|helpinghand,bodypress,yawn,playrough||85,85,85,85,85,85|F|||90|,,,,,Steel]Dragonite||ChoiceBand|InnerFocus|ironhead,dragonclaw,stompingtantrum,extremespeed||85,85,85,85,85,85|F|||82|,,,,,Normal]Iron Boulder||BoosterEnergy|QuarkDrive|protect,swordsdance,closecombat,mightycleave||85,85,85,85,85,85|N|||77|,,,,,Fighting",
+  "p1Team": [
+    {
+      "name": "Garchomp",
+      "species": "Garchomp",
+      "item": "Loaded Dice",
+      "ability": "Rough Skin",
+      "moves": [
+        "Protect",
+        "Swords Dance",
+        "Earthquake",
+        "Scale Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Pelipper",
+      "species": "Pelipper",
+      "item": "Sitrus Berry",
+      "ability": "Drizzle",
+      "moves": [
+        "Wide Guard",
+        "Hurricane",
+        "Tailwind",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Venusaur",
+      "species": "Venusaur",
+      "item": "Life Orb",
+      "ability": "Overgrow",
+      "moves": [
+        "Sludge Bomb",
+        "Knock Off",
+        "Protect",
+        "Leaf Storm"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Probopass",
+      "species": "Probopass",
+      "item": "Leftovers",
+      "ability": "Magnet Pull",
+      "moves": [
+        "Iron Defense",
+        "Body Press",
+        "Flash Cannon",
+        "Thunder Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Slowking",
+      "species": "Slowking",
+      "item": "Life Orb",
+      "ability": "Regenerator",
+      "moves": [
+        "Scald",
+        "Trick Room",
+        "Fire Blast",
+        "Ice Beam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Iron Hands",
+      "species": "Iron Hands",
+      "item": "Leftovers",
+      "ability": "Quark Drive",
+      "moves": [
+        "Drain Punch",
+        "Protect",
+        "Swords Dance",
+        "Thunder Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Sawsbuck",
+      "species": "Sawsbuck-Summer",
+      "item": "Life Orb",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Protect",
+        "Swords Dance",
+        "Horn Leech",
+        "Double-Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Gumshoos",
+      "species": "Gumshoos",
+      "item": "Choice Band",
+      "ability": "Adaptability",
+      "moves": [
+        "Double-Edge",
+        "Knock Off",
+        "U-turn",
+        "Stomping Tantrum"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 93,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Entei",
+      "species": "Entei",
+      "item": "Choice Band",
+      "ability": "Inner Focus",
+      "moves": [
+        "Sacred Fire",
+        "Flare Blitz",
+        "Extreme Speed",
+        "Stomping Tantrum"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Dachsbun",
+      "species": "Dachsbun",
+      "item": "Sitrus Berry",
+      "ability": "Well-Baked Body",
+      "moves": [
+        "Helping Hand",
+        "Body Press",
+        "Yawn",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Dragonite",
+      "species": "Dragonite",
+      "item": "Choice Band",
+      "ability": "Inner Focus",
+      "moves": [
+        "Iron Head",
+        "Dragon Claw",
+        "Stomping Tantrum",
+        "Extreme Speed"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Iron Boulder",
+      "species": "Iron Boulder",
+      "item": "Booster Energy",
+      "ability": "Quark Drive",
+      "moves": [
+        "Protect",
+        "Swords Dance",
+        "Close Combat",
+        "Mighty Cleave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"505,938,1371,2236\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Garchomp||LoadedDice|RoughSkin|protect,swordsdance,earthquake,scaleshot||85,85,85,85,85,85|F|||77|,,,,,Dragon]Pelipper||SitrusBerry|Drizzle|wideguard,hurricane,tailwind,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Venusaur||LifeOrb|Overgrow|sludgebomb,knockoff,protect,leafstorm||85,85,85,85,85,85|M|||86|,,,,,Dark]Probopass||Leftovers|MagnetPull|irondefense,bodypress,flashcannon,thunderwave||85,,85,85,85,85|F|,0,,,,||90|,,,,,Fighting]Slowking||LifeOrb|Regenerator|scald,trickroom,fireblast,icebeam||85,,85,85,85,|M|,0,,,,0||88|,,,,,Fire]Iron Hands||Leftovers|QuarkDrive|drainpunch,protect,swordsdance,thunderpunch||85,85,85,85,85,85|N|||77|,,,,,Fire\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Sawsbuck|SawsbuckSummer|LifeOrb|SapSipper|protect,swordsdance,hornleech,doubleedge||85,85,85,85,85,85|F|||91|,,,,,Normal]Gumshoos||ChoiceBand|Adaptability|doubleedge,knockoff,uturn,stompingtantrum||85,85,85,85,85,85|M|||93|,,,,,Normal]Entei||ChoiceBand|InnerFocus|sacredfire,flareblitz,extremespeed,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal]Dachsbun||SitrusBerry|WellBakedBody|helpinghand,bodypress,yawn,playrough||85,85,85,85,85,85|F|||90|,,,,,Steel]Dragonite||ChoiceBand|InnerFocus|ironhead,dragonclaw,stompingtantrum,extremespeed||85,85,85,85,85,85|F|||82|,,,,,Normal]Iron Boulder||BoosterEnergy|QuarkDrive|protect,swordsdance,closecombat,mightycleave||85,85,85,85,85,85|N|||77|,,,,,Fighting\"}",
+    ">p1 move swordsdance, move wideguard",
+    ">p2 move protect, move stompingtantrum +2",
+    ">p1 move swordsdance, move tailwind",
+    ">p2 move hornleech +1, move stompingtantrum +1",
+    ">p1 switch 3, pass",
+    ">p1 move knockoff +1, move muddywater",
+    ">p2 move hornleech +1, move stompingtantrum +1",
+    ">p1 move knockoff +1, move tailwind",
+    ">p2 move protect, move stompingtantrum +1",
+    ">p1 move sludgebomb +1, move hurricane +1",
+    ">p2 move protect, move stompingtantrum +1",
+    ">p2 switch 5, switch 6",
+    ">p1 move knockoff +1, move hurricane +2",
+    ">p2 move ironhead +2, move closecombat +1",
+    ">p1 switch 4, pass",
+    ">p1 move bodypress +1, move muddywater",
+    ">p2 move ironhead +2, move protect",
+    ">p1 move bodypress +1, move hurricane +2",
+    ">p2 move ironhead +2, move swordsdance",
+    ">p1 move flashcannon +1, move muddywater",
+    ">p2 move ironhead +1, move closecombat +2",
+    ">p2 pass, switch 3",
+    ">p1 move thunderwave +1, move wideguard",
+    ">p2 move ironhead +1, move stompingtantrum +1",
+    ">p1 switch 5, pass",
+    ">p1 move trickroom, move muddywater",
+    ">p2 move ironhead +1, move stompingtantrum +1",
+    ">p1 move fireblast +2, move wideguard",
+    ">p2 move ironhead +2, move stompingtantrum +1",
+    ">p1 move scald +2, move hurricane +2",
+    ">p2 move ironhead +2, move stompingtantrum +1",
+    ">p1 switch 6, pass",
+    ">p2 switch 4, pass",
+    ">p1 move thunderpunch +1, move muddywater",
+    ">p2 move playrough +2, pass",
+    ">p1 move swordsdance, move wideguard",
+    ">p2 move bodypress +1, pass",
+    ">p1 move swordsdance, move hurricane +2",
+    ">p2 move bodypress +2, pass",
+    ">p1 move drainpunch +1, pass",
+    ">p2 move yawn +2, pass"
+  ]
+}

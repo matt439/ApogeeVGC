@@ -1,0 +1,457 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "645,1198,1751,2856",
+  "p1Seed": "3782,3976,4354,4916",
+  "p2Seed": "5478,5672,6234,6612",
+  "p1TeamPacked": "Mewtwo||LifeOrb|Unnerve|darkpulse,fireblast,aurasphere,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Psychic]Zangoose||ToxicOrb|ToxicBoost|facade,feint,knockoff,protect||85,85,85,85,85,85|F|||87|,,,,,Normal]Archaludon||PowerHerb|Stamina|electroshot,dragonpulse,protect,flashcannon||85,,85,85,85,85|M|,0,,,,||77|,,,,,Flying]Iron Valiant||LifeOrb|QuarkDrive|moonblast,encore,closecombat,protect||85,85,85,85,85,85|N|||79|,,,,,Fighting]Basculegion|BasculegionF|ChoiceScarf|Adaptability|muddywater,lastrespects,flipturn,wavecrash||85,85,85,85,85,85|F|||72|,,,,,Ghost]Palossand||Leftovers|WaterCompaction|shoreup,earthpower,protect,shadowball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Water",
+  "p2TeamPacked": "Kingdra||LifeOrb|SwiftSwim|protect,dracometeor,wavecrash,raindance||85,85,85,85,85,85|M|||85|,,,,,Water]Malamar||SitrusBerry|Contrary|knockoff,protect,trickroom,superpower||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Hitmonlee||WhiteHerb|Unburden|fakeout,closecombat,protect,poisonjab||85,85,85,85,85,85|M|||86|,,,,,Poison]Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,earthpower,recover,yawn||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Skeledirge||Leftovers|Unaware|slackoff,protect,shadowball,torchsong||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fairy]Sceptile||WhiteHerb|Unburden|protect,leafstorm,breakingswipe,focusblast||85,85,85,85,85,85|F|||88|,,,,,Water",
+  "p1Team": [
+    {
+      "name": "Mewtwo",
+      "species": "Mewtwo",
+      "item": "Life Orb",
+      "ability": "Unnerve",
+      "moves": [
+        "Dark Pulse",
+        "Fire Blast",
+        "Aura Sphere",
+        "Psystrike"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Zangoose",
+      "species": "Zangoose",
+      "item": "Toxic Orb",
+      "ability": "Toxic Boost",
+      "moves": [
+        "Facade",
+        "Feint",
+        "Knock Off",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Archaludon",
+      "species": "Archaludon",
+      "item": "Power Herb",
+      "ability": "Stamina",
+      "moves": [
+        "Electro Shot",
+        "Dragon Pulse",
+        "Protect",
+        "Flash Cannon"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Iron Valiant",
+      "species": "Iron Valiant",
+      "item": "Life Orb",
+      "ability": "Quark Drive",
+      "moves": [
+        "Moonblast",
+        "Encore",
+        "Close Combat",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Basculegion",
+      "species": "Basculegion-F",
+      "item": "Choice Scarf",
+      "ability": "Adaptability",
+      "moves": [
+        "Muddy Water",
+        "Last Respects",
+        "Flip Turn",
+        "Wave Crash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 72,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Palossand",
+      "species": "Palossand",
+      "item": "Leftovers",
+      "ability": "Water Compaction",
+      "moves": [
+        "Shore Up",
+        "Earth Power",
+        "Protect",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Kingdra",
+      "species": "Kingdra",
+      "item": "Life Orb",
+      "ability": "Swift Swim",
+      "moves": [
+        "Protect",
+        "Draco Meteor",
+        "Wave Crash",
+        "Rain Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Malamar",
+      "species": "Malamar",
+      "item": "Sitrus Berry",
+      "ability": "Contrary",
+      "moves": [
+        "Knock Off",
+        "Protect",
+        "Trick Room",
+        "Superpower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Hitmonlee",
+      "species": "Hitmonlee",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Fake Out",
+        "Close Combat",
+        "Protect",
+        "Poison Jab"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Gastrodon",
+      "species": "Gastrodon-East",
+      "item": "Leftovers",
+      "ability": "Storm Drain",
+      "moves": [
+        "Ice Beam",
+        "Earth Power",
+        "Recover",
+        "Yawn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Skeledirge",
+      "species": "Skeledirge",
+      "item": "Leftovers",
+      "ability": "Unaware",
+      "moves": [
+        "Slack Off",
+        "Protect",
+        "Shadow Ball",
+        "Torch Song"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Sceptile",
+      "species": "Sceptile",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Protect",
+        "Leaf Storm",
+        "Breaking Swipe",
+        "Focus Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"645,1198,1751,2856\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Mewtwo||LifeOrb|Unnerve|darkpulse,fireblast,aurasphere,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Psychic]Zangoose||ToxicOrb|ToxicBoost|facade,feint,knockoff,protect||85,85,85,85,85,85|F|||87|,,,,,Normal]Archaludon||PowerHerb|Stamina|electroshot,dragonpulse,protect,flashcannon||85,,85,85,85,85|M|,0,,,,||77|,,,,,Flying]Iron Valiant||LifeOrb|QuarkDrive|moonblast,encore,closecombat,protect||85,85,85,85,85,85|N|||79|,,,,,Fighting]Basculegion|BasculegionF|ChoiceScarf|Adaptability|muddywater,lastrespects,flipturn,wavecrash||85,85,85,85,85,85|F|||72|,,,,,Ghost]Palossand||Leftovers|WaterCompaction|shoreup,earthpower,protect,shadowball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Kingdra||LifeOrb|SwiftSwim|protect,dracometeor,wavecrash,raindance||85,85,85,85,85,85|M|||85|,,,,,Water]Malamar||SitrusBerry|Contrary|knockoff,protect,trickroom,superpower||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Hitmonlee||WhiteHerb|Unburden|fakeout,closecombat,protect,poisonjab||85,85,85,85,85,85|M|||86|,,,,,Poison]Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,earthpower,recover,yawn||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Skeledirge||Leftovers|Unaware|slackoff,protect,shadowball,torchsong||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fairy]Sceptile||WhiteHerb|Unburden|protect,leafstorm,breakingswipe,focusblast||85,85,85,85,85,85|F|||88|,,,,,Water\"}",
+    ">p1 move fireblast +2, move protect",
+    ">p2 move protect, move protect",
+    ">p1 move aurasphere +1, move knockoff +2",
+    ">p2 move protect, move trickroom",
+    ">p1 move psystrike +2, move knockoff +2",
+    ">p2 move raindance, move superpower +1",
+    ">p1 move fireblast +2, move feint +2",
+    ">p2 move protect, move trickroom",
+    ">p2 pass, switch 4",
+    ">p1 move fireblast +1, move feint +1",
+    ">p2 move protect, move yawn +1",
+    ">p1 move psystrike +1, move knockoff +2",
+    ">p2 move wavecrash +2, move earthpower +1",
+    ">p2 switch 5, pass",
+    ">p1 move fireblast +2, move facade +1",
+    ">p2 move torchsong +2, move recover",
+    ">p1 pass, switch 3",
+    ">p1 move darkpulse +2, move electroshot +2",
+    ">p2 move shadowball +1, move yawn +2",
+    ">p1 switch 4, pass",
+    ">p1 move moonblast +2, move dragonpulse +2",
+    ">p2 move protect, move icebeam +1",
+    ">p2 pass, switch 6",
+    ">p1 move closecombat +2, move dragonpulse +1",
+    ">p2 move slackoff, move focusblast +2",
+    ">p1 pass, switch 5",
+    ">p1 move closecombat +1, move muddywater",
+    ">p2 move slackoff, move breakingswipe",
+    ">p1 move moonblast +2, move muddywater",
+    ">p2 move slackoff, move protect",
+    ">p1 move closecombat +2, move muddywater",
+    ">p2 move torchsong +2, move leafstorm +2",
+    ">p1 switch 6, pass",
+    ">p2 pass, switch 3",
+    ">p1 move shadowball +1, pass",
+    ">p2 move protect, move poisonjab +1",
+    ">p1 move protect, pass",
+    ">p2 move torchsong +2, move poisonjab +2",
+    ">p1 move protect, pass",
+    ">p2 move protect, move poisonjab +2",
+    ">p1 move earthpower +2, pass",
+    ">p2 move slackoff, move fakeout +2",
+    ">p1 move earthpower +1, pass",
+    ">p2 move shadowball +1, move closecombat +1"
+  ]
+}

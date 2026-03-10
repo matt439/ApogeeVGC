@@ -1,0 +1,38 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"533,990,1447,2360"}
+>player p1 {"name":"Player1","team":"Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,heatcrash,dragonclaw,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Volbeat||SitrusBerry|Prankster|encore,thunderwave,lunge,tailwind||85,85,85,85,85,85|M|||82|,,,,,Steel]Ribombee||LifeOrb|ShieldDust|protect,terablast,quiverdance,dazzlinggleam||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ground]Greninja|GreninjaBond|LifeOrb|BattleBond|darkpulse,hydropump,icebeam,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Water]Venusaur||LifeOrb|Overgrow|knockoff,protect,gigadrain,sludgebomb||85,85,85,85,85,85|F|||86|,,,,,Dark]Samurott||LifeOrb|Torrent|knockoff,sacredsword,swordsdance,liquidation||85,85,85,85,85,85|M|||89|,,,,,Dark"}
+>player p2 {"name":"Player2","team":"Tyranitar||ClearAmulet|SandStream|highhorsepower,dragondance,rockslide,knockoff||85,85,85,85,85,85|M|||81|,,,,,Ghost]Indeedee|IndeedeeF|SitrusBerry|PsychicSurge|healpulse,psychic,followme,helpinghand||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Dachsbun||SitrusBerry|WellBakedBody|playrough,bodypress,snarl,yawn||85,85,85,85,85,85|M|||90|,,,,,Steel]Latias||SoulDew|Levitate|mistball,dracometeor,tailwind,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Dragon]Spidops||SitrusBerry|Stakeout|circlethrow,uturn,lunge,stickyweb||85,85,85,85,85,85|F||||,,,,,Water"}
+>p1 move dragondance, move thunderwave +1
+>p2 move highhorsepower +2, move psychic +1
+>p1 move dragondance, move tailwind
+>p2 move dragondance, move psychic +1
+>p1 switch 4, pass
+>p1 move hydropump +1, move thunderwave +1
+>p2 move knockoff +1, move psychic +2
+>p1 move protect, move tailwind
+>p2 move rockslide, move helpinghand -1
+>p1 pass, switch 6
+>p1 move icebeam +1, move knockoff +1
+>p2 move dragondance, move healpulse +2
+>p1 move hydropump +2, move knockoff +2
+>p2 move highhorsepower +1, move psychic +1
+>p1 move icebeam +1, move sacredsword +1
+>p2 move dragondance, move helpinghand -1
+>p2 switch 5, switch 6
+>p1 move hydropump +2, move swordsdance
+>p2 move knockoff +2, move uturn +1
+>p2 pass, switch 3
+>p1 switch 3, pass
+>p1 move terablast +1, move swordsdance
+>p2 move swordsdance, move bodypress +2
+>p1 move terablast +2, move liquidation +2
+>p2 move knockoff +1, move bodypress +2
+>p2 pass, switch 4
+>p1 move protect, move sacredsword +2
+>p2 move sacredsword +1, move dracometeor +2
+>p1 pass, switch 5
+>p1 move protect, move knockoff +2
+>p2 move liquidation +1, move protect
+>p1 pass, move knockoff +2
+>p2 move sacredsword +1, move dracometeor +2
+>p1 pass, move sludgebomb +2
+>p2 move sacredsword +2, move dracometeor +2

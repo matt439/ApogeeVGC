@@ -1,0 +1,455 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "337,626,915,1492",
+  "p1Seed": "1978,2084,2286,2584",
+  "p2Seed": "2882,2988,3286,3488",
+  "p1TeamPacked": "Arboliva||LifeOrb|SeedSower|hypervoice,pollenpuff,strengthsap,energyball||85,,85,85,85,85|M|,0,,,,||88|,,,,,Poison]Espathra||LifeOrb|SpeedBoost|protect,luminacrash,dazzlinggleam,batonpass||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fairy]Solgaleo||AssaultVest|FullMetalBody|psychicfangs,sunsteelstrike,closecombat,knockoff||85,85,85,85,85,85|N|||74|,,,,,Fighting]Polteageist||WhiteHerb|CursedBody|terablast,shadowball,shellsmash,protect||85,,85,85,85,85|N|,0,,,,||85|,,,,,Fighting]Magmar||Eviolite|FlameBody|protect,heatwave,followme,willowisp||85,,85,85,85,85|F|,0,,,,||84|,,,,,Grass]Iron Hands||AssaultVest|QuarkDrive|icepunch,fakeout,closecombat,wildcharge||85,85,85,85,85,85|N|||77|,,,,,Fire",
+  "p2TeamPacked": "Ogerpon|OgerponCornerstone|CornerstoneMask|Sturdy|swordsdance,ivycudgel,spikyshield,powerwhip||85,85,85,85,85,85|F|||75|,,,,,Rock]Feraligatr||LifeOrb|SheerForce|swordsdance,liquidation,icepunch,aquajet||85,85,85,85,85,85|F|||82|,,,,,Dragon]Cloyster||WhiteHerb|SkillLink|iciclespear,rockblast,hydropump,shellsmash||85,85,85,85,85,85|M|||87|,,,,,Rock]Exeggutor|ExeggutorAlola|SitrusBerry|Harvest|flamethrower,woodhammer,dracometeor,trickroom||85,85,85,85,85,|M|,,,,,0||87|,,,,,Fire]Illumise||SitrusBerry|Prankster|bugbuzz,encore,tailwind,thunderwave||85,,85,85,85,85|F|,0,,,,||83|,,,,,Water]Mudsdale||ChestoBerry|Stamina|highhorsepower,bodypress,rest,stoneedge||85,85,85,85,85,85|M|||84|,,,,,Fighting",
+  "p1Team": [
+    {
+      "name": "Arboliva",
+      "species": "Arboliva",
+      "item": "Life Orb",
+      "ability": "Seed Sower",
+      "moves": [
+        "Hyper Voice",
+        "Pollen Puff",
+        "Strength Sap",
+        "Energy Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Espathra",
+      "species": "Espathra",
+      "item": "Life Orb",
+      "ability": "Speed Boost",
+      "moves": [
+        "Protect",
+        "Lumina Crash",
+        "Dazzling Gleam",
+        "Baton Pass"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Solgaleo",
+      "species": "Solgaleo",
+      "item": "Assault Vest",
+      "ability": "Full Metal Body",
+      "moves": [
+        "Psychic Fangs",
+        "Sunsteel Strike",
+        "Close Combat",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Polteageist",
+      "species": "Polteageist",
+      "item": "White Herb",
+      "ability": "Cursed Body",
+      "moves": [
+        "Tera Blast",
+        "Shadow Ball",
+        "Shell Smash",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Magmar",
+      "species": "Magmar",
+      "item": "Eviolite",
+      "ability": "Flame Body",
+      "moves": [
+        "Protect",
+        "Heat Wave",
+        "Follow Me",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Iron Hands",
+      "species": "Iron Hands",
+      "item": "Assault Vest",
+      "ability": "Quark Drive",
+      "moves": [
+        "Ice Punch",
+        "Fake Out",
+        "Close Combat",
+        "Wild Charge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Ogerpon",
+      "species": "Ogerpon-Cornerstone",
+      "item": "Cornerstone Mask",
+      "ability": "Sturdy",
+      "moves": [
+        "Swords Dance",
+        "Ivy Cudgel",
+        "Spiky Shield",
+        "Power Whip"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Feraligatr",
+      "species": "Feraligatr",
+      "item": "Life Orb",
+      "ability": "Sheer Force",
+      "moves": [
+        "Swords Dance",
+        "Liquidation",
+        "Ice Punch",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Cloyster",
+      "species": "Cloyster",
+      "item": "White Herb",
+      "ability": "Skill Link",
+      "moves": [
+        "Icicle Spear",
+        "Rock Blast",
+        "Hydro Pump",
+        "Shell Smash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Exeggutor",
+      "species": "Exeggutor-Alola",
+      "item": "Sitrus Berry",
+      "ability": "Harvest",
+      "moves": [
+        "Flamethrower",
+        "Wood Hammer",
+        "Draco Meteor",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Illumise",
+      "species": "Illumise",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Bug Buzz",
+        "Encore",
+        "Tailwind",
+        "Thunder Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Mudsdale",
+      "species": "Mudsdale",
+      "item": "Chesto Berry",
+      "ability": "Stamina",
+      "moves": [
+        "High Horsepower",
+        "Body Press",
+        "Rest",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"337,626,915,1492\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Arboliva||LifeOrb|SeedSower|hypervoice,pollenpuff,strengthsap,energyball||85,,85,85,85,85|M|,0,,,,||88|,,,,,Poison]Espathra||LifeOrb|SpeedBoost|protect,luminacrash,dazzlinggleam,batonpass||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fairy]Solgaleo||AssaultVest|FullMetalBody|psychicfangs,sunsteelstrike,closecombat,knockoff||85,85,85,85,85,85|N|||74|,,,,,Fighting]Polteageist||WhiteHerb|CursedBody|terablast,shadowball,shellsmash,protect||85,,85,85,85,85|N|,0,,,,||85|,,,,,Fighting]Magmar||Eviolite|FlameBody|protect,heatwave,followme,willowisp||85,,85,85,85,85|F|,0,,,,||84|,,,,,Grass]Iron Hands||AssaultVest|QuarkDrive|icepunch,fakeout,closecombat,wildcharge||85,85,85,85,85,85|N|||77|,,,,,Fire\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Ogerpon|OgerponCornerstone|CornerstoneMask|Sturdy|swordsdance,ivycudgel,spikyshield,powerwhip||85,85,85,85,85,85|F|||75|,,,,,Rock]Feraligatr||LifeOrb|SheerForce|swordsdance,liquidation,icepunch,aquajet||85,85,85,85,85,85|F|||82|,,,,,Dragon]Cloyster||WhiteHerb|SkillLink|iciclespear,rockblast,hydropump,shellsmash||85,85,85,85,85,85|M|||87|,,,,,Rock]Exeggutor|ExeggutorAlola|SitrusBerry|Harvest|flamethrower,woodhammer,dracometeor,trickroom||85,85,85,85,85,|M|,,,,,0||87|,,,,,Fire]Illumise||SitrusBerry|Prankster|bugbuzz,encore,tailwind,thunderwave||85,,85,85,85,85|F|,0,,,,||83|,,,,,Water]Mudsdale||ChestoBerry|Stamina|highhorsepower,bodypress,rest,stoneedge||85,85,85,85,85,85|M|||84|,,,,,Fighting\"}",
+    ">p1 move strengthsap +2, move dazzlinggleam",
+    ">p2 move swordsdance, move liquidation +2",
+    ">p1 move energyball +2, move dazzlinggleam",
+    ">p2 move spikyshield, move liquidation +1",
+    ">p2 pass, switch 3",
+    ">p1 move hypervoice, move luminacrash +2",
+    ">p2 move powerwhip +2, move hydropump +1",
+    ">p1 pass, switch 5",
+    ">p2 pass, switch 5",
+    ">p1 move hypervoice, move protect",
+    ">p2 move spikyshield, move tailwind",
+    ">p1 move strengthsap +1, move followme",
+    ">p2 move swordsdance, move thunderwave +2",
+    ">p1 move strengthsap +2, move heatwave",
+    ">p2 move swordsdance, move thunderwave +2",
+    ">p1 move hypervoice, move followme",
+    ">p2 move powerwhip +1, move bugbuzz +2",
+    ">p1 pass, switch 6",
+    ">p2 pass, switch 4",
+    ">p1 move pollenpuff +1, move closecombat +1",
+    ">p2 move swordsdance, move dracometeor +1",
+    ">p2 switch 6, pass",
+    ">p1 move pollenpuff +1, move fakeout +2",
+    ">p2 move rest, move dracometeor +1",
+    ">p1 switch 4, pass",
+    ">p1 move shadowball +2, move fakeout +2",
+    ">p2 move stoneedge +2, move dracometeor +1",
+    ">p1 move shadowball +1, move icepunch +2",
+    ">p2 move bodypress +2, move woodhammer +2",
+    ">p1 move shellsmash, move closecombat +2",
+    ">p2 move highhorsepower +1, pass",
+    ">p1 switch 3, pass",
+    ">p1 move psychicfangs +1, move icepunch +1",
+    ">p2 move rest, pass",
+    ">p1 move sunsteelstrike +2, move closecombat +1",
+    ">p2 move bodypress +1, pass",
+    ">p1 move closecombat +2, move closecombat +2",
+    ">p2 move rest, pass",
+    ">p1 move closecombat +2, move wildcharge +1",
+    ">p2 move bodypress +1, pass",
+    ">p1 pass, move icepunch +2",
+    ">p2 move stoneedge +1, pass"
+  ]
+}

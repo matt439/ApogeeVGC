@@ -1,0 +1,425 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "43,80,117,190",
+  "p1Seed": "256,278,312,358",
+  "p2Seed": "404,426,472,506",
+  "p1TeamPacked": "Victreebel||LifeOrb|Chlorophyll|suckerpunch,sludgebomb,powerwhip,protect||85,85,85,85,85,85|M|||91|,,,,,Grass]Staraptor||LifeOrb|Intimidate|closecombat,doubleedge,bravebird,protect||85,85,85,85,85,85|F|||82|,,,,,Fighting]Kommo-o||ThroatSpray|Bulletproof|clangoroussoul,protect,clangingscales,ironhead||85,85,85,85,85,85|F|||79|,,,,,Steel]Kyurem||LoadedDice|Pressure|scaleshot,protect,earthpower,iciclespear||85,85,85,85,85,85|N|||77|,,,,,Fairy]Ariados||RockyHelmet|Insomnia|ragepowder,protect,stickyweb,megahorn||85,85,85,85,85,85|M||||,,,,,Dark]Lycanroc||LifeOrb|SandRush|protect,closecombat,drillrun,rockslide||85,85,85,85,85,85|M|||85|,,,,,Fighting",
+  "p2TeamPacked": "Klawf||LifeOrb|Regenerator|knockoff,protect,crabhammer,rockslide||85,85,85,85,85,85|F|||91|,,,,,Water]Gardevoir||ChoiceScarf|Trace|psychic,mysticalfire,dazzlinggleam,trick||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fairy]Moltres|MoltresGalar|SitrusBerry|Berserk|fierywrath,tailwind,nastyplot,hurricane||85,,85,85,85,85|N|,0,,,,||74|,,,,,Dark]Rotom|RotomHeat|SitrusBerry|Levitate|overheat,electroweb,thunderbolt,protect||85,,85,85,85,85|N|,0,,,,||84|,,,,,Steel]Granbull||AssaultVest|Intimidate|stompingtantrum,superfang,closecombat,playrough||85,85,85,85,85,85|F|||88|,,,,,Steel]Bombirdier||ChoiceBand|RockyPayload|bravebird,knockoff,rockslide,suckerpunch||85,85,85,85,85,85|F|||84|,,,,,Rock",
+  "p1Team": [
+    {
+      "name": "Victreebel",
+      "species": "Victreebel",
+      "item": "Life Orb",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Sucker Punch",
+        "Sludge Bomb",
+        "Power Whip",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Staraptor",
+      "species": "Staraptor",
+      "item": "Life Orb",
+      "ability": "Intimidate",
+      "moves": [
+        "Close Combat",
+        "Double-Edge",
+        "Brave Bird",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Kommo-o",
+      "species": "Kommo-o",
+      "item": "Throat Spray",
+      "ability": "Bulletproof",
+      "moves": [
+        "Clangorous Soul",
+        "Protect",
+        "Clanging Scales",
+        "Iron Head"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Kyurem",
+      "species": "Kyurem",
+      "item": "Loaded Dice",
+      "ability": "Pressure",
+      "moves": [
+        "Scale Shot",
+        "Protect",
+        "Earth Power",
+        "Icicle Spear"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Ariados",
+      "species": "Ariados",
+      "item": "Rocky Helmet",
+      "ability": "Insomnia",
+      "moves": [
+        "Rage Powder",
+        "Protect",
+        "Sticky Web",
+        "Megahorn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Lycanroc",
+      "species": "Lycanroc",
+      "item": "Life Orb",
+      "ability": "Sand Rush",
+      "moves": [
+        "Protect",
+        "Close Combat",
+        "Drill Run",
+        "Rock Slide"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Klawf",
+      "species": "Klawf",
+      "item": "Life Orb",
+      "ability": "Regenerator",
+      "moves": [
+        "Knock Off",
+        "Protect",
+        "Crabhammer",
+        "Rock Slide"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Gardevoir",
+      "species": "Gardevoir",
+      "item": "Choice Scarf",
+      "ability": "Trace",
+      "moves": [
+        "Psychic",
+        "Mystical Fire",
+        "Dazzling Gleam",
+        "Trick"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Moltres",
+      "species": "Moltres-Galar",
+      "item": "Sitrus Berry",
+      "ability": "Berserk",
+      "moves": [
+        "Fiery Wrath",
+        "Tailwind",
+        "Nasty Plot",
+        "Hurricane"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Rotom",
+      "species": "Rotom-Heat",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "moves": [
+        "Overheat",
+        "Electroweb",
+        "Thunderbolt",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Granbull",
+      "species": "Granbull",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Stomping Tantrum",
+        "Super Fang",
+        "Close Combat",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Bombirdier",
+      "species": "Bombirdier",
+      "item": "Choice Band",
+      "ability": "Rocky Payload",
+      "moves": [
+        "Brave Bird",
+        "Knock Off",
+        "Rock Slide",
+        "Sucker Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"43,80,117,190\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Victreebel||LifeOrb|Chlorophyll|suckerpunch,sludgebomb,powerwhip,protect||85,85,85,85,85,85|M|||91|,,,,,Grass]Staraptor||LifeOrb|Intimidate|closecombat,doubleedge,bravebird,protect||85,85,85,85,85,85|F|||82|,,,,,Fighting]Kommo-o||ThroatSpray|Bulletproof|clangoroussoul,protect,clangingscales,ironhead||85,85,85,85,85,85|F|||79|,,,,,Steel]Kyurem||LoadedDice|Pressure|scaleshot,protect,earthpower,iciclespear||85,85,85,85,85,85|N|||77|,,,,,Fairy]Ariados||RockyHelmet|Insomnia|ragepowder,protect,stickyweb,megahorn||85,85,85,85,85,85|M||||,,,,,Dark]Lycanroc||LifeOrb|SandRush|protect,closecombat,drillrun,rockslide||85,85,85,85,85,85|M|||85|,,,,,Fighting\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Klawf||LifeOrb|Regenerator|knockoff,protect,crabhammer,rockslide||85,85,85,85,85,85|F|||91|,,,,,Water]Gardevoir||ChoiceScarf|Trace|psychic,mysticalfire,dazzlinggleam,trick||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fairy]Moltres|MoltresGalar|SitrusBerry|Berserk|fierywrath,tailwind,nastyplot,hurricane||85,,85,85,85,85|N|,0,,,,||74|,,,,,Dark]Rotom|RotomHeat|SitrusBerry|Levitate|overheat,electroweb,thunderbolt,protect||85,,85,85,85,85|N|,0,,,,||84|,,,,,Steel]Granbull||AssaultVest|Intimidate|stompingtantrum,superfang,closecombat,playrough||85,85,85,85,85,85|F|||88|,,,,,Steel]Bombirdier||ChoiceBand|RockyPayload|bravebird,knockoff,rockslide,suckerpunch||85,85,85,85,85,85|F|||84|,,,,,Rock\"}",
+    ">p1 move protect, move closecombat +1",
+    ">p2 move crabhammer +1, move trick +2",
+    ">p1 move protect, move closecombat +1",
+    ">p2 move knockoff +1, move dazzlinggleam",
+    ">p1 pass, switch 4",
+    ">p1 move suckerpunch +1, move earthpower +1",
+    ">p2 move knockoff +2, move mysticalfire +1",
+    ">p1 switch 6, pass",
+    ">p2 switch 4, pass",
+    ">p1 move protect, move protect",
+    ">p2 move overheat +2, move mysticalfire +1",
+    ">p1 move rockslide, move protect",
+    ">p2 move overheat +2, move mysticalfire +1",
+    ">p1 move closecombat +2, move scaleshot +1",
+    ">p2 move thunderbolt +2, move dazzlinggleam",
+    ">p1 switch 3, switch 5",
+    ">p2 pass, switch 5",
+    ">p1 move protect, move protect",
+    ">p2 move thunderbolt +2, move stompingtantrum +2",
+    ">p1 move clangoroussoul, move stickyweb",
+    ">p2 move overheat +1, move stompingtantrum +1",
+    ">p1 move protect, move stickyweb",
+    ">p2 move protect, move stompingtantrum +2",
+    ">p1 move protect, move protect",
+    ">p2 move protect, move stompingtantrum +1",
+    ">p1 move protect, move megahorn +2",
+    ">p2 move electroweb, move superfang +1",
+    ">p1 move protect, move stickyweb",
+    ">p2 move overheat +2, move stompingtantrum +2",
+    ">p1 move clangoroussoul, move protect",
+    ">p2 move thunderbolt +2, move closecombat +1",
+    ">p1 pass, move ragepowder",
+    ">p2 move thunderbolt +2, move superfang +1",
+    ">p1 pass, move protect",
+    ">p2 move protect, move superfang +1",
+    ">p1 pass, move stickyweb",
+    ">p2 move thunderbolt +2, move stompingtantrum +2"
+  ]
+}

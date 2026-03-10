@@ -1,0 +1,417 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "169,314,459,748",
+  "p1Seed": "994,1052,1158,1312",
+  "p2Seed": "1466,1524,1678,1784",
+  "p1TeamPacked": "Delibird||ChoiceBand|Hustle|foulplay,bravebird,icespinner,iceshard||85,85,85,85,85,85|M||||,,,,,Ice]Mimikyu||LifeOrb|Disguise|playrough,protect,shadowsneak,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost]Mandibuzz||SitrusBerry|Overcoat|tailwind,foulplay,uturn,snarl||85,85,85,85,85,85|F|||85|,,,,,Steel]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,flipturn,protect||85,85,85,85,85,85|M|||79|,,,,,Water]Magcargo||LifeOrb|WeakArmor|powergem,shellsmash,heatwave,protect||85,,85,85,85,85|M|,0,,,,||93|,,,,,Fire]Haxorus||LifeOrb|Unnerve|protect,dragonclaw,firstimpression,ironhead||85,85,85,85,85,85|F|||84|,,,,,Steel",
+  "p2TeamPacked": "Mesprit||ChoiceScarf|Levitate|uturn,thunderbolt,psychic,icebeam||85,85,85,85,85,85|N|||86|,,,,,Electric]Latios||ChoiceSpecs|Levitate|trick,lusterpurge,dracometeor,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|fakeout,volttackle,encore,knockoff||85,85,85,85,85,85|M|||94|,,,,,Grass]Avalugg||Leftovers|Sturdy|recover,bodypress,avalanche,protect||85,85,85,85,85,85|M|||92|,,,,,Poison]Camerupt||SitrusBerry|SolidRock|heatwave,protect,earthpower,willowisp||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Zangoose||ToxicOrb|ToxicBoost|knockoff,protect,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Ghost",
+  "p1Team": [
+    {
+      "name": "Delibird",
+      "species": "Delibird",
+      "item": "Choice Band",
+      "ability": "Hustle",
+      "moves": [
+        "Foul Play",
+        "Brave Bird",
+        "Ice Spinner",
+        "Ice Shard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Mimikyu",
+      "species": "Mimikyu",
+      "item": "Life Orb",
+      "ability": "Disguise",
+      "moves": [
+        "Play Rough",
+        "Protect",
+        "Shadow Sneak",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Mandibuzz",
+      "species": "Mandibuzz",
+      "item": "Sitrus Berry",
+      "ability": "Overcoat",
+      "moves": [
+        "Tailwind",
+        "Foul Play",
+        "U-turn",
+        "Snarl"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Palafin",
+      "species": "Palafin",
+      "item": "Mystic Water",
+      "ability": "Zero to Hero",
+      "moves": [
+        "Jet Punch",
+        "Wave Crash",
+        "Flip Turn",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Magcargo",
+      "species": "Magcargo",
+      "item": "Life Orb",
+      "ability": "Weak Armor",
+      "moves": [
+        "Power Gem",
+        "Shell Smash",
+        "Heat Wave",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 93,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Haxorus",
+      "species": "Haxorus",
+      "item": "Life Orb",
+      "ability": "Unnerve",
+      "moves": [
+        "Protect",
+        "Dragon Claw",
+        "First Impression",
+        "Iron Head"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Mesprit",
+      "species": "Mesprit",
+      "item": "Choice Scarf",
+      "ability": "Levitate",
+      "moves": [
+        "U-turn",
+        "Thunderbolt",
+        "Psychic",
+        "Ice Beam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Latios",
+      "species": "Latios",
+      "item": "Choice Specs",
+      "ability": "Levitate",
+      "moves": [
+        "Trick",
+        "Luster Purge",
+        "Draco Meteor",
+        "Aura Sphere"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Pikachu",
+      "species": "Pikachu-Alola",
+      "item": "Light Ball",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Fake Out",
+        "Volt Tackle",
+        "Encore",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Avalugg",
+      "species": "Avalugg",
+      "item": "Leftovers",
+      "ability": "Sturdy",
+      "moves": [
+        "Recover",
+        "Body Press",
+        "Avalanche",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Camerupt",
+      "species": "Camerupt",
+      "item": "Sitrus Berry",
+      "ability": "Solid Rock",
+      "moves": [
+        "Heat Wave",
+        "Protect",
+        "Earth Power",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Zangoose",
+      "species": "Zangoose",
+      "item": "Toxic Orb",
+      "ability": "Toxic Boost",
+      "moves": [
+        "Knock Off",
+        "Protect",
+        "Feint",
+        "Facade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"169,314,459,748\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Delibird||ChoiceBand|Hustle|foulplay,bravebird,icespinner,iceshard||85,85,85,85,85,85|M||||,,,,,Ice]Mimikyu||LifeOrb|Disguise|playrough,protect,shadowsneak,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost]Mandibuzz||SitrusBerry|Overcoat|tailwind,foulplay,uturn,snarl||85,85,85,85,85,85|F|||85|,,,,,Steel]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,flipturn,protect||85,85,85,85,85,85|M|||79|,,,,,Water]Magcargo||LifeOrb|WeakArmor|powergem,shellsmash,heatwave,protect||85,,85,85,85,85|M|,0,,,,||93|,,,,,Fire]Haxorus||LifeOrb|Unnerve|protect,dragonclaw,firstimpression,ironhead||85,85,85,85,85,85|F|||84|,,,,,Steel\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Mesprit||ChoiceScarf|Levitate|uturn,thunderbolt,psychic,icebeam||85,85,85,85,85,85|N|||86|,,,,,Electric]Latios||ChoiceSpecs|Levitate|trick,lusterpurge,dracometeor,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|fakeout,volttackle,encore,knockoff||85,85,85,85,85,85|M|||94|,,,,,Grass]Avalugg||Leftovers|Sturdy|recover,bodypress,avalanche,protect||85,85,85,85,85,85|M|||92|,,,,,Poison]Camerupt||SitrusBerry|SolidRock|heatwave,protect,earthpower,willowisp||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Zangoose||ToxicOrb|ToxicBoost|knockoff,protect,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Ghost\"}",
+    ">p1 move iceshard +2, move shadowsneak +1",
+    ">p2 move icebeam +1, move lusterpurge +2",
+    ">p1 move iceshard +2, move playrough +2",
+    ">p2 move icebeam +2, move lusterpurge +2",
+    ">p1 pass, switch 3",
+    ">p1 move iceshard +1, move tailwind",
+    ">p2 move icebeam +1, move lusterpurge +2",
+    ">p1 move iceshard +1, move uturn +2",
+    ">p2 move icebeam +1, move lusterpurge +2",
+    ">p1 pass, switch 5",
+    ">p1 switch 6, pass",
+    ">p2 pass, switch 3",
+    ">p1 move dragonclaw +1, move shellsmash",
+    ">p2 move icebeam +1, move encore +1",
+    ">p2 switch 4, pass",
+    ">p1 move dragonclaw +2, move heatwave",
+    ">p2 move bodypress +1, move encore +1",
+    ">p2 switch 6, switch 5",
+    ">p1 move dragonclaw +1, move shellsmash",
+    ">p2 move facade +1, move protect",
+    ">p1 move dragonclaw +1, move shellsmash",
+    ">p2 move facade +2, move earthpower +1",
+    ">p1 switch 4, pass",
+    ">p1 move jetpunch +1, move shellsmash",
+    ">p2 pass, move protect",
+    ">p1 move jetpunch +1, move protect",
+    ">p2 pass, move heatwave",
+    ">p1 move flipturn +2, move protect",
+    ">p2 pass, move willowisp +1"
+  ]
+}

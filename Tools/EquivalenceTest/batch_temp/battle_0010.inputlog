@@ -1,0 +1,40 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"71,132,193,314"}
+>player p1 {"name":"Player1","team":"Tsareena||AssaultVest|QueenlyMajesty|knockoff,rapidspin,powerwhip,tripleaxel||85,85,85,85,85,85|F|||85|,,,,,Fire]Alcremie||SitrusBerry|AromaVeil|helpinghand,dazzlinggleam,protect,decorate||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel]Infernape||FocusSash|Blaze|fakeout,overheat,knockoff,closecombat||85,85,85,85,85,85|M|||82|,,,,,Dark]Lokix||LifeOrb|TintedLens|firstimpression,protect,knockoff,suckerpunch||85,85,85,85,85,85|M|||88|,,,,,Dark]Flygon||SitrusBerry|Levitate|protect,earthpower,tailwind,breakingswipe||85,85,85,85,85,85|M|||83|,,,,,Steel]Murkrow||Eviolite|Prankster|tailwind,protect,bravebird,taunt||85,85,85,85,85,85|M|||90|,,,,,Ghost"}
+>player p2 {"name":"Player2","team":"Hydrapple||SitrusBerry|Regenerator|gigadrain,protect,ficklebeam,pollenpuff||85,,85,85,85,85|F|,0,,,,||85|,,,,,Steel]Sunflora||LifeOrb|Chlorophyll|protect,earthpower,leafstorm,sludgebomb||85,,85,85,85,85|F|,0,,,,|||,,,,,Poison]Baxcalibur||ChoiceBand|ThermalExchange|iceshard,highhorsepower,glaiverush,iciclecrash||85,85,85,85,85,85|M|||78|,,,,,Dragon]Blaziken||LifeOrb|SpeedBoost|closecombat,protect,vacuumwave,heatwave||85,85,85,85,85,85|M|||79|,,,,,Fighting]Armarouge||ChoiceSpecs|FlashFire|armorcannon,aurasphere,psychic,energyball||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fire]Spiritomb||SitrusBerry|Infiltrator|icywind,foulplay,helpinghand,willowisp||85,,85,85,85,85|M|,0,,,,||89|,,,,,Steel"}
+>p1 move rapidspin +1, move helpinghand -1
+>p2 move protect, move earthpower +1
+>p1 move knockoff +1, move protect
+>p2 move protect, move earthpower +2
+>p1 move knockoff +2, move protect
+>p2 move protect, move sludgebomb +2
+>p1 move knockoff +1, move decorate +2
+>p2 move gigadrain +1, move protect
+>p1 move powerwhip +2, move protect
+>p2 move pollenpuff +1, move sludgebomb +1
+>p1 switch 4, pass
+>p1 move knockoff +1, move protect
+>p2 move ficklebeam +2, move sludgebomb +2
+>p1 pass, switch 5
+>p1 move knockoff +1, move tailwind
+>p2 move pollenpuff +1, move sludgebomb +2
+>p1 move firstimpression +1, move breakingswipe
+>p2 move ficklebeam +2, move earthpower +1
+>p1 switch 6, pass
+>p2 switch 3, pass
+>p1 move taunt +2, move protect
+>p2 move highhorsepower +1, move earthpower +2
+>p1 move tailwind, move breakingswipe
+>p2 move highhorsepower +2, move sludgebomb +1
+>p2 pass, switch 5
+>p1 move bravebird +1, move breakingswipe
+>p2 move highhorsepower +1, move psychic +2
+>p1 pass, switch 3
+>p2 switch 4, pass
+>p1 move protect, move overheat +2
+>p2 move heatwave, move psychic +2
+>p1 move tailwind, pass
+>p2 move closecombat +2, move psychic +1
+>p1 move protect, pass
+>p2 move heatwave, move psychic +1
+>p1 move tailwind, pass
+>p2 move heatwave, move psychic +1

@@ -1,0 +1,67 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"274,509,744,1213"}
+>player p1 {"name":"Player1","team":"Necrozma|NecrozmaDawnWings|LifeOrb|PrismArmor|photongeyser,moongeistbeam,terablast,trickroom||85,,85,85,85,|N|,0,,,,0||74|,,,,,Fairy]Phione||Leftovers|Hydration|icebeam,takeheart,protect,scald||85,,85,85,85,85|N|,0,,,,||90|,,,,,Dragon]Infernape||FocusSash|Blaze|overheat,protect,closecombat,knockoff||85,85,85,85,85,85|F|||82|,,,,,Fire]Hydrapple||ChoiceSpecs|Regenerator|earthpower,leafstorm,gigadrain,dracometeor||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Glalie||SitrusBerry|InnerFocus|helpinghand,freezedry,icywind,disable||85,,85,85,85,85|M|,0,,,,||94|,,,,,Steel]Rotom|RotomFan|SitrusBerry|Levitate|electroweb,airslash,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||85|,,,,,Electric"}
+>player p2 {"name":"Player2","team":"Latias||SoulDew|Levitate|dracometeor,mistball,recover,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Zangoose||ToxicOrb|ToxicBoost|protect,knockoff,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Normal]Mabosstiff||ChoiceBand|Intimidate|crunch,firefang,psychicfangs,playrough||85,85,85,85,85,85|F|||84|,,,,,Fairy]Darkrai||LifeOrb|BadDreams|sludgebomb,darkpulse,substitute,protect||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Milotic||SitrusBerry|Competitive|recover,protect,scald,icywind||85,,85,85,85,85|M|,0,,,,||81|,,,,,Grass]Comfey||SitrusBerry|Triage|tailwind,floralhealing,drainingkiss,helpinghand||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel"}
+>p1 move trickroom, move protect
+>p2 move protect, move feint +1
+>p1 move photongeyser +1, move icebeam +2
+>p2 move protect, move facade +1
+>p1 move photongeyser +1, move scald +2
+>p2 move dracometeor +2, move knockoff +1
+>p1 switch 5, pass
+>p1 move disable +1, move takeheart
+>p2 move dracometeor +1, move facade +2
+>p1 pass, switch 6
+>p2 pass, switch 3
+>p1 move helpinghand -2, move protect
+>p2 move protect, move playrough +1
+>p1 move helpinghand -2, move electroweb
+>p2 move protect, move playrough +1
+>p1 move freezedry +2, move protect
+>p2 move recover, move playrough +2
+>p1 move disable +1, move electroweb
+>p2 move dracometeor +1, move playrough +1
+>p1 switch 4, pass
+>p1 move earthpower +1, move thunderbolt +2
+>p2 move mistball +1, move playrough +1
+>p2 pass, switch 4
+>p1 move earthpower +2, move electroweb
+>p2 move protect, move darkpulse +1
+>p1 move earthpower +2, move protect
+>p2 move mistball +1, move protect
+>p1 move earthpower +1, move protect
+>p2 move recover, move sludgebomb +1
+>p1 switch 3, pass
+>p1 move closecombat +2, move airslash +1
+>p2 move mistball +2, move darkpulse +1
+>p2 pass, switch 6
+>p1 move overheat +2, move protect
+>p2 move protect, move floralhealing +2
+>p1 move overheat +1, move airslash +1
+>p2 move mistball +2, move tailwind
+>p1 move overheat +2, move electroweb
+>p2 move protect, move floralhealing +2
+>p1 move closecombat +1, move airslash +2
+>p2 move dracometeor +2, move tailwind
+>p2 pass, switch 5
+>p1 move closecombat +2, move protect
+>p2 move recover, move protect
+>p1 move protect, move airslash +2
+>p2 move recover, move scald +2
+>p1 move overheat +2, move thunderbolt +2
+>p2 move protect, move icywind
+>p1 move protect, move electroweb
+>p2 move mistball +2, move scald +2
+>p1 move closecombat +2, pass
+>p2 move mistball +1, move scald +1
+>p1 move closecombat +1, pass
+>p2 move dracometeor +2, pass
+>p1 move overheat +1, pass
+>p2 move protect, pass
+>p1 move knockoff +2, pass
+>p2 move recover, pass
+>p1 move protect, pass
+>p2 move mistball +2, pass
+>p1 move knockoff +1, pass
+>p2 move protect, pass
+>p1 move closecombat +1, pass
+>p2 move mistball +1, pass

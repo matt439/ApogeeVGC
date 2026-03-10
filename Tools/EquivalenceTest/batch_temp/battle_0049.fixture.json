@@ -1,0 +1,448 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "344,639,934,1523",
+  "p1Seed": "2019,2127,2333,2637",
+  "p2Seed": "2941,3049,3353,3559",
+  "p1TeamPacked": "Hawlucha||WhiteHerb|Unburden|closecombat,protect,bravebird,swordsdance||85,85,85,85,85,85|F|||84|,,,,,Fire]Delibird||ChoiceBand|Hustle|iceshard,bravebird,icespinner,drillrun||85,85,85,85,85,85|M||||,,,,,Ice]Dialga||SitrusBerry|Telepathy|thunderwave,heavyslam,dracometeor,protect||85,85,85,85,85,85|N|||74|,,,,,Flying]Sawsbuck|SawsbuckSummer|LifeOrb|SapSipper|doubleedge,hornleech,protect,swordsdance||85,85,85,85,85,85|F|||91|,,,,,Normal]Wyrdeer||LifeOrb|Intimidate|earthpower,trickroom,doubleedge,psychic||85,85,85,85,85,|F|,,,,,0||85|,,,,,Ground]Espathra||LifeOrb|SpeedBoost|protect,dazzlinggleam,shadowball,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy",
+  "p2TeamPacked": "Deoxys||LifeOrb|Pressure|extremespeed,protect,psychoboost,superpower||85,85,85,85,85,85|N|||79|,,,,,Stellar]Weavile||FocusSash|Pickpocket|fakeout,iceshard,knockoff,tripleaxel||85,85,85,85,85,85|M|||81|,,,,,Ice]Umbreon||SitrusBerry|InnerFocus|thunderwave,moonlight,foulplay,snarl||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Dewgong||SitrusBerry|ThickFat|fakeout,icywind,encore,hydropump||85,85,85,85,85,85|M|||91|,,,,,Grass]Lanturn||AssaultVest|VoltAbsorb|voltswitch,icebeam,electroweb,scald||85,,85,85,85,85|F|,0,,,,||87|,,,,,Flying]Reshiram||LifeOrb|Turboblaze|protect,blueflare,heatwave,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire",
+  "p1Team": [
+    {
+      "name": "Hawlucha",
+      "species": "Hawlucha",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Close Combat",
+        "Protect",
+        "Brave Bird",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Delibird",
+      "species": "Delibird",
+      "item": "Choice Band",
+      "ability": "Hustle",
+      "moves": [
+        "Ice Shard",
+        "Brave Bird",
+        "Ice Spinner",
+        "Drill Run"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Dialga",
+      "species": "Dialga",
+      "item": "Sitrus Berry",
+      "ability": "Telepathy",
+      "moves": [
+        "Thunder Wave",
+        "Heavy Slam",
+        "Draco Meteor",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Sawsbuck",
+      "species": "Sawsbuck-Summer",
+      "item": "Life Orb",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Double-Edge",
+        "Horn Leech",
+        "Protect",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Wyrdeer",
+      "species": "Wyrdeer",
+      "item": "Life Orb",
+      "ability": "Intimidate",
+      "moves": [
+        "Earth Power",
+        "Trick Room",
+        "Double-Edge",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Espathra",
+      "species": "Espathra",
+      "item": "Life Orb",
+      "ability": "Speed Boost",
+      "moves": [
+        "Protect",
+        "Dazzling Gleam",
+        "Shadow Ball",
+        "Lumina Crash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Deoxys",
+      "species": "Deoxys",
+      "item": "Life Orb",
+      "ability": "Pressure",
+      "moves": [
+        "Extreme Speed",
+        "Protect",
+        "Psycho Boost",
+        "Superpower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Stellar"
+    },
+    {
+      "name": "Weavile",
+      "species": "Weavile",
+      "item": "Focus Sash",
+      "ability": "Pickpocket",
+      "moves": [
+        "Fake Out",
+        "Ice Shard",
+        "Knock Off",
+        "Triple Axel"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Umbreon",
+      "species": "Umbreon",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Thunder Wave",
+        "Moonlight",
+        "Foul Play",
+        "Snarl"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Dewgong",
+      "species": "Dewgong",
+      "item": "Sitrus Berry",
+      "ability": "Thick Fat",
+      "moves": [
+        "Fake Out",
+        "Icy Wind",
+        "Encore",
+        "Hydro Pump"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Lanturn",
+      "species": "Lanturn",
+      "item": "Assault Vest",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Volt Switch",
+        "Ice Beam",
+        "Electroweb",
+        "Scald"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Reshiram",
+      "species": "Reshiram",
+      "item": "Life Orb",
+      "ability": "Turboblaze",
+      "moves": [
+        "Protect",
+        "Blue Flare",
+        "Heat Wave",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 72,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"344,639,934,1523\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Hawlucha||WhiteHerb|Unburden|closecombat,protect,bravebird,swordsdance||85,85,85,85,85,85|F|||84|,,,,,Fire]Delibird||ChoiceBand|Hustle|iceshard,bravebird,icespinner,drillrun||85,85,85,85,85,85|M||||,,,,,Ice]Dialga||SitrusBerry|Telepathy|thunderwave,heavyslam,dracometeor,protect||85,85,85,85,85,85|N|||74|,,,,,Flying]Sawsbuck|SawsbuckSummer|LifeOrb|SapSipper|doubleedge,hornleech,protect,swordsdance||85,85,85,85,85,85|F|||91|,,,,,Normal]Wyrdeer||LifeOrb|Intimidate|earthpower,trickroom,doubleedge,psychic||85,85,85,85,85,|F|,,,,,0||85|,,,,,Ground]Espathra||LifeOrb|SpeedBoost|protect,dazzlinggleam,shadowball,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Deoxys||LifeOrb|Pressure|extremespeed,protect,psychoboost,superpower||85,85,85,85,85,85|N|||79|,,,,,Stellar]Weavile||FocusSash|Pickpocket|fakeout,iceshard,knockoff,tripleaxel||85,85,85,85,85,85|M|||81|,,,,,Ice]Umbreon||SitrusBerry|InnerFocus|thunderwave,moonlight,foulplay,snarl||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Dewgong||SitrusBerry|ThickFat|fakeout,icywind,encore,hydropump||85,85,85,85,85,85|M|||91|,,,,,Grass]Lanturn||AssaultVest|VoltAbsorb|voltswitch,icebeam,electroweb,scald||85,,85,85,85,85|F|,0,,,,||87|,,,,,Flying]Reshiram||LifeOrb|Turboblaze|protect,blueflare,heatwave,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire\"}",
+    ">p1 move closecombat +1, move iceshard +1",
+    ">p2 move superpower +1, move fakeout +1",
+    ">p1 move swordsdance, move iceshard +2",
+    ">p2 move protect, move knockoff +1",
+    ">p1 move protect, move iceshard +1",
+    ">p2 move protect, move iceshard +2",
+    ">p1 move swordsdance, move iceshard +2",
+    ">p2 move psychoboost +1, move iceshard +1",
+    ">p1 switch 5, switch 4",
+    ">p1 move trickroom, move protect",
+    ">p2 move extremespeed +1, move iceshard +1",
+    ">p1 move psychic +2, move hornleech +1",
+    ">p2 move psychoboost +2, move iceshard +1",
+    ">p2 switch 4, pass",
+    ">p1 move doubleedge +2, move protect",
+    ">p2 move icywind, move knockoff +1",
+    ">p2 pass, switch 3",
+    ">p1 move doubleedge +1, move protect",
+    ">p2 move icywind, move thunderwave +1",
+    ">p1 switch 6, pass",
+    ">p1 move dazzlinggleam, move hornleech +2",
+    ">p2 move encore +1, move moonlight",
+    ">p1 move luminacrash +2, move hornleech +2",
+    ">p2 move icywind, move foulplay +2",
+    ">p1 pass, switch 3",
+    ">p1 move luminacrash +1, move thunderwave +1",
+    ">p2 move icywind, move snarl",
+    ">p1 move dazzlinggleam, move protect",
+    ">p2 move hydropump +2, move snarl",
+    ">p2 switch 5, pass",
+    ">p1 pass, move thunderwave +1",
+    ">p2 move icebeam +2, move moonlight",
+    ">p1 pass, move protect",
+    ">p2 move scald +2, move thunderwave +1",
+    ">p1 pass, move thunderwave +2",
+    ">p2 move scald +2, move thunderwave +2",
+    ">p1 pass, move protect",
+    ">p2 move electroweb, move snarl",
+    ">p1 pass, move dracometeor +2",
+    ">p2 move icebeam +2, move snarl",
+    ">p1 pass, move thunderwave +1",
+    ">p2 move electroweb, move moonlight",
+    ">p1 pass, move thunderwave +1",
+    ">p2 move voltswitch +2, move moonlight"
+  ]
+}

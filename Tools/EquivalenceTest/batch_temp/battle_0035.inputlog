@@ -1,0 +1,42 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"246,457,668,1089"}
+>player p1 {"name":"Player1","team":"Rhyperior||ChoiceBand|SolidRock|highhorsepower,rockslide,megahorn,icepunch||85,85,85,85,85,85|M|||82|,,,,,Water]Cacturne||LifeOrb|WaterAbsorb|leafstorm,knockoff,suckerpunch,spikyshield||85,85,85,85,85,85|F|||91|,,,,,Poison]Skarmory||Leftovers|Sturdy|irondefense,bravebird,bodypress,roost||85,85,85,85,85,85|M|||85|,,,,,Fighting]Azelf||LifeOrb|Levitate|protect,psychic,dazzlinggleam,nastyplot||85,,85,85,85,85|N|,0,,,,||83|,,,,,Fairy]Cetitan||LifeOrb|SheerForce|iceshard,highhorsepower,iciclecrash,liquidation||85,85,85,85,85,85|F|||83|,,,,,Ground]Pikachu|PikachuUnova|LightBall|LightningRod|fakeout,protect,knockoff,volttackle||85,85,85,85,85,85|F|||94|,,,,,Grass"}
+>player p2 {"name":"Player2","team":"Forretress||ChoiceBand|Sturdy|bodypress,ironhead,explosion,lunge||85,85,85,85,85,85|F|||90|,,,,,Fire]Copperajah||AssaultVest|HeavyMetal|heavyslam,stoneedge,heatcrash,highhorsepower||85,85,85,85,85,85|F|||86|,,,,,Fire]Lugia||Leftovers|Multiscale|aeroblast,earthpower,recover,calmmind||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Miraidon||LifeOrb|HadronEngine|protect,dragonpulse,voltswitch,electrodrift||85,,85,85,85,85|N|,0,,,,||65|,,,,,Electric]Drifblim||SitrusBerry|Unburden|willowisp,strengthsap,tailwind,shadowball||85,,85,85,85,85|M|,0,,,,||85|,,,,,Fairy]Galvantula||SitrusBerry|CompoundEyes|thunder,bugbuzz,stickyweb,voltswitch||85,,85,85,85,85|F|,0,,,,||85|,,,,,Electric"}
+>p1 move highhorsepower +1, move leafstorm +2
+>p2 move explosion, move heatcrash +1
+>p2 switch 4, switch 6
+>p1 move highhorsepower +1, move spikyshield
+>p2 move voltswitch +1, move thunder +2
+>p2 switch 3, pass
+>p1 move highhorsepower +2, move leafstorm +2
+>p2 move calmmind, move stickyweb
+>p1 pass, switch 5
+>p2 pass, switch 5
+>p1 move highhorsepower +1, move liquidation +1
+>p2 move aeroblast +2, move tailwind
+>p1 move highhorsepower +1, move highhorsepower +2
+>p2 move recover, move strengthsap +2
+>p1 move highhorsepower +1, move iceshard +2
+>p2 move earthpower +2, move tailwind
+>p1 move highhorsepower +1, move iciclecrash +1
+>p2 move calmmind, move strengthsap +1
+>p1 move highhorsepower +1, move liquidation +2
+>p2 move recover, move tailwind
+>p1 move highhorsepower +1, move highhorsepower +1
+>p2 move aeroblast +1, move strengthsap +1
+>p1 move highhorsepower +1, move iciclecrash +1
+>p2 move calmmind, move strengthsap +2
+>p1 move highhorsepower +1, move iciclecrash +1
+>p2 move aeroblast +1, move tailwind
+>p1 move highhorsepower +1, move highhorsepower +1
+>p2 pass, move willowisp +1
+>p1 switch 4, pass
+>p1 move nastyplot, move highhorsepower +2
+>p2 pass, move willowisp +1
+>p1 move protect, move iciclecrash +2
+>p2 pass, move willowisp +1
+>p1 move protect, move iceshard +1
+>p2 pass, move willowisp +2
+>p1 move protect, move iceshard +2
+>p2 pass, move tailwind
+>p1 move dazzlinggleam, move iceshard +2
+>p2 pass, move shadowball +2

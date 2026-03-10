@@ -1,0 +1,38 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"36,67,98,159"}
+>player p1 {"name":"Player1","team":"Shiftry||FocusSash|WindRider|fakeout,tailwind,knockoff,leafblade||85,85,85,85,85,85|M|||84|,,,,,Ghost]Politoed||ChoiceSpecs|Drizzle|weatherball,hydropump,muddywater,icebeam||85,,85,85,85,85|M|,0,,,,||82|,,,,,Water]Regice||SitrusBerry|ClearBody|icebeam,icywind,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||84|,,,,,Electric]Gengar||FocusSash|CursedBody|protect,sludgebomb,shadowball,focusblast||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fighting]Victreebel||LifeOrb|Chlorophyll|knockoff,sludgebomb,protect,powerwhip||85,85,85,85,85,85|F|||91|,,,,,Dark]Sandaconda||SitrusBerry|ShedSkin|rest,highhorsepower,stoneedge,glare||85,85,85,85,85,85|F|||88|,,,,,Dragon"}
+>player p2 {"name":"Player2","team":"Mightyena||LifeOrb|Intimidate|playrough,crunch,suckerpunch,howl||85,85,85,85,85,85|F|||95|,,,,,Fairy]Dachsbun||SitrusBerry|WellBakedBody|playrough,snarl,howl,bodypress||85,85,85,85,85,85|F|||90|,,,,,Steel]Politoed||SitrusBerry|Drizzle|helpinghand,icywind,encore,muddywater||85,,85,85,85,85|F|,0,,,,||82|,,,,,Steel]Granbull||AssaultVest|Intimidate|stompingtantrum,closecombat,playrough,superfang||85,85,85,85,85,85|M|||88|,,,,,Steel]Tentacruel||AssaultVest|ClearBody|knockoff,hydropump,icywind,sludgebomb||85,85,85,85,85,85|M|||85|,,,,,Grass]Banette||LifeOrb|Frisk|protect,poltergeist,shadowsneak,gunkshot||85,85,85,85,85,85|F|||94|,,,,,Ghost"}
+>p1 move tailwind, move muddywater
+>p2 move howl, move howl
+>p1 move fakeout +1, move muddywater
+>p2 move suckerpunch +1, move playrough +1
+>p2 switch 6, switch 3
+>p1 move tailwind, move muddywater
+>p2 move poltergeist +2, move helpinghand -1
+>p1 pass, switch 4
+>p1 move knockoff +2, move focusblast +1
+>p2 move shadowsneak +1, move muddywater
+>p1 move leafblade +2, move protect
+>p2 move poltergeist +2, move helpinghand -1
+>p2 pass, switch 4
+>p1 move leafblade +1, move protect
+>p2 move poltergeist +2, move stompingtantrum +2
+>p1 pass, switch 5
+>p1 move leafblade +2, move protect
+>p2 move protect, move superfang +1
+>p1 move tailwind, move protect
+>p2 move protect, move closecombat +2
+>p1 move knockoff +1, move knockoff +1
+>p2 move gunkshot +1, move stompingtantrum +2
+>p2 switch 5, pass
+>p1 move knockoff +1, move protect
+>p2 move knockoff +1, move stompingtantrum +1
+>p1 move leafblade +1, move protect
+>p2 move knockoff +1, move superfang +2
+>p1 move tailwind, move knockoff +2
+>p2 move sludgebomb +1, move superfang +1
+>p1 switch 3, pass
+>p1 move thunderbolt +2, move knockoff +2
+>p2 move knockoff +1, move playrough +2
+>p1 pass, switch 6
+>p1 move icywind, move stoneedge +2
+>p2 move sludgebomb +1, move closecombat +1

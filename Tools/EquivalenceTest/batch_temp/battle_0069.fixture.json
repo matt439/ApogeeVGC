@@ -1,0 +1,430 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "484,899,1314,2143",
+  "p1Seed": "2839,2987,3273,3697",
+  "p2Seed": "4121,4269,4693,4979",
+  "p1TeamPacked": "Bruxish||LifeOrb|StrongJaw|crunch,psychicfangs,protect,wavecrash||85,85,85,85,85,85|M|||86|,,,,,Psychic]Virizion||SitrusBerry|Justified|leafstorm,coaching,closecombat,stoneedge||85,85,85,85,85,85|N|||86|,,,,,Steel]Vigoroth||Eviolite|VitalSpirit|knockoff,icywind,doubleedge,slackoff||85,85,85,85,85,85|F|||91|,,,,,Ghost]Emboar||ChoiceScarf|Reckless|knockoff,headsmash,closecombat,flareblitz||85,85,85,85,85,85|F|||85|,,,,,Rock]Rhyperior||ChoiceBand|SolidRock|megahorn,icepunch,highhorsepower,rockslide||85,85,85,85,85,85|M|||82|,,,,,Water]Gouging Fire||ClearAmulet|Protosynthesis|dragondance,dragonclaw,burningbulwark,heatcrash||85,85,85,85,85,85|N|||75|,,,,,Fire",
+  "p2TeamPacked": "Heatran||SitrusBerry|FlashFire|protect,terablast,heatwave,flashcannon||85,,85,85,85,85|F|,0,,,,||78|,,,,,Grass]Dedenne||SitrusBerry|CheekPouch|thunderbolt,helpinghand,nuzzle,dazzlinggleam||85,85,85,85,85,85|F|||85|,,,,,Electric]Diancie||SitrusBerry|ClearBody|diamondstorm,bodypress,trickroom,moonblast||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Yanmega||ChoiceSpecs|TintedLens|uturn,bugbuzz,gigadrain,airslash||85,85,85,85,85,85|F|||84|,,,,,Bug]Lokix||LifeOrb|TintedLens|suckerpunch,protect,knockoff,firstimpression||85,85,85,85,85,85|M|||88|,,,,,Dark]Pelipper||SitrusBerry|Drizzle|protect,tailwind,hurricane,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground",
+  "p1Team": [
+    {
+      "name": "Bruxish",
+      "species": "Bruxish",
+      "item": "Life Orb",
+      "ability": "Strong Jaw",
+      "moves": [
+        "Crunch",
+        "Psychic Fangs",
+        "Protect",
+        "Wave Crash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Virizion",
+      "species": "Virizion",
+      "item": "Sitrus Berry",
+      "ability": "Justified",
+      "moves": [
+        "Leaf Storm",
+        "Coaching",
+        "Close Combat",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Vigoroth",
+      "species": "Vigoroth",
+      "item": "Eviolite",
+      "ability": "Vital Spirit",
+      "moves": [
+        "Knock Off",
+        "Icy Wind",
+        "Double-Edge",
+        "Slack Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Emboar",
+      "species": "Emboar",
+      "item": "Choice Scarf",
+      "ability": "Reckless",
+      "moves": [
+        "Knock Off",
+        "Head Smash",
+        "Close Combat",
+        "Flare Blitz"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Rhyperior",
+      "species": "Rhyperior",
+      "item": "Choice Band",
+      "ability": "Solid Rock",
+      "moves": [
+        "Megahorn",
+        "Ice Punch",
+        "High Horsepower",
+        "Rock Slide"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Gouging Fire",
+      "species": "Gouging Fire",
+      "item": "Clear Amulet",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Dragon Dance",
+        "Dragon Claw",
+        "Burning Bulwark",
+        "Heat Crash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Heatran",
+      "species": "Heatran",
+      "item": "Sitrus Berry",
+      "ability": "Flash Fire",
+      "moves": [
+        "Protect",
+        "Tera Blast",
+        "Heat Wave",
+        "Flash Cannon"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Dedenne",
+      "species": "Dedenne",
+      "item": "Sitrus Berry",
+      "ability": "Cheek Pouch",
+      "moves": [
+        "Thunderbolt",
+        "Helping Hand",
+        "Nuzzle",
+        "Dazzling Gleam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Diancie",
+      "species": "Diancie",
+      "item": "Sitrus Berry",
+      "ability": "Clear Body",
+      "moves": [
+        "Diamond Storm",
+        "Body Press",
+        "Trick Room",
+        "Moonblast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Yanmega",
+      "species": "Yanmega",
+      "item": "Choice Specs",
+      "ability": "Tinted Lens",
+      "moves": [
+        "U-turn",
+        "Bug Buzz",
+        "Giga Drain",
+        "Air Slash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Bug"
+    },
+    {
+      "name": "Lokix",
+      "species": "Lokix",
+      "item": "Life Orb",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Sucker Punch",
+        "Protect",
+        "Knock Off",
+        "First Impression"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Pelipper",
+      "species": "Pelipper",
+      "item": "Sitrus Berry",
+      "ability": "Drizzle",
+      "moves": [
+        "Protect",
+        "Tailwind",
+        "Hurricane",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"484,899,1314,2143\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Bruxish||LifeOrb|StrongJaw|crunch,psychicfangs,protect,wavecrash||85,85,85,85,85,85|M|||86|,,,,,Psychic]Virizion||SitrusBerry|Justified|leafstorm,coaching,closecombat,stoneedge||85,85,85,85,85,85|N|||86|,,,,,Steel]Vigoroth||Eviolite|VitalSpirit|knockoff,icywind,doubleedge,slackoff||85,85,85,85,85,85|F|||91|,,,,,Ghost]Emboar||ChoiceScarf|Reckless|knockoff,headsmash,closecombat,flareblitz||85,85,85,85,85,85|F|||85|,,,,,Rock]Rhyperior||ChoiceBand|SolidRock|megahorn,icepunch,highhorsepower,rockslide||85,85,85,85,85,85|M|||82|,,,,,Water]Gouging Fire||ClearAmulet|Protosynthesis|dragondance,dragonclaw,burningbulwark,heatcrash||85,85,85,85,85,85|N|||75|,,,,,Fire\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Heatran||SitrusBerry|FlashFire|protect,terablast,heatwave,flashcannon||85,,85,85,85,85|F|,0,,,,||78|,,,,,Grass]Dedenne||SitrusBerry|CheekPouch|thunderbolt,helpinghand,nuzzle,dazzlinggleam||85,85,85,85,85,85|F|||85|,,,,,Electric]Diancie||SitrusBerry|ClearBody|diamondstorm,bodypress,trickroom,moonblast||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Yanmega||ChoiceSpecs|TintedLens|uturn,bugbuzz,gigadrain,airslash||85,85,85,85,85,85|F|||84|,,,,,Bug]Lokix||LifeOrb|TintedLens|suckerpunch,protect,knockoff,firstimpression||85,85,85,85,85,85|M|||88|,,,,,Dark]Pelipper||SitrusBerry|Drizzle|protect,tailwind,hurricane,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground\"}",
+    ">p1 move psychicfangs +2, move stoneedge +1",
+    ">p2 move terablast +1, move nuzzle +2",
+    ">p2 pass, switch 5",
+    ">p1 move crunch +1, move coaching -1",
+    ">p2 move heatwave, move protect",
+    ">p1 move crunch +2, move closecombat +2",
+    ">p2 move heatwave, move suckerpunch +2",
+    ">p2 pass, switch 3",
+    ">p1 move crunch +1, move closecombat +1",
+    ">p2 move terablast +1, move trickroom",
+    ">p1 switch 6, pass",
+    ">p1 move heatcrash +1, move closecombat +1",
+    ">p2 move heatwave, move moonblast +2",
+    ">p1 pass, switch 3",
+    ">p1 move dragondance, move slackoff",
+    ">p2 move flashcannon +2, move diamondstorm",
+    ">p1 move heatcrash +2, move slackoff",
+    ">p2 move heatwave, move moonblast +1",
+    ">p1 move burningbulwark, move knockoff +1",
+    ">p2 move heatwave, move diamondstorm",
+    ">p1 move burningbulwark, move knockoff +1",
+    ">p2 move protect, move trickroom",
+    ">p1 move dragonclaw +1, move knockoff +1",
+    ">p2 move heatwave, move diamondstorm",
+    ">p1 switch 4, switch 5",
+    ">p1 move headsmash +2, move highhorsepower +1",
+    ">p2 move protect, move diamondstorm",
+    ">p1 move headsmash +2, move highhorsepower +2",
+    ">p2 move protect, move trickroom",
+    ">p1 move headsmash +1, move highhorsepower +1",
+    ">p2 move protect, move moonblast +1",
+    ">p1 move headsmash +2, move highhorsepower +1",
+    ">p2 move terablast +2, move trickroom",
+    ">p2 switch 6, pass",
+    ">p1 move headsmash +2, move highhorsepower +1",
+    ">p2 move protect, move moonblast +2",
+    ">p1 move headsmash +2, move highhorsepower +2",
+    ">p2 move protect, move bodypress +2",
+    ">p2 pass, switch 4",
+    ">p1 move headsmash +1, pass",
+    ">p2 move muddywater, move uturn +1"
+  ]
+}

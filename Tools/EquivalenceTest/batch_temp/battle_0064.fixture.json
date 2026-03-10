@@ -1,0 +1,428 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "449,834,1219,1988",
+  "p1Seed": "2634,2772,3038,3432",
+  "p2Seed": "3826,3964,4358,4624",
+  "p1TeamPacked": "Virizion||SitrusBerry|Justified|leafstorm,closecombat,coaching,protect||85,85,85,85,85,85|N|||86|,,,,,Steel]Groudon||SitrusBerry|Drought|swordsdance,precipiceblades,heatcrash,stoneedge||85,85,85,85,85,85|N|||69|,,,,,Fire]Noivern||SitrusBerry|Frisk|tailwind,flamethrower,dracometeor,hurricane||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon]Glimmora||PowerHerb|ToxicDebris|sludgebomb,earthpower,meteorbeam,spikyshield||85,,85,85,85,85|M|,0,,,,||77|,,,,,Ground]Greninja|GreninjaBond|LifeOrb|BattleBond|gunkshot,protect,darkpulse,hydropump||85,85,85,85,85,85|M|||83|,,,,,Poison]Ariados||RockyHelmet|Insomnia|megahorn,protect,ragepowder,stickyweb||85,85,85,85,85,85|F||||,,,,,Dark",
+  "p2TeamPacked": "Mewtwo||LifeOrb|Unnerve|protect,psystrike,darkpulse,fireblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Dark]Deoxys|DeoxysSpeed|LifeOrb|Pressure|taunt,thunderwave,superpower,psychoboost||85,85,85,85,85,85|N|||85|,,,,,Psychic]Plusle||SitrusBerry|LightningRod|encore,thunderbolt,superfang,nuzzle||85,85,85,85,85,85|F|||92|,,,,,Flying]Hydrapple||AssaultVest|Regenerator|leafstorm,ficklebeam,earthpower,pollenpuff||85,,85,85,85,85|F|,0,,,,||85|,,,,,Steel]Samurott||AssaultVest|Torrent|hydropump,megahorn,knockoff,sacredsword||85,85,85,85,85,85|M|||89|,,,,,Water]Smeargle||FocusSash|Technician|decorate,fakeout,followme,tailwind||85,85,85,85,85,85|F||||,,,,,Ghost",
+  "p1Team": [
+    {
+      "name": "Virizion",
+      "species": "Virizion",
+      "item": "Sitrus Berry",
+      "ability": "Justified",
+      "moves": [
+        "Leaf Storm",
+        "Close Combat",
+        "Coaching",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Groudon",
+      "species": "Groudon",
+      "item": "Sitrus Berry",
+      "ability": "Drought",
+      "moves": [
+        "Swords Dance",
+        "Precipice Blades",
+        "Heat Crash",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 69,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Noivern",
+      "species": "Noivern",
+      "item": "Sitrus Berry",
+      "ability": "Frisk",
+      "moves": [
+        "Tailwind",
+        "Flamethrower",
+        "Draco Meteor",
+        "Hurricane"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Glimmora",
+      "species": "Glimmora",
+      "item": "Power Herb",
+      "ability": "Toxic Debris",
+      "moves": [
+        "Sludge Bomb",
+        "Earth Power",
+        "Meteor Beam",
+        "Spiky Shield"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Greninja",
+      "species": "Greninja-Bond",
+      "item": "Life Orb",
+      "ability": "Battle Bond",
+      "moves": [
+        "Gunk Shot",
+        "Protect",
+        "Dark Pulse",
+        "Hydro Pump"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Ariados",
+      "species": "Ariados",
+      "item": "Rocky Helmet",
+      "ability": "Insomnia",
+      "moves": [
+        "Megahorn",
+        "Protect",
+        "Rage Powder",
+        "Sticky Web"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Mewtwo",
+      "species": "Mewtwo",
+      "item": "Life Orb",
+      "ability": "Unnerve",
+      "moves": [
+        "Protect",
+        "Psystrike",
+        "Dark Pulse",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Deoxys",
+      "species": "Deoxys-Speed",
+      "item": "Life Orb",
+      "ability": "Pressure",
+      "moves": [
+        "Taunt",
+        "Thunder Wave",
+        "Superpower",
+        "Psycho Boost"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Plusle",
+      "species": "Plusle",
+      "item": "Sitrus Berry",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Encore",
+        "Thunderbolt",
+        "Super Fang",
+        "Nuzzle"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Hydrapple",
+      "species": "Hydrapple",
+      "item": "Assault Vest",
+      "ability": "Regenerator",
+      "moves": [
+        "Leaf Storm",
+        "Fickle Beam",
+        "Earth Power",
+        "Pollen Puff"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Samurott",
+      "species": "Samurott",
+      "item": "Assault Vest",
+      "ability": "Torrent",
+      "moves": [
+        "Hydro Pump",
+        "Megahorn",
+        "Knock Off",
+        "Sacred Sword"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Smeargle",
+      "species": "Smeargle",
+      "item": "Focus Sash",
+      "ability": "Technician",
+      "moves": [
+        "Decorate",
+        "Fake Out",
+        "Follow Me",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"449,834,1219,1988\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Virizion||SitrusBerry|Justified|leafstorm,closecombat,coaching,protect||85,85,85,85,85,85|N|||86|,,,,,Steel]Groudon||SitrusBerry|Drought|swordsdance,precipiceblades,heatcrash,stoneedge||85,85,85,85,85,85|N|||69|,,,,,Fire]Noivern||SitrusBerry|Frisk|tailwind,flamethrower,dracometeor,hurricane||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon]Glimmora||PowerHerb|ToxicDebris|sludgebomb,earthpower,meteorbeam,spikyshield||85,,85,85,85,85|M|,0,,,,||77|,,,,,Ground]Greninja|GreninjaBond|LifeOrb|BattleBond|gunkshot,protect,darkpulse,hydropump||85,85,85,85,85,85|M|||83|,,,,,Poison]Ariados||RockyHelmet|Insomnia|megahorn,protect,ragepowder,stickyweb||85,85,85,85,85,85|F||||,,,,,Dark\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Mewtwo||LifeOrb|Unnerve|protect,psystrike,darkpulse,fireblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Dark]Deoxys|DeoxysSpeed|LifeOrb|Pressure|taunt,thunderwave,superpower,psychoboost||85,85,85,85,85,85|N|||85|,,,,,Psychic]Plusle||SitrusBerry|LightningRod|encore,thunderbolt,superfang,nuzzle||85,85,85,85,85,85|F|||92|,,,,,Flying]Hydrapple||AssaultVest|Regenerator|leafstorm,ficklebeam,earthpower,pollenpuff||85,,85,85,85,85|F|,0,,,,||85|,,,,,Steel]Samurott||AssaultVest|Torrent|hydropump,megahorn,knockoff,sacredsword||85,85,85,85,85,85|M|||89|,,,,,Water]Smeargle||FocusSash|Technician|decorate,fakeout,followme,tailwind||85,85,85,85,85,85|F||||,,,,,Ghost\"}",
+    ">p1 move coaching -2, move swordsdance",
+    ">p2 move psystrike +1, move taunt +1",
+    ">p1 switch 4, pass",
+    ">p1 move earthpower +2, move precipiceblades",
+    ">p2 move fireblast +2, move psychoboost +1",
+    ">p1 switch 6, pass",
+    ">p1 move protect, move swordsdance",
+    ">p2 move protect, move psychoboost +1",
+    ">p1 move protect, move heatcrash +1",
+    ">p2 move protect, move thunderwave +1",
+    ">p1 move protect, move swordsdance",
+    ">p2 move protect, move thunderwave +1",
+    ">p1 move megahorn +2, move swordsdance",
+    ">p2 move fireblast +2, move taunt +1",
+    ">p1 pass, switch 5",
+    ">p2 switch 4, switch 6",
+    ">p1 move megahorn +1, move gunkshot +2",
+    ">p2 move ficklebeam +2, move decorate +1",
+    ">p2 switch 5, pass",
+    ">p1 move megahorn +1, move hydropump +2",
+    ">p2 move megahorn +2, move tailwind",
+    ">p1 pass, switch 3",
+    ">p2 pass, switch 3",
+    ">p1 move protect, move tailwind",
+    ">p2 move megahorn +2, move nuzzle +2",
+    ">p1 move protect, move dracometeor +2",
+    ">p2 move megahorn +1, move nuzzle +1",
+    ">p1 move protect, move tailwind",
+    ">p2 pass, move nuzzle +2",
+    ">p1 move stickyweb, move dracometeor +2",
+    ">p2 pass, move nuzzle +1",
+    ">p1 move ragepowder, move dracometeor +1",
+    ">p2 pass, move superfang +2"
+  ]
+}

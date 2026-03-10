@@ -1,0 +1,42 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"491,912,1333,2174"}
+>player p1 {"name":"Player1","team":"Gumshoos||ChoiceBand|Adaptability|knockoff,uturn,stompingtantrum,doubleedge||85,85,85,85,85,85|F|||93|,,,,,Normal]Abomasnow||LightClay|SnowWarning|woodhammer,auroraveil,blizzard,iceshard||85,85,85,85,85,85|M|||81|,,,,,Water]Infernape||FocusSash|Blaze|closecombat,fakeout,overheat,knockoff||85,85,85,85,85,85|M|||82|,,,,,Fighting]Furret||SitrusBerry|Frisk|followme,uturn,bodyslam,helpinghand||85,85,85,85,85,85|F|||98|,,,,,Ghost]Sandy Shocks||SitrusBerry|Protosynthesis|electroweb,stealthrock,earthpower,thunderbolt||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ground]Flutter Mane||BoosterEnergy|Protosynthesis|protect,dazzlinggleam,shadowball,moonblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Salazzle||FocusSash|Corrosion|heatwave,protect,sludgebomb,fakeout||85,85,85,85,85,85|F|||86|,,,,,Water]Tsareena||AssaultVest|QueenlyMajesty|highjumpkick,rapidspin,knockoff,powerwhip||85,85,85,85,85,85|F|||85|,,,,,Fighting]Magmortar||SitrusBerry|FlameBody|protect,willowisp,heatwave,followme||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fire]Zangoose||ToxicOrb|ToxicBoost|facade,protect,closecombat,knockoff||85,85,85,85,85,85|M|||87|,,,,,Normal]Volbeat||SitrusBerry|Prankster|thunderwave,encore,tailwind,lunge||85,85,85,85,85,85|M|||82|,,,,,Steel]Rhydon||Eviolite|LightningRod|stealthrock,highhorsepower,stoneedge,protect||85,85,85,85,85,85|M|||86|,,,,,Water"}
+>p1 move uturn +1, move auroraveil
+>p2 move sludgebomb +2, move highjumpkick +2
+>p1 switch 3, pass
+>p1 pass, switch 6
+>p1 move closecombat +2, move protect
+>p2 move fakeout +1, move highjumpkick +1
+>p1 move closecombat +2, move shadowball +2
+>p2 move sludgebomb +2, move knockoff +2
+>p2 pass, switch 4
+>p1 move overheat +1, move protect
+>p2 move sludgebomb +1, move facade +2
+>p1 switch 3, pass
+>p1 move uturn +1, move protect
+>p2 move protect, move knockoff +1
+>p1 move stompingtantrum +2, move shadowball +2
+>p2 move protect, move protect
+>p1 move stompingtantrum +1, move moonblast +1
+>p2 move fakeout +2, move protect
+>p1 pass, switch 5
+>p2 switch 3, pass
+>p1 move stompingtantrum +1, move thunderbolt +1
+>p2 move followme, move facade +2
+>p2 switch 5, pass
+>p1 move stompingtantrum +2, move thunderbolt +2
+>p2 move encore +2, move facade +2
+>p1 pass, switch 4
+>p2 pass, switch 6
+>p1 move knockoff +1, move bodyslam +2
+>p2 move lunge +1, move protect
+>p1 move stompingtantrum +1, move followme
+>p2 move tailwind, move stealthrock
+>p1 move uturn +2, move bodyslam +2
+>p2 move encore +2, move highhorsepower +2
+>p1 move uturn +1, move followme
+>p2 move encore +2, move stoneedge +2
+>p1 move stompingtantrum +2, move followme
+>p2 move tailwind, move stoneedge +1
+>p1 move stompingtantrum +1, pass
+>p2 move tailwind, move highhorsepower +2

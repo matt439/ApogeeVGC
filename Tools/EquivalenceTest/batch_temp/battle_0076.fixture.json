@@ -1,0 +1,428 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "533,990,1447,2360",
+  "p1Seed": "3126,3288,3602,4068",
+  "p2Seed": "4534,4696,5162,5476",
+  "p1TeamPacked": "Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,heatcrash,dragonclaw,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Volbeat||SitrusBerry|Prankster|encore,thunderwave,lunge,tailwind||85,85,85,85,85,85|M|||82|,,,,,Steel]Ribombee||LifeOrb|ShieldDust|protect,terablast,quiverdance,dazzlinggleam||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ground]Greninja|GreninjaBond|LifeOrb|BattleBond|darkpulse,hydropump,icebeam,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Water]Venusaur||LifeOrb|Overgrow|knockoff,protect,gigadrain,sludgebomb||85,85,85,85,85,85|F|||86|,,,,,Dark]Samurott||LifeOrb|Torrent|knockoff,sacredsword,swordsdance,liquidation||85,85,85,85,85,85|M|||89|,,,,,Dark",
+  "p2TeamPacked": "Tyranitar||ClearAmulet|SandStream|highhorsepower,dragondance,rockslide,knockoff||85,85,85,85,85,85|M|||81|,,,,,Ghost]Indeedee|IndeedeeF|SitrusBerry|PsychicSurge|healpulse,psychic,followme,helpinghand||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Dachsbun||SitrusBerry|WellBakedBody|playrough,bodypress,snarl,yawn||85,85,85,85,85,85|M|||90|,,,,,Steel]Latias||SoulDew|Levitate|mistball,dracometeor,tailwind,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Dragon]Spidops||SitrusBerry|Stakeout|circlethrow,uturn,lunge,stickyweb||85,85,85,85,85,85|F||||,,,,,Water",
+  "p1Team": [
+    {
+      "name": "Gouging Fire",
+      "species": "Gouging Fire",
+      "item": "Clear Amulet",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Burning Bulwark",
+        "Heat Crash",
+        "Dragon Claw",
+        "Dragon Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Volbeat",
+      "species": "Volbeat",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Encore",
+        "Thunder Wave",
+        "Lunge",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Ribombee",
+      "species": "Ribombee",
+      "item": "Life Orb",
+      "ability": "Shield Dust",
+      "moves": [
+        "Protect",
+        "Tera Blast",
+        "Quiver Dance",
+        "Dazzling Gleam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Greninja",
+      "species": "Greninja-Bond",
+      "item": "Life Orb",
+      "ability": "Battle Bond",
+      "moves": [
+        "Dark Pulse",
+        "Hydro Pump",
+        "Ice Beam",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Venusaur",
+      "species": "Venusaur",
+      "item": "Life Orb",
+      "ability": "Overgrow",
+      "moves": [
+        "Knock Off",
+        "Protect",
+        "Giga Drain",
+        "Sludge Bomb"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Samurott",
+      "species": "Samurott",
+      "item": "Life Orb",
+      "ability": "Torrent",
+      "moves": [
+        "Knock Off",
+        "Sacred Sword",
+        "Swords Dance",
+        "Liquidation"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Tyranitar",
+      "species": "Tyranitar",
+      "item": "Clear Amulet",
+      "ability": "Sand Stream",
+      "moves": [
+        "High Horsepower",
+        "Dragon Dance",
+        "Rock Slide",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Indeedee",
+      "species": "Indeedee-F",
+      "item": "Sitrus Berry",
+      "ability": "Psychic Surge",
+      "moves": [
+        "Heal Pulse",
+        "Psychic",
+        "Follow Me",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Dachsbun",
+      "species": "Dachsbun",
+      "item": "Sitrus Berry",
+      "ability": "Well-Baked Body",
+      "moves": [
+        "Play Rough",
+        "Body Press",
+        "Snarl",
+        "Yawn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Latias",
+      "species": "Latias",
+      "item": "Soul Dew",
+      "ability": "Levitate",
+      "moves": [
+        "Mist Ball",
+        "Draco Meteor",
+        "Tailwind",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Ditto",
+      "species": "Ditto",
+      "item": "Sitrus Berry",
+      "ability": "Imposter",
+      "moves": [
+        "Transform"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 97,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Spidops",
+      "species": "Spidops",
+      "item": "Sitrus Berry",
+      "ability": "Stakeout",
+      "moves": [
+        "Circle Throw",
+        "U-turn",
+        "Lunge",
+        "Sticky Web"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"533,990,1447,2360\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,heatcrash,dragonclaw,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Volbeat||SitrusBerry|Prankster|encore,thunderwave,lunge,tailwind||85,85,85,85,85,85|M|||82|,,,,,Steel]Ribombee||LifeOrb|ShieldDust|protect,terablast,quiverdance,dazzlinggleam||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ground]Greninja|GreninjaBond|LifeOrb|BattleBond|darkpulse,hydropump,icebeam,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Water]Venusaur||LifeOrb|Overgrow|knockoff,protect,gigadrain,sludgebomb||85,85,85,85,85,85|F|||86|,,,,,Dark]Samurott||LifeOrb|Torrent|knockoff,sacredsword,swordsdance,liquidation||85,85,85,85,85,85|M|||89|,,,,,Dark\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Tyranitar||ClearAmulet|SandStream|highhorsepower,dragondance,rockslide,knockoff||85,85,85,85,85,85|M|||81|,,,,,Ghost]Indeedee|IndeedeeF|SitrusBerry|PsychicSurge|healpulse,psychic,followme,helpinghand||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Dachsbun||SitrusBerry|WellBakedBody|playrough,bodypress,snarl,yawn||85,85,85,85,85,85|M|||90|,,,,,Steel]Latias||SoulDew|Levitate|mistball,dracometeor,tailwind,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Dragon]Spidops||SitrusBerry|Stakeout|circlethrow,uturn,lunge,stickyweb||85,85,85,85,85,85|F||||,,,,,Water\"}",
+    ">p1 move dragondance, move thunderwave +1",
+    ">p2 move highhorsepower +2, move psychic +1",
+    ">p1 move dragondance, move tailwind",
+    ">p2 move dragondance, move psychic +1",
+    ">p1 switch 4, pass",
+    ">p1 move hydropump +1, move thunderwave +1",
+    ">p2 move knockoff +1, move psychic +2",
+    ">p1 move protect, move tailwind",
+    ">p2 move rockslide, move helpinghand -1",
+    ">p1 pass, switch 6",
+    ">p1 move icebeam +1, move knockoff +1",
+    ">p2 move dragondance, move healpulse +2",
+    ">p1 move hydropump +2, move knockoff +2",
+    ">p2 move highhorsepower +1, move psychic +1",
+    ">p1 move icebeam +1, move sacredsword +1",
+    ">p2 move dragondance, move helpinghand -1",
+    ">p2 switch 5, switch 6",
+    ">p1 move hydropump +2, move swordsdance",
+    ">p2 move knockoff +2, move uturn +1",
+    ">p2 pass, switch 3",
+    ">p1 switch 3, pass",
+    ">p1 move terablast +1, move swordsdance",
+    ">p2 move swordsdance, move bodypress +2",
+    ">p1 move terablast +2, move liquidation +2",
+    ">p2 move knockoff +1, move bodypress +2",
+    ">p2 pass, switch 4",
+    ">p1 move protect, move sacredsword +2",
+    ">p2 move sacredsword +1, move dracometeor +2",
+    ">p1 pass, switch 5",
+    ">p1 move protect, move knockoff +2",
+    ">p2 move liquidation +1, move protect",
+    ">p1 pass, move knockoff +2",
+    ">p2 move sacredsword +1, move dracometeor +2",
+    ">p1 pass, move sludgebomb +2",
+    ">p2 move sacredsword +2, move dracometeor +2"
+  ]
+}

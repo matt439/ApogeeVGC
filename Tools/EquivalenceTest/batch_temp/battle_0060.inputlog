@@ -1,0 +1,36 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"421,782,1143,1864"}
+>player p1 {"name":"Player1","team":"Snorlax||ChoiceBand|ThickFat|crunch,heatcrash,highhorsepower,bodyslam||85,85,85,85,85,85|M|||84|,,,,,Ground]Lapras||SitrusBerry|WaterAbsorb|protect,freezedry,muddywater,icywind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Mesprit||ChoiceSpecs|Levitate|psychic,thunderbolt,uturn,icebeam||85,85,85,85,85,85|N|||86|,,,,,Electric]Lycanroc|LycanrocMidnight|ChoiceScarf|NoGuard|closecombat,stoneedge,knockoff,rockslide||85,85,85,85,85,85|M|||84|,,,,,Fighting]Glimmora||PowerHerb|ToxicDebris|earthpower,spikyshield,sludgebomb,meteorbeam||85,,85,85,85,85|M|,0,,,,||77|,,,,,Ground]Rotom|RotomMow|SitrusBerry|Levitate|electroweb,thunderbolt,leafstorm,protect||85,,85,85,85,85|N|,0,,,,||86|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Inteleon||ChoiceSpecs|Torrent|scald,muddywater,hydropump,icebeam||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Tauros|TaurosPaldeaCombat|SitrusBerry|Intimidate|bulkup,protect,ragingbull,stoneedge||85,85,85,85,85,85|M|||82|,,,,,Steel]Gliscor||ToxicOrb|PoisonHeal|facade,swordsdance,protect,earthquake||85,85,85,85,85,85|M|||81|,,,,,Normal]Lucario||ChoiceBand|InnerFocus|meteormash,closecombat,rockslide,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Entei||ChoiceBand|InnerFocus|extremespeed,stompingtantrum,sacredfire,flareblitz||85,85,85,85,85,85|N|||77|,,,,,Normal]Leavanny||LifeOrb|Swarm|protect,leafblade,stickyweb,lunge||85,85,85,85,85,85|M|||91|,,,,,Rock"}
+>p1 move crunch +2, move muddywater
+>p2 move icebeam +1, move stoneedge +2
+>p1 move crunch +2, move muddywater
+>p2 move icebeam +1, move bulkup
+>p1 move crunch +2, move icywind
+>p2 move icebeam +1, move bulkup
+>p2 pass, switch 3
+>p1 move crunch +1, move icywind
+>p2 move icebeam +2, move protect
+>p2 switch 4, pass
+>p1 move crunch +2, move freezedry +2
+>p2 move closecombat +2, move earthquake
+>p1 pass, switch 3
+>p2 switch 6, pass
+>p1 move crunch +1, move icebeam +1
+>p2 move stickyweb, move protect
+>p1 move crunch +2, move icebeam +2
+>p2 move lunge +2, move facade +1
+>p1 pass, switch 6
+>p2 switch 5, pass
+>p1 move crunch +1, move electroweb
+>p2 move sacredfire +1, move earthquake
+>p1 switch 4, switch 5
+>p1 move knockoff +2, move sludgebomb +1
+>p2 move sacredfire +1, move earthquake
+>p1 move knockoff +1, pass
+>p2 pass, move facade +2
+>p1 move knockoff +2, pass
+>p2 pass, move facade +2
+>p1 move knockoff +1, pass
+>p2 pass, move swordsdance
+>p1 move knockoff +1, pass
+>p2 pass, move facade +2

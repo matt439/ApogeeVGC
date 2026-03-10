@@ -1,0 +1,444 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "687,1276,1865,3042",
+  "p1Seed": "4028,4234,4636,5234",
+  "p2Seed": "5832,6038,6636,7038",
+  "p1TeamPacked": "Golurk||LifeOrb|NoGuard|highhorsepower,poltergeist,dynamicpunch,protect||85,85,85,85,85,85|N|||86|,,,,,Fighting]Excadrill||LifeOrb|MoldBreaker|highhorsepower,protect,ironhead,swordsdance||85,85,85,85,85,85|M|||82|,,,,,Flying]Cinderace||LifeOrb|Blaze|gunkshot,pyroball,protect,highjumpkick||85,85,85,85,85,85|M|||82|,,,,,Fighting]Forretress||ChoiceBand|Sturdy|lunge,ironhead,explosion,bodypress||85,85,85,85,85,85|M|||90|,,,,,Fighting]Raikou||LifeOrb|InnerFocus|voltswitch,thunderbolt,protect,scald||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Glaceon||BlunderPolicy|IceBody|protect,mudshot,blizzard,freezedry||85,,85,85,85,85|F|,0,,,,||86|,,,,,Ground",
+  "p2TeamPacked": "Vikavolt||SitrusBerry|Levitate|thunderbolt,bugbuzz,stickyweb,protect||85,,85,85,85,85|F|,0,,,,||84|,,,,,Electric]Samurott||LifeOrb|Torrent|swordsdance,liquidation,protect,knockoff||85,85,85,85,85,85|F|||89|,,,,,Fire]Tropius||SitrusBerry|Harvest|tailwind,hurricane,protect,energyball||85,,85,85,85,85|F|,0,,,,||94|,,,,,Steel]Sawsbuck|SawsbuckAutumn|LifeOrb|SapSipper|swordsdance,doubleedge,hornleech,protect||85,85,85,85,85,85|F|||91|,,,,,Normal]Kommo-o||Leftovers|Bulletproof|throatchop,irondefense,protect,bodypress||85,85,85,85,85,85|F|||79|,,,,,Steel]Granbull||AssaultVest|Intimidate|playrough,closecombat,stompingtantrum,superfang||85,85,85,85,85,85|M|||88|,,,,,Steel",
+  "p1Team": [
+    {
+      "name": "Golurk",
+      "species": "Golurk",
+      "item": "Life Orb",
+      "ability": "No Guard",
+      "moves": [
+        "High Horsepower",
+        "Poltergeist",
+        "Dynamic Punch",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Excadrill",
+      "species": "Excadrill",
+      "item": "Life Orb",
+      "ability": "Mold Breaker",
+      "moves": [
+        "High Horsepower",
+        "Protect",
+        "Iron Head",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Cinderace",
+      "species": "Cinderace",
+      "item": "Life Orb",
+      "ability": "Blaze",
+      "moves": [
+        "Gunk Shot",
+        "Pyro Ball",
+        "Protect",
+        "High Jump Kick"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Forretress",
+      "species": "Forretress",
+      "item": "Choice Band",
+      "ability": "Sturdy",
+      "moves": [
+        "Lunge",
+        "Iron Head",
+        "Explosion",
+        "Body Press"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Raikou",
+      "species": "Raikou",
+      "item": "Life Orb",
+      "ability": "Inner Focus",
+      "moves": [
+        "Volt Switch",
+        "Thunderbolt",
+        "Protect",
+        "Scald"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Glaceon",
+      "species": "Glaceon",
+      "item": "Blunder Policy",
+      "ability": "Ice Body",
+      "moves": [
+        "Protect",
+        "Mud Shot",
+        "Blizzard",
+        "Freeze-Dry"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Vikavolt",
+      "species": "Vikavolt",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "moves": [
+        "Thunderbolt",
+        "Bug Buzz",
+        "Sticky Web",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Samurott",
+      "species": "Samurott",
+      "item": "Life Orb",
+      "ability": "Torrent",
+      "moves": [
+        "Swords Dance",
+        "Liquidation",
+        "Protect",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Tropius",
+      "species": "Tropius",
+      "item": "Sitrus Berry",
+      "ability": "Harvest",
+      "moves": [
+        "Tailwind",
+        "Hurricane",
+        "Protect",
+        "Energy Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Sawsbuck",
+      "species": "Sawsbuck-Autumn",
+      "item": "Life Orb",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Swords Dance",
+        "Double-Edge",
+        "Horn Leech",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Kommo-o",
+      "species": "Kommo-o",
+      "item": "Leftovers",
+      "ability": "Bulletproof",
+      "moves": [
+        "Throat Chop",
+        "Iron Defense",
+        "Protect",
+        "Body Press"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Granbull",
+      "species": "Granbull",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Play Rough",
+        "Close Combat",
+        "Stomping Tantrum",
+        "Super Fang"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"687,1276,1865,3042\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Golurk||LifeOrb|NoGuard|highhorsepower,poltergeist,dynamicpunch,protect||85,85,85,85,85,85|N|||86|,,,,,Fighting]Excadrill||LifeOrb|MoldBreaker|highhorsepower,protect,ironhead,swordsdance||85,85,85,85,85,85|M|||82|,,,,,Flying]Cinderace||LifeOrb|Blaze|gunkshot,pyroball,protect,highjumpkick||85,85,85,85,85,85|M|||82|,,,,,Fighting]Forretress||ChoiceBand|Sturdy|lunge,ironhead,explosion,bodypress||85,85,85,85,85,85|M|||90|,,,,,Fighting]Raikou||LifeOrb|InnerFocus|voltswitch,thunderbolt,protect,scald||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Glaceon||BlunderPolicy|IceBody|protect,mudshot,blizzard,freezedry||85,,85,85,85,85|F|,0,,,,||86|,,,,,Ground\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Vikavolt||SitrusBerry|Levitate|thunderbolt,bugbuzz,stickyweb,protect||85,,85,85,85,85|F|,0,,,,||84|,,,,,Electric]Samurott||LifeOrb|Torrent|swordsdance,liquidation,protect,knockoff||85,85,85,85,85,85|F|||89|,,,,,Fire]Tropius||SitrusBerry|Harvest|tailwind,hurricane,protect,energyball||85,,85,85,85,85|F|,0,,,,||94|,,,,,Steel]Sawsbuck|SawsbuckAutumn|LifeOrb|SapSipper|swordsdance,doubleedge,hornleech,protect||85,85,85,85,85,85|F|||91|,,,,,Normal]Kommo-o||Leftovers|Bulletproof|throatchop,irondefense,protect,bodypress||85,85,85,85,85,85|F|||79|,,,,,Steel]Granbull||AssaultVest|Intimidate|playrough,closecombat,stompingtantrum,superfang||85,85,85,85,85,85|M|||88|,,,,,Steel\"}",
+    ">p1 move dynamicpunch +1, move protect",
+    ">p2 move stickyweb, move liquidation +1",
+    ">p1 switch 5, pass",
+    ">p1 move protect, move ironhead +2",
+    ">p2 move bugbuzz +2, move knockoff +2",
+    ">p1 move scald +1, move ironhead +2",
+    ">p2 move protect, move protect",
+    ">p1 move voltswitch +2, move highhorsepower +1",
+    ">p2 move bugbuzz +2, move liquidation +2",
+    ">p1 switch 6, pass",
+    ">p1 pass, switch 3",
+    ">p2 pass, switch 4",
+    ">p1 move blizzard, move gunkshot +1",
+    ">p2 move stickyweb, move swordsdance",
+    ">p1 move freezedry +1, move pyroball +2",
+    ">p2 move protect, move doubleedge +2",
+    ">p1 pass, switch 4",
+    ">p2 pass, switch 6",
+    ">p1 move blizzard, move lunge +1",
+    ">p2 move thunderbolt +1, move stompingtantrum +1",
+    ">p2 switch 3, pass",
+    ">p1 move freezedry +1, move lunge +2",
+    ">p2 move protect, move stompingtantrum +2",
+    ">p1 move mudshot +1, move lunge +1",
+    ">p2 move protect, move closecombat +1",
+    ">p1 switch 6, pass",
+    ">p1 move protect, move lunge +1",
+    ">p2 move protect, move playrough +1",
+    ">p1 move voltswitch +2, move lunge +1",
+    ">p2 move tailwind, move stompingtantrum +2",
+    ">p2 pass, switch 5",
+    ">p1 move protect, move lunge +1",
+    ">p2 move energyball +1, move protect",
+    ">p1 move scald +2, move lunge +2",
+    ">p2 move tailwind, move bodypress +1",
+    ">p1 move scald +2, move lunge +2",
+    ">p2 move tailwind, move protect",
+    ">p1 move thunderbolt +1, move lunge +2",
+    ">p2 move energyball +2, move throatchop +1",
+    ">p1 move thunderbolt +2, move lunge +2",
+    ">p2 move protect, move throatchop +2",
+    ">p1 pass, move lunge +2",
+    ">p2 move tailwind, move protect",
+    ">p1 pass, move lunge +1",
+    ">p2 move energyball +2, move protect",
+    ">p1 pass, move lunge +1",
+    ">p2 move hurricane +2, move bodypress +2"
+  ]
+}

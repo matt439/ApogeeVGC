@@ -1,0 +1,427 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "267,496,725,1182",
+  "p1Seed": "1568,1654,1816,2054",
+  "p2Seed": "2292,2378,2616,2778",
+  "p1TeamPacked": "Noctowl||LifeOrb|TintedLens|hurricane,hypervoice,tailwind,protect||85,,85,85,85,85|F|,0,,,,||91|,,,,,Normal]Entei||ChoiceBand|InnerFocus|sacredfire,extremespeed,flareblitz,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal]Glimmora||SitrusBerry|ToxicDebris|spikyshield,powergem,mortalspin,sludgebomb||85,85,85,85,85,85|M|||77|,,,,,Grass]Inteleon||ChoiceSpecs|Torrent|scald,icebeam,hydropump,muddywater||85,,85,85,85,85|M|,0,,,,||78|,,,,,Water]Empoleon||SitrusBerry|Competitive|icywind,yawn,hydropump,flashcannon||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Gallade||ChoiceScarf|Sharpness|sacredsword,nightslash,psychocut,trick||85,85,85,85,85,85|M|||80|,,,,,Dark",
+  "p2TeamPacked": "Murkrow||Eviolite|Prankster|protect,haze,tailwind,bravebird||85,85,85,85,85,85|M|||90|,,,,,Steel]Glalie||SitrusBerry|InnerFocus|helpinghand,freezedry,foulplay,icywind||85,,85,85,85,85|F|,0,,,,||94|,,,,,Poison]Roaring Moon||BoosterEnergy|Protosynthesis|breakingswipe,acrobatics,knockoff,protect||85,85,85,85,85,85|N|||76|,,,,,Flying]Jirachi||SitrusBerry|SereneGrace|ironhead,thunderwave,uturn,lifedew||85,85,85,85,85,85|N|||80|,,,,,Dark]Clodsire||Leftovers|Unaware|recover,highhorsepower,gunkshot,toxicspikes||85,85,85,85,85,85|M|||87|,,,,,Flying]Cetitan||LifeOrb|SheerForce|highhorsepower,iciclecrash,liquidation,iceshard||85,85,85,85,85,85|M|||83|,,,,,Water",
+  "p1Team": [
+    {
+      "name": "Noctowl",
+      "species": "Noctowl",
+      "item": "Life Orb",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Hurricane",
+        "Hyper Voice",
+        "Tailwind",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Entei",
+      "species": "Entei",
+      "item": "Choice Band",
+      "ability": "Inner Focus",
+      "moves": [
+        "Sacred Fire",
+        "Extreme Speed",
+        "Flare Blitz",
+        "Stomping Tantrum"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Glimmora",
+      "species": "Glimmora",
+      "item": "Sitrus Berry",
+      "ability": "Toxic Debris",
+      "moves": [
+        "Spiky Shield",
+        "Power Gem",
+        "Mortal Spin",
+        "Sludge Bomb"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Inteleon",
+      "species": "Inteleon",
+      "item": "Choice Specs",
+      "ability": "Torrent",
+      "moves": [
+        "Scald",
+        "Ice Beam",
+        "Hydro Pump",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Empoleon",
+      "species": "Empoleon",
+      "item": "Sitrus Berry",
+      "ability": "Competitive",
+      "moves": [
+        "Icy Wind",
+        "Yawn",
+        "Hydro Pump",
+        "Flash Cannon"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Gallade",
+      "species": "Gallade",
+      "item": "Choice Scarf",
+      "ability": "Sharpness",
+      "moves": [
+        "Sacred Sword",
+        "Night Slash",
+        "Psycho Cut",
+        "Trick"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Murkrow",
+      "species": "Murkrow",
+      "item": "Eviolite",
+      "ability": "Prankster",
+      "moves": [
+        "Protect",
+        "Haze",
+        "Tailwind",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Glalie",
+      "species": "Glalie",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Helping Hand",
+        "Freeze-Dry",
+        "Foul Play",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Roaring Moon",
+      "species": "Roaring Moon",
+      "item": "Booster Energy",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Breaking Swipe",
+        "Acrobatics",
+        "Knock Off",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 76,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Jirachi",
+      "species": "Jirachi",
+      "item": "Sitrus Berry",
+      "ability": "Serene Grace",
+      "moves": [
+        "Iron Head",
+        "Thunder Wave",
+        "U-turn",
+        "Life Dew"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Clodsire",
+      "species": "Clodsire",
+      "item": "Leftovers",
+      "ability": "Unaware",
+      "moves": [
+        "Recover",
+        "High Horsepower",
+        "Gunk Shot",
+        "Toxic Spikes"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Cetitan",
+      "species": "Cetitan",
+      "item": "Life Orb",
+      "ability": "Sheer Force",
+      "moves": [
+        "High Horsepower",
+        "Icicle Crash",
+        "Liquidation",
+        "Ice Shard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"267,496,725,1182\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Noctowl||LifeOrb|TintedLens|hurricane,hypervoice,tailwind,protect||85,,85,85,85,85|F|,0,,,,||91|,,,,,Normal]Entei||ChoiceBand|InnerFocus|sacredfire,extremespeed,flareblitz,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal]Glimmora||SitrusBerry|ToxicDebris|spikyshield,powergem,mortalspin,sludgebomb||85,85,85,85,85,85|M|||77|,,,,,Grass]Inteleon||ChoiceSpecs|Torrent|scald,icebeam,hydropump,muddywater||85,,85,85,85,85|M|,0,,,,||78|,,,,,Water]Empoleon||SitrusBerry|Competitive|icywind,yawn,hydropump,flashcannon||85,,85,85,85,85|M|,0,,,,||83|,,,,,Flying]Gallade||ChoiceScarf|Sharpness|sacredsword,nightslash,psychocut,trick||85,85,85,85,85,85|M|||80|,,,,,Dark\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Murkrow||Eviolite|Prankster|protect,haze,tailwind,bravebird||85,85,85,85,85,85|M|||90|,,,,,Steel]Glalie||SitrusBerry|InnerFocus|helpinghand,freezedry,foulplay,icywind||85,,85,85,85,85|F|,0,,,,||94|,,,,,Poison]Roaring Moon||BoosterEnergy|Protosynthesis|breakingswipe,acrobatics,knockoff,protect||85,85,85,85,85,85|N|||76|,,,,,Flying]Jirachi||SitrusBerry|SereneGrace|ironhead,thunderwave,uturn,lifedew||85,85,85,85,85,85|N|||80|,,,,,Dark]Clodsire||Leftovers|Unaware|recover,highhorsepower,gunkshot,toxicspikes||85,85,85,85,85,85|M|||87|,,,,,Flying]Cetitan||LifeOrb|SheerForce|highhorsepower,iciclecrash,liquidation,iceshard||85,85,85,85,85,85|M|||83|,,,,,Water\"}",
+    ">p1 move hurricane +1, move flareblitz +1",
+    ">p2 move bravebird +1, move helpinghand -1",
+    ">p2 switch 4, pass",
+    ">p1 move tailwind, move flareblitz +2",
+    ">p2 move uturn +1, move foulplay +1",
+    ">p2 switch 5, pass",
+    ">p1 switch 3, pass",
+    ">p2 pass, switch 6",
+    ">p1 move mortalspin, move flareblitz +2",
+    ">p2 move gunkshot +2, move liquidation +2",
+    ">p1 pass, switch 6",
+    ">p2 pass, switch 3",
+    ">p1 move sludgebomb +2, move psychocut +2",
+    ">p2 move recover, move protect",
+    ">p1 move sludgebomb +2, move psychocut +2",
+    ">p2 move gunkshot +1, move breakingswipe",
+    ">p1 move mortalspin, move psychocut +2",
+    ">p2 move toxicspikes, move breakingswipe",
+    ">p1 move spikyshield, move psychocut +1",
+    ">p2 move gunkshot +2, move knockoff +2",
+    ">p1 pass, switch 4",
+    ">p1 move sludgebomb +1, move scald +1",
+    ">p2 move recover, move breakingswipe",
+    ">p2 switch 5, pass",
+    ">p1 move spikyshield, move scald +1",
+    ">p2 move thunderwave +1, pass",
+    ">p1 move spikyshield, move scald +1",
+    ">p2 move thunderwave +1, pass",
+    ">p1 move mortalspin, move scald +2",
+    ">p2 move ironhead +1, pass"
+  ]
+}

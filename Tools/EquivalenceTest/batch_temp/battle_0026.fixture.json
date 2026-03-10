@@ -1,0 +1,445 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "183,340,497,810",
+  "p1Seed": "1076,1138,1252,1418",
+  "p2Seed": "1584,1646,1812,1926",
+  "p1TeamPacked": "Basculin||ChoiceBand|Adaptability|psychicfangs,wavecrash,flipturn,aquajet||85,85,85,85,85,85|F|||87|,,,,,Water]Leavanny||LifeOrb|Swarm|leafblade,stickyweb,lunge,protect||85,85,85,85,85,85|F|||91|,,,,,Water]Landorus|LandorusTherian|SitrusBerry|Intimidate|stompingtantrum,protect,taunt,stoneedge||85,85,85,85,85,85|M|||77|,,,,,Water]Slowbro||SitrusBerry|Regenerator|trickroom,scald,helpinghand,psychic||85,,85,85,85,|F|,0,,,,0||88|,,,,,Dark]Spectrier||LifeOrb|GrimNeigh|nastyplot,protect,drainingkiss,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Froslass||WideLens|CursedBody|protect,tripleaxel,poltergeist,icywind||85,85,85,85,85,85|F|||88|,,,,,Water",
+  "p2TeamPacked": "Gogoat||AssaultVest|SapSipper|hornleech,doubleedge,leafstorm,highhorsepower||85,85,85,85,85,85|F|||90|,,,,,Normal]Feraligatr||LifeOrb|SheerForce|swordsdance,icepunch,liquidation,aquajet||85,85,85,85,85,85|M|||82|,,,,,Water]Toxapex||Leftovers|Regenerator|banefulbunker,recover,toxic,infestation||85,,85,85,85,85|M|,0,,,,||92|,,,,,Grass]Gliscor||ToxicOrb|PoisonHeal|swordsdance,earthquake,protect,facade||85,85,85,85,85,85|M|||81|,,,,,Normal]Hatterene||LifeOrb|MagicBounce|dazzlinggleam,psychic,protect,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Psychic]Reshiram||LifeOrb|Turboblaze|tailwind,protect,blueflare,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire",
+  "p1Team": [
+    {
+      "name": "Basculin",
+      "species": "Basculin",
+      "item": "Choice Band",
+      "ability": "Adaptability",
+      "moves": [
+        "Psychic Fangs",
+        "Wave Crash",
+        "Flip Turn",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Leavanny",
+      "species": "Leavanny",
+      "item": "Life Orb",
+      "ability": "Swarm",
+      "moves": [
+        "Leaf Blade",
+        "Sticky Web",
+        "Lunge",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Landorus",
+      "species": "Landorus-Therian",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Stomping Tantrum",
+        "Protect",
+        "Taunt",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Slowbro",
+      "species": "Slowbro",
+      "item": "Sitrus Berry",
+      "ability": "Regenerator",
+      "moves": [
+        "Trick Room",
+        "Scald",
+        "Helping Hand",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Spectrier",
+      "species": "Spectrier",
+      "item": "Life Orb",
+      "ability": "Grim Neigh",
+      "moves": [
+        "Nasty Plot",
+        "Protect",
+        "Draining Kiss",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Froslass",
+      "species": "Froslass",
+      "item": "Wide Lens",
+      "ability": "Cursed Body",
+      "moves": [
+        "Protect",
+        "Triple Axel",
+        "Poltergeist",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Gogoat",
+      "species": "Gogoat",
+      "item": "Assault Vest",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Horn Leech",
+        "Double-Edge",
+        "Leaf Storm",
+        "High Horsepower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Feraligatr",
+      "species": "Feraligatr",
+      "item": "Life Orb",
+      "ability": "Sheer Force",
+      "moves": [
+        "Swords Dance",
+        "Ice Punch",
+        "Liquidation",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Toxapex",
+      "species": "Toxapex",
+      "item": "Leftovers",
+      "ability": "Regenerator",
+      "moves": [
+        "Baneful Bunker",
+        "Recover",
+        "Toxic",
+        "Infestation"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Gliscor",
+      "species": "Gliscor",
+      "item": "Toxic Orb",
+      "ability": "Poison Heal",
+      "moves": [
+        "Swords Dance",
+        "Earthquake",
+        "Protect",
+        "Facade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Hatterene",
+      "species": "Hatterene",
+      "item": "Life Orb",
+      "ability": "Magic Bounce",
+      "moves": [
+        "Dazzling Gleam",
+        "Psychic",
+        "Protect",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Reshiram",
+      "species": "Reshiram",
+      "item": "Life Orb",
+      "ability": "Turboblaze",
+      "moves": [
+        "Tailwind",
+        "Protect",
+        "Blue Flare",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 72,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"183,340,497,810\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Basculin||ChoiceBand|Adaptability|psychicfangs,wavecrash,flipturn,aquajet||85,85,85,85,85,85|F|||87|,,,,,Water]Leavanny||LifeOrb|Swarm|leafblade,stickyweb,lunge,protect||85,85,85,85,85,85|F|||91|,,,,,Water]Landorus|LandorusTherian|SitrusBerry|Intimidate|stompingtantrum,protect,taunt,stoneedge||85,85,85,85,85,85|M|||77|,,,,,Water]Slowbro||SitrusBerry|Regenerator|trickroom,scald,helpinghand,psychic||85,,85,85,85,|F|,0,,,,0||88|,,,,,Dark]Spectrier||LifeOrb|GrimNeigh|nastyplot,protect,drainingkiss,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Froslass||WideLens|CursedBody|protect,tripleaxel,poltergeist,icywind||85,85,85,85,85,85|F|||88|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Gogoat||AssaultVest|SapSipper|hornleech,doubleedge,leafstorm,highhorsepower||85,85,85,85,85,85|F|||90|,,,,,Normal]Feraligatr||LifeOrb|SheerForce|swordsdance,icepunch,liquidation,aquajet||85,85,85,85,85,85|M|||82|,,,,,Water]Toxapex||Leftovers|Regenerator|banefulbunker,recover,toxic,infestation||85,,85,85,85,85|M|,0,,,,||92|,,,,,Grass]Gliscor||ToxicOrb|PoisonHeal|swordsdance,earthquake,protect,facade||85,85,85,85,85,85|M|||81|,,,,,Normal]Hatterene||LifeOrb|MagicBounce|dazzlinggleam,psychic,protect,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Psychic]Reshiram||LifeOrb|Turboblaze|tailwind,protect,blueflare,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire\"}",
+    ">p1 move flipturn +1, move protect",
+    ">p2 move leafstorm +2, move aquajet +2",
+    ">p1 switch 6, pass",
+    ">p1 move protect, move stickyweb",
+    ">p2 move doubleedge +1, move swordsdance",
+    ">p1 move protect, move lunge +2",
+    ">p2 move leafstorm +1, move swordsdance",
+    ">p1 move protect, move lunge +2",
+    ">p2 move highhorsepower +2, move icepunch +1",
+    ">p1 move poltergeist +1, move stickyweb",
+    ">p2 move hornleech +2, move aquajet +1",
+    ">p1 move icywind, move lunge +2",
+    ">p2 move hornleech +2, move icepunch +1",
+    ">p2 switch 6, switch 5",
+    ">p1 move poltergeist +1, move lunge +2",
+    ">p2 move blueflare +1, move psychic +2",
+    ">p1 switch 4, switch 3",
+    ">p1 move helpinghand -2, move protect",
+    ">p2 move dracometeor +1, move trickroom",
+    ">p1 move psychic +1, move protect",
+    ">p2 move dracometeor +1, move psychic +1",
+    ">p2 switch 3, pass",
+    ">p1 move helpinghand -2, move stompingtantrum +2",
+    ">p2 move banefulbunker, move protect",
+    ">p1 move helpinghand -2, move protect",
+    ">p2 move banefulbunker, move psychic +1",
+    ">p1 switch 6, pass",
+    ">p1 move flipturn +1, move stoneedge +2",
+    ">p2 move recover, move trickroom",
+    ">p1 switch 5, pass",
+    ">p2 pass, switch 4",
+    ">p1 move shadowball +2, move taunt +1",
+    ">p2 move toxic +1, move earthquake",
+    ">p1 move nastyplot, move stompingtantrum +2",
+    ">p2 move infestation +1, move earthquake",
+    ">p1 move shadowball +1, move stoneedge +2",
+    ">p2 move infestation +1, move earthquake",
+    ">p1 switch 5, pass",
+    ">p1 move wavecrash +2, move stoneedge +1",
+    ">p2 pass, move facade +1"
+  ]
+}

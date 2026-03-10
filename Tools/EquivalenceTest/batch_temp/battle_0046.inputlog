@@ -1,0 +1,54 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"323,600,877,1430"}
+>player p1 {"name":"Player1","team":"Zapdos|ZapdosGalar|ChoiceBand|Defiant|uturn,closecombat,bravebird,thunderouskick||85,85,85,85,85,85|N|||77|,,,,,Fighting]Rillaboom||AssaultVest|GrassySurge|fakeout,woodhammer,grassyglide,uturn||85,85,85,85,85,85|F|||81|,,,,,Steel]Dondozo||AssaultVest|Unaware|bodypress,heavyslam,wavecrash,avalanche||85,85,85,85,85,85|M|||85|,,,,,Dragon]Quaquaval||LifeOrb|Moxie|aquastep,tripleaxel,closecombat,protect||85,85,85,85,85,85|M|||82|,,,,,Water]Iron Crown||BoosterEnergy|QuarkDrive|protect,tachyoncutter,focusblast,psychic||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting]Espathra||LifeOrb|SpeedBoost|protect,dazzlinggleam,luminacrash,batonpass||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Sceptile||WhiteHerb|Unburden|protect,focusblast,breakingswipe,leafstorm||85,85,85,85,85,85|F|||88|,,,,,Water]Deoxys|DeoxysSpeed|SitrusBerry|Pressure|superpower,icywind,psychoboost,taunt||85,85,85,85,85,85|N|||85|,,,,,Fighting]Skeledirge||Leftovers|Unaware|protect,torchsong,shadowball,slackoff||85,,85,85,85,85|M|,0,,,,||80|,,,,,Water]Suicune||Leftovers|InnerFocus|icebeam,protect,scald,calmmind||85,,85,85,85,85|N|,0,,,,||79|,,,,,Grass]Slaking||ChoiceBand|Truant|gigaimpact,knockoff,doubleedge,highhorsepower||85,85,85,85,85,85|F|||89|,,,,,Ghost]Zebstrika||LifeOrb|SapSipper|wildcharge,highhorsepower,protect,overheat||85,85,85,85,85,85|F|||87|,,,,,Ground"}
+>p1 move thunderouskick +2, move woodhammer +1
+>p2 move breakingswipe, move superpower +2
+>p1 move thunderouskick +1, move fakeout +1
+>p2 move protect, move taunt +1
+>p1 move thunderouskick +2, move grassyglide +2
+>p2 move protect, move superpower +2
+>p2 pass, switch 6
+>p1 move thunderouskick +2, move grassyglide +1
+>p2 move leafstorm +1, move wildcharge +2
+>p2 pass, switch 4
+>p1 move thunderouskick +1, move woodhammer +2
+>p2 move breakingswipe, move protect
+>p2 switch 3, pass
+>p1 move thunderouskick +1, move grassyglide +2
+>p2 move slackoff, move calmmind
+>p1 move thunderouskick +1, move grassyglide +1
+>p2 move shadowball +2, move calmmind
+>p1 move thunderouskick +2, move fakeout +1
+>p2 move slackoff, move calmmind
+>p1 move thunderouskick +1, move woodhammer +1
+>p2 move shadowball +1, move scald +2
+>p1 switch 3, switch 4
+>p1 move heavyslam +1, move closecombat +1
+>p2 move protect, move calmmind
+>p1 move bodypress +1, move tripleaxel +2
+>p2 move torchsong +1, move protect
+>p1 move avalanche +2, move aquastep +1
+>p2 move protect, move scald +2
+>p1 move wavecrash +2, move tripleaxel +1
+>p2 move slackoff, move scald +2
+>p1 pass, switch 6
+>p1 move bodypress +1, move batonpass
+>p2 move slackoff, move scald +2
+>p1 pass, switch 5
+>p1 pass, switch 5
+>p1 move heavyslam +1, move luminacrash +1
+>p2 move shadowball +2, move icebeam +2
+>p1 move bodypress +2, pass
+>p2 move slackoff, move calmmind
+>p1 move bodypress +1, pass
+>p2 move shadowball +2, move scald +2
+>p1 move heavyslam +2, pass
+>p2 move protect, move protect
+>p1 move avalanche +1, pass
+>p2 move shadowball +2, move calmmind
+>p1 move heavyslam +1, pass
+>p2 move shadowball +1, move protect
+>p1 move heavyslam +2, pass
+>p2 move shadowball +1, move protect
+>p1 move bodypress +1, pass
+>p2 move shadowball +2, move scald +1

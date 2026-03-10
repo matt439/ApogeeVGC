@@ -1,0 +1,413 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "358,665,972,1585",
+  "p1Seed": "2101,2213,2427,2743",
+  "p2Seed": "3059,3171,3487,3701",
+  "p1TeamPacked": "Amoonguss||RockyHelmet|Regenerator|protect,pollenpuff,ragepowder,spore||85,,85,85,85,85|F|,0,,,,||86|,,,,,Water]Ceruledge||LifeOrb|WeakArmor|poltergeist,bitterblade,swordsdance,protect||85,85,85,85,85,85|F|||80|,,,,,Grass]Crabominable||LifeOrb|IronFist|icehammer,protect,drainpunch,gunkshot||85,85,85,85,85,85|F|||89|,,,,,Fire]Scrafty||AssaultVest|Intimidate|fakeout,closecombat,snarl,knockoff||85,85,85,85,85,85|F|||83|,,,,,Poison]Snorlax||ChoiceBand|ThickFat|doubleedge,crunch,hammerarm,highhorsepower||85,85,85,85,85,85|M|||84|,,,,,Ghost]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,protect,flipturn||85,85,85,85,85,85|M|||79|,,,,,Water",
+  "p2TeamPacked": "Groudon||SitrusBerry|Drought|precipiceblades,protect,heatcrash,swordsdance||85,85,85,85,85,85|N|||69|,,,,,Fire]Reshiram||LifeOrb|Turboblaze|tailwind,dracometeor,heatwave,protect||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Pawmot||LifeOrb|VoltAbsorb|closecombat,protect,revivalblessing,doubleshock||85,85,85,85,85,85|M|||80|,,,,,Electric]Noctowl||LifeOrb|TintedLens|tailwind,hurricane,hypervoice,protect||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Bombirdier||LifeOrb|RockyPayload|knockoff,rockslide,protect,bravebird||85,85,85,85,85,85|M|||84|,,,,,Rock]Qwilfish|QwilfishHisui|Eviolite|Intimidate|crunch,toxicspikes,gunkshot,icywind||85,85,85,85,85,85|F|||82|,,,,,Flying",
+  "p1Team": [
+    {
+      "name": "Amoonguss",
+      "species": "Amoonguss",
+      "item": "Rocky Helmet",
+      "ability": "Regenerator",
+      "moves": [
+        "Protect",
+        "Pollen Puff",
+        "Rage Powder",
+        "Spore"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Ceruledge",
+      "species": "Ceruledge",
+      "item": "Life Orb",
+      "ability": "Weak Armor",
+      "moves": [
+        "Poltergeist",
+        "Bitter Blade",
+        "Swords Dance",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Crabominable",
+      "species": "Crabominable",
+      "item": "Life Orb",
+      "ability": "Iron Fist",
+      "moves": [
+        "Ice Hammer",
+        "Protect",
+        "Drain Punch",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Scrafty",
+      "species": "Scrafty",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Fake Out",
+        "Close Combat",
+        "Snarl",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Snorlax",
+      "species": "Snorlax",
+      "item": "Choice Band",
+      "ability": "Thick Fat",
+      "moves": [
+        "Double-Edge",
+        "Crunch",
+        "Hammer Arm",
+        "High Horsepower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Palafin",
+      "species": "Palafin",
+      "item": "Mystic Water",
+      "ability": "Zero to Hero",
+      "moves": [
+        "Jet Punch",
+        "Wave Crash",
+        "Protect",
+        "Flip Turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Groudon",
+      "species": "Groudon",
+      "item": "Sitrus Berry",
+      "ability": "Drought",
+      "moves": [
+        "Precipice Blades",
+        "Protect",
+        "Heat Crash",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 69,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Reshiram",
+      "species": "Reshiram",
+      "item": "Life Orb",
+      "ability": "Turboblaze",
+      "moves": [
+        "Tailwind",
+        "Draco Meteor",
+        "Heat Wave",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 72,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Pawmot",
+      "species": "Pawmot",
+      "item": "Life Orb",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Close Combat",
+        "Protect",
+        "Revival Blessing",
+        "Double Shock"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Noctowl",
+      "species": "Noctowl",
+      "item": "Life Orb",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Tailwind",
+        "Hurricane",
+        "Hyper Voice",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Bombirdier",
+      "species": "Bombirdier",
+      "item": "Life Orb",
+      "ability": "Rocky Payload",
+      "moves": [
+        "Knock Off",
+        "Rock Slide",
+        "Protect",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Qwilfish",
+      "species": "Qwilfish-Hisui",
+      "item": "Eviolite",
+      "ability": "Intimidate",
+      "moves": [
+        "Crunch",
+        "Toxic Spikes",
+        "Gunk Shot",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"358,665,972,1585\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Amoonguss||RockyHelmet|Regenerator|protect,pollenpuff,ragepowder,spore||85,,85,85,85,85|F|,0,,,,||86|,,,,,Water]Ceruledge||LifeOrb|WeakArmor|poltergeist,bitterblade,swordsdance,protect||85,85,85,85,85,85|F|||80|,,,,,Grass]Crabominable||LifeOrb|IronFist|icehammer,protect,drainpunch,gunkshot||85,85,85,85,85,85|F|||89|,,,,,Fire]Scrafty||AssaultVest|Intimidate|fakeout,closecombat,snarl,knockoff||85,85,85,85,85,85|F|||83|,,,,,Poison]Snorlax||ChoiceBand|ThickFat|doubleedge,crunch,hammerarm,highhorsepower||85,85,85,85,85,85|M|||84|,,,,,Ghost]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,protect,flipturn||85,85,85,85,85,85|M|||79|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Groudon||SitrusBerry|Drought|precipiceblades,protect,heatcrash,swordsdance||85,85,85,85,85,85|N|||69|,,,,,Fire]Reshiram||LifeOrb|Turboblaze|tailwind,dracometeor,heatwave,protect||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Pawmot||LifeOrb|VoltAbsorb|closecombat,protect,revivalblessing,doubleshock||85,85,85,85,85,85|M|||80|,,,,,Electric]Noctowl||LifeOrb|TintedLens|tailwind,hurricane,hypervoice,protect||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Bombirdier||LifeOrb|RockyPayload|knockoff,rockslide,protect,bravebird||85,85,85,85,85,85|M|||84|,,,,,Rock]Qwilfish|QwilfishHisui|Eviolite|Intimidate|crunch,toxicspikes,gunkshot,icywind||85,85,85,85,85,85|F|||82|,,,,,Flying\"}",
+    ">p1 move spore +2, move poltergeist +2",
+    ">p2 move precipiceblades, move protect",
+    ">p1 move ragepowder, move poltergeist +1",
+    ">p2 move precipiceblades, move tailwind",
+    ">p1 pass, switch 3",
+    ">p1 move pollenpuff +2, move gunkshot +2",
+    ">p2 move swordsdance, move tailwind",
+    ">p1 move ragepowder, move drainpunch +1",
+    ">p2 move heatcrash +1, move heatwave",
+    ">p1 switch 5, switch 4",
+    ">p1 move crunch +2, move closecombat +1",
+    ">p2 move precipiceblades, move protect",
+    ">p1 move crunch +2, move fakeout +1",
+    ">p2 move precipiceblades, move protect",
+    ">p1 pass, switch 6",
+    ">p1 move crunch +2, move jetpunch +2",
+    ">p2 move precipiceblades, move dracometeor +2",
+    ">p2 pass, switch 6",
+    ">p1 move crunch +2, pass",
+    ">p2 move precipiceblades, move icywind",
+    ">p1 move crunch +2, pass",
+    ">p2 move heatcrash +2, move icywind",
+    ">p1 move crunch +2, pass",
+    ">p2 move protect, move icywind"
+  ]
+}

@@ -1,0 +1,465 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "442,821,1200,1957",
+  "p1Seed": "2593,2729,2991,3379",
+  "p2Seed": "3767,3903,4291,4553",
+  "p1TeamPacked": "Magcargo||LifeOrb|WeakArmor|protect,shellsmash,powergem,heatwave||85,,85,85,85,85|F|,0,,,,||93|,,,,,Fire]Tinkaton||AssaultVest|MoldBreaker|playrough,gigatonhammer,knockoff,fakeout||85,85,85,85,85,85|F|||82|,,,,,Water]Dedenne||SitrusBerry|CheekPouch|dazzlinggleam,thunderbolt,superfang,nuzzle||85,85,85,85,85,85|F|||85|,,,,,Flying]Glaceon||BlunderPolicy|IceBody|blizzard,mudshot,protect,freezedry||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ground]Bellossom||SitrusBerry|Healer|quiverdance,batonpass,protect,gigadrain||85,,85,85,85,85|M|,0,,,,||87|,,,,,Poison]Bruxish||ChoiceScarf|StrongJaw|flipturn,psychicfangs,crunch,wavecrash||85,85,85,85,85,85|M|||86|,,,,,Dark",
+  "p2TeamPacked": "Milotic||SitrusBerry|Competitive|recover,protect,scald,icywind||85,,85,85,85,85|M|,0,,,,||81|,,,,,Dragon]Delphox||LifeOrb|Blaze|protect,psychic,nastyplot,fireblast||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fire]Lapras||SitrusBerry|WaterAbsorb|muddywater,freezedry,icywind,protect||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Muk||SitrusBerry|PoisonTouch|helpinghand,poisonjab,icepunch,knockoff||85,85,85,85,85,85|F|||86|,,,,,Dark]Shiftry||ClearAmulet|WindRider|tailwind,fakeout,knockoff,leafblade||85,85,85,85,85,85|F|||84|,,,,,Ghost]Hypno||SitrusBerry|InnerFocus|encore,helpinghand,lowsweep,psychic||85,85,85,85,85,85|F|||95|,,,,,Dark",
+  "p1Team": [
+    {
+      "name": "Magcargo",
+      "species": "Magcargo",
+      "item": "Life Orb",
+      "ability": "Weak Armor",
+      "moves": [
+        "Protect",
+        "Shell Smash",
+        "Power Gem",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 93,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Tinkaton",
+      "species": "Tinkaton",
+      "item": "Assault Vest",
+      "ability": "Mold Breaker",
+      "moves": [
+        "Play Rough",
+        "Gigaton Hammer",
+        "Knock Off",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Dedenne",
+      "species": "Dedenne",
+      "item": "Sitrus Berry",
+      "ability": "Cheek Pouch",
+      "moves": [
+        "Dazzling Gleam",
+        "Thunderbolt",
+        "Super Fang",
+        "Nuzzle"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Glaceon",
+      "species": "Glaceon",
+      "item": "Blunder Policy",
+      "ability": "Ice Body",
+      "moves": [
+        "Blizzard",
+        "Mud Shot",
+        "Protect",
+        "Freeze-Dry"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Bellossom",
+      "species": "Bellossom",
+      "item": "Sitrus Berry",
+      "ability": "Healer",
+      "moves": [
+        "Quiver Dance",
+        "Baton Pass",
+        "Protect",
+        "Giga Drain"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Bruxish",
+      "species": "Bruxish",
+      "item": "Choice Scarf",
+      "ability": "Strong Jaw",
+      "moves": [
+        "Flip Turn",
+        "Psychic Fangs",
+        "Crunch",
+        "Wave Crash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Milotic",
+      "species": "Milotic",
+      "item": "Sitrus Berry",
+      "ability": "Competitive",
+      "moves": [
+        "Recover",
+        "Protect",
+        "Scald",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Delphox",
+      "species": "Delphox",
+      "item": "Life Orb",
+      "ability": "Blaze",
+      "moves": [
+        "Protect",
+        "Psychic",
+        "Nasty Plot",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Lapras",
+      "species": "Lapras",
+      "item": "Sitrus Berry",
+      "ability": "Water Absorb",
+      "moves": [
+        "Muddy Water",
+        "Freeze-Dry",
+        "Icy Wind",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Muk",
+      "species": "Muk",
+      "item": "Sitrus Berry",
+      "ability": "Poison Touch",
+      "moves": [
+        "Helping Hand",
+        "Poison Jab",
+        "Ice Punch",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Shiftry",
+      "species": "Shiftry",
+      "item": "Clear Amulet",
+      "ability": "Wind Rider",
+      "moves": [
+        "Tailwind",
+        "Fake Out",
+        "Knock Off",
+        "Leaf Blade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Hypno",
+      "species": "Hypno",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Encore",
+        "Helping Hand",
+        "Low Sweep",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 95,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"442,821,1200,1957\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Magcargo||LifeOrb|WeakArmor|protect,shellsmash,powergem,heatwave||85,,85,85,85,85|F|,0,,,,||93|,,,,,Fire]Tinkaton||AssaultVest|MoldBreaker|playrough,gigatonhammer,knockoff,fakeout||85,85,85,85,85,85|F|||82|,,,,,Water]Dedenne||SitrusBerry|CheekPouch|dazzlinggleam,thunderbolt,superfang,nuzzle||85,85,85,85,85,85|F|||85|,,,,,Flying]Glaceon||BlunderPolicy|IceBody|blizzard,mudshot,protect,freezedry||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ground]Bellossom||SitrusBerry|Healer|quiverdance,batonpass,protect,gigadrain||85,,85,85,85,85|M|,0,,,,||87|,,,,,Poison]Bruxish||ChoiceScarf|StrongJaw|flipturn,psychicfangs,crunch,wavecrash||85,85,85,85,85,85|M|||86|,,,,,Dark\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Milotic||SitrusBerry|Competitive|recover,protect,scald,icywind||85,,85,85,85,85|M|,0,,,,||81|,,,,,Dragon]Delphox||LifeOrb|Blaze|protect,psychic,nastyplot,fireblast||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fire]Lapras||SitrusBerry|WaterAbsorb|muddywater,freezedry,icywind,protect||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Muk||SitrusBerry|PoisonTouch|helpinghand,poisonjab,icepunch,knockoff||85,85,85,85,85,85|F|||86|,,,,,Dark]Shiftry||ClearAmulet|WindRider|tailwind,fakeout,knockoff,leafblade||85,85,85,85,85,85|F|||84|,,,,,Ghost]Hypno||SitrusBerry|InnerFocus|encore,helpinghand,lowsweep,psychic||85,85,85,85,85,85|F|||95|,,,,,Dark\"}",
+    ">p1 move powergem +1, move gigatonhammer +2",
+    ">p2 move protect, move psychic +2",
+    ">p1 move heatwave, move knockoff +2",
+    ">p2 move protect, move protect",
+    ">p1 move heatwave, move fakeout +2",
+    ">p2 move scald +2, move psychic +2",
+    ">p1 move heatwave, move knockoff +2",
+    ">p2 move scald +2, move fireblast +2",
+    ">p2 pass, switch 6",
+    ">p1 move shellsmash, move gigatonhammer +2",
+    ">p2 move scald +1, move helpinghand -1",
+    ">p1 switch 4, pass",
+    ">p1 move blizzard, move knockoff +1",
+    ">p2 move scald +1, move lowsweep +1",
+    ">p1 move protect, move gigatonhammer +1",
+    ">p2 move scald +1, move psychic +1",
+    ">p2 switch 5, pass",
+    ">p1 move freezedry +1, move knockoff +1",
+    ">p2 move fakeout +1, move encore +1",
+    ">p1 move protect, move fakeout +1",
+    ">p2 move fakeout +2, move encore +2",
+    ">p1 move protect, move fakeout +2",
+    ">p2 move tailwind, move encore +2",
+    ">p1 move protect, move fakeout +2",
+    ">p2 move knockoff +2, move psychic +2",
+    ">p1 pass, switch 6",
+    ">p1 move freezedry +2, move crunch +2",
+    ">p2 move tailwind, move psychic +1",
+    ">p1 switch 3, pass",
+    ">p2 pass, switch 3",
+    ">p1 move nuzzle +2, move crunch +1",
+    ">p2 move tailwind, move protect",
+    ">p1 move nuzzle +1, move crunch +2",
+    ">p2 move fakeout +1, move muddywater",
+    ">p1 move nuzzle +2, move crunch +1",
+    ">p2 move leafblade +2, move freezedry +2",
+    ">p1 pass, switch 5",
+    ">p1 move thunderbolt +1, move gigadrain +2",
+    ">p2 move knockoff +2, move protect",
+    ">p1 move dazzlinggleam, move protect",
+    ">p2 move knockoff +1, move freezedry +2",
+    ">p2 switch 4, pass",
+    ">p1 move nuzzle +1, move gigadrain +2",
+    ">p2 move knockoff +2, move freezedry +1",
+    ">p1 move superfang +1, move batonpass",
+    ">p2 move poisonjab +2, move freezedry +2",
+    ">p1 move superfang +2, pass",
+    ">p2 move helpinghand -2, move freezedry +1",
+    ">p1 move dazzlinggleam, pass",
+    ">p2 move helpinghand -2, move protect",
+    ">p1 move thunderbolt +2, pass",
+    ">p2 move icepunch +1, move icywind"
+  ]
+}

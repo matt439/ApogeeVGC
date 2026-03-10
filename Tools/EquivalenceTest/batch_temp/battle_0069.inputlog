@@ -1,0 +1,44 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"484,899,1314,2143"}
+>player p1 {"name":"Player1","team":"Bruxish||LifeOrb|StrongJaw|crunch,psychicfangs,protect,wavecrash||85,85,85,85,85,85|M|||86|,,,,,Psychic]Virizion||SitrusBerry|Justified|leafstorm,coaching,closecombat,stoneedge||85,85,85,85,85,85|N|||86|,,,,,Steel]Vigoroth||Eviolite|VitalSpirit|knockoff,icywind,doubleedge,slackoff||85,85,85,85,85,85|F|||91|,,,,,Ghost]Emboar||ChoiceScarf|Reckless|knockoff,headsmash,closecombat,flareblitz||85,85,85,85,85,85|F|||85|,,,,,Rock]Rhyperior||ChoiceBand|SolidRock|megahorn,icepunch,highhorsepower,rockslide||85,85,85,85,85,85|M|||82|,,,,,Water]Gouging Fire||ClearAmulet|Protosynthesis|dragondance,dragonclaw,burningbulwark,heatcrash||85,85,85,85,85,85|N|||75|,,,,,Fire"}
+>player p2 {"name":"Player2","team":"Heatran||SitrusBerry|FlashFire|protect,terablast,heatwave,flashcannon||85,,85,85,85,85|F|,0,,,,||78|,,,,,Grass]Dedenne||SitrusBerry|CheekPouch|thunderbolt,helpinghand,nuzzle,dazzlinggleam||85,85,85,85,85,85|F|||85|,,,,,Electric]Diancie||SitrusBerry|ClearBody|diamondstorm,bodypress,trickroom,moonblast||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Yanmega||ChoiceSpecs|TintedLens|uturn,bugbuzz,gigadrain,airslash||85,85,85,85,85,85|F|||84|,,,,,Bug]Lokix||LifeOrb|TintedLens|suckerpunch,protect,knockoff,firstimpression||85,85,85,85,85,85|M|||88|,,,,,Dark]Pelipper||SitrusBerry|Drizzle|protect,tailwind,hurricane,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground"}
+>p1 move psychicfangs +2, move stoneedge +1
+>p2 move terablast +1, move nuzzle +2
+>p2 pass, switch 5
+>p1 move crunch +1, move coaching -1
+>p2 move heatwave, move protect
+>p1 move crunch +2, move closecombat +2
+>p2 move heatwave, move suckerpunch +2
+>p2 pass, switch 3
+>p1 move crunch +1, move closecombat +1
+>p2 move terablast +1, move trickroom
+>p1 switch 6, pass
+>p1 move heatcrash +1, move closecombat +1
+>p2 move heatwave, move moonblast +2
+>p1 pass, switch 3
+>p1 move dragondance, move slackoff
+>p2 move flashcannon +2, move diamondstorm
+>p1 move heatcrash +2, move slackoff
+>p2 move heatwave, move moonblast +1
+>p1 move burningbulwark, move knockoff +1
+>p2 move heatwave, move diamondstorm
+>p1 move burningbulwark, move knockoff +1
+>p2 move protect, move trickroom
+>p1 move dragonclaw +1, move knockoff +1
+>p2 move heatwave, move diamondstorm
+>p1 switch 4, switch 5
+>p1 move headsmash +2, move highhorsepower +1
+>p2 move protect, move diamondstorm
+>p1 move headsmash +2, move highhorsepower +2
+>p2 move protect, move trickroom
+>p1 move headsmash +1, move highhorsepower +1
+>p2 move protect, move moonblast +1
+>p1 move headsmash +2, move highhorsepower +1
+>p2 move terablast +2, move trickroom
+>p2 switch 6, pass
+>p1 move headsmash +2, move highhorsepower +1
+>p2 move protect, move moonblast +2
+>p1 move headsmash +2, move highhorsepower +2
+>p2 move protect, move bodypress +2
+>p2 pass, switch 4
+>p1 move headsmash +1, pass
+>p2 move muddywater, move uturn +1

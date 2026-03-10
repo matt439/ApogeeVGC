@@ -1,0 +1,451 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "78,145,212,345",
+  "p1Seed": "461,493,547,623",
+  "p2Seed": "699,731,807,861",
+  "p1TeamPacked": "Gallade||LifeOrb|Sharpness|psychocut,protect,sacredsword,swordsdance||85,85,85,85,85,85|M|||80|,,,,,Fighting]Dragonite||LifeOrb|InnerFocus|terablast,tailwind,dracometeor,firepunch||85,85,85,85,85,85|F|||82|,,,,,Flying]Granbull||AssaultVest|Intimidate|superfang,closecombat,stompingtantrum,playrough||85,85,85,85,85,85|M|||88|,,,,,Steel]Persian||SilkScarf|Technician|fakeout,helpinghand,doubleedge,icywind||85,85,85,85,85,85|M|||92|,,,,,Normal]Diancie||SitrusBerry|ClearBody|bodypress,trickroom,diamondstorm,moonblast||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Blissey||SitrusBerry|Healer|hypervoice,thunderwave,helpinghand,softboiled||85,,85,85,85,85|F|,0,,,,||96|,,,,,Ghost",
+  "p2TeamPacked": "Cramorant||SitrusBerry|GulpMissile|bravebird,protect,surf,tailwind||85,85,85,85,85,85|M|||86|,,,,,Ground]Baxcalibur||ChoiceBand|ThermalExchange|glaiverush,highhorsepower,iciclecrash,iceshard||85,85,85,85,85,85|M|||78|,,,,,Ground]Sceptile||SitrusBerry|Overgrow|shedtail,protect,focusblast,leafstorm||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel]Reshiram||LifeOrb|Turboblaze|tailwind,blueflare,heatwave,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Arboliva||LifeOrb|SeedSower|energyball,earthpower,strengthsap,hypervoice||85,,85,85,85,85|F|,0,,,,||88|,,,,,Normal]Flutter Mane||ChoiceSpecs|Protosynthesis|moonblast,shadowball,dazzlinggleam,icywind||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy",
+  "p1Team": [
+    {
+      "name": "Gallade",
+      "species": "Gallade",
+      "item": "Life Orb",
+      "ability": "Sharpness",
+      "moves": [
+        "Psycho Cut",
+        "Protect",
+        "Sacred Sword",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Dragonite",
+      "species": "Dragonite",
+      "item": "Life Orb",
+      "ability": "Inner Focus",
+      "moves": [
+        "Tera Blast",
+        "Tailwind",
+        "Draco Meteor",
+        "Fire Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Granbull",
+      "species": "Granbull",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Super Fang",
+        "Close Combat",
+        "Stomping Tantrum",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Persian",
+      "species": "Persian",
+      "item": "Silk Scarf",
+      "ability": "Technician",
+      "moves": [
+        "Fake Out",
+        "Helping Hand",
+        "Double-Edge",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Diancie",
+      "species": "Diancie",
+      "item": "Sitrus Berry",
+      "ability": "Clear Body",
+      "moves": [
+        "Body Press",
+        "Trick Room",
+        "Diamond Storm",
+        "Moonblast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Blissey",
+      "species": "Blissey",
+      "item": "Sitrus Berry",
+      "ability": "Healer",
+      "moves": [
+        "Hyper Voice",
+        "Thunder Wave",
+        "Helping Hand",
+        "Soft-Boiled"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 96,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Cramorant",
+      "species": "Cramorant",
+      "item": "Sitrus Berry",
+      "ability": "Gulp Missile",
+      "moves": [
+        "Brave Bird",
+        "Protect",
+        "Surf",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Baxcalibur",
+      "species": "Baxcalibur",
+      "item": "Choice Band",
+      "ability": "Thermal Exchange",
+      "moves": [
+        "Glaive Rush",
+        "High Horsepower",
+        "Icicle Crash",
+        "Ice Shard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Sceptile",
+      "species": "Sceptile",
+      "item": "Sitrus Berry",
+      "ability": "Overgrow",
+      "moves": [
+        "Shed Tail",
+        "Protect",
+        "Focus Blast",
+        "Leaf Storm"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Reshiram",
+      "species": "Reshiram",
+      "item": "Life Orb",
+      "ability": "Turboblaze",
+      "moves": [
+        "Tailwind",
+        "Blue Flare",
+        "Heat Wave",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 72,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Arboliva",
+      "species": "Arboliva",
+      "item": "Life Orb",
+      "ability": "Seed Sower",
+      "moves": [
+        "Energy Ball",
+        "Earth Power",
+        "Strength Sap",
+        "Hyper Voice"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Flutter Mane",
+      "species": "Flutter Mane",
+      "item": "Choice Specs",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Moonblast",
+        "Shadow Ball",
+        "Dazzling Gleam",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"78,145,212,345\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Gallade||LifeOrb|Sharpness|psychocut,protect,sacredsword,swordsdance||85,85,85,85,85,85|M|||80|,,,,,Fighting]Dragonite||LifeOrb|InnerFocus|terablast,tailwind,dracometeor,firepunch||85,85,85,85,85,85|F|||82|,,,,,Flying]Granbull||AssaultVest|Intimidate|superfang,closecombat,stompingtantrum,playrough||85,85,85,85,85,85|M|||88|,,,,,Steel]Persian||SilkScarf|Technician|fakeout,helpinghand,doubleedge,icywind||85,85,85,85,85,85|M|||92|,,,,,Normal]Diancie||SitrusBerry|ClearBody|bodypress,trickroom,diamondstorm,moonblast||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Blissey||SitrusBerry|Healer|hypervoice,thunderwave,helpinghand,softboiled||85,,85,85,85,85|F|,0,,,,||96|,,,,,Ghost\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Cramorant||SitrusBerry|GulpMissile|bravebird,protect,surf,tailwind||85,85,85,85,85,85|M|||86|,,,,,Ground]Baxcalibur||ChoiceBand|ThermalExchange|glaiverush,highhorsepower,iciclecrash,iceshard||85,85,85,85,85,85|M|||78|,,,,,Ground]Sceptile||SitrusBerry|Overgrow|shedtail,protect,focusblast,leafstorm||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel]Reshiram||LifeOrb|Turboblaze|tailwind,blueflare,heatwave,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Arboliva||LifeOrb|SeedSower|energyball,earthpower,strengthsap,hypervoice||85,,85,85,85,85|F|,0,,,,||88|,,,,,Normal]Flutter Mane||ChoiceSpecs|Protosynthesis|moonblast,shadowball,dazzlinggleam,icywind||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy\"}",
+    ">p1 move psychocut +1, move tailwind",
+    ">p2 move surf, move iceshard +2",
+    ">p1 pass, switch 3",
+    ">p1 move psychocut +2, move superfang +2",
+    ">p2 move bravebird +1, move iceshard +1",
+    ">p1 switch 4, pass",
+    ">p1 move fakeout +1, move playrough +2",
+    ">p2 move tailwind, move iceshard +2",
+    ">p2 pass, switch 6",
+    ">p1 move helpinghand -2, move superfang +2",
+    ">p2 move tailwind, move dazzlinggleam",
+    ">p1 move doubleedge +2, move closecombat +1",
+    ">p2 move bravebird +1, move dazzlinggleam",
+    ">p1 switch 6, pass",
+    ">p2 switch 3, pass",
+    ">p1 move softboiled, move superfang +1",
+    ">p2 move shedtail, move dazzlinggleam",
+    ">p2 switch 5, pass",
+    ">p1 pass, switch 5",
+    ">p1 move hypervoice, move bodypress +2",
+    ">p2 move strengthsap +1, move dazzlinggleam",
+    ">p1 move helpinghand -2, move bodypress +1",
+    ">p2 move hypervoice, move dazzlinggleam",
+    ">p1 move thunderwave +1, move bodypress +2",
+    ">p2 move hypervoice, move dazzlinggleam",
+    ">p1 move hypervoice, pass",
+    ">p2 move strengthsap +2, move dazzlinggleam",
+    ">p1 move hypervoice, pass",
+    ">p2 move earthpower +2, move dazzlinggleam",
+    ">p1 move thunderwave +1, pass",
+    ">p2 move hypervoice, move dazzlinggleam",
+    ">p1 move hypervoice, pass",
+    ">p2 move earthpower +2, move dazzlinggleam",
+    ">p1 move hypervoice, pass",
+    ">p2 move earthpower +1, move dazzlinggleam",
+    ">p2 switch 5, pass",
+    ">p1 move softboiled, pass",
+    ">p2 move focusblast +1, move dazzlinggleam"
+  ]
+}

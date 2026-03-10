@@ -1,0 +1,444 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "246,457,668,1089",
+  "p1Seed": "1445,1525,1675,1895",
+  "p2Seed": "2115,2195,2415,2565",
+  "p1TeamPacked": "Rhyperior||ChoiceBand|SolidRock|highhorsepower,rockslide,megahorn,icepunch||85,85,85,85,85,85|M|||82|,,,,,Water]Cacturne||LifeOrb|WaterAbsorb|leafstorm,knockoff,suckerpunch,spikyshield||85,85,85,85,85,85|F|||91|,,,,,Poison]Skarmory||Leftovers|Sturdy|irondefense,bravebird,bodypress,roost||85,85,85,85,85,85|M|||85|,,,,,Fighting]Azelf||LifeOrb|Levitate|protect,psychic,dazzlinggleam,nastyplot||85,,85,85,85,85|N|,0,,,,||83|,,,,,Fairy]Cetitan||LifeOrb|SheerForce|iceshard,highhorsepower,iciclecrash,liquidation||85,85,85,85,85,85|F|||83|,,,,,Ground]Pikachu|PikachuUnova|LightBall|LightningRod|fakeout,protect,knockoff,volttackle||85,85,85,85,85,85|F|||94|,,,,,Grass",
+  "p2TeamPacked": "Forretress||ChoiceBand|Sturdy|bodypress,ironhead,explosion,lunge||85,85,85,85,85,85|F|||90|,,,,,Fire]Copperajah||AssaultVest|HeavyMetal|heavyslam,stoneedge,heatcrash,highhorsepower||85,85,85,85,85,85|F|||86|,,,,,Fire]Lugia||Leftovers|Multiscale|aeroblast,earthpower,recover,calmmind||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Miraidon||LifeOrb|HadronEngine|protect,dragonpulse,voltswitch,electrodrift||85,,85,85,85,85|N|,0,,,,||65|,,,,,Electric]Drifblim||SitrusBerry|Unburden|willowisp,strengthsap,tailwind,shadowball||85,,85,85,85,85|M|,0,,,,||85|,,,,,Fairy]Galvantula||SitrusBerry|CompoundEyes|thunder,bugbuzz,stickyweb,voltswitch||85,,85,85,85,85|F|,0,,,,||85|,,,,,Electric",
+  "p1Team": [
+    {
+      "name": "Rhyperior",
+      "species": "Rhyperior",
+      "item": "Choice Band",
+      "ability": "Solid Rock",
+      "moves": [
+        "High Horsepower",
+        "Rock Slide",
+        "Megahorn",
+        "Ice Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Cacturne",
+      "species": "Cacturne",
+      "item": "Life Orb",
+      "ability": "Water Absorb",
+      "moves": [
+        "Leaf Storm",
+        "Knock Off",
+        "Sucker Punch",
+        "Spiky Shield"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Skarmory",
+      "species": "Skarmory",
+      "item": "Leftovers",
+      "ability": "Sturdy",
+      "moves": [
+        "Iron Defense",
+        "Brave Bird",
+        "Body Press",
+        "Roost"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Azelf",
+      "species": "Azelf",
+      "item": "Life Orb",
+      "ability": "Levitate",
+      "moves": [
+        "Protect",
+        "Psychic",
+        "Dazzling Gleam",
+        "Nasty Plot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Cetitan",
+      "species": "Cetitan",
+      "item": "Life Orb",
+      "ability": "Sheer Force",
+      "moves": [
+        "Ice Shard",
+        "High Horsepower",
+        "Icicle Crash",
+        "Liquidation"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Pikachu",
+      "species": "Pikachu-Unova",
+      "item": "Light Ball",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Fake Out",
+        "Protect",
+        "Knock Off",
+        "Volt Tackle"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Forretress",
+      "species": "Forretress",
+      "item": "Choice Band",
+      "ability": "Sturdy",
+      "moves": [
+        "Body Press",
+        "Iron Head",
+        "Explosion",
+        "Lunge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Copperajah",
+      "species": "Copperajah",
+      "item": "Assault Vest",
+      "ability": "Heavy Metal",
+      "moves": [
+        "Heavy Slam",
+        "Stone Edge",
+        "Heat Crash",
+        "High Horsepower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Lugia",
+      "species": "Lugia",
+      "item": "Leftovers",
+      "ability": "Multiscale",
+      "moves": [
+        "Aeroblast",
+        "Earth Power",
+        "Recover",
+        "Calm Mind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 71,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Miraidon",
+      "species": "Miraidon",
+      "item": "Life Orb",
+      "ability": "Hadron Engine",
+      "moves": [
+        "Protect",
+        "Dragon Pulse",
+        "Volt Switch",
+        "Electro Drift"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 65,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Drifblim",
+      "species": "Drifblim",
+      "item": "Sitrus Berry",
+      "ability": "Unburden",
+      "moves": [
+        "Will-O-Wisp",
+        "Strength Sap",
+        "Tailwind",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Galvantula",
+      "species": "Galvantula",
+      "item": "Sitrus Berry",
+      "ability": "Compound Eyes",
+      "moves": [
+        "Thunder",
+        "Bug Buzz",
+        "Sticky Web",
+        "Volt Switch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"246,457,668,1089\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Rhyperior||ChoiceBand|SolidRock|highhorsepower,rockslide,megahorn,icepunch||85,85,85,85,85,85|M|||82|,,,,,Water]Cacturne||LifeOrb|WaterAbsorb|leafstorm,knockoff,suckerpunch,spikyshield||85,85,85,85,85,85|F|||91|,,,,,Poison]Skarmory||Leftovers|Sturdy|irondefense,bravebird,bodypress,roost||85,85,85,85,85,85|M|||85|,,,,,Fighting]Azelf||LifeOrb|Levitate|protect,psychic,dazzlinggleam,nastyplot||85,,85,85,85,85|N|,0,,,,||83|,,,,,Fairy]Cetitan||LifeOrb|SheerForce|iceshard,highhorsepower,iciclecrash,liquidation||85,85,85,85,85,85|F|||83|,,,,,Ground]Pikachu|PikachuUnova|LightBall|LightningRod|fakeout,protect,knockoff,volttackle||85,85,85,85,85,85|F|||94|,,,,,Grass\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Forretress||ChoiceBand|Sturdy|bodypress,ironhead,explosion,lunge||85,85,85,85,85,85|F|||90|,,,,,Fire]Copperajah||AssaultVest|HeavyMetal|heavyslam,stoneedge,heatcrash,highhorsepower||85,85,85,85,85,85|F|||86|,,,,,Fire]Lugia||Leftovers|Multiscale|aeroblast,earthpower,recover,calmmind||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Miraidon||LifeOrb|HadronEngine|protect,dragonpulse,voltswitch,electrodrift||85,,85,85,85,85|N|,0,,,,||65|,,,,,Electric]Drifblim||SitrusBerry|Unburden|willowisp,strengthsap,tailwind,shadowball||85,,85,85,85,85|M|,0,,,,||85|,,,,,Fairy]Galvantula||SitrusBerry|CompoundEyes|thunder,bugbuzz,stickyweb,voltswitch||85,,85,85,85,85|F|,0,,,,||85|,,,,,Electric\"}",
+    ">p1 move highhorsepower +1, move leafstorm +2",
+    ">p2 move explosion, move heatcrash +1",
+    ">p2 switch 4, switch 6",
+    ">p1 move highhorsepower +1, move spikyshield",
+    ">p2 move voltswitch +1, move thunder +2",
+    ">p2 switch 3, pass",
+    ">p1 move highhorsepower +2, move leafstorm +2",
+    ">p2 move calmmind, move stickyweb",
+    ">p1 pass, switch 5",
+    ">p2 pass, switch 5",
+    ">p1 move highhorsepower +1, move liquidation +1",
+    ">p2 move aeroblast +2, move tailwind",
+    ">p1 move highhorsepower +1, move highhorsepower +2",
+    ">p2 move recover, move strengthsap +2",
+    ">p1 move highhorsepower +1, move iceshard +2",
+    ">p2 move earthpower +2, move tailwind",
+    ">p1 move highhorsepower +1, move iciclecrash +1",
+    ">p2 move calmmind, move strengthsap +1",
+    ">p1 move highhorsepower +1, move liquidation +2",
+    ">p2 move recover, move tailwind",
+    ">p1 move highhorsepower +1, move highhorsepower +1",
+    ">p2 move aeroblast +1, move strengthsap +1",
+    ">p1 move highhorsepower +1, move iciclecrash +1",
+    ">p2 move calmmind, move strengthsap +2",
+    ">p1 move highhorsepower +1, move iciclecrash +1",
+    ">p2 move aeroblast +1, move tailwind",
+    ">p1 move highhorsepower +1, move highhorsepower +1",
+    ">p2 pass, move willowisp +1",
+    ">p1 switch 4, pass",
+    ">p1 move nastyplot, move highhorsepower +2",
+    ">p2 pass, move willowisp +1",
+    ">p1 move protect, move iciclecrash +2",
+    ">p2 pass, move willowisp +1",
+    ">p1 move protect, move iceshard +1",
+    ">p2 pass, move willowisp +2",
+    ">p1 move protect, move iceshard +2",
+    ">p2 pass, move tailwind",
+    ">p1 move dazzlinggleam, move iceshard +2",
+    ">p2 pass, move shadowball +2"
+  ]
+}

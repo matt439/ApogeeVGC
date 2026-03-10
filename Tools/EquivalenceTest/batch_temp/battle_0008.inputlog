@@ -1,0 +1,40 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"57,106,155,252"}
+>player p1 {"name":"Player1","team":"Tyranitar||AssaultVest|SandStream|icywind,rockslide,knockoff,highhorsepower||85,85,85,85,85,85|M|||81|,,,,,Ghost]Meowstic||SitrusBerry|Prankster|thunderwave,psychic,fakeout,helpinghand||85,85,85,85,85,85|M|||88|,,,,,Steel]Mismagius||LifeOrb|Levitate|protect,dazzlinggleam,willowisp,shadowball||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy]Cramorant||SitrusBerry|GulpMissile|surf,tailwind,protect,bravebird||85,85,85,85,85,85|M|||86|,,,,,Ground]Quagsire||SitrusBerry|Unaware|liquidation,recover,highhorsepower,icywind||85,85,85,85,85,85|M|||91|,,,,,Poison]Rillaboom||AssaultVest|GrassySurge|highhorsepower,fakeout,grassyglide,woodhammer||85,85,85,85,85,85|F|||81|,,,,,Grass"}
+>player p2 {"name":"Player2","team":"Drifblim||SitrusBerry|Unburden|tailwind,strengthsap,shadowball,willowisp||85,,85,85,85,85|F|,0,,,,||85|,,,,,Fairy]Thundurus|||Defiant|protect,acrobatics,knockoff,wildboltstorm||85,85,85,85,85,85|M|||79|,,,,,Electric]Iron Valiant||LifeOrb|QuarkDrive|protect,dazzlinggleam,closecombat,knockoff||85,85,85,85,85,85|N|||79|,,,,,Fighting]Dugtrio||LifeOrb|ArenaTrap|stompingtantrum,protect,rockslide,helpinghand||85,85,85,85,85,85|M|||91|,,,,,Ground]Primarina||ChoiceSpecs|LiquidVoice|moonblast,flipturn,hypervoice,hydropump||85,85,85,85,85,85|M|||79|,,,,,Water]Malamar||SitrusBerry|Contrary|protect,psychocut,knockoff,superpower||85,85,85,85,85,85|F|||80|,,,,,Fighting"}
+>p1 move highhorsepower +2, move fakeout +2
+>p2 move tailwind, move acrobatics +2
+>p1 move rockslide, move psychic +1
+>p2 move willowisp +2, move protect
+>p1 move highhorsepower +2, move psychic +2
+>p2 move tailwind, move protect
+>p1 move rockslide, move fakeout +1
+>p2 move shadowball +2, move acrobatics +1
+>p2 switch 6, pass
+>p1 move icywind, move psychic +1
+>p2 move psychocut +2, move acrobatics +2
+>p1 pass, switch 6
+>p2 pass, switch 3
+>p1 move rockslide, move woodhammer +1
+>p2 move knockoff +2, move protect
+>p1 move rockslide, move woodhammer +1
+>p2 move knockoff +1, move knockoff +2
+>p2 switch 5, pass
+>p1 move icywind, move woodhammer +2
+>p2 move hydropump +2, move closecombat +1
+>p1 switch 4, switch 5
+>p2 pass, switch 4
+>p1 move bravebird +2, move recover
+>p2 move hydropump +1, move stompingtantrum +2
+>p1 move surf, move highhorsepower +2
+>p2 move hydropump +2, move rockslide
+>p1 move tailwind, move highhorsepower +1
+>p2 move hydropump +2, pass
+>p1 move protect, move icywind
+>p2 move hydropump +2, pass
+>p1 pass, switch 3
+>p1 move protect, move willowisp +2
+>p2 move hydropump +2, pass
+>p1 move protect, move dazzlinggleam
+>p2 move hydropump +1, pass
+>p1 move surf, move protect
+>p2 move hydropump +2, pass

@@ -1,0 +1,39 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"561,1042,1523,2484"}
+>player p1 {"name":"Player1","team":"Kilowattrel||FocusSash|Competitive|hurricane,thunderbolt,protect,tailwind||85,,85,85,85,85|M|,0,,,,||80|,,,,,Flying]Venusaur||LifeOrb|Overgrow|sludgebomb,earthpower,leafstorm,protect||85,,85,85,85,85|M|,0,,,,||86|,,,,,Water]Rhyperior||ChoiceBand|SolidRock|rockslide,megahorn,highhorsepower,heatcrash||85,85,85,85,85,85|F|||82|,,,,,Flying]Typhlosion||ChoiceScarf|FlashFire|eruption,scorchingsands,fireblast,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Porygon-Z||ChoiceSpecs|Adaptability|triattack,trick,shadowball,swift||85,,85,85,85,85|N|,0,,,,||84|,,,,,Ghost]Beartic||LifeOrb|SlushRush|protect,closecombat,aquajet,iciclecrash||85,85,85,85,85,85|F|||91|,,,,,Fighting"}
+>player p2 {"name":"Player2","team":"Snorlax||Leftovers|ThickFat|curse,protect,bodyslam,highhorsepower||85,85,85,85,85,85|M|||84|,,,,,Poison]Tropius||SitrusBerry|Harvest|tailwind,hurricane,protect,energyball||85,,85,85,85,85|F|,0,,,,||94|,,,,,Steel]Clodsire||SitrusBerry|Unaware|highhorsepower,gunkshot,helpinghand,toxicspikes||85,85,85,85,85,85|M|||87|,,,,,Steel]Eiscue||SitrusBerry|IceFace|bellydrum,protect,icespinner,liquidation||85,85,85,85,85,85|M|||89|,,,,,Water]Basculegion|BasculegionF|ChoiceScarf|Adaptability|wavecrash,flipturn,lastrespects,muddywater||85,85,85,85,85,85|F|||72|,,,,,Ghost]Milotic||SitrusBerry|Competitive|scald,icywind,dragontail,protect||85,85,85,85,85,85|M|||81|,,,,,Dragon"}
+>p1 move thunderbolt +2, move sludgebomb +1
+>p2 move curse, move tailwind
+>p1 move tailwind, move sludgebomb +1
+>p2 move curse, move tailwind
+>p1 move tailwind, move sludgebomb +2
+>p2 move protect, move tailwind
+>p2 pass, switch 4
+>p1 move tailwind, move sludgebomb +1
+>p2 move protect, move bellydrum
+>p1 move tailwind, move sludgebomb +2
+>p2 move bodyslam +1, move bellydrum
+>p1 move protect, move earthpower +2
+>p2 move highhorsepower +2, move bellydrum
+>p1 pass, switch 5
+>p1 move hurricane +2, move triattack +2
+>p2 move curse, move bellydrum
+>p2 switch 6, switch 3
+>p1 move protect, move triattack +1
+>p2 move dragontail +2, move gunkshot +1
+>p1 move protect, move highhorsepower +2
+>p2 move scald +2, move highhorsepower +1
+>p2 pass, switch 5
+>p1 move hurricane +1, move highhorsepower +1
+>p2 move dragontail +2, move flipturn +2
+>p1 switch 6, switch 4
+>p1 move closecombat +2, move scorchingsands +2
+>p2 move dragontail +2, move flipturn +1
+>p1 move iciclecrash +1, move scorchingsands +1
+>p2 move protect, move flipturn +1
+>p1 move closecombat +1, move scorchingsands +1
+>p2 move scald +2, move flipturn +1
+>p1 move iciclecrash +2, move scorchingsands +1
+>p2 pass, move flipturn +2
+>p1 pass, switch 3
+>p1 move protect, move shadowball +1
+>p2 pass, move flipturn +1

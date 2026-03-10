@@ -1,0 +1,33 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"603,1120,1637,2670"}
+>player p1 {"name":"Player1","team":"Mightyena||LifeOrb|Intimidate|playrough,suckerpunch,throatchop,howl||85,85,85,85,85,85|F|||95|,,,,,Dark]Spectrier||LifeOrb|GrimNeigh|protect,terablast,nastyplot,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fighting]Samurott||LifeOrb|Torrent|swordsdance,protect,liquidation,sacredsword||85,85,85,85,85,85|M|||89|,,,,,Water]Dialga||SitrusBerry|Telepathy|fireblast,heavyslam,protect,dracometeor||85,85,85,85,85,85|N|||74|,,,,,Fire]Regirock||ChestoBerry|ClearBody|stoneedge,rest,irondefense,bodypress||85,85,85,85,85,85|N|||82|,,,,,Fighting]Dipplin||Eviolite|StickyHold|syrupbomb,dragonpulse,recover,pollenpuff||85,,85,85,85,85|F|,0,,,,||92|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Volcanion||SitrusBerry|WaterAbsorb|heatwave,earthpower,protect,steameruption||85,,85,85,85,85|N|,0,,,,||75|,,,,,Ground]Heracross||FlameOrb|Guts|facade,closecombat,protect,knockoff||85,85,85,85,85,85|F|||82|,,,,,Normal]Vespiquen||Leftovers|Unnerve|roost,pollenpuff,helpinghand,hurricane||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel]Grumpig||LifeOrb|ThickFat|nastyplot,dazzlinggleam,protect,psychic||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Magnezone||AssaultVest|MagnetPull|electroweb,flashcannon,voltswitch,thunderbolt||85,,85,85,85,85|N|,0,,,,||84|,,,,,Flying]Dusknoir||LifeOrb|Frisk|shadowsneak,leechlife,willowisp,poltergeist||85,85,85,85,85,85|F|||89|,,,,,Dark"}
+>p1 move throatchop +1, move nastyplot
+>p2 move protect, move facade +1
+>p1 move suckerpunch +1, move shadowball +2
+>p2 move heatwave, move facade +1
+>p1 switch 3, pass
+>p1 move protect, move nastyplot
+>p2 move heatwave, move knockoff +2
+>p1 pass, switch 4
+>p2 pass, switch 3
+>p1 move swordsdance, move dracometeor +1
+>p2 move steameruption +2, move hurricane +2
+>p2 switch 6, pass
+>p1 move sacredsword +2, move fireblast +1
+>p2 move willowisp +1, move hurricane +1
+>p1 move protect, move heavyslam +1
+>p2 move poltergeist +2, move hurricane +2
+>p1 pass, switch 5
+>p1 move protect, move stoneedge +2
+>p2 move shadowsneak +1, move helpinghand -1
+>p1 switch 6, pass
+>p2 pass, switch 4
+>p1 move recover, move stoneedge +1
+>p2 move shadowsneak +2, move protect
+>p2 switch 5, pass
+>p1 move syrupbomb +2, move stoneedge +2
+>p2 move thunderbolt +2, move nastyplot
+>p1 move syrupbomb +1, move bodypress +1
+>p2 move electroweb, move dazzlinggleam
+>p1 move syrupbomb +1, pass
+>p2 move thunderbolt +2, move psychic +2

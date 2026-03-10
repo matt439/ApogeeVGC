@@ -1,0 +1,418 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "372,691,1010,1647",
+  "p1Seed": "2183,2299,2521,2849",
+  "p2Seed": "3177,3293,3621,3843",
+  "p1TeamPacked": "Brute Bonnet||RockyHelmet|Protosynthesis|seedbomb,spore,suckerpunch,ragepowder||85,85,85,85,85,85|N|||80|,,,,,Ghost]Komala||ChoiceScarf|Comatose|doubleedge,superpower,uturn,woodhammer||85,85,85,85,85,85|M|||92|,,,,,Grass]Urshifu||LifeOrb|UnseenFist|wickedblow,suckerpunch,closecombat,poisonjab||85,85,85,85,85,85|M|||75|,,,,,Poison]Delphox||LifeOrb|Blaze|protect,nastyplot,heatwave,psychic||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fire]Flutter Mane||BoosterEnergy|Protosynthesis|protect,moonblast,dazzlinggleam,shadowball||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy]Medicham||LifeOrb|PurePower|closecombat,icepunch,zenheadbutt,protect||85,85,85,85,85,85|M|||86|,,,,,Fire",
+  "p2TeamPacked": "Luxray||AssaultVest|Intimidate|snarl,playrough,throatchop,wildcharge||85,85,85,85,85,85|M|||86|,,,,,Fairy]Honchkrow||LifeOrb|Moxie|heatwave,suckerpunch,protect,bravebird||85,85,85,85,85,85|F|||85|,,,,,Fire]Delibird||SitrusBerry|Insomnia|bravebird,fakeout,tailwind,helpinghand||85,85,85,85,85,85|M||||,,,,,Ground]Abomasnow||LightClay|SnowWarning|iceshard,woodhammer,auroraveil,blizzard||85,85,85,85,85,85|M|||81|,,,,,Water]Lumineon||SitrusBerry|StormDrain|helpinghand,hydropump,tailwind,encore||85,,85,85,85,85|F|,0,,,,||92|,,,,,Fire]Hitmonlee||WhiteHerb|Unburden|closecombat,protect,poisonjab,fakeout||85,85,85,85,85,85|M|||86|,,,,,Poison",
+  "p1Team": [
+    {
+      "name": "Brute Bonnet",
+      "species": "Brute Bonnet",
+      "item": "Rocky Helmet",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Seed Bomb",
+        "Spore",
+        "Sucker Punch",
+        "Rage Powder"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Komala",
+      "species": "Komala",
+      "item": "Choice Scarf",
+      "ability": "Comatose",
+      "moves": [
+        "Double-Edge",
+        "Superpower",
+        "U-turn",
+        "Wood Hammer"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Urshifu",
+      "species": "Urshifu",
+      "item": "Life Orb",
+      "ability": "Unseen Fist",
+      "moves": [
+        "Wicked Blow",
+        "Sucker Punch",
+        "Close Combat",
+        "Poison Jab"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 75,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Delphox",
+      "species": "Delphox",
+      "item": "Life Orb",
+      "ability": "Blaze",
+      "moves": [
+        "Protect",
+        "Nasty Plot",
+        "Heat Wave",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Flutter Mane",
+      "species": "Flutter Mane",
+      "item": "Booster Energy",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Protect",
+        "Moonblast",
+        "Dazzling Gleam",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Medicham",
+      "species": "Medicham",
+      "item": "Life Orb",
+      "ability": "Pure Power",
+      "moves": [
+        "Close Combat",
+        "Ice Punch",
+        "Zen Headbutt",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Luxray",
+      "species": "Luxray",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Snarl",
+        "Play Rough",
+        "Throat Chop",
+        "Wild Charge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Honchkrow",
+      "species": "Honchkrow",
+      "item": "Life Orb",
+      "ability": "Moxie",
+      "moves": [
+        "Heat Wave",
+        "Sucker Punch",
+        "Protect",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Delibird",
+      "species": "Delibird",
+      "item": "Sitrus Berry",
+      "ability": "Insomnia",
+      "moves": [
+        "Brave Bird",
+        "Fake Out",
+        "Tailwind",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Abomasnow",
+      "species": "Abomasnow",
+      "item": "Light Clay",
+      "ability": "Snow Warning",
+      "moves": [
+        "Ice Shard",
+        "Wood Hammer",
+        "Aurora Veil",
+        "Blizzard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Lumineon",
+      "species": "Lumineon",
+      "item": "Sitrus Berry",
+      "ability": "Storm Drain",
+      "moves": [
+        "Helping Hand",
+        "Hydro Pump",
+        "Tailwind",
+        "Encore"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Hitmonlee",
+      "species": "Hitmonlee",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Close Combat",
+        "Protect",
+        "Poison Jab",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"372,691,1010,1647\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Brute Bonnet||RockyHelmet|Protosynthesis|seedbomb,spore,suckerpunch,ragepowder||85,85,85,85,85,85|N|||80|,,,,,Ghost]Komala||ChoiceScarf|Comatose|doubleedge,superpower,uturn,woodhammer||85,85,85,85,85,85|M|||92|,,,,,Grass]Urshifu||LifeOrb|UnseenFist|wickedblow,suckerpunch,closecombat,poisonjab||85,85,85,85,85,85|M|||75|,,,,,Poison]Delphox||LifeOrb|Blaze|protect,nastyplot,heatwave,psychic||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fire]Flutter Mane||BoosterEnergy|Protosynthesis|protect,moonblast,dazzlinggleam,shadowball||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy]Medicham||LifeOrb|PurePower|closecombat,icepunch,zenheadbutt,protect||85,85,85,85,85,85|M|||86|,,,,,Fire\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Luxray||AssaultVest|Intimidate|snarl,playrough,throatchop,wildcharge||85,85,85,85,85,85|M|||86|,,,,,Fairy]Honchkrow||LifeOrb|Moxie|heatwave,suckerpunch,protect,bravebird||85,85,85,85,85,85|F|||85|,,,,,Fire]Delibird||SitrusBerry|Insomnia|bravebird,fakeout,tailwind,helpinghand||85,85,85,85,85,85|M||||,,,,,Ground]Abomasnow||LightClay|SnowWarning|iceshard,woodhammer,auroraveil,blizzard||85,85,85,85,85,85|M|||81|,,,,,Water]Lumineon||SitrusBerry|StormDrain|helpinghand,hydropump,tailwind,encore||85,,85,85,85,85|F|,0,,,,||92|,,,,,Fire]Hitmonlee||WhiteHerb|Unburden|closecombat,protect,poisonjab,fakeout||85,85,85,85,85,85|M|||86|,,,,,Poison\"}",
+    ">p1 move suckerpunch +1, move doubleedge +2",
+    ">p2 move playrough +2, move suckerpunch +2",
+    ">p1 move seedbomb +1, move doubleedge +1",
+    ">p2 move playrough +1, move bravebird +1",
+    ">p1 switch 3, pass",
+    ">p2 switch 3, switch 5",
+    ">p1 move wickedblow +1, move doubleedge +2",
+    ">p2 move bravebird +2, move hydropump +2",
+    ">p1 switch 4, switch 6",
+    ">p1 move protect, move protect",
+    ">p2 move tailwind, move hydropump +2",
+    ">p1 move heatwave, move icepunch +1",
+    ">p2 move fakeout +1, move helpinghand -1",
+    ">p2 switch 4, pass",
+    ">p1 move nastyplot, move closecombat +1",
+    ">p2 move auroraveil, move helpinghand -1",
+    ">p1 move nastyplot, move icepunch +1",
+    ">p2 move iceshard +1, move encore +1",
+    ">p2 switch 6, pass",
+    ">p1 move nastyplot, move closecombat +1",
+    ">p2 move poisonjab +1, move helpinghand -1",
+    ">p1 move nastyplot, move closecombat +2",
+    ">p2 move poisonjab +2, move helpinghand -1",
+    ">p1 pass, switch 5",
+    ">p1 move heatwave, move dazzlinggleam",
+    ">p2 move closecombat +2, move tailwind",
+    ">p1 move nastyplot, move moonblast +2",
+    ">p2 pass, move encore +2",
+    ">p1 move psychic +1, move dazzlinggleam",
+    ">p2 pass, move encore +1"
+  ]
+}

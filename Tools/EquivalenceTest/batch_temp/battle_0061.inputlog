@@ -1,0 +1,38 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"428,795,1162,1895"}
+>player p1 {"name":"Player1","team":"Coalossal||SitrusBerry|FlameBody|heatwave,stealthrock,stoneedge,willowisp||85,85,85,85,85,85|F|||90|,,,,,Water]Incineroar||HeavyDutyBoots|Intimidate|fakeout,flareblitz,partingshot,knockoff||85,85,85,85,85,85|F|||78|,,,,,Water]Noctowl||LifeOrb|TintedLens|protect,tailwind,hypervoice,hurricane||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Regieleki||Magnet|Transistor|protect,terablast,electroweb,thunderbolt||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ice]Sceptile||WhiteHerb|Unburden|focusblast,protect,leafstorm,breakingswipe||85,85,85,85,85,85|M|||88|,,,,,Water]Brute Bonnet||RockyHelmet|Protosynthesis|ragepowder,seedbomb,suckerpunch,spore||85,85,85,85,85,85|N|||80|,,,,,Poison"}
+>player p2 {"name":"Player2","team":"Scrafty||SitrusBerry|Intimidate|knockoff,coaching,fakeout,closecombat||85,85,85,85,85,85|F|||83|,,,,,Poison]Phione||Leftovers|Hydration|takeheart,protect,icebeam,scald||85,,85,85,85,85|N|,0,,,,||90|,,,,,Steel]Exeggutor|ExeggutorAlola|SitrusBerry|Harvest|woodhammer,flamethrower,trickroom,dracometeor||85,85,85,85,85,|F|,,,,,0||87|,,,,,Fire]Oricorio|OricorioSensu|Leftovers|Dancer|revelationdance,quiverdance,airslash,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Fighting]Furret||SitrusBerry|Frisk|bodyslam,protect,helpinghand,followme||85,85,85,85,85,85|F|||98|,,,,,Ghost]Iron Bundle||BoosterEnergy|QuarkDrive|freezedry,hydropump,protect,icywind||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dragon"}
+>p1 move stealthrock, move fakeout +1
+>p2 move knockoff +2, move takeheart
+>p1 move heatwave, move fakeout +2
+>p2 move coaching -2, move takeheart
+>p1 move heatwave, move knockoff +1
+>p2 move fakeout +1, move scald +1
+>p1 switch 3, pass
+>p1 move tailwind, move partingshot +1
+>p2 move closecombat +1, move takeheart
+>p1 pass, switch 4
+>p1 move tailwind, move terablast +1
+>p2 move knockoff +2, move icebeam +2
+>p1 pass, switch 6
+>p1 move hurricane +2, move ragepowder
+>p2 move knockoff +1, move takeheart
+>p1 move hurricane +1, move spore +1
+>p2 move closecombat +1, move icebeam +1
+>p2 switch 5, pass
+>p1 move hypervoice, move spore +1
+>p2 move helpinghand -2, move takeheart
+>p1 move protect, move ragepowder
+>p2 move protect, move icebeam +1
+>p1 pass, switch 5
+>p1 move protect, move focusblast +1
+>p2 move bodyslam +2, move icebeam +2
+>p1 pass, switch 4
+>p2 switch 4, pass
+>p1 move hurricane +1, move partingshot +1
+>p2 move airslash +2, move scald +1
+>p1 pass, move knockoff +2
+>p2 move revelationdance +1, move protect
+>p1 pass, move knockoff +1
+>p2 move revelationdance +2, move takeheart
+>p1 pass, move knockoff +1
+>p2 move protect, move icebeam +2

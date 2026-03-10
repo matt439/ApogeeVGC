@@ -1,0 +1,444 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "176,327,478,779",
+  "p1Seed": "1035,1095,1205,1365",
+  "p2Seed": "1525,1585,1745,1855",
+  "p1TeamPacked": "Cacturne||LifeOrb|WaterAbsorb|knockoff,suckerpunch,spikyshield,leafstorm||85,85,85,85,85,85|M|||91|,,,,,Dark]Typhlosion|TyphlosionHisui|ChoiceSpecs|Blaze|heatwave,focusblast,eruption,shadowball||85,,85,85,85,85|F|,0,,,,||77|,,,,,Fire]Orthworm||Leftovers|EarthEater|bodypress,heavyslam,irondefense,protect||85,85,85,85,85,85|M|||88|,,,,,Electric]Excadrill||AssaultVest|MoldBreaker|highhorsepower,rockslide,rapidspin,ironhead||85,85,85,85,85,85|F|||82|,,,,,Flying]Manaphy||SitrusBerry|Hydration|scald,tailglow,energyball,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass]Scovillain||ChoiceSpecs|Chlorophyll|fireblast,energyball,leafstorm,burningjealousy||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel",
+  "p2TeamPacked": "Chesnaught||Leftovers|Bulletproof|spikyshield,irondefense,leechseed,bodypress||85,,85,85,85,85|F|,0,,,,||86|,,,,,Steel]Tentacruel||AssaultVest|ClearBody|hydropump,sludgebomb,icywind,acidspray||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Lanturn||AssaultVest|VoltAbsorb|icebeam,electroweb,scald,voltswitch||85,,85,85,85,85|M|,0,,,,||87|,,,,,Flying]Jolteon||LifeOrb|VoltAbsorb|terablast,thunderbolt,calmmind,protect||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Torterra||WhiteHerb|ShellArmor|headlongrush,rockslide,protect,shellsmash||85,85,85,85,85,85|M|||81|,,,,,Rock]Mamoswine||LifeOrb|ThickFat|protect,iciclecrash,highhorsepower,iceshard||85,85,85,85,85,85|F|||82|,,,,,Ice",
+  "p1Team": [
+    {
+      "name": "Cacturne",
+      "species": "Cacturne",
+      "item": "Life Orb",
+      "ability": "Water Absorb",
+      "moves": [
+        "Knock Off",
+        "Sucker Punch",
+        "Spiky Shield",
+        "Leaf Storm"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Typhlosion",
+      "species": "Typhlosion-Hisui",
+      "item": "Choice Specs",
+      "ability": "Blaze",
+      "moves": [
+        "Heat Wave",
+        "Focus Blast",
+        "Eruption",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Orthworm",
+      "species": "Orthworm",
+      "item": "Leftovers",
+      "ability": "Earth Eater",
+      "moves": [
+        "Body Press",
+        "Heavy Slam",
+        "Iron Defense",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Excadrill",
+      "species": "Excadrill",
+      "item": "Assault Vest",
+      "ability": "Mold Breaker",
+      "moves": [
+        "High Horsepower",
+        "Rock Slide",
+        "Rapid Spin",
+        "Iron Head"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Manaphy",
+      "species": "Manaphy",
+      "item": "Sitrus Berry",
+      "ability": "Hydration",
+      "moves": [
+        "Scald",
+        "Tail Glow",
+        "Energy Ball",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Scovillain",
+      "species": "Scovillain",
+      "item": "Choice Specs",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Fire Blast",
+        "Energy Ball",
+        "Leaf Storm",
+        "Burning Jealousy"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Chesnaught",
+      "species": "Chesnaught",
+      "item": "Leftovers",
+      "ability": "Bulletproof",
+      "moves": [
+        "Spiky Shield",
+        "Iron Defense",
+        "Leech Seed",
+        "Body Press"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Tentacruel",
+      "species": "Tentacruel",
+      "item": "Assault Vest",
+      "ability": "Clear Body",
+      "moves": [
+        "Hydro Pump",
+        "Sludge Bomb",
+        "Icy Wind",
+        "Acid Spray"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Lanturn",
+      "species": "Lanturn",
+      "item": "Assault Vest",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Ice Beam",
+        "Electroweb",
+        "Scald",
+        "Volt Switch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Jolteon",
+      "species": "Jolteon",
+      "item": "Life Orb",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Tera Blast",
+        "Thunderbolt",
+        "Calm Mind",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Torterra",
+      "species": "Torterra",
+      "item": "White Herb",
+      "ability": "Shell Armor",
+      "moves": [
+        "Headlong Rush",
+        "Rock Slide",
+        "Protect",
+        "Shell Smash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Mamoswine",
+      "species": "Mamoswine",
+      "item": "Life Orb",
+      "ability": "Thick Fat",
+      "moves": [
+        "Protect",
+        "Icicle Crash",
+        "High Horsepower",
+        "Ice Shard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"176,327,478,779\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Cacturne||LifeOrb|WaterAbsorb|knockoff,suckerpunch,spikyshield,leafstorm||85,85,85,85,85,85|M|||91|,,,,,Dark]Typhlosion|TyphlosionHisui|ChoiceSpecs|Blaze|heatwave,focusblast,eruption,shadowball||85,,85,85,85,85|F|,0,,,,||77|,,,,,Fire]Orthworm||Leftovers|EarthEater|bodypress,heavyslam,irondefense,protect||85,85,85,85,85,85|M|||88|,,,,,Electric]Excadrill||AssaultVest|MoldBreaker|highhorsepower,rockslide,rapidspin,ironhead||85,85,85,85,85,85|F|||82|,,,,,Flying]Manaphy||SitrusBerry|Hydration|scald,tailglow,energyball,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass]Scovillain||ChoiceSpecs|Chlorophyll|fireblast,energyball,leafstorm,burningjealousy||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Chesnaught||Leftovers|Bulletproof|spikyshield,irondefense,leechseed,bodypress||85,,85,85,85,85|F|,0,,,,||86|,,,,,Steel]Tentacruel||AssaultVest|ClearBody|hydropump,sludgebomb,icywind,acidspray||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Lanturn||AssaultVest|VoltAbsorb|icebeam,electroweb,scald,voltswitch||85,,85,85,85,85|M|,0,,,,||87|,,,,,Flying]Jolteon||LifeOrb|VoltAbsorb|terablast,thunderbolt,calmmind,protect||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Torterra||WhiteHerb|ShellArmor|headlongrush,rockslide,protect,shellsmash||85,85,85,85,85,85|M|||81|,,,,,Rock]Mamoswine||LifeOrb|ThickFat|protect,iciclecrash,highhorsepower,iceshard||85,85,85,85,85,85|F|||82|,,,,,Ice\"}",
+    ">p1 move leafstorm +2, move eruption",
+    ">p2 move irondefense, move acidspray +2",
+    ">p2 switch 5, pass",
+    ">p1 move knockoff +1, move eruption",
+    ">p2 move shellsmash, move acidspray +1",
+    ">p2 switch 4, switch 6",
+    ">p1 move spikyshield, move eruption",
+    ">p2 move protect, move iceshard +2",
+    ">p1 move spikyshield, move eruption",
+    ">p2 move thunderbolt +1, move protect",
+    ">p1 switch 6, pass",
+    ">p1 move fireblast +2, move eruption",
+    ">p2 move terablast +1, move protect",
+    ">p2 switch 3, pass",
+    ">p1 move fireblast +2, move eruption",
+    ">p2 move scald +2, pass",
+    ">p1 pass, switch 5",
+    ">p1 move fireblast +1, move protect",
+    ">p2 move electroweb, pass",
+    ">p1 move fireblast +2, move protect",
+    ">p2 move icebeam +2, pass",
+    ">p1 move fireblast +2, move protect",
+    ">p2 move icebeam +2, pass"
+  ]
+}

@@ -1,0 +1,32 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"169,314,459,748"}
+>player p1 {"name":"Player1","team":"Delibird||ChoiceBand|Hustle|foulplay,bravebird,icespinner,iceshard||85,85,85,85,85,85|M||||,,,,,Ice]Mimikyu||LifeOrb|Disguise|playrough,protect,shadowsneak,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Ghost]Mandibuzz||SitrusBerry|Overcoat|tailwind,foulplay,uturn,snarl||85,85,85,85,85,85|F|||85|,,,,,Steel]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,flipturn,protect||85,85,85,85,85,85|M|||79|,,,,,Water]Magcargo||LifeOrb|WeakArmor|powergem,shellsmash,heatwave,protect||85,,85,85,85,85|M|,0,,,,||93|,,,,,Fire]Haxorus||LifeOrb|Unnerve|protect,dragonclaw,firstimpression,ironhead||85,85,85,85,85,85|F|||84|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Mesprit||ChoiceScarf|Levitate|uturn,thunderbolt,psychic,icebeam||85,85,85,85,85,85|N|||86|,,,,,Electric]Latios||ChoiceSpecs|Levitate|trick,lusterpurge,dracometeor,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|fakeout,volttackle,encore,knockoff||85,85,85,85,85,85|M|||94|,,,,,Grass]Avalugg||Leftovers|Sturdy|recover,bodypress,avalanche,protect||85,85,85,85,85,85|M|||92|,,,,,Poison]Camerupt||SitrusBerry|SolidRock|heatwave,protect,earthpower,willowisp||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Zangoose||ToxicOrb|ToxicBoost|knockoff,protect,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Ghost"}
+>p1 move iceshard +2, move shadowsneak +1
+>p2 move icebeam +1, move lusterpurge +2
+>p1 move iceshard +2, move playrough +2
+>p2 move icebeam +2, move lusterpurge +2
+>p1 pass, switch 3
+>p1 move iceshard +1, move tailwind
+>p2 move icebeam +1, move lusterpurge +2
+>p1 move iceshard +1, move uturn +2
+>p2 move icebeam +1, move lusterpurge +2
+>p1 pass, switch 5
+>p1 switch 6, pass
+>p2 pass, switch 3
+>p1 move dragonclaw +1, move shellsmash
+>p2 move icebeam +1, move encore +1
+>p2 switch 4, pass
+>p1 move dragonclaw +2, move heatwave
+>p2 move bodypress +1, move encore +1
+>p2 switch 6, switch 5
+>p1 move dragonclaw +1, move shellsmash
+>p2 move facade +1, move protect
+>p1 move dragonclaw +1, move shellsmash
+>p2 move facade +2, move earthpower +1
+>p1 switch 4, pass
+>p1 move jetpunch +1, move shellsmash
+>p2 pass, move protect
+>p1 move jetpunch +1, move protect
+>p2 pass, move heatwave
+>p1 move flipturn +2, move protect
+>p2 pass, move willowisp +1

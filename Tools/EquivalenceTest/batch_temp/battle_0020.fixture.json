@@ -1,0 +1,455 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "141,262,383,624",
+  "p1Seed": "830,880,970,1100",
+  "p2Seed": "1230,1280,1410,1500",
+  "p1TeamPacked": "Comfey||SitrusBerry|Triage|drainingkiss,helpinghand,floralhealing,tailwind||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel]Sandslash||AssaultVest|SandRush|highhorsepower,superfang,knockoff,rapidspin||85,85,85,85,85,85|M|||93|,,,,,Water]Ceruledge||LifeOrb|WeakArmor|poltergeist,bitterblade,protect,swordsdance||85,85,85,85,85,85|F|||80|,,,,,Grass]Altaria||Leftovers|NaturalCure|willowisp,bravebird,dracometeor,roost||85,85,85,85,85,85|F|||91|,,,,,Steel]Camerupt||SitrusBerry|SolidRock|willowisp,earthpower,stealthrock,heatwave||85,,85,85,85,85|F|,0,,,,||88|,,,,,Water]Revavroom||LifeOrb|Filter|protect,ironhead,partingshot,gunkshot||85,85,85,85,85,85|F|||84|,,,,,Flying",
+  "p2TeamPacked": "Spectrier||LifeOrb|GrimNeigh|protect,nastyplot,drainingkiss,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Leafeon||LifeOrb|Chlorophyll|knockoff,doubleedge,swordsdance,leafblade||85,85,85,85,85,85|M|||90|,,,,,Normal]Regidrago||ChoiceScarf|DragonsMaw|dragonenergy,dragonclaw,dracometeor,earthpower||85,85,85,85,85,85|N|||74|,,,,,Dragon]Lunala||PowerHerb|ShadowShield|protect,meteorbeam,moongeistbeam,moonblast||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Florges||Leftovers|FlowerVeil|protect,calmmind,synthesis,moonblast||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Incineroar||HeavyDutyBoots|Intimidate|partingshot,knockoff,flareblitz,fakeout||85,85,85,85,85,85|F|||78|,,,,,Water",
+  "p1Team": [
+    {
+      "name": "Comfey",
+      "species": "Comfey",
+      "item": "Sitrus Berry",
+      "ability": "Triage",
+      "moves": [
+        "Draining Kiss",
+        "Helping Hand",
+        "Floral Healing",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Sandslash",
+      "species": "Sandslash",
+      "item": "Assault Vest",
+      "ability": "Sand Rush",
+      "moves": [
+        "High Horsepower",
+        "Super Fang",
+        "Knock Off",
+        "Rapid Spin"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 93,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Ceruledge",
+      "species": "Ceruledge",
+      "item": "Life Orb",
+      "ability": "Weak Armor",
+      "moves": [
+        "Poltergeist",
+        "Bitter Blade",
+        "Protect",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Altaria",
+      "species": "Altaria",
+      "item": "Leftovers",
+      "ability": "Natural Cure",
+      "moves": [
+        "Will-O-Wisp",
+        "Brave Bird",
+        "Draco Meteor",
+        "Roost"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Camerupt",
+      "species": "Camerupt",
+      "item": "Sitrus Berry",
+      "ability": "Solid Rock",
+      "moves": [
+        "Will-O-Wisp",
+        "Earth Power",
+        "Stealth Rock",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Revavroom",
+      "species": "Revavroom",
+      "item": "Life Orb",
+      "ability": "Filter",
+      "moves": [
+        "Protect",
+        "Iron Head",
+        "Parting Shot",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Spectrier",
+      "species": "Spectrier",
+      "item": "Life Orb",
+      "ability": "Grim Neigh",
+      "moves": [
+        "Protect",
+        "Nasty Plot",
+        "Draining Kiss",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Leafeon",
+      "species": "Leafeon",
+      "item": "Life Orb",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Knock Off",
+        "Double-Edge",
+        "Swords Dance",
+        "Leaf Blade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Regidrago",
+      "species": "Regidrago",
+      "item": "Choice Scarf",
+      "ability": "Dragon's Maw",
+      "moves": [
+        "Dragon Energy",
+        "Dragon Claw",
+        "Draco Meteor",
+        "Earth Power"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Lunala",
+      "species": "Lunala",
+      "item": "Power Herb",
+      "ability": "Shadow Shield",
+      "moves": [
+        "Protect",
+        "Meteor Beam",
+        "Moongeist Beam",
+        "Moonblast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 71,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Florges",
+      "species": "Florges",
+      "item": "Leftovers",
+      "ability": "Flower Veil",
+      "moves": [
+        "Protect",
+        "Calm Mind",
+        "Synthesis",
+        "Moonblast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Incineroar",
+      "species": "Incineroar",
+      "item": "Heavy-Duty Boots",
+      "ability": "Intimidate",
+      "moves": [
+        "Parting Shot",
+        "Knock Off",
+        "Flare Blitz",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"141,262,383,624\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Comfey||SitrusBerry|Triage|drainingkiss,helpinghand,floralhealing,tailwind||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel]Sandslash||AssaultVest|SandRush|highhorsepower,superfang,knockoff,rapidspin||85,85,85,85,85,85|M|||93|,,,,,Water]Ceruledge||LifeOrb|WeakArmor|poltergeist,bitterblade,protect,swordsdance||85,85,85,85,85,85|F|||80|,,,,,Grass]Altaria||Leftovers|NaturalCure|willowisp,bravebird,dracometeor,roost||85,85,85,85,85,85|F|||91|,,,,,Steel]Camerupt||SitrusBerry|SolidRock|willowisp,earthpower,stealthrock,heatwave||85,,85,85,85,85|F|,0,,,,||88|,,,,,Water]Revavroom||LifeOrb|Filter|protect,ironhead,partingshot,gunkshot||85,85,85,85,85,85|F|||84|,,,,,Flying\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Spectrier||LifeOrb|GrimNeigh|protect,nastyplot,drainingkiss,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Leafeon||LifeOrb|Chlorophyll|knockoff,doubleedge,swordsdance,leafblade||85,85,85,85,85,85|M|||90|,,,,,Normal]Regidrago||ChoiceScarf|DragonsMaw|dragonenergy,dragonclaw,dracometeor,earthpower||85,85,85,85,85,85|N|||74|,,,,,Dragon]Lunala||PowerHerb|ShadowShield|protect,meteorbeam,moongeistbeam,moonblast||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Florges||Leftovers|FlowerVeil|protect,calmmind,synthesis,moonblast||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Incineroar||HeavyDutyBoots|Intimidate|partingshot,knockoff,flareblitz,fakeout||85,85,85,85,85,85|F|||78|,,,,,Water\"}",
+    ">p1 move helpinghand -2, move superfang +2",
+    ">p2 move protect, move leafblade +1",
+    ">p1 move helpinghand -2, move rapidspin +2",
+    ">p2 move shadowball +2, move doubleedge +2",
+    ">p1 move floralhealing +1, move rapidspin +2",
+    ">p2 move nastyplot, move leafblade +1",
+    ">p2 pass, switch 4",
+    ">p1 move drainingkiss +1, move rapidspin +1",
+    ">p2 move nastyplot, move meteorbeam +1",
+    ">p1 move helpinghand -2, move knockoff +2",
+    ">p2 move nastyplot, move moonblast +1",
+    ">p1 move floralhealing +2, move rapidspin +1",
+    ">p2 move protect, move moongeistbeam +2",
+    ">p1 pass, switch 3",
+    ">p1 move tailwind, move poltergeist +1",
+    ">p2 move shadowball +1, move moonblast +2",
+    ">p1 switch 6, pass",
+    ">p2 switch 6, pass",
+    ">p1 move partingshot +2, move protect",
+    ">p2 move fakeout +2, move meteorbeam +1",
+    ">p1 switch 5, pass",
+    ">p1 move earthpower +2, move swordsdance",
+    ">p2 move flareblitz +1, move meteorbeam +1",
+    ">p1 move heatwave, move bitterblade +1",
+    ">p2 move partingshot +1, move protect",
+    ">p2 switch 3, pass",
+    ">p1 move earthpower +2, move protect",
+    ">p2 move dragonenergy, move protect",
+    ">p1 switch 5, pass",
+    ">p1 move gunkshot +1, move swordsdance",
+    ">p2 move dragonenergy, move meteorbeam +2",
+    ">p1 move gunkshot +2, move bitterblade +1",
+    ">p2 move dragonenergy, move meteorbeam +2",
+    ">p1 pass, switch 4",
+    ">p2 switch 5, pass",
+    ">p1 move protect, move bravebird +2",
+    ">p2 move synthesis, move meteorbeam +1",
+    ">p1 move ironhead +1, move willowisp +1",
+    ">p2 move moonblast +2, move meteorbeam +1",
+    ">p2 switch 3, pass",
+    ">p1 move protect, move dracometeor +2",
+    ">p2 move partingshot +1, move moongeistbeam +2",
+    ">p1 move protect, move roost",
+    ">p2 move fakeout +1, pass",
+    ">p1 move protect, move roost",
+    ">p2 move fakeout +1, pass",
+    ">p1 move protect, move roost",
+    ">p2 move fakeout +2, pass",
+    ">p1 move gunkshot +1, move dracometeor +2",
+    ">p2 move flareblitz +1, pass"
+  ]
+}

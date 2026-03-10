@@ -1,0 +1,501 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "274,509,744,1213",
+  "p1Seed": "1609,1697,1863,2107",
+  "p2Seed": "2351,2439,2683,2849",
+  "p1TeamPacked": "Necrozma|NecrozmaDawnWings|LifeOrb|PrismArmor|photongeyser,moongeistbeam,terablast,trickroom||85,,85,85,85,|N|,0,,,,0||74|,,,,,Fairy]Phione||Leftovers|Hydration|icebeam,takeheart,protect,scald||85,,85,85,85,85|N|,0,,,,||90|,,,,,Dragon]Infernape||FocusSash|Blaze|overheat,protect,closecombat,knockoff||85,85,85,85,85,85|F|||82|,,,,,Fire]Hydrapple||ChoiceSpecs|Regenerator|earthpower,leafstorm,gigadrain,dracometeor||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Glalie||SitrusBerry|InnerFocus|helpinghand,freezedry,icywind,disable||85,,85,85,85,85|M|,0,,,,||94|,,,,,Steel]Rotom|RotomFan|SitrusBerry|Levitate|electroweb,airslash,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||85|,,,,,Electric",
+  "p2TeamPacked": "Latias||SoulDew|Levitate|dracometeor,mistball,recover,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Zangoose||ToxicOrb|ToxicBoost|protect,knockoff,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Normal]Mabosstiff||ChoiceBand|Intimidate|crunch,firefang,psychicfangs,playrough||85,85,85,85,85,85|F|||84|,,,,,Fairy]Darkrai||LifeOrb|BadDreams|sludgebomb,darkpulse,substitute,protect||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Milotic||SitrusBerry|Competitive|recover,protect,scald,icywind||85,,85,85,85,85|M|,0,,,,||81|,,,,,Grass]Comfey||SitrusBerry|Triage|tailwind,floralhealing,drainingkiss,helpinghand||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel",
+  "p1Team": [
+    {
+      "name": "Necrozma",
+      "species": "Necrozma-Dawn-Wings",
+      "item": "Life Orb",
+      "ability": "Prism Armor",
+      "moves": [
+        "Photon Geyser",
+        "Moongeist Beam",
+        "Tera Blast",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 74,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Phione",
+      "species": "Phione",
+      "item": "Leftovers",
+      "ability": "Hydration",
+      "moves": [
+        "Ice Beam",
+        "Take Heart",
+        "Protect",
+        "Scald"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Infernape",
+      "species": "Infernape",
+      "item": "Focus Sash",
+      "ability": "Blaze",
+      "moves": [
+        "Overheat",
+        "Protect",
+        "Close Combat",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Hydrapple",
+      "species": "Hydrapple",
+      "item": "Choice Specs",
+      "ability": "Regenerator",
+      "moves": [
+        "Earth Power",
+        "Leaf Storm",
+        "Giga Drain",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Glalie",
+      "species": "Glalie",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Helping Hand",
+        "Freeze-Dry",
+        "Icy Wind",
+        "Disable"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Rotom",
+      "species": "Rotom-Fan",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "moves": [
+        "Electroweb",
+        "Air Slash",
+        "Protect",
+        "Thunderbolt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Latias",
+      "species": "Latias",
+      "item": "Soul Dew",
+      "ability": "Levitate",
+      "moves": [
+        "Draco Meteor",
+        "Mist Ball",
+        "Recover",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Zangoose",
+      "species": "Zangoose",
+      "item": "Toxic Orb",
+      "ability": "Toxic Boost",
+      "moves": [
+        "Protect",
+        "Knock Off",
+        "Feint",
+        "Facade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Mabosstiff",
+      "species": "Mabosstiff",
+      "item": "Choice Band",
+      "ability": "Intimidate",
+      "moves": [
+        "Crunch",
+        "Fire Fang",
+        "Psychic Fangs",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Darkrai",
+      "species": "Darkrai",
+      "item": "Life Orb",
+      "ability": "Bad Dreams",
+      "moves": [
+        "Sludge Bomb",
+        "Dark Pulse",
+        "Substitute",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Milotic",
+      "species": "Milotic",
+      "item": "Sitrus Berry",
+      "ability": "Competitive",
+      "moves": [
+        "Recover",
+        "Protect",
+        "Scald",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Comfey",
+      "species": "Comfey",
+      "item": "Sitrus Berry",
+      "ability": "Triage",
+      "moves": [
+        "Tailwind",
+        "Floral Healing",
+        "Draining Kiss",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"274,509,744,1213\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Necrozma|NecrozmaDawnWings|LifeOrb|PrismArmor|photongeyser,moongeistbeam,terablast,trickroom||85,,85,85,85,|N|,0,,,,0||74|,,,,,Fairy]Phione||Leftovers|Hydration|icebeam,takeheart,protect,scald||85,,85,85,85,85|N|,0,,,,||90|,,,,,Dragon]Infernape||FocusSash|Blaze|overheat,protect,closecombat,knockoff||85,85,85,85,85,85|F|||82|,,,,,Fire]Hydrapple||ChoiceSpecs|Regenerator|earthpower,leafstorm,gigadrain,dracometeor||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Glalie||SitrusBerry|InnerFocus|helpinghand,freezedry,icywind,disable||85,,85,85,85,85|M|,0,,,,||94|,,,,,Steel]Rotom|RotomFan|SitrusBerry|Levitate|electroweb,airslash,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||85|,,,,,Electric\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Latias||SoulDew|Levitate|dracometeor,mistball,recover,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Zangoose||ToxicOrb|ToxicBoost|protect,knockoff,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Normal]Mabosstiff||ChoiceBand|Intimidate|crunch,firefang,psychicfangs,playrough||85,85,85,85,85,85|F|||84|,,,,,Fairy]Darkrai||LifeOrb|BadDreams|sludgebomb,darkpulse,substitute,protect||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Milotic||SitrusBerry|Competitive|recover,protect,scald,icywind||85,,85,85,85,85|M|,0,,,,||81|,,,,,Grass]Comfey||SitrusBerry|Triage|tailwind,floralhealing,drainingkiss,helpinghand||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel\"}",
+    ">p1 move trickroom, move protect",
+    ">p2 move protect, move feint +1",
+    ">p1 move photongeyser +1, move icebeam +2",
+    ">p2 move protect, move facade +1",
+    ">p1 move photongeyser +1, move scald +2",
+    ">p2 move dracometeor +2, move knockoff +1",
+    ">p1 switch 5, pass",
+    ">p1 move disable +1, move takeheart",
+    ">p2 move dracometeor +1, move facade +2",
+    ">p1 pass, switch 6",
+    ">p2 pass, switch 3",
+    ">p1 move helpinghand -2, move protect",
+    ">p2 move protect, move playrough +1",
+    ">p1 move helpinghand -2, move electroweb",
+    ">p2 move protect, move playrough +1",
+    ">p1 move freezedry +2, move protect",
+    ">p2 move recover, move playrough +2",
+    ">p1 move disable +1, move electroweb",
+    ">p2 move dracometeor +1, move playrough +1",
+    ">p1 switch 4, pass",
+    ">p1 move earthpower +1, move thunderbolt +2",
+    ">p2 move mistball +1, move playrough +1",
+    ">p2 pass, switch 4",
+    ">p1 move earthpower +2, move electroweb",
+    ">p2 move protect, move darkpulse +1",
+    ">p1 move earthpower +2, move protect",
+    ">p2 move mistball +1, move protect",
+    ">p1 move earthpower +1, move protect",
+    ">p2 move recover, move sludgebomb +1",
+    ">p1 switch 3, pass",
+    ">p1 move closecombat +2, move airslash +1",
+    ">p2 move mistball +2, move darkpulse +1",
+    ">p2 pass, switch 6",
+    ">p1 move overheat +2, move protect",
+    ">p2 move protect, move floralhealing +2",
+    ">p1 move overheat +1, move airslash +1",
+    ">p2 move mistball +2, move tailwind",
+    ">p1 move overheat +2, move electroweb",
+    ">p2 move protect, move floralhealing +2",
+    ">p1 move closecombat +1, move airslash +2",
+    ">p2 move dracometeor +2, move tailwind",
+    ">p2 pass, switch 5",
+    ">p1 move closecombat +2, move protect",
+    ">p2 move recover, move protect",
+    ">p1 move protect, move airslash +2",
+    ">p2 move recover, move scald +2",
+    ">p1 move overheat +2, move thunderbolt +2",
+    ">p2 move protect, move icywind",
+    ">p1 move protect, move electroweb",
+    ">p2 move mistball +2, move scald +2",
+    ">p1 move closecombat +2, pass",
+    ">p2 move mistball +1, move scald +1",
+    ">p1 move closecombat +1, pass",
+    ">p2 move dracometeor +2, pass",
+    ">p1 move overheat +1, pass",
+    ">p2 move protect, pass",
+    ">p1 move knockoff +2, pass",
+    ">p2 move recover, pass",
+    ">p1 move protect, pass",
+    ">p2 move mistball +2, pass",
+    ">p1 move knockoff +1, pass",
+    ">p2 move protect, pass",
+    ">p1 move closecombat +1, pass",
+    ">p2 move mistball +1, pass"
+  ]
+}

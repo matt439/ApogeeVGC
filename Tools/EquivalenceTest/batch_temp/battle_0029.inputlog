@@ -1,0 +1,40 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"204,379,554,903"}
+>player p1 {"name":"Player1","team":"Pecharunt||SitrusBerry|PoisonPuppeteer|malignantchain,shadowball,poisongas,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dark]Mienshao||ChoiceBand|InnerFocus|knockoff,tripleaxel,uturn,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Excadrill||AssaultVest|MoldBreaker|highhorsepower,ironhead,rockslide,rapidspin||85,85,85,85,85,85|M|||82|,,,,,Flying]Whiscash||SitrusBerry|Oblivious|icywind,highhorsepower,protect,muddywater||85,85,85,85,85,85|F|||88|,,,,,Fire]Chandelure||ChoiceScarf|FlashFire|shadowball,heatwave,trick,energyball||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Breloom||FocusSash|Technician|closecombat,bulletseed,machpunch,spore||85,85,85,85,85,85|F|||84|,,,,,Fighting"}
+>player p2 {"name":"Player2","team":"Oinkologne|OinkologneF|ChoiceBand|ThickFat|bodyslam,doubleedge,lashout,highhorsepower||85,85,85,85,85,85|F|||92|,,,,,Normal]Mienshao||ChoiceBand|InnerFocus|tripleaxel,knockoff,closecombat,uturn||85,85,85,85,85,85|M|||84|,,,,,Steel]Scovillain||SitrusBerry|Chlorophyll|ragepowder,energyball,fireblast,willowisp||85,,85,85,85,85|F|,0,,,,||90|,,,,,Fire]Lucario||LifeOrb|InnerFocus|protect,flashcannon,closecombat,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Milotic||SitrusBerry|Competitive|dragontail,scald,icywind,recover||85,85,85,85,85,85|M|||81|,,,,,Steel]Houndoom||LifeOrb|FlashFire|heatwave,protect,nastyplot,darkpulse||85,,85,85,85,85|M|,0,,,,||86|,,,,,Grass"}
+>p1 move poisongas, move uturn +2
+>p2 move doubleedge +2, move knockoff +1
+>p1 pass, switch 5
+>p1 move poisongas, move energyball +1
+>p2 move doubleedge +2, move knockoff +1
+>p1 switch 4, pass
+>p1 move icywind, move energyball +2
+>p2 move doubleedge +2, move knockoff +2
+>p1 pass, switch 3
+>p2 pass, switch 3
+>p1 move highhorsepower +1, move rockslide
+>p2 move doubleedge +2, move fireblast +2
+>p2 switch 4, pass
+>p1 move highhorsepower +2, move rapidspin +2
+>p2 move closecombat +2, move fireblast +2
+>p1 pass, switch 6
+>p1 move protect, move spore +2
+>p2 move closecombat +1, move energyball +2
+>p1 move icywind, move closecombat +2
+>p2 move protect, move ragepowder
+>p2 pass, switch 6
+>p1 move muddywater, move spore +2
+>p2 move extremespeed +2, move protect
+>p1 move highhorsepower +2, move machpunch +2
+>p2 move closecombat +1, move heatwave
+>p1 switch 5, pass
+>p1 move tripleaxel +1, pass
+>p2 move protect, move darkpulse +1
+>p1 move tripleaxel +1, pass
+>p2 move protect, move darkpulse +2
+>p2 switch 5, pass
+>p1 move tripleaxel +1, pass
+>p2 move recover, pass
+>p1 move tripleaxel +2, pass
+>p2 move dragontail +2, pass
+>p1 move tripleaxel +1, pass
+>p2 move icywind, pass

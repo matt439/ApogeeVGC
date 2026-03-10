@@ -1,0 +1,60 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"190,353,516,841"}
+>player p1 {"name":"Player1","team":"Manaphy||Leftovers|Hydration|icebeam,tailglow,scald,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass]Cobalion||SitrusBerry|Justified|thunderwave,ironhead,voltswitch,bodypress||85,85,85,85,85,85|N|||79|,,,,,Water]Politoed||ChoiceSpecs|Drizzle|weatherball,hydropump,muddywater,icebeam||85,,85,85,85,85|M|,0,,,,||82|,,,,,Water]Comfey||SitrusBerry|Triage|helpinghand,tailwind,floralhealing,drainingkiss||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel]Haxorus||LoadedDice|Unnerve|protect,ironhead,swordsdance,scaleshot||85,85,85,85,85,85|M|||84|,,,,,Steel]Blissey||SitrusBerry|Healer|helpinghand,hypervoice,softboiled,thunderwave||85,,85,85,85,85|F|,0,,,,||96|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Registeel||Leftovers|ClearBody|bodypress,ironhead,irondefense,thunderwave||85,85,85,85,85,85|N|||78|,,,,,Fighting]Magmortar||SitrusBerry|FlameBody|focusblast,followme,heatwave,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fire]Delibird||SitrusBerry|VitalSpirit|helpinghand,bravebird,fakeout,icywind||85,85,85,85,85,85|F||||,,,,,Steel]Flapple||ClearAmulet|Hustle|terablast,dragondance,protect,gravapple||85,85,85,85,85,85|F|||95|,,,,,Fire]Golem||ChoiceBand|Sturdy|stoneedge,rockslide,highhorsepower,firepunch||85,85,85,85,85,85|F|||87|,,,,,Grass]Scream Tail||SitrusBerry|Protosynthesis|thunderwave,disable,playrough,helpinghand||85,85,85,85,85,85|N|||82|,,,,,Steel"}
+>p1 move protect, move ironhead +1
+>p2 move thunderwave +2, move protect
+>p1 move protect, move ironhead +1
+>p2 move ironhead +1, move protect
+>p1 move scald +2, move ironhead +2
+>p2 move irondefense, move focusblast +1
+>p1 move icebeam +1, move ironhead +1
+>p2 move irondefense, move protect
+>p1 move protect, move thunderwave +1
+>p2 move irondefense, move heatwave
+>p1 move scald +1, move thunderwave +2
+>p2 move bodypress +1, move followme
+>p2 pass, switch 4
+>p1 move tailglow, move voltswitch +2
+>p2 move irondefense, move terablast +2
+>p1 move scald +2, move ironhead +2
+>p2 move thunderwave +2, move terablast +2
+>p1 move scald +2, move ironhead +2
+>p2 move bodypress +2, move protect
+>p1 move tailglow, move thunderwave +2
+>p2 move thunderwave +2, move dragondance
+>p1 move protect, move bodypress +2
+>p2 move irondefense, move terablast +2
+>p1 pass, switch 6
+>p1 move scald +2, move helpinghand -1
+>p2 move bodypress +2, move gravapple +1
+>p1 move tailglow, move thunderwave +1
+>p2 move irondefense, move dragondance
+>p2 pass, switch 6
+>p1 move protect, move hypervoice
+>p2 move irondefense, move thunderwave +2
+>p1 move protect, move thunderwave +1
+>p2 move irondefense, move disable +2
+>p1 move protect, move softboiled
+>p2 move thunderwave +1, move helpinghand -1
+>p1 move icebeam +1, move softboiled
+>p2 move irondefense, move disable +2
+>p1 move tailglow, move helpinghand -1
+>p2 move thunderwave +2, move playrough +1
+>p1 move tailglow, move hypervoice
+>p2 move ironhead +1, move helpinghand -1
+>p1 move protect, move hypervoice
+>p2 move irondefense, move disable +1
+>p1 move tailglow, move helpinghand -1
+>p2 move ironhead +1, move helpinghand -1
+>p1 move scald +1, move softboiled
+>p2 move thunderwave +1, move helpinghand -1
+>p2 switch 3, pass
+>p1 move icebeam +2, move hypervoice
+>p2 move helpinghand -2, move playrough +2
+>p2 pass, switch 5
+>p1 move scald +2, move thunderwave +1
+>p2 move helpinghand -2, move rockslide
+>p1 move tailglow, move softboiled
+>p2 move icywind, pass
+>p1 move scald +1, move thunderwave +1
+>p2 move fakeout +1, pass

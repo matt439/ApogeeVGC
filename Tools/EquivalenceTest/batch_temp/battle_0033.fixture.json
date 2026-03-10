@@ -1,0 +1,427 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "232,431,630,1027",
+  "p1Seed": "1363,1439,1581,1789",
+  "p2Seed": "1997,2073,2281,2423",
+  "p1TeamPacked": "Goodra||AssaultVest|SapSipper|powerwhip,dracometeor,sludgebomb,fireblast||85,85,85,85,85,85|F|||86|,,,,,Poison]Swanna||LifeOrb|Hydration|bravebird,hydropump,tailwind,protect||85,85,85,85,85,85|F|||87|,,,,,Ground]Roaring Moon||ClearAmulet|Protosynthesis|dragonclaw,dragondance,protect,knockoff||85,85,85,85,85,85|N|||76|,,,,,Fire]Magmortar||SitrusBerry|FlameBody|focusblast,fireblast,thunderbolt,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fire]Leavanny||LifeOrb|Swarm|leafblade,lunge,protect,stickyweb||85,85,85,85,85,85|M|||91|,,,,,Water]Tauros|TaurosPaldeaBlaze|SitrusBerry|Intimidate|bulkup,protect,ragingbull,closecombat||85,85,85,85,85,85|M|||79|,,,,,Water",
+  "p2TeamPacked": "Meloetta||LifeOrb|SereneGrace|psychic,relicsong,terablast,closecombat||85,85,85,85,85,85|N|||80|,,,,,Normal]Arcanine|ArcanineHisui|ChoiceBand|Intimidate|flareblitz,stoneedge,extremespeed,rockslide||85,85,85,85,85,85|M|||79|,,,,,Normal]Pawmot||LifeOrb|VoltAbsorb|doubleshock,closecombat,protect,revivalblessing||85,85,85,85,85,85|F|||80|,,,,,Electric]Farigiraf||LifeOrb|ArmorTail|hypervoice,psychic,protect,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fairy]Wugtrio||ChoiceBand|Gooey|liquidation,aquajet,throatchop,stompingtantrum||85,85,85,85,85,85|F|||92|,,,,,Dark]Pelipper||SitrusBerry|Drizzle|tailwind,hurricane,protect,muddywater||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel",
+  "p1Team": [
+    {
+      "name": "Goodra",
+      "species": "Goodra",
+      "item": "Assault Vest",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Power Whip",
+        "Draco Meteor",
+        "Sludge Bomb",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Swanna",
+      "species": "Swanna",
+      "item": "Life Orb",
+      "ability": "Hydration",
+      "moves": [
+        "Brave Bird",
+        "Hydro Pump",
+        "Tailwind",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Roaring Moon",
+      "species": "Roaring Moon",
+      "item": "Clear Amulet",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Dragon Claw",
+        "Dragon Dance",
+        "Protect",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 76,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Magmortar",
+      "species": "Magmortar",
+      "item": "Sitrus Berry",
+      "ability": "Flame Body",
+      "moves": [
+        "Focus Blast",
+        "Fire Blast",
+        "Thunderbolt",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Leavanny",
+      "species": "Leavanny",
+      "item": "Life Orb",
+      "ability": "Swarm",
+      "moves": [
+        "Leaf Blade",
+        "Lunge",
+        "Protect",
+        "Sticky Web"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Tauros",
+      "species": "Tauros-Paldea-Blaze",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Bulk Up",
+        "Protect",
+        "Raging Bull",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Meloetta",
+      "species": "Meloetta",
+      "item": "Life Orb",
+      "ability": "Serene Grace",
+      "moves": [
+        "Psychic",
+        "Relic Song",
+        "Tera Blast",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Arcanine",
+      "species": "Arcanine-Hisui",
+      "item": "Choice Band",
+      "ability": "Intimidate",
+      "moves": [
+        "Flare Blitz",
+        "Stone Edge",
+        "Extreme Speed",
+        "Rock Slide"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Pawmot",
+      "species": "Pawmot",
+      "item": "Life Orb",
+      "ability": "Volt Absorb",
+      "moves": [
+        "Double Shock",
+        "Close Combat",
+        "Protect",
+        "Revival Blessing"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Farigiraf",
+      "species": "Farigiraf",
+      "item": "Life Orb",
+      "ability": "Armor Tail",
+      "moves": [
+        "Hyper Voice",
+        "Psychic",
+        "Protect",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Wugtrio",
+      "species": "Wugtrio",
+      "item": "Choice Band",
+      "ability": "Gooey",
+      "moves": [
+        "Liquidation",
+        "Aqua Jet",
+        "Throat Chop",
+        "Stomping Tantrum"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Pelipper",
+      "species": "Pelipper",
+      "item": "Sitrus Berry",
+      "ability": "Drizzle",
+      "moves": [
+        "Tailwind",
+        "Hurricane",
+        "Protect",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"232,431,630,1027\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Goodra||AssaultVest|SapSipper|powerwhip,dracometeor,sludgebomb,fireblast||85,85,85,85,85,85|F|||86|,,,,,Poison]Swanna||LifeOrb|Hydration|bravebird,hydropump,tailwind,protect||85,85,85,85,85,85|F|||87|,,,,,Ground]Roaring Moon||ClearAmulet|Protosynthesis|dragonclaw,dragondance,protect,knockoff||85,85,85,85,85,85|N|||76|,,,,,Fire]Magmortar||SitrusBerry|FlameBody|focusblast,fireblast,thunderbolt,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fire]Leavanny||LifeOrb|Swarm|leafblade,lunge,protect,stickyweb||85,85,85,85,85,85|M|||91|,,,,,Water]Tauros|TaurosPaldeaBlaze|SitrusBerry|Intimidate|bulkup,protect,ragingbull,closecombat||85,85,85,85,85,85|M|||79|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Meloetta||LifeOrb|SereneGrace|psychic,relicsong,terablast,closecombat||85,85,85,85,85,85|N|||80|,,,,,Normal]Arcanine|ArcanineHisui|ChoiceBand|Intimidate|flareblitz,stoneedge,extremespeed,rockslide||85,85,85,85,85,85|M|||79|,,,,,Normal]Pawmot||LifeOrb|VoltAbsorb|doubleshock,closecombat,protect,revivalblessing||85,85,85,85,85,85|F|||80|,,,,,Electric]Farigiraf||LifeOrb|ArmorTail|hypervoice,psychic,protect,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fairy]Wugtrio||ChoiceBand|Gooey|liquidation,aquajet,throatchop,stompingtantrum||85,85,85,85,85,85|F|||92|,,,,,Dark]Pelipper||SitrusBerry|Drizzle|tailwind,hurricane,protect,muddywater||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel\"}",
+    ">p1 move powerwhip +2, move protect",
+    ">p2 move relicsong, move flareblitz +2",
+    ">p1 move sludgebomb +1, move protect",
+    ">p2 move terablast +1, move flareblitz +2",
+    ">p1 move fireblast +1, move tailwind",
+    ">p2 move psychic +2, move flareblitz +1",
+    ">p1 move dracometeor +1, move bravebird +1",
+    ">p2 move closecombat +2, move flareblitz +2",
+    ">p1 pass, switch 3",
+    ">p2 switch 3, switch 6",
+    ">p1 move powerwhip +1, move dragondance",
+    ">p2 move protect, move tailwind",
+    ">p1 move powerwhip +2, move protect",
+    ">p2 move revivalblessing, move tailwind",
+    ">p2 switch 6, pass",
+    ">p1 move powerwhip +1, move dragonclaw +2",
+    ">p2 move doubleshock +2, move hurricane +1",
+    ">p1 move powerwhip +2, move knockoff +1",
+    ">p2 move doubleshock +1, move protect",
+    ">p1 move powerwhip +1, move dragonclaw +1",
+    ">p2 move protect, move protect",
+    ">p1 move sludgebomb +1, move protect",
+    ">p2 move doubleshock +2, move hurricane +1",
+    ">p2 switch 6, pass",
+    ">p1 move dracometeor +2, move knockoff +2",
+    ">p2 move rockslide, move hurricane +2",
+    ">p2 pass, switch 5",
+    ">p1 move sludgebomb +2, move dragonclaw +2",
+    ">p2 move rockslide, move aquajet +1",
+    ">p1 switch 4, switch 6",
+    ">p1 move thunderbolt +2, move closecombat +2",
+    ">p2 move rockslide, move aquajet +1",
+    ">p1 switch 5, pass",
+    ">p2 pass, switch 4",
+    ">p1 move leafblade +1, move closecombat +2",
+    ">p2 move rockslide, move psychic +1",
+    ">p1 move lunge +1, move bulkup",
+    ">p2 pass, move psychic +1"
+  ]
+}

@@ -1,0 +1,449 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "22,41,60,97",
+  "p1Seed": "133,149,171,199",
+  "p2Seed": "227,243,271,293",
+  "p1TeamPacked": "Toxicroak||FocusSash|DrySkin|suckerpunch,gunkshot,fakeout,closecombat||85,85,85,85,85,85|M|||85|,,,,,Fighting]Flutter Mane||ChoiceSpecs|Protosynthesis|icywind,dazzlinggleam,shadowball,moonblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy]Wigglytuff||SitrusBerry|Competitive|thunderwave,helpinghand,dazzlinggleam,encore||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Staraptor||LifeOrb|Intimidate|protect,quickattack,closecombat,bravebird||85,85,85,85,85,85|M|||82|,,,,,Fighting]Heracross||FlameOrb|Guts|protect,knockoff,facade,closecombat||85,85,85,85,85,85|F|||82|,,,,,Normal]Altaria||SitrusBerry|NaturalCure|bravebird,willowisp,tailwind,roost||85,85,85,85,85,85|F|||91|,,,,,Steel",
+  "p2TeamPacked": "Cacturne||LifeOrb|WaterAbsorb|leafstorm,suckerpunch,knockoff,spikyshield||85,85,85,85,85,85|M|||91|,,,,,Dark]Arbok||SitrusBerry|Intimidate|gunkshot,glare,toxicspikes,knockoff||85,85,85,85,85,85|F|||88|,,,,,Dark]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,protect,flipturn||85,85,85,85,85,85|M|||79|,,,,,Water]Diancie||SitrusBerry|ClearBody|protect,bodypress,diamondstorm,trickroom||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Electrode|ElectrodeHisui|SitrusBerry|Soundproof|electroweb,thunderbolt,energyball,taunt||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Tinkaton||SitrusBerry|OwnTempo|gigatonhammer,fakeout,playrough,stealthrock||85,85,85,85,85,85|F|||82|,,,,,Water",
+  "p1Team": [
+    {
+      "name": "Toxicroak",
+      "species": "Toxicroak",
+      "item": "Focus Sash",
+      "ability": "Dry Skin",
+      "moves": [
+        "Sucker Punch",
+        "Gunk Shot",
+        "Fake Out",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Flutter Mane",
+      "species": "Flutter Mane",
+      "item": "Choice Specs",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Icy Wind",
+        "Dazzling Gleam",
+        "Shadow Ball",
+        "Moonblast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Wigglytuff",
+      "species": "Wigglytuff",
+      "item": "Sitrus Berry",
+      "ability": "Competitive",
+      "moves": [
+        "Thunder Wave",
+        "Helping Hand",
+        "Dazzling Gleam",
+        "Encore"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Staraptor",
+      "species": "Staraptor",
+      "item": "Life Orb",
+      "ability": "Intimidate",
+      "moves": [
+        "Protect",
+        "Quick Attack",
+        "Close Combat",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Heracross",
+      "species": "Heracross",
+      "item": "Flame Orb",
+      "ability": "Guts",
+      "moves": [
+        "Protect",
+        "Knock Off",
+        "Facade",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Altaria",
+      "species": "Altaria",
+      "item": "Sitrus Berry",
+      "ability": "Natural Cure",
+      "moves": [
+        "Brave Bird",
+        "Will-O-Wisp",
+        "Tailwind",
+        "Roost"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Cacturne",
+      "species": "Cacturne",
+      "item": "Life Orb",
+      "ability": "Water Absorb",
+      "moves": [
+        "Leaf Storm",
+        "Sucker Punch",
+        "Knock Off",
+        "Spiky Shield"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Arbok",
+      "species": "Arbok",
+      "item": "Sitrus Berry",
+      "ability": "Intimidate",
+      "moves": [
+        "Gunk Shot",
+        "Glare",
+        "Toxic Spikes",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Palafin",
+      "species": "Palafin",
+      "item": "Mystic Water",
+      "ability": "Zero to Hero",
+      "moves": [
+        "Jet Punch",
+        "Wave Crash",
+        "Protect",
+        "Flip Turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Diancie",
+      "species": "Diancie",
+      "item": "Sitrus Berry",
+      "ability": "Clear Body",
+      "moves": [
+        "Protect",
+        "Body Press",
+        "Diamond Storm",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Electrode",
+      "species": "Electrode-Hisui",
+      "item": "Sitrus Berry",
+      "ability": "Soundproof",
+      "moves": [
+        "Electroweb",
+        "Thunderbolt",
+        "Energy Ball",
+        "Taunt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Tinkaton",
+      "species": "Tinkaton",
+      "item": "Sitrus Berry",
+      "ability": "Own Tempo",
+      "moves": [
+        "Gigaton Hammer",
+        "Fake Out",
+        "Play Rough",
+        "Stealth Rock"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"22,41,60,97\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Toxicroak||FocusSash|DrySkin|suckerpunch,gunkshot,fakeout,closecombat||85,85,85,85,85,85|M|||85|,,,,,Fighting]Flutter Mane||ChoiceSpecs|Protosynthesis|icywind,dazzlinggleam,shadowball,moonblast||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy]Wigglytuff||SitrusBerry|Competitive|thunderwave,helpinghand,dazzlinggleam,encore||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Staraptor||LifeOrb|Intimidate|protect,quickattack,closecombat,bravebird||85,85,85,85,85,85|M|||82|,,,,,Fighting]Heracross||FlameOrb|Guts|protect,knockoff,facade,closecombat||85,85,85,85,85,85|F|||82|,,,,,Normal]Altaria||SitrusBerry|NaturalCure|bravebird,willowisp,tailwind,roost||85,85,85,85,85,85|F|||91|,,,,,Steel\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Cacturne||LifeOrb|WaterAbsorb|leafstorm,suckerpunch,knockoff,spikyshield||85,85,85,85,85,85|M|||91|,,,,,Dark]Arbok||SitrusBerry|Intimidate|gunkshot,glare,toxicspikes,knockoff||85,85,85,85,85,85|F|||88|,,,,,Dark]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,protect,flipturn||85,85,85,85,85,85|M|||79|,,,,,Water]Diancie||SitrusBerry|ClearBody|protect,bodypress,diamondstorm,trickroom||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Electrode|ElectrodeHisui|SitrusBerry|Soundproof|electroweb,thunderbolt,energyball,taunt||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Tinkaton||SitrusBerry|OwnTempo|gigatonhammer,fakeout,playrough,stealthrock||85,85,85,85,85,85|F|||82|,,,,,Water\"}",
+    ">p1 move closecombat +1, move dazzlinggleam",
+    ">p2 move knockoff +1, move toxicspikes",
+    ">p2 switch 5, pass",
+    ">p1 move fakeout +2, move dazzlinggleam",
+    ">p2 move taunt +2, move toxicspikes",
+    ">p1 move closecombat +1, move dazzlinggleam",
+    ">p2 move electroweb, move knockoff +2",
+    ">p1 move fakeout +1, move icywind",
+    ">p2 move electroweb, move glare +2",
+    ">p2 switch 6, pass",
+    ">p1 move suckerpunch +2, move moonblast +2",
+    ">p2 move stealthrock, move glare +1",
+    ">p1 move fakeout +2, move moonblast +2",
+    ">p2 move playrough +1, move gunkshot +1",
+    ">p1 switch 3, switch 6",
+    ">p1 move helpinghand -2, move roost",
+    ">p2 move fakeout +1, move toxicspikes",
+    ">p1 move thunderwave +2, move willowisp +2",
+    ">p2 move stealthrock, move glare +2",
+    ">p1 move thunderwave +2, move willowisp +2",
+    ">p2 move fakeout +1, move glare +2",
+    ">p1 move thunderwave +1, move roost",
+    ">p2 move stealthrock, move toxicspikes",
+    ">p1 move helpinghand -2, move bravebird +1",
+    ">p2 move gigatonhammer +1, move toxicspikes",
+    ">p1 switch 4, pass",
+    ">p1 move protect, move tailwind",
+    ">p2 move playrough +2, move gunkshot +1",
+    ">p1 move bravebird +1, move tailwind",
+    ">p2 move playrough +1, move glare +2",
+    ">p1 move quickattack +2, move tailwind",
+    ">p2 move fakeout +1, move toxicspikes",
+    ">p2 pass, switch 3",
+    ">p1 move quickattack +2, move willowisp +1",
+    ">p2 move gigatonhammer +2, move flipturn +1",
+    ">p2 pass, switch 4",
+    ">p1 move quickattack +1, move roost",
+    ">p2 move gigatonhammer +1, move bodypress +2",
+    ">p1 switch 5, pass",
+    ">p1 move knockoff +2, move willowisp +1",
+    ">p2 move stealthrock, move bodypress +1",
+    ">p1 move facade +1, move willowisp +2",
+    ">p2 move stealthrock, move protect",
+    ">p1 move protect, move willowisp +2",
+    ">p2 move playrough +2, move bodypress +1",
+    ">p1 move closecombat +1, move tailwind",
+    ">p2 move playrough +1, move trickroom",
+    ">p2 switch 4, pass",
+    ">p1 move protect, move roost",
+    ">p2 move protect, move protect",
+    ">p1 pass, move willowisp +1",
+    ">p2 move jetpunch +2, move diamondstorm"
+  ]
+}

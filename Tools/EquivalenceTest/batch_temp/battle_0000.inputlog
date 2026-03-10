@@ -1,45 +1,37 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"1,2,3,4"}
->player p1 {"name":"Player1","team":"Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,dragonclaw,heatcrash,dragondance||85,85,85,85,85,85|N|||75|,,,,,Fire]Florges||Leftovers|FlowerVeil|synthesis,protect,dazzlinggleam,calmmind||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Arceus|ArceusFairy|PixiePlate|Multitype|judgment,snarl,icywind,willowisp||85,,85,85,85,85|N|,0,,,,||70|,,,,,Steel]Squawkabilly|SquawkabillyBlue|LifeOrb|Intimidate|protect,quickattack,bravebird,doubleedge||85,85,85,85,85,85|M|||91|,,,,,Flying]Braviary|BraviaryHisui|Leftovers|TintedLens|hurricane,calmmind,protect,esperwing||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Veluza||ChoiceBand|Sharpness|nightslash,psychocut,aquajet,aquacutter||85,85,85,85,85,85|F|||88|,,,,,Psychic"}
->player p2 {"name":"Player2","team":"Pincurchin||SitrusBerry|ElectricSurge|scald,recover,electroweb,thunderbolt||85,,85,85,85,85|M|,0,,,,||97|,,,,,Water]Dialga||SitrusBerry|Telepathy|protect,fireblast,dracometeor,heavyslam||85,85,85,85,85,85|N|||74|,,,,,Dragon]Scrafty||AssaultVest|Intimidate|snarl,fakeout,closecombat,knockoff||85,85,85,85,85,85|F|||83|,,,,,Poison]Blastoise||SitrusBerry|Torrent|icywind,flipturn,wavecrash,yawn||85,85,85,85,85,85|M|||83|,,,,,Grass]Barraskewda||ChoiceBand|PropellerTail|poisonjab,waterfall,closecombat,flipturn||85,85,85,85,85,85|M|||85|,,,,,Fighting]Ogerpon||ChoiceBand|Defiant|knockoff,uturn,superpower,ivycudgel||85,85,85,85,85,85|F|||78|,,,,,Grass"}
->p1 move dragondance, move protect
->p2 move recover, move dracometeor +1
->p1 switch 4, pass
->p1 move protect, move synthesis
->p2 move scald +1, move heavyslam +2
->p1 move doubleedge +2, move dazzlinggleam
->p2 move recover, move protect
->p1 move protect, move synthesis
->p2 move recover, move dracometeor +1
->p1 move protect, move dazzlinggleam
->p2 move electroweb, move fireblast +2
->p1 move quickattack +1, move dazzlinggleam
->p2 move thunderbolt +1, move fireblast +2
+>player p1 {"name":"Player1","team":"Scizor||ChoiceBand|Technician|uturn,closecombat,bugbite,bulletpunch||85,85,85,85,85,85|F|||80|,,,,,Water]Ogerpon||ChoiceBand|Defiant|superpower,ivycudgel,uturn,knockoff||85,85,85,85,85,85|F|||78|,,,,,Grass]Milotic||SitrusBerry|Competitive|scald,icywind,recover,dragontail||85,85,85,85,85,85|M|||81|,,,,,Steel]Azelf||LifeOrb|Levitate|protect,fireblast,dazzlinggleam,psychic||85,,85,85,85,85|N|,0,,,,||83|,,,,,Fairy]Kingdra||LifeOrb|SwiftSwim|dracometeor,wavecrash,protect,raindance||85,85,85,85,85,85|F|||85|,,,,,Water]Regigigas||Leftovers|SlowStart|protect,knockoff,doubleedge,thunderwave||85,85,85,85,85,85|N|||86|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Eiscue||SitrusBerry|IceFace|bellydrum,protect,icespinner,liquidation||85,85,85,85,85,85|M|||89|,,,,,Water]Cramorant||SitrusBerry|GulpMissile|bravebird,surf,protect,tailwind||85,85,85,85,85,85|M|||86|,,,,,Ground]Volcanion||SitrusBerry|WaterAbsorb|steameruption,earthpower,heatwave,protect||85,,85,85,85,85|N|,0,,,,||75|,,,,,Ground]Sunflora||LifeOrb|Chlorophyll|sludgebomb,earthpower,protect,leafstorm||85,,85,85,85,85|M|,0,,,,|||,,,,,Poison]Snorlax||FigyBerry|Gluttony|encore,icywind,bodyslam,highhorsepower||85,85,85,85,85,85|M|||84|,,,,,Ground]Electrode|ElectrodeHisui|LifeOrb|Static|foulplay,protect,leafstorm,thunderbolt||85,,85,85,85,85|N|,0,,,,||88|,,,,,Dark"}
+>p1 move closecombat +2, move superpower +1
+>p2 move protect, move protect
+>p1 move closecombat +2, move superpower +1
+>p2 move liquidation +2, move tailwind
+>p1 move closecombat +2, move superpower +1
+>p2 move liquidation +2, move tailwind
+>p2 switch 4, pass
+>p1 move closecombat +2, move superpower +1
+>p2 move sludgebomb +1, move protect
+>p1 move closecombat +1, move superpower +2
+>p2 move earthpower +1, move tailwind
+>p1 switch 5, pass
+>p1 move raindance, move superpower +2
+>p2 move sludgebomb +2, move bravebird +2
+>p1 pass, switch 4
+>p1 move wavecrash +2, move protect
+>p2 move earthpower +1, move surf
 >p1 switch 6, pass
->p1 move psychocut +1, move dazzlinggleam
->p2 move recover, move heavyslam +2
->p2 switch 5, pass
->p1 move psychocut +2, move dazzlinggleam
->p2 move closecombat +2, move fireblast +2
->p1 pass, switch 5
->p1 move psychocut +2, move esperwing +2
->p2 move closecombat +1, move dracometeor +2
->p2 switch 3, switch 4
->p1 move psychocut +1, move protect
->p2 move fakeout +2, move wavecrash +1
->p1 move psychocut +1, move protect
->p2 move fakeout +1, move flipturn +2
->p2 pass, switch 6
->p1 move psychocut +1, move protect
->p2 move closecombat +1, move knockoff +2
->p1 move psychocut +1, move hurricane +1
->p2 move knockoff +2, move knockoff +1
+>p2 pass, switch 5
+>p1 move doubleedge +2, move dazzlinggleam
+>p2 move leafstorm +1, move highhorsepower +2
+>p1 move knockoff +2, move fireblast +1
+>p2 move protect, move icywind
+>p1 move doubleedge +2, move dazzlinggleam
+>p2 move leafstorm +1, move encore +2
 >p1 switch 3, pass
->p1 move icywind, move esperwing +1
->p2 move fakeout +2, move knockoff +2
->p1 move judgment +1, pass
->p2 move knockoff +1, move knockoff +2
 >p2 switch 6, pass
->p1 move snarl, pass
->p2 move icywind, move knockoff +1
->p1 move snarl, pass
->p2 move icywind, move knockoff +1
+>p1 move recover, move dazzlinggleam
+>p2 move thunderbolt +1, move icywind
+>p1 move icywind, move dazzlinggleam
+>p2 move thunderbolt +2, move highhorsepower +2
+>p2 pass, switch 3
+>p1 move scald +1, pass
+>p2 move leafstorm +1, move steameruption +2

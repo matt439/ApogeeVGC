@@ -1,0 +1,439 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "498,925,1352,2205",
+  "p1Seed": "2921,3073,3367,3803",
+  "p2Seed": "4239,4391,4827,5121",
+  "p1TeamPacked": "Mienshao||AssaultVest|Regenerator|knockoff,uturn,fakeout,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Enamorus||LifeOrb|Contrary|playrough,protect,tailwind,superpower||85,85,85,85,85,85|F|||79|,,,,,Fighting]Crawdaunt||LifeOrb|Adaptability|protect,knockoff,crabhammer,aquajet||85,85,85,85,85,85|M|||87|,,,,,Water]Persian|PersianAlola|SitrusBerry|FurCoat|fakeout,foulplay,taunt,thunderwave||85,85,85,85,85,85|M|||88|,,,,,Poison]Palossand||SitrusBerry|WaterCompaction|stealthrock,protect,earthpower,shadowball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Grass]Raichu|RaichuAlola|ChoiceSpecs|SurgeSurfer|voltswitch,thunderbolt,psychic,focusblast||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting",
+  "p2TeamPacked": "Bellossom||SitrusBerry|Healer|protect,gigadrain,quiverdance,batonpass||85,,85,85,85,85|F|,0,,,,||87|,,,,,Water]Iron Treads||SitrusBerry|QuarkDrive|highhorsepower,stealthrock,knockoff,ironhead||85,85,85,85,85,85|N|||81|,,,,,Flying]Mamoswine||LifeOrb|ThickFat|iciclecrash,highhorsepower,protect,iceshard||85,85,85,85,85,85|M|||82|,,,,,Ice]Noctowl||LifeOrb|TintedLens|hypervoice,protect,tailwind,hurricane||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Granbull||AssaultVest|Intimidate|superfang,stompingtantrum,closecombat,playrough||85,85,85,85,85,85|F|||88|,,,,,Steel]Eternatus||Leftovers|Pressure|toxicspikes,sludgebomb,dynamaxcannon,recover||85,,85,85,85,85|N|,0,,,,||70|,,,,,Water",
+  "p1Team": [
+    {
+      "name": "Mienshao",
+      "species": "Mienshao",
+      "item": "Assault Vest",
+      "ability": "Regenerator",
+      "moves": [
+        "Knock Off",
+        "U-turn",
+        "Fake Out",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Enamorus",
+      "species": "Enamorus",
+      "item": "Life Orb",
+      "ability": "Contrary",
+      "moves": [
+        "Play Rough",
+        "Protect",
+        "Tailwind",
+        "Superpower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Crawdaunt",
+      "species": "Crawdaunt",
+      "item": "Life Orb",
+      "ability": "Adaptability",
+      "moves": [
+        "Protect",
+        "Knock Off",
+        "Crabhammer",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Persian",
+      "species": "Persian-Alola",
+      "item": "Sitrus Berry",
+      "ability": "Fur Coat",
+      "moves": [
+        "Fake Out",
+        "Foul Play",
+        "Taunt",
+        "Thunder Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Palossand",
+      "species": "Palossand",
+      "item": "Sitrus Berry",
+      "ability": "Water Compaction",
+      "moves": [
+        "Stealth Rock",
+        "Protect",
+        "Earth Power",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Raichu",
+      "species": "Raichu-Alola",
+      "item": "Choice Specs",
+      "ability": "Surge Surfer",
+      "moves": [
+        "Volt Switch",
+        "Thunderbolt",
+        "Psychic",
+        "Focus Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Bellossom",
+      "species": "Bellossom",
+      "item": "Sitrus Berry",
+      "ability": "Healer",
+      "moves": [
+        "Protect",
+        "Giga Drain",
+        "Quiver Dance",
+        "Baton Pass"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Iron Treads",
+      "species": "Iron Treads",
+      "item": "Sitrus Berry",
+      "ability": "Quark Drive",
+      "moves": [
+        "High Horsepower",
+        "Stealth Rock",
+        "Knock Off",
+        "Iron Head"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Mamoswine",
+      "species": "Mamoswine",
+      "item": "Life Orb",
+      "ability": "Thick Fat",
+      "moves": [
+        "Icicle Crash",
+        "High Horsepower",
+        "Protect",
+        "Ice Shard"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Noctowl",
+      "species": "Noctowl",
+      "item": "Life Orb",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Hyper Voice",
+        "Protect",
+        "Tailwind",
+        "Hurricane"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Granbull",
+      "species": "Granbull",
+      "item": "Assault Vest",
+      "ability": "Intimidate",
+      "moves": [
+        "Super Fang",
+        "Stomping Tantrum",
+        "Close Combat",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Eternatus",
+      "species": "Eternatus",
+      "item": "Leftovers",
+      "ability": "Pressure",
+      "moves": [
+        "Toxic Spikes",
+        "Sludge Bomb",
+        "Dynamax Cannon",
+        "Recover"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 70,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"498,925,1352,2205\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Mienshao||AssaultVest|Regenerator|knockoff,uturn,fakeout,closecombat||85,85,85,85,85,85|F|||84|,,,,,Steel]Enamorus||LifeOrb|Contrary|playrough,protect,tailwind,superpower||85,85,85,85,85,85|F|||79|,,,,,Fighting]Crawdaunt||LifeOrb|Adaptability|protect,knockoff,crabhammer,aquajet||85,85,85,85,85,85|M|||87|,,,,,Water]Persian|PersianAlola|SitrusBerry|FurCoat|fakeout,foulplay,taunt,thunderwave||85,85,85,85,85,85|M|||88|,,,,,Poison]Palossand||SitrusBerry|WaterCompaction|stealthrock,protect,earthpower,shadowball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Grass]Raichu|RaichuAlola|ChoiceSpecs|SurgeSurfer|voltswitch,thunderbolt,psychic,focusblast||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Bellossom||SitrusBerry|Healer|protect,gigadrain,quiverdance,batonpass||85,,85,85,85,85|F|,0,,,,||87|,,,,,Water]Iron Treads||SitrusBerry|QuarkDrive|highhorsepower,stealthrock,knockoff,ironhead||85,85,85,85,85,85|N|||81|,,,,,Flying]Mamoswine||LifeOrb|ThickFat|iciclecrash,highhorsepower,protect,iceshard||85,85,85,85,85,85|M|||82|,,,,,Ice]Noctowl||LifeOrb|TintedLens|hypervoice,protect,tailwind,hurricane||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Granbull||AssaultVest|Intimidate|superfang,stompingtantrum,closecombat,playrough||85,85,85,85,85,85|F|||88|,,,,,Steel]Eternatus||Leftovers|Pressure|toxicspikes,sludgebomb,dynamaxcannon,recover||85,,85,85,85,85|N|,0,,,,||70|,,,,,Water\"}",
+    ">p1 move knockoff +2, move superpower +2",
+    ">p2 move quiverdance, move ironhead +2",
+    ">p1 pass, switch 3",
+    ">p1 move closecombat +2, move crabhammer +1",
+    ">p2 move batonpass, move ironhead +1",
+    ">p2 switch 5, pass",
+    ">p2 pass, switch 6",
+    ">p1 move fakeout +2, move aquajet +2",
+    ">p2 move closecombat +1, move dynamaxcannon +2",
+    ">p1 move closecombat +1, move crabhammer +2",
+    ">p2 move stompingtantrum +1, move recover",
+    ">p1 switch 4, pass",
+    ">p1 move taunt +1, move crabhammer +1",
+    ">p2 move playrough +1, move sludgebomb +1",
+    ">p1 switch 5, pass",
+    ">p2 switch 5, pass",
+    ">p1 move earthpower +1, move knockoff +1",
+    ">p2 move protect, move toxicspikes",
+    ">p1 move protect, move aquajet +2",
+    ">p2 move protect, move dynamaxcannon +2",
+    ">p1 pass, switch 6",
+    ">p1 move stealthrock, move psychic +1",
+    ">p2 move gigadrain +1, move recover",
+    ">p1 move shadowball +2, move psychic +1",
+    ">p2 move quiverdance, move dynamaxcannon +2",
+    ">p1 move protect, move psychic +2",
+    ">p2 move batonpass, move dynamaxcannon +2",
+    ">p2 switch 3, pass",
+    ">p2 pass, switch 3",
+    ">p1 move shadowball +2, move psychic +2",
+    ">p2 move iciclecrash +1, move batonpass",
+    ">p2 pass, switch 4",
+    ">p1 move stealthrock, move psychic +2",
+    ">p2 move iciclecrash +1, move hurricane +1"
+  ]
+}

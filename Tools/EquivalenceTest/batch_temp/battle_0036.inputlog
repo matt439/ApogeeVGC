@@ -1,0 +1,67 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"253,470,687,1120"}
+>player p1 {"name":"Player1","team":"Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,earthpower,yawn,recover||85,,85,85,85,85|F|,0,,,,||82|,,,,,Fire]Klefki||SitrusBerry|Prankster|spikes,foulplay,dazzlinggleam,thunderwave||85,,85,85,85,85|M|,0,,,,||81|,,,,,Water]Goodra||SitrusBerry|SapSipper|thunderbolt,protect,dracometeor,fireblast||85,,85,85,85,85|F|,0,,,,||86|,,,,,Fire]Bastiodon||Leftovers|Sturdy|wideguard,bodypress,irondefense,foulplay||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting]Landorus|LandorusTherian|AssaultVest|Intimidate|uturn,stoneedge,stompingtantrum,terablast||85,85,85,85,85,85|M|||77|,,,,,Flying]Raikou||Leftovers|InnerFocus|thunderbolt,protect,scald,calmmind||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Oricorio|OricorioPomPom|Leftovers|Dancer|protect,revelationdance,airslash,quiverdance||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Raikou||LifeOrb|InnerFocus|scald,voltswitch,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water]Dachsbun||SitrusBerry|WellBakedBody|snarl,howl,bodypress,playrough||85,85,85,85,85,85|M|||90|,,,,,Steel]Gholdengo||SitrusBerry|GoodasGold|shadowball,protect,nastyplot,makeitrain||85,,85,85,85,85|N|,0,,,,||78|,,,,,Steel]Chesnaught||Leftovers|Bulletproof|irondefense,bodypress,leechseed,spikyshield||85,,85,85,85,85|M|,0,,,,||86|,,,,,Fire]Shaymin||SitrusBerry|NaturalCure|synthesis,earthpower,tailwind,seedflare||85,,85,85,85,85|N|,0,,,,||81|,,,,,Steel"}
+>p1 move yawn +1, move spikes
+>p2 move protect, move thunderbolt +1
+>p1 move icebeam +2, move foulplay +1
+>p2 move protect, move thunderbolt +1
+>p1 move icebeam +1, move foulplay +1
+>p2 move airslash +2, move scald +2
+>p1 move recover, move foulplay +2
+>p2 move revelationdance +1, move voltswitch +2
+>p2 pass, switch 6
+>p1 move yawn +2, move foulplay +2
+>p2 move airslash +1, move synthesis
+>p1 move yawn +1, move thunderwave +2
+>p2 move revelationdance +1, move seedflare +1
+>p1 move recover, move spikes
+>p2 move revelationdance +1, move seedflare +1
+>p1 move earthpower +1, move foulplay +2
+>p2 move protect, move tailwind
+>p1 move recover, move foulplay +2
+>p2 move airslash +2, move seedflare +1
+>p1 move icebeam +1, move spikes
+>p2 move revelationdance +2, move tailwind
+>p2 switch 6, pass
+>p1 move recover, move foulplay +2
+>p2 move voltswitch +1, move synthesis
+>p1 move recover, move dazzlinggleam
+>p2 move voltswitch +2, move tailwind
+>p2 switch 5, pass
+>p1 move yawn +2, move thunderwave +1
+>p2 move leechseed +1, move earthpower +1
+>p1 move yawn +2, move spikes
+>p2 move irondefense, move tailwind
+>p1 move yawn +1, move foulplay +2
+>p2 move bodypress +2, move synthesis
+>p1 pass, switch 5
+>p1 move recover, move stompingtantrum +2
+>p2 move bodypress +2, move earthpower +2
+>p1 move icebeam +2, move stoneedge +2
+>p2 move leechseed +1, move synthesis
+>p2 pass, switch 5
+>p1 move earthpower +1, move stompingtantrum +2
+>p2 move leechseed +2, move scald +2
+>p2 pass, switch 3
+>p1 move earthpower +1, move uturn +2
+>p2 move irondefense, move playrough +2
+>p1 pass, switch 3
+>p1 move icebeam +1, move thunderbolt +2
+>p2 move bodypress +1, move bodypress +1
+>p2 switch 4, pass
+>p1 move yawn +2, move fireblast +2
+>p2 move nastyplot, move playrough +1
+>p1 move icebeam +1, move dracometeor +1
+>p2 move shadowball +1, move howl
+>p1 switch 6, pass
+>p1 move scald +2, move thunderbolt +2
+>p2 move protect, move howl
+>p1 move protect, move protect
+>p2 move makeitrain, move bodypress +2
+>p1 move calmmind, move dracometeor +1
+>p2 move nastyplot, move playrough +2
+>p1 pass, switch 4
+>p1 move protect, move bodypress +2
+>p2 move protect, move playrough +2
+>p1 move thunderbolt +1, move foulplay +2
+>p2 move protect, pass

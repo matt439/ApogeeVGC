@@ -1,0 +1,27 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"358,665,972,1585"}
+>player p1 {"name":"Player1","team":"Amoonguss||RockyHelmet|Regenerator|protect,pollenpuff,ragepowder,spore||85,,85,85,85,85|F|,0,,,,||86|,,,,,Water]Ceruledge||LifeOrb|WeakArmor|poltergeist,bitterblade,swordsdance,protect||85,85,85,85,85,85|F|||80|,,,,,Grass]Crabominable||LifeOrb|IronFist|icehammer,protect,drainpunch,gunkshot||85,85,85,85,85,85|F|||89|,,,,,Fire]Scrafty||AssaultVest|Intimidate|fakeout,closecombat,snarl,knockoff||85,85,85,85,85,85|F|||83|,,,,,Poison]Snorlax||ChoiceBand|ThickFat|doubleedge,crunch,hammerarm,highhorsepower||85,85,85,85,85,85|M|||84|,,,,,Ghost]Palafin||MysticWater|ZerotoHero|jetpunch,wavecrash,protect,flipturn||85,85,85,85,85,85|M|||79|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Groudon||SitrusBerry|Drought|precipiceblades,protect,heatcrash,swordsdance||85,85,85,85,85,85|N|||69|,,,,,Fire]Reshiram||LifeOrb|Turboblaze|tailwind,dracometeor,heatwave,protect||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Pawmot||LifeOrb|VoltAbsorb|closecombat,protect,revivalblessing,doubleshock||85,85,85,85,85,85|M|||80|,,,,,Electric]Noctowl||LifeOrb|TintedLens|tailwind,hurricane,hypervoice,protect||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Bombirdier||LifeOrb|RockyPayload|knockoff,rockslide,protect,bravebird||85,85,85,85,85,85|M|||84|,,,,,Rock]Qwilfish|QwilfishHisui|Eviolite|Intimidate|crunch,toxicspikes,gunkshot,icywind||85,85,85,85,85,85|F|||82|,,,,,Flying"}
+>p1 move spore +2, move poltergeist +2
+>p2 move precipiceblades, move protect
+>p1 move ragepowder, move poltergeist +1
+>p2 move precipiceblades, move tailwind
+>p1 pass, switch 3
+>p1 move pollenpuff +2, move gunkshot +2
+>p2 move swordsdance, move tailwind
+>p1 move ragepowder, move drainpunch +1
+>p2 move heatcrash +1, move heatwave
+>p1 switch 5, switch 4
+>p1 move crunch +2, move closecombat +1
+>p2 move precipiceblades, move protect
+>p1 move crunch +2, move fakeout +1
+>p2 move precipiceblades, move protect
+>p1 pass, switch 6
+>p1 move crunch +2, move jetpunch +2
+>p2 move precipiceblades, move dracometeor +2
+>p2 pass, switch 6
+>p1 move crunch +2, pass
+>p2 move precipiceblades, move icywind
+>p1 move crunch +2, pass
+>p2 move heatcrash +2, move icywind
+>p1 move crunch +2, pass
+>p2 move protect, move icywind

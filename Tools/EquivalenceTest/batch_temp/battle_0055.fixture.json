@@ -1,0 +1,440 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "386,717,1048,1709",
+  "p1Seed": "2265,2385,2615,2955",
+  "p2Seed": "3295,3415,3755,3985",
+  "p1TeamPacked": "Gogoat||AssaultVest|SapSipper|leafstorm,hornleech,highhorsepower,doubleedge||85,85,85,85,85,85|M|||90|,,,,,Normal]Pyroar||LifeOrb|Unnerve|willowisp,protect,hypervoice,heatwave||85,,85,85,85,85|F|,0,,,,||83|,,,,,Water]Cinccino||LoadedDice|Technician|tailslap,knockoff,protect,tripleaxel||85,85,85,85,85,85|M|||85|,,,,,Ice]Espeon||LifeOrb|MagicBounce|protect,dazzlinggleam,shadowball,psychic||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fairy]Muk||SitrusBerry|PoisonTouch|knockoff,shadowsneak,toxicspikes,gunkshot||85,85,85,85,85,85|M|||86|,,,,,Dark]Veluza||ChoiceBand|Sharpness|nightslash,aquacutter,aquajet,psychocut||85,85,85,85,85,85|F|||88|,,,,,Psychic",
+  "p2TeamPacked": "Meganium||SitrusBerry|Overgrow|encore,knockoff,energyball,healpulse||85,85,85,85,85,85|F|||91|,,,,,Poison]Raging Bolt||Leftovers|Protosynthesis|thunderclap,protect,dragonpulse,calmmind||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Heracross||ChoiceScarf|Moxie|rockslide,knockoff,megahorn,closecombat||85,85,85,85,85,85|F|||82|,,,,,Bug]Hitmonlee||WhiteHerb|Unburden|protect,poisonjab,closecombat,knockoff||85,85,85,85,85,85|M|||86|,,,,,Poison]Banette||LifeOrb|Frisk|poltergeist,protect,gunkshot,shadowsneak||85,85,85,85,85,85|F|||94|,,,,,Poison]Iron Crown||ChoiceSpecs|QuarkDrive|tachyoncutter,psychic,voltswitch,focusblast||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting",
+  "p1Team": [
+    {
+      "name": "Gogoat",
+      "species": "Gogoat",
+      "item": "Assault Vest",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Leaf Storm",
+        "Horn Leech",
+        "High Horsepower",
+        "Double-Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Pyroar",
+      "species": "Pyroar",
+      "item": "Life Orb",
+      "ability": "Unnerve",
+      "moves": [
+        "Will-O-Wisp",
+        "Protect",
+        "Hyper Voice",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Cinccino",
+      "species": "Cinccino",
+      "item": "Loaded Dice",
+      "ability": "Technician",
+      "moves": [
+        "Tail Slap",
+        "Knock Off",
+        "Protect",
+        "Triple Axel"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ice"
+    },
+    {
+      "name": "Espeon",
+      "species": "Espeon",
+      "item": "Life Orb",
+      "ability": "Magic Bounce",
+      "moves": [
+        "Protect",
+        "Dazzling Gleam",
+        "Shadow Ball",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Muk",
+      "species": "Muk",
+      "item": "Sitrus Berry",
+      "ability": "Poison Touch",
+      "moves": [
+        "Knock Off",
+        "Shadow Sneak",
+        "Toxic Spikes",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Veluza",
+      "species": "Veluza",
+      "item": "Choice Band",
+      "ability": "Sharpness",
+      "moves": [
+        "Night Slash",
+        "Aqua Cutter",
+        "Aqua Jet",
+        "Psycho Cut"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Meganium",
+      "species": "Meganium",
+      "item": "Sitrus Berry",
+      "ability": "Overgrow",
+      "moves": [
+        "Encore",
+        "Knock Off",
+        "Energy Ball",
+        "Heal Pulse"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Raging Bolt",
+      "species": "Raging Bolt",
+      "item": "Leftovers",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Thunderclap",
+        "Protect",
+        "Dragon Pulse",
+        "Calm Mind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Heracross",
+      "species": "Heracross",
+      "item": "Choice Scarf",
+      "ability": "Moxie",
+      "moves": [
+        "Rock Slide",
+        "Knock Off",
+        "Megahorn",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Bug"
+    },
+    {
+      "name": "Hitmonlee",
+      "species": "Hitmonlee",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Protect",
+        "Poison Jab",
+        "Close Combat",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Banette",
+      "species": "Banette",
+      "item": "Life Orb",
+      "ability": "Frisk",
+      "moves": [
+        "Poltergeist",
+        "Protect",
+        "Gunk Shot",
+        "Shadow Sneak"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Iron Crown",
+      "species": "Iron Crown",
+      "item": "Choice Specs",
+      "ability": "Quark Drive",
+      "moves": [
+        "Tachyon Cutter",
+        "Psychic",
+        "Volt Switch",
+        "Focus Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"386,717,1048,1709\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Gogoat||AssaultVest|SapSipper|leafstorm,hornleech,highhorsepower,doubleedge||85,85,85,85,85,85|M|||90|,,,,,Normal]Pyroar||LifeOrb|Unnerve|willowisp,protect,hypervoice,heatwave||85,,85,85,85,85|F|,0,,,,||83|,,,,,Water]Cinccino||LoadedDice|Technician|tailslap,knockoff,protect,tripleaxel||85,85,85,85,85,85|M|||85|,,,,,Ice]Espeon||LifeOrb|MagicBounce|protect,dazzlinggleam,shadowball,psychic||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fairy]Muk||SitrusBerry|PoisonTouch|knockoff,shadowsneak,toxicspikes,gunkshot||85,85,85,85,85,85|M|||86|,,,,,Dark]Veluza||ChoiceBand|Sharpness|nightslash,aquacutter,aquajet,psychocut||85,85,85,85,85,85|F|||88|,,,,,Psychic\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Meganium||SitrusBerry|Overgrow|encore,knockoff,energyball,healpulse||85,85,85,85,85,85|F|||91|,,,,,Poison]Raging Bolt||Leftovers|Protosynthesis|thunderclap,protect,dragonpulse,calmmind||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Heracross||ChoiceScarf|Moxie|rockslide,knockoff,megahorn,closecombat||85,85,85,85,85,85|F|||82|,,,,,Bug]Hitmonlee||WhiteHerb|Unburden|protect,poisonjab,closecombat,knockoff||85,85,85,85,85,85|M|||86|,,,,,Poison]Banette||LifeOrb|Frisk|poltergeist,protect,gunkshot,shadowsneak||85,85,85,85,85,85|F|||94|,,,,,Poison]Iron Crown||ChoiceSpecs|QuarkDrive|tachyoncutter,psychic,voltswitch,focusblast||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting\"}",
+    ">p1 move leafstorm +1, move protect",
+    ">p2 move knockoff +2, move calmmind",
+    ">p1 move highhorsepower +1, move heatwave",
+    ">p2 move knockoff +2, move dragonpulse +1",
+    ">p1 move highhorsepower +2, move willowisp +2",
+    ">p2 move encore +2, move calmmind",
+    ">p1 move hornleech +1, move willowisp +2",
+    ">p2 move encore +1, move thunderclap +2",
+    ">p2 switch 5, pass",
+    ">p1 move highhorsepower +2, move willowisp +2",
+    ">p2 move poltergeist +1, move thunderclap +1",
+    ">p1 switch 5, pass",
+    ">p1 move knockoff +1, move willowisp +2",
+    ">p2 move gunkshot +1, move calmmind",
+    ">p1 move knockoff +1, move willowisp +2",
+    ">p2 move shadowsneak +1, move dragonpulse +1",
+    ">p2 switch 3, pass",
+    ">p1 move knockoff +1, move willowisp +1",
+    ">p2 move rockslide, move dragonpulse +1",
+    ">p1 switch 4, switch 6",
+    ">p1 move dazzlinggleam, move psychocut +1",
+    ">p2 move rockslide, move protect",
+    ">p2 switch 6, pass",
+    ">p1 move shadowball +2, move psychocut +1",
+    ">p2 move focusblast +1, move calmmind",
+    ">p1 move psychic +2, move psychocut +1",
+    ">p2 move focusblast +2, move protect",
+    ">p1 move protect, move psychocut +2",
+    ">p2 move focusblast +2, move calmmind",
+    ">p2 pass, switch 4",
+    ">p1 move psychic +2, move psychocut +1",
+    ">p2 move focusblast +2, move protect",
+    ">p1 move dazzlinggleam, move psychocut +2",
+    ">p2 move focusblast +2, move poisonjab +2",
+    ">p1 pass, switch 3",
+    ">p1 move psychic +2, move tripleaxel +2",
+    ">p2 move focusblast +2, move protect",
+    ">p1 move shadowball +2, pass",
+    ">p2 move focusblast +2, move knockoff +2",
+    ">p1 move protect, pass",
+    ">p2 move focusblast +1, pass",
+    ">p1 move dazzlinggleam, pass",
+    ">p2 move struggle, pass"
+  ]
+}

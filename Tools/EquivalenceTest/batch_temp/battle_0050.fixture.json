@@ -1,0 +1,429 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "351,652,953,1554",
+  "p1Seed": "2060,2170,2380,2690",
+  "p2Seed": "3000,3110,3420,3630",
+  "p1TeamPacked": "Camerupt||SitrusBerry|SolidRock|stealthrock,protect,earthpower,heatwave||85,,85,85,85,85|F|,0,,,,||88|,,,,,Water]Leavanny||LifeOrb|Swarm|lunge,stickyweb,leafblade,protect||85,85,85,85,85,85|M|||91|,,,,,Rock]Delibird||SitrusBerry|Insomnia|icywind,helpinghand,bravebird,fakeout||85,85,85,85,85,85|M||||,,,,,Steel]Slowking|SlowkingGalar|LifeOrb|Regenerator|fireblast,sludgebomb,trickroom,psychic||85,,85,85,85,|F|,0,,,,0||86|,,,,,Poison]Wugtrio||ChoiceBand|Gooey|aquajet,stompingtantrum,liquidation,throatchop||85,85,85,85,85,85|M|||92|,,,,,Dark]Sableye||SitrusBerry|Prankster|knockoff,fakeout,willowisp,quash||85,85,85,85,85,85|M|||92|,,,,,Poison",
+  "p2TeamPacked": "Dragapult||LifeOrb|ClearBody|shadowball,protect,dragondarts,dracometeor||85,85,85,85,85,85|F|||79|,,,,,Dragon]Torterra||WhiteHerb|Overgrow|headlongrush,rockslide,woodhammer,shellsmash||85,85,85,85,85,85|F|||81|,,,,,Rock]Bellibolt||SitrusBerry|Electromorphosis|thunderbolt,slackoff,thunderwave,muddywater||85,,85,85,85,85|F|,0,,,,||81|,,,,,Water]Bombirdier||ChoiceBand|RockyPayload|knockoff,bravebird,rockslide,suckerpunch||85,85,85,85,85,85|M|||84|,,,,,Rock]Basculin||ChoiceBand|Adaptability|aquajet,psychicfangs,flipturn,wavecrash||85,85,85,85,85,85|F|||87|,,,,,Water]Vikavolt||SitrusBerry|Levitate|thunderbolt,protect,stickyweb,bugbuzz||85,,85,85,85,85|F|,0,,,,||84|,,,,,Electric",
+  "p1Team": [
+    {
+      "name": "Camerupt",
+      "species": "Camerupt",
+      "item": "Sitrus Berry",
+      "ability": "Solid Rock",
+      "moves": [
+        "Stealth Rock",
+        "Protect",
+        "Earth Power",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Leavanny",
+      "species": "Leavanny",
+      "item": "Life Orb",
+      "ability": "Swarm",
+      "moves": [
+        "Lunge",
+        "Sticky Web",
+        "Leaf Blade",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Delibird",
+      "species": "Delibird",
+      "item": "Sitrus Berry",
+      "ability": "Insomnia",
+      "moves": [
+        "Icy Wind",
+        "Helping Hand",
+        "Brave Bird",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Slowking",
+      "species": "Slowking-Galar",
+      "item": "Life Orb",
+      "ability": "Regenerator",
+      "moves": [
+        "Fire Blast",
+        "Sludge Bomb",
+        "Trick Room",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Wugtrio",
+      "species": "Wugtrio",
+      "item": "Choice Band",
+      "ability": "Gooey",
+      "moves": [
+        "Aqua Jet",
+        "Stomping Tantrum",
+        "Liquidation",
+        "Throat Chop"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Sableye",
+      "species": "Sableye",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Knock Off",
+        "Fake Out",
+        "Will-O-Wisp",
+        "Quash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Dragapult",
+      "species": "Dragapult",
+      "item": "Life Orb",
+      "ability": "Clear Body",
+      "moves": [
+        "Shadow Ball",
+        "Protect",
+        "Dragon Darts",
+        "Draco Meteor"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Torterra",
+      "species": "Torterra",
+      "item": "White Herb",
+      "ability": "Overgrow",
+      "moves": [
+        "Headlong Rush",
+        "Rock Slide",
+        "Wood Hammer",
+        "Shell Smash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Bellibolt",
+      "species": "Bellibolt",
+      "item": "Sitrus Berry",
+      "ability": "Electromorphosis",
+      "moves": [
+        "Thunderbolt",
+        "Slack Off",
+        "Thunder Wave",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Bombirdier",
+      "species": "Bombirdier",
+      "item": "Choice Band",
+      "ability": "Rocky Payload",
+      "moves": [
+        "Knock Off",
+        "Brave Bird",
+        "Rock Slide",
+        "Sucker Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Basculin",
+      "species": "Basculin",
+      "item": "Choice Band",
+      "ability": "Adaptability",
+      "moves": [
+        "Aqua Jet",
+        "Psychic Fangs",
+        "Flip Turn",
+        "Wave Crash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Vikavolt",
+      "species": "Vikavolt",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "moves": [
+        "Thunderbolt",
+        "Protect",
+        "Sticky Web",
+        "Bug Buzz"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"351,652,953,1554\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Camerupt||SitrusBerry|SolidRock|stealthrock,protect,earthpower,heatwave||85,,85,85,85,85|F|,0,,,,||88|,,,,,Water]Leavanny||LifeOrb|Swarm|lunge,stickyweb,leafblade,protect||85,85,85,85,85,85|M|||91|,,,,,Rock]Delibird||SitrusBerry|Insomnia|icywind,helpinghand,bravebird,fakeout||85,85,85,85,85,85|M||||,,,,,Steel]Slowking|SlowkingGalar|LifeOrb|Regenerator|fireblast,sludgebomb,trickroom,psychic||85,,85,85,85,|F|,0,,,,0||86|,,,,,Poison]Wugtrio||ChoiceBand|Gooey|aquajet,stompingtantrum,liquidation,throatchop||85,85,85,85,85,85|M|||92|,,,,,Dark]Sableye||SitrusBerry|Prankster|knockoff,fakeout,willowisp,quash||85,85,85,85,85,85|M|||92|,,,,,Poison\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Dragapult||LifeOrb|ClearBody|shadowball,protect,dragondarts,dracometeor||85,85,85,85,85,85|F|||79|,,,,,Dragon]Torterra||WhiteHerb|Overgrow|headlongrush,rockslide,woodhammer,shellsmash||85,85,85,85,85,85|F|||81|,,,,,Rock]Bellibolt||SitrusBerry|Electromorphosis|thunderbolt,slackoff,thunderwave,muddywater||85,,85,85,85,85|F|,0,,,,||81|,,,,,Water]Bombirdier||ChoiceBand|RockyPayload|knockoff,bravebird,rockslide,suckerpunch||85,85,85,85,85,85|M|||84|,,,,,Rock]Basculin||ChoiceBand|Adaptability|aquajet,psychicfangs,flipturn,wavecrash||85,85,85,85,85,85|F|||87|,,,,,Water]Vikavolt||SitrusBerry|Levitate|thunderbolt,protect,stickyweb,bugbuzz||85,,85,85,85,85|F|,0,,,,||84|,,,,,Electric\"}",
+    ">p1 move stealthrock, move stickyweb",
+    ">p2 move shadowball +1, move shellsmash",
+    ">p1 move earthpower +2, move lunge +1",
+    ">p2 move shadowball +2, move shellsmash",
+    ">p1 move protect, move protect",
+    ">p2 move dracometeor +2, move woodhammer +1",
+    ">p1 move heatwave, move stickyweb",
+    ">p2 move shadowball +1, move shellsmash",
+    ">p2 pass, switch 3",
+    ">p1 move earthpower +1, move leafblade +1",
+    ">p2 move dragondarts +1, move thunderwave +2",
+    ">p2 switch 6, switch 5",
+    ">p1 move heatwave, move protect",
+    ">p2 move bugbuzz +2, move flipturn +2",
+    ">p1 move heatwave, move leafblade +1",
+    ">p2 move bugbuzz +1, move flipturn +1",
+    ">p2 pass, switch 4",
+    ">p1 switch 6, switch 3",
+    ">p1 move willowisp +2, move helpinghand -1",
+    ">p2 move bugbuzz +1, move bravebird +1",
+    ">p1 switch 4, pass",
+    ">p1 move trickroom, move bravebird +2",
+    ">p2 move bugbuzz +2, move bravebird +1",
+    ">p2 pass, switch 4",
+    ">p1 move trickroom, move icywind",
+    ">p2 move stickyweb, move flipturn +1",
+    ">p1 switch 5, pass",
+    ">p1 move liquidation +1, move fakeout +1",
+    ">p2 move bugbuzz +1, move flipturn +1",
+    ">p1 move liquidation +1, move fakeout +1",
+    ">p2 pass, move flipturn +2",
+    ">p1 move liquidation +1, move helpinghand -1",
+    ">p2 pass, move flipturn +2"
+  ]
+}

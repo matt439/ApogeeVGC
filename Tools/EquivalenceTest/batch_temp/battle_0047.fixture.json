@@ -1,0 +1,440 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "330,613,896,1461",
+  "p1Seed": "1937,2041,2239,2531",
+  "p2Seed": "2823,2927,3219,3417",
+  "p1TeamPacked": "Rillaboom||AssaultVest|GrassySurge|woodhammer,fakeout,highhorsepower,grassyglide||85,85,85,85,85,85|F|||81|,,,,,Fire]Wigglytuff||SitrusBerry|Competitive|thunderwave,helpinghand,dazzlinggleam,encore||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|grassknot,volttackle,fakeout,knockoff||85,85,85,85,85,85|F|||94|,,,,,Electric]Avalugg||Leftovers|Sturdy|avalanche,protect,bodypress,recover||85,85,85,85,85,85|M|||92|,,,,,Water]Slaking||ChoiceBand|Truant|doubleedge,gigaimpact,highhorsepower,knockoff||85,85,85,85,85,85|F|||89|,,,,,Ghost]Wugtrio||ChoiceBand|Gooey|stompingtantrum,liquidation,throatchop,aquajet||85,85,85,85,85,85|M|||92|,,,,,Dark",
+  "p2TeamPacked": "Ninetales||LifeOrb|Drought|protect,fireblast,solarbeam,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Deoxys|DeoxysSpeed|LifeOrb|Pressure|thunderwave,taunt,psychoboost,superpower||85,85,85,85,85,85|N|||85|,,,,,Psychic]Illumise||SitrusBerry|Prankster|tailwind,encore,thunderwave,strugglebug||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel]Sandaconda||SitrusBerry|ShedSkin|rest,glare,highhorsepower,stoneedge||85,85,85,85,85,85|M|||88|,,,,,Steel]Arbok||Leftovers|Intimidate|gunkshot,protect,stompingtantrum,coil||85,85,85,85,85,85|M|||88|,,,,,Ground]Gastrodon||SitrusBerry|StormDrain|earthpower,muddywater,helpinghand,icywind||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire",
+  "p1Team": [
+    {
+      "name": "Rillaboom",
+      "species": "Rillaboom",
+      "item": "Assault Vest",
+      "ability": "Grassy Surge",
+      "moves": [
+        "Wood Hammer",
+        "Fake Out",
+        "High Horsepower",
+        "Grassy Glide"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Wigglytuff",
+      "species": "Wigglytuff",
+      "item": "Sitrus Berry",
+      "ability": "Competitive",
+      "moves": [
+        "Thunder Wave",
+        "Helping Hand",
+        "Dazzling Gleam",
+        "Encore"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Pikachu",
+      "species": "Pikachu-Alola",
+      "item": "Light Ball",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Grass Knot",
+        "Volt Tackle",
+        "Fake Out",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 94,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Avalugg",
+      "species": "Avalugg",
+      "item": "Leftovers",
+      "ability": "Sturdy",
+      "moves": [
+        "Avalanche",
+        "Protect",
+        "Body Press",
+        "Recover"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Slaking",
+      "species": "Slaking",
+      "item": "Choice Band",
+      "ability": "Truant",
+      "moves": [
+        "Double-Edge",
+        "Giga Impact",
+        "High Horsepower",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Wugtrio",
+      "species": "Wugtrio",
+      "item": "Choice Band",
+      "ability": "Gooey",
+      "moves": [
+        "Stomping Tantrum",
+        "Liquidation",
+        "Throat Chop",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Ninetales",
+      "species": "Ninetales",
+      "item": "Life Orb",
+      "ability": "Drought",
+      "moves": [
+        "Protect",
+        "Fire Blast",
+        "Solar Beam",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Deoxys",
+      "species": "Deoxys-Speed",
+      "item": "Life Orb",
+      "ability": "Pressure",
+      "moves": [
+        "Thunder Wave",
+        "Taunt",
+        "Psycho Boost",
+        "Superpower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Illumise",
+      "species": "Illumise",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Tailwind",
+        "Encore",
+        "Thunder Wave",
+        "Struggle Bug"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Sandaconda",
+      "species": "Sandaconda",
+      "item": "Sitrus Berry",
+      "ability": "Shed Skin",
+      "moves": [
+        "Rest",
+        "Glare",
+        "High Horsepower",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Arbok",
+      "species": "Arbok",
+      "item": "Leftovers",
+      "ability": "Intimidate",
+      "moves": [
+        "Gunk Shot",
+        "Protect",
+        "Stomping Tantrum",
+        "Coil"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Gastrodon",
+      "species": "Gastrodon",
+      "item": "Sitrus Berry",
+      "ability": "Storm Drain",
+      "moves": [
+        "Earth Power",
+        "Muddy Water",
+        "Helping Hand",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"330,613,896,1461\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Rillaboom||AssaultVest|GrassySurge|woodhammer,fakeout,highhorsepower,grassyglide||85,85,85,85,85,85|F|||81|,,,,,Fire]Wigglytuff||SitrusBerry|Competitive|thunderwave,helpinghand,dazzlinggleam,encore||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|grassknot,volttackle,fakeout,knockoff||85,85,85,85,85,85|F|||94|,,,,,Electric]Avalugg||Leftovers|Sturdy|avalanche,protect,bodypress,recover||85,85,85,85,85,85|M|||92|,,,,,Water]Slaking||ChoiceBand|Truant|doubleedge,gigaimpact,highhorsepower,knockoff||85,85,85,85,85,85|F|||89|,,,,,Ghost]Wugtrio||ChoiceBand|Gooey|stompingtantrum,liquidation,throatchop,aquajet||85,85,85,85,85,85|M|||92|,,,,,Dark\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Ninetales||LifeOrb|Drought|protect,fireblast,solarbeam,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Deoxys|DeoxysSpeed|LifeOrb|Pressure|thunderwave,taunt,psychoboost,superpower||85,85,85,85,85,85|N|||85|,,,,,Psychic]Illumise||SitrusBerry|Prankster|tailwind,encore,thunderwave,strugglebug||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel]Sandaconda||SitrusBerry|ShedSkin|rest,glare,highhorsepower,stoneedge||85,85,85,85,85,85|M|||88|,,,,,Steel]Arbok||Leftovers|Intimidate|gunkshot,protect,stompingtantrum,coil||85,85,85,85,85,85|M|||88|,,,,,Ground]Gastrodon||SitrusBerry|StormDrain|earthpower,muddywater,helpinghand,icywind||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire\"}",
+    ">p1 move highhorsepower +2, move encore +1",
+    ">p2 move heatwave, move taunt +1",
+    ">p1 move woodhammer +2, move dazzlinggleam",
+    ">p2 move heatwave, move thunderwave +1",
+    ">p1 switch 5, pass",
+    ">p1 move highhorsepower +2, move thunderwave +2",
+    ">p2 move heatwave, move thunderwave +1",
+    ">p1 move highhorsepower +2, move dazzlinggleam",
+    ">p2 move heatwave, move thunderwave +1",
+    ">p1 pass, switch 3",
+    ">p1 move knockoff +1, move volttackle +1",
+    ">p2 move solarbeam +2, move taunt +1",
+    ">p2 switch 6, switch 5",
+    ">p1 move knockoff +1, move knockoff +1",
+    ">p2 move icywind, move protect",
+    ">p1 move knockoff +1, move volttackle +1",
+    ">p2 move helpinghand -2, move gunkshot +1",
+    ">p1 switch 4, pass",
+    ">p1 move protect, move volttackle +2",
+    ">p2 move earthpower +1, move coil",
+    ">p1 move bodypress +2, move grassknot +1",
+    ">p2 move earthpower +2, move protect",
+    ">p2 switch 4, pass",
+    ">p1 move avalanche +2, move knockoff +1",
+    ">p2 move rest, move coil",
+    ">p1 move bodypress +1, move knockoff +1",
+    ">p2 move glare +1, move coil",
+    ">p1 move protect, move grassknot +2",
+    ">p2 move highhorsepower +1, move gunkshot +2",
+    ">p1 pass, switch 6",
+    ">p1 move protect, move liquidation +1",
+    ">p2 move highhorsepower +2, move gunkshot +1",
+    ">p2 switch 3, pass",
+    ">p1 move protect, move liquidation +1",
+    ">p2 move thunderwave +1, move gunkshot +2",
+    ">p1 move protect, pass",
+    ">p2 move strugglebug, move protect",
+    ">p1 move avalanche +1, pass",
+    ">p2 move strugglebug, move stompingtantrum +2",
+    ">p1 move avalanche +2, pass",
+    ">p2 move encore +1, move protect",
+    ">p1 move protect, pass",
+    ">p2 move tailwind, move gunkshot +2"
+  ]
+}

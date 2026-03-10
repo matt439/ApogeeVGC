@@ -1,0 +1,68 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"302,561,820,1337"}
+>player p1 {"name":"Player1","team":"Stonjourner||LifeOrb|PowerSpot|highhorsepower,protect,rockpolish,stoneedge||85,85,85,85,85,85|M|||88|,,,,,Rock]Exeggutor||SitrusBerry|Harvest|protect,psychic,trickroom,leafstorm||85,,85,85,85,|M|,0,,,,0||87|,,,,,Steel]Ogerpon|OgerponWellspring|WellspringMask|WaterAbsorb|ivycudgel,hornleech,swordsdance,spikyshield||85,85,85,85,85,85|F|||77|,,,,,Water]Garganacl||Leftovers|PurifyingSalt|saltcure,stealthrock,protect,recover||85,85,85,85,85,85|M|||81|,,,,,Ghost]Wigglytuff||SitrusBerry|Competitive|thunderwave,dazzlinggleam,encore,fireblast||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel]Spidops||SitrusBerry|Stakeout|stickyweb,knockoff,lunge,uturn||85,85,85,85,85,85|M||||,,,,,Water"}
+>player p2 {"name":"Player2","team":"Uxie||SitrusBerry|Levitate|knockoff,mysticalpower,thunderwave,stealthrock||85,85,85,85,85,85|N|||85|,,,,,Poison]Magearna|MagearnaOriginal|LifeOrb|SoulHeart|trickroom,dazzlinggleam,protect,flashcannon||85,,85,85,85,|N|,0,,,,0||71|,,,,,Fairy]Jumpluff|||Infiltrator|tailwind,acrobatics,sleeppowder,encore||85,85,85,85,85,85|F|||92|,,,,,Steel]Excadrill||LifeOrb|MoldBreaker|protect,ironhead,swordsdance,highhorsepower||85,85,85,85,85,85|M|||82|,,,,,Water]Ninetales||ChoiceSpecs|Drought|heatwave,overheat,solarbeam,weatherball||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Dusknoir||LifeOrb|Frisk|poltergeist,shadowsneak,leechlife,willowisp||85,85,85,85,85,85|M|||89|,,,,,Dark"}
+>p1 move stoneedge +1, move psychic +2
+>p2 move mysticalpower +2, move flashcannon +2
+>p1 move stoneedge +2, move leafstorm +2
+>p2 move thunderwave +2, move trickroom
+>p1 move rockpolish, move trickroom
+>p2 move stealthrock, move protect
+>p1 move highhorsepower +1, move leafstorm +2
+>p2 move thunderwave +2, move protect
+>p2 pass, switch 4
+>p1 move highhorsepower +1, move protect
+>p2 move thunderwave +1, move ironhead +2
+>p1 move highhorsepower +1, move protect
+>p2 move thunderwave +2, move ironhead +1
+>p1 move protect, move leafstorm +2
+>p2 move mysticalpower +1, move highhorsepower +2
+>p1 move stoneedge +1, move trickroom
+>p2 move thunderwave +2, move protect
+>p2 switch 5, pass
+>p1 move rockpolish, move protect
+>p2 move weatherball +2, move ironhead +1
+>p1 switch 4, pass
+>p1 move stealthrock, move leafstorm +1
+>p2 move weatherball +1, move highhorsepower +1
+>p1 switch 6, pass
+>p1 move uturn +1, move trickroom
+>p2 move weatherball +1, move protect
+>p1 switch 5, pass
+>p1 move thunderwave +1, move protect
+>p2 move weatherball +1, move highhorsepower +2
+>p1 switch 5, pass
+>p1 move uturn +1, move protect
+>p2 move weatherball +1, move ironhead +1
+>p1 switch 3, pass
+>p1 move hornleech +2, move psychic +1
+>p2 move weatherball +2, move highhorsepower +1
+>p1 move swordsdance, move psychic +1
+>p2 move weatherball +2, move highhorsepower +2
+>p2 pass, switch 3
+>p1 move ivycudgel +1, move leafstorm +1
+>p2 move weatherball +2, move tailwind
+>p2 switch 6, pass
+>p1 move hornleech +2, move psychic +1
+>p2 move willowisp +2, move sleeppowder +2
+>p1 move hornleech +1, move psychic +1
+>p2 move leechlife +1, move sleeppowder +1
+>p1 move spikyshield, move leafstorm +1
+>p2 move poltergeist +1, move sleeppowder +2
+>p1 move spikyshield, move leafstorm +1
+>p2 pass, move tailwind
+>p1 move hornleech +2, move leafstorm +1
+>p2 pass, move tailwind
+>p1 move spikyshield, move leafstorm +2
+>p2 pass, move tailwind
+>p1 move spikyshield, move trickroom
+>p2 pass, move sleeppowder +1
+>p1 move spikyshield, move psychic +2
+>p2 pass, move sleeppowder +1
+>p1 move swordsdance, move trickroom
+>p2 pass, move encore +1
+>p1 move spikyshield, move trickroom
+>p2 pass, move encore +1
+>p1 move spikyshield, move protect
+>p2 pass, move tailwind
+>p1 move ivycudgel +1, move protect
+>p2 pass, move tailwind

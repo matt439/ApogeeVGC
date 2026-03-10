@@ -1,0 +1,458 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "50,93,136,221",
+  "p1Seed": "297,321,359,411",
+  "p2Seed": "463,487,539,577",
+  "p1TeamPacked": "Enamorus||LifeOrb|Contrary|superpower,tailwind,protect,playrough||85,85,85,85,85,85|F|||79|,,,,,Fighting]Mismagius||LifeOrb|Levitate|dazzlinggleam,taunt,shadowball,protect||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy]Yanmega||LifeOrb|SpeedBoost|protect,bugbuzz,airslash,terablast||85,,85,85,85,85|F|,0,,,,||84|,,,,,Ground]Flygon||SitrusBerry|Levitate|tailwind,earthpower,breakingswipe,protect||85,85,85,85,85,85|F|||83|,,,,,Steel]Grimmsnarl||SitrusBerry|Prankster|spiritbreak,thunderwave,suckerpunch,fakeout||85,85,85,85,85,85|M|||82|,,,,,Steel]Duraludon||Eviolite|Stalwart|snarl,irondefense,flashcannon,bodypress||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fighting",
+  "p2TeamPacked": "Palafin||ChoiceBand|ZerotoHero|flipturn,closecombat,jetpunch,wavecrash||85,85,85,85,85,85|F|||79|,,,,,Water]Spiritomb||SitrusBerry|Infiltrator|foulplay,snarl,trickroom,willowisp||85,,85,85,85,|M|,0,,,,0||89|,,,,,Steel]Bombirdier||LifeOrb|RockyPayload|knockoff,rockslide,protect,bravebird||85,85,85,85,85,85|F|||84|,,,,,Rock]Muk||AssaultVest|PoisonTouch|knockoff,poisonjab,icepunch,shadowsneak||85,85,85,85,85,85|F|||86|,,,,,Dark]Revavroom||LifeOrb|Filter|gunkshot,partingshot,ironhead,protect||85,85,85,85,85,85|M|||84|,,,,,Flying]Electrode|ElectrodeHisui|SitrusBerry|Aftermath|electroweb,leafstorm,thunderbolt,taunt||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel",
+  "p1Team": [
+    {
+      "name": "Enamorus",
+      "species": "Enamorus",
+      "item": "Life Orb",
+      "ability": "Contrary",
+      "moves": [
+        "Superpower",
+        "Tailwind",
+        "Protect",
+        "Play Rough"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Mismagius",
+      "species": "Mismagius",
+      "item": "Life Orb",
+      "ability": "Levitate",
+      "moves": [
+        "Dazzling Gleam",
+        "Taunt",
+        "Shadow Ball",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Yanmega",
+      "species": "Yanmega",
+      "item": "Life Orb",
+      "ability": "Speed Boost",
+      "moves": [
+        "Protect",
+        "Bug Buzz",
+        "Air Slash",
+        "Tera Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Flygon",
+      "species": "Flygon",
+      "item": "Sitrus Berry",
+      "ability": "Levitate",
+      "moves": [
+        "Tailwind",
+        "Earth Power",
+        "Breaking Swipe",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Grimmsnarl",
+      "species": "Grimmsnarl",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Spirit Break",
+        "Thunder Wave",
+        "Sucker Punch",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Duraludon",
+      "species": "Duraludon",
+      "item": "Eviolite",
+      "ability": "Stalwart",
+      "moves": [
+        "Snarl",
+        "Iron Defense",
+        "Flash Cannon",
+        "Body Press"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Palafin",
+      "species": "Palafin",
+      "item": "Choice Band",
+      "ability": "Zero to Hero",
+      "moves": [
+        "Flip Turn",
+        "Close Combat",
+        "Jet Punch",
+        "Wave Crash"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Spiritomb",
+      "species": "Spiritomb",
+      "item": "Sitrus Berry",
+      "ability": "Infiltrator",
+      "moves": [
+        "Foul Play",
+        "Snarl",
+        "Trick Room",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Bombirdier",
+      "species": "Bombirdier",
+      "item": "Life Orb",
+      "ability": "Rocky Payload",
+      "moves": [
+        "Knock Off",
+        "Rock Slide",
+        "Protect",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Muk",
+      "species": "Muk",
+      "item": "Assault Vest",
+      "ability": "Poison Touch",
+      "moves": [
+        "Knock Off",
+        "Poison Jab",
+        "Ice Punch",
+        "Shadow Sneak"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Revavroom",
+      "species": "Revavroom",
+      "item": "Life Orb",
+      "ability": "Filter",
+      "moves": [
+        "Gunk Shot",
+        "Parting Shot",
+        "Iron Head",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Electrode",
+      "species": "Electrode-Hisui",
+      "item": "Sitrus Berry",
+      "ability": "Aftermath",
+      "moves": [
+        "Electroweb",
+        "Leaf Storm",
+        "Thunderbolt",
+        "Taunt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"50,93,136,221\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Enamorus||LifeOrb|Contrary|superpower,tailwind,protect,playrough||85,85,85,85,85,85|F|||79|,,,,,Fighting]Mismagius||LifeOrb|Levitate|dazzlinggleam,taunt,shadowball,protect||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy]Yanmega||LifeOrb|SpeedBoost|protect,bugbuzz,airslash,terablast||85,,85,85,85,85|F|,0,,,,||84|,,,,,Ground]Flygon||SitrusBerry|Levitate|tailwind,earthpower,breakingswipe,protect||85,85,85,85,85,85|F|||83|,,,,,Steel]Grimmsnarl||SitrusBerry|Prankster|spiritbreak,thunderwave,suckerpunch,fakeout||85,85,85,85,85,85|M|||82|,,,,,Steel]Duraludon||Eviolite|Stalwart|snarl,irondefense,flashcannon,bodypress||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fighting\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Palafin||ChoiceBand|ZerotoHero|flipturn,closecombat,jetpunch,wavecrash||85,85,85,85,85,85|F|||79|,,,,,Water]Spiritomb||SitrusBerry|Infiltrator|foulplay,snarl,trickroom,willowisp||85,,85,85,85,|M|,0,,,,0||89|,,,,,Steel]Bombirdier||LifeOrb|RockyPayload|knockoff,rockslide,protect,bravebird||85,85,85,85,85,85|F|||84|,,,,,Rock]Muk||AssaultVest|PoisonTouch|knockoff,poisonjab,icepunch,shadowsneak||85,85,85,85,85,85|F|||86|,,,,,Dark]Revavroom||LifeOrb|Filter|gunkshot,partingshot,ironhead,protect||85,85,85,85,85,85|M|||84|,,,,,Flying]Electrode|ElectrodeHisui|SitrusBerry|Aftermath|electroweb,leafstorm,thunderbolt,taunt||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel\"}",
+    ">p1 move protect, move taunt +1",
+    ">p2 move jetpunch +1, move willowisp +1",
+    ">p1 move playrough +2, move protect",
+    ">p2 move jetpunch +2, move trickroom",
+    ">p1 move superpower +1, move protect",
+    ">p2 move jetpunch +2, move foulplay +1",
+    ">p1 move tailwind, move shadowball +1",
+    ">p2 move jetpunch +2, move trickroom",
+    ">p2 switch 6, pass",
+    ">p1 move playrough +2, move protect",
+    ">p2 move electroweb, move foulplay +2",
+    ">p2 pass, switch 5",
+    ">p1 move protect, move protect",
+    ">p2 move thunderbolt +1, move ironhead +2",
+    ">p1 move protect, move dazzlinggleam",
+    ">p2 move electroweb, move protect",
+    ">p1 switch 3, pass",
+    ">p1 move terablast +2, move taunt +2",
+    ">p2 move electroweb, move ironhead +1",
+    ">p1 pass, switch 5",
+    ">p1 move protect, move fakeout +2",
+    ">p2 move taunt +2, move gunkshot +1",
+    ">p1 move protect, move spiritbreak +2",
+    ">p2 move electroweb, move partingshot +1",
+    ">p2 pass, switch 3",
+    ">p1 switch 6, pass",
+    ">p1 move flashcannon +2, move suckerpunch +2",
+    ">p2 move leafstorm +1, move protect",
+    ">p1 move irondefense, move spiritbreak +1",
+    ">p2 move leafstorm +1, move rockslide",
+    ">p1 move flashcannon +2, move suckerpunch +2",
+    ">p2 move electroweb, move knockoff +2",
+    ">p2 pass, switch 3",
+    ">p1 move snarl, move thunderwave +2",
+    ">p2 move taunt +1, move gunkshot +1",
+    ">p1 move bodypress +2, move suckerpunch +2",
+    ">p2 move taunt +2, move partingshot +2",
+    ">p1 move bodypress +2, move fakeout +1",
+    ">p2 move thunderbolt +2, move gunkshot +2",
+    ">p2 pass, switch 4",
+    ">p1 move irondefense, move spiritbreak +2",
+    ">p2 move electroweb, move shadowsneak +1",
+    ">p1 move snarl, move suckerpunch +2",
+    ">p2 move thunderbolt +2, move icepunch +2",
+    ">p1 pass, switch 4",
+    ">p1 move flashcannon +2, move protect",
+    ">p2 move thunderbolt +1, move shadowsneak +2",
+    ">p1 move snarl, move breakingswipe",
+    ">p2 move taunt +2, move knockoff +1",
+    ">p1 move irondefense, move breakingswipe",
+    ">p2 move thunderbolt +1, move icepunch +2",
+    ">p1 move flashcannon +2, move earthpower +1",
+    ">p2 move leafstorm +2, pass"
+  ]
+}

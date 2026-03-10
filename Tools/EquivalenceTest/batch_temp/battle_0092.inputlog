@@ -1,0 +1,47 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"645,1198,1751,2856"}
+>player p1 {"name":"Player1","team":"Mewtwo||LifeOrb|Unnerve|darkpulse,fireblast,aurasphere,psystrike||85,,85,85,85,85|N|,0,,,,||73|,,,,,Psychic]Zangoose||ToxicOrb|ToxicBoost|facade,feint,knockoff,protect||85,85,85,85,85,85|F|||87|,,,,,Normal]Archaludon||PowerHerb|Stamina|electroshot,dragonpulse,protect,flashcannon||85,,85,85,85,85|M|,0,,,,||77|,,,,,Flying]Iron Valiant||LifeOrb|QuarkDrive|moonblast,encore,closecombat,protect||85,85,85,85,85,85|N|||79|,,,,,Fighting]Basculegion|BasculegionF|ChoiceScarf|Adaptability|muddywater,lastrespects,flipturn,wavecrash||85,85,85,85,85,85|F|||72|,,,,,Ghost]Palossand||Leftovers|WaterCompaction|shoreup,earthpower,protect,shadowball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Kingdra||LifeOrb|SwiftSwim|protect,dracometeor,wavecrash,raindance||85,85,85,85,85,85|M|||85|,,,,,Water]Malamar||SitrusBerry|Contrary|knockoff,protect,trickroom,superpower||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Hitmonlee||WhiteHerb|Unburden|fakeout,closecombat,protect,poisonjab||85,85,85,85,85,85|M|||86|,,,,,Poison]Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,earthpower,recover,yawn||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Skeledirge||Leftovers|Unaware|slackoff,protect,shadowball,torchsong||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fairy]Sceptile||WhiteHerb|Unburden|protect,leafstorm,breakingswipe,focusblast||85,85,85,85,85,85|F|||88|,,,,,Water"}
+>p1 move fireblast +2, move protect
+>p2 move protect, move protect
+>p1 move aurasphere +1, move knockoff +2
+>p2 move protect, move trickroom
+>p1 move psystrike +2, move knockoff +2
+>p2 move raindance, move superpower +1
+>p1 move fireblast +2, move feint +2
+>p2 move protect, move trickroom
+>p2 pass, switch 4
+>p1 move fireblast +1, move feint +1
+>p2 move protect, move yawn +1
+>p1 move psystrike +1, move knockoff +2
+>p2 move wavecrash +2, move earthpower +1
+>p2 switch 5, pass
+>p1 move fireblast +2, move facade +1
+>p2 move torchsong +2, move recover
+>p1 pass, switch 3
+>p1 move darkpulse +2, move electroshot +2
+>p2 move shadowball +1, move yawn +2
+>p1 switch 4, pass
+>p1 move moonblast +2, move dragonpulse +2
+>p2 move protect, move icebeam +1
+>p2 pass, switch 6
+>p1 move closecombat +2, move dragonpulse +1
+>p2 move slackoff, move focusblast +2
+>p1 pass, switch 5
+>p1 move closecombat +1, move muddywater
+>p2 move slackoff, move breakingswipe
+>p1 move moonblast +2, move muddywater
+>p2 move slackoff, move protect
+>p1 move closecombat +2, move muddywater
+>p2 move torchsong +2, move leafstorm +2
+>p1 switch 6, pass
+>p2 pass, switch 3
+>p1 move shadowball +1, pass
+>p2 move protect, move poisonjab +1
+>p1 move protect, pass
+>p2 move torchsong +2, move poisonjab +2
+>p1 move protect, pass
+>p2 move protect, move poisonjab +2
+>p1 move earthpower +2, pass
+>p2 move slackoff, move fakeout +2
+>p1 move earthpower +1, pass
+>p2 move shadowball +1, move closecombat +1

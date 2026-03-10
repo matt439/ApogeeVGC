@@ -1,0 +1,33 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"64,119,174,283"}
+>player p1 {"name":"Player1","team":"Krookodile||LifeOrb|Intimidate|highhorsepower,protect,knockoff,gunkshot||85,85,85,85,85,85|F|||80|,,,,,Poison]Illumise||SitrusBerry|Prankster|encore,strugglebug,thunderwave,tailwind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel]Mandibuzz||SitrusBerry|Overcoat|tailwind,roost,knockoff,bravebird||85,85,85,85,85,85|F|||85|,,,,,Steel]Typhlosion||ChoiceSpecs|FlashFire|heatwave,scorchingsands,eruption,fireblast||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Duraludon||Eviolite|Stalwart|dracometeor,bodypress,flashcannon,irondefense||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fighting]Heatran||LifeOrb|FlashFire|protect,flashcannon,earthpower,heatwave||85,,85,85,85,85|F|,0,,,,||78|,,,,,Grass"}
+>player p2 {"name":"Player2","team":"Electabuzz||Eviolite|Static|electroweb,thunderbolt,followme,knockoff||85,85,85,85,85,85|F|||84|,,,,,Flying]Zangoose||ToxicOrb|ToxicBoost|knockoff,facade,protect,closecombat||85,85,85,85,85,85|F|||87|,,,,,Normal]Swampert||AssaultVest|Torrent|highhorsepower,icywind,flipturn,muddywater||85,85,85,85,85,85|F|||82|,,,,,Fire]Chandelure||LifeOrb|FlashFire|protect,shadowball,energyball,heatwave||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Spidops||SitrusBerry|Stakeout|circlethrow,stickyweb,stringshot,lunge||85,85,85,85,85,85|F||||,,,,,Water]Mismagius||ChoiceSpecs|Levitate|dazzlinggleam,shadowball,thunderbolt,trick||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy"}
+>p1 move highhorsepower +1, move tailwind
+>p2 move thunderbolt +1, move protect
+>p2 switch 4, pass
+>p1 move protect, move tailwind
+>p2 move shadowball +2, move closecombat +2
+>p1 move gunkshot +1, move encore +1
+>p2 move energyball +1, move protect
+>p1 move protect, move encore +2
+>p2 move shadowball +2, move knockoff +2
+>p1 pass, switch 5
+>p1 move protect, move flashcannon +1
+>p2 move shadowball +2, move protect
+>p1 move highhorsepower +2, move bodypress +1
+>p2 move shadowball +1, move protect
+>p2 switch 6, pass
+>p1 move protect, move bodypress +2
+>p2 move trick +2, move protect
+>p2 pass, switch 3
+>p1 move highhorsepower +2, move bodypress +2
+>p2 move trick +1, move muddywater
+>p1 switch 6, pass
+>p1 move earthpower +2, move bodypress +2
+>p2 move trick +1, move flipturn +2
+>p2 pass, switch 5
+>p1 move heatwave, move bodypress +1
+>p2 move trick +2, move stringshot
+>p1 move heatwave, move bodypress +1
+>p2 move trick +1, move stringshot
+>p1 move heatwave, move irondefense
+>p2 move shadowball +1, pass

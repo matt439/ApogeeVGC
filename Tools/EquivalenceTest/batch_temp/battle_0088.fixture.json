@@ -1,0 +1,458 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "617,1146,1675,2732",
+  "p1Seed": "3618,3804,4166,4704",
+  "p2Seed": "5242,5428,5966,6328",
+  "p1TeamPacked": "Clawitzer||ChoiceSpecs|MegaLauncher|muddywater,dragonpulse,darkpulse,aurasphere||85,,85,85,85,85|F|,0,,,,||84|,,,,,Dragon]Emboar||ChoiceBand|Reckless|flareblitz,closecombat,headsmash,wildcharge||85,85,85,85,85,85|M|||85|,,,,,Rock]Gastrodon||Leftovers|StormDrain|yawn,recover,icebeam,earthpower||85,,85,85,85,85|F|,0,,,,||82|,,,,,Fire]Hawlucha||WhiteHerb|Unburden|closecombat,protect,bravebird,swordsdance||85,85,85,85,85,85|F|||84|,,,,,Flying]Arceus|ArceusIce|IciclePlate|Multitype|recover,earthpower,calmmind,judgment||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ground]Skeledirge||Leftovers|Unaware|protect,torchsong,shadowball,slackoff||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fairy",
+  "p2TeamPacked": "Chandelure||LifeOrb|FlashFire|protect,heatwave,energyball,shadowball||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Ceruledge||LifeOrb|WeakArmor|swordsdance,bitterblade,poltergeist,protect||85,85,85,85,85,85|M|||80|,,,,,Grass]Hydrapple||SitrusBerry|Regenerator|ficklebeam,protect,gigadrain,pollenpuff||85,,85,85,85,85|F|,0,,,,||85|,,,,,Steel]Avalugg||Leftovers|Sturdy|protect,recover,bodypress,avalanche||85,85,85,85,85,85|F|||92|,,,,,Water]Bellossom||SitrusBerry|Healer|gigadrain,strengthsap,quiverdance,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Poison]Krookodile||ChoiceScarf|Intimidate|rockslide,knockoff,highhorsepower,gunkshot||85,85,85,85,85,85|F|||80|,,,,,Poison",
+  "p1Team": [
+    {
+      "name": "Clawitzer",
+      "species": "Clawitzer",
+      "item": "Choice Specs",
+      "ability": "Mega Launcher",
+      "moves": [
+        "Muddy Water",
+        "Dragon Pulse",
+        "Dark Pulse",
+        "Aura Sphere"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Emboar",
+      "species": "Emboar",
+      "item": "Choice Band",
+      "ability": "Reckless",
+      "moves": [
+        "Flare Blitz",
+        "Close Combat",
+        "Head Smash",
+        "Wild Charge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Rock"
+    },
+    {
+      "name": "Gastrodon",
+      "species": "Gastrodon",
+      "item": "Leftovers",
+      "ability": "Storm Drain",
+      "moves": [
+        "Yawn",
+        "Recover",
+        "Ice Beam",
+        "Earth Power"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Hawlucha",
+      "species": "Hawlucha",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Close Combat",
+        "Protect",
+        "Brave Bird",
+        "Swords Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Arceus",
+      "species": "Arceus-Ice",
+      "item": "Icicle Plate",
+      "ability": "Multitype",
+      "moves": [
+        "Recover",
+        "Earth Power",
+        "Calm Mind",
+        "Judgment"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 73,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Skeledirge",
+      "species": "Skeledirge",
+      "item": "Leftovers",
+      "ability": "Unaware",
+      "moves": [
+        "Protect",
+        "Torch Song",
+        "Shadow Ball",
+        "Slack Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Chandelure",
+      "species": "Chandelure",
+      "item": "Life Orb",
+      "ability": "Flash Fire",
+      "moves": [
+        "Protect",
+        "Heat Wave",
+        "Energy Ball",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Ceruledge",
+      "species": "Ceruledge",
+      "item": "Life Orb",
+      "ability": "Weak Armor",
+      "moves": [
+        "Swords Dance",
+        "Bitter Blade",
+        "Poltergeist",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Hydrapple",
+      "species": "Hydrapple",
+      "item": "Sitrus Berry",
+      "ability": "Regenerator",
+      "moves": [
+        "Fickle Beam",
+        "Protect",
+        "Giga Drain",
+        "Pollen Puff"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Avalugg",
+      "species": "Avalugg",
+      "item": "Leftovers",
+      "ability": "Sturdy",
+      "moves": [
+        "Protect",
+        "Recover",
+        "Body Press",
+        "Avalanche"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Bellossom",
+      "species": "Bellossom",
+      "item": "Sitrus Berry",
+      "ability": "Healer",
+      "moves": [
+        "Giga Drain",
+        "Strength Sap",
+        "Quiver Dance",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Krookodile",
+      "species": "Krookodile",
+      "item": "Choice Scarf",
+      "ability": "Intimidate",
+      "moves": [
+        "Rock Slide",
+        "Knock Off",
+        "High Horsepower",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"617,1146,1675,2732\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Clawitzer||ChoiceSpecs|MegaLauncher|muddywater,dragonpulse,darkpulse,aurasphere||85,,85,85,85,85|F|,0,,,,||84|,,,,,Dragon]Emboar||ChoiceBand|Reckless|flareblitz,closecombat,headsmash,wildcharge||85,85,85,85,85,85|M|||85|,,,,,Rock]Gastrodon||Leftovers|StormDrain|yawn,recover,icebeam,earthpower||85,,85,85,85,85|F|,0,,,,||82|,,,,,Fire]Hawlucha||WhiteHerb|Unburden|closecombat,protect,bravebird,swordsdance||85,85,85,85,85,85|F|||84|,,,,,Flying]Arceus|ArceusIce|IciclePlate|Multitype|recover,earthpower,calmmind,judgment||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ground]Skeledirge||Leftovers|Unaware|protect,torchsong,shadowball,slackoff||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fairy\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Chandelure||LifeOrb|FlashFire|protect,heatwave,energyball,shadowball||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Ceruledge||LifeOrb|WeakArmor|swordsdance,bitterblade,poltergeist,protect||85,85,85,85,85,85|M|||80|,,,,,Grass]Hydrapple||SitrusBerry|Regenerator|ficklebeam,protect,gigadrain,pollenpuff||85,,85,85,85,85|F|,0,,,,||85|,,,,,Steel]Avalugg||Leftovers|Sturdy|protect,recover,bodypress,avalanche||85,85,85,85,85,85|F|||92|,,,,,Water]Bellossom||SitrusBerry|Healer|gigadrain,strengthsap,quiverdance,protect||85,,85,85,85,85|M|,0,,,,||87|,,,,,Poison]Krookodile||ChoiceScarf|Intimidate|rockslide,knockoff,highhorsepower,gunkshot||85,85,85,85,85,85|F|||80|,,,,,Poison\"}",
+    ">p1 move darkpulse +1, move flareblitz +1",
+    ">p2 move protect, move poltergeist +2",
+    ">p1 move darkpulse +1, move flareblitz +1",
+    ">p2 move energyball +1, move poltergeist +2",
+    ">p2 switch 5, pass",
+    ">p1 move darkpulse +1, move flareblitz +1",
+    ">p2 move protect, move protect",
+    ">p1 move darkpulse +1, move flareblitz +2",
+    ">p2 move strengthsap +2, move protect",
+    ">p1 move darkpulse +2, move flareblitz +1",
+    ">p2 move strengthsap +1, move poltergeist +1",
+    ">p1 switch 5, switch 3",
+    ">p2 switch 6, pass",
+    ">p1 move calmmind, move recover",
+    ">p2 move gunkshot +1, move protect",
+    ">p1 move earthpower +2, move yawn +1",
+    ">p2 move gunkshot +1, move protect",
+    ">p2 pass, switch 4",
+    ">p1 move judgment +1, move recover",
+    ">p2 move gunkshot +1, move bodypress +1",
+    ">p1 switch 6, pass",
+    ">p1 move shadowball +1, move earthpower +1",
+    ">p2 move gunkshot +2, move bodypress +1",
+    ">p1 move torchsong +2, move earthpower +2",
+    ">p2 move gunkshot +2, move recover",
+    ">p2 pass, switch 3",
+    ">p1 move shadowball +1, move icebeam +2",
+    ">p2 move gunkshot +2, move gigadrain +2",
+    ">p1 pass, switch 4",
+    ">p1 move slackoff, move protect",
+    ">p2 move gunkshot +2, move gigadrain +1",
+    ">p1 move shadowball +2, move closecombat +1",
+    ">p2 move gunkshot +2, move ficklebeam +2",
+    ">p1 move protect, move protect",
+    ">p2 pass, move pollenpuff +1",
+    ">p1 move shadowball +1, move closecombat +1",
+    ">p2 pass, move gigadrain +2"
+  ]
+}

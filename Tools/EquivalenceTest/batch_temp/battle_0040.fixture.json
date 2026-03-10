@@ -1,0 +1,420 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "281,522,763,1244",
+  "p1Seed": "1650,1740,1910,2160",
+  "p2Seed": "2410,2500,2750,2920",
+  "p1TeamPacked": "Basculin||ChoiceBand|Adaptability|flipturn,wavecrash,aquajet,psychicfangs||85,85,85,85,85,85|F|||87|,,,,,Water]Gumshoos||ChoiceBand|Adaptability|knockoff,doubleedge,stompingtantrum,uturn||85,85,85,85,85,85|M|||93|,,,,,Normal]Munkidori||AssaultVest|ToxicChain|sludgebomb,focusblast,fakeout,psychic||85,85,85,85,85,85|M|||80|,,,,,Fighting]Meowstic|MeowsticF|LifeOrb|Competitive|darkpulse,protect,thunderbolt,psychic||85,,85,85,85,85|F|,0,,,,||89|,,,,,Dark]Iron Hands||AssaultVest|QuarkDrive|closecombat,fakeout,wildcharge,icepunch||85,85,85,85,85,85|N|||77|,,,,,Electric]Persian|PersianAlola|SitrusBerry|FurCoat|foulplay,partingshot,thunderwave,fakeout||85,85,85,85,85,85|F|||88|,,,,,Poison",
+  "p2TeamPacked": "Feraligatr||LifeOrb|SheerForce|dragondance,liquidation,icepunch,protect||85,85,85,85,85,85|M|||82|,,,,,Fire]Archaludon||PowerHerb|Stamina|electroshot,flashcannon,protect,dragonpulse||85,,85,85,85,85|F|,0,,,,||77|,,,,,Flying]Furret||LifeOrb|Frisk|tidyup,doubleedge,protect,knockoff||85,85,85,85,85,85|F|||98|,,,,,Normal]Whimsicott||SitrusBerry|Prankster|moonblast,helpinghand,tailwind,encore||85,,85,85,85,85|M|,0,,,,||80|,,,,,Steel]Iron Thorns||ClearAmulet|QuarkDrive|rockslide,wildcharge,icepunch,dragondance||85,85,85,85,85,85|N|||82|,,,,,Grass]Qwilfish|QwilfishHisui|Eviolite|Intimidate|throatchop,toxicspikes,icywind,gunkshot||85,85,85,85,85,85|M|||82|,,,,,Flying",
+  "p1Team": [
+    {
+      "name": "Basculin",
+      "species": "Basculin",
+      "item": "Choice Band",
+      "ability": "Adaptability",
+      "moves": [
+        "Flip Turn",
+        "Wave Crash",
+        "Aqua Jet",
+        "Psychic Fangs"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Gumshoos",
+      "species": "Gumshoos",
+      "item": "Choice Band",
+      "ability": "Adaptability",
+      "moves": [
+        "Knock Off",
+        "Double-Edge",
+        "Stomping Tantrum",
+        "U-turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 93,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Munkidori",
+      "species": "Munkidori",
+      "item": "Assault Vest",
+      "ability": "Toxic Chain",
+      "moves": [
+        "Sludge Bomb",
+        "Focus Blast",
+        "Fake Out",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Meowstic",
+      "species": "Meowstic-F",
+      "item": "Life Orb",
+      "ability": "Competitive",
+      "moves": [
+        "Dark Pulse",
+        "Protect",
+        "Thunderbolt",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Iron Hands",
+      "species": "Iron Hands",
+      "item": "Assault Vest",
+      "ability": "Quark Drive",
+      "moves": [
+        "Close Combat",
+        "Fake Out",
+        "Wild Charge",
+        "Ice Punch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Persian",
+      "species": "Persian-Alola",
+      "item": "Sitrus Berry",
+      "ability": "Fur Coat",
+      "moves": [
+        "Foul Play",
+        "Parting Shot",
+        "Thunder Wave",
+        "Fake Out"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Feraligatr",
+      "species": "Feraligatr",
+      "item": "Life Orb",
+      "ability": "Sheer Force",
+      "moves": [
+        "Dragon Dance",
+        "Liquidation",
+        "Ice Punch",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Archaludon",
+      "species": "Archaludon",
+      "item": "Power Herb",
+      "ability": "Stamina",
+      "moves": [
+        "Electro Shot",
+        "Flash Cannon",
+        "Protect",
+        "Dragon Pulse"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Furret",
+      "species": "Furret",
+      "item": "Life Orb",
+      "ability": "Frisk",
+      "moves": [
+        "Tidy Up",
+        "Double-Edge",
+        "Protect",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 98,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Whimsicott",
+      "species": "Whimsicott",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Moonblast",
+        "Helping Hand",
+        "Tailwind",
+        "Encore"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Iron Thorns",
+      "species": "Iron Thorns",
+      "item": "Clear Amulet",
+      "ability": "Quark Drive",
+      "moves": [
+        "Rock Slide",
+        "Wild Charge",
+        "Ice Punch",
+        "Dragon Dance"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Qwilfish",
+      "species": "Qwilfish-Hisui",
+      "item": "Eviolite",
+      "ability": "Intimidate",
+      "moves": [
+        "Throat Chop",
+        "Toxic Spikes",
+        "Icy Wind",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"281,522,763,1244\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Basculin||ChoiceBand|Adaptability|flipturn,wavecrash,aquajet,psychicfangs||85,85,85,85,85,85|F|||87|,,,,,Water]Gumshoos||ChoiceBand|Adaptability|knockoff,doubleedge,stompingtantrum,uturn||85,85,85,85,85,85|M|||93|,,,,,Normal]Munkidori||AssaultVest|ToxicChain|sludgebomb,focusblast,fakeout,psychic||85,85,85,85,85,85|M|||80|,,,,,Fighting]Meowstic|MeowsticF|LifeOrb|Competitive|darkpulse,protect,thunderbolt,psychic||85,,85,85,85,85|F|,0,,,,||89|,,,,,Dark]Iron Hands||AssaultVest|QuarkDrive|closecombat,fakeout,wildcharge,icepunch||85,85,85,85,85,85|N|||77|,,,,,Electric]Persian|PersianAlola|SitrusBerry|FurCoat|foulplay,partingshot,thunderwave,fakeout||85,85,85,85,85,85|F|||88|,,,,,Poison\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Feraligatr||LifeOrb|SheerForce|dragondance,liquidation,icepunch,protect||85,85,85,85,85,85|M|||82|,,,,,Fire]Archaludon||PowerHerb|Stamina|electroshot,flashcannon,protect,dragonpulse||85,,85,85,85,85|F|,0,,,,||77|,,,,,Flying]Furret||LifeOrb|Frisk|tidyup,doubleedge,protect,knockoff||85,85,85,85,85,85|F|||98|,,,,,Normal]Whimsicott||SitrusBerry|Prankster|moonblast,helpinghand,tailwind,encore||85,,85,85,85,85|M|,0,,,,||80|,,,,,Steel]Iron Thorns||ClearAmulet|QuarkDrive|rockslide,wildcharge,icepunch,dragondance||85,85,85,85,85,85|N|||82|,,,,,Grass]Qwilfish|QwilfishHisui|Eviolite|Intimidate|throatchop,toxicspikes,icywind,gunkshot||85,85,85,85,85,85|M|||82|,,,,,Flying\"}",
+    ">p1 move psychicfangs +2, move knockoff +2",
+    ">p2 move dragondance, move dragonpulse +1",
+    ">p1 move psychicfangs +1, move knockoff +1",
+    ">p2 move protect, move electroshot +1",
+    ">p1 move psychicfangs +1, move knockoff +2",
+    ">p2 move liquidation +2, move electroshot +1",
+    ">p1 switch 3, pass",
+    ">p1 move sludgebomb +2, move knockoff +1",
+    ">p2 move icepunch +1, move electroshot +2",
+    ">p1 move fakeout +2, move knockoff +2",
+    ">p2 move icepunch +1, move electroshot +2",
+    ">p1 switch 5, switch 6",
+    ">p1 move fakeout +2, move partingshot +1",
+    ">p2 move liquidation +2, move flashcannon +2",
+    ">p1 pass, switch 4",
+    ">p1 move wildcharge +2, move darkpulse +2",
+    ">p2 move liquidation +1, move protect",
+    ">p1 move icepunch +1, move protect",
+    ">p2 move icepunch +2, move electroshot +1",
+    ">p1 move icepunch +1, move psychic +1",
+    ">p2 move liquidation +1, move electroshot +1",
+    ">p2 switch 6, pass",
+    ">p1 move icepunch +2, move darkpulse +1",
+    ">p2 move gunkshot +2, move dragonpulse +1",
+    ">p1 switch 4, pass",
+    ">p1 move fakeout +2, move thunderbolt +1",
+    ">p2 move icywind, move protect",
+    ">p1 move foulplay +1, move psychic +1",
+    ">p2 move icywind, move flashcannon +1",
+    ">p1 pass, move darkpulse +1",
+    ">p2 move icywind, move electroshot +2"
+  ]
+}

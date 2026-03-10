@@ -1,0 +1,44 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"295,548,801,1306"}
+>player p1 {"name":"Player1","team":"Solgaleo||AssaultVest|FullMetalBody|closecombat,flareblitz,sunsteelstrike,psychicfangs||85,85,85,85,85,85|N|||74|,,,,,Fire]Ursaluna|UrsalunaBloodmoon|AssaultVest|MindsEye|bloodmoon,hypervoice,earthpower,vacuumwave||85,,85,85,85,85|M|,0,,,,||78|,,,,,Normal]Cetitan||LifeOrb|SheerForce|highhorsepower,iceshard,liquidation,iciclecrash||85,85,85,85,85,85|M|||83|,,,,,Ground]Bronzong||Leftovers|Levitate|ironhead,bodypress,irondefense,trickroom||85,85,85,85,85,|N|,,,,,0||87|,,,,,Fighting]Cinderace||SitrusBerry|Blaze|uturn,highjumpkick,pyroball,protect||85,85,85,85,85,85|F|||82|,,,,,Fighting]Basculin|BasculinBlueStriped|ChoiceBand|Adaptability|flipturn,aquajet,wavecrash,psychicfangs||85,85,85,85,85,85|F|||87|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Electabuzz||Eviolite|Static|electroweb,followme,protect,thunderbolt||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass]Luxray||AssaultVest|Intimidate|crunch,wildcharge,playrough,voltswitch||85,85,85,85,85,85|F|||86|,,,,,Flying]Weavile||LifeOrb|Pickpocket|protect,iceshard,tripleaxel,knockoff||85,85,85,85,85,85|F|||81|,,,,,Ghost]Azumarill||ChoiceBand|HugePower|liquidation,aquajet,icespinner,playrough||85,85,85,85,85,85|F|||83|,,,,,Water]Avalugg||Leftovers|Sturdy|protect,recover,bodypress,avalanche||85,85,85,85,85,85|M|||92|,,,,,Water]Gholdengo||ChoiceSpecs|GoodasGold|shadowball,focusblast,dazzlinggleam,makeitrain||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fairy"}
+>p1 move sunsteelstrike +2, move vacuumwave +1
+>p2 move electroweb, move crunch +2
+>p1 move psychicfangs +1, move vacuumwave +2
+>p2 move protect, move playrough +1
+>p1 move flareblitz +2, move hypervoice
+>p2 move followme, move playrough +1
+>p1 move closecombat +1, move earthpower +2
+>p2 move followme, move wildcharge +2
+>p2 switch 4, pass
+>p1 move psychicfangs +2, move earthpower +1
+>p2 move icespinner +2, move crunch +2
+>p1 pass, switch 3
+>p1 move psychicfangs +1, move iceshard +2
+>p2 move icespinner +1, move playrough +2
+>p2 pass, switch 5
+>p1 move closecombat +1, move iceshard +1
+>p2 move icespinner +2, move recover
+>p1 move sunsteelstrike +1, move liquidation +2
+>p2 move icespinner +1, move avalanche +1
+>p1 switch 6, pass
+>p1 move wavecrash +2, move iceshard +1
+>p2 move icespinner +2, move bodypress +2
+>p1 pass, switch 5
+>p1 move wavecrash +2, move pyroball +1
+>p2 move icespinner +1, move protect
+>p1 move wavecrash +2, move highjumpkick +2
+>p2 move icespinner +1, move protect
+>p1 move wavecrash +1, move highjumpkick +2
+>p2 move icespinner +2, move avalanche +2
+>p2 switch 6, pass
+>p1 move wavecrash +1, move protect
+>p2 move makeitrain, move bodypress +1
+>p1 switch 4, pass
+>p1 move trickroom, move pyroball +2
+>p2 move makeitrain, move recover
+>p1 move trickroom, move highjumpkick +1
+>p2 move makeitrain, move bodypress +1
+>p1 move bodypress +1, pass
+>p2 move makeitrain, move protect
+>p1 move bodypress +1, pass
+>p2 move makeitrain, move recover

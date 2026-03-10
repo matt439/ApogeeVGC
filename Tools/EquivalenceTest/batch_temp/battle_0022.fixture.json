@@ -1,0 +1,456 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "155,288,421,686",
+  "p1Seed": "912,966,1064,1206",
+  "p2Seed": "1348,1402,1544,1642",
+  "p1TeamPacked": "Honchkrow||LifeOrb|Moxie|protect,bravebird,suckerpunch,heatwave||85,85,85,85,85,85|M|||85|,,,,,Flying]Raichu|RaichuAlola|ChoiceSpecs|SurgeSurfer|thunderbolt,psychic,focusblast,voltswitch||85,,85,85,85,85|F|,0,,,,||89|,,,,,Electric]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fairy]Camerupt||SitrusBerry|SolidRock|earthpower,heatwave,willowisp,stealthrock||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Hydrapple||AssaultVest|Regenerator|earthpower,ficklebeam,pollenpuff,leafstorm||85,,85,85,85,85|M|,0,,,,||85|,,,,,Steel]Probopass||ChestoBerry|MagnetPull|rest,bodypress,irondefense,flashcannon||85,,85,85,85,85|M|,0,,,,||90|,,,,,Fighting",
+  "p2TeamPacked": "Latios||SoulDew|Levitate|dracometeor,lusterpurge,protect,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Dragon]Spectrier||LifeOrb|GrimNeigh|protect,nastyplot,terablast,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fighting]Great Tusk||SitrusBerry|Protosynthesis|protect,rockslide,closecombat,headlongrush||85,85,85,85,85,85|N|||81|,,,,,Ground]Lilligant||LifeOrb|Chlorophyll|pollenpuff,energyball,quiverdance,sleeppowder||85,,85,85,85,85|F|,0,,,,||88|,,,,,Steel]Ariados||RockyHelmet|Swarm|megahorn,ragepowder,stickyweb,protect||85,85,85,85,85,85|F||||,,,,,Dark]Reuniclus||LifeOrb|MagicGuard|shadowball,focusblast,trickroom,psychic||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fighting",
+  "p1Team": [
+    {
+      "name": "Honchkrow",
+      "species": "Honchkrow",
+      "item": "Life Orb",
+      "ability": "Moxie",
+      "moves": [
+        "Protect",
+        "Brave Bird",
+        "Sucker Punch",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Raichu",
+      "species": "Raichu-Alola",
+      "item": "Choice Specs",
+      "ability": "Surge Surfer",
+      "moves": [
+        "Thunderbolt",
+        "Psychic",
+        "Focus Blast",
+        "Volt Switch"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Ditto",
+      "species": "Ditto",
+      "item": "Sitrus Berry",
+      "ability": "Imposter",
+      "moves": [
+        "Transform"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 97,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Camerupt",
+      "species": "Camerupt",
+      "item": "Sitrus Berry",
+      "ability": "Solid Rock",
+      "moves": [
+        "Earth Power",
+        "Heat Wave",
+        "Will-O-Wisp",
+        "Stealth Rock"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Hydrapple",
+      "species": "Hydrapple",
+      "item": "Assault Vest",
+      "ability": "Regenerator",
+      "moves": [
+        "Earth Power",
+        "Fickle Beam",
+        "Pollen Puff",
+        "Leaf Storm"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Probopass",
+      "species": "Probopass",
+      "item": "Chesto Berry",
+      "ability": "Magnet Pull",
+      "moves": [
+        "Rest",
+        "Body Press",
+        "Iron Defense",
+        "Flash Cannon"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Latios",
+      "species": "Latios",
+      "item": "Soul Dew",
+      "ability": "Levitate",
+      "moves": [
+        "Draco Meteor",
+        "Luster Purge",
+        "Protect",
+        "Aura Sphere"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Spectrier",
+      "species": "Spectrier",
+      "item": "Life Orb",
+      "ability": "Grim Neigh",
+      "moves": [
+        "Protect",
+        "Nasty Plot",
+        "Tera Blast",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Great Tusk",
+      "species": "Great Tusk",
+      "item": "Sitrus Berry",
+      "ability": "Protosynthesis",
+      "moves": [
+        "Protect",
+        "Rock Slide",
+        "Close Combat",
+        "Headlong Rush"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Lilligant",
+      "species": "Lilligant",
+      "item": "Life Orb",
+      "ability": "Chlorophyll",
+      "moves": [
+        "Pollen Puff",
+        "Energy Ball",
+        "Quiver Dance",
+        "Sleep Powder"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Ariados",
+      "species": "Ariados",
+      "item": "Rocky Helmet",
+      "ability": "Swarm",
+      "moves": [
+        "Megahorn",
+        "Rage Powder",
+        "Sticky Web",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Reuniclus",
+      "species": "Reuniclus",
+      "item": "Life Orb",
+      "ability": "Magic Guard",
+      "moves": [
+        "Shadow Ball",
+        "Focus Blast",
+        "Trick Room",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"155,288,421,686\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Honchkrow||LifeOrb|Moxie|protect,bravebird,suckerpunch,heatwave||85,85,85,85,85,85|M|||85|,,,,,Flying]Raichu|RaichuAlola|ChoiceSpecs|SurgeSurfer|thunderbolt,psychic,focusblast,voltswitch||85,,85,85,85,85|F|,0,,,,||89|,,,,,Electric]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fairy]Camerupt||SitrusBerry|SolidRock|earthpower,heatwave,willowisp,stealthrock||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Hydrapple||AssaultVest|Regenerator|earthpower,ficklebeam,pollenpuff,leafstorm||85,,85,85,85,85|M|,0,,,,||85|,,,,,Steel]Probopass||ChestoBerry|MagnetPull|rest,bodypress,irondefense,flashcannon||85,,85,85,85,85|M|,0,,,,||90|,,,,,Fighting\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Latios||SoulDew|Levitate|dracometeor,lusterpurge,protect,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Dragon]Spectrier||LifeOrb|GrimNeigh|protect,nastyplot,terablast,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fighting]Great Tusk||SitrusBerry|Protosynthesis|protect,rockslide,closecombat,headlongrush||85,85,85,85,85,85|N|||81|,,,,,Ground]Lilligant||LifeOrb|Chlorophyll|pollenpuff,energyball,quiverdance,sleeppowder||85,,85,85,85,85|F|,0,,,,||88|,,,,,Steel]Ariados||RockyHelmet|Swarm|megahorn,ragepowder,stickyweb,protect||85,85,85,85,85,85|F||||,,,,,Dark]Reuniclus||LifeOrb|MagicGuard|shadowball,focusblast,trickroom,psychic||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fighting\"}",
+    ">p1 move protect, move psychic +1",
+    ">p2 move lusterpurge +2, move protect",
+    ">p1 move protect, move psychic +2",
+    ">p2 move lusterpurge +2, move protect",
+    ">p2 pass, switch 4",
+    ">p1 move bravebird +2, move psychic +1",
+    ">p2 move lusterpurge +2, move quiverdance",
+    ">p1 pass, switch 5",
+    ">p2 pass, switch 6",
+    ">p1 move suckerpunch +1, move ficklebeam +1",
+    ">p2 move dracometeor +2, move shadowball +2",
+    ">p2 switch 3, pass",
+    ">p1 move protect, move leafstorm +1",
+    ">p2 move rockslide, move psychic +2",
+    ">p1 move bravebird +2, move ficklebeam +2",
+    ">p2 move rockslide, move trickroom",
+    ">p1 move protect, move pollenpuff +2",
+    ">p2 move rockslide, move focusblast +1",
+    ">p1 pass, switch 3",
+    ">p1 move suckerpunch +1, move rockslide",
+    ">p2 move closecombat +2, move shadowball +1",
+    ">p1 switch 4, pass",
+    ">p2 pass, switch 5",
+    ">p1 move earthpower +1, move protect",
+    ">p2 move closecombat +2, move megahorn +1",
+    ">p1 move earthpower +2, move rockslide",
+    ">p2 pass, move ragepowder",
+    ">p1 move willowisp +2, move rockslide",
+    ">p2 pass, move ragepowder",
+    ">p1 move willowisp +2, move rockslide",
+    ">p2 pass, move ragepowder"
+  ]
+}

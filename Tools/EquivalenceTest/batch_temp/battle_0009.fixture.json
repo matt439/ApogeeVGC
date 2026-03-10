@@ -1,0 +1,442 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "64,119,174,283",
+  "p1Seed": "379,407,453,517",
+  "p2Seed": "581,609,673,719",
+  "p1TeamPacked": "Krookodile||LifeOrb|Intimidate|highhorsepower,protect,knockoff,gunkshot||85,85,85,85,85,85|F|||80|,,,,,Poison]Illumise||SitrusBerry|Prankster|encore,strugglebug,thunderwave,tailwind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel]Mandibuzz||SitrusBerry|Overcoat|tailwind,roost,knockoff,bravebird||85,85,85,85,85,85|F|||85|,,,,,Steel]Typhlosion||ChoiceSpecs|FlashFire|heatwave,scorchingsands,eruption,fireblast||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Duraludon||Eviolite|Stalwart|dracometeor,bodypress,flashcannon,irondefense||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fighting]Heatran||LifeOrb|FlashFire|protect,flashcannon,earthpower,heatwave||85,,85,85,85,85|F|,0,,,,||78|,,,,,Grass",
+  "p2TeamPacked": "Electabuzz||Eviolite|Static|electroweb,thunderbolt,followme,knockoff||85,85,85,85,85,85|F|||84|,,,,,Flying]Zangoose||ToxicOrb|ToxicBoost|knockoff,facade,protect,closecombat||85,85,85,85,85,85|F|||87|,,,,,Normal]Swampert||AssaultVest|Torrent|highhorsepower,icywind,flipturn,muddywater||85,85,85,85,85,85|F|||82|,,,,,Fire]Chandelure||LifeOrb|FlashFire|protect,shadowball,energyball,heatwave||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Spidops||SitrusBerry|Stakeout|circlethrow,stickyweb,stringshot,lunge||85,85,85,85,85,85|F||||,,,,,Water]Mismagius||ChoiceSpecs|Levitate|dazzlinggleam,shadowball,thunderbolt,trick||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy",
+  "p1Team": [
+    {
+      "name": "Krookodile",
+      "species": "Krookodile",
+      "item": "Life Orb",
+      "ability": "Intimidate",
+      "moves": [
+        "High Horsepower",
+        "Protect",
+        "Knock Off",
+        "Gunk Shot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Illumise",
+      "species": "Illumise",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Encore",
+        "Struggle Bug",
+        "Thunder Wave",
+        "Tailwind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Mandibuzz",
+      "species": "Mandibuzz",
+      "item": "Sitrus Berry",
+      "ability": "Overcoat",
+      "moves": [
+        "Tailwind",
+        "Roost",
+        "Knock Off",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Typhlosion",
+      "species": "Typhlosion",
+      "item": "Choice Specs",
+      "ability": "Flash Fire",
+      "moves": [
+        "Heat Wave",
+        "Scorching Sands",
+        "Eruption",
+        "Fire Blast"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Duraludon",
+      "species": "Duraludon",
+      "item": "Eviolite",
+      "ability": "Stalwart",
+      "moves": [
+        "Draco Meteor",
+        "Body Press",
+        "Flash Cannon",
+        "Iron Defense"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Heatran",
+      "species": "Heatran",
+      "item": "Life Orb",
+      "ability": "Flash Fire",
+      "moves": [
+        "Protect",
+        "Flash Cannon",
+        "Earth Power",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Electabuzz",
+      "species": "Electabuzz",
+      "item": "Eviolite",
+      "ability": "Static",
+      "moves": [
+        "Electroweb",
+        "Thunderbolt",
+        "Follow Me",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 84,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    },
+    {
+      "name": "Zangoose",
+      "species": "Zangoose",
+      "item": "Toxic Orb",
+      "ability": "Toxic Boost",
+      "moves": [
+        "Knock Off",
+        "Facade",
+        "Protect",
+        "Close Combat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Swampert",
+      "species": "Swampert",
+      "item": "Assault Vest",
+      "ability": "Torrent",
+      "moves": [
+        "High Horsepower",
+        "Icy Wind",
+        "Flip Turn",
+        "Muddy Water"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Chandelure",
+      "species": "Chandelure",
+      "item": "Life Orb",
+      "ability": "Flash Fire",
+      "moves": [
+        "Protect",
+        "Shadow Ball",
+        "Energy Ball",
+        "Heat Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Spidops",
+      "species": "Spidops",
+      "item": "Sitrus Berry",
+      "ability": "Stakeout",
+      "moves": [
+        "Circle Throw",
+        "Sticky Web",
+        "String Shot",
+        "Lunge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Mismagius",
+      "species": "Mismagius",
+      "item": "Choice Specs",
+      "ability": "Levitate",
+      "moves": [
+        "Dazzling Gleam",
+        "Shadow Ball",
+        "Thunderbolt",
+        "Trick"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"64,119,174,283\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Krookodile||LifeOrb|Intimidate|highhorsepower,protect,knockoff,gunkshot||85,85,85,85,85,85|F|||80|,,,,,Poison]Illumise||SitrusBerry|Prankster|encore,strugglebug,thunderwave,tailwind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel]Mandibuzz||SitrusBerry|Overcoat|tailwind,roost,knockoff,bravebird||85,85,85,85,85,85|F|||85|,,,,,Steel]Typhlosion||ChoiceSpecs|FlashFire|heatwave,scorchingsands,eruption,fireblast||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Duraludon||Eviolite|Stalwart|dracometeor,bodypress,flashcannon,irondefense||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fighting]Heatran||LifeOrb|FlashFire|protect,flashcannon,earthpower,heatwave||85,,85,85,85,85|F|,0,,,,||78|,,,,,Grass\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Electabuzz||Eviolite|Static|electroweb,thunderbolt,followme,knockoff||85,85,85,85,85,85|F|||84|,,,,,Flying]Zangoose||ToxicOrb|ToxicBoost|knockoff,facade,protect,closecombat||85,85,85,85,85,85|F|||87|,,,,,Normal]Swampert||AssaultVest|Torrent|highhorsepower,icywind,flipturn,muddywater||85,85,85,85,85,85|F|||82|,,,,,Fire]Chandelure||LifeOrb|FlashFire|protect,shadowball,energyball,heatwave||85,,85,85,85,85|F|,0,,,,||81|,,,,,Fire]Spidops||SitrusBerry|Stakeout|circlethrow,stickyweb,stringshot,lunge||85,85,85,85,85,85|F||||,,,,,Water]Mismagius||ChoiceSpecs|Levitate|dazzlinggleam,shadowball,thunderbolt,trick||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy\"}",
+    ">p1 move highhorsepower +1, move tailwind",
+    ">p2 move thunderbolt +1, move protect",
+    ">p2 switch 4, pass",
+    ">p1 move protect, move tailwind",
+    ">p2 move shadowball +2, move closecombat +2",
+    ">p1 move gunkshot +1, move encore +1",
+    ">p2 move energyball +1, move protect",
+    ">p1 move protect, move encore +2",
+    ">p2 move shadowball +2, move knockoff +2",
+    ">p1 pass, switch 5",
+    ">p1 move protect, move flashcannon +1",
+    ">p2 move shadowball +2, move protect",
+    ">p1 move highhorsepower +2, move bodypress +1",
+    ">p2 move shadowball +1, move protect",
+    ">p2 switch 6, pass",
+    ">p1 move protect, move bodypress +2",
+    ">p2 move trick +2, move protect",
+    ">p2 pass, switch 3",
+    ">p1 move highhorsepower +2, move bodypress +2",
+    ">p2 move trick +1, move muddywater",
+    ">p1 switch 6, pass",
+    ">p1 move earthpower +2, move bodypress +2",
+    ">p2 move trick +1, move flipturn +2",
+    ">p2 pass, switch 5",
+    ">p1 move heatwave, move bodypress +1",
+    ">p2 move trick +2, move stringshot",
+    ">p1 move heatwave, move bodypress +1",
+    ">p2 move trick +1, move stringshot",
+    ">p1 move heatwave, move irondefense",
+    ">p2 move shadowball +1, pass"
+  ]
+}

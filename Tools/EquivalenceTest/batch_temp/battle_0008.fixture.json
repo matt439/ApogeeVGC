@@ -1,0 +1,418 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "57,106,155,252",
+  "p1Seed": "338,364,406,464",
+  "p2Seed": "522,548,606,648",
+  "p1TeamPacked": "Tyranitar||AssaultVest|SandStream|icywind,rockslide,knockoff,highhorsepower||85,85,85,85,85,85|M|||81|,,,,,Ghost]Meowstic||SitrusBerry|Prankster|thunderwave,psychic,fakeout,helpinghand||85,85,85,85,85,85|M|||88|,,,,,Steel]Mismagius||LifeOrb|Levitate|protect,dazzlinggleam,willowisp,shadowball||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy]Cramorant||SitrusBerry|GulpMissile|surf,tailwind,protect,bravebird||85,85,85,85,85,85|M|||86|,,,,,Ground]Quagsire||SitrusBerry|Unaware|liquidation,recover,highhorsepower,icywind||85,85,85,85,85,85|M|||91|,,,,,Poison]Rillaboom||AssaultVest|GrassySurge|highhorsepower,fakeout,grassyglide,woodhammer||85,85,85,85,85,85|F|||81|,,,,,Grass",
+  "p2TeamPacked": "Drifblim||SitrusBerry|Unburden|tailwind,strengthsap,shadowball,willowisp||85,,85,85,85,85|F|,0,,,,||85|,,,,,Fairy]Thundurus|||Defiant|protect,acrobatics,knockoff,wildboltstorm||85,85,85,85,85,85|M|||79|,,,,,Electric]Iron Valiant||LifeOrb|QuarkDrive|protect,dazzlinggleam,closecombat,knockoff||85,85,85,85,85,85|N|||79|,,,,,Fighting]Dugtrio||LifeOrb|ArenaTrap|stompingtantrum,protect,rockslide,helpinghand||85,85,85,85,85,85|M|||91|,,,,,Ground]Primarina||ChoiceSpecs|LiquidVoice|moonblast,flipturn,hypervoice,hydropump||85,85,85,85,85,85|M|||79|,,,,,Water]Malamar||SitrusBerry|Contrary|protect,psychocut,knockoff,superpower||85,85,85,85,85,85|F|||80|,,,,,Fighting",
+  "p1Team": [
+    {
+      "name": "Tyranitar",
+      "species": "Tyranitar",
+      "item": "Assault Vest",
+      "ability": "Sand Stream",
+      "moves": [
+        "Icy Wind",
+        "Rock Slide",
+        "Knock Off",
+        "High Horsepower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Meowstic",
+      "species": "Meowstic",
+      "item": "Sitrus Berry",
+      "ability": "Prankster",
+      "moves": [
+        "Thunder Wave",
+        "Psychic",
+        "Fake Out",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Mismagius",
+      "species": "Mismagius",
+      "item": "Life Orb",
+      "ability": "Levitate",
+      "moves": [
+        "Protect",
+        "Dazzling Gleam",
+        "Will-O-Wisp",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Cramorant",
+      "species": "Cramorant",
+      "item": "Sitrus Berry",
+      "ability": "Gulp Missile",
+      "moves": [
+        "Surf",
+        "Tailwind",
+        "Protect",
+        "Brave Bird"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Quagsire",
+      "species": "Quagsire",
+      "item": "Sitrus Berry",
+      "ability": "Unaware",
+      "moves": [
+        "Liquidation",
+        "Recover",
+        "High Horsepower",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Poison"
+    },
+    {
+      "name": "Rillaboom",
+      "species": "Rillaboom",
+      "item": "Assault Vest",
+      "ability": "Grassy Surge",
+      "moves": [
+        "High Horsepower",
+        "Fake Out",
+        "Grassy Glide",
+        "Wood Hammer"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Drifblim",
+      "species": "Drifblim",
+      "item": "Sitrus Berry",
+      "ability": "Unburden",
+      "moves": [
+        "Tailwind",
+        "Strength Sap",
+        "Shadow Ball",
+        "Will-O-Wisp"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    },
+    {
+      "name": "Thundurus",
+      "species": "Thundurus",
+      "item": "",
+      "ability": "Defiant",
+      "moves": [
+        "Protect",
+        "Acrobatics",
+        "Knock Off",
+        "Wildbolt Storm"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Electric"
+    },
+    {
+      "name": "Iron Valiant",
+      "species": "Iron Valiant",
+      "item": "Life Orb",
+      "ability": "Quark Drive",
+      "moves": [
+        "Protect",
+        "Dazzling Gleam",
+        "Close Combat",
+        "Knock Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Dugtrio",
+      "species": "Dugtrio",
+      "item": "Life Orb",
+      "ability": "Arena Trap",
+      "moves": [
+        "Stomping Tantrum",
+        "Protect",
+        "Rock Slide",
+        "Helping Hand"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Primarina",
+      "species": "Primarina",
+      "item": "Choice Specs",
+      "ability": "Liquid Voice",
+      "moves": [
+        "Moonblast",
+        "Flip Turn",
+        "Hyper Voice",
+        "Hydro Pump"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Malamar",
+      "species": "Malamar",
+      "item": "Sitrus Berry",
+      "ability": "Contrary",
+      "moves": [
+        "Protect",
+        "Psycho Cut",
+        "Knock Off",
+        "Superpower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"57,106,155,252\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Tyranitar||AssaultVest|SandStream|icywind,rockslide,knockoff,highhorsepower||85,85,85,85,85,85|M|||81|,,,,,Ghost]Meowstic||SitrusBerry|Prankster|thunderwave,psychic,fakeout,helpinghand||85,85,85,85,85,85|M|||88|,,,,,Steel]Mismagius||LifeOrb|Levitate|protect,dazzlinggleam,willowisp,shadowball||85,,85,85,85,85|F|,0,,,,||88|,,,,,Fairy]Cramorant||SitrusBerry|GulpMissile|surf,tailwind,protect,bravebird||85,85,85,85,85,85|M|||86|,,,,,Ground]Quagsire||SitrusBerry|Unaware|liquidation,recover,highhorsepower,icywind||85,85,85,85,85,85|M|||91|,,,,,Poison]Rillaboom||AssaultVest|GrassySurge|highhorsepower,fakeout,grassyglide,woodhammer||85,85,85,85,85,85|F|||81|,,,,,Grass\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Drifblim||SitrusBerry|Unburden|tailwind,strengthsap,shadowball,willowisp||85,,85,85,85,85|F|,0,,,,||85|,,,,,Fairy]Thundurus|||Defiant|protect,acrobatics,knockoff,wildboltstorm||85,85,85,85,85,85|M|||79|,,,,,Electric]Iron Valiant||LifeOrb|QuarkDrive|protect,dazzlinggleam,closecombat,knockoff||85,85,85,85,85,85|N|||79|,,,,,Fighting]Dugtrio||LifeOrb|ArenaTrap|stompingtantrum,protect,rockslide,helpinghand||85,85,85,85,85,85|M|||91|,,,,,Ground]Primarina||ChoiceSpecs|LiquidVoice|moonblast,flipturn,hypervoice,hydropump||85,85,85,85,85,85|M|||79|,,,,,Water]Malamar||SitrusBerry|Contrary|protect,psychocut,knockoff,superpower||85,85,85,85,85,85|F|||80|,,,,,Fighting\"}",
+    ">p1 move highhorsepower +2, move fakeout +2",
+    ">p2 move tailwind, move acrobatics +2",
+    ">p1 move rockslide, move psychic +1",
+    ">p2 move willowisp +2, move protect",
+    ">p1 move highhorsepower +2, move psychic +2",
+    ">p2 move tailwind, move protect",
+    ">p1 move rockslide, move fakeout +1",
+    ">p2 move shadowball +2, move acrobatics +1",
+    ">p2 switch 6, pass",
+    ">p1 move icywind, move psychic +1",
+    ">p2 move psychocut +2, move acrobatics +2",
+    ">p1 pass, switch 6",
+    ">p2 pass, switch 3",
+    ">p1 move rockslide, move woodhammer +1",
+    ">p2 move knockoff +2, move protect",
+    ">p1 move rockslide, move woodhammer +1",
+    ">p2 move knockoff +1, move knockoff +2",
+    ">p2 switch 5, pass",
+    ">p1 move icywind, move woodhammer +2",
+    ">p2 move hydropump +2, move closecombat +1",
+    ">p1 switch 4, switch 5",
+    ">p2 pass, switch 4",
+    ">p1 move bravebird +2, move recover",
+    ">p2 move hydropump +1, move stompingtantrum +2",
+    ">p1 move surf, move highhorsepower +2",
+    ">p2 move hydropump +2, move rockslide",
+    ">p1 move tailwind, move highhorsepower +1",
+    ">p2 move hydropump +2, pass",
+    ">p1 move protect, move icywind",
+    ">p2 move hydropump +2, pass",
+    ">p1 pass, switch 3",
+    ">p1 move protect, move willowisp +2",
+    ">p2 move hydropump +2, pass",
+    ">p1 move protect, move dazzlinggleam",
+    ">p2 move hydropump +1, pass",
+    ">p1 move surf, move protect",
+    ">p2 move hydropump +2, pass"
+  ]
+}

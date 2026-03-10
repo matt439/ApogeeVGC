@@ -1,0 +1,448 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "323,600,877,1430",
+  "p1Seed": "1896,1998,2192,2478",
+  "p2Seed": "2764,2866,3152,3346",
+  "p1TeamPacked": "Zapdos|ZapdosGalar|ChoiceBand|Defiant|uturn,closecombat,bravebird,thunderouskick||85,85,85,85,85,85|N|||77|,,,,,Fighting]Rillaboom||AssaultVest|GrassySurge|fakeout,woodhammer,grassyglide,uturn||85,85,85,85,85,85|F|||81|,,,,,Steel]Dondozo||AssaultVest|Unaware|bodypress,heavyslam,wavecrash,avalanche||85,85,85,85,85,85|M|||85|,,,,,Dragon]Quaquaval||LifeOrb|Moxie|aquastep,tripleaxel,closecombat,protect||85,85,85,85,85,85|M|||82|,,,,,Water]Iron Crown||BoosterEnergy|QuarkDrive|protect,tachyoncutter,focusblast,psychic||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting]Espathra||LifeOrb|SpeedBoost|protect,dazzlinggleam,luminacrash,batonpass||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy",
+  "p2TeamPacked": "Sceptile||WhiteHerb|Unburden|protect,focusblast,breakingswipe,leafstorm||85,85,85,85,85,85|F|||88|,,,,,Water]Deoxys|DeoxysSpeed|SitrusBerry|Pressure|superpower,icywind,psychoboost,taunt||85,85,85,85,85,85|N|||85|,,,,,Fighting]Skeledirge||Leftovers|Unaware|protect,torchsong,shadowball,slackoff||85,,85,85,85,85|M|,0,,,,||80|,,,,,Water]Suicune||Leftovers|InnerFocus|icebeam,protect,scald,calmmind||85,,85,85,85,85|N|,0,,,,||79|,,,,,Grass]Slaking||ChoiceBand|Truant|gigaimpact,knockoff,doubleedge,highhorsepower||85,85,85,85,85,85|F|||89|,,,,,Ghost]Zebstrika||LifeOrb|SapSipper|wildcharge,highhorsepower,protect,overheat||85,85,85,85,85,85|F|||87|,,,,,Ground",
+  "p1Team": [
+    {
+      "name": "Zapdos",
+      "species": "Zapdos-Galar",
+      "item": "Choice Band",
+      "ability": "Defiant",
+      "moves": [
+        "U-turn",
+        "Close Combat",
+        "Brave Bird",
+        "Thunderous Kick"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Rillaboom",
+      "species": "Rillaboom",
+      "item": "Assault Vest",
+      "ability": "Grassy Surge",
+      "moves": [
+        "Fake Out",
+        "Wood Hammer",
+        "Grassy Glide",
+        "U-turn"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Dondozo",
+      "species": "Dondozo",
+      "item": "Assault Vest",
+      "ability": "Unaware",
+      "moves": [
+        "Body Press",
+        "Heavy Slam",
+        "Wave Crash",
+        "Avalanche"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dragon"
+    },
+    {
+      "name": "Quaquaval",
+      "species": "Quaquaval",
+      "item": "Life Orb",
+      "ability": "Moxie",
+      "moves": [
+        "Aqua Step",
+        "Triple Axel",
+        "Close Combat",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 82,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Iron Crown",
+      "species": "Iron Crown",
+      "item": "Booster Energy",
+      "ability": "Quark Drive",
+      "moves": [
+        "Protect",
+        "Tachyon Cutter",
+        "Focus Blast",
+        "Psychic"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Espathra",
+      "species": "Espathra",
+      "item": "Life Orb",
+      "ability": "Speed Boost",
+      "moves": [
+        "Protect",
+        "Dazzling Gleam",
+        "Lumina Crash",
+        "Baton Pass"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 83,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fairy"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Sceptile",
+      "species": "Sceptile",
+      "item": "White Herb",
+      "ability": "Unburden",
+      "moves": [
+        "Protect",
+        "Focus Blast",
+        "Breaking Swipe",
+        "Leaf Storm"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 88,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Deoxys",
+      "species": "Deoxys-Speed",
+      "item": "Sitrus Berry",
+      "ability": "Pressure",
+      "moves": [
+        "Superpower",
+        "Icy Wind",
+        "Psycho Boost",
+        "Taunt"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Skeledirge",
+      "species": "Skeledirge",
+      "item": "Leftovers",
+      "ability": "Unaware",
+      "moves": [
+        "Protect",
+        "Torch Song",
+        "Shadow Ball",
+        "Slack Off"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 80,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Suicune",
+      "species": "Suicune",
+      "item": "Leftovers",
+      "ability": "Inner Focus",
+      "moves": [
+        "Ice Beam",
+        "Protect",
+        "Scald",
+        "Calm Mind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 79,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Slaking",
+      "species": "Slaking",
+      "item": "Choice Band",
+      "ability": "Truant",
+      "moves": [
+        "Giga Impact",
+        "Knock Off",
+        "Double-Edge",
+        "High Horsepower"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ghost"
+    },
+    {
+      "name": "Zebstrika",
+      "species": "Zebstrika",
+      "item": "Life Orb",
+      "ability": "Sap Sipper",
+      "moves": [
+        "Wild Charge",
+        "High Horsepower",
+        "Protect",
+        "Overheat"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 87,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"323,600,877,1430\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Zapdos|ZapdosGalar|ChoiceBand|Defiant|uturn,closecombat,bravebird,thunderouskick||85,85,85,85,85,85|N|||77|,,,,,Fighting]Rillaboom||AssaultVest|GrassySurge|fakeout,woodhammer,grassyglide,uturn||85,85,85,85,85,85|F|||81|,,,,,Steel]Dondozo||AssaultVest|Unaware|bodypress,heavyslam,wavecrash,avalanche||85,85,85,85,85,85|M|||85|,,,,,Dragon]Quaquaval||LifeOrb|Moxie|aquastep,tripleaxel,closecombat,protect||85,85,85,85,85,85|M|||82|,,,,,Water]Iron Crown||BoosterEnergy|QuarkDrive|protect,tachyoncutter,focusblast,psychic||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fighting]Espathra||LifeOrb|SpeedBoost|protect,dazzlinggleam,luminacrash,batonpass||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Sceptile||WhiteHerb|Unburden|protect,focusblast,breakingswipe,leafstorm||85,85,85,85,85,85|F|||88|,,,,,Water]Deoxys|DeoxysSpeed|SitrusBerry|Pressure|superpower,icywind,psychoboost,taunt||85,85,85,85,85,85|N|||85|,,,,,Fighting]Skeledirge||Leftovers|Unaware|protect,torchsong,shadowball,slackoff||85,,85,85,85,85|M|,0,,,,||80|,,,,,Water]Suicune||Leftovers|InnerFocus|icebeam,protect,scald,calmmind||85,,85,85,85,85|N|,0,,,,||79|,,,,,Grass]Slaking||ChoiceBand|Truant|gigaimpact,knockoff,doubleedge,highhorsepower||85,85,85,85,85,85|F|||89|,,,,,Ghost]Zebstrika||LifeOrb|SapSipper|wildcharge,highhorsepower,protect,overheat||85,85,85,85,85,85|F|||87|,,,,,Ground\"}",
+    ">p1 move thunderouskick +2, move woodhammer +1",
+    ">p2 move breakingswipe, move superpower +2",
+    ">p1 move thunderouskick +1, move fakeout +1",
+    ">p2 move protect, move taunt +1",
+    ">p1 move thunderouskick +2, move grassyglide +2",
+    ">p2 move protect, move superpower +2",
+    ">p2 pass, switch 6",
+    ">p1 move thunderouskick +2, move grassyglide +1",
+    ">p2 move leafstorm +1, move wildcharge +2",
+    ">p2 pass, switch 4",
+    ">p1 move thunderouskick +1, move woodhammer +2",
+    ">p2 move breakingswipe, move protect",
+    ">p2 switch 3, pass",
+    ">p1 move thunderouskick +1, move grassyglide +2",
+    ">p2 move slackoff, move calmmind",
+    ">p1 move thunderouskick +1, move grassyglide +1",
+    ">p2 move shadowball +2, move calmmind",
+    ">p1 move thunderouskick +2, move fakeout +1",
+    ">p2 move slackoff, move calmmind",
+    ">p1 move thunderouskick +1, move woodhammer +1",
+    ">p2 move shadowball +1, move scald +2",
+    ">p1 switch 3, switch 4",
+    ">p1 move heavyslam +1, move closecombat +1",
+    ">p2 move protect, move calmmind",
+    ">p1 move bodypress +1, move tripleaxel +2",
+    ">p2 move torchsong +1, move protect",
+    ">p1 move avalanche +2, move aquastep +1",
+    ">p2 move protect, move scald +2",
+    ">p1 move wavecrash +2, move tripleaxel +1",
+    ">p2 move slackoff, move scald +2",
+    ">p1 pass, switch 6",
+    ">p1 move bodypress +1, move batonpass",
+    ">p2 move slackoff, move scald +2",
+    ">p1 pass, switch 5",
+    ">p1 pass, switch 5",
+    ">p1 move heavyslam +1, move luminacrash +1",
+    ">p2 move shadowball +2, move icebeam +2",
+    ">p1 move bodypress +2, pass",
+    ">p2 move slackoff, move calmmind",
+    ">p1 move bodypress +1, pass",
+    ">p2 move shadowball +2, move scald +2",
+    ">p1 move heavyslam +2, pass",
+    ">p2 move protect, move protect",
+    ">p1 move avalanche +1, pass",
+    ">p2 move shadowball +2, move calmmind",
+    ">p1 move heavyslam +1, pass",
+    ">p2 move shadowball +1, move protect",
+    ">p1 move heavyslam +2, pass",
+    ">p2 move shadowball +1, move protect",
+    ">p1 move bodypress +1, pass",
+    ">p2 move shadowball +2, move scald +1"
+  ]
+}

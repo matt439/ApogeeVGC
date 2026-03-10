@@ -1,0 +1,52 @@
+>start {"formatid":"gen9randomdoublesbattle","seed":"540,1003,1466,2391"}
+>player p1 {"name":"Player1","team":"Cetitan||LifeOrb|SheerForce|liquidation,iciclecrash,protect,iceshard||85,85,85,85,85,85|M|||83|,,,,,Water]Pachirisu||SitrusBerry|VoltAbsorb|thunderbolt,superfang,nuzzle,followme||85,85,85,85,85,85|F|||93|,,,,,Flying]Hitmonlee||WhiteHerb|Unburden|closecombat,protect,poisonjab,knockoff||85,85,85,85,85,85|M|||86|,,,,,Dark]Oricorio|OricorioPau|SitrusBerry|Dancer|revelationdance,protect,tailwind,hurricane||85,,85,85,85,85|F|,0,,,,||89|,,,,,Ground]Exeggutor|ExeggutorAlola|SitrusBerry|Harvest|dracometeor,flamethrower,protect,woodhammer||85,85,85,85,85,85|M|||87|,,,,,Fire]Spidops||SitrusBerry|Stakeout|knockoff,lunge,stringshot,stickyweb||85,85,85,85,85,85|M||||,,,,,Water"}
+>player p2 {"name":"Player2","team":"Registeel||Leftovers|ClearBody|ironhead,irondefense,thunderwave,bodypress||85,85,85,85,85,85|N|||78|,,,,,Fighting]Flapple||ClearAmulet|Hustle|terablast,protect,gravapple,dragondance||85,85,85,85,85,85|M|||95|,,,,,Dragon]Yanmega||ChoiceSpecs|TintedLens|bugbuzz,gigadrain,airslash,uturn||85,85,85,85,85,85|F|||84|,,,,,Bug]Roaring Moon||ClearAmulet|Protosynthesis|dragondance,knockoff,protect,dragonclaw||85,85,85,85,85,85|N|||76|,,,,,Fire]Rampardos||ChoiceScarf|SheerForce|stompingtantrum,headsmash,rockslide,firepunch||85,85,85,85,85,85|F|||87|,,,,,Rock]Mimikyu||LifeOrb|Disguise|playrough,swordsdance,shadowsneak,protect||85,85,85,85,85,85|M|||82|,,,,,Ghost"}
+>p1 move iceshard +1, move superfang +1
+>p2 move irondefense, move protect
+>p1 move protect, move superfang +1
+>p2 move thunderwave +1, move gravapple +2
+>p1 move protect, move superfang +2
+>p2 move bodypress +2, move terablast +2
+>p1 pass, switch 4
+>p1 move liquidation +2, move protect
+>p2 move thunderwave +1, move protect
+>p1 move iceshard +1, move tailwind
+>p2 move irondefense, move protect
+>p1 move iciclecrash +2, move hurricane +1
+>p2 move ironhead +2, move dragondance
+>p1 move iceshard +2, move revelationdance +1
+>p2 move ironhead +1, move protect
+>p1 move iciclecrash +1, move hurricane +1
+>p2 move irondefense, move dragondance
+>p1 move iceshard +2, move tailwind
+>p2 move ironhead +2, move terablast +1
+>p1 move iciclecrash +2, move revelationdance +2
+>p2 move thunderwave +2, move dragondance
+>p1 move iciclecrash +2, move protect
+>p2 move irondefense, move terablast +2
+>p2 pass, switch 3
+>p1 move liquidation +1, move protect
+>p2 move irondefense, move airslash +2
+>p1 move protect, move hurricane +1
+>p2 move bodypress +2, move airslash +2
+>p1 pass, switch 6
+>p1 move iciclecrash +2, move stringshot
+>p2 move thunderwave +1, move airslash +2
+>p2 pass, switch 5
+>p1 move iciclecrash +2, move knockoff +2
+>p2 move thunderwave +2, move stompingtantrum +2
+>p1 move protect, move stickyweb
+>p2 move thunderwave +2, move rockslide
+>p1 switch 3, switch 5
+>p1 move poisonjab +1, move woodhammer +2
+>p2 move irondefense, move rockslide
+>p2 pass, switch 4
+>p1 move closecombat +2, move flamethrower +1
+>p2 move thunderwave +1, move dragonclaw +1
+>p2 pass, switch 6
+>p1 move poisonjab +1, move protect
+>p2 move ironhead +2, move swordsdance
+>p1 move closecombat +1, move woodhammer +1
+>p2 move thunderwave +2, move playrough +2
+>p1 move knockoff +1, pass
+>p2 move irondefense, move shadowsneak +2

@@ -1,0 +1,428 @@
+{
+  "formatid": "gen9randomdoublesbattle",
+  "seed": "162,301,440,717",
+  "p1Seed": "953,1009,1111,1259",
+  "p2Seed": "1407,1463,1611,1713",
+  "p1TeamPacked": "Palossand||Leftovers|WaterCompaction|shoreup,protect,earthpower,shadowball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Grass]Dodrio||LifeOrb|EarlyBird|bravebird,protect,drillrun,quickattack||85,85,85,85,85,85|M|||85|,,,,,Ground]Beartic||LifeOrb|SwiftSwim|protect,closecombat,iciclecrash,aquajet||85,85,85,85,85,85|M|||91|,,,,,Fighting]Salazzle||FocusSash|Corrosion|protect,fakeout,heatwave,sludgebomb||85,85,85,85,85,85|F|||86|,,,,,Fire]Venusaur||LifeOrb|Overgrow|sludgebomb,earthpower,gigadrain,protect||85,,85,85,85,85|F|,0,,,,||86|,,,,,Water]Registeel||Leftovers|ClearBody|irondefense,ironhead,bodypress,thunderwave||85,85,85,85,85,85|N|||78|,,,,,Fighting",
+  "p2TeamPacked": "Hariyama||AssaultVest|ThickFat|knockoff,fakeout,closecombat,heavyslam||85,85,85,85,85,85|M|||85|,,,,,Steel]Iron Treads||AssaultVest|QuarkDrive|highhorsepower,rapidspin,ironhead,stoneedge||85,85,85,85,85,85|N|||81|,,,,,Steel]Sawsbuck||LifeOrb|SapSipper|highhorsepower,swordsdance,doubleedge,hornleech||85,85,85,85,85,85|M|||91|,,,,,Normal]Noctowl||LifeOrb|TintedLens|protect,hurricane,tailwind,hypervoice||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Hypno||SitrusBerry|InnerFocus|psychic,knockoff,lowsweep,poisongas||85,85,85,85,85,85|M|||95|,,,,,Dark]Plusle||LifeOrb|LightningRod|thunderbolt,protect,alluringvoice,nastyplot||85,,85,85,85,85|F|,0,,,,||92|,,,,,Flying",
+  "p1Team": [
+    {
+      "name": "Palossand",
+      "species": "Palossand",
+      "item": "Leftovers",
+      "ability": "Water Compaction",
+      "moves": [
+        "Shore Up",
+        "Protect",
+        "Earth Power",
+        "Shadow Ball"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 90,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Grass"
+    },
+    {
+      "name": "Dodrio",
+      "species": "Dodrio",
+      "item": "Life Orb",
+      "ability": "Early Bird",
+      "moves": [
+        "Brave Bird",
+        "Protect",
+        "Drill Run",
+        "Quick Attack"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Ground"
+    },
+    {
+      "name": "Beartic",
+      "species": "Beartic",
+      "item": "Life Orb",
+      "ability": "Swift Swim",
+      "moves": [
+        "Protect",
+        "Close Combat",
+        "Icicle Crash",
+        "Aqua Jet"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Salazzle",
+      "species": "Salazzle",
+      "item": "Focus Sash",
+      "ability": "Corrosion",
+      "moves": [
+        "Protect",
+        "Fake Out",
+        "Heat Wave",
+        "Sludge Bomb"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Venusaur",
+      "species": "Venusaur",
+      "item": "Life Orb",
+      "ability": "Overgrow",
+      "moves": [
+        "Sludge Bomb",
+        "Earth Power",
+        "Giga Drain",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 86,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Water"
+    },
+    {
+      "name": "Registeel",
+      "species": "Registeel",
+      "item": "Leftovers",
+      "ability": "Clear Body",
+      "moves": [
+        "Iron Defense",
+        "Iron Head",
+        "Body Press",
+        "Thunder Wave"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 78,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    }
+  ],
+  "p2Team": [
+    {
+      "name": "Hariyama",
+      "species": "Hariyama",
+      "item": "Assault Vest",
+      "ability": "Thick Fat",
+      "moves": [
+        "Knock Off",
+        "Fake Out",
+        "Close Combat",
+        "Heavy Slam"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 85,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Iron Treads",
+      "species": "Iron Treads",
+      "item": "Assault Vest",
+      "ability": "Quark Drive",
+      "moves": [
+        "High Horsepower",
+        "Rapid Spin",
+        "Iron Head",
+        "Stone Edge"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Sawsbuck",
+      "species": "Sawsbuck",
+      "item": "Life Orb",
+      "ability": "Sap Sipper",
+      "moves": [
+        "High Horsepower",
+        "Swords Dance",
+        "Double-Edge",
+        "Horn Leech"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Normal"
+    },
+    {
+      "name": "Noctowl",
+      "species": "Noctowl",
+      "item": "Life Orb",
+      "ability": "Tinted Lens",
+      "moves": [
+        "Protect",
+        "Hurricane",
+        "Tailwind",
+        "Hyper Voice"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Steel"
+    },
+    {
+      "name": "Hypno",
+      "species": "Hypno",
+      "item": "Sitrus Berry",
+      "ability": "Inner Focus",
+      "moves": [
+        "Psychic",
+        "Knock Off",
+        "Low Sweep",
+        "Poison Gas"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 95,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
+    },
+    {
+      "name": "Plusle",
+      "species": "Plusle",
+      "item": "Life Orb",
+      "ability": "Lightning Rod",
+      "moves": [
+        "Thunderbolt",
+        "Protect",
+        "Alluring Voice",
+        "Nasty Plot"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 92,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Flying"
+    }
+  ],
+  "inputLog": [
+    ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"162,301,440,717\"}",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Palossand||Leftovers|WaterCompaction|shoreup,protect,earthpower,shadowball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Grass]Dodrio||LifeOrb|EarlyBird|bravebird,protect,drillrun,quickattack||85,85,85,85,85,85|M|||85|,,,,,Ground]Beartic||LifeOrb|SwiftSwim|protect,closecombat,iciclecrash,aquajet||85,85,85,85,85,85|M|||91|,,,,,Fighting]Salazzle||FocusSash|Corrosion|protect,fakeout,heatwave,sludgebomb||85,85,85,85,85,85|F|||86|,,,,,Fire]Venusaur||LifeOrb|Overgrow|sludgebomb,earthpower,gigadrain,protect||85,,85,85,85,85|F|,0,,,,||86|,,,,,Water]Registeel||Leftovers|ClearBody|irondefense,ironhead,bodypress,thunderwave||85,85,85,85,85,85|N|||78|,,,,,Fighting\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Hariyama||AssaultVest|ThickFat|knockoff,fakeout,closecombat,heavyslam||85,85,85,85,85,85|M|||85|,,,,,Steel]Iron Treads||AssaultVest|QuarkDrive|highhorsepower,rapidspin,ironhead,stoneedge||85,85,85,85,85,85|N|||81|,,,,,Steel]Sawsbuck||LifeOrb|SapSipper|highhorsepower,swordsdance,doubleedge,hornleech||85,85,85,85,85,85|M|||91|,,,,,Normal]Noctowl||LifeOrb|TintedLens|protect,hurricane,tailwind,hypervoice||85,,85,85,85,85|M|,0,,,,||91|,,,,,Steel]Hypno||SitrusBerry|InnerFocus|psychic,knockoff,lowsweep,poisongas||85,85,85,85,85,85|M|||95|,,,,,Dark]Plusle||LifeOrb|LightningRod|thunderbolt,protect,alluringvoice,nastyplot||85,,85,85,85,85|F|,0,,,,||92|,,,,,Flying\"}",
+    ">p1 move protect, move bravebird +1",
+    ">p2 move heavyslam +2, move rapidspin +1",
+    ">p2 switch 5, pass",
+    ">p1 move shadowball +2, move protect",
+    ">p2 move knockoff +2, move ironhead +1",
+    ">p1 move shadowball +1, move quickattack +2",
+    ">p2 move psychic +2, move rapidspin +2",
+    ">p1 pass, switch 4",
+    ">p1 move shoreup, move heatwave",
+    ">p2 move knockoff +2, move rapidspin +2",
+    ">p1 move protect, move sludgebomb +1",
+    ">p2 move lowsweep +2, move rapidspin +2",
+    ">p1 move shoreup, move fakeout +1",
+    ">p2 move psychic +1, move highhorsepower +1",
+    ">p1 move protect, move heatwave",
+    ">p2 move psychic +2, move rapidspin +1",
+    ">p1 pass, switch 3",
+    ">p2 switch 3, pass",
+    ">p1 move protect, move protect",
+    ">p2 move hornleech +1, move ironhead +2",
+    ">p1 move shoreup, move closecombat +1",
+    ">p2 move hornleech +1, move stoneedge +1",
+    ">p1 switch 5, pass",
+    ">p2 switch 4, pass",
+    ">p1 move earthpower +2, move closecombat +1",
+    ">p2 move tailwind, move highhorsepower +2",
+    ">p2 pass, switch 6",
+    ">p1 move sludgebomb +1, move aquajet +2",
+    ">p2 move tailwind, move protect",
+    ">p1 move sludgebomb +2, move iciclecrash +1",
+    ">p2 pass, move protect"
+  ]
+}
