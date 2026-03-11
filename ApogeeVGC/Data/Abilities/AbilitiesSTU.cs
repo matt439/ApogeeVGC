@@ -142,9 +142,9 @@ public partial record Abilities
                 Num = 157,
                 Rating = 3.0,
                 Flags = new AbilityFlags { Breakable = true },
-                // OnTryHitEventInfo.Create passes (source/attacker, target/defender, move).
+                // OnTryHitEventInfo.Create passes (target/defender, source/attacker, move).
                 // TS signature is onTryHit(target, source, move) = (defender, attacker, move).
-                OnTryHit = OnTryHitEventInfo.Create((battle, source, target, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target != source && move.Type == MoveType.Grass)
                     {
@@ -824,7 +824,7 @@ public partial record Abilities
                 Num = 43,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = OnTryHitEventInfo.Create((battle, source, target, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
                     if (target != source && move.Flags.Sound == true)
                     {
@@ -1196,7 +1196,7 @@ public partial record Abilities
                 Num = 5,
                 Rating = 3.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = OnTryHitEventInfo.Create((battle, _, target, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, _, move) =>
                 {
                     if (move.Ohko != null)
                     {
