@@ -181,11 +181,13 @@ public partial class Battle
         // If all sides have no Pokemon left, it's a tie (or last-faint-wins in Gen 5+)
         if (Sides.All(side => side.PokemonLeft <= 0))
         {
-            // In Gen 5+, the side whose Pokemon fainted last loses (so their foe wins)
+            // In Gen 5+, the side whose Pokemon fainted last wins
+            // (they dealt the last KO before fainting from recoil/Life Orb/etc.)
+            // Matches Showdown: this.win(faintData.target.side)
             // In earlier gens, it's a tie
             if (faintData != null && Gen > 4)
             {
-                return Win(faintData.Target.Side.Foe);
+                return Win(faintData.Target.Side);
             }
             else
             {
