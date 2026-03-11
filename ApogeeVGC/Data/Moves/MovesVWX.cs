@@ -681,8 +681,7 @@ public partial record Moves
                     Heal = true,
                     Metronome = true,
                 },
-                // Note: Wish applies a slot condition that heals after 1 turn - not implemented
-                // as slot conditions require special infrastructure not present in current architecture
+                SlotCondition = ConditionId.Wish,
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
