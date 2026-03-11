@@ -1306,7 +1306,7 @@ public partial record Moves
                 },
                 OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, target, move) =>
                 {
-                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
+                    if (target.RunEffectiveness(move).ToModifier() <= 0) return new VoidReturn();
                     // Only apply buff when super effective (> 0)
                     battle.Debug("electro drift super effective buff");
                     battle.ChainModify([5461, 4096]);

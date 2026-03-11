@@ -2138,7 +2138,7 @@ public partial record Moves
                 Type = MoveType.Fighting,
                 OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, target, move) =>
                 {
-                    if (target.RunEffectiveness(move) > 0)
+                    if (target.RunEffectiveness(move).ToModifier() > 0)
                     {
                         battle.Debug("collision course super effective buff");
                         battle.ChainModify([5461, 4096]);
