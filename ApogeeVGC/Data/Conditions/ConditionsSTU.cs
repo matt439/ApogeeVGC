@@ -1245,7 +1245,7 @@ public partial record Conditions
 
                     return VoidFalseUnion.FromVoid();
                 }),
-                //OnResidualOrder = 22,
+                OnResidual = OnResidualEventInfo.Create((_, _, _, _) => { }, order: 22),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
