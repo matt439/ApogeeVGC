@@ -46,7 +46,7 @@ public sealed record OnAllyTryMoveEventInfo : EventHandlerInfo
                 return result switch
                 {
                     BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
-                    EmptyBoolEmptyVoidUnion => BoolRelayVar.False,
+                    EmptyBoolEmptyVoidUnion => null,
                     VoidUnionBoolEmptyVoidUnion => null,
                     _ => null
                 };

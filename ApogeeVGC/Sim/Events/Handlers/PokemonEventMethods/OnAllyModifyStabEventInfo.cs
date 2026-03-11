@@ -40,8 +40,8 @@ public sealed record OnAllyModifyStabEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                 context.GetIntRelayVar(),
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return result switch

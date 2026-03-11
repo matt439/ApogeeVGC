@@ -1,14 +1,72 @@
-﻿namespace ApogeeVGC.Sim.Stats;
+namespace ApogeeVGC.Sim.Stats;
 
 public class SparseBoostsTable
 {
-    public int? Atk { get; set; }
-    public int? Def { get; set; }
-    public int? SpA { get; set; }
-    public int? SpD { get; set; }
-    public int? Spe { get; set; }
-    public int? Accuracy { get; set; }
-    public int? Evasion { get; set; }
+    // Track insertion order to match Showdown's JS property iteration order
+    private readonly List<BoostId> _insertionOrder = new();
+
+    private int? _atk;
+    private int? _def;
+    private int? _spa;
+    private int? _spd;
+    private int? _spe;
+    private int? _accuracy;
+    private int? _evasion;
+
+    public int? Atk
+    {
+        get => _atk;
+        set { _atk = value; TrackOrder(BoostId.Atk, value); }
+    }
+
+    public int? Def
+    {
+        get => _def;
+        set { _def = value; TrackOrder(BoostId.Def, value); }
+    }
+
+    public int? SpA
+    {
+        get => _spa;
+        set { _spa = value; TrackOrder(BoostId.SpA, value); }
+    }
+
+    public int? SpD
+    {
+        get => _spd;
+        set { _spd = value; TrackOrder(BoostId.SpD, value); }
+    }
+
+    public int? Spe
+    {
+        get => _spe;
+        set { _spe = value; TrackOrder(BoostId.Spe, value); }
+    }
+
+    public int? Accuracy
+    {
+        get => _accuracy;
+        set { _accuracy = value; TrackOrder(BoostId.Accuracy, value); }
+    }
+
+    public int? Evasion
+    {
+        get => _evasion;
+        set { _evasion = value; TrackOrder(BoostId.Evasion, value); }
+    }
+
+    private void TrackOrder(BoostId id, int? value)
+    {
+        if (value.HasValue)
+        {
+            if (!_insertionOrder.Contains(id))
+                _insertionOrder.Add(id);
+        }
+        else
+        {
+            _insertionOrder.Remove(id);
+        }
+    }
 
     public int? GetBoost(BoostId stat)
     {
@@ -97,7 +155,7 @@ public class SparseBoostsTable
 
         return stat switch
         {
-            BoostId.Atk or BoostId.Def or BoostId.SpA or BoostId.SpD or BoostId.Spe 
+            BoostId.Atk or BoostId.Def or BoostId.SpA or BoostId.SpD or BoostId.Spe
                 => BoostsTable.CalculateRegularStatMultiplier(boost.Value),
             BoostId.Accuracy => BoostsTable.CalculateAccuracyStatMultiplier(boost.Value),
             BoostId.Evasion => BoostsTable.CalculateEvasionStatMultiplier(boost.Value),
@@ -138,38 +196,31 @@ public class SparseBoostsTable
     /// Only yields boosts that have been explicitly set (non-null).
     /// </summary>
     /// <returns>An enumerable of (BoostId, value) pairs for all non-null boosts</returns>
-    public SparseBoostsTable Copy() => new SparseBoostsTable
+    public SparseBoostsTable Copy()
     {
-        Atk = Atk,
-        Def = Def,
-        SpA = SpA,
-        SpD = SpD,
-        Spe = Spe,
-        Accuracy = Accuracy,
-        Evasion = Evasion,
-    };
+        // Must preserve insertion order to match Showdown's JS spread ({...boost}) behavior.
+        // Setting properties in _insertionOrder sequence ensures the copy iterates identically.
+        var copy = new SparseBoostsTable();
+        foreach (var boostId in _insertionOrder)
+        {
+            int? val = GetBoost(boostId);
+            if (val.HasValue)
+                copy.SetBoost(boostId, val.Value);
+        }
+        return copy;
+    }
 
+    /// <summary>
+    /// Enumerates all non-null boost values in insertion order.
+    /// Matches Showdown's JS property iteration order (for..in).
+    /// </summary>
     public IEnumerable<(BoostId BoostId, int Value)> GetNonNullBoosts()
     {
-        if (Atk.HasValue)
-            yield return (BoostId.Atk, Atk.Value);
-        
-        if (Def.HasValue)
-            yield return (BoostId.Def, Def.Value);
-        
-        if (SpA.HasValue)
-            yield return (BoostId.SpA, SpA.Value);
-        
-        if (SpD.HasValue)
-            yield return (BoostId.SpD, SpD.Value);
-        
-        if (Spe.HasValue)
-            yield return (BoostId.Spe, Spe.Value);
-        
-        if (Accuracy.HasValue)
-            yield return (BoostId.Accuracy, Accuracy.Value);
-        
-        if (Evasion.HasValue)
-            yield return (BoostId.Evasion, Evasion.Value);
+        foreach (var boostId in _insertionOrder)
+        {
+            int? val = GetBoost(boostId);
+            if (val.HasValue)
+                yield return (boostId, val.Value);
+        }
     }
 }

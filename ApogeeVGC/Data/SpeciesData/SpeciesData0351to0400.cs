@@ -328,6 +328,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 1,
                 Color = "Blue",
+                Prevo = SpecieId.Chingling,
             },
             [SpecieId.Absol] = new()
             {

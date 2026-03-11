@@ -876,7 +876,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.SilkTrap,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, pokemon, _, _) =>
                     battle.Queue.WillAct() is not null &&
-                    battle.RunEvent(EventId.StallMove, pokemon) is not null
+                    battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }
                         ? new VoidReturn()
                         : false),
                 OnHit = OnHitEventInfo.Create((_, pokemon, _, _) =>
@@ -1700,7 +1700,8 @@ public partial record Moves
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
-                        return battle.ChainModify(0.5);
+                        battle.ChainModify(0.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1780,7 +1781,8 @@ public partial record Moves
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
-                        return battle.ChainModify(0.5);
+                        battle.ChainModify(0.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1986,7 +1988,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.SpikyShield,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, pokemon, _, _) =>
                     battle.Queue.WillAct() is not null &&
-                    battle.RunEvent(EventId.StallMove, pokemon) is not null
+                    battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }
                         ? new VoidReturn()
                         : false),
                 OnHit = OnHitEventInfo.Create((_, pokemon, _, _) =>

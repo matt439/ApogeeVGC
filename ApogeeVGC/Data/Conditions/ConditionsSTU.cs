@@ -130,7 +130,7 @@ public partial record Conditions
                         ? 4
                         : 8;
                     battle.Damage(pokemon.BaseMaxHp / divisor, pokemon);
-                }, 13),
+                }, order: 13),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -144,6 +144,7 @@ public partial record Conditions
                 Id = ConditionId.Sandstorm,
                 Name = "Sandstorm",
                 EffectType = EffectType.Weather,
+                ImmuneTypes = [PokemonType.Ground, PokemonType.Rock, PokemonType.Steel],
                 Duration = 5,
                 DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
                     source?.HasItem(ItemId.SmoothRock) == true ? 8 : 5),
@@ -175,7 +176,6 @@ public partial record Conditions
                         battle.Add("-weather", "Sandstorm");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -187,8 +187,10 @@ public partial record Conditions
                         {
                             battle.EachEvent(EventId.Weather);
                         }
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnWeather = OnWeatherEventInfo.Create((battle, target, _, _) => { battle.Damage(target.BaseMaxHp / 16); }),
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
@@ -455,7 +457,6 @@ public partial record Conditions
                         battle.Add("-weather", "Snowscape");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -467,8 +468,10 @@ public partial record Conditions
                         {
                             battle.EachEvent(EventId.Weather);
                         }
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -944,20 +947,23 @@ public partial record Conditions
                             !attacker.HasItem(ItemId.UtilityUmbrella))
                         {
                             battle.Debug("Sunny Day Hydro Steam boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
                         if (move.Type == MoveType.Fire)
                         {
                             battle.Debug("Sunny Day fire boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         if (move.Type == MoveType.Water)
                         {
                             battle.Debug("Sunny Day water suppress");
-                            return battle.ChainModify(0.5);
+                            battle.ChainModify(0.5);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -982,7 +988,6 @@ public partial record Conditions
                     if (type.AsConditionId == ConditionId.Freeze) return false;
                     return new VoidReturn();
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -991,8 +996,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -1033,7 +1040,7 @@ public partial record Conditions
                 {
                     battle.Boost(new SparseBoostsTable { Spe = -1 },
                         pokemon, battle.EffectState.Source);
-                }, 14),
+                }, order: 14),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -1149,7 +1156,7 @@ public partial record Conditions
                 OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                }, 15),
+                }, order: 15),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
@@ -1319,7 +1326,7 @@ public partial record Conditions
                         battle.Damage(battle.ClampIntRange(pokemon.BaseMaxHp / 16, 1, null) *
                                       (battle.EffectState.Stage ?? 0));
                     },
-                    9),
+                    order: 9),
             },
             [ConditionId.ToxicSpikes] = new()
             {
@@ -1433,8 +1440,11 @@ public partial record Conditions
                         battle.Debug("[TrickRoom.OnFieldRestart] After RemovePseudoWeather call");
                     }
                 }),
-                //OnFieldResidualOrder = 27,
-                //OnFieldResidualSubOrder = 1,
+                OnFieldResidual = OnFieldResidualEventInfo.Create((_, _, _, _) => { }) with
+                {
+                    Order = 27,
+                    SubOrder = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -1624,7 +1634,7 @@ public partial record Conditions
                     {
                         battle.Add("-start", target, "Uproar", "[upkeep]");
                     }
-                }, 28, 1),
+                }, order: 28, subOrder: 1),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)

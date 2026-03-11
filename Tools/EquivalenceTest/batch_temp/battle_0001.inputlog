@@ -1,42 +1,59 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"8,15,22,35"}
->player p1 {"name":"Player1","team":"Altaria||SitrusBerry|NaturalCure|bravebird,dracometeor,willowisp,tailwind||85,85,85,85,85,85|F|||91|,,,,,Steel]Iron Valiant||LifeOrb|QuarkDrive|protect,dazzlinggleam,knockoff,closecombat||85,85,85,85,85,85|N|||79|,,,,,Fairy]Sneasler||WhiteHerb|Unburden|swordsdance,direclaw,closecombat,protect||85,85,85,85,85,85|M|||77|,,,,,Poison]Kingdra||LifeOrb|SwiftSwim|dracometeor,raindance,protect,wavecrash||85,85,85,85,85,85|F|||85|,,,,,Water]Ogerpon||LifeOrb|Defiant|knockoff,superpower,ivycudgel,spikyshield||85,85,85,85,85,85|F|||78|,,,,,Grass]Electivire||AssaultVest|MotorDrive|icepunch,wildcharge,electroweb,knockoff||85,85,85,85,85,85|M|||86|,,,,,Flying"}
->player p2 {"name":"Player2","team":"Metagross||AssaultVest|ClearBody|heavyslam,psychicfangs,knockoff,stompingtantrum||85,85,85,85,85,85|N|||80|,,,,,Dark]Shiftry||FocusSash|WindRider|knockoff,tailwind,leafblade,fakeout||85,85,85,85,85,85|M|||84|,,,,,Ghost]Volcanion||AssaultVest|WaterAbsorb|steameruption,heatwave,sludgebomb,earthpower||85,,85,85,85,85|N|,0,,,,||75|,,,,,Ground]Wugtrio||ChoiceBand|Gooey|aquajet,throatchop,liquidation,stompingtantrum||85,85,85,85,85,85|F|||92|,,,,,Dark]Toedscruel||SitrusBerry|MyceliumMight|knockoff,earthpower,spore,ragepowder||85,85,85,85,85,85|M|||87|,,,,,Water]Electrode||SitrusBerry|Static|voltswitch,helpinghand,thunderbolt,electroweb||85,,85,85,85,85|N|,0,,,,||89|,,,,,Flying"}
->p1 move tailwind, move closecombat +2
->p2 move psychicfangs +1, move leafblade +1
->p1 move dracometeor +1, move protect
->p2 move psychicfangs +1, move tailwind
->p1 move willowisp +2, move dazzlinggleam
->p2 move knockoff +1, move tailwind
->p2 pass, switch 5
->p1 move tailwind, move closecombat +1
->p2 move heavyslam +2, move ragepowder
+>player p1 {"name":"Player1","team":"Arceus|ArceusRock|StonePlate|Multitype|judgment,calmmind,recover,earthpower||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ground]Sandslash|SandslashAlola|AssaultVest|SlushRush|iceshard,drillrun,ironhead,tripleaxel||85,85,85,85,85,85|F|||91|,,,,,Water]Registeel||Leftovers|ClearBody|ironhead,thunderwave,bodypress,irondefense||85,85,85,85,85,85|N|||78|,,,,,Fighting]Squawkabilly|SquawkabillyBlue|LifeOrb|Intimidate|bravebird,doubleedge,protect,quickattack||85,85,85,85,85,85|F|||91|,,,,,Normal]Vespiquen||Leftovers|Unnerve|pollenpuff,roost,helpinghand,hurricane||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel]Uxie||SitrusBerry|Levitate|knockoff,encore,mysticalpower,thunderwave||85,85,85,85,85,85|N|||85|,,,,,Poison"}
+>player p2 {"name":"Player2","team":"Zangoose||ToxicOrb|ToxicBoost|facade,feint,protect,knockoff||85,85,85,85,85,85|M|||87|,,,,,Normal]Chi-Yu||ChoiceSpecs|BeadsofRuin|heatwave,darkpulse,overheat,snarl||85,,85,85,85,85|N|,0,,,,||75|,,,,,Water]Zapdos||LifeOrb|Static|tailwind,thunderbolt,heatwave,hurricane||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Ambipom||SilkScarf|Technician|fakeout,doubleedge,protect,knockoff||85,85,85,85,85,85|F|||87|,,,,,Normal]Heracross||FlameOrb|Guts|knockoff,facade,protect,closecombat||85,85,85,85,85,85|M|||82|,,,,,Normal]Iron Jugulis||BoosterEnergy|QuarkDrive|hurricane,darkpulse,earthpower,protect||85,,85,85,85,85|N|,0,,,,||79|,,,,,Steel"}
+>p1 move calmmind, move iceshard +2
+>p2 move protect, move snarl
+>p1 move calmmind, move drillrun +2
+>p2 move facade +2, move snarl
 >p1 pass, switch 6
->p1 move willowisp +2, move knockoff +2
->p2 move psychicfangs +2, move ragepowder
->p1 move bravebird +1, move icepunch +1
->p2 move knockoff +2, move knockoff +1
->p1 move tailwind, move icepunch +1
->p2 move knockoff +2, move knockoff +1
->p2 switch 3, pass
->p1 move tailwind, move wildcharge +2
->p2 move earthpower +2, move earthpower +2
+>p1 move judgment +1, move encore +1
+>p2 move protect, move snarl
+>p1 move recover, move thunderwave +1
+>p2 move protect, move snarl
+>p1 move recover, move encore +2
+>p2 move protect, move snarl
+>p1 pass, switch 3
+>p1 move calmmind, move bodypress +1
+>p2 move feint +2, move snarl
+>p2 switch 6, pass
+>p1 move judgment +2, move ironhead +1
+>p2 move hurricane +2, move snarl
+>p1 move recover, move bodypress +1
+>p2 move darkpulse +1, move snarl
+>p1 pass, switch 5
+>p1 move recover, move hurricane +1
+>p2 move protect, move snarl
+>p1 move recover, move hurricane +2
+>p2 move protect, move snarl
+>p1 move recover, move roost
+>p2 move hurricane +1, move snarl
+>p1 move calmmind, move pollenpuff +2
+>p2 move protect, move snarl
+>p2 pass, switch 3
+>p1 move judgment +1, move helpinghand -1
+>p2 move hurricane +1, move heatwave
+>p1 move calmmind, move helpinghand -1
+>p2 move earthpower +2, move thunderbolt +2
+>p1 move recover, move pollenpuff +1
+>p2 move hurricane +1, move tailwind
+>p1 move calmmind, move hurricane +2
+>p2 move darkpulse +2, move hurricane +1
+>p1 move recover, move roost
+>p2 move protect, move tailwind
+>p1 move recover, move hurricane +2
+>p2 move darkpulse +2, move heatwave
 >p1 pass, switch 4
->p1 move willowisp +1, move protect
->p2 move steameruption +2, move earthpower +2
->p2 pass, switch 6
->p1 move willowisp +2, move wavecrash +2
->p2 move steameruption +2, move voltswitch +1
+>p1 move earthpower +2, move quickattack +2
+>p2 move darkpulse +2, move thunderbolt +1
+>p1 move calmmind, move doubleedge +2
+>p2 move earthpower +2, move heatwave
+>p2 pass, switch 5
+>p1 move judgment +2, move bravebird +2
+>p2 move earthpower +1, move closecombat +1
 >p2 pass, switch 4
->p1 switch 5, pass
->p1 move superpower +2, move raindance
->p2 move steameruption +1, move aquajet +2
->p1 move superpower +1, move protect
->p2 move sludgebomb +1, move aquajet +1
->p1 switch 3, pass
->p1 move direclaw +1, move dracometeor +2
->p2 move heatwave, move aquajet +2
->p2 pass, switch 4
->p1 move direclaw +1, pass
->p2 move sludgebomb +1, move thunderbolt +2
->p1 move closecombat +2, pass
->p2 move steameruption +1, move voltswitch +2
+>p1 move earthpower +2, pass
+>p2 move darkpulse +1, move fakeout +2
+>p1 move calmmind, pass
+>p2 move protect, move doubleedge +1
+>p1 move calmmind, pass
+>p2 move earthpower +2, move doubleedge +1

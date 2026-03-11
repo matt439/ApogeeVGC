@@ -37,13 +37,13 @@ public sealed record OnSourceModifySpAEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                 context.GetIntRelayVar(),
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return result switch
                 {
-                    DoubleDoubleVoidUnion => null,
+                    DoubleDoubleVoidUnion d => IntRelayVar.Get((int)d.Value),
                     VoidDoubleVoidUnion => null,
                     _ => null
                 };

@@ -39,8 +39,8 @@ public sealed record OnSourceModifyStabEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                 context.GetIntRelayVar(),
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return result switch

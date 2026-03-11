@@ -63,7 +63,7 @@ public partial record Conditions
                                 BattleHealEffect.FromIEffect(leechSeedCondition));
                         }
                     },
-                    8),
+                    order: 8),
             },
             [ConditionId.LightScreen] = new()
             {
@@ -129,7 +129,7 @@ public partial record Conditions
             [ConditionId.LockedMove] = new()
             {
                 Id = ConditionId.LockedMove,
-                Name = "Locked Move",
+                Name = "lockedmove",
                 EffectType = EffectType.Condition,
                 // Outrage, Thrash, Petal Dance - moves that lock the user for 2-3 turns
                 Duration = 2,

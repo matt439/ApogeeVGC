@@ -1,38 +1,28 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"162,301,440,717"}
->player p1 {"name":"Player1","team":"Azumarill||ChoiceBand|HugePower|aquajet,playrough,knockoff,liquidation||85,85,85,85,85,85|M|||83|,,,,,Water]Iron Moth||LifeOrb|QuarkDrive|heatwave,sludgewave,energyball,protect||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fire]Pikachu|PikachuSinnoh|LightBall|LightningRod|encore,fakeout,volttackle,knockoff||85,85,85,85,85,85|F|||94|,,,,,Electric]Lokix||LifeOrb|TintedLens|protect,knockoff,firstimpression,leechlife||85,85,85,85,85,85|M|||88|,,,,,Bug]Ho-Oh||SitrusBerry|Regenerator|sacredfire,tailwind,protect,bravebird||85,85,85,85,85,85|N|||70|,,,,,Ground]Flutter Mane||ChoiceSpecs|Protosynthesis|dazzlinggleam,moonblast,shadowball,icywind||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy"}
->player p2 {"name":"Player2","team":"Magmar||Eviolite|FlameBody|followme,heatwave,protect,willowisp||85,,85,85,85,85|F|,0,,,,||84|,,,,,Grass]Gouging Fire||ClearAmulet|Protosynthesis|dragonclaw,heatcrash,dragondance,burningbulwark||85,85,85,85,85,85|N|||75|,,,,,Fire]Blissey||SitrusBerry|Healer|thunderwave,lifedew,helpinghand,hypervoice||85,,85,85,85,85|F|,0,,,,||96|,,,,,Poison]Lunala||PowerHerb|ShadowShield|moongeistbeam,moonblast,meteorbeam,protect||85,,85,85,85,85|N|,0,,,,|S|71|,,,,,Fairy]Indeedee||LifeOrb|PsychicSurge|protect,hypervoice,shadowball,expandingforce||85,,85,85,85,85|M|,0,,,,||79|,,,,,Psychic]Lycanroc|LycanrocMidnight|ChoiceBand|NoGuard|closecombat,knockoff,stoneedge,rockslide||85,85,85,85,85,85|F|||84|,,,,,Water"}
->p1 move aquajet +1, move heatwave
->p2 move protect, move burningbulwark
->p1 move aquajet +1, move energyball +2
->p2 move willowisp +1, move dragondance
->p1 move aquajet +1, move protect
->p2 move willowisp +2, move heatcrash +1
->p1 move aquajet +2, move protect
->p2 move protect, move dragondance
->p1 move aquajet +1, move protect
->p2 move willowisp +1, move heatcrash +2
->p2 switch 5, pass
->p1 move aquajet +1, move energyball +1
->p2 move hypervoice, move burningbulwark
->p1 switch 4, switch 6
->p1 move leechlife +2, move dazzlinggleam
->p2 move expandingforce +1, move dragondance
->p2 switch 6, pass
->p1 move firstimpression +1, move dazzlinggleam
->p2 move closecombat +1, move dragonclaw +2
->p2 pass, switch 3
->p1 move leechlife +2, move dazzlinggleam
->p2 move closecombat +2, move helpinghand -1
+>player p1 {"name":"Player1","team":"Charizard||LifeOrb|Blaze|hurricane,scorchingsands,heatwave,protect||85,,85,85,85,85|M|,0,,,,||82|,,,,,Dragon]Baxcalibur||LoadedDice|ThermalExchange|iciclespear,swordsdance,protect,scaleshot||85,85,85,85,85,85|F|||78|,,,,,Steel]Staraptor||ChoiceScarf|Intimidate|doubleedge,bravebird,closecombat,finalgambit||85,85,85,85,85,85|F|||82|,,,,,Fighting]Garchomp||LoadedDice|RoughSkin|scaleshot,protect,swordsdance,earthquake||85,85,85,85,85,85|F|||77|,,,,,Fire]Bastiodon||ChestoBerry|Sturdy|foulplay,bodypress,rest,irondefense||85,,85,85,85,85|M|,0,,,,||89|,,,,,Fighting]Slaking||ChoiceBand|Truant|knockoff,gigaimpact,doubleedge,highhorsepower||85,85,85,85,85,85|M|||89|,,,,,Normal"}
+>player p2 {"name":"Player2","team":"Scizor||SitrusBerry|Technician|uturn,bulletpunch,tailwind,closecombat||85,85,85,85,85,85|F|||80|,,,,,Water]Regigigas||Leftovers|SlowStart|knockoff,doubleedge,thunderwave,protect||85,85,85,85,85,85|N|||86|,,,,,Fairy]Calyrex||SitrusBerry|Unnerve|psychic,leafstorm,pollenpuff,encore||85,,85,85,85,85|N|,0,,,,||94|,,,,,Steel]Kingambit||AssaultVest|Defiant|kowtowcleave,suckerpunch,terablast,ironhead||85,85,85,85,85,85|M|||77|,,,,,Fairy]Mudsdale||ChestoBerry|Stamina|highhorsepower,stoneedge,rest,bodypress||85,85,85,85,85,85|F|||84|,,,,,Fighting]Araquanid||SitrusBerry|WaterBubble|stickyweb,wideguard,liquidation,hydropump||85,85,85,85,85,85|F|||84|,,,,,Water"}
+>p1 move scorchingsands +2, move scaleshot +1
+>p2 move tailwind, move protect
+>p1 move heatwave, move swordsdance
+>p2 move closecombat +2, move thunderwave +1
 >p2 switch 4, pass
->p1 move knockoff +1, move dazzlinggleam
->p2 move protect, move thunderwave +1
->p1 move knockoff +2, move dazzlinggleam
->p2 move moongeistbeam +1, move helpinghand -1
->p1 move firstimpression +1, move dazzlinggleam
->p2 move protect, move helpinghand -1
->p1 move knockoff +1, move dazzlinggleam
->p2 move moongeistbeam +2, pass
->p1 move knockoff +2, move dazzlinggleam
->p2 move protect, pass
->p1 move firstimpression +2, move dazzlinggleam
->p2 move moongeistbeam +1, pass
+>p1 move scorchingsands +1, move protect
+>p2 move kowtowcleave +2, move thunderwave +1
+>p1 move scorchingsands +1, move iciclespear +2
+>p2 move kowtowcleave +2, move protect
+>p1 move heatwave, move swordsdance
+>p2 move ironhead +1, move knockoff +1
+>p2 switch 3, pass
+>p1 move protect, move iciclespear +2
+>p2 move pollenpuff +1, move doubleedge +1
+>p2 pass, switch 5
+>p1 move scorchingsands +1, move swordsdance
+>p2 move psychic +1, move rest
+>p1 switch 6, pass
+>p1 move gigaimpact +1, move iciclespear +2
+>p2 move psychic +1, move rest
+>p2 switch 6, pass
+>p1 move recharge +1, move protect
+>p2 move stickyweb, pass
+>p1 move gigaimpact +1, move swordsdance
+>p2 move hydropump +1, pass

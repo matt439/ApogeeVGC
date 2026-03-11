@@ -842,7 +842,7 @@ public partial record Abilities
                     // Trigger the weather change event to potentially change forme
                     // OnStart delegates to the weather change logic
                     if (!pokemon.IsActive ||
-                        pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                        pokemon.BaseSpecies.Id != SpecieId.Cherrim ||
                         pokemon.Transformed) return;
                     if (pokemon.Hp == 0) return;
 
@@ -867,7 +867,7 @@ public partial record Abilities
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (!pokemon.IsActive ||
-                        pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                        pokemon.BaseSpecies.Id != SpecieId.Cherrim ||
                         pokemon.Transformed) return;
                     if (pokemon.Hp == 0) return;
 
@@ -897,7 +897,7 @@ public partial record Abilities
                             Pokemon: var flowerGiftHolder,
                         })
                         return atk;
-                    if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return atk;
+                    if (flowerGiftHolder.BaseSpecies.Id != SpecieId.Cherrim) return atk;
                     ConditionId? weather = pokemon.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
@@ -915,7 +915,7 @@ public partial record Abilities
                             Pokemon: var flowerGiftHolder,
                         })
                         return spd;
-                    if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return spd;
+                    if (flowerGiftHolder.BaseSpecies.Id != SpecieId.Cherrim) return spd;
                     ConditionId? weather = pokemon.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
@@ -1076,7 +1076,7 @@ public partial record Abilities
                 },
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Castform ||
                         pokemon.Transformed) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();
@@ -1096,7 +1096,7 @@ public partial record Abilities
                 }, -2),
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Castform ||
                         pokemon.Transformed) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();

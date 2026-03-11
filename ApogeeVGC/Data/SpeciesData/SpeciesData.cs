@@ -117,6 +117,29 @@ public partial record SpeciesData
             combinedSpecies[kvp.Key] = kvp.Value;
         }
 
+        // Compute Evos from Prevo data (reverse mapping)
+        // Many species have Prevo set but Evos is empty — build it automatically
+        var evosMap = new Dictionary<SpecieId, List<SpecieId>>();
+        foreach (var (specieId, species) in combinedSpecies)
+        {
+            if (species.Prevo is SpecieId prevoId)
+            {
+                if (!evosMap.TryGetValue(prevoId, out var evosList))
+                {
+                    evosList = [];
+                    evosMap[prevoId] = evosList;
+                }
+                evosList.Add(specieId);
+            }
+        }
+        foreach (var (prevoId, evosList) in evosMap)
+        {
+            if (combinedSpecies.TryGetValue(prevoId, out var prevoSpecies) && prevoSpecies.Evos.Count == 0)
+            {
+                prevoSpecies.Evos = evosList.AsReadOnly();
+            }
+        }
+
         SpeciesDataDictionary = combinedSpecies.ToFrozenDictionary();
     }
 }

@@ -194,6 +194,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 14.5,
                 Color = "Green",
+                Prevo = SpecieId.Roselia,
             },
             [SpecieId.Cranidos] = new()
             {
@@ -712,6 +713,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 20.3,
                 Color = "Purple",
+                Prevo = SpecieId.Aipom,
             },
             [SpecieId.Drifloon] = new()
             {
@@ -870,6 +872,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 4.4,
                 Color = "Purple",
+                Prevo = SpecieId.Misdreavus,
             },
             [SpecieId.Honchkrow] = new()
             {
@@ -896,6 +899,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 27.3,
                 Color = "Black",
+                Prevo = SpecieId.Murkrow,
             },
             [SpecieId.Glameow] = new()
             {

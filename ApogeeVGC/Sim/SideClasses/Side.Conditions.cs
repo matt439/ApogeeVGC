@@ -29,12 +29,15 @@ public partial class Side
         if (SideConditions.TryGetValue(status.Id, out EffectState? condition))
         {
             // If no onSideRestart handler, return false
-            if (status.OnRestart == null)
+            if (status.OnSideRestart == null)
                 return false;
 
             // Call the restart handler
             RelayVar? restartResult = Battle.SingleEvent(EventId.SideRestart, status, condition, (SingleEventTarget)this, source, sourceEffect);
-            return restartResult is BoolRelayVar { Value: true };
+            // In Showdown: return this.battle.singleEvent('SideRestart', ...)
+            // singleEvent returns relayVar (defaults to true) for void handlers.
+            // Only explicit false means failure.
+            return restartResult is not BoolRelayVar { Value: false };
         }
 
         // Step 4: Create EffectState (target is this Side, matching Showdown's {target: this})

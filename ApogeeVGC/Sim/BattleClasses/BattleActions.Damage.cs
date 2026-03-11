@@ -508,7 +508,7 @@ public partial class BattleActions
         // Chloroblast is a special case - returns 50% of max HP as recoil
         if (move.Id == MoveId.Chloroblast)
         {
-            return (int)Math.Round(pokemon.MaxHp / 2.0);
+            return (int)Math.Round(pokemon.MaxHp / 2.0, MidpointRounding.AwayFromZero);
         }
 
         // Standard recoil calculation: damageDealt * recoil[0] / recoil[1]
@@ -516,7 +516,7 @@ public partial class BattleActions
         if (move.Recoil == null) return 0;
 
         var recoilDamage = (int)Math.Round(damageDealt * move.Recoil.Value.Item1 /
-                                           (double)move.Recoil.Value.Item2);
+                                           (double)move.Recoil.Value.Item2, MidpointRounding.AwayFromZero);
         return Battle.ClampIntRange(recoilDamage, 1, null);
     }
 }

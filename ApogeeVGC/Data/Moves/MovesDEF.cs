@@ -77,7 +77,7 @@ public partial record Moves
                 Status = ConditionId.Sleep,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dark,
-                OnTry = OnTryEventInfo.Create((battle, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, move) =>
                 {
                     // Only Darkrai can use Dark Void (or if the move has bounced)
                     if (source.Species.BaseSpecies == SpecieId.Darkrai || (move.HasBounced ?? false))
@@ -1309,7 +1309,8 @@ public partial record Moves
                     if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
                     // Only apply buff when super effective (> 0)
                     battle.Debug("electro drift super effective buff");
-                    return battle.ChainModify([5461, 4096]);
+                    battle.ChainModify([5461, 4096]);
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1624,7 +1625,8 @@ public partial record Moves
                         (source.IsGrounded() ?? false))
                     {
                         battle.Debug("terrain buff");
-                        return battle.ChainModify(3, 2); // 1.5x = 3/2
+                        battle.ChainModify(3, 2);
+                    return new VoidReturn(); // 1.5x = 3/2
                     }
 
                     return new VoidReturn();
@@ -1712,7 +1714,8 @@ public partial record Moves
                         pokemon.Status != ConditionId.Sleep)
                     {
                         battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1932,7 +1935,8 @@ public partial record Moves
                             battle.Add("-activate", pokemon, "move: Fickle Beam");
                         }
 
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -3113,7 +3117,8 @@ public partial record Moves
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionFlare)
                     {
                         battle.Debug("double power");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -3138,7 +3143,8 @@ public partial record Moves
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionBolt)
                     {
                         battle.Debug("double power");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();

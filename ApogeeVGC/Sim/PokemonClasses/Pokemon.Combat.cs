@@ -180,6 +180,10 @@ public partial class Pokemon
             PokemonSlot = source.GetSlot(),
             DamageValue = damage,
         });
+
+        // Increment timesAttacked counter (used by Rage Fist)
+        // Matches Showdown: pokemon.timesAttacked++ in gotAttacked()
+        TimesAttacked++;
     }
 
     public Attacker? GetLastAttackedBy()

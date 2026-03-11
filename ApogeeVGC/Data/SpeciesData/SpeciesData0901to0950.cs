@@ -36,6 +36,7 @@ public partial record SpeciesData
                 HeightM = 2.4,
                 WeightKg = 290,
                 Color = "Brown",
+                Prevo = SpecieId.Ursaring,
                 OtherFormes = [FormeId.Bloodmoon],
             },
             [SpecieId.UrsalunaBloodmoon] = new()
@@ -90,6 +91,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 110,
                 Color = "Green",
+                Prevo = SpecieId.BasculinWhiteStriped,
                 OtherFormes = [FormeId.F],
             },
             [SpecieId.BasculegionF] = new()
@@ -119,6 +121,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 110,
                 Color = "Green",
+                Prevo = SpecieId.BasculinWhiteStriped,
             },
             // 903 - Sneasler
             [SpecieId.Sneasler] = new()
@@ -145,6 +148,7 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 43,
                 Color = "Blue",
+                Prevo = SpecieId.SneaselHisui,
             },
             // 904 - Overqwil
             [SpecieId.Overqwil] = new()
@@ -171,6 +175,7 @@ public partial record SpeciesData
                 HeightM = 2.5,
                 WeightKg = 60.5,
                 Color = "Black",
+                Prevo = SpecieId.QwilfishHisui,
             },
             // 905 - Enamorus
             [SpecieId.Enamorus] = new()
@@ -278,6 +283,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 12.2,
                 Color = "Green",
+                Prevo = SpecieId.Sprigatito,
             },
             // 908 - Meowscarada
             [SpecieId.Meowscarada] = new()
@@ -304,6 +310,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 31.2,
                 Color = "Green",
+                Prevo = SpecieId.Floragato,
             },
             // 909 - Fuecoco
             [SpecieId.Fuecoco] = new()
@@ -356,6 +363,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 30.7,
                 Color = "Red",
+                Prevo = SpecieId.Fuecoco,
             },
             // 911 - Skeledirge
             [SpecieId.Skeledirge] = new()
@@ -382,6 +390,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 326.5,
                 Color = "Red",
+                Prevo = SpecieId.Crocalor,
             },
             // 912 - Quaxly
             [SpecieId.Quaxly] = new()
@@ -434,6 +443,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 21.5,
                 Color = "Blue",
+                Prevo = SpecieId.Quaxly,
             },
             // 914 - Quaquaval
             [SpecieId.Quaquaval] = new()
@@ -460,6 +470,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 61.9,
                 Color = "Blue",
+                Prevo = SpecieId.Quaxwell,
             },
             // 915 - Lechonk
             [SpecieId.Lechonk] = new()
@@ -513,6 +524,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 120,
                 Color = "Gray",
+                Prevo = SpecieId.Lechonk,
                 OtherFormes = [FormeId.F],
             },
             [SpecieId.OinkologneF] = new()
@@ -542,6 +554,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 120,
                 Color = "Brown",
+                Prevo = SpecieId.Lechonk,
             },
             // 917 - Tarountula
             [SpecieId.Tarountula] = new()
@@ -592,6 +605,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 16.5,
                 Color = "Green",
+                Prevo = SpecieId.Tarountula,
             },
             // 919 - Nymble
             [SpecieId.Nymble] = new()
@@ -642,6 +656,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 17.5,
                 Color = "Gray",
+                Prevo = SpecieId.Nymble,
             },
             // 921 - Pawmi
             [SpecieId.Pawmi] = new()
@@ -694,6 +709,7 @@ public partial record SpeciesData
                 HeightM = 0.4,
                 WeightKg = 6.5,
                 Color = "Yellow",
+                Prevo = SpecieId.Pawmi,
             },
             // 923 - Pawmot
             [SpecieId.Pawmot] = new()
@@ -720,6 +736,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 41,
                 Color = "Yellow",
+                Prevo = SpecieId.Pawmo,
             },
             // 924 - Tandemaus
             [SpecieId.Tandemaus] = new()
@@ -774,6 +791,7 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 2.3,
                 Color = "White",
+                Prevo = SpecieId.Tandemaus,
                 BaseForme = FormeId.Three,
                 OtherFormes = [FormeId.Four],
             },
@@ -804,6 +822,7 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 2.8,
                 Color = "White",
+                Prevo = SpecieId.Tandemaus,
             },
             // 926 - Fidough
             [SpecieId.Fidough] = new()
@@ -854,6 +873,7 @@ public partial record SpeciesData
                 HeightM = 0.5,
                 WeightKg = 14.9,
                 Color = "Brown",
+                Prevo = SpecieId.Fidough,
             },
             // 928 - Smoliv
             [SpecieId.Smoliv] = new()
@@ -904,6 +924,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 11.9,
                 Color = "Green",
+                Prevo = SpecieId.Smoliv,
             },
             // 930 - Arboliva
             [SpecieId.Arboliva] = new()
@@ -929,6 +950,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 48.2,
                 Color = "Green",
+                Prevo = SpecieId.Dolliv,
             },
             // 931 - Squawkabilly
             [SpecieId.Squawkabilly] = new()
@@ -1089,6 +1111,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 105,
                 Color = "Brown",
+                Prevo = SpecieId.Nacli,
             },
             // 934 - Garganacl
             [SpecieId.Garganacl] = new()
@@ -1115,6 +1138,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 240,
                 Color = "Brown",
+                Prevo = SpecieId.Naclstack,
             },
             // 935 - Charcadet
             [SpecieId.Charcadet] = new()
@@ -1165,6 +1189,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 85,
                 Color = "Red",
+                Prevo = SpecieId.Charcadet,
             },
             // 937 - Ceruledge
             [SpecieId.Ceruledge] = new()
@@ -1190,6 +1215,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 62,
                 Color = "Purple",
+                Prevo = SpecieId.Charcadet,
             },
             // 938 - Tadbulb
             [SpecieId.Tadbulb] = new()
@@ -1242,6 +1268,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 113,
                 Color = "Green",
+                Prevo = SpecieId.Tadbulb,
             },
             // 940 - Wattrel
             [SpecieId.Wattrel] = new()
@@ -1294,6 +1321,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 38.6,
                 Color = "Yellow",
+                Prevo = SpecieId.Wattrel,
             },
             // 942 - Maschiff
             [SpecieId.Maschiff] = new()
@@ -1346,6 +1374,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 61,
                 Color = "Gray",
+                Prevo = SpecieId.Maschiff,
             },
             // 944 - Shroodle
             [SpecieId.Shroodle] = new()
@@ -1398,6 +1427,7 @@ public partial record SpeciesData
                 HeightM = 0.7,
                 WeightKg = 27.2,
                 Color = "Gray",
+                Prevo = SpecieId.Shroodle,
             },
             // 946 - Bramblin
             [SpecieId.Bramblin] = new()
@@ -1448,6 +1478,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 6,
                 Color = "Brown",
+                Prevo = SpecieId.Bramblin,
             },
             // 948 - Toedscool
             [SpecieId.Toedscool] = new()
@@ -1496,6 +1527,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 58,
                 Color = "Black",
+                Prevo = SpecieId.Toedscool,
             },
             // 950 - Klawf
             [SpecieId.Klawf] = new()

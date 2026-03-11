@@ -29,7 +29,7 @@ public partial record Condition : ISideEventMethods, IFieldEventMethods, IEffect
             }
             field = value;
         }
-    }
+    } = EffectType.Condition;
     public string Name { get; init; } = string.Empty;
     public string FullName => Name;
 

@@ -45,8 +45,8 @@ return new BasePowerCallbackEventInfo(
  {
      var result = handler(
     context.Battle,
-   context.GetSourceOrTargetPokemon(),
-        context.GetTargetOrSourcePokemon(),
+   context.GetTargetOrSourcePokemon(),
+        context.GetSourceOrTargetPokemon(),
       context.GetMove()
     );
   if (result == null) return null;

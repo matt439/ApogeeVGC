@@ -44,8 +44,8 @@ public record MoveAction : IAction
             }
         }
     }
-    public int Priority { get; set; }
-    public int FractionalPriority { get; set; }
+    public double Priority { get; set; }
+    public double FractionalPriority { get; set; }
     public int Speed { get; set; }
     public required Pokemon Pokemon { get; set; }
     public int TargetLoc { get; set; }

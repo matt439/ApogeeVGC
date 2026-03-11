@@ -1,39 +1,56 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"15,28,41,66"}
->player p1 {"name":"Player1","team":"Plusle||SitrusBerry|LightningRod|thunderbolt,superfang,nuzzle,encore||85,85,85,85,85,85|M|||92|,,,,,Flying]Deoxys||LifeOrb|Pressure|psychoboost,protect,extremespeed,superpower||85,85,85,85,85,85|N|||79|,,,,,Stellar]Spiritomb||SitrusBerry|Infiltrator|willowisp,icywind,helpinghand,foulplay||85,,85,85,85,85|F|,0,,,,||89|,,,,,Steel]Arcanine||HeavyDutyBoots|Intimidate|flareblitz,extremespeed,closecombat,howl||85,85,85,85,85,85|F|||82|,,,,,Fighting]Scream Tail||SitrusBerry|Protosynthesis|stealthrock,thunderwave,playrough,disable||85,85,85,85,85,85|N|||82|,,,,,Steel]Oinkologne|OinkologneF|SitrusBerry|ThickFat|doubleedge,protect,yawn,helpinghand||85,85,85,85,85,85|F|||92|,,,,,Normal"}
->player p2 {"name":"Player2","team":"Palafin||ChoiceBand|ZerotoHero|wavecrash,flipturn,jetpunch,closecombat||85,85,85,85,85,85|F|||79|,,,,,Water]Blaziken||LifeOrb|SpeedBoost|stoneedge,overheat,protect,closecombat||85,85,85,85,85,85|F|||79|,,,,,Stellar]Farigiraf||LifeOrb|ArmorTail|hypervoice,protect,trickroom,psychic||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fairy]Cacturne||LifeOrb|WaterAbsorb|leafstorm,suckerpunch,knockoff,spikyshield||85,85,85,85,85,85|M|||91|,,,,,Dark]Eelektross||AssaultVest|Levitate|thunderbolt,flamethrower,knockoff,uturn||85,85,85,85,85,85|M|||86|,,,,,Poison]Arceus|ArceusFire|FlamePlate|Multitype|protect,extremespeed,flareblitz,swordsdance||85,85,85,85,85,85|N|||73|,,,,,Fire"}
->p1 move encore +2, move psychoboost +2
->p2 move wavecrash +2, move stoneedge +2
->p1 pass, switch 5
->p2 pass, switch 5
->p1 move nuzzle +2, move disable +1
->p2 move wavecrash +1, move thunderbolt +1
->p1 move thunderbolt +1, move playrough +2
->p2 move struggle, move flamethrower +2
->p2 switch 6, pass
->p1 move superfang +1, move playrough +2
->p2 move protect, move flamethrower +1
->p1 move thunderbolt +2, move stealthrock
->p2 move swordsdance, move flamethrower +1
->p1 move thunderbolt +1, move disable +2
->p2 move protect, move flamethrower +1
->p1 move superfang +1, move thunderwave +1
->p2 move protect, move knockoff +2
->p1 move superfang +1, move stealthrock
->p2 move flareblitz +1, move uturn +2
->p2 pass, switch 4
->p1 switch 4, pass
->p1 move closecombat +1, move stealthrock
->p2 move protect, move suckerpunch +1
->p1 move flareblitz +1, move playrough +1
->p2 move flareblitz +2, move knockoff +1
+>player p1 {"name":"Player1","team":"Skarmory||Leftovers|Sturdy|bravebird,irondefense,tailwind,bodypress||85,85,85,85,85,85|M|||85|,,,,,Fighting]Iron Boulder||LifeOrb|QuarkDrive|swordsdance,closecombat,mightycleave,protect||85,85,85,85,85,85|N|||77|,,,,,Fighting]Clodsire||Leftovers|WaterAbsorb|gunkshot,highhorsepower,toxicspikes,recover||85,85,85,85,85,85|F|||87|,,,,,Flying]Great Tusk||SitrusBerry|Protosynthesis|knockoff,headlongrush,closecombat,protect||85,85,85,85,85,85|N|||81|,,,,,Fire]Hawlucha||WhiteHerb|Unburden|bravebird,protect,closecombat,swordsdance||85,85,85,85,85,85|F|||84|,,,,,Fire]Kyurem|KyuremWhite|BlunderPolicy|Turboblaze|fusionflare,freezedry,blizzard,earthpower||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire"}
+>player p2 {"name":"Player2","team":"Enamorus|EnamorusTherian|SitrusBerry|Overcoat|protect,earthpower,moonblast,springtidestorm||85,,85,85,85,85|F|,0,,,,||82|,,,,,Ground]Alomomola||SitrusBerry|Regenerator|wideguard,icywind,scald,flipturn||85,85,85,85,85,85|F|||96|,,,,,Steel]Meowstic||LightClay|Prankster|reflect,psychic,lightscreen,helpinghand||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel]Rotom|RotomWash|SitrusBerry|Levitate|electroweb,protect,thunderbolt,hydropump||85,,85,85,85,85|N|,0,,,,||83|,,,,,Electric]Darkrai||LifeOrb|BadDreams|protect,focusblast,sludgebomb,darkpulse||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Magmar||Eviolite|FlameBody|knockoff,followme,heatwave,protect||85,85,85,85,85,85|M|||84|,,,,,Grass"}
+>p1 move tailwind, move swordsdance
+>p2 move springtidestorm, move scald +2
+>p1 move tailwind, move swordsdance
+>p2 move moonblast +2, move wideguard
 >p1 pass, switch 6
->p2 switch 3, switch 4
->p1 move flareblitz +2, move yawn +2
->p2 move hypervoice, move uturn +1
->p1 switch 3, pass
->p1 move icywind, move helpinghand -1
->p2 move protect, pass
->p1 move willowisp +1, move helpinghand -1
->p2 move psychic +2, pass
->p1 move foulplay +1, move doubleedge +1
->p2 move hypervoice, pass
+>p1 move irondefense, move blizzard
+>p2 move earthpower +2, move icywind
+>p1 move bodypress +1, move blizzard
+>p2 move protect, move flipturn +2
+>p2 pass, switch 3
+>p1 move bravebird +1, move fusionflare +1
+>p2 move moonblast +2, move psychic +2
+>p1 pass, switch 5
+>p1 move tailwind, move bravebird +1
+>p2 move springtidestorm, move psychic +1
+>p2 switch 3, pass
+>p1 move bravebird +1, move swordsdance
+>p2 move icywind, move helpinghand -1
+>p1 move bodypress +2, move bravebird +1
+>p2 move flipturn +1, move psychic +1
+>p2 switch 4, pass
+>p1 move irondefense, move swordsdance
+>p2 move protect, move lightscreen
+>p1 move bravebird +1, move swordsdance
+>p2 move protect, move lightscreen
+>p1 move bravebird +2, move protect
+>p2 move electroweb, move psychic +1
+>p1 switch 4, pass
+>p1 move headlongrush +2, move bravebird +1
+>p2 move protect, move helpinghand -1
+>p1 move closecombat +1, move closecombat +2
+>p2 move protect, move psychic +1
+>p2 pass, switch 4
+>p1 move protect, move protect
+>p2 move thunderbolt +1, move icywind
+>p1 move closecombat +1, move bravebird +2
+>p2 move thunderbolt +1, move scald +1
+>p1 pass, switch 3
+>p2 switch 6, switch 5
+>p1 move knockoff +2, move highhorsepower +1
+>p2 move protect, move sludgebomb +1
+>p1 move headlongrush +2, move highhorsepower +1
+>p2 move followme, move protect
+>p1 move protect, move recover
+>p2 pass, move protect
+>p1 move closecombat +2, move recover
+>p2 pass, move focusblast +1
+>p1 pass, move highhorsepower +2
+>p2 pass, move sludgebomb +1
+>p1 pass, move highhorsepower +2
+>p2 pass, move protect
+>p1 pass, move gunkshot +1
+>p2 pass, move focusblast +2

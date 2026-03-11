@@ -1,24 +1,39 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"218,405,592,965"}
->player p1 {"name":"Player1","team":"Hydreigon||LifeOrb|Levitate|dracometeor,darkpulse,heatwave,protect||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Gliscor||ToxicOrb|PoisonHeal|knockoff,dualwingbeat,protect,highhorsepower||85,85,85,85,85,85|M|||81|,,,,,Water]Basculegion||ChoiceScarf|Adaptability|aquajet,wavecrash,flipturn,lastrespects||85,85,85,85,85,85|M|||69|,,,,,Ghost]Tatsugiri||AssaultVest|StormDrain|icywind,muddywater,rapidspin,dracometeor||85,85,85,85,85,85|M|||84|,,,,,Steel]Necrozma|NecrozmaDuskMane|WeaknessPolicy|PrismArmor|trickroom,earthquake,photongeyser,sunsteelstrike||85,85,85,85,85,|N|,,,,,0||70|,,,,,Dark]Moltres||SitrusBerry|FlameBody|scorchingsands,tailwind,fireblast,bravebird||85,85,85,85,85,85|N|||79|,,,,,Ground"}
->player p2 {"name":"Player2","team":"Cinccino||LoadedDice|Technician|tailslap,tripleaxel,protect,bulletseed||85,85,85,85,85,85|F|||85|,,,,,Grass]Bronzong||Leftovers|Levitate|trickroom,psychicnoise,bodypress,irondefense||85,,85,85,85,|N|,0,,,,0||87|,,,,,Fighting]Miraidon||LifeOrb|HadronEngine|dracometeor,voltswitch,electrodrift,protect||85,,85,85,85,85|N|,0,,,,||65|,,,,,Electric]Toxicroak||LifeOrb|DrySkin|gunkshot,closecombat,swordsdance,protect||85,85,85,85,85,85|F|||85|,,,,,Dark]Krookodile||LifeOrb|Intimidate|highhorsepower,protect,stoneedge,knockoff||85,85,85,85,85,85|F|||80|,,,,,Ground]Great Tusk||AssaultVest|Protosynthesis|rockslide,headlongrush,icespinner,closecombat||85,85,85,85,85,85|N|||81|,,,,,Ground"}
->p1 move darkpulse +1, move highhorsepower +2
->p2 move tripleaxel +2, move irondefense
->p1 pass, switch 5
->p1 move darkpulse +2, move earthquake
->p2 move bulletseed +2, move bodypress +2
->p1 move heatwave, move earthquake
->p2 move tailslap +2, move trickroom
->p2 switch 4, switch 3
->p1 move darkpulse +2, move sunsteelstrike +2
->p2 move closecombat +1, move dracometeor +1
->p1 switch 3, switch 4
->p1 move lastrespects +1, move muddywater
->p2 move swordsdance, move protect
+>player p1 {"name":"Player1","team":"Clodsire||SitrusBerry|Unaware|toxicspikes,highhorsepower,gunkshot,helpinghand||85,85,85,85,85,85|M|||87|,,,,,Flying]Greninja|GreninjaBond|LifeOrb|BattleBond|darkpulse,hydropump,icebeam,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Water]Farigiraf||LifeOrb|ArmorTail|hypervoice,psychic,trickroom,protect||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fairy]Dodrio||ChoiceBand|EarlyBird|drillrun,quickattack,knockoff,bravebird||85,85,85,85,85,85|M|||85|,,,,,Ground]Spectrier||LifeOrb|GrimNeigh|shadowball,drainingkiss,nastyplot,protect||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Hypno||SitrusBerry|InnerFocus|psychic,poisongas,knockoff,lowsweep||85,85,85,85,85,85|M|||95|,,,,,Dark"}
+>player p2 {"name":"Player2","team":"Arceus|ArceusGround|EarthPlate|Multitype|judgment,fireblast,calmmind,recover||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Malamar||SitrusBerry|Contrary|knockoff,superpower,protect,psychocut||85,85,85,85,85,85|M|||80|,,,,,Fighting]Rhydon||Eviolite|LightningRod|stealthrock,stoneedge,highhorsepower,protect||85,85,85,85,85,85|M|||86|,,,,,Flying]Thundurus|ThundurusTherian|LifeOrb|VoltAbsorb|protect,wildboltstorm,terablast,nastyplot||85,,85,85,85,85|M|,0,,,,||78|,,,,,Ice]Kricketune||SitrusBerry|Technician|stickyweb,knockoff,taunt,bugbite||85,85,85,85,85,85|M||||,,,,,Water]Slither Wing||LifeOrb|Protosynthesis|firstimpression,closecombat,protect,wildcharge||85,85,85,85,85,85|N|||83|,,,,,Bug"}
+>p1 move highhorsepower +2, move protect
+>p2 move recover, move psychocut +2
+>p1 move gunkshot +2, move hydropump +1
+>p2 move judgment +1, move protect
+>p1 move gunkshot +1, move hydropump +2
+>p2 move recover, move knockoff +1
+>p1 move helpinghand -2, move darkpulse +2
+>p2 move fireblast +1, move superpower +1
+>p2 pass, switch 4
+>p1 move highhorsepower +2, move protect
+>p2 move recover, move terablast +2
+>p1 move gunkshot +2, move hydropump +1
+>p2 move recover, move terablast +2
 >p2 switch 6, pass
->p1 move lastrespects +2, move muddywater
->p2 move rockslide, move protect
->p2 pass, switch 5
->p1 move lastrespects +1, move rapidspin +1
->p2 move headlongrush +1, move knockoff +2
->p1 move lastrespects +2, move muddywater
->p2 pass, move stoneedge +1
+>p1 move highhorsepower +1, move darkpulse +2
+>p2 move closecombat +1, move protect
+>p1 move highhorsepower +2, move protect
+>p2 move protect, move wildboltstorm
+>p1 move helpinghand -2, move hydropump +1
+>p2 move firstimpression +1, move nastyplot
+>p2 switch 5, pass
+>p1 move toxicspikes, move hydropump +2
+>p2 move stickyweb, move terablast +1
+>p2 pass, switch 3
+>p1 move gunkshot +2, move protect
+>p2 move taunt +2, move stoneedge +1
+>p1 switch 3, pass
+>p1 move protect, move darkpulse +1
+>p2 move stickyweb, move protect
+>p1 move protect, move darkpulse +2
+>p2 move stickyweb, move stoneedge +2
+>p1 pass, switch 4
+>p1 move psychic +2, move drillrun +2
+>p2 move taunt +1, move stoneedge +2
+>p1 move hypervoice, move drillrun +1
+>p2 move bugbite +1, pass

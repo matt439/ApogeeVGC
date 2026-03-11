@@ -1,47 +1,55 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"288,535,782,1275"}
->player p1 {"name":"Player1","team":"Moltres|MoltresGalar|SitrusBerry|Berserk|nastyplot,hurricane,protect,fierywrath||85,,85,85,85,85|N|,0,,,,||74|,,,,,Dark]Leafeon||LifeOrb|Chlorophyll|doubleedge,knockoff,swordsdance,leafblade||85,85,85,85,85,85|M|||90|,,,,,Normal]Hawlucha||WhiteHerb|Unburden|swordsdance,closecombat,protect,bravebird||85,85,85,85,85,85|M|||84|,,,,,Fire]Milotic||SitrusBerry|Competitive|scald,icywind,protect,dragontail||85,85,85,85,85,85|M|||81|,,,,,Dragon]Arcanine||HeavyDutyBoots|Intimidate|extremespeed,flareblitz,howl,willowisp||85,85,85,85,85,85|M|||82|,,,,,Normal]Volcarona||HeavyDutyBoots|FlameBody|heatwave,bugbuzz,quiverdance,protect||85,,85,85,85,85|F|,0,,,,||78|,,,,,Ground"}
->player p2 {"name":"Player2","team":"Comfey||SitrusBerry|Triage|floralhealing,tailwind,helpinghand,drainingkiss||85,,85,85,85,85|F|,0,,,,||88|,,,,,Steel]Drednaw||WhiteHerb|StrongJaw|rockslide,crunch,liquidation,shellsmash||85,85,85,85,85,85|M|||83|,,,,,Dark]Pincurchin||SitrusBerry|ElectricSurge|recover,electroweb,scald,thunderbolt||85,,85,85,85,85|F|,0,,,,||97|,,,,,Grass]Noivern||LifeOrb|Frisk|hurricane,flamethrower,dracometeor,tailwind||85,,85,85,85,85|F|,0,,,,||84|,,,,,Dragon]Lucario||LifeOrb|InnerFocus|flashcannon,closecombat,protect,extremespeed||85,85,85,85,85,85|F|||86|,,,,,Normal]Hoopa|HoopaUnbound|ChoiceScarf|Magician|gunkshot,hyperspacefury,trick,drainpunch||85,85,85,85,85,85|N|||80|,,,,,Dark"}
->p1 move hurricane +2, move leafblade +2
->p2 move tailwind, move crunch +1
->p2 pass, switch 6
->p1 move fierywrath, move leafblade +2
->p2 move floralhealing +2, move drainpunch +1
->p2 pass, switch 5
->p1 move hurricane +1, move doubleedge +2
->p2 move tailwind, move extremespeed +1
->p1 move nastyplot, move knockoff +2
->p2 move helpinghand -2, move extremespeed +2
->p1 move fierywrath, move doubleedge +2
->p2 move drainingkiss +1, move protect
->p1 switch 6, pass
->p1 move heatwave, move doubleedge +2
->p2 move floralhealing +1, move protect
->p2 pass, switch 4
->p1 move protect, move knockoff +1
->p2 move tailwind, move tailwind
->p1 pass, switch 4
->p1 move bugbuzz +1, move icywind
->p2 move drainingkiss +1, move hurricane +2
->p2 switch 3, pass
->p1 move heatwave, move scald +1
->p2 move scald +1, move tailwind
->p1 move protect, move icywind
->p2 move electroweb, move flamethrower +2
->p1 move heatwave, move scald +2
->p2 move electroweb, move flamethrower +2
->p1 pass, switch 5
->p1 move quiverdance, move extremespeed +2
->p2 move recover, pass
->p1 move protect, move extremespeed +2
->p2 move recover, pass
->p1 move quiverdance, move extremespeed +2
->p2 move scald +1, pass
+>player p1 {"name":"Player1","team":"Zekrom||ClearAmulet|Teravolt|dragonclaw,protect,boltstrike,dragondance||85,85,85,85,85,85|N|||74|,,,,,Dragon]Klefki||SitrusBerry|Prankster|spikes,foulplay,dazzlinggleam,thunderwave||85,,85,85,85,85|F|,0,,,,||81|,,,,,Water]Camerupt||SitrusBerry|SolidRock|heatwave,willowisp,stealthrock,earthpower||85,,85,85,85,85|F|,0,,,,||88|,,,,,Water]Yanmega||FocusSash|TintedLens|protect,tailwind,airslash,bugbuzz||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Leafeon||LifeOrb|Chlorophyll|doubleedge,leafblade,knockoff,swordsdance||85,85,85,85,85,85|M|||90|,,,,,Normal]Dewgong||SitrusBerry|ThickFat|encore,hydropump,icywind,fakeout||85,85,85,85,85,85|M|||91|,,,,,Grass"}
+>player p2 {"name":"Player2","team":"Golduck||LifeOrb|CloudNine|hydropump,encore,protect,grassknot||85,,85,85,85,85|M|,0,,,,||91|,,,,,Grass]Appletun||SitrusBerry|Ripen|leechseed,dragonpulse,protect,appleacid||85,,85,85,85,85|M|,0,,,,||92|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|knockoff,grassknot,volttackle,fakeout||85,85,85,85,85,85|M|||94|,,,,,Grass]Shaymin||Leftovers|NaturalCure|earthpower,seedflare,protect,synthesis||85,,85,85,85,85|N|,0,,,,||81|,,,,,Steel]Camerupt||SitrusBerry|SolidRock|protect,heatwave,earthpower,willowisp||85,,85,85,85,85|F|,0,,,,||88|,,,,,Water]Iron Jugulis||BoosterEnergy|QuarkDrive|darkpulse,taunt,earthpower,hurricane||85,,85,85,85,85|N|,0,,,,||79|,,,,,Flying"}
+>p1 move dragonclaw +2, move thunderwave +2
+>p2 move hydropump +1, move protect
+>p1 move dragonclaw +1, move thunderwave +2
+>p2 move encore +1, move appleacid +1
+>p1 move dragonclaw +1, move dazzlinggleam
+>p2 move grassknot +1, move appleacid +1
 >p1 switch 3, pass
->p1 move protect, move willowisp +2
->p2 move recover, pass
->p1 move swordsdance, move willowisp +2
->p2 move electroweb, pass
->p1 move protect, move howl
->p2 move scald +2, pass
->p1 move closecombat +2, move howl
->p2 move recover, pass
+>p1 move earthpower +1, move foulplay +2
+>p2 move hydropump +1, move dragonpulse +2
+>p1 switch 6, pass
+>p2 switch 4, pass
+>p1 move icywind, move spikes
+>p2 move protect, move appleacid +1
+>p1 move encore +1, move thunderwave +1
+>p2 move synthesis, move leechseed +2
+>p1 move hydropump +2, move dazzlinggleam
+>p2 move protect, move appleacid +1
+>p1 move hydropump +2, move spikes
+>p2 move protect, move leechseed +1
+>p1 move encore +1, move foulplay +2
+>p2 move seedflare +1, move leechseed +2
+>p1 move fakeout +1, move dazzlinggleam
+>p2 move protect, move dragonpulse +1
+>p1 move encore +2, move dazzlinggleam
+>p2 move protect, move leechseed +1
+>p2 pass, switch 5
+>p1 move hydropump +2, move thunderwave +1
+>p2 move synthesis, move willowisp +1
+>p2 pass, switch 6
+>p1 move fakeout +2, move dazzlinggleam
+>p2 move earthpower +2, move earthpower +2
+>p1 pass, switch 5
+>p1 move fakeout +2, move knockoff +1
+>p2 move earthpower +2, move darkpulse +2
+>p1 move icywind, move knockoff +2
+>p2 move seedflare +1, move darkpulse +2
+>p1 switch 4, pass
+>p1 move protect, pass
+>p2 move earthpower +2, move earthpower +1
+>p1 move tailwind, pass
+>p2 move protect, move hurricane +2
+>p1 move airslash +2, pass
+>p2 move earthpower +1, move earthpower +2
+>p1 move tailwind, pass
+>p2 move seedflare +2, move darkpulse +1
+>p1 move airslash +2, pass
+>p2 move earthpower +1, move hurricane +2
+>p2 pass, switch 3
+>p1 move tailwind, pass
+>p2 move synthesis, move fakeout +2
+>p1 move tailwind, pass
+>p2 move synthesis, move knockoff +2

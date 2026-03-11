@@ -1,49 +1,33 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"176,327,478,779"}
->player p1 {"name":"Player1","team":"Sinistcha|SinistchaMasterpiece|Leftovers|Hospitality|calmmind,protect,shadowball,matchagotcha||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Great Tusk||AssaultVest|Protosynthesis|closecombat,headlongrush,knockoff,icespinner||85,85,85,85,85,85|N|||81|,,,,,Fire]Hariyama||FlameOrb|Guts|fakeout,closecombat,knockoff,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Espathra||LifeOrb|SpeedBoost|dazzlinggleam,shadowball,protect,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Zapdos||SitrusBerry|Static|thunderbolt,tailwind,roost,hurricane||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Minun||SitrusBerry|VoltAbsorb|encore,superfang,nuzzle,thunderbolt||85,85,85,85,85,85|M|||91|,,,,,Flying"}
->player p2 {"name":"Player2","team":"Giratina||Leftovers|Pressure|shadowball,calmmind,protect,aurasphere||85,,85,85,85,85|N|,0,,,,||76|,,,,,Fairy]Drifblim||SitrusBerry|Unburden|strengthsap,willowisp,tailwind,shadowball||85,,85,85,85,85|F|,0,,,,||85|,,,,,Ground]Milotic||SitrusBerry|Competitive|dragontail,icywind,recover,scald||85,85,85,85,85,85|M|||81|,,,,,Steel]Arcanine|ArcanineHisui|HeavyDutyBoots|Intimidate|protect,rockslide,flareblitz,willowisp||85,85,85,85,85,85|M|||79|,,,,,Grass]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fire]Furret||SitrusBerry|Frisk|bodyslam,knockoff,helpinghand,followme||85,85,85,85,85,85|M|||98|,,,,,Ghost"}
->p1 move shadowball +1, move knockoff +2
->p2 move calmmind, move shadowball +2
->p1 move protect, move knockoff +1
->p2 move aurasphere +1, move shadowball +1
->p1 move shadowball +1, move closecombat +2
->p2 move shadowball +1, move shadowball +2
->p1 switch 5, pass
->p1 move hurricane +2, move headlongrush +1
->p2 move calmmind, move willowisp +1
->p2 switch 3, switch 4
->p1 move roost, move closecombat +2
->p2 move dragontail +1, move rockslide
->p1 move fakeout +1, move icespinner +2
->p2 move recover, move willowisp +2
->p1 move closecombat +1, move knockoff +1
->p2 move recover, move rockslide
->p1 move facade +2, move closecombat +1
->p2 move dragontail +2, move rockslide
->p2 switch 5, pass
->p1 move closecombat +2, move headlongrush +1
->p2 move icespinner +1, move flareblitz +1
->p1 switch 6, switch 4
+>player p1 {"name":"Player1","team":"Cinccino||LoadedDice|Technician|protect,tripleaxel,tailslap,bulletseed||85,85,85,85,85,85|F|||85|,,,,,Normal]Diancie||SitrusBerry|ClearBody|bodypress,protect,diamondstorm,trickroom||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Enamorus|EnamorusTherian|SitrusBerry|Overcoat|moonblast,earthpower,springtidestorm,protect||85,,85,85,85,85|F|,0,,,,||82|,,,,,Ground]Quagsire||SitrusBerry|Unaware|liquidation,helpinghand,highhorsepower,icywind||85,85,85,85,85,85|M|||91|,,,,,Fire]Spectrier||LifeOrb|GrimNeigh|protect,shadowball,terablast,nastyplot||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Kingdra||LifeOrb|SwiftSwim|raindance,wavecrash,protect,dracometeor||85,85,85,85,85,85|F|||85|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Golduck||LifeOrb|CloudNine|icebeam,grassknot,hydropump,encore||85,,85,85,85,85|M|,0,,,,||91|,,,,,Grass]Iron Leaves||LifeOrb|QuarkDrive|protect,closecombat,leafblade,psyblade||85,85,85,85,85,85|N|||81|,,,,,Psychic]Enamorus||LifeOrb|Contrary|protect,springtidestorm,tailwind,earthpower||85,,85,85,85,85|F|,0,,,,||79|,,,,,Ground]Yanmega||FocusSash|TintedLens|tailwind,bugbuzz,airslash,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Blissey||SitrusBerry|Healer|hypervoice,helpinghand,softboiled,thunderwave||85,,85,85,85,85|F|,0,,,,||96|,,,,,Poison]Meowstic|MeowsticF|LifeOrb|Competitive|darkpulse,psychic,thunderbolt,protect||85,,85,85,85,85|F|,0,,,,||89|,,,,,Dark"}
+>p1 move bulletseed +2, move protect
+>p2 move hydropump +2, move closecombat +2
+>p1 move tripleaxel +2, move protect
+>p2 move encore +2, move protect
+>p1 move tailslap +2, move bodypress +2
+>p2 move grassknot +2, move closecombat +2
 >p2 pass, switch 6
->p1 move encore +2, move protect
->p2 move icespinner +1, move bodyslam +1
->p1 move encore +2, move dazzlinggleam
->p2 move icespinner +1, move bodyslam +2
->p1 move nuzzle +2, move shadowball +2
->p2 pass, move bodyslam +2
->p1 pass, switch 3
->p1 move thunderbolt +1, move roost
->p2 pass, move bodyslam +2
->p1 move nuzzle +1, move roost
->p2 pass, move followme
->p1 move encore +2, move roost
->p2 pass, move knockoff +1
->p1 move encore +2, move hurricane +2
->p2 pass, move followme
->p1 move nuzzle +2, move roost
->p2 pass, move followme
->p1 move nuzzle +1, move hurricane +2
->p2 pass, move bodyslam +2
->p1 move nuzzle +2, move thunderbolt +1
->p2 pass, move followme
->p1 move superfang +1, move hurricane +2
->p2 pass, move followme
+>p1 move bulletseed +1, move trickroom
+>p2 move icebeam +2, move darkpulse +1
+>p2 switch 4, pass
+>p1 move tripleaxel +1, move protect
+>p2 move airslash +2, move thunderbolt +1
+>p1 move protect, move bodypress +1
+>p2 move airslash +2, move darkpulse +1
+>p2 switch 5, pass
+>p1 move tripleaxel +1, move trickroom
+>p2 move thunderwave +1, move protect
+>p1 move bulletseed +2, move trickroom
+>p2 move helpinghand -2, move thunderbolt +1
+>p1 switch 6, pass
+>p1 move wavecrash +1, move diamondstorm
+>p2 move softboiled, move darkpulse +1
+>p1 move protect, move bodypress +1
+>p2 move softboiled, move thunderbolt +2
+>p2 switch 3, pass
+>p1 move wavecrash +1, move trickroom
+>p2 move earthpower +2, move protect
+>p1 switch 5, switch 3
+>p1 move protect, move earthpower +2
+>p2 move springtidestorm, move thunderbolt +2

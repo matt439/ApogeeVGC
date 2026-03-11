@@ -37,6 +37,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 120,
                 Color = "Red",
+                Prevo = SpecieId.Sizzlipede,
             },
             // 852 - Clobbopus
             [SpecieId.Clobbopus] = new()
@@ -87,6 +88,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 39,
                 Color = "Blue",
+                Prevo = SpecieId.Clobbopus,
             },
             // 854 - Sinistea
             [SpecieId.Sinistea] = new()
@@ -166,6 +168,7 @@ public partial record SpeciesData
                 HeightM = 0.2,
                 WeightKg = 0.4,
                 Color = "Purple",
+                Prevo = SpecieId.Sinistea,
             },
             [SpecieId.PolteageistAntique] = new()
             {
@@ -193,6 +196,7 @@ public partial record SpeciesData
                 HeightM = 0.2,
                 WeightKg = 0.4,
                 Color = "Purple",
+                Prevo = SpecieId.SinisteaAntique,
             },
             // 856 - Hatenna
             [SpecieId.Hatenna] = new()
@@ -247,6 +251,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 4.8,
                 Color = "Pink",
+                Prevo = SpecieId.Hatenna,
             },
             // 858 - Hatterene
             [SpecieId.Hatterene] = new()
@@ -274,6 +279,7 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 5.1,
                 Color = "Pink",
+                Prevo = SpecieId.Hattrem,
             },
             // 859 - Impidimp
             [SpecieId.Impidimp] = new()
@@ -328,6 +334,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 12.5,
                 Color = "Pink",
+                Prevo = SpecieId.Impidimp,
             },
             // 861 - Grimmsnarl (already exists)
             [SpecieId.Grimmsnarl] = new()
@@ -355,6 +362,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 61,
                 Color = "Purple",
+                Prevo = SpecieId.Morgrem,
             },
             // 862 - Obstagoon
             [SpecieId.Obstagoon] = new()
@@ -381,6 +389,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 46,
                 Color = "Gray",
+                Prevo = SpecieId.LinooneGalar,
             },
             // 863 - Perrserker
             [SpecieId.Perrserker] = new()
@@ -407,6 +416,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 28,
                 Color = "Brown",
+                Prevo = SpecieId.MeowthGalar,
             },
             // 864 - Cursola
             [SpecieId.Cursola] = new()
@@ -433,6 +443,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 0.4,
                 Color = "White",
+                Prevo = SpecieId.CorsolaGalar,
             },
             // 865 - Sirfetch'd
             [SpecieId.Sirfetchd] = new()
@@ -484,6 +495,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 58.2,
                 Color = "Purple",
+                Prevo = SpecieId.MrMimeGalar,
             },
             // 867 - Runerigus
             [SpecieId.Runerigus] = new()
@@ -508,6 +520,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 66.6,
                 Color = "Gray",
+                Prevo = SpecieId.YamaskGalar,
             },
             // 868 - Milcery
             [SpecieId.Milcery] = new()
@@ -560,6 +573,7 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 0.5,
                 Color = "White",
+                Prevo = SpecieId.Milcery,
             },
             // 870 - Falinks
             [SpecieId.Falinks] = new()
@@ -690,6 +704,7 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 42,
                 Color = "White",
+                Prevo = SpecieId.Snom,
             },
             // 874 - Stonjourner
             [SpecieId.Stonjourner] = new()
@@ -921,6 +936,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 650,
                 Color = "Green",
+                Prevo = SpecieId.Cufant,
             },
             // 880 - Dracozolt
             [SpecieId.Dracozolt] = new()
@@ -1107,6 +1123,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 11,
                 Color = "Green",
+                Prevo = SpecieId.Dreepy,
             },
             // 887 - Dragapult
             [SpecieId.Dragapult] = new()
@@ -1133,6 +1150,7 @@ public partial record SpeciesData
                 HeightM = 3,
                 WeightKg = 50,
                 Color = "Green",
+                Prevo = SpecieId.Drakloak,
             },
             // 888 - Zacian
             [SpecieId.Zacian] = new()
@@ -1344,6 +1362,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 105,
                 Color = "Gray",
+                Prevo = SpecieId.Kubfu,
             },
             [SpecieId.UrshifuRapidStrike] = new()
             {
@@ -1370,6 +1389,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 105,
                 Color = "Gray",
+                Prevo = SpecieId.Kubfu,
             },
             // 893 - Zarude
             [SpecieId.Zarude] = new()
@@ -1627,6 +1647,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 95.1,
                 Color = "Gray",
+                Prevo = SpecieId.Stantler,
             },
             // 900 - Kleavor
             [SpecieId.Kleavor] = new()
@@ -1653,6 +1674,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 89,
                 Color = "Brown",
+                Prevo = SpecieId.Scyther,
             },
         };
     }

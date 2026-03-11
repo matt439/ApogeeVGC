@@ -165,11 +165,15 @@ public partial class BattleActions
             {
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(brv2.Value));
             }
+            else if (result is IntRelayVar irv)
+            {
+                // Integer relay vars are truthy if non-zero (matching Showdown's JS truthiness)
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(irv.Value != 0));
+            }
             else
             {
-                // Any other RelayVar type defaults to false
-                Battle.Debug("[HitStepTryEvent] Unknown type, defaulting to false");
-                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
+                // Any other RelayVar type (VoidReturn, etc.) - treat as truthy (no change)
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
             }
         }
 
@@ -210,11 +214,12 @@ public partial class BattleActions
         {
             bool canHit = true;
 
-            // Gen 6+: Check powder move immunity (Grass-types and Overcoat ability)
+            // Gen 6+: Check powder move immunity (Grass-types are immune)
+            // Showdown: dex.getImmunity('powder', target) — Grass type has damageTaken['powder'] = 3
             if (Battle.Gen >= 6 &&
                 move.Flags.Powder == true &&
                 target != pokemon &&
-                !Battle.Dex.GetImmunity(move.Condition?.Id ?? ConditionId.None, target.Types))
+                target.HasType(PokemonType.Grass))
             {
                 Battle.Debug("natural powder immunity");
 
@@ -913,7 +918,7 @@ public partial class BattleActions
             {
                 int hpBeforeRecoil = pokemon.Hp;
 
-                Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
+                Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0, MidpointRounding.AwayFromZero), pokemon, pokemon,
                     BattleDamageEffect.FromIEffect(move),
                     true);
 
@@ -982,7 +987,7 @@ public partial class BattleActions
         {
             int hpBeforeRecoil = pokemon.Hp;
             int recoilDamage =
-                Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0), 1, null);
+                Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0, MidpointRounding.AwayFromZero), 1, null);
 
             Battle.DirectDamage(recoilDamage, pokemon, pokemon,
                 Library.Conditions[ConditionId.StruggleRecoil]);

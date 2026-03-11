@@ -1,59 +1,45 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"120,223,326,531"}
->player p1 {"name":"Player1","team":"Sandaconda||Leftovers|ShedSkin|coil,highhorsepower,rest,stoneedge||85,85,85,85,85,85|F|||88|,,,,,Dragon]Masquerain||HeavyDutyBoots|Intimidate|batonpass,quiverdance,hurricane,hydropump||85,,85,85,85,85|F|,0,,,,||90|,,,,,Water]Vikavolt||SitrusBerry|Levitate|stickyweb,thunderbolt,protect,bugbuzz||85,,85,85,85,85|F|,0,,,,||84|,,,,,Electric]Delphox||LifeOrb|Blaze|heatwave,nastyplot,protect,psychic||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fire]Iron Leaves||BoosterEnergy|QuarkDrive|leafblade,protect,closecombat,swordsdance||85,85,85,85,85,85|N|||81|,,,,,Poison]Greninja|GreninjaBond|LifeOrb|BattleBond|hydropump,protect,taunt,darkpulse||85,,85,85,85,85|M|,0,,,,||83|,,,,,Dark"}
->player p2 {"name":"Player2","team":"Keldeo|KeldeoResolute|ChoiceSpecs|Justified|muddywater,vacuumwave,hydropump,secretsword||85,,85,85,85,85|N|,0,,,,||78|,,,,,Water]Meowstic||LightClay|Prankster|reflect,lightscreen,psychic,thunderwave||85,,85,85,85,85|M|,0,,,,||88|,,,,,Dark]Excadrill||LifeOrb|MoldBreaker|highhorsepower,swordsdance,ironhead,protect||85,85,85,85,85,85|M|||82|,,,,,Water]Slowbro||LifeOrb|Regenerator|hydropump,trickroom,psychic,fireblast||85,,85,85,85,|F|,0,,,,0||88|,,,,,Fire]Sunflora||LifeOrb|Chlorophyll|earthpower,dazzlinggleam,leafstorm,protect||85,,85,85,85,85|M|,0,,,,|||,,,,,Fairy]Sandy Shocks||LifeOrb|Protosynthesis|terablast,voltswitch,earthpower,protect||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ice"}
->p1 move coil, move hurricane +2
->p2 move secretsword +2, move reflect
->p1 move rest, move batonpass
->p2 move secretsword +1, move psychic +1
->p1 pass, switch 4
->p1 move highhorsepower +2, move nastyplot
->p2 move secretsword +2, move thunderwave +2
->p1 move rest, move protect
->p2 move secretsword +2, move lightscreen
->p1 move stoneedge +1, move protect
->p2 move secretsword +2, move lightscreen
->p1 move coil, move nastyplot
->p2 move secretsword +1, move thunderwave +1
->p1 move coil, move heatwave
->p2 move secretsword +2, move psychic +2
+>player p1 {"name":"Player1","team":"Rhydon||Eviolite|LightningRod|highhorsepower,stoneedge,protect,helpinghand||85,85,85,85,85,85|F|||86|,,,,,Flying]Jumpluff|||Infiltrator|sleeppowder,acrobatics,tailwind,encore||85,85,85,85,85,85|F|||92|,,,,,Steel]Hydreigon||ChoiceSpecs|Levitate|heatwave,snarl,darkpulse,dracometeor||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Sableye||SitrusBerry|Prankster|disable,fakeout,thunderwave,knockoff||85,85,85,85,85,85|M|||92|,,,,,Poison]Florges|FlorgesWhite|Leftovers|FlowerVeil|protect,synthesis,dazzlinggleam,calmmind||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Bruxish||LifeOrb|StrongJaw|wavecrash,protect,crunch,psychicfangs||85,85,85,85,85,85|M|||86|,,,,,Dark"}
+>player p2 {"name":"Player2","team":"Gengar||ChoiceSpecs|CursedBody|focusblast,shadowball,sludgebomb,trick||85,,85,85,85,85|F|,0,,,,|S|84|,,,,,Ghost]Florges||Leftovers|FlowerVeil|synthesis,protect,calmmind,dazzlinggleam||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Lucario||LifeOrb|InnerFocus|extremespeed,closecombat,flashcannon,protect||85,85,85,85,85,85|M|||86|,,,,,Normal]Terrakion||LifeOrb|Justified|protect,closecombat,stoneedge,rockslide||85,85,85,85,85,85|N|||78|,,,,,Ghost]Goodra||AssaultVest|SapSipper|breakingswipe,dracometeor,scald,thunderbolt||85,85,85,85,85,85|F|||86|,,,,,Electric]Mightyena||LifeOrb|Intimidate|crunch,suckerpunch,playrough,howl||85,85,85,85,85,85|F|||95|,,,,,Fairy"}
+>p1 move highhorsepower +2, move tailwind
+>p2 move sludgebomb +2, move dazzlinggleam
 >p1 pass, switch 5
->p1 move rest, move leafblade +1
->p2 move secretsword +2, move psychic +2
->p1 move rest, move swordsdance
->p2 move secretsword +2, move lightscreen
->p1 move rest, move swordsdance
->p2 move secretsword +2, move thunderwave +1
->p1 pass, switch 6
->p1 move stoneedge +1, move protect
->p2 move secretsword +2, move psychic +2
->p2 switch 3, pass
->p1 move stoneedge +2, move darkpulse +2
->p2 move protect, move thunderwave +2
->p2 pass, switch 5
->p1 move stoneedge +2, move darkpulse +1
->p2 move ironhead +1, move leafstorm +1
->p1 switch 4, pass
->p1 move batonpass, move protect
->p2 move ironhead +2, move leafstorm +2
->p1 switch 3, pass
->p1 move thunderbolt +1, move protect
->p2 move swordsdance, move protect
->p1 move thunderbolt +2, move protect
->p2 move swordsdance, move dazzlinggleam
->p2 pass, switch 6
->p1 move bugbuzz +2, move hydropump +1
->p2 move highhorsepower +2, move earthpower +1
+>p1 move stoneedge +2, move protect
+>p2 move sludgebomb +1, move protect
+>p1 move protect, move protect
+>p2 move sludgebomb +1, move calmmind
+>p1 move highhorsepower +1, move dazzlinggleam
+>p2 move sludgebomb +1, move dazzlinggleam
+>p2 switch 5, pass
+>p1 move helpinghand -2, move synthesis
+>p2 move thunderbolt +2, move calmmind
+>p1 move protect, move synthesis
+>p2 move scald +2, move protect
+>p1 move helpinghand -2, move calmmind
+>p2 move breakingswipe, move calmmind
+>p1 move protect, move protect
+>p2 move breakingswipe, move calmmind
+>p1 move protect, move calmmind
+>p2 move scald +1, move dazzlinggleam
+>p1 move helpinghand -2, move protect
+>p2 move breakingswipe, move calmmind
+>p1 move protect, move dazzlinggleam
+>p2 move scald +2, move dazzlinggleam
+>p1 move highhorsepower +1, move dazzlinggleam
+>p2 move scald +2, move synthesis
 >p2 switch 4, pass
->p1 move thunderbolt +2, move protect
->p2 move trickroom, move protect
->p1 move protect, move taunt +1
->p2 move hydropump +2, move voltswitch +1
->p1 move stickyweb, move protect
->p2 move hydropump +1, move voltswitch +1
->p1 move thunderbolt +2, move darkpulse +2
->p2 move hydropump +1, move voltswitch +2
->p1 pass, switch 3
->p1 move bugbuzz +2, move batonpass
->p2 move fireblast +2, move terablast +1
->p1 move stickyweb, pass
->p2 move fireblast +1, pass
+>p1 move helpinghand -2, move calmmind
+>p2 move closecombat +1, move protect
+>p1 switch 4, pass
+>p1 move thunderwave +1, move dazzlinggleam
+>p2 move protect, move calmmind
+>p1 move knockoff +2, move calmmind
+>p2 move stoneedge +1, move calmmind
+>p1 move thunderwave +2, move dazzlinggleam
+>p2 move rockslide, move calmmind
+>p1 move disable +2, move dazzlinggleam
+>p2 move closecombat +1, move dazzlinggleam
+>p1 switch 6, switch 3
+>p2 switch 6, pass
+>p1 move psychicfangs +1, move snarl
+>p2 move suckerpunch +2, move dazzlinggleam

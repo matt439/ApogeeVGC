@@ -1,49 +1,37 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"64,119,174,283"}
->player p1 {"name":"Player1","team":"Jolteon||LifeOrb|VoltAbsorb|calmmind,protect,terablast,thunderbolt||85,,85,85,85,85|F|,0,,,,||85|,,,,,Ice]Skeledirge||Leftovers|Unaware|torchsong,shadowball,slackoff,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Fairy]Malamar||SitrusBerry|Contrary|superpower,knockoff,psychocut,protect||85,85,85,85,85,85|M|||80|,,,,,Fighting]Grumpig||LifeOrb|ThickFat|earthpower,nastyplot,protect,psychic||85,,85,85,85,85|M|,0,,,,||91|,,,,,Ground]Tauros||ChoiceBand|Intimidate|doubleedge,stoneedge,closecombat,lashout||85,85,85,85,85,85|M|||82|,,,,,Fighting]Groudon||SitrusBerry|Drought|protect,stoneedge,precipiceblades,heatcrash||85,85,85,85,85,85|N|||69|,,,,,Fire"}
->player p2 {"name":"Player2","team":"Bronzong||Leftovers|Levitate|trickroom,irondefense,ironhead,bodypress||85,85,85,85,85,|N|,,,,,0||87|,,,,,Fighting]Komala||AssaultVest|Comatose|superpower,doubleedge,knockoff,rapidspin||85,85,85,85,85,85|M|||92|,,,,,Fighting]Incineroar||HeavyDutyBoots|Intimidate|partingshot,flareblitz,fakeout,knockoff||85,85,85,85,85,85|M|||78|,,,,,Water]Haxorus||LoadedDice|Unnerve|ironhead,swordsdance,scaleshot,closecombat||85,85,85,85,85,85|F|||84|,,,,,Fighting]Vaporeon||Leftovers|WaterAbsorb|protect,icywind,scald,wish||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon]Zebstrika||LifeOrb|LightningRod|thunderbolt,highhorsepower,overheat,protect||85,85,85,85,85,85|M|||87|,,,,,Flying"}
->p1 move protect, move slackoff
->p2 move irondefense, move doubleedge +1
->p1 move terablast +2, move protect
->p2 move irondefense, move knockoff +2
->p1 move terablast +2, move shadowball +1
->p2 move ironhead +1, move doubleedge +1
->p1 switch 5, pass
->p1 move closecombat +2, move shadowball +2
->p2 move bodypress +2, move knockoff +2
->p2 pass, switch 3
->p1 move closecombat +1, move shadowball +2
->p2 move irondefense, move fakeout +2
->p2 switch 5, pass
->p1 move closecombat +1, move protect
->p2 move icywind, move knockoff +1
->p1 switch 6, pass
->p1 move protect, move shadowball +2
->p2 move wish, move knockoff +2
->p1 move stoneedge +1, move torchsong +1
->p2 move wish, move flareblitz +2
->p1 move stoneedge +1, move slackoff
->p2 move wish, move flareblitz +1
->p1 move precipiceblades, move torchsong +2
->p2 move icywind, move fakeout +1
->p2 pass, switch 4
->p1 move precipiceblades, move torchsong +2
->p2 move icywind, move swordsdance
->p1 switch 3, pass
->p1 move knockoff +2, move protect
->p2 move scald +1, move scaleshot +1
->p1 switch 4, pass
->p1 move earthpower +1, move protect
->p2 move icywind, move swordsdance
->p1 move protect, move protect
->p2 move icywind, move swordsdance
->p1 move psychic +1, move protect
->p2 move protect, move closecombat +1
->p1 pass, move torchsong +2
->p2 move icywind, move swordsdance
+>player p1 {"name":"Player1","team":"Malamar||SitrusBerry|Contrary|trickroom,protect,knockoff,superpower||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Duraludon||Eviolite|Stalwart|bodypress,snarl,irondefense,flashcannon||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fighting]Delibird||ChoiceBand|Hustle|icespinner,iceshard,bravebird,drillrun||85,85,85,85,85,85|M||||,,,,,Ice]Typhlosion||ChoiceScarf|FlashFire|heatwave,eruption,fireblast,scorchingsands||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Pyroar||LifeOrb|Unnerve|fireblast,hypervoice,willowisp,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Water]Great Tusk||AssaultVest|Protosynthesis|icespinner,knockoff,closecombat,headlongrush||85,85,85,85,85,85|N|||81|,,,,,Ground"}
+>player p2 {"name":"Player2","team":"Grumpig||LifeOrb|ThickFat|nastyplot,psychic,earthpower,dazzlinggleam||85,,85,85,85,85|F|,0,,,,||91|,,,,,Ground]Mismagius||LifeOrb|Levitate|protect,thunderbolt,taunt,shadowball||85,,85,85,85,85|F|,0,,,,||88|,,,,,Electric]Gogoat||AssaultVest|SapSipper|hornleech,leafstorm,doubleedge,highhorsepower||85,85,85,85,85,85|F|||90|,,,,,Ground]Toxicroak||FocusSash|DrySkin|closecombat,protect,fakeout,gunkshot||85,85,85,85,85,85|M|||85|,,,,,Dark]Tatsugiri||ChoiceSpecs|StormDrain|hydropump,muddywater,icywind,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon]Kyurem||LoadedDice|Pressure|earthpower,scaleshot,iciclespear,protect||85,85,85,85,85,85|N|||77|,,,,,Steel"}
+>p1 move protect, move irondefense
+>p2 move psychic +1, move taunt +1
+>p1 move knockoff +2, move flashcannon +1
+>p2 move dazzlinggleam, move thunderbolt +1
 >p2 pass, switch 6
->p1 pass, move protect
->p2 move scald +1, move protect
->p1 pass, move protect
->p2 move protect, move overheat +2
->p1 pass, move torchsong +2
->p2 move icywind, move thunderbolt +2
+>p1 move knockoff +2, move snarl
+>p2 move earthpower +1, move iciclespear +1
+>p1 switch 5, pass
+>p1 move fireblast +2, move irondefense
+>p2 move earthpower +1, move iciclespear +2
+>p1 move willowisp +1, move snarl
+>p2 move nastyplot, move protect
+>p2 switch 4, pass
+>p1 move hypervoice, move flashcannon +2
+>p2 move fakeout +1, move scaleshot +1
+>p1 switch 6, pass
+>p2 pass, switch 5
+>p1 move closecombat +2, move bodypress +1
+>p2 move gunkshot +2, move icywind
+>p1 move icespinner +1, move snarl
+>p2 move closecombat +2, move icywind
+>p1 pass, switch 4
+>p1 move icespinner +1, move fireblast +2
+>p2 move protect, move icywind
+>p1 switch 3, pass
+>p1 move drillrun +2, move fireblast +1
+>p2 move closecombat +2, move icywind
+>p2 switch 3, pass
+>p1 move drillrun +1, move fireblast +1
+>p2 move hornleech +2, pass
+>p1 move drillrun +2, move fireblast +1
+>p2 move doubleedge +2, pass
+>p1 move drillrun +2, move fireblast +2
+>p2 move doubleedge +2, pass

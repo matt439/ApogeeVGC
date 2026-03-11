@@ -65,6 +65,7 @@ public enum ConditionId
     HealingWish,
     HealReplacement,
     HelpingHand,
+    HighJumpKick,
     Imprison,
     Ingrain,
     LeechSeed,

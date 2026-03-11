@@ -1,38 +1,27 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"29,54,79,128"}
->player p1 {"name":"Player1","team":"Krookodile||ChoiceScarf|Intimidate|gunkshot,highhorsepower,rockslide,knockoff||85,85,85,85,85,85|M|||80|,,,,,Ground]Shiftry||FocusSash|WindRider|fakeout,tailwind,leafblade,knockoff||85,85,85,85,85,85|M|||84|,,,,,Ghost]Blaziken||LifeOrb|SpeedBoost|heatwave,vacuumwave,protect,closecombat||85,85,85,85,85,85|M|||79|,,,,,Fighting]Zekrom||ClearAmulet|Teravolt|protect,boltstrike,dragondance,dragonclaw||85,85,85,85,85,85|N|||74|,,,,,Grass]Carbink||Leftovers|ClearBody|moonblast,bodypress,trickroom,irondefense||85,,85,85,85,|N|,0,,,,0||88|,,,,,Fighting]Milotic||SitrusBerry|Competitive|icywind,recover,scald,protect||85,,85,85,85,85|F|,0,,,,||81|,,,,,Grass"}
->player p2 {"name":"Player2","team":"Maushold||WideLens|Technician|followme,populationbomb,encore,protect||85,85,85,85,85,85|N|||79|,,,,,Ghost]Golurk||AssaultVest|NoGuard|stoneedge,dynamicpunch,poltergeist,highhorsepower||85,85,85,85,85,85|N|||86|,,,,,Fighting]Avalugg||Leftovers|Sturdy|protect,recover,avalanche,bodypress||85,85,85,85,85,85|F|||92|,,,,,Water]Kilowattrel||FocusSash|Competitive|tailwind,hurricane,thunderbolt,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Flying]Magearna||AssaultVest|SoulHeart|flashcannon,aurasphere,fleurcannon,dazzlinggleam||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Manaphy||SitrusBerry|Hydration|protect,tailglow,scald,energyball||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass"}
->p1 move gunkshot +2, move knockoff +2
->p2 move populationbomb +2, move dynamicpunch +1
->p1 move gunkshot +1, move knockoff +1
->p2 move populationbomb +1, move poltergeist +1
+>player p1 {"name":"Player1","team":"Cacturne||LifeOrb|WaterAbsorb|knockoff,spikyshield,suckerpunch,leafstorm||85,85,85,85,85,85|M|||91|,,,,,Poison]Cetitan||LifeOrb|SheerForce|liquidation,highhorsepower,iceshard,iciclecrash||85,85,85,85,85,85|M|||83|,,,,,Water]Hitmonlee||WhiteHerb|Unburden|fakeout,closecombat,protect,poisonjab||85,85,85,85,85,85|M|||86|,,,,,Poison]Amoonguss||RockyHelmet|Regenerator|ragepowder,pollenpuff,spore,sludgebomb||85,,85,85,85,85|F|,0,,,,||86|,,,,,Water]Sandy Shocks||LifeOrb|Protosynthesis|voltswitch,protect,earthpower,thunderbolt||85,,85,85,85,85|N|,0,,,,||79|,,,,,Electric]Inteleon||ChoiceSpecs|Torrent|muddywater,hydropump,scald,icebeam||85,,85,85,85,85|M|,0,,,,||78|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Great Tusk||AssaultVest|Protosynthesis|headlongrush,icespinner,closecombat,rockslide||85,85,85,85,85,85|N|||81|,,,,,Fire]Leafeon||LifeOrb|Chlorophyll|leafblade,synthesis,swordsdance,doubleedge||85,85,85,85,85,85|M|||90|,,,,,Normal]Eelektross||AssaultVest|Levitate|electroweb,knockoff,gigadrain,thunderbolt||85,85,85,85,85,85|F|||86|,,,,,Electric]Hawlucha||WhiteHerb|Unburden|protect,closecombat,bravebird,swordsdance||85,85,85,85,85,85|M|||84|,,,,,Flying]Calyrex|CalyrexIce|WeaknessPolicy|AsOneGlastrier|highhorsepower,protect,glaciallance,trickroom||85,85,85,85,85,|N|,,,,,0||65|,,,,,Ice]Rampardos||ChoiceScarf|SheerForce|headsmash,firepunch,rockslide,stompingtantrum||85,85,85,85,85,85|F|||87|,,,,,Rock"}
+>p1 move knockoff +2, move liquidation +2
+>p2 move rockslide, move swordsdance
+>p1 move knockoff +1, move iciclecrash +2
+>p2 move icespinner +1, move doubleedge +2
+>p1 switch 4, pass
+>p2 pass, switch 6
+>p1 move spore +1, move highhorsepower +1
+>p2 move rockslide, move headsmash +2
+>p1 pass, switch 6
+>p1 move pollenpuff +2, move icebeam +1
+>p2 move headlongrush +2, move headsmash +1
 >p1 switch 3, pass
->p2 switch 4, pass
->p1 move vacuumwave +2, move leafblade +1
->p2 move protect, move stoneedge +1
->p1 move closecombat +1, move fakeout +2
->p2 move hurricane +2, move dynamicpunch +2
->p1 pass, switch 4
->p1 move vacuumwave +1, move protect
->p2 move thunderbolt +1, move highhorsepower +1
->p1 switch 6, pass
->p1 move recover, move dragondance
->p2 move hurricane +2, move poltergeist +1
->p1 move icywind, move dragondance
->p2 move protect, move stoneedge +1
->p2 pass, switch 5
->p1 move scald +2, move protect
->p2 move protect, move aurasphere +2
->p1 move protect, move dragondance
->p2 move thunderbolt +2, move aurasphere +2
->p1 move icywind, move boltstrike +1
->p2 move tailwind, move aurasphere +1
->p2 switch 6, pass
->p1 move icywind, move dragondance
->p2 move energyball +1, move flashcannon +2
->p1 pass, switch 5
->p1 move protect, move trickroom
->p2 move tailglow, move flashcannon +2
->p1 move protect, pass
->p2 move energyball +2, move fleurcannon +2
->p1 move scald +2, pass
->p2 move energyball +2, move fleurcannon +2
+>p2 switch 5, pass
+>p1 move closecombat +2, move icebeam +2
+>p2 move protect, move headsmash +2
+>p2 pass, switch 4
+>p1 move poisonjab +1, move icebeam +2
+>p2 move trickroom, move bravebird +1
+>p1 switch 5, pass
+>p2 pass, switch 3
+>p1 move thunderbolt +1, move icebeam +1
+>p2 move protect, move gigadrain +1
+>p1 move thunderbolt +1, move icebeam +1
+>p2 move glaciallance, move thunderbolt +2

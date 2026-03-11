@@ -61,6 +61,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 82,
                 Color = "Green",
+                Prevo = SpecieId.Dewpider,
             },
             [SpecieId.AraquanidTotem] = new()
             {
@@ -137,6 +138,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 18.5,
                 Color = "Pink",
+                Prevo = SpecieId.Fomantis,
             },
             [SpecieId.LurantisTotem] = new()
             {
@@ -215,6 +217,7 @@ public partial record SpeciesData
                 HeightM = 1.0,
                 WeightKg = 11.5,
                 Color = "Purple",
+                Prevo = SpecieId.Morelull,
             },
             [SpecieId.Salandit] = new()
             {
@@ -265,6 +268,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 22.2,
                 Color = "Black",
+                Prevo = SpecieId.Salandit,
             },
             [SpecieId.SalazzleTotem] = new()
             {
@@ -343,6 +347,7 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 135,
                 Color = "Pink",
+                Prevo = SpecieId.Stufful,
             },
             [SpecieId.Bounsweet] = new()
             {
@@ -395,6 +400,7 @@ public partial record SpeciesData
                 HeightM = 0.7,
                 WeightKg = 8.2,
                 Color = "Purple",
+                Prevo = SpecieId.Bounsweet,
             },
             [SpecieId.Tsareena] = new()
             {
@@ -421,6 +427,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 21.4,
                 Color = "Purple",
+                Prevo = SpecieId.Steenee,
             },
             [SpecieId.Comfey] = new()
             {
@@ -546,6 +553,7 @@ public partial record SpeciesData
                 HeightM = 2.0,
                 WeightKg = 108,
                 Color = "Gray",
+                Prevo = SpecieId.Wimpod,
             },
             [SpecieId.Sandygast] = new()
             {
@@ -596,6 +604,7 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 250,
                 Color = "Brown",
+                Prevo = SpecieId.Sandygast,
             },
             [SpecieId.Pyukumuku] = new()
             {
@@ -669,6 +678,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 100.5,
                 Color = "Gray",
+                Prevo = SpecieId.TypeNull,
             },
             [SpecieId.SilvallyBug] = new()
             {
@@ -1561,6 +1571,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 47,
                 Color = "Gray",
+                Prevo = SpecieId.Jangmoo,
             },
             [SpecieId.Kommoo] = new()
             {
@@ -1587,6 +1598,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 78.2,
                 Color = "Gray",
+                Prevo = SpecieId.Hakamoo,
             },
             [SpecieId.KommooTotem] = new()
             {
@@ -1761,6 +1773,7 @@ public partial record SpeciesData
                 HeightM = 0.1,
                 WeightKg = 999.9,
                 Color = "Blue",
+                Prevo = SpecieId.Cosmog,
             },
             [SpecieId.Solgaleo] = new()
             {
@@ -1785,6 +1798,7 @@ public partial record SpeciesData
                 HeightM = 3.4,
                 WeightKg = 230,
                 Color = "White",
+                Prevo = SpecieId.Cosmoem,
             },
             [SpecieId.Lunala] = new()
             {
@@ -1809,6 +1823,7 @@ public partial record SpeciesData
                 HeightM = 4,
                 WeightKg = 120,
                 Color = "Purple",
+                Prevo = SpecieId.Cosmoem,
             },
             [SpecieId.Nihilego] = new()
             {

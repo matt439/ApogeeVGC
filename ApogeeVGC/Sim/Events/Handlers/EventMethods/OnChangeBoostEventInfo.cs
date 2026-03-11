@@ -42,7 +42,8 @@ public sealed record OnChangeBoostEventInfo : EventHandlerInfo
                 context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
-                return null;
+                // Return the modified relay var so boost changes (e.g. Contrary inversion) are seen by caller
+                return context.GetRelayVar<SparseBoostsTableRelayVar>();
             },
             priority,
             usesSpeed

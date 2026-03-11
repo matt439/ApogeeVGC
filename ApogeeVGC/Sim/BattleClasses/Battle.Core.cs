@@ -309,6 +309,13 @@ public partial class Battle
 
         Format = options.Format ?? Library.Formats[options.Id];
         RuleTable = Format.RuleTable ?? new RuleTable();
+
+        // Populate RuleTable from Format.Ruleset so Has(RuleId) works for random formats
+        // (which define rules in Ruleset but don't create an explicit RuleTable)
+        foreach (var ruleId in Format.Ruleset)
+        {
+            RuleTable.TryAdd(ruleId, new Rule());
+        }
         DebugMode = options.Debug;
         DisplayUi = options.DisplayUi ?? !options.Sync;
         FormatData = InitEffectState(Format.FormatId);

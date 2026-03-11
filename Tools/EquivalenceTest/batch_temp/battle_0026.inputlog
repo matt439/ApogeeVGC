@@ -1,44 +1,53 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"183,340,497,810"}
->player p1 {"name":"Player1","team":"Volcarona||HeavyDutyBoots|FlameBody|bugbuzz,protect,heatwave,quiverdance||85,,85,85,85,85|F|,0,,,,||78|,,,,,Fire]Excadrill||LifeOrb|MoldBreaker|highhorsepower,protect,swordsdance,ironhead||85,85,85,85,85,85|F|||82|,,,,,Water]Iron Bundle||FocusSash|QuarkDrive|protect,freezedry,hydropump,encore||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dragon]Plusle||LifeOrb|LightningRod|nastyplot,alluringvoice,thunderbolt,protect||85,,85,85,85,85|M|,0,,,,||92|,,,,,Flying]Calyrex||SitrusBerry|Unnerve|psychic,leechseed,leafstorm,pollenpuff||85,,85,85,85,85|N|,0,,,,||94|,,,,,Steel]Wugtrio||ChoiceBand|Gooey|throatchop,aquajet,stompingtantrum,liquidation||85,85,85,85,85,85|F|||92|,,,,,Ground"}
->player p2 {"name":"Player2","team":"Rabsca||SitrusBerry|Synchronize|trickroom,psychic,revivalblessing,bugbuzz||85,,85,85,85,|M|,0,,,,0||87|,,,,,Steel]Blissey||SitrusBerry|Healer|thunderwave,helpinghand,softboiled,hypervoice||85,,85,85,85,85|F|,0,,,,||96|,,,,,Fairy]Emboar||ChoiceScarf|Reckless|knockoff,headsmash,flareblitz,closecombat||85,85,85,85,85,85|M|||85|,,,,,Rock]Solgaleo||WeaknessPolicy|FullMetalBody|protect,flamecharge,sunsteelstrike,closecombat||85,85,85,85,85,85|N|||74|,,,,,Fighting]Samurott||AssaultVest|Torrent|knockoff,aquajet,icebeam,hydropump||85,85,85,85,85,85|M|||89|,,,,,Water]Greedent||SitrusBerry|CheekPouch|knockoff,highhorsepower,swordsdance,doubleedge||85,85,85,85,85,85|M|||86|,,,,,Fairy"}
->p1 move bugbuzz +1, move ironhead +1
->p2 move revivalblessing, move helpinghand -1
->p1 move quiverdance, move swordsdance
->p2 move bugbuzz +2, move hypervoice
->p1 move heatwave, move highhorsepower +1
->p2 move trickroom, move thunderwave +1
->p2 switch 3, switch 5
->p1 move quiverdance, move protect
->p2 move knockoff +1, move knockoff +1
->p1 move bugbuzz +1, move swordsdance
->p2 move knockoff +1, move aquajet +1
->p1 switch 5, pass
->p1 move pollenpuff +2, move protect
->p2 move knockoff +2, move knockoff +2
->p1 move psychic +2, move swordsdance
->p2 move knockoff +2, move knockoff +1
+>player p1 {"name":"Player1","team":"Hippowdon||Leftovers|SandStream|slackoff,stoneedge,whirlwind,highhorsepower||85,85,85,85,85,85|F|||86|,,,,,Water]Zangoose||ToxicOrb|ToxicBoost|protect,knockoff,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Ghost]Volbeat||SitrusBerry|Prankster|thunderwave,encore,tailwind,lunge||85,85,85,85,85,85|M|||82|,,,,,Water]Quagsire||SitrusBerry|WaterAbsorb|icywind,highhorsepower,helpinghand,liquidation||85,85,85,85,85,85|F|||91|,,,,,Poison]Meganium||SitrusBerry|Overgrow|energyball,encore,knockoff,healpulse||85,85,85,85,85,85|F|||91|,,,,,Steel]Baxcalibur||ChoiceBand|ThermalExchange|glaiverush,iceshard,highhorsepower,iciclecrash||85,85,85,85,85,85|F|||78|,,,,,Dragon"}
+>player p2 {"name":"Player2","team":"Krookodile||ChoiceBand|Intimidate|rockslide,knockoff,gunkshot,highhorsepower||85,85,85,85,85,85|F|||80|,,,,,Poison]Flygon||LoadedDice|Levitate|scaleshot,protect,tailwind,earthpower||85,85,85,85,85,85|F|||83|,,,,,Steel]Plusle||SitrusBerry|LightningRod|superfang,nuzzle,thunderbolt,encore||85,85,85,85,85,85|F|||92|,,,,,Flying]Mandibuzz||SitrusBerry|Overcoat|snarl,tailwind,uturn,knockoff||85,85,85,85,85,85|F|||85|,,,,,Steel]Scream Tail||SitrusBerry|Protosynthesis|stealthrock,thunderwave,playrough,helpinghand||85,85,85,85,85,85|N|||82|,,,,,Steel]Bruxish||LifeOrb|StrongJaw|psychicfangs,wavecrash,protect,crunch||85,85,85,85,85,85|F|||86|,,,,,Dark"}
+>p1 move stoneedge +1, move facade +2
+>p2 move highhorsepower +2, move earthpower +1
+>p1 move slackoff, move feint +2
+>p2 move highhorsepower +1, move scaleshot +1
+>p1 move highhorsepower +1, move protect
+>p2 move highhorsepower +1, move protect
+>p1 pass, switch 3
+>p1 move whirlwind +2, move encore +2
+>p2 move highhorsepower +1, move scaleshot +1
+>p1 move stoneedge +2, move tailwind
+>p2 move highhorsepower +1, move psychicfangs +1
+>p1 switch 4, pass
+>p1 move helpinghand -2, move thunderwave +2
+>p2 move highhorsepower +2, move crunch +1
+>p1 move helpinghand -2, move encore +2
+>p2 move highhorsepower +2, move crunch +2
 >p1 pass, switch 6
->p1 move psychic +2, move aquajet +2
->p2 move knockoff +2, move aquajet +2
->p1 move leafstorm +1, move aquajet +1
->p2 move knockoff +2, move knockoff +1
->p1 pass, switch 4
->p2 pass, switch 4
->p1 move psychic +2, move thunderbolt +2
->p2 move knockoff +2, move flamecharge +2
->p1 move leafstorm +1, move thunderbolt +2
->p2 move knockoff +1, move sunsteelstrike +1
->p1 switch 3, pass
->p1 move hydropump +1, move alluringvoice +2
->p2 move knockoff +2, move flamecharge +1
+>p1 move helpinghand -2, move iceshard +1
+>p2 move highhorsepower +2, move crunch +2
+>p2 switch 3, pass
+>p1 move icywind, move iceshard +1
+>p2 move encore +1, move crunch +2
+>p2 pass, switch 5
+>p1 move helpinghand -2, move iceshard +1
+>p2 move superfang +2, move stealthrock
 >p2 switch 6, pass
->p1 move encore +1, move alluringvoice +2
->p2 move knockoff +1, move protect
->p1 move freezedry +1, move thunderbolt +1
->p2 move highhorsepower +1, move flamecharge +1
->p1 move protect, move thunderbolt +1
->p2 move highhorsepower +2, pass
->p1 move encore +2, pass
->p2 move swordsdance, pass
->p1 move encore +1, pass
->p2 move highhorsepower +2, pass
+>p1 move helpinghand -2, move iceshard +2
+>p2 move earthpower +1, move thunderwave +1
+>p1 move helpinghand -2, move iceshard +2
+>p2 move scaleshot +2, move playrough +1
+>p1 pass, switch 5
+>p1 move liquidation +2, move healpulse +1
+>p2 move protect, move helpinghand -1
+>p1 move highhorsepower +2, move encore +2
+>p2 move scaleshot +1, move stealthrock
+>p1 move highhorsepower +1, move encore +1
+>p2 move protect, move stealthrock
+>p1 move liquidation +2, move energyball +2
+>p2 move tailwind, move stealthrock
+>p2 pass, switch 4
+>p1 move liquidation +2, move energyball +1
+>p2 move tailwind, move tailwind
+>p1 move icywind, move energyball +1
+>p2 pass, move uturn +2
+>p1 move helpinghand -2, move knockoff +1
+>p2 pass, move tailwind
+>p1 move liquidation +2, move knockoff +2
+>p2 pass, move tailwind
+>p1 move helpinghand -2, move knockoff +1
+>p2 pass, move snarl

@@ -35,7 +35,9 @@ public abstract record BoolIntUndefinedUnion
 public record BoolBoolIntUndefinedUnion(bool Value) : BoolIntUndefinedUnion
 {
     public override bool IsTruthy() => Value;
-    public override bool IsZero() => !Value;
+    // In JS, false !== 0 is true — a boolean false is NOT the integer 0.
+    // This must return false so that the Showdown pattern `!x && x !== 0` works correctly.
+    public override bool IsZero() => false;
     public override int ToInt() => Value ? 1 : 0;
 }
 

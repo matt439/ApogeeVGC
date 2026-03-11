@@ -155,15 +155,6 @@ public partial class Battle
             }
         }
 
-        // Safety net: if any side has no Pokemon left, always check for a winner
-        // regardless of the checkWin parameter. This guards against callers that pass
-        // checkWin=false based only on the attacker's HP, missing target-side faints
-        // (e.g., HitStepMoveHitLoop passing checkWin = attacker.Hp <= 0).
-        if (!checkWin && Sides.Any(side => side.PokemonLeft <= 0))
-        {
-            checkWin = true;
-        }
-
         // Check for battle end
         if (checkWin && CheckWin(faintData) == true)
         {

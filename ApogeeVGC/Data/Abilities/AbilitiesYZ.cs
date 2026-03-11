@@ -40,7 +40,7 @@ public partial record Abilities
                 OnResidual = OnResidualEventInfo.Create((_, pokemon, _, _) =>
                 {
                     // Only works for Darmanitan that hasn't transformed
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Darmanitan ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Darmanitan ||
                         pokemon.Transformed)
                     {
                         return;

@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -57,7 +58,20 @@ public partial class Pokemon
                         );
                     }
 
-                    Battle.Add("-fail", this, Battle.Library.Conditions[Status]);
+                    // Use the status ID string directly: psn for Poison, tox for Toxic
+                    // (GetProtocolEffectName maps both to "psn" for [from] tags,
+                    // but -fail messages need the actual status ID)
+                    string statusStr = Status switch
+                    {
+                        ConditionId.Burn => "brn",
+                        ConditionId.Paralysis => "par",
+                        ConditionId.Poison => "psn",
+                        ConditionId.Toxic => "tox",
+                        ConditionId.Sleep => "slp",
+                        ConditionId.Freeze => "frz",
+                        _ => Battle.Library.Conditions[Status].Name,
+                    };
+                    Battle.Add("-fail", this, statusStr);
                 }
             }
             else if (sourceEffect is ActiveMove { Status: not null })
@@ -102,6 +116,31 @@ public partial class Pokemon
         // Store previous status for potential rollback
         ConditionId prevStatus = Status;
         EffectState prevStatusState = StatusState;
+
+        // Sleep Clause Mod: prevent putting multiple Pokemon on the same side to sleep
+        if (Battle.RuleTable.Has(RuleId.SleepClauseMod) && status.Id == ConditionId.Sleep)
+        {
+            // Skip clause for self-inflicted sleep (e.g., Rest)
+            if (source == null || !source.IsAlly(this))
+            {
+                foreach (Pokemon pokemon in Side.Pokemon)
+                {
+                    if (pokemon.Hp > 0 && pokemon.Status == ConditionId.Sleep)
+                    {
+                        // Only count sleep from enemies (not self-induced via Rest)
+                        if (pokemon.StatusState.Source == null || !pokemon.StatusState.Source.IsAlly(pokemon))
+                        {
+                            if (Battle.DisplayUi)
+                            {
+                                Battle.Add("-message", "Sleep Clause Mod activated.");
+                                Battle.Hint("Sleep Clause Mod prevents players from putting more than one of their opponent's Pok\u00e9mon to sleep at a time");
+                            }
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
 
         // Run SetStatus event
         if (status.Id != ConditionId.None)
@@ -229,10 +268,19 @@ public partial class Pokemon
         if (Hp <= 0 || Status == ConditionId.None) return false;
 
         // Add cure status message to battle log
+        // Toxic uses "tox" in protocol for -curestatus (not "psn" like residual damage)
         if (Battle.DisplayUi)
         {
-            Battle.Add("-curestatus", this, Battle.Library.Conditions[Status],
-                silent ? "[silent]" : "[msg]");
+            if (Status == ConditionId.Toxic)
+            {
+                Battle.Add("-curestatus", this, "tox",
+                    silent ? "[silent]" : "[msg]");
+            }
+            else
+            {
+                Battle.Add("-curestatus", this, Battle.Library.Conditions[Status],
+                    silent ? "[silent]" : "[msg]");
+            }
         }
 
         // Clear the status (equivalent to setStatus(''))

@@ -23,7 +23,7 @@ public partial class Battle
         {
             string ruleString = rule.ToString();
             if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
-            Format subFormat = Library.Rulesets[rule];
+            if (!Library.Rulesets.TryGetValue(rule, out Format? subFormat)) continue;
             Debug($"[RunPickTeam] Calling subFormat.OnTeamPreview for {rule}");
             subFormat.OnTeamPreview?.Invoke(this);
         }

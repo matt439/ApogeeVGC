@@ -1,28 +1,36 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"309,574,839,1368"}
->player p1 {"name":"Player1","team":"Ting-Lu||SitrusBerry|VesselofRuin|stompingtantrum,spikes,whirlwind,throatchop||85,85,85,85,85,85|N|||82|,,,,,Poison]Gouging Fire||ClearAmulet|Protosynthesis|burningbulwark,dragonclaw,dragondance,heatcrash||85,85,85,85,85,85|N|||75|,,,,,Fire]Alcremie|AlcremieLemonCream|SitrusBerry|AromaVeil|protect,encore,decorate,dazzlinggleam||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel]Rotom|RotomMow|SitrusBerry|Levitate|thunderbolt,voltswitch,protect,leafstorm||85,,85,85,85,85|N|,0,,,,||86|,,,,,Electric]Mienshao||AssaultVest|Regenerator|closecombat,uturn,fakeout,knockoff||85,85,85,85,85,85|M|||84|,,,,,Steel]Pikachu|PikachuAlola|LightBall|LightningRod|fakeout,encore,knockoff,volttackle||85,85,85,85,85,85|M|||94|,,,,,Grass"}
->player p2 {"name":"Player2","team":"Hoopa|HoopaUnbound|ChoiceScarf|Magician|hyperspacefury,trick,drainpunch,zenheadbutt||85,85,85,85,85,85|N|||80|,,,,,Dark]Iron Thorns||ClearAmulet|QuarkDrive|wildcharge,dragondance,rockslide,icepunch||85,85,85,85,85,85|N|||82|,,,,,Grass]Grumpig||LifeOrb|ThickFat|nastyplot,dazzlinggleam,psychic,protect||85,,85,85,85,85|M|,0,,,,||91|,,,,,Fairy]Snorlax||ChoiceBand|ThickFat|doubleedge,crunch,highhorsepower,hammerarm||85,85,85,85,85,85|F|||84|,,,,,Ghost]Dipplin||Eviolite|StickyHold|recover,pollenpuff,dragonpulse,syrupbomb||85,,85,85,85,85|M|,0,,,,||92|,,,,,Steel]Illumise||SitrusBerry|Prankster|encore,bugbuzz,thunderwave,tailwind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Water"}
->p1 move throatchop +2, move heatcrash +2
->p2 move drainpunch +1, move icepunch +1
->p1 move stompingtantrum +1, move dragonclaw +2
->p2 move drainpunch +1, move rockslide
->p1 move whirlwind +1, move heatcrash +1
->p2 move drainpunch +1, move rockslide
->p1 switch 5, pass
->p1 move closecombat +2, move dragonclaw +1
->p2 move drainpunch +2, move wildcharge +1
->p2 pass, switch 4
->p1 move fakeout +1, move dragondance
->p2 move drainpunch +1, move doubleedge +1
->p1 switch 3, pass
->p1 move dazzlinggleam, move dragondance
->p2 move drainpunch +1, move doubleedge +1
->p1 move encore +2, move dragondance
->p2 move drainpunch +2, move doubleedge +2
->p1 pass, switch 6
->p1 move decorate +2, move encore +2
->p2 move drainpunch +1, move doubleedge +1
+>player p1 {"name":"Player1","team":"Eternatus||SitrusBerry|Pressure|sludgebomb,dynamaxcannon,fireblast,toxicspikes||85,,85,85,85,85|N|,0,,,,||70|,,,,,Dragon]Klawf||LifeOrb|Regenerator|rockslide,highhorsepower,crabhammer,protect||85,85,85,85,85,85|M|||91|,,,,,Ground]Kleavor||LifeOrb|Sharpness|closecombat,xscissor,protect,stoneaxe||85,85,85,85,85,85|F|||79|,,,,,Fighting]Duraludon||Eviolite|Stalwart|irondefense,dracometeor,bodypress,flashcannon||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fighting]Ribombee||LifeOrb|ShieldDust|quiverdance,moonblast,terablast,protect||85,,85,85,85,85|F|,0,,,,||86|,,,,,Ground]Mudsdale||AssaultVest|Stamina|bodypress,highhorsepower,stoneedge,heavyslam||85,85,85,85,85,85|F|||84|,,,,,Fighting"}
+>player p2 {"name":"Player2","team":"Kyogre||ChoiceScarf|Drizzle|thunder,waterspout,originpulse,icebeam||85,,85,85,85,85|N|,0,,,,||65|,,,,,Water]Porygon-Z||ChoiceSpecs|Adaptability|triattack,shadowball,trick,swift||85,,85,85,85,85|N|,0,,,,||84|,,,,,Ghost]Decidueye|DecidueyeHisui|SitrusBerry|Scrappy|leafblade,protect,tailwind,triplearrows||85,85,85,85,85,85|M|||85|,,,,,Dark]Great Tusk||AssaultVest|Protosynthesis|closecombat,rockslide,icespinner,headlongrush||85,85,85,85,85,85|N|||81|,,,,,Fire]Entei||ChoiceBand|InnerFocus|extremespeed,sacredfire,flareblitz,stompingtantrum||85,85,85,85,85,85|N|||77|,,,,,Normal]Grumpig||LifeOrb|ThickFat|earthpower,psychic,dazzlinggleam,nastyplot||85,,85,85,85,85|M|,0,,,,||91|,,,,,Ground"}
+>p1 move toxicspikes, move protect
+>p2 move thunder +2, move trick +1
+>p1 move sludgebomb +1, move highhorsepower +2
+>p2 move thunder +2, move trick +1
+>p1 move fireblast +1, move protect
+>p2 move thunder +1, move trick +2
+>p1 move sludgebomb +2, move protect
+>p2 move thunder +1, move trick +2
+>p1 move dynamaxcannon +1, move rockslide
+>p2 move thunder +1, move trick +2
+>p1 move toxicspikes, move highhorsepower +1
+>p2 move thunder +1, move triattack +1
 >p1 switch 4, pass
->p1 move protect, move encore +1
->p2 move drainpunch +2, move doubleedge +2
->p1 move thunderbolt +1, pass
->p2 move drainpunch +2, move doubleedge +2
+>p1 move bodypress +2, move rockslide
+>p2 move thunder +2, move triattack +2
+>p2 switch 4, switch 5
+>p1 move dracometeor +2, move rockslide
+>p2 move icespinner +1, move stompingtantrum +1
+>p1 pass, switch 6
+>p2 pass, switch 3
+>p1 move irondefense, move heavyslam +1
+>p2 move icespinner +2, move tailwind
+>p1 move irondefense, move bodypress +2
+>p2 move rockslide, move protect
+>p1 move bodypress +2, move bodypress +1
+>p2 move closecombat +2, move leafblade +1
+>p2 switch 6, pass
+>p1 move irondefense, move stoneedge +1
+>p2 move nastyplot, move protect
+>p1 move dracometeor +1, move heavyslam +2
+>p2 move nastyplot, move leafblade +1
+>p1 move flashcannon +2, move bodypress +2
+>p2 move nastyplot, pass

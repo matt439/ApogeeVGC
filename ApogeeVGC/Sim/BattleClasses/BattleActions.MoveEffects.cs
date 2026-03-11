@@ -27,8 +27,9 @@ public partial class BattleActions
             BoolIntUndefinedUnion didSomething = BoolIntUndefinedUnion.FromUndefined();
 
             // Apply boosts
-            // Check both moveData.HitEffect?.Boosts and move.HitEffect?.Boosts (for secondary effects)
-            SparseBoostsTable? boostsToApply = moveData.HitEffect?.Boosts ?? (move.HitEffect as HitEffect)?.Boosts;
+            // Check moveData.Boosts directly (inherited from HitEffect base class),
+            // then fall back to the separate HitEffect property (used for secondary effects)
+            SparseBoostsTable? boostsToApply = moveData.Boosts ?? moveData.HitEffect?.Boosts ?? move.Boosts;
             if (boostsToApply != null && !target.Fainted)
             {
                 BoolZeroUnion? boostResult = Battle.Boost(boostsToApply, target, source, move, isSecondary, isSelf);
@@ -43,7 +44,9 @@ public partial class BattleActions
             }
 
             // Apply healing
-            if (moveData.Heal != null && !target.Fainted)
+            // Showdown: moveData is hitEffect (SecondaryEffect) for self/secondary calls, which has no Heal.
+            // In C# moveData is always the move, so skip heal for isSelf to match Showdown behavior.
+            if (moveData.Heal != null && !isSelf && !target.Fainted)
             {
                 if (target.Hp >= target.MaxHp)
                 {
@@ -57,8 +60,10 @@ public partial class BattleActions
                     continue;
                 }
 
-                int amount = target.BaseMaxHp * moveData.Heal[0] / moveData.Heal[1];
-                int roundedAmount = Battle.Gen < 5 ? (int)Math.Floor((double)amount) : (int)Math.Round((double)amount);
+                // Use float division to match Showdown (JS number arithmetic)
+                // JS Math.round uses "round half up", C# Math.Round uses "round half to even"
+                double amount = (double)(target.BaseMaxHp * moveData.Heal[0]) / moveData.Heal[1];
+                int roundedAmount = Battle.Gen < 5 ? (int)Math.Floor(amount) : (int)Math.Round(amount, MidpointRounding.AwayFromZero);
 
                 IntFalseUnion? healResult = Battle.Heal(roundedAmount, target, source,
                     BattleHealEffect.FromIEffect(move));
@@ -102,7 +107,8 @@ public partial class BattleActions
             }
 
             // Force status (bypasses immunity)
-            if (moveData.ForceStatus != null)
+            // ForceStatus is a Move-level property, not on HitEffect — skip for isSelf
+            if (moveData.ForceStatus != null && !isSelf)
             {
                 bool forceStatusResult = target.SetStatus(moveData.ForceStatus.Value, source, move);
                 hitResult = BoolIntUndefinedUnion.FromBool(forceStatusResult);
@@ -140,10 +146,11 @@ public partial class BattleActions
             }
 
             // Apply slot condition
-            if (moveData.HitEffect?.SlotCondition != null)
+            ConditionId? slotCondToApply = moveData.SlotCondition ?? moveData.HitEffect?.SlotCondition;
+            if (slotCondToApply != null)
             {
                 bool slotCondResult = target.Side.AddSlotCondition(target,
-                    Library.Conditions[moveData.HitEffect.SlotCondition.Value], source, move);
+                    Library.Conditions[slotCondToApply.Value], source, move);
                 hitResult = BoolIntUndefinedUnion.FromBool(slotCondResult);
                 didSomething = CombineResults(didSomething, hitResult);
             }
@@ -158,10 +165,11 @@ public partial class BattleActions
             }
 
             // Set terrain
-            if (moveData.HitEffect?.Terrain != null)
+            ConditionId? terrainToApply = moveData.Terrain ?? moveData.HitEffect?.Terrain;
+            if (terrainToApply != null)
             {
                 bool terrainResult = Battle.Field.SetTerrain(
-                    Library.Conditions[moveData.HitEffect.Terrain.Value], source, move);
+                    Library.Conditions[terrainToApply.Value], source, move);
                 hitResult = BoolIntUndefinedUnion.FromBool(terrainResult);
                 didSomething = CombineResults(didSomething, hitResult);
             }
@@ -219,8 +227,31 @@ public partial class BattleActions
             }
             else
             {
-                if (moveData.OnHit != null)
+                // In Showdown, moveData is the secondary/self object when processing those,
+                // so moveData.onHit refers to the secondary/self's handler. In C#, moveData
+                // is always the move itself, so for secondary/self we check move.HitEffect
+                // for the raw delegate, and skip the move's primary OnHit handler.
+                if (isSecondary || isSelf)
                 {
+                    // For secondary/self: invoke the hitEffect's OnHit delegate (if any)
+                    var hitEffectOnHit = (move.HitEffect as HitEffect)?.OnHit;
+                    if (hitEffectOnHit != null)
+                    {
+                        var result = hitEffectOnHit(Battle, target, source, move);
+                        hitResult = result switch
+                        {
+                            BoolBoolEmptyVoidUnion b => BoolIntUndefinedUnion.FromBool(b.Value),
+                            EmptyBoolEmptyVoidUnion => null,
+                            VoidUnionBoolEmptyVoidUnion => BoolIntUndefinedUnion.FromUndefined(),
+                            null => BoolIntUndefinedUnion.FromUndefined(),
+                            _ => BoolIntUndefinedUnion.FromUndefined(),
+                        };
+                        didSomething = CombineResults(didSomething, hitResult);
+                    }
+                }
+                else if (moveData.OnHit != null)
+                {
+                    // Primary hit: invoke the move's OnHit through the event system
                     RelayVar? hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
                         target, source, move);
                     hitResult = hitEventResult switch
@@ -313,6 +344,15 @@ public partial class BattleActions
             {
                 if (Battle.DebugMode) Battle.Debug($"[SelfDrops] Processing self effect for {source.Name}");
 
+                // Showdown: if (!move.multihit) move.selfDropped = true;
+                // Set BEFORE MoveHit to prevent re-entry via recursive SpreadMoveHit→SelfDrops.
+                // In Showdown, re-entry is prevented because inner spreadMoveHit uses moveData=SecondaryEffect
+                // (which has no .self). In C# we always pass move, so we must guard via selfDropped.
+                if (move.MultiHit == null)
+                {
+                    move.SelfDropped = true;
+                }
+
                 if (!isSecondary && moveData.Self.Boosts != null)
                 {
                     int secondaryRoll = Battle.Random(100);
@@ -323,17 +363,42 @@ public partial class BattleActions
                         // isSelf=true prevents damage calculation (matching TypeScript behavior)
                         MoveHit(source, source, move, moveData.Self, isSecondary, true);
                     }
-
-                    if (move.MultiHit == null)
-                    {
-                        move.SelfDropped = true;
-                    }
                 }
                 else
                 {
                     // isSelf=true prevents damage calculation (matching TypeScript behavior)
                     MoveHit(source, source, move, moveData.Self, isSecondary, true);
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Processes the Self effect from a secondary effect (e.g., Rapid Spin's speed boost).
+    /// In Showdown, moveData.self is checked when moveData is the secondary effect object.
+    /// </summary>
+    public void SelfDropsFromHitEffect(SpreadMoveTargets targets, Pokemon source, ActiveMove move,
+        HitEffect self, bool isSecondary = false)
+    {
+        foreach (PokemonFalseUnion targetUnion in targets)
+        {
+            if (targetUnion is not PokemonPokemonUnion) continue;
+
+            if (move.SelfDropped == true) break;
+
+            if (!isSecondary && self.Boosts != null)
+            {
+                int secondaryRoll = Battle.Random(100);
+                var selfAsSecondary = self as SecondaryEffect;
+                if (selfAsSecondary?.Chance == null || secondaryRoll < selfAsSecondary.Chance)
+                {
+                    MoveHit(source, source, move, self, isSecondary, true);
+                }
+                if (move.MultiHit == null) move.SelfDropped = true;
+            }
+            else
+            {
+                MoveHit(source, source, move, self, isSecondary, true);
             }
         }
     }
@@ -434,6 +499,11 @@ public partial class BattleActions
                         // false on non-status move = prevent silently
                         break;
                 }
+            }
+            else if (target.Hp > 0 && source.Hp > 0)
+            {
+                // CanSwitch == 0: no Pokemon to switch to, move fails
+                damage[i] = BoolIntUndefinedUnion.FromBool(false);
             }
         }
 

@@ -1,59 +1,47 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"127,236,345,562"}
->player p1 {"name":"Player1","team":"Umbreon||SitrusBerry|InnerFocus|snarl,moonlight,foulplay,thunderwave||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Mabosstiff||ChoiceBand|Intimidate|crunch,wildcharge,playrough,firefang||85,85,85,85,85,85|M|||84|,,,,,Fairy]Hawlucha||WhiteHerb|Unburden|swordsdance,bravebird,protect,closecombat||85,85,85,85,85,85|F|||84|,,,,,Fire]Perrserker||AssaultVest|SteelySpirit|ironhead,closecombat,uturn,fakeout||85,85,85,85,85,85|F|||88|,,,,,Steel]Sinistcha|SinistchaMasterpiece|RockyHelmet|Hospitality|ragepowder,trickroom,matchagotcha,lifedew||85,,85,85,85,|N|,0,,,,0||81|,,,,,Fairy]Articuno|ArticunoGalar|LifeOrb|Competitive|hurricane,tailwind,protect,freezingglare||85,,85,85,85,85|N|,0,,,,||82|,,,,,Steel"}
->player p2 {"name":"Player2","team":"Toxtricity|ToxtricityLowKey|ChoiceSpecs|PunkRock|psychicnoise,overdrive,sludgebomb,voltswitch||85,,85,85,85,85|F|,0,,,,||82|,,,,,Electric]Hawlucha||WhiteHerb|Unburden|swordsdance,closecombat,protect,bravebird||85,85,85,85,85,85|M|||84|,,,,,Flying]Greedent||SitrusBerry|CheekPouch|doubleedge,protect,highhorsepower,swordsdance||85,85,85,85,85,85|F|||86|,,,,,Fairy]Luxray||AssaultVest|Intimidate|voltswitch,wildcharge,snarl,crunch||85,85,85,85,85,85|F|||86|,,,,,Flying]Magearna|MagearnaOriginal|AssaultVest|SoulHeart|fleurcannon,aurasphere,flashcannon,dazzlinggleam||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Murkrow||Eviolite|Prankster|bravebird,tailwind,taunt,haze||85,85,85,85,85,85|F|||90|,,,,,Ghost"}
->p1 move foulplay +2, move crunch +2
->p2 move psychicnoise +1, move closecombat +1
->p1 move foulplay +1, move crunch +2
->p2 move psychicnoise +2, move closecombat +2
->p2 pass, switch 4
->p1 move thunderwave +2, move crunch +2
->p2 move psychicnoise +2, move crunch +1
->p1 move moonlight, move crunch +2
->p2 move psychicnoise +2, move wildcharge +2
->p1 pass, switch 6
->p1 move moonlight, move hurricane +2
->p2 move psychicnoise +2, move snarl
->p1 move moonlight, move hurricane +1
->p2 move psychicnoise +2, move voltswitch +1
+>player p1 {"name":"Player1","team":"Uxie||SitrusBerry|Levitate|stealthrock,thunderwave,helpinghand,mysticalpower||85,,85,85,85,85|N|,0,,,,||85|,,,,,Poison]Tentacruel||AssaultVest|ClearBody|icywind,muddywater,sludgebomb,acidspray||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass]Chien-Pao||LifeOrb|SwordofRuin|throatchop,suckerpunch,iciclecrash,protect||85,85,85,85,85,85|N|||75|,,,,,Ghost]Sunflora||LifeOrb|Chlorophyll|dazzlinggleam,protect,sludgebomb,leafstorm||85,,85,85,85,85|M|,0,,,,|||,,,,,Poison]Sinistcha||Leftovers|Hospitality|shadowball,calmmind,protect,matchagotcha||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Duraludon||Eviolite|Stalwart|flashcannon,bodypress,irondefense,dracometeor||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fighting"}
+>player p2 {"name":"Player2","team":"Avalugg|AvaluggHisui|LoadedDice|Sturdy|protect,bodypress,iciclespear,rockblast||85,85,85,85,85,85|M|||88|,,,,,Poison]Farigiraf||LifeOrb|ArmorTail|psychic,protect,trickroom,hypervoice||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fairy]Brambleghast||SitrusBerry|WindRider|disable,powerwhip,protect,poltergeist||85,85,85,85,85,85|M|||86|,,,,,Steel]Armarouge||LifeOrb|FlashFire|protect,heatwave,psychic,trickroom||85,,85,85,85,|M|,0,,,,0||80|,,,,,Grass]Tinkaton||SitrusBerry|MoldBreaker|fakeout,encore,playrough,gigatonhammer||85,85,85,85,85,85|F|||82|,,,,,Water]Glalie||SitrusBerry|InnerFocus|disable,icywind,freezedry,helpinghand||85,,85,85,85,85|F|,0,,,,||94|,,,,,Poison"}
+>p1 move helpinghand -2, move sludgebomb +2
+>p2 move protect, move trickroom
+>p1 move thunderwave +2, move sludgebomb +1
+>p2 move iciclespear +2, move protect
+>p1 move thunderwave +1, move icywind
+>p2 move bodypress +1, move hypervoice
+>p1 move thunderwave +1, move acidspray +1
+>p2 move bodypress +2, move trickroom
+>p1 move thunderwave +2, move icywind
+>p2 move protect, move trickroom
+>p1 move thunderwave +2, move icywind
+>p2 move protect, move psychic +2
+>p1 pass, switch 3
+>p1 move helpinghand -2, move protect
+>p2 move rockblast +2, move protect
+>p1 move thunderwave +2, move iciclecrash +1
+>p2 move bodypress +1, move protect
+>p1 move thunderwave +1, move throatchop +2
+>p2 move protect, move trickroom
 >p2 pass, switch 5
->p1 move snarl, move protect
->p2 move psychicnoise +2, move dazzlinggleam
->p1 move foulplay +2, move protect
->p2 move psychicnoise +1, move dazzlinggleam
->p1 move moonlight, move freezingglare +1
->p2 move psychicnoise +1, move fleurcannon +1
->p2 switch 6, pass
->p1 move snarl, move freezingglare +2
->p2 move tailwind, move flashcannon +2
->p1 pass, switch 5
->p1 move moonlight, move matchagotcha
->p2 move bravebird +2, move dazzlinggleam
->p1 pass, switch 4
->p1 move snarl, move uturn +2
->p2 move taunt +1, move aurasphere +1
->p1 pass, switch 3
->p1 move moonlight, move swordsdance
->p2 move haze, move aurasphere +1
->p1 move snarl, move bravebird +1
->p2 move tailwind, move fleurcannon +2
->p1 pass, switch 3
->p1 move snarl, move ironhead +1
->p2 move haze, move dazzlinggleam
->p2 switch 5, pass
->p1 move snarl, move fakeout +2
->p2 move voltswitch +1, move aurasphere +1
->p2 switch 3, pass
->p1 move snarl, move ironhead +1
->p2 move doubleedge +2, move fleurcannon +2
->p1 move moonlight, move uturn +1
->p2 move doubleedge +1, move aurasphere +1
->p1 move thunderwave +1, move uturn +2
->p2 move swordsdance, move aurasphere +2
->p1 move thunderwave +1, move fakeout +2
->p2 move highhorsepower +2, move flashcannon +2
->p1 move thunderwave +2, pass
->p2 move swordsdance, move flashcannon +2
->p1 move foulplay +2, pass
->p2 move protect, move dazzlinggleam
->p1 move thunderwave +2, pass
->p2 move doubleedge +2, move aurasphere +2
+>p1 move mysticalpower +2, move suckerpunch +2
+>p2 move bodypress +1, move playrough +1
+>p1 move thunderwave +1, move iciclecrash +1
+>p2 move iciclespear +1, move encore +1
+>p1 move thunderwave +2, move protect
+>p2 move bodypress +2, move gigatonhammer +1
+>p1 switch 4, pass
+>p1 move dazzlinggleam, move throatchop +2
+>p2 move bodypress +2, move playrough +1
+>p2 switch 4, pass
+>p1 move sludgebomb +2, move protect
+>p2 move protect, move fakeout +1
+>p1 move leafstorm +1, move throatchop +1
+>p2 move trickroom, move fakeout +2
+>p2 switch 6, switch 3
+>p1 move protect, move iciclecrash +2
+>p2 move icywind, move powerwhip +2
+>p1 move protect, move iciclecrash +1
+>p2 move freezedry +2, pass
+>p1 pass, switch 6
+>p1 move leafstorm +2, move flashcannon +2
+>p2 move disable +2, pass
+>p1 move sludgebomb +2, move dracometeor +1
+>p2 move disable +1, pass

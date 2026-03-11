@@ -20,7 +20,7 @@ public record FieldAction : IAction
             }
         }
     }
-    public int Priority { get; init; }
+    public double Priority { get; init; }
     public int Speed => 1;
     public Pokemon? Pokemon => null;
 

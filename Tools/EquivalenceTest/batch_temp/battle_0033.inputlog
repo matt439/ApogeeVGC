@@ -1,43 +1,23 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"232,431,630,1027"}
->player p1 {"name":"Player1","team":"Dachsbun||SitrusBerry|WellBakedBody|howl,snarl,bodypress,playrough||85,85,85,85,85,85|M|||90|,,,,,Steel]Palafin||ChoiceBand|ZerotoHero|flipturn,closecombat,wavecrash,jetpunch||85,85,85,85,85,85|F|||79|,,,,,Water]Skeledirge||Leftovers|Unaware|shadowball,torchsong,protect,slackoff||85,,85,85,85,85|F|,0,,,,||80|,,,,,Fairy]Masquerain||HeavyDutyBoots|Intimidate|protect,bugbuzz,hurricane,tailwind||85,,85,85,85,85|F|,0,,,,||90|,,,,,Ground]Iron Jugulis||BoosterEnergy|QuarkDrive|darkpulse,protect,earthpower,hurricane||85,,85,85,85,85|N|,0,,,,||79|,,,,,Ground]Duraludon||Eviolite|Stalwart|irondefense,flashcannon,bodypress,dracometeor||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fighting"}
->player p2 {"name":"Player2","team":"Scovillain||SitrusBerry|Chlorophyll|energyball,fireblast,protect,ragepowder||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel]Krookodile||ChoiceBand|Intimidate|rockslide,highhorsepower,knockoff,gunkshot||85,85,85,85,85,85|F|||80|,,,,,Dark]Clefairy||Eviolite|FriendGuard|followme,moonblast,lifedew,helpinghand||85,,85,85,85,85|M|,0,,,,||98|,,,,,Fire]Trevenant||SitrusBerry|Harvest|protect,trickroom,woodhammer,poltergeist||85,85,85,85,85,|F|,,,,,0||88|,,,,,Dark]Florges|FlorgesOrange|Leftovers|FlowerVeil|dazzlinggleam,protect,synthesis,calmmind||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Sudowoodo||LifeOrb|RockHead|protect,headsmash,woodhammer,suckerpunch||85,85,85,85,85,85|F|||94|,,,,,Grass"}
->p1 move howl, move jetpunch +1
->p2 move fireblast +2, move highhorsepower +1
->p1 move howl, move jetpunch +2
->p2 move protect, move highhorsepower +2
->p1 pass, switch 5
->p1 move bodypress +2, move earthpower +1
->p2 move ragepowder, move highhorsepower +1
->p1 move howl, move protect
->p2 move ragepowder, move highhorsepower +1
->p1 switch 3, pass
->p1 move shadowball +2, move hurricane +2
->p2 move energyball +2, move highhorsepower +1
->p2 switch 6, switch 4
->p1 move shadowball +1, move hurricane +1
->p2 move woodhammer +2, move woodhammer +1
->p1 move torchsong +1, move darkpulse +2
->p2 move woodhammer +1, move woodhammer +2
->p2 switch 3, pass
->p1 move slackoff, move hurricane +1
->p2 move moonblast +1, move woodhammer +1
->p1 move shadowball +1, move protect
->p2 move followme, move woodhammer +2
->p1 move shadowball +2, move darkpulse +1
->p2 move lifedew, move trickroom
->p2 pass, switch 5
->p1 move protect, move darkpulse +1
->p2 move helpinghand -2, move calmmind
->p1 move slackoff, move earthpower +1
->p2 pass, move dazzlinggleam
->p1 pass, switch 4
->p1 move slackoff, move hurricane +2
->p2 pass, move calmmind
->p1 move shadowball +1, move hurricane +1
->p2 pass, move calmmind
->p1 move protect, move protect
->p2 pass, move dazzlinggleam
->p1 move protect, move bugbuzz +2
->p2 pass, move protect
->p1 move torchsong +1, move tailwind
->p2 pass, move synthesis
+>player p1 {"name":"Player1","team":"Salazzle||FocusSash|Corrosion|fakeout,sludgebomb,fireblast,encore||85,85,85,85,85,85|F|||86|,,,,,Fire]Toxicroak||LifeOrb|DrySkin|swordsdance,gunkshot,closecombat,protect||85,85,85,85,85,85|F|||85|,,,,,Fighting]Emboar||ChoiceBand|Reckless|wildcharge,flareblitz,closecombat,headsmash||85,85,85,85,85,85|M|||85|,,,,,Rock]Gyarados||ClearAmulet|Intimidate|waterfall,protect,dragondance,terablast||85,85,85,85,85,85|M|||80|,,,,,Flying]Espathra||LifeOrb|SpeedBoost|protect,luminacrash,dazzlinggleam,batonpass||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Farigiraf||LifeOrb|ArmorTail|trickroom,psychic,hypervoice,protect||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Zoroark|ZoroarkHisui|ChoiceSpecs|Illusion|flamethrower,focusblast,hypervoice,bittermalice||85,,85,85,85,85|F|,0,,,,||80|,,,,,Normal]Arboliva||ChoiceSpecs|SeedSower|hypervoice,pollenpuff,energyball,earthpower||85,,85,85,85,85|M|,0,,,,||88|,,,,,Normal]Hydrapple||AssaultVest|Regenerator|gigadrain,ficklebeam,earthpower,pollenpuff||85,,85,85,85,85|F|,0,,,,||85|,,,,,Steel]Azumarill||ChoiceBand|HugePower|icespinner,aquajet,playrough,liquidation||85,85,85,85,85,85|F|||83|,,,,,Water]Phione||Leftovers|Hydration|icebeam,takeheart,scald,protect||85,,85,85,85,85|N|,0,,,,||90|,,,,,Dragon]Raikou||LifeOrb|InnerFocus|shadowball,scald,thunderbolt,protect||85,,85,85,85,85|N|,0,,,,||81|,,,,,Water"}
+>p1 move fakeout +2, move protect
+>p2 move focusblast +2, move hypervoice
+>p1 move fireblast +1, move protect
+>p2 move focusblast +2, move hypervoice
+>p1 pass, switch 6
+>p1 move fireblast +1, move hypervoice
+>p2 move focusblast +2, move hypervoice
+>p1 switch 3, switch 4
+>p1 move headsmash +1, move protect
+>p2 move focusblast +1, move hypervoice
+>p1 switch 5, pass
+>p1 move protect, move waterfall +2
+>p2 move focusblast +2, move hypervoice
+>p1 move protect, move waterfall +1
+>p2 move focusblast +1, move hypervoice
+>p2 switch 4, pass
+>p1 move batonpass, move terablast +1
+>p2 move aquajet +2, move hypervoice
+>p1 move batonpass, pass
+>p2 move aquajet +2, move hypervoice

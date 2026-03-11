@@ -1227,7 +1227,8 @@ public partial record Moves
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         battle.Debug("psyblade electric terrain boost");
-                        return battle.ChainModify(1.5);
+                        battle.ChainModify(1.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -2255,7 +2256,8 @@ public partial record Moves
                     if (source.Side.FaintedLastTurn != null)
                     {
                         battle.Debug("Boosted for a faint last turn");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();

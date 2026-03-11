@@ -1,27 +1,36 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"71,132,193,314"}
->player p1 {"name":"Player1","team":"Slowbro|SlowbroGalar|LifeOrb|Regenerator|trickroom,psychic,shellsidearm,fireblast||85,85,85,85,85,|M|,,,,,0||87|,,,,,Fire]Leavanny||SitrusBerry|Swarm|knockoff,leafblade,pollenpuff,stickyweb||85,85,85,85,85,85|M|||91|,,,,,Water]Whimsicott||SitrusBerry|Prankster|encore,tailwind,taunt,moonblast||85,,85,85,85,85|M|,0,,,,||80|,,,,,Ghost]Talonflame||SitrusBerry|GaleWings|overheat,willowisp,tailwind,bravebird||85,85,85,85,85,85|M|||82|,,,,,Flying]Sudowoodo||LifeOrb|RockHead|woodhammer,highhorsepower,suckerpunch,headsmash||85,85,85,85,85,85|F|||94|,,,,,Grass]Slowking||LifeOrb|Regenerator|hydropump,fireblast,trickroom,psychic||85,,85,85,85,|M|,0,,,,0||88|,,,,,Fire"}
->player p2 {"name":"Player2","team":"Gholdengo||LifeOrb|GoodasGold|makeitrain,protect,dazzlinggleam,shadowball||85,,85,85,85,85|N|,0,,,,||78|,,,,,Steel]Ogerpon|OgerponHearthflame|HearthflameMask|MoldBreaker|hornleech,ivycudgel,followme,spikyshield||85,85,85,85,85,85|F|||74|,,,,,Fire]Zoroark|ZoroarkHisui|LifeOrb|Illusion|hypervoice,bittermalice,flamethrower,nastyplot||85,,85,85,85,85|M|,0,,,,||80|,,,,,Normal]Ariados||RockyHelmet|Insomnia|megahorn,stickyweb,protect,ragepowder||85,85,85,85,85,85|F||||,,,,,Dark]Roaring Moon||BoosterEnergy|Protosynthesis|acrobatics,knockoff,breakingswipe,protect||85,85,85,85,85,85|N|||76|,,,,,Flying]Sceptile||WhiteHerb|Unburden|focusblast,protect,leafstorm,breakingswipe||85,85,85,85,85,85|F|||88|,,,,,Steel"}
->p1 move shellsidearm +1, move leafblade +2
->p2 move dazzlinggleam, move followme
->p2 pass, switch 3
->p1 move trickroom, move leafblade +1
->p2 move protect, move bittermalice +1
->p1 switch 5, pass
->p1 move suckerpunch +1, move pollenpuff +2
->p2 move dazzlinggleam, move nastyplot
->p1 move suckerpunch +1, move knockoff +2
->p2 move protect, move bittermalice +2
->p1 pass, switch 3
->p1 move highhorsepower +1, move taunt +1
->p2 move protect, move nastyplot
->p1 move suckerpunch +1, move taunt +2
->p2 move protect, move bittermalice +1
->p1 switch 4, pass
->p1 move tailwind, move taunt +2
->p2 move protect, move flamethrower +1
->p1 move overheat +1, move encore +1
->p2 move dazzlinggleam, move hypervoice
+>player p1 {"name":"Player1","team":"Leafeon||LifeOrb|Chlorophyll|doubleedge,swordsdance,synthesis,leafblade||85,85,85,85,85,85|M|||90|,,,,,Normal]Incineroar||HeavyDutyBoots|Intimidate|knockoff,flareblitz,partingshot,fakeout||85,85,85,85,85,85|F|||78|,,,,,Water]Regidrago||ChoiceScarf|DragonsMaw|dragonclaw,earthpower,dragonenergy,dracometeor||85,85,85,85,85,85|N|||74|,,,,,Dragon]Drednaw||WhiteHerb|StrongJaw|rockslide,liquidation,shellsmash,crunch||85,85,85,85,85,85|F|||83|,,,,,Dark]Salazzle||FocusSash|Corrosion|fakeout,heatwave,encore,sludgebomb||85,85,85,85,85,85|F|||86|,,,,,Fire]Noctowl||LifeOrb|TintedLens|hypervoice,tailwind,protect,hurricane||85,,85,85,85,85|F|,0,,,,||91|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Rampardos||ChoiceScarf|SheerForce|firepunch,stompingtantrum,headsmash,rockslide||85,85,85,85,85,85|M|||87|,,,,,Rock]Forretress||ChoiceBand|Sturdy|explosion,bodypress,ironhead,lunge||85,85,85,85,85,85|M|||90|,,,,,Fire]Grimmsnarl||SitrusBerry|Prankster|thunderwave,fakeout,spiritbreak,taunt||85,85,85,85,85,85|M|||82|,,,,,Steel]Conkeldurr||FlameOrb|Guts|protect,closecombat,machpunch,knockoff||85,85,85,85,85,85|F|||81|,,,,,Fighting]Spiritomb||SitrusBerry|Infiltrator|foulplay,helpinghand,icywind,willowisp||85,,85,85,85,85|F|,0,,,,||89|,,,,,Steel]Suicune||Leftovers|InnerFocus|protect,icebeam,calmmind,scald||85,,85,85,85,85|N|,0,,,,||79|,,,,,Dragon"}
+>p1 move synthesis, move flareblitz +1
+>p2 move stompingtantrum +1, move bodypress +1
+>p1 move synthesis, move flareblitz +1
+>p2 move stompingtantrum +1, move bodypress +2
+>p1 pass, switch 5
+>p1 move leafblade +1, move encore +2
+>p2 move stompingtantrum +1, move bodypress +1
+>p2 switch 3, pass
+>p1 move leafblade +2, move sludgebomb +2
+>p2 move fakeout +1, move bodypress +2
+>p1 move doubleedge +1, move fakeout +1
+>p2 move spiritbreak +1, move bodypress +1
 >p1 switch 6, pass
->p2 switch 6, pass
->p1 move trickroom, pass
->p2 move breakingswipe, move bittermalice +1
+>p1 move tailwind, move heatwave
+>p2 move thunderwave +2, move bodypress +1
+>p1 move protect, move fakeout +2
+>p2 move spiritbreak +2, move bodypress +1
+>p1 move hypervoice, move heatwave
+>p2 move taunt +1, move bodypress +1
+>p2 switch 6, switch 5
+>p1 move hurricane +2, move encore +1
+>p2 move icebeam +2, move icywind
+>p1 pass, switch 3
+>p1 move hurricane +1, move dragonenergy
+>p2 move icebeam +1, move willowisp +1
+>p1 switch 4, pass
+>p1 move shellsmash, move dragonenergy
+>p2 move scald +2, move foulplay +2
+>p2 switch 4, pass
+>p1 move shellsmash, move dragonenergy
+>p2 move protect, pass
+>p1 move liquidation +1, move dragonenergy
+>p2 move machpunch +2, pass

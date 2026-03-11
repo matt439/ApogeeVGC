@@ -128,7 +128,8 @@ public partial record Abilities
                     if (accuracy.HasValue && battle.Field.IsWeather(ConditionId.Sandstorm))
                     {
                         battle.Debug("Sand Veil - decreasing accuracy");
-                        return battle.ChainModify([3277, 4096]);
+                        battle.ChainModify([3277, 4096]);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -193,7 +194,7 @@ public partial record Abilities
                 // OnSwitchInPriority = -1
                 OnStart = OnStartEventInfo.Create((_, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Wishiwashi ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Wishiwashi ||
                         pokemon.Level < 20 || pokemon.Transformed)
                         return;
 
@@ -215,7 +216,7 @@ public partial record Abilities
                 // OnResidualOrder = 29
                 OnResidual = OnResidualEventInfo.Create((_, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Wishiwashi ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Wishiwashi ||
                         pokemon.Level < 20 || pokemon.Transformed || pokemon.Hp == 0)
                         return;
 
@@ -509,7 +510,7 @@ public partial record Abilities
                 // OnSwitchInPriority = -1
                 OnStart = OnStartEventInfo.Create((_, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Minior || pokemon.Transformed)
+                    if (pokemon.BaseSpecies.Id != SpecieId.Minior || pokemon.Transformed)
                         return;
 
                     if (pokemon.Hp > pokemon.MaxHp / 2)
@@ -530,7 +531,7 @@ public partial record Abilities
                 // OnResidualOrder = 29
                 OnResidual = OnResidualEventInfo.Create((_, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Minior ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Minior ||
                         pokemon.Transformed || pokemon.Hp == 0)
                         return;
 
@@ -630,6 +631,18 @@ public partial record Abilities
                     }
                     battle.EffectState.Counter = 5;
                 }),
+                OnEnd = OnEndEventInfo.Create((battle, pokemonUnion) =>
+                {
+                    if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
+                    if (battle.EffectState.Counter != null)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", psfp.Pokemon, "Slow Start", "[silent]");
+                        }
+                        battle.EffectState.Counter = null;
+                    }
+                }),
                 // OnResidualOrder = 28, OnResidualSubOrder = 2
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
@@ -720,7 +733,8 @@ public partial record Abilities
                     if (accuracy.HasValue && battle.Field.IsWeather(ConditionId.Snowscape))
                     {
                         battle.Debug("Snow Cloak - decreasing accuracy");
-                        return battle.ChainModify([3277, 4096]);
+                        battle.ChainModify([3277, 4096]);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -942,7 +956,7 @@ public partial record Abilities
                 // OnModifyMovePriority = 1
                 OnModifyMove = OnModifyMoveEventInfo.Create((_, move, attacker, _) =>
                 {
-                    if (attacker.BaseSpecies.BaseSpecies != SpecieId.Aegislash ||
+                    if (attacker.BaseSpecies.Id != SpecieId.Aegislash ||
                         attacker.Transformed)
                         return;
                     // In Gen 9, King's Shield doesn't exist, so only handle attacking moves -> Blade Forme
@@ -1147,14 +1161,10 @@ public partial record Abilities
                         if (battle.ValidTarget(abilityHolder, source, redirectTarget))
                         {
                             if (move.SmartTarget == true) move.SmartTarget = false;
-                            if (abilityHolder != target)
+                            if (abilityHolder != target && battle.DisplayUi)
                             {
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Add("-activate", abilityHolder, "ability: Storm Drain");
-                                }
+                                battle.Add("-activate", abilityHolder, "ability: Storm Drain");
                             }
-
                             return abilityHolder;
                         }
 
@@ -1517,9 +1527,10 @@ public partial record Abilities
                         {
                             battle.Add("-activate", target, "ability: Synchronize");
                         }
-                        // TS uses a hack { status: status.id, id: 'synchronize' } to make status-prevention
-                        // abilities think Synchronize is a status move. We pass the ability as the effect.
-                        source.TrySetStatus(status.Id, target, sourceEffect: _library.Abilities[target.Ability]);
+                        // TS passes a hack object { status: status.id, id: 'synchronize' } without effectType,
+                        // so status conditions' onStart don't add [from] ability attribution.
+                        // Passing null matches that behavior.
+                        source.TrySetStatus(status.Id, target);
                     }),
             },
 
@@ -1568,7 +1579,8 @@ public partial record Abilities
                     if (accuracy.HasValue && target.Volatiles.ContainsKey(ConditionId.Confusion))
                     {
                         battle.Debug("Tangled Feet - decreasing accuracy");
-                        return battle.ChainModify(0.5);
+                        battle.ChainModify(0.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1715,7 +1727,7 @@ public partial record Abilities
                 // OnSwitchInPriority = 2
                 OnSwitchIn = OnSwitchInEventInfo.Create((battle, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Terapagos) return;
+                    if (pokemon.BaseSpecies.Id != SpecieId.Terapagos) return;
                     if (pokemon.Species.Id != SpecieId.TerapagosTerastal)
                     {
                         if (battle.DisplayUi)

@@ -245,7 +245,8 @@ public partial record Conditions
                     ];
                     if (stompingMoves.Contains(move.Id))
                     {
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return DoubleVoidUnion.FromVoid();
@@ -460,7 +461,8 @@ public partial record Conditions
                             !defender.IsSemiInvulnerable())
                         {
                             battle.Debug("misty terrain weaken");
-                            return battle.ChainModify([2048, 4096]);
+                            battle.ChainModify([2048, 4096]);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();

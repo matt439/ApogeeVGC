@@ -150,7 +150,7 @@ public partial class Pokemon
             speed = TrickRoomSpeedOffset - speed;
         }
 
-        return speed;
+        return Battle.Trunc(speed, 13);
     }
 
     public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
@@ -205,9 +205,9 @@ public partial class Pokemon
         var newMaxHp = BaseMaxHp;
         Hp = Hp <= 0 ? 0 : Math.Max(1, newMaxHp - (MaxHp - Hp));
         MaxHp = newMaxHp;
-        if (Hp > 0)
+        if (Hp > 0 && Battle.DisplayUi)
         {
-            //UiGenerator.PrintHealEvent(this, Hp.ToString());
+            Battle.Add("-heal", this, $"{Hp}/{MaxHp}", "[silent]");
         }
     }
 

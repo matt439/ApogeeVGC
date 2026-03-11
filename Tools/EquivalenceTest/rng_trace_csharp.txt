@@ -1,81 +1,227 @@
-[RNG#1] raw=2030470262
-[RNG#2] raw=3793892072
-[RNG#3] raw=2851743046
-[RNG#4] raw=574702432
-[RNG#5] raw=3620926519
-[RNG#6] raw=2468984361
-[RNG#7] raw=4121665136
-[RNG#8] raw=1670872321
-[RNG#9] raw=3334870608
-[RNG#10] raw=3556944531
-[RNG#11] raw=465610318
-[RNG#12] raw=965678468
-[RNG#13] raw=270333586
-[RNG#14] raw=3615859060
-[RNG#15] raw=1369590262
-[RNG#16] raw=3684755315
-[RNG#17] raw=604892614
-[RNG#18] raw=4022611215
-[RNG#19] raw=630540104
-[RNG#20] raw=84059166
-[RNG#21] raw=2028659572
-[RNG#22] raw=2126884272
-[RNG#23] raw=3364923756
-[RNG#24] raw=2048826045
-[RNG#25] raw=1176702841
-[RNG#26] raw=3679846461
-[RNG#27] raw=3549433714
-[RNG#28] raw=3244670038
-[RNG#29] raw=2175320053
-[RNG#30] raw=849491237
-[RNG#31] raw=3779565983
-[RNG#32] raw=2243071149
-[RNG#33] raw=4065436464
-[RNG#34] raw=408917616
-[RNG#35] raw=4093071397
-[RNG#36] raw=2256153550
-[RNG#37] raw=1103511184
-[RNG#38] raw=2970934260
-[RNG#39] raw=290057490
-[RNG#40] raw=1698248446
-[RNG#41] raw=2443024608
-[RNG#42] raw=2516615605
-[RNG#43] raw=4057459217
-[RNG#44] raw=1504293385
-[RNG#45] raw=831772952
-[RNG#46] raw=3397713759
-[RNG#47] raw=58174970
-[RNG#48] raw=3024180618
-[RNG#49] raw=2577121549
-[RNG#50] raw=2817215737
-[RNG#51] raw=243670234
-[RNG#52] raw=177615586
-[RNG#53] raw=486682350
-[RNG#54] raw=894538112
-[RNG#55] raw=3002469269
-[RNG#56] raw=63757723
-[RNG#57] raw=1408059051
-[RNG#58] raw=3142869095
-[RNG#59] raw=1958632948
-[RNG#60] raw=2004404973
-[RNG#61] raw=2977154916
-[RNG#62] raw=132387900
-[RNG#63] raw=1590007430
-[RNG#64] raw=1789461918
-[RNG#65] raw=4107763283
-[RNG#66] raw=4035189549
-[RNG#67] raw=836260674
-[RNG#68] raw=2476551503
-[RNG#69] raw=2161279504
-[RNG#70] raw=730177272
-[RNG#71] raw=3847132085
-[RNG#72] raw=1653149473
-[RNG#73] raw=457837693
-[RNG#74] raw=1102346648
-[RNG#75] raw=3462362586
-[RNG#76] raw=905601403
-[RNG#77] raw=29536417
-[RNG#78] raw=3239885666
-[RNG#79] raw=1703647446
-[RNG#80] raw=3875784682
-[RNG#81] raw=3002890778
+[Equivalence] Loading fixture: Tools/EquivalenceTest/battle_output.fixture.json
+[Equivalence] Loading Showdown log: Tools/EquivalenceTest/batch_temp/battle_0001.log
+[Equivalence] Format: gen9randomdoublesbattle, Seed: 8,15,22,35
+[Equivalence] P1 team: Espeon, Reuniclus, Noivern, Snorlax, Zangoose, Sunflora
+[Equivalence] P2 team: Zarude, Jolteon, Minior, Vaporeon, Rotom, Cloyster
+RNG#0: raw=1567319150
+RNG#1: raw=1608906259
+RNG#2: raw=3984260919
+RNG#3: raw=3639368672
+RNG#4: raw=3512563182
+RNG#5: raw=1531401476
+RNG#6: raw=516329499
+RNG#7: raw=1472290676
+RNG#8: raw=3338937890
+RNG#9: raw=486606606
+RNG#10: raw=204714044
+RNG#11: raw=1759555377
+RNG#12: raw=635771971
+RNG#13: raw=2477757517
+RNG#14: raw=2535926155
+RNG#15: raw=3623669572
+RNG#16: raw=73120383
+RNG#17: raw=1119122888
+RNG#18: raw=3784644872
+RNG#19: raw=3126985141
+RNG#20: raw=799639533
+RNG#21: raw=3769201993
+RNG#22: raw=3674475679
+RNG#23: raw=2069806619
+RNG#24: raw=2357887005
+RNG#25: raw=1800051441
+RNG#26: raw=2782590690
+RNG#27: raw=3151252502
+RNG#28: raw=3560210240
+RNG#29: raw=3115686513
+RNG#30: raw=3484312099
+RNG#31: raw=3628156041
+RNG#32: raw=3461708133
+RNG#33: raw=1189701585
+RNG#34: raw=1711827893
+RNG#35: raw=3509428734
+RNG#36: raw=248118061
+RNG#37: raw=3890105332
+RNG#38: raw=2174459332
+RNG#39: raw=2822334518
+RNG#40: raw=2632784747
+RNG#41: raw=3042969158
+RNG#42: raw=1503173866
+RNG#43: raw=473365319
+RNG#44: raw=586972212
+RNG#45: raw=1231983618
+RNG#46: raw=1246037323
+RNG#47: raw=2280282553
+RNG#48: raw=2902353831
+RNG#49: raw=787867934
+RNG#50: raw=2086276094
+RNG#51: raw=2578174104
+RNG#52: raw=1632277990
+RNG#53: raw=1672502181
+RNG#54: raw=2942149685
+RNG#55: raw=2802994682
+RNG#56: raw=140676895
+RNG#57: raw=328061738
+RNG#58: raw=253015515
+RNG#59: raw=3055907840
+RNG#60: raw=1110059753
+RNG#61: raw=284810116
+RNG#62: raw=1908174100
+RNG#63: raw=2310890882
+RNG#64: raw=4169915973
+RNG#65: raw=1403184969
+RNG#66: raw=3925534883
+RNG#67: raw=254559225
+RNG#68: raw=1711261717
+RNG#69: raw=3939173268
+RNG#70: raw=4156391628
+RNG#71: raw=906391070
+RNG#72: raw=1908464025
+RNG#73: raw=138323811
+RNG#74: raw=1623329395
+RNG#75: raw=2287473918
+RNG#76: raw=4165970475
+RNG#77: raw=1276417184
+RNG#78: raw=1643754113
+RNG#79: raw=3885640889
+RNG#80: raw=3155903444
+RNG#81: raw=1279517685
+RNG#82: raw=2541108812
+RNG#83: raw=3431035777
+RNG#84: raw=2476555830
+RNG#85: raw=2001438237
+RNG#86: raw=942761439
+RNG#87: raw=1028081475
+RNG#88: raw=3767222056
+RNG#89: raw=1001062827
+RNG#90: raw=170192679
+RNG#91: raw=2150477311
+RNG#92: raw=1177573790
+RNG#93: raw=135461556
+RNG#94: raw=116577286
+RNG#95: raw=3948533784
+RNG#96: raw=1843518433
+RNG#97: raw=3171853882
+RNG#98: raw=2440154084
+RNG#99: raw=389999732
+RNG#100: raw=1765276539
+RNG#101: raw=1201436041
+RNG#102: raw=4198931003
+RNG#103: raw=227356216
+RNG#104: raw=4141166446
+RNG#105: raw=3670790505
+RNG#106: raw=3486165396
+RNG#107: raw=2370762861
+RNG#108: raw=151266726
+RNG#109: raw=2366650901
+RNG#110: raw=2509452349
+[Equivalence] Applied 37 choices, battle ended at turn 15
+[Equivalence] Winner: Player1
+[Equivalence] C# log: 283 lines
+[Equivalence] Filtered: C# 208 lines, Showdown 210 lines
+
+=== Context around first mismatch (line 1) ===
+      C# [0]: |start
+      SD [0]: |start
+  >>> C# [1]: |switch|p1a: Espeon|Espeon, L84, M|246/246
+  >>> SD [1]: |switch|p1a: Ogerpon|Ogerpon, L78, F|253/253
+      C# [2]: |switch|p1b: Reuniclus|Reuniclus, L84, F|322/322
+      SD [2]: |switch|p1b: Glalie|Glalie, L94, M|303/303
+      C# [3]: |switch|p2a: Zarude|Zarude-Dada, L80|299/299
+      SD [3]: |switch|p2a: Corviknight|Corviknight, L80, F|288/288
+      C# [4]: |switch|p2b: Jolteon|Jolteon, L85, M|249/249
+      SD [4]: |switch|p2b: Mandibuzz|Mandibuzz, L85, F|326/326
+      C# [5]: |turn|1
+      SD [5]: |turn|1
+      C# [6]: |move|p2b: Jolteon|Calm Mind|p2b: Jolteon
+      SD [6]: |move|p1b: Glalie|Helping Hand|p1a: Ogerpon
+      C# [7]: |-boost|p2b: Jolteon|spa|1
+      SD [7]: |-singleturn|p1a: Ogerpon|Helping Hand|[of] p1b: Glalie
+      C# [8]: |-boost|p2b: Jolteon|spd|1
+      SD [8]: |move|p1a: Ogerpon|Spiky Shield|p1a: Ogerpon
+      C# [9]: |move|p1a: Espeon|Dazzling Gleam|p2a: Zarude|[spread] p2a,p2b
+      SD [9]: |-singleturn|p1a: Ogerpon|move: Protect
+      C# [10]: |-supereffective|p2a: Zarude
+      SD [10]: |move|p2b: Mandibuzz|Brave Bird|p1b: Glalie
+
+  MISMATCH at line 1:
+    C#:  |switch|p1a: Espeon|Espeon, L84, M|246/246
+    SD:  |switch|p1a: Ogerpon|Ogerpon, L78, F|253/253
+
+  MISMATCH at line 2:
+    C#:  |switch|p1b: Reuniclus|Reuniclus, L84, F|322/322
+    SD:  |switch|p1b: Glalie|Glalie, L94, M|303/303
+
+  MISMATCH at line 3:
+    C#:  |switch|p2a: Zarude|Zarude-Dada, L80|299/299
+    SD:  |switch|p2a: Corviknight|Corviknight, L80, F|288/288
+
+  MISMATCH at line 4:
+    C#:  |switch|p2b: Jolteon|Jolteon, L85, M|249/249
+    SD:  |switch|p2b: Mandibuzz|Mandibuzz, L85, F|326/326
+
+  MISMATCH at line 6:
+    C#:  |move|p2b: Jolteon|Calm Mind|p2b: Jolteon
+    SD:  |move|p1b: Glalie|Helping Hand|p1a: Ogerpon
+
+  MISMATCH at line 7:
+    C#:  |-boost|p2b: Jolteon|spa|1
+    SD:  |-singleturn|p1a: Ogerpon|Helping Hand|[of] p1b: Glalie
+
+  MISMATCH at line 8:
+    C#:  |-boost|p2b: Jolteon|spd|1
+    SD:  |move|p1a: Ogerpon|Spiky Shield|p1a: Ogerpon
+
+  MISMATCH at line 9:
+    C#:  |move|p1a: Espeon|Dazzling Gleam|p2a: Zarude|[spread] p2a,p2b
+    SD:  |-singleturn|p1a: Ogerpon|move: Protect
+
+  MISMATCH at line 10:
+    C#:  |-supereffective|p2a: Zarude
+    SD:  |move|p2b: Mandibuzz|Brave Bird|p1b: Glalie
+
+  MISMATCH at line 11:
+    C#:  |-damage|p2a: Zarude|156/299
+    SD:  |-damage|p1b: Glalie|215/303
+
+  MISMATCH at line 12:
+    C#:  |-damage|p2b: Jolteon|204/249
+    SD:  |-damage|p2b: Mandibuzz|297/326|[from] Recoil
+
+  MISMATCH at line 13:
+    C#:  |-damage|p1a: Espeon|222/246|[from] item: Life Orb
+    SD:  |move|p2a: Corviknight|Roost||[still]
+
+  MISMATCH at line 14:
+    C#:  |move|p2a: Zarude|Power Whip|p1a: Espeon
+    SD:  |-fail|p2a: Corviknight|heal
+
+  MISMATCH at line 15:
+    C#:  |-damage|p1a: Espeon|0 fnt
+    SD:  |turn|2
+
+  MISMATCH at line 16:
+    C#:  |faint|p1a: Espeon
+    SD:  |move|p1a: Ogerpon|Follow Me|p1a: Ogerpon
+
+  MISMATCH at line 17:
+    C#:  |-damage|p2a: Zarude|127/299|[from] item: Life Orb
+    SD:  |-singleturn|p1a: Ogerpon|move: Follow Me
+
+  MISMATCH at line 18:
+    C#:  |move|p1b: Reuniclus|Focus Blast|p2a: Zarude
+    SD:  |move|p1b: Glalie|Disable|p2a: Corviknight
+
+  MISMATCH at line 19:
+    C#:  |-supereffective|p2a: Zarude
+    SD:  |-start|p2a: Corviknight|Disable|Roost
+
+  MISMATCH at line 20:
+    C#:  |-damage|p2a: Zarude|0 fnt
+    SD:  |move|p2b: Mandibuzz|Roost|p2b: Mandibuzz
+
+  MISMATCH at line 21:
+    C#:  |faint|p2a: Zarude
+    SD:  |-heal|p2b: Mandibuzz|326/326
+
+[Equivalence] Result: 3 matches, 207 mismatches out of 210 lines
+[Equivalence] FAIL — protocols diverge

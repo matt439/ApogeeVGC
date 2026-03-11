@@ -65,8 +65,7 @@ public class Prng
         {
             // Match Showdown: Math.floor(result * from / 2**32)
             uint result = _gen5Rng.Next();
-            int val = (int)(result * (ulong)max >> 32);
-            return val;
+            return (int)(result * (ulong)max >> 32);
         }
         return _dotnetRng!.Next(max);
     }
@@ -80,8 +79,7 @@ public class Prng
         {
             // Match Showdown: Math.floor(result * (to - from) / 2**32) + from
             uint result = _gen5Rng.Next();
-            int val = (int)(result * (ulong)(max - min) >> 32) + min;
-            return val;
+            return (int)(result * (ulong)(max - min) >> 32) + min;
         }
         return _dotnetRng!.Next(min, max);
     }

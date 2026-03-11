@@ -1,56 +1,28 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"281,522,763,1244"}
->player p1 {"name":"Player1","team":"Breloom||FocusSash|Technician|machpunch,bulletseed,protect,spore||85,85,85,85,85,85|M|||84|,,,,,Fighting]Metagross||WeaknessPolicy|ClearBody|agility,heavyslam,psychicfangs,stompingtantrum||85,85,85,85,85,85|N|||80|,,,,,Dragon]Volbeat||SitrusBerry|Prankster|encore,thunderwave,lunge,tailwind||85,85,85,85,85,85|M|||82|,,,,,Water]Deoxys|DeoxysSpeed|SitrusBerry|Pressure|psychoboost,taunt,icywind,superpower||85,85,85,85,85,85|N|||85|,,,,,Fighting]Dudunsparce|DudunsparceThreeSegment|SitrusBerry|Rattled|helpinghand,protect,earthpower,boomburst||85,,85,85,85,85|F|,0,,,,||86|,,,,,Ghost]Magmortar||SitrusBerry|FlameBody|willowisp,protect,followme,heatwave||85,,85,85,85,85|M|,0,,,,||84|,,,,,Grass"}
->player p2 {"name":"Player2","team":"Donphan||AssaultVest|Sturdy|knockoff,iceshard,highhorsepower,rapidspin||85,85,85,85,85,85|M|||87|,,,,,Water]Decidueye||SitrusBerry|Overgrow|protect,leafstorm,spiritshackle,tailwind||85,85,85,85,85,85|M|||89|,,,,,Dark]Houndstone||ChoiceScarf|Fluffy|trick,shadowsneak,bodypress,lastrespects||85,85,85,85,85,85|F|||73|,,,,,Ghost]Inteleon||ChoiceSpecs|Torrent|icebeam,scald,muddywater,hydropump||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Revavroom||LifeOrb|Filter|gunkshot,ironhead,protect,highhorsepower||85,85,85,85,85,85|M|||84|,,,,,Ground]Palafin||MysticWater|ZerotoHero|wavecrash,flipturn,jetpunch,protect||85,85,85,85,85,85|F|||79|,,,,,Water"}
->p1 move bulletseed +1, move stompingtantrum +2
->p2 move knockoff +2, move spiritshackle +2
->p2 switch 4, pass
->p1 move bulletseed +1, move heavyslam +1
->p2 move hydropump +1, move protect
->p2 switch 3, pass
->p1 move bulletseed +2, move agility
->p2 move bodypress +1, move leafstorm +2
->p1 move machpunch +1, move stompingtantrum +1
->p2 move bodypress +1, move tailwind
->p1 move spore +2, move agility
->p2 move bodypress +2, move protect
->p1 pass, switch 5
->p1 move protect, move helpinghand -1
->p2 move bodypress +1, move tailwind
->p1 move machpunch +2, move earthpower +2
->p2 move bodypress +1, move spiritshackle +2
->p1 move machpunch +2, move protect
->p2 move bodypress +1, move spiritshackle +1
->p1 switch 4, pass
->p1 move taunt +1, move protect
->p2 move bodypress +2, move protect
->p1 move icywind, move boomburst
->p2 move bodypress +2, move leafstorm +1
->p1 move icywind, move protect
->p2 move bodypress +2, move protect
->p1 move taunt +1, move helpinghand -1
->p2 move bodypress +2, move protect
->p1 move taunt +2, move earthpower +1
->p2 move bodypress +2, move spiritshackle +1
+>player p1 {"name":"Player1","team":"Swanna||LifeOrb|Hydration|bravebird,protect,hydropump,tailwind||85,85,85,85,85,85|F|||87|,,,,,Ground]Kyurem|KyuremBlack|ClearAmulet|Teravolt|dragondance,protect,fusionbolt,iciclespear||85,85,85,85,85,85|N|||75|,,,,,Electric]Gengar||FocusSash|CursedBody|focusblast,sludgebomb,shadowball,protect||85,,85,85,85,85|F|,0,,,,||84|,,,,,Ghost]Pecharunt||SitrusBerry|PoisonPuppeteer|protect,partingshot,malignantchain,shadowball||85,,85,85,85,85|N|,0,,,,||78|,,,,,Dark]Glalie||SitrusBerry|InnerFocus|freezedry,icywind,protect,disable||85,,85,85,85,85|M|,0,,,,||94|,,,,,Poison]Regirock||ChestoBerry|ClearBody|rockslide,irondefense,rest,bodypress||85,85,85,85,85,85|N|||82|,,,,,Fighting"}
+>player p2 {"name":"Player2","team":"Chi-Yu||ChoiceSpecs|BeadsofRuin|snarl,heatwave,overheat,darkpulse||85,,85,85,85,85|N|,0,,,,||75|,,,,,Water]Jolteon||LifeOrb|VoltAbsorb|terablast,protect,calmmind,thunderbolt||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Meowstic|MeowsticF|LifeOrb|Competitive|protect,darkpulse,thunderbolt,psychic||85,,85,85,85,85|F|,0,,,,||89|,,,,,Electric]Corviknight||SitrusBerry|MirrorArmor|ironhead,tailwind,roost,bravebird||85,85,85,85,85,85|F|||80|,,,,,Dragon]Snorlax||MagoBerry|Gluttony|bodyslam,yawn,highhorsepower,helpinghand||85,85,85,85,85,85|M|||84|,,,,,Ghost]Luvdisc||SitrusBerry|SwiftSwim|charm,icywind,hydropump,endeavor||85,,85,85,85,85|M|,0,,,,|||,,,,,Dragon"}
+>p1 move hydropump +1, move fusionbolt +1
+>p2 move snarl, move calmmind
+>p2 switch 6, pass
+>p1 move bravebird +2, move protect
+>p2 move charm +2, move terablast +1
+>p1 move bravebird +1, move protect
+>p2 move hydropump +1, move calmmind
 >p1 switch 3, pass
->p1 move encore +2, move boomburst
->p2 move bodypress +2, move leafstorm +1
->p1 pass, switch 6
->p1 move lunge +1, move protect
->p2 move bodypress +1, move spiritshackle +2
->p1 move lunge +1, move followme
->p2 move bodypress +2, move spiritshackle +2
->p1 move tailwind, move willowisp +2
->p2 move bodypress +2, move protect
->p1 move encore +2, move heatwave
->p2 move bodypress +2, move tailwind
->p2 switch 6, switch 5
->p1 move tailwind, move protect
->p2 move jetpunch +2, move protect
->p1 move encore +2, move followme
->p2 move protect, move protect
->p1 move lunge +2, move followme
->p2 move protect, move protect
->p1 move thunderwave +2, move willowisp +1
->p2 move flipturn +2, move protect
->p1 move tailwind, pass
->p2 move jetpunch +1, move protect
+>p1 move sludgebomb +2, move fusionbolt +1
+>p2 move charm +2, move calmmind
+>p2 pass, switch 5
+>p1 move focusblast +2, move dragondance
+>p2 move charm +2, move bodyslam +2
+>p1 move focusblast +2, move fusionbolt +1
+>p2 move endeavor +1, move helpinghand -1
+>p2 switch 3, pass
+>p1 move sludgebomb +2, move iciclespear +1
+>p2 move darkpulse +2, move yawn +1
+>p1 move sludgebomb +2, move iciclespear +1
+>p2 move protect, move helpinghand -1
+>p2 pass, switch 4
+>p1 move protect, move iciclespear +1
+>p2 move thunderbolt +2, move roost
+>p1 move focusblast +1, move iciclespear +2
+>p2 pass, move ironhead +1

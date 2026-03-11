@@ -131,7 +131,6 @@ public partial class Driver
         };
 
         var battle = new Battle(battleOptions, Library);
-
         battle.Start();
 
         // Parse choice entries from input log (skip start/player setup lines)
@@ -284,9 +283,9 @@ public partial class Driver
         else
             Console.WriteLine("[Equivalence] FAIL — protocols diverge");
 
-        // press Enter to exit so we can review the output
-        Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        //// press Enter to exit so we can review the output
+        //Console.WriteLine("Press Enter key to exit...");
+        //Console.ReadLine();
     }
 
     /// <summary>
@@ -430,6 +429,11 @@ public partial class Driver
             // Shiny
             bool shiny = mon.TryGetProperty("shiny", out JsonElement shinyElem) && shinyElem.GetBoolean();
 
+            // Check if species name from fixture differs from library name (cosmetic forms)
+            string libraryName = Library.Species[specieId].Name;
+            string? speciesOverride = !string.Equals(species, libraryName, StringComparison.OrdinalIgnoreCase)
+                ? species : null;
+
             sets.Add(new PokemonSet
             {
                 Name = mon.TryGetProperty("name", out JsonElement nameElem)
@@ -445,6 +449,7 @@ public partial class Driver
                 TeraType = teraType,
                 Gender = gender,
                 Shiny = shiny,
+                SpeciesOverrideName = speciesOverride,
             });
         }
 

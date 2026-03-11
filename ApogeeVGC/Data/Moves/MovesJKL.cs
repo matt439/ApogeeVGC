@@ -236,7 +236,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = OnTryEventInfo.Create((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, source, _, _) =>
                 {
                     // Last Resort fails unless the user knows at least 2 moves
                     if (source.MoveSlots.Count < 2) return false;

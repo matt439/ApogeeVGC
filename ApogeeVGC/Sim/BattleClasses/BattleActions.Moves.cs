@@ -502,7 +502,7 @@ public partial class BattleActions
             }
         }
 
-        // Run TryMove events
+        // Run TryMove events (short-circuit: if SingleEvent fails, don't call RunEvent)
         bool tryMoveResult = Battle.SingleEvent(EventId.TryMove, activeMove, null, pokemon,
                                      SingleEventSource.FromNullablePokemon(target), activeMove)
                                  is not BoolRelayVar { Value: false } and not NullRelayVar

@@ -87,20 +87,7 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     public MoveCategory Category { get; set; }
     public MoveType Type { get; set; }
 
-    public int Priority
-    {
-        get;
-        set
-        {
-            if (value is > 5 or < -7)
-            {
-                throw new ArgumentOutOfRangeException(nameof(Priority),
-                    "Priority must be between -7 and 5.");
-            }
-
-            field = value;
-        }
-    }
+    public int Priority { get; set; }
 
     public MoveTarget Target { get; set; }
     public MoveFlags Flags { get; set; } = new();

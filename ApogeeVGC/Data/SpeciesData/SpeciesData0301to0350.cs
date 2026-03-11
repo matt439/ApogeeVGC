@@ -63,6 +63,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 32.6,
                 Color = "Purple",
+                Prevo = SpecieId.Skitty,
             },
             [SpecieId.Sableye] = new()
             {
@@ -567,6 +568,7 @@ public partial record SpeciesData
                 HeightM = 0.3,
                 WeightKg = 2,
                 Color = "Green",
+                Prevo = SpecieId.Budew,
             },
             [SpecieId.Gulpin] = new()
             {

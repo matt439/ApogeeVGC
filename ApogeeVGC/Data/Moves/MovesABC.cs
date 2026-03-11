@@ -807,13 +807,11 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
-                // TODO: TS uses this.dex.conditions.get('High Jump Kick') as the damage effect for historical
-                // consistency, but C# has no ConditionId.HighJumpKick. Using the current move instead means
-                // the crash damage log will reference "Axe Kick" rather than "High Jump Kick".
                 OnMoveFail = OnMoveFailEventInfo.Create((battle, _, source, move) =>
                 {
                     battle.Damage(source.BaseMaxHp / 2, source, source,
-                        BattleDamageEffect.FromIEffect(move));
+                        BattleDamageEffect.FromIEffect(
+                            battle.Library.Conditions[ConditionId.HighJumpKick]));
                 }),
             },
             [MoveId.BabyDollEyes] = new()
@@ -874,7 +872,8 @@ public partial record Moves
                 {
                     if (target.Status is ConditionId.Poison or ConditionId.Toxic)
                     {
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return DoubleVoidUnion.FromVoid();
@@ -1546,7 +1545,8 @@ public partial record Moves
                 {
                     if (target.Hp * 2 <= target.MaxHp)
                     {
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return DoubleVoidUnion.FromVoid();
@@ -2141,7 +2141,8 @@ public partial record Moves
                     if (target.RunEffectiveness(move) > 0)
                     {
                         battle.Debug("collision course super effective buff");
-                        return battle.ChainModify([5461, 4096]);
+                        battle.ChainModify([5461, 4096]);
+                    return new VoidReturn();
                     }
 
                     return DoubleVoidUnion.FromVoid();

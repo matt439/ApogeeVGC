@@ -114,6 +114,7 @@ public partial class Battle
         }
 
         // Calculate default subOrder if not set
+        // Showdown: if (!handler.subOrder) handler.subOrder = effectType === 'Ability' ? 7 : effectType === 'Item' ? 8 : 0
         if (subOrder == 0)
         {
             subOrder = CalculateDefaultSubOrder(h);
@@ -132,26 +133,11 @@ public partial class Battle
             ? (h.State?.EffectOrder ?? 0)
             : 0;
 
-        // Determine if this event uses speed for sorting  
-        bool usesSpeed = callbackName is not (
-            EventId.Residual or
-            EventId.FieldResidual or
-            EventId.SideResidual or
-            EventId.End or
-            EventId.FieldEnd or
-            EventId.SideEnd or
-            EventId.Start or
-            EventId.FieldStart or
-            EventId.SideStart or
-            EventId.Restart or
-            EventId.FieldRestart or
-            EventId.SideRestart or
-            EventId.Update
-            );
-
-        // Calculate speed if needed
+        // Calculate speed if the handler is held by a Pokemon
+        // Showdown always assigns speed from pokemon.speed for Pokemon-held handlers,
+        // regardless of event type (Residual, SwitchIn, etc.)
         int speed = 0;
-        if (usesSpeed && h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
+        if (h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
         {
             Pokemon pokemon = pokemonEffectHolder.Pokemon;
             speed = pokemon.Speed;
@@ -237,7 +223,7 @@ public partial class Battle
             // This is used by Quick Guard to block moves with artificially enhanced priority
             if (Gen > 5)
             {
-                moveAction.Move.Priority = priority;
+                move.Priority = priority;
             }
 
             // Update the speed directly — no record clone needed

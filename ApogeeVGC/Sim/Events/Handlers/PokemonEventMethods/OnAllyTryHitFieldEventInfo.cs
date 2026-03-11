@@ -48,7 +48,7 @@ public sealed record OnAllyTryHitFieldEventInfo : EventHandlerInfo
                 {
                     BoolBoolIntEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     IntBoolIntEmptyVoidUnion i => IntRelayVar.Get(i.Value),
-                    EmptyBoolIntEmptyVoidUnion => BoolRelayVar.False,
+                    EmptyBoolIntEmptyVoidUnion => null,
                     VoidUnionBoolIntEmptyVoidUnion => null,
                     null => null,
                     _ => null

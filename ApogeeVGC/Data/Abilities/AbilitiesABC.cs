@@ -1057,7 +1057,8 @@ public partial record Abilities
                     {
                         if (!accuracy.HasValue) return new VoidReturn();
                         battle.Debug("compoundeyes - enhancing accuracy");
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                    return new VoidReturn();
                     }, -1),
             },
             [AbilityId.Contrary] = new()
@@ -1311,8 +1312,8 @@ public partial record Abilities
         if (pokemon.SwitchFlag.IsTrue() || ally?.SwitchFlag.IsTrue() == true) return;
 
         if (ally == null ||
-            pokemon.BaseSpecies.BaseSpecies != SpecieId.Tatsugiri ||
-            ally.BaseSpecies.BaseSpecies != SpecieId.Dondozo)
+            pokemon.BaseSpecies.Id != SpecieId.Tatsugiri ||
+            ally.BaseSpecies.Id != SpecieId.Dondozo)
         {
             // Handle edge cases - remove commanding volatile if present
             if (pokemon.GetVolatile(ConditionId.Commanding) != null)

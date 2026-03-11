@@ -1,47 +1,36 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"141,262,383,624"}
->player p1 {"name":"Player1","team":"Rhydon||Eviolite|LightningRod|stoneedge,protect,highhorsepower,stealthrock||85,85,85,85,85,85|M|||86|,,,,,Flying]Spidops||SitrusBerry|Stakeout|circlethrow,stringshot,stickyweb,lunge||85,85,85,85,85,85|M||||,,,,,Water]Greedent||SitrusBerry|CheekPouch|highhorsepower,swordsdance,doubleedge,knockoff||85,85,85,85,85,85|M|||86|,,,,,Ghost]Zangoose||ToxicOrb|ToxicBoost|facade,closecombat,knockoff,protect||85,85,85,85,85,85|M|||87|,,,,,Normal]Gardevoir||ChoiceScarf|Trace|mysticalfire,trick,dazzlinggleam,psychic||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fire]Revavroom||LifeOrb|Filter|gunkshot,ironhead,protect,partingshot||85,85,85,85,85,85|F|||84|,,,,,Flying"}
->player p2 {"name":"Player2","team":"Delibird||ChoiceBand|Hustle|drillrun,iceshard,icespinner,bravebird||85,85,85,85,85,85|M||||,,,,,Ground]Grafaiai||AssaultVest|PoisonTouch|gunkshot,knockoff,uturn,superfang||85,85,85,85,85,85|M|||88|,,,,,Dark]Reuniclus||LifeOrb|MagicGuard|trickroom,protect,focusblast,psychic||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fighting]Zebstrika||LifeOrb|LightningRod|highhorsepower,overheat,thunderbolt,protect||85,85,85,85,85,85|M|||87|,,,,,Water]Iron Treads||SitrusBerry|QuarkDrive|ironhead,knockoff,stealthrock,highhorsepower||85,85,85,85,85,85|N|||81|,,,,,Steel]Dragonite||ChoiceBand|InnerFocus|ironhead,dragonclaw,stompingtantrum,extremespeed||85,85,85,85,85,85|F|||82|,,,,,Normal"}
->p1 move protect, move circlethrow +2
->p2 move iceshard +1, move superfang +1
->p1 move stoneedge +1, move stickyweb
->p2 move iceshard +2, move thunderbolt +1
->p1 move stealthrock, move stickyweb
->p2 move iceshard +2, move overheat +1
->p1 move highhorsepower +2, move stringshot
->p2 move iceshard +2, move highhorsepower +1
->p2 pass, switch 4
->p1 move highhorsepower +1, move lunge +1
->p2 move iceshard +1, move superfang +1
->p1 move protect, move circlethrow +2
->p2 move iceshard +2, move uturn +2
->p2 pass, switch 6
->p1 move highhorsepower +2, move circlethrow +2
->p2 move iceshard +1, move highhorsepower +2
->p1 switch 5, switch 4
->p1 move dazzlinggleam, move knockoff +1
->p2 move iceshard +2, move ironhead +2
->p2 switch 5, pass
->p1 move dazzlinggleam, move knockoff +2
->p2 move ironhead +2, move ironhead +1
->p2 switch 3, pass
->p1 move dazzlinggleam, move protect
->p2 move trickroom, move ironhead +2
->p1 move dazzlinggleam, move protect
->p2 move psychic +2, move stealthrock
->p1 pass, switch 6
->p2 pass, switch 6
->p1 move dazzlinggleam, move protect
->p2 move trickroom, move knockoff +1
+>player p1 {"name":"Player1","team":"Lokix||LifeOrb|TintedLens|firstimpression,protect,suckerpunch,uturn||85,85,85,85,85,85|F|||88|,,,,,Bug]Barraskewda||LifeOrb|PropellerTail|closecombat,waterfall,protect,poisonjab||85,85,85,85,85,85|F|||85|,,,,,Fighting]Venomoth||LifeOrb|TintedLens|sludgebomb,quiverdance,bugbuzz,protect||85,,85,85,85,85|M|,0,,,,||90|,,,,,Bug]Rayquaza||LifeOrb|AirLock|dracometeor,dragonascent,earthpower,protect||85,85,85,85,85,85|N|||75|,,,,,Ground]Spectrier||LifeOrb|GrimNeigh|protect,nastyplot,terablast,shadowball||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Iron Boulder||BoosterEnergy|QuarkDrive|protect,swordsdance,mightycleave,closecombat||85,85,85,85,85,85|N|||77|,,,,,Fighting"}
+>player p2 {"name":"Player2","team":"Muk|MukAlola|AssaultVest|PoisonTouch|poisonjab,knockoff,snarl,icepunch||85,85,85,85,85,85|F|||82|,,,,,Flying]Malamar||SitrusBerry|Contrary|protect,trickroom,knockoff,superpower||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Zamazenta||RustedShield|DauntlessShield|wideguard,heavyslam,irondefense,bodypress||85,85,85,85,85,85|N|||67|,,,,,Steel]Qwilfish||SitrusBerry|Intimidate|icywind,flipturn,toxicspikes,gunkshot||85,85,85,85,85,85|F|||87|,,,,,Grass]Reuniclus||LifeOrb|MagicGuard|psychic,focusblast,shadowball,trickroom||85,,85,85,85,|M|,0,,,,0||84|,,,,,Fighting]Gyarados||SitrusBerry|Intimidate|thunderwave,waterfall,helpinghand,taunt||85,85,85,85,85,85|F|||80|,,,,,Ground"}
+>p1 move uturn +2, move waterfall +2
+>p2 move knockoff +1, move superpower +1
 >p1 switch 3, pass
->p1 move doubleedge +1, move partingshot +2
->p2 move focusblast +1, move gunkshot +2
->p1 pass, move partingshot +1
->p2 move psychic +1, move uturn +1
->p1 pass, move partingshot +1
->p2 move trickroom, move uturn +1
->p1 pass, move protect
->p2 move trickroom, move gunkshot +2
->p1 pass, move protect
->p2 move protect, move superfang +1
->p1 pass, move ironhead +1
->p2 move psychic +2, move knockoff +2
+>p2 pass, switch 4
+>p1 move sludgebomb +1, move poisonjab +2
+>p2 move icepunch +2, move flipturn +2
+>p2 pass, switch 5
+>p1 move bugbuzz +1, move protect
+>p2 move poisonjab +2, move trickroom
+>p1 move sludgebomb +2, move waterfall +1
+>p2 move snarl, move focusblast +1
+>p1 pass, switch 6
+>p1 move quiverdance, move mightycleave +1
+>p2 move knockoff +1, move psychic +2
+>p2 switch 3, pass
+>p1 move quiverdance, move closecombat +2
+>p2 move irondefense, move psychic +2
+>p1 move quiverdance, move mightycleave +2
+>p2 move bodypress +2, move trickroom
+>p1 pass, switch 5
+>p1 move bugbuzz +1, move shadowball +2
+>p2 move heavyslam +2, move psychic +2
+>p2 pass, switch 5
+>p1 move quiverdance, move shadowball +1
+>p2 move irondefense, move toxicspikes
+>p2 switch 6, pass
+>p1 move quiverdance, move shadowball +2
+>p2 move taunt +1, move icywind
+>p1 move bugbuzz +2, move nastyplot
+>p2 move waterfall +2, pass
+>p1 pass, switch 4
+>p1 move sludgebomb +2, move protect
+>p2 move waterfall +1, pass

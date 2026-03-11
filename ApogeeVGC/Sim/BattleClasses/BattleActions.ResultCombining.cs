@@ -14,14 +14,13 @@ public partial class BattleActions
     }
 
     /// <summary>
-    /// Combines two move result values based on priority.
-    /// Used to aggregate results across multiple targets.
-    /// Priority order (highest to lowest): undefined, string (success), null, boolean, number.
-    /// When both values are numbers, they are summed.
+    /// Combines two move result values following Showdown's combineResults semantics.
+    /// In Showdown, the dominated/indexOf(typeof) check is dead code (it compares type strings
+    /// against a value array, always returning -1). The effective logic is:
+    /// 1. If left is truthy and right is falsy (not 0), return left
+    /// 2. If both are numbers, sum them
+    /// 3. Otherwise return right
     /// </summary>
-    /// <param name="left">First result value</param>
-    /// <param name="right">Second result value</param>
-    /// <returns>Combined result with the higher priority, or sum if both are numbers</returns>
     public static BoolIntEmptyUndefinedUnion CombineResults(BoolIntEmptyUndefinedUnion? left,
         BoolIntEmptyUndefinedUnion? right)
     {
@@ -38,15 +37,9 @@ public partial class BattleActions
 
         if (right == null) return left;
 
-        int leftPriority = GetBattleActionsPriority(left);
-        int rightPriority = GetBattleActionsPriority(right);
-
-        // If left has lower priority (higher index = more concrete), return it
-        // Matches Showdown: indexOf(typeof left) > indexOf(typeof right) → return left
-        if (leftPriority > rightPriority)
-        {
-            return left;
-        }
+        // Note: Showdown's dominated/indexOf(typeof) priority check is dead code —
+        // it uses indexOf(typeof value) on a value array, always returning -1.
+        // We intentionally omit it here to match Showdown's actual behavior.
 
         // If left is truthy and right is falsy (but not 0)
         // In TS: left && !right && right !== 0

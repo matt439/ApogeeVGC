@@ -88,7 +88,9 @@ public partial class BattleActions
                 newMove = oldActive.LastMove;
             }
 
-            // Copy volatiles if needed (U-turn, Shed Tail, etc.)
+            // Copy volatiles if needed (Baton Pass, Shed Tail)
+            // U-turn/Flip Turn (BoolMoveSelfSwitch) just switch — they do NOT copy volatiles/boosts.
+            // Only CopyVolatileMoveSelfSwitch (Baton Pass) copies volatiles/boosts.
             if (switchCopyFlag != null)
             {
                 switch (switchCopyFlag)
@@ -96,9 +98,10 @@ public partial class BattleActions
                     case ShedTailMoveSelfSwitch:
                         pokemon.CopyVolatileFrom(oldActive, ConditionId.ShedTail);
                         break;
-                    default:
+                    case CopyVolatileMoveSelfSwitch:
                         pokemon.CopyVolatileFrom(oldActive, false);
                         break;
+                    // BoolMoveSelfSwitch (U-turn, Flip Turn, etc.) — no volatile copy
                 }
             }
 

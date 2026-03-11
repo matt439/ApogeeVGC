@@ -386,7 +386,7 @@ public partial record Abilities
                 // OnResidualOrder = 29
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Zygarde ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Zygarde ||
                         pokemon.Transformed ||
                         pokemon.Hp == 0) return;
                     if (pokemon.Species.Id == SpecieId.ZygardeComplete ||
@@ -452,6 +452,7 @@ public partial record Abilities
                 Name = "Prankster",
                 Num = 158,
                 Rating = 4.0,
+                ImmuneTypes = [PokemonType.Dark],
                 OnModifyPriority = OnModifyPriorityEventInfo.Create((_, priority, _, _, move) =>
                 {
                     if (move == null || move.Category != MoveCategory.Status) return new VoidReturn();

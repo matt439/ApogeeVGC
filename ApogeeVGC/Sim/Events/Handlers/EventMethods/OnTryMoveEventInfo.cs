@@ -34,8 +34,8 @@ public sealed record OnTryMoveEventInfo : EventHandlerInfo
         return new OnTryMoveEventInfo(
             context => handler(
                 context.Battle,
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
             ),
             priority,

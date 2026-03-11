@@ -4,6 +4,12 @@ using System.Data;
 namespace ApogeeVGC.Sim.FormatClasses;
 
 /// <summary>
+/// Minimal rule entry in the RuleTable dictionary.
+/// In Showdown, rules carry sub-rules and values; here we just need presence tracking.
+/// </summary>
+public record Rule;
+
+/// <summary>
 /// Tracks rules, bans, and numeric settings for a format.
 /// Mirrors the RuleTable from Pokemon Showdown's dex-formats.ts.
 /// </summary>

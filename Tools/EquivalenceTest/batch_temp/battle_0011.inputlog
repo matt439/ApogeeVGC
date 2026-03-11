@@ -1,83 +1,33 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"78,145,212,345"}
->player p1 {"name":"Player1","team":"Breloom||FocusSash|Technician|closecombat,bulletseed,spore,machpunch||85,85,85,85,85,85|M|||84|,,,,,Fighting]Kyurem|KyuremWhite|ChoiceSpecs|Turboblaze|earthpower,dracometeor,fusionflare,icebeam||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Giratina|GiratinaOrigin|GriseousCore|Levitate|poltergeist,protect,dracometeor,shadowforce||85,85,85,85,85,85|N|||74|,,,,,Poison]Pyroar||LifeOrb|Unnerve|terablast,fireblast,hypervoice,protect||85,,85,85,85,85|M|,0,,,,||83|,,,,,Grass]Overqwil||LifeOrb|Intimidate|liquidation,gunkshot,throatchop,swordsdance||85,85,85,85,85,85|F|||82|,,,,,Dark]Bellossom||SitrusBerry|Healer|gigadrain,strengthsap,quiverdance,batonpass||85,,85,85,85,85|F|,0,,,,||87|,,,,,Poison"}
->player p2 {"name":"Player2","team":"Skeledirge||Leftovers|Unaware|protect,slackoff,torchsong,shadowball||85,,85,85,85,85|M|,0,,,,||80|,,,,,Water]Gogoat||AssaultVest|SapSipper|leafstorm,hornleech,highhorsepower,doubleedge||85,85,85,85,85,85|M|||90|,,,,,Normal]Grimmsnarl||LightClay|Prankster|thunderwave,spiritbreak,reflect,lightscreen||85,85,85,85,85,85|M|||82|,,,,,Steel]Vileplume||SitrusBerry|EffectSpore|stunspore,sludgebomb,strengthsap,pollenpuff||85,,85,85,85,85|M|,0,,,,||89|,,,,,Steel]Iron Bundle||FocusSash|QuarkDrive|protect,freezedry,hydropump,encore||85,,85,85,85,85|N|,0,,,,||78|,,,,,Water]Toxapex||Leftovers|Regenerator|toxic,recover,infestation,banefulbunker||85,,85,85,85,85|F|,0,,,,||92|,,,,,Grass"}
->p1 move bulletseed +2, move dracometeor +1
->p2 move shadowball +1, move leafstorm +1
->p1 move closecombat +1, move dracometeor +2
->p2 move protect, move doubleedge +2
->p1 move closecombat +1, move dracometeor +2
->p2 move shadowball +2, move hornleech +1
->p1 switch 6, pass
->p1 move strengthsap +2, move dracometeor +2
->p2 move protect, move hornleech +2
->p2 pass, switch 6
->p1 move batonpass, move dracometeor +2
->p2 move slackoff, move recover
->p1 switch 4, pass
->p1 move protect, move dracometeor +1
->p2 move slackoff, move banefulbunker
->p1 move fireblast +2, move dracometeor +2
->p2 move shadowball +2, move recover
+>player p1 {"name":"Player1","team":"Eiscue||SitrusBerry|IceFace|bellydrum,protect,liquidation,icespinner||85,85,85,85,85,85|F|||89|,,,,,Water]Porygon-Z||ChoiceSpecs|Adaptability|swift,trick,shadowball,triattack||85,,85,85,85,85|N|,0,,,,||84|,,,,,Ghost]Passimian||ChoiceScarf|Defiant|uturn,knockoff,closecombat,rockslide||85,85,85,85,85,85|M|||82|,,,,,Dark]Electabuzz||Eviolite|Static|followme,protect,electroweb,thunderbolt||85,,85,85,85,85|F|,0,,,,||84|,,,,,Flying]Terapagos||PowerHerb|TeraShift|meteorbeam,darkpulse,terastarstorm,protect||85,,85,85,85,85|F|,0,,,,||73|,,,,,Stellar]Regieleki||Magnet|Transistor|thunderbolt,protect,voltswitch,electroweb||85,,85,85,85,85|N|,0,,,,||79|,,,,,Electric"}
+>player p2 {"name":"Player2","team":"Flamigo||ChoiceScarf|Scrappy|closecombat,uturn,bravebird,throatchop||85,85,85,85,85,85|M|||84|,,,,,Fire]Spidops||SitrusBerry|Stakeout|stickyweb,stringshot,lunge,knockoff||85,85,85,85,85,85|M||||,,,,,Water]Dialga|DialgaOrigin|AdamantCrystal|Telepathy|dracometeor,flashcannon,thunderwave,fireblast||85,,85,85,85,85|N|,0,,,,||74|,,,,,Dragon]Lurantis||AssaultVest|Contrary|superpower,leafstorm,terablast,knockoff||85,85,85,85,85,85|M|||85|,,,,,Stellar]Ninetales||ChoiceSpecs|Drought|solarbeam,overheat,heatwave,weatherball||85,,85,85,85,85|M|,0,,,,||79|,,,,,Grass]Bombirdier||ChoiceBand|RockyPayload|bravebird,suckerpunch,knockoff,rockslide||85,85,85,85,85,85|F|||84|,,,,,Rock"}
+>p1 move bellydrum, move trick +1
+>p2 move closecombat +2, move stickyweb
 >p1 pass, switch 3
->p1 move protect, move protect
->p2 move torchsong +2, move infestation +1
->p1 move fireblast +1, move protect
->p2 move protect, move banefulbunker
->p1 move hypervoice, move protect
->p2 move torchsong +2, move recover
->p1 move terablast +2, move poltergeist +2
->p2 move protect, move banefulbunker
->p1 move hypervoice, move poltergeist +2
->p2 move torchsong +1, move infestation +2
->p1 move hypervoice, move shadowforce +1
->p2 move protect, move banefulbunker
->p1 move hypervoice, move shadowforce +1
->p2 move protect, move toxic +1
->p1 move hypervoice, move shadowforce +2
->p2 move shadowball +2, move recover
->p1 move terablast +2, move shadowforce +2
->p2 move protect, move toxic +2
+>p1 move bellydrum, move closecombat +1
+>p2 move closecombat +2, move lunge +1
+>p2 switch 6, pass
+>p1 move liquidation +1, move closecombat +2
+>p2 move rockslide, move stringshot
 >p1 switch 4, pass
->p1 move strengthsap +2, move poltergeist +1
->p2 move protect, move infestation +1
->p2 switch 3, pass
->p1 move strengthsap +2, move shadowforce +1
->p2 move reflect, move toxic +2
->p1 move gigadrain +1, move shadowforce +1
->p2 move thunderwave +2, move banefulbunker
->p1 move batonpass, move protect
->p2 move thunderwave +2, move banefulbunker
->p1 switch 5, pass
->p1 move gunkshot +1, move poltergeist +2
->p2 move spiritbreak +1, move infestation +1
->p1 move gunkshot +2, move shadowforce +1
->p2 move reflect, move toxic +1
->p1 move swordsdance, move shadowforce +1
->p2 move thunderwave +1, move infestation +1
->p1 move throatchop +1, move dracometeor +2
->p2 move reflect, move banefulbunker
->p1 move liquidation +2, move protect
->p2 move thunderwave +2, move banefulbunker
->p1 switch 5, pass
->p1 move gigadrain +1, move shadowforce +1
->p2 move lightscreen, move infestation +2
->p2 switch 5, pass
->p1 move gigadrain +2, move shadowforce +1
->p2 move freezedry +2, move infestation +1
->p1 move quiverdance, move protect
->p2 move protect, move banefulbunker
->p1 move quiverdance, move shadowforce +1
->p2 move protect, move infestation +2
->p1 move strengthsap +1, move shadowforce +1
->p2 move encore +1, move banefulbunker
+>p1 move thunderbolt +2, move closecombat +2
+>p2 move rockslide, move lunge +1
+>p1 pass, switch 5
+>p1 move thunderbolt +1, move protect
+>p2 move rockslide, move stickyweb
 >p2 switch 4, pass
->p1 move strengthsap +1, move dracometeor +1
->p2 move pollenpuff +1, move infestation +2
->p1 move strengthsap +2, pass
->p2 move stunspore +1, move infestation +2
->p1 move strengthsap +1, pass
->p2 move sludgebomb +1, move infestation +1
->p1 move strengthsap +2, pass
->p2 move stunspore +1, move toxic +1
->p1 move batonpass, pass
->p2 move stunspore +2, move recover
+>p1 move electroweb, move protect
+>p2 move superpower +2, move stringshot
+>p1 move thunderbolt +1, move protect
+>p2 move superpower +2, move lunge +2
+>p1 move followme, move protect
+>p2 move terablast +1, move lunge +1
+>p1 switch 6, pass
+>p1 move protect, move darkpulse +1
+>p2 move superpower +1, move stickyweb
+>p1 move thunderbolt +2, move darkpulse +1
+>p2 move terablast +1, move stringshot
+>p1 move electroweb, move darkpulse +1
+>p2 move leafstorm +1, move stickyweb
+>p1 pass, move meteorbeam +2
+>p2 move superpower +2, move stickyweb

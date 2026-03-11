@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 // ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
@@ -540,7 +541,8 @@ public partial record Abilities
                         // (TypeScript checks: move.category === 'Physical' && typeof accuracy === 'number')
                         if (move.Category == MoveCategory.Physical && accuracy.HasValue)
                         {
-                            return battle.ChainModify([3277, 4096]);
+                            battle.ChainModify([3277, 4096]);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -807,6 +809,10 @@ public partial record Abilities
                         {
                             battle.Add("replace", pokemon, details.ToString());
                             battle.Add("-end", pokemon, "Illusion");
+                            if (battle.RuleTable.Has(RuleId.IllusionLevelMod))
+                            {
+                                battle.Hint("Illusion Level Mod is active, so this Pok\u00e9mon's true level was hidden.", true);
+                            }
                         }
                     }
                 }),

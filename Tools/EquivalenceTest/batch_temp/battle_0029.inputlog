@@ -1,59 +1,58 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"204,379,554,903"}
->player p1 {"name":"Player1","team":"Sandslash|SandslashAlola|AssaultVest|SlushRush|ironhead,drillrun,tripleaxel,iceshard||85,85,85,85,85,85|M|||91|,,,,,Water]Ribombee||LifeOrb|ShieldDust|dazzlinggleam,protect,terablast,quiverdance||85,,85,85,85,85|M|,0,,,,||86|,,,,,Ground]Dewgong||SitrusBerry|ThickFat|fakeout,hydropump,icywind,encore||85,85,85,85,85,85|F|||91|,,,,,Grass]Flygon||LoadedDice|Levitate|tailwind,protect,scaleshot,earthpower||85,85,85,85,85,85|F|||83|,,,,,Steel]Mimikyu||LifeOrb|Disguise|shadowclaw,playrough,shadowsneak,swordsdance||85,85,85,85,85,85|M|||82|,,,,,Ghost]Donphan||AssaultVest|Sturdy|rapidspin,iceshard,highhorsepower,stoneedge||85,85,85,85,85,85|M|||87|,,,,,Dragon"}
->player p2 {"name":"Player2","team":"Cramorant||SitrusBerry|GulpMissile|protect,tailwind,surf,bravebird||85,85,85,85,85,85|M|||86|,,,,,Ground]Ho-Oh||SitrusBerry|Regenerator|bravebird,sacredfire,protect,tailwind||85,85,85,85,85,85|N|||70|,,,,,Ground]Metagross||AssaultVest|ClearBody|heavyslam,stompingtantrum,psychicfangs,bulletpunch||85,85,85,85,85,85|N|||80|,,,,,Water]Giratina||ChestoBerry|Pressure|breakingswipe,thunderwave,rest,shadowball||85,85,85,85,85,85|N|||76|,,,,,Fairy]Regidrago||ChoiceScarf|DragonsMaw|earthpower,dracometeor,dragonclaw,dragonenergy||85,85,85,85,85,85|N|||74|,,,,,Dragon]Revavroom||LifeOrb|Filter|partingshot,ironhead,protect,gunkshot||85,85,85,85,85,85|F|||84|,,,,,Water"}
->p1 move iceshard +2, move protect
->p2 move bravebird +1, move tailwind
->p1 move tripleaxel +2, move dazzlinggleam
->p2 move bravebird +1, move tailwind
->p1 move ironhead +2, move protect
->p2 move bravebird +2, move tailwind
+>player p1 {"name":"Player1","team":"Barraskewda||LifeOrb|PropellerTail|protect,closecombat,waterfall,poisonjab||85,85,85,85,85,85|M|||85|,,,,,Fighting]Phione||Leftovers|Hydration|icebeam,scald,takeheart,protect||85,,85,85,85,85|N|,0,,,,||90|,,,,,Dragon]Tinkaton||SitrusBerry|OwnTempo|encore,playrough,gigatonhammer,fakeout||85,85,85,85,85,85|F|||82|,,,,,Water]Dudunsparce|DudunsparceThreeSegment|SitrusBerry|Rattled|tailwind,hyperdrill,protect,earthpower||85,85,85,85,85,85|M|||86|,,,,,Normal]Charizard||LifeOrb|Blaze|hurricane,heatwave,protect,scorchingsands||85,,85,85,85,85|M|,0,,,,||82|,,,,,Ground]Hatterene||LifeOrb|MagicBounce|dazzlinggleam,psychic,mysticalfire,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Goodra||AssaultVest|SapSipper|fireblast,powerwhip,dracometeor,breakingswipe||85,85,85,85,85,85|M|||86|,,,,,Fire]Murkrow||Eviolite|Prankster|tailwind,haze,taunt,bravebird||85,85,85,85,85,85|M|||90|,,,,,Ghost]Latios||SoulDew|Levitate|protect,dracometeor,lusterpurge,aurasphere||85,,85,85,85,85|M|,0,,,,||79|,,,,,Dragon]Articuno||SitrusBerry|Pressure|bravebird,icebeam,protect,icywind||85,85,85,85,85,85|N|||82|,,,,,Ground]Tentacruel||AssaultVest|ClearBody|sludgebomb,icywind,knockoff,hydropump||85,85,85,85,85,85|M|||85|,,,,,Grass]Rabsca||SitrusBerry|Synchronize|trickroom,bugbuzz,psychic,revivalblessing||85,,85,85,85,|F|,0,,,,0||87|,,,,,Steel"}
+>p1 move waterfall +2, move scald +2
+>p2 move fireblast +1, move taunt +1
+>p1 move waterfall +2, move icebeam +2
+>p2 move breakingswipe, move bravebird +1
 >p2 pass, switch 5
->p1 move tripleaxel +2, move terablast +2
->p2 move protect, move dragonclaw +2
->p1 move tripleaxel +1, move terablast +2
->p2 move surf, move dragonclaw +1
->p1 move tripleaxel +2, move quiverdance
->p2 move surf, move dragonclaw +1
+>p1 move closecombat +2, move scald +2
+>p2 move powerwhip +2, move icywind
+>p1 move poisonjab +2, move takeheart
+>p2 move fireblast +2, move knockoff +2
+>p1 switch 6, pass
+>p1 move trickroom, move takeheart
+>p2 move dracometeor +1, move knockoff +1
+>p1 move mysticalfire +2, move scald +2
+>p2 move powerwhip +1, move sludgebomb +1
 >p1 switch 5, pass
->p1 move playrough +1, move dazzlinggleam
->p2 move protect, move dragonclaw +1
->p2 pass, switch 4
->p1 move shadowclaw +2, move quiverdance
->p2 move bravebird +2, move shadowball +1
->p1 pass, switch 6
->p1 move swordsdance, move stoneedge +2
->p2 move protect, move breakingswipe
->p1 move shadowclaw +1, move rapidspin +2
->p2 move tailwind, move shadowball +2
->p2 switch 6, pass
->p1 move playrough +1, move iceshard +1
->p2 move protect, move breakingswipe
->p1 move shadowclaw +2, move rapidspin +2
->p2 move ironhead +1, move shadowball +1
->p1 switch 4, pass
->p1 move earthpower +1, move rapidspin +2
->p2 move partingshot +1, move thunderwave +2
->p2 switch 3, pass
->p1 move protect, move highhorsepower +2
->p2 move heavyslam +1, move rest
->p1 move protect, move iceshard +2
->p2 move stompingtantrum +2, move rest
->p1 move earthpower +1, move stoneedge +1
->p2 move stompingtantrum +2, move shadowball +2
->p1 move tailwind, move highhorsepower +1
->p2 move bulletpunch +2, move breakingswipe
+>p1 move scorchingsands +1, move protect
+>p2 move fireblast +1, move sludgebomb +2
+>p1 move scorchingsands +2, move takeheart
+>p2 move fireblast +2, move sludgebomb +1
+>p2 pass, switch 3
+>p1 move heatwave, move takeheart
+>p2 move powerwhip +1, move protect
+>p1 move protect, move scald +1
+>p2 move dracometeor +1, move protect
+>p1 move heatwave, move icebeam +1
+>p2 move breakingswipe, move aurasphere +2
+>p2 switch 4, pass
+>p1 move heatwave, move takeheart
+>p2 move protect, move dracometeor +2
 >p1 pass, switch 3
->p1 move earthpower +1, move fakeout +2
->p2 move bulletpunch +1, move thunderwave +1
->p1 move earthpower +1, move encore +1
->p2 move bulletpunch +1, move shadowball +1
->p1 move tailwind, move icywind
->p2 pass, move thunderwave +1
+>p1 move hurricane +1, move encore +2
+>p2 move protect, move lusterpurge +2
 >p1 move protect, move fakeout +2
->p2 pass, move thunderwave +1
->p1 move protect, move fakeout +2
->p2 pass, move thunderwave +1
->p1 move earthpower +1, move icywind
->p2 pass, move thunderwave +1
->p1 move earthpower +1, move icywind
->p2 pass, move breakingswipe
+>p2 move icebeam +1, move lusterpurge +2
+>p1 move hurricane +1, move encore +1
+>p2 move protect, move lusterpurge +1
+>p1 move protect, move gigatonhammer +1
+>p2 move icywind, move lusterpurge +1
+>p1 move heatwave, move encore +2
+>p2 move icebeam +1, move lusterpurge +2
+>p2 switch 6, pass
+>p1 move heatwave, move encore +2
+>p2 move trickroom, move lusterpurge +1
+>p1 switch 4, pass
+>p1 move earthpower +1, move fakeout +1
+>p2 move revivalblessing, move lusterpurge +1
+>p2 switch 6, pass
+>p1 move tailwind, move gigatonhammer +1
+>p2 move psychic +2, move lusterpurge +2
+>p1 move earthpower +1, move fakeout +1
+>p2 move bugbuzz +1, move aurasphere +1
+>p1 move protect, move playrough +2
+>p2 move bugbuzz +2, move dracometeor +1
+>p1 move protect, pass
+>p2 move psychic +2, move aurasphere +1

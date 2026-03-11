@@ -37,12 +37,19 @@ public sealed record OnAnyRedirectTargetEventInfo : EventHandlerInfo
         return new OnAnyRedirectTargetEventInfo(
                         context =>
             {
+                // In Showdown: callback(relayVar, target, source, sourceEffect)
+                // relayVar = current move target Pokemon
+                // target = event target = attacker
+                // source = event source = attacker
+                // For onAnyRedirectTarget, the first param ('target') is the relayVar
+                var moveTarget = context.TryGetRelayVar<PokemonRelayVar>()?.Pokemon
+                                 ?? context.GetTargetOrSourcePokemon();
                 var result = handler(
                     context.Battle,
-                context.GetTargetOrSourcePokemon(),
-                context.GetSourceOrTargetPokemon(),
-                context.GetSourceEffect<IEffect>(),
-                context.GetMove()
+                    moveTarget,
+                    context.GetSourceOrTargetPokemon(),
+                    context.GetSourceEffect<IEffect>(),
+                    context.GetMove()
                 );
                 return result switch
                 {

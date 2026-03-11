@@ -35,19 +35,19 @@ public sealed record OnTryHitEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return result switch
                 {
                     BoolBoolIntEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     IntBoolIntEmptyVoidUnion i => IntRelayVar.Get(i.Value),
-                    EmptyBoolIntEmptyVoidUnion => BoolRelayVar.False,
+                    // Empty = NOT_FAIL (Showdown's empty string ""). Must return non-null falsy
+                    // RelayVar so RunEvent processes it (C# null = TS undefined = passthrough).
+                    EmptyBoolIntEmptyVoidUnion => new NullRelayVar(),
                     VoidUnionBoolIntEmptyVoidUnion => null,
-                    // null result = NOT_FAIL (Showdown's empty string "").
-                    // Must return a non-null falsy RelayVar so RunEvent processes it
-                    // (C# null = TS undefined = "no opinion/passthrough", which is wrong here).
+                    // null result also = NOT_FAIL
                     null => new NullRelayVar(),
                     _ => null
                 };

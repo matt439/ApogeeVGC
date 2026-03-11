@@ -42,7 +42,7 @@ public sealed record OnTryHitSideEventInfo : EventHandlerInfo
                 return result switch
                 {
                     BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
-                    EmptyBoolEmptyVoidUnion => BoolRelayVar.False,
+                    EmptyBoolEmptyVoidUnion => new NullRelayVar(),
                     VoidUnionBoolEmptyVoidUnion => null,
                     _ => null
                 };

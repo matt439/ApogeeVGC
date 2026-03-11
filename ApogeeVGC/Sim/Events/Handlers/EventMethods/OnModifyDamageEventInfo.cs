@@ -35,8 +35,8 @@ public sealed record OnModifyDamageEventInfo : EventHandlerInfo
             context => handler(
                 context.Battle,
                 context.GetIntRelayVar(),
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
             ),
             priority,

@@ -3,56 +3,19 @@
   "seed": "176,327,478,779",
   "p1Seed": "1035,1095,1205,1365",
   "p2Seed": "1525,1585,1745,1855",
-  "p1TeamPacked": "Sinistcha|SinistchaMasterpiece|Leftovers|Hospitality|calmmind,protect,shadowball,matchagotcha||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Great Tusk||AssaultVest|Protosynthesis|closecombat,headlongrush,knockoff,icespinner||85,85,85,85,85,85|N|||81|,,,,,Fire]Hariyama||FlameOrb|Guts|fakeout,closecombat,knockoff,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Espathra||LifeOrb|SpeedBoost|dazzlinggleam,shadowball,protect,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Zapdos||SitrusBerry|Static|thunderbolt,tailwind,roost,hurricane||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Minun||SitrusBerry|VoltAbsorb|encore,superfang,nuzzle,thunderbolt||85,85,85,85,85,85|M|||91|,,,,,Flying",
-  "p2TeamPacked": "Giratina||Leftovers|Pressure|shadowball,calmmind,protect,aurasphere||85,,85,85,85,85|N|,0,,,,||76|,,,,,Fairy]Drifblim||SitrusBerry|Unburden|strengthsap,willowisp,tailwind,shadowball||85,,85,85,85,85|F|,0,,,,||85|,,,,,Ground]Milotic||SitrusBerry|Competitive|dragontail,icywind,recover,scald||85,85,85,85,85,85|M|||81|,,,,,Steel]Arcanine|ArcanineHisui|HeavyDutyBoots|Intimidate|protect,rockslide,flareblitz,willowisp||85,85,85,85,85,85|M|||79|,,,,,Grass]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fire]Furret||SitrusBerry|Frisk|bodyslam,knockoff,helpinghand,followme||85,85,85,85,85,85|M|||98|,,,,,Ghost",
+  "p1TeamPacked": "Cinccino||LoadedDice|Technician|protect,tripleaxel,tailslap,bulletseed||85,85,85,85,85,85|F|||85|,,,,,Normal]Diancie||SitrusBerry|ClearBody|bodypress,protect,diamondstorm,trickroom||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Enamorus|EnamorusTherian|SitrusBerry|Overcoat|moonblast,earthpower,springtidestorm,protect||85,,85,85,85,85|F|,0,,,,||82|,,,,,Ground]Quagsire||SitrusBerry|Unaware|liquidation,helpinghand,highhorsepower,icywind||85,85,85,85,85,85|M|||91|,,,,,Fire]Spectrier||LifeOrb|GrimNeigh|protect,shadowball,terablast,nastyplot||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Kingdra||LifeOrb|SwiftSwim|raindance,wavecrash,protect,dracometeor||85,85,85,85,85,85|F|||85|,,,,,Water",
+  "p2TeamPacked": "Golduck||LifeOrb|CloudNine|icebeam,grassknot,hydropump,encore||85,,85,85,85,85|M|,0,,,,||91|,,,,,Grass]Iron Leaves||LifeOrb|QuarkDrive|protect,closecombat,leafblade,psyblade||85,85,85,85,85,85|N|||81|,,,,,Psychic]Enamorus||LifeOrb|Contrary|protect,springtidestorm,tailwind,earthpower||85,,85,85,85,85|F|,0,,,,||79|,,,,,Ground]Yanmega||FocusSash|TintedLens|tailwind,bugbuzz,airslash,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Blissey||SitrusBerry|Healer|hypervoice,helpinghand,softboiled,thunderwave||85,,85,85,85,85|F|,0,,,,||96|,,,,,Poison]Meowstic|MeowsticF|LifeOrb|Competitive|darkpulse,psychic,thunderbolt,protect||85,,85,85,85,85|F|,0,,,,||89|,,,,,Dark",
   "p1Team": [
     {
-      "name": "Sinistcha",
-      "species": "Sinistcha-Masterpiece",
-      "item": "Leftovers",
-      "ability": "Hospitality",
+      "name": "Cinccino",
+      "species": "Cinccino",
+      "item": "Loaded Dice",
+      "ability": "Technician",
       "moves": [
-        "Calm Mind",
         "Protect",
-        "Shadow Ball",
-        "Matcha Gotcha"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 0,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "N",
-      "ivs": {
-        "hp": 31,
-        "atk": 0,
-        "def": 31,
-        "spa": 31,
-        "spd": 31,
-        "spe": 31
-      },
-      "level": 81,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Fairy"
-    },
-    {
-      "name": "Great Tusk",
-      "species": "Great Tusk",
-      "item": "Assault Vest",
-      "ability": "Protosynthesis",
-      "moves": [
-        "Close Combat",
-        "Headlong Rush",
-        "Knock Off",
-        "Ice Spinner"
+        "Triple Axel",
+        "Tail Slap",
+        "Bullet Seed"
       ],
       "nature": "",
       "evs": {
@@ -63,36 +26,7 @@
         "spd": 85,
         "spe": 85
       },
-      "gender": "N",
-      "level": 81,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Fire"
-    },
-    {
-      "name": "Hariyama",
-      "species": "Hariyama",
-      "item": "Flame Orb",
-      "ability": "Guts",
-      "moves": [
-        "Fake Out",
-        "Close Combat",
-        "Knock Off",
-        "Facade"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "M",
+      "gender": "F",
       "level": 85,
       "happiness": 255,
       "hpType": "",
@@ -102,15 +36,52 @@
       "teraType": "Normal"
     },
     {
-      "name": "Espathra",
-      "species": "Espathra",
-      "item": "Life Orb",
-      "ability": "Speed Boost",
+      "name": "Diancie",
+      "species": "Diancie",
+      "item": "Sitrus Berry",
+      "ability": "Clear Body",
       "moves": [
-        "Dazzling Gleam",
-        "Shadow Ball",
+        "Body Press",
         "Protect",
-        "Lumina Crash"
+        "Diamond Storm",
+        "Trick Room"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 0
+      },
+      "gender": "N",
+      "ivs": {
+        "hp": 31,
+        "atk": 31,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 0
+      },
+      "level": 77,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fighting"
+    },
+    {
+      "name": "Enamorus",
+      "species": "Enamorus-Therian",
+      "item": "Sitrus Berry",
+      "ability": "Overcoat",
+      "moves": [
+        "Moonblast",
+        "Earth Power",
+        "Springtide Storm",
+        "Protect"
       ],
       "nature": "",
       "evs": {
@@ -121,7 +92,7 @@
         "spd": 85,
         "spe": 85
       },
-      "gender": "M",
+      "gender": "F",
       "ivs": {
         "hp": 31,
         "atk": 0,
@@ -130,24 +101,53 @@
         "spd": 31,
         "spe": 31
       },
-      "level": 83,
+      "level": 82,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Fairy"
+      "teraType": "Ground"
     },
     {
-      "name": "Zapdos",
-      "species": "Zapdos",
+      "name": "Quagsire",
+      "species": "Quagsire",
       "item": "Sitrus Berry",
-      "ability": "Static",
+      "ability": "Unaware",
       "moves": [
-        "Thunderbolt",
-        "Tailwind",
-        "Roost",
-        "Hurricane"
+        "Liquidation",
+        "Helping Hand",
+        "High Horsepower",
+        "Icy Wind"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "M",
+      "level": 91,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Fire"
+    },
+    {
+      "name": "Spectrier",
+      "species": "Spectrier",
+      "item": "Life Orb",
+      "ability": "Grim Neigh",
+      "moves": [
+        "Protect",
+        "Shadow Ball",
+        "Tera Blast",
+        "Nasty Plot"
       ],
       "nature": "",
       "evs": {
@@ -173,18 +173,18 @@
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Electric"
+      "teraType": "Fairy"
     },
     {
-      "name": "Minun",
-      "species": "Minun",
-      "item": "Sitrus Berry",
-      "ability": "Volt Absorb",
+      "name": "Kingdra",
+      "species": "Kingdra",
+      "item": "Life Orb",
+      "ability": "Swift Swim",
       "moves": [
-        "Encore",
-        "Super Fang",
-        "Nuzzle",
-        "Thunderbolt"
+        "Rain Dance",
+        "Wave Crash",
+        "Protect",
+        "Draco Meteor"
       ],
       "nature": "",
       "evs": {
@@ -195,27 +195,27 @@
         "spd": 85,
         "spe": 85
       },
-      "gender": "M",
-      "level": 91,
+      "gender": "F",
+      "level": 85,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Flying"
+      "teraType": "Water"
     }
   ],
   "p2Team": [
     {
-      "name": "Giratina",
-      "species": "Giratina",
-      "item": "Leftovers",
-      "ability": "Pressure",
+      "name": "Golduck",
+      "species": "Golduck",
+      "item": "Life Orb",
+      "ability": "Cloud Nine",
       "moves": [
-        "Shadow Ball",
-        "Calm Mind",
-        "Protect",
-        "Aura Sphere"
+        "Ice Beam",
+        "Grass Knot",
+        "Hydro Pump",
+        "Encore"
       ],
       "nature": "",
       "evs": {
@@ -226,7 +226,7 @@
         "spd": 85,
         "spe": 85
       },
-      "gender": "N",
+      "gender": "M",
       "ivs": {
         "hp": 31,
         "atk": 0,
@@ -235,24 +235,53 @@
         "spd": 31,
         "spe": 31
       },
-      "level": 76,
+      "level": 91,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Fairy"
+      "teraType": "Grass"
     },
     {
-      "name": "Drifblim",
-      "species": "Drifblim",
-      "item": "Sitrus Berry",
-      "ability": "Unburden",
+      "name": "Iron Leaves",
+      "species": "Iron Leaves",
+      "item": "Life Orb",
+      "ability": "Quark Drive",
       "moves": [
-        "Strength Sap",
-        "Will-O-Wisp",
+        "Protect",
+        "Close Combat",
+        "Leaf Blade",
+        "Psyblade"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 85,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "N",
+      "level": 81,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Psychic"
+    },
+    {
+      "name": "Enamorus",
+      "species": "Enamorus",
+      "item": "Life Orb",
+      "ability": "Contrary",
+      "moves": [
+        "Protect",
+        "Springtide Storm",
         "Tailwind",
-        "Shadow Ball"
+        "Earth Power"
       ],
       "nature": "",
       "evs": {
@@ -272,7 +301,7 @@
         "spd": 31,
         "spe": 31
       },
-      "level": 85,
+      "level": 79,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
@@ -281,27 +310,35 @@
       "teraType": "Ground"
     },
     {
-      "name": "Milotic",
-      "species": "Milotic",
-      "item": "Sitrus Berry",
-      "ability": "Competitive",
+      "name": "Yanmega",
+      "species": "Yanmega",
+      "item": "Focus Sash",
+      "ability": "Tinted Lens",
       "moves": [
-        "Dragon Tail",
-        "Icy Wind",
-        "Recover",
-        "Scald"
+        "Tailwind",
+        "Bug Buzz",
+        "Air Slash",
+        "Protect"
       ],
       "nature": "",
       "evs": {
         "hp": 85,
-        "atk": 85,
+        "atk": 0,
         "def": 85,
         "spa": 85,
         "spd": 85,
         "spe": 85
       },
       "gender": "M",
-      "level": 81,
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 84,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
@@ -310,139 +347,113 @@
       "teraType": "Steel"
     },
     {
-      "name": "Arcanine",
-      "species": "Arcanine-Hisui",
-      "item": "Heavy-Duty Boots",
-      "ability": "Intimidate",
-      "moves": [
-        "Protect",
-        "Rock Slide",
-        "Flare Blitz",
-        "Will-O-Wisp"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "M",
-      "level": 79,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Grass"
-    },
-    {
-      "name": "Ditto",
-      "species": "Ditto",
+      "name": "Blissey",
+      "species": "Blissey",
       "item": "Sitrus Berry",
-      "ability": "Imposter",
+      "ability": "Healer",
       "moves": [
-        "Transform"
-      ],
-      "nature": "",
-      "evs": {
-        "hp": 85,
-        "atk": 85,
-        "def": 85,
-        "spa": 85,
-        "spd": 85,
-        "spe": 85
-      },
-      "gender": "N",
-      "level": 97,
-      "happiness": 255,
-      "hpType": "",
-      "pokeball": "",
-      "gigantamax": false,
-      "dynamaxLevel": 10,
-      "teraType": "Fire"
-    },
-    {
-      "name": "Furret",
-      "species": "Furret",
-      "item": "Sitrus Berry",
-      "ability": "Frisk",
-      "moves": [
-        "Body Slam",
-        "Knock Off",
+        "Hyper Voice",
         "Helping Hand",
-        "Follow Me"
+        "Soft-Boiled",
+        "Thunder Wave"
       ],
       "nature": "",
       "evs": {
         "hp": 85,
-        "atk": 85,
+        "atk": 0,
         "def": 85,
         "spa": 85,
         "spd": 85,
         "spe": 85
       },
-      "gender": "M",
-      "level": 98,
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 96,
       "happiness": 255,
       "hpType": "",
       "pokeball": "",
       "gigantamax": false,
       "dynamaxLevel": 10,
-      "teraType": "Ghost"
+      "teraType": "Poison"
+    },
+    {
+      "name": "Meowstic",
+      "species": "Meowstic-F",
+      "item": "Life Orb",
+      "ability": "Competitive",
+      "moves": [
+        "Dark Pulse",
+        "Psychic",
+        "Thunderbolt",
+        "Protect"
+      ],
+      "nature": "",
+      "evs": {
+        "hp": 85,
+        "atk": 0,
+        "def": 85,
+        "spa": 85,
+        "spd": 85,
+        "spe": 85
+      },
+      "gender": "F",
+      "ivs": {
+        "hp": 31,
+        "atk": 0,
+        "def": 31,
+        "spa": 31,
+        "spd": 31,
+        "spe": 31
+      },
+      "level": 89,
+      "happiness": 255,
+      "hpType": "",
+      "pokeball": "",
+      "gigantamax": false,
+      "dynamaxLevel": 10,
+      "teraType": "Dark"
     }
   ],
   "inputLog": [
     ">start {\"formatid\":\"gen9randomdoublesbattle\",\"seed\":\"176,327,478,779\"}",
-    ">player p1 {\"name\":\"Player1\",\"team\":\"Sinistcha|SinistchaMasterpiece|Leftovers|Hospitality|calmmind,protect,shadowball,matchagotcha||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Great Tusk||AssaultVest|Protosynthesis|closecombat,headlongrush,knockoff,icespinner||85,85,85,85,85,85|N|||81|,,,,,Fire]Hariyama||FlameOrb|Guts|fakeout,closecombat,knockoff,facade||85,85,85,85,85,85|M|||85|,,,,,Normal]Espathra||LifeOrb|SpeedBoost|dazzlinggleam,shadowball,protect,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Zapdos||SitrusBerry|Static|thunderbolt,tailwind,roost,hurricane||85,,85,85,85,85|N|,0,,,,||77|,,,,,Electric]Minun||SitrusBerry|VoltAbsorb|encore,superfang,nuzzle,thunderbolt||85,85,85,85,85,85|M|||91|,,,,,Flying\"}",
-    ">player p2 {\"name\":\"Player2\",\"team\":\"Giratina||Leftovers|Pressure|shadowball,calmmind,protect,aurasphere||85,,85,85,85,85|N|,0,,,,||76|,,,,,Fairy]Drifblim||SitrusBerry|Unburden|strengthsap,willowisp,tailwind,shadowball||85,,85,85,85,85|F|,0,,,,||85|,,,,,Ground]Milotic||SitrusBerry|Competitive|dragontail,icywind,recover,scald||85,85,85,85,85,85|M|||81|,,,,,Steel]Arcanine|ArcanineHisui|HeavyDutyBoots|Intimidate|protect,rockslide,flareblitz,willowisp||85,85,85,85,85,85|M|||79|,,,,,Grass]Ditto||SitrusBerry|Imposter|transform||85,85,85,85,85,85|N|||97|,,,,,Fire]Furret||SitrusBerry|Frisk|bodyslam,knockoff,helpinghand,followme||85,85,85,85,85,85|M|||98|,,,,,Ghost\"}",
-    ">p1 move shadowball +1, move knockoff +2",
-    ">p2 move calmmind, move shadowball +2",
-    ">p1 move protect, move knockoff +1",
-    ">p2 move aurasphere +1, move shadowball +1",
-    ">p1 move shadowball +1, move closecombat +2",
-    ">p2 move shadowball +1, move shadowball +2",
-    ">p1 switch 5, pass",
-    ">p1 move hurricane +2, move headlongrush +1",
-    ">p2 move calmmind, move willowisp +1",
-    ">p2 switch 3, switch 4",
-    ">p1 move roost, move closecombat +2",
-    ">p2 move dragontail +1, move rockslide",
-    ">p1 move fakeout +1, move icespinner +2",
-    ">p2 move recover, move willowisp +2",
-    ">p1 move closecombat +1, move knockoff +1",
-    ">p2 move recover, move rockslide",
-    ">p1 move facade +2, move closecombat +1",
-    ">p2 move dragontail +2, move rockslide",
-    ">p2 switch 5, pass",
-    ">p1 move closecombat +2, move headlongrush +1",
-    ">p2 move icespinner +1, move flareblitz +1",
-    ">p1 switch 6, switch 4",
+    ">player p1 {\"name\":\"Player1\",\"team\":\"Cinccino||LoadedDice|Technician|protect,tripleaxel,tailslap,bulletseed||85,85,85,85,85,85|F|||85|,,,,,Normal]Diancie||SitrusBerry|ClearBody|bodypress,protect,diamondstorm,trickroom||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Enamorus|EnamorusTherian|SitrusBerry|Overcoat|moonblast,earthpower,springtidestorm,protect||85,,85,85,85,85|F|,0,,,,||82|,,,,,Ground]Quagsire||SitrusBerry|Unaware|liquidation,helpinghand,highhorsepower,icywind||85,85,85,85,85,85|M|||91|,,,,,Fire]Spectrier||LifeOrb|GrimNeigh|protect,shadowball,terablast,nastyplot||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Kingdra||LifeOrb|SwiftSwim|raindance,wavecrash,protect,dracometeor||85,85,85,85,85,85|F|||85|,,,,,Water\"}",
+    ">player p2 {\"name\":\"Player2\",\"team\":\"Golduck||LifeOrb|CloudNine|icebeam,grassknot,hydropump,encore||85,,85,85,85,85|M|,0,,,,||91|,,,,,Grass]Iron Leaves||LifeOrb|QuarkDrive|protect,closecombat,leafblade,psyblade||85,85,85,85,85,85|N|||81|,,,,,Psychic]Enamorus||LifeOrb|Contrary|protect,springtidestorm,tailwind,earthpower||85,,85,85,85,85|F|,0,,,,||79|,,,,,Ground]Yanmega||FocusSash|TintedLens|tailwind,bugbuzz,airslash,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Blissey||SitrusBerry|Healer|hypervoice,helpinghand,softboiled,thunderwave||85,,85,85,85,85|F|,0,,,,||96|,,,,,Poison]Meowstic|MeowsticF|LifeOrb|Competitive|darkpulse,psychic,thunderbolt,protect||85,,85,85,85,85|F|,0,,,,||89|,,,,,Dark\"}",
+    ">p1 move bulletseed +2, move protect",
+    ">p2 move hydropump +2, move closecombat +2",
+    ">p1 move tripleaxel +2, move protect",
+    ">p2 move encore +2, move protect",
+    ">p1 move tailslap +2, move bodypress +2",
+    ">p2 move grassknot +2, move closecombat +2",
     ">p2 pass, switch 6",
-    ">p1 move encore +2, move protect",
-    ">p2 move icespinner +1, move bodyslam +1",
-    ">p1 move encore +2, move dazzlinggleam",
-    ">p2 move icespinner +1, move bodyslam +2",
-    ">p1 move nuzzle +2, move shadowball +2",
-    ">p2 pass, move bodyslam +2",
-    ">p1 pass, switch 3",
-    ">p1 move thunderbolt +1, move roost",
-    ">p2 pass, move bodyslam +2",
-    ">p1 move nuzzle +1, move roost",
-    ">p2 pass, move followme",
-    ">p1 move encore +2, move roost",
-    ">p2 pass, move knockoff +1",
-    ">p1 move encore +2, move hurricane +2",
-    ">p2 pass, move followme",
-    ">p1 move nuzzle +2, move roost",
-    ">p2 pass, move followme",
-    ">p1 move nuzzle +1, move hurricane +2",
-    ">p2 pass, move bodyslam +2",
-    ">p1 move nuzzle +2, move thunderbolt +1",
-    ">p2 pass, move followme",
-    ">p1 move superfang +1, move hurricane +2",
-    ">p2 pass, move followme"
+    ">p1 move bulletseed +1, move trickroom",
+    ">p2 move icebeam +2, move darkpulse +1",
+    ">p2 switch 4, pass",
+    ">p1 move tripleaxel +1, move protect",
+    ">p2 move airslash +2, move thunderbolt +1",
+    ">p1 move protect, move bodypress +1",
+    ">p2 move airslash +2, move darkpulse +1",
+    ">p2 switch 5, pass",
+    ">p1 move tripleaxel +1, move trickroom",
+    ">p2 move thunderwave +1, move protect",
+    ">p1 move bulletseed +2, move trickroom",
+    ">p2 move helpinghand -2, move thunderbolt +1",
+    ">p1 switch 6, pass",
+    ">p1 move wavecrash +1, move diamondstorm",
+    ">p2 move softboiled, move darkpulse +1",
+    ">p1 move protect, move bodypress +1",
+    ">p2 move softboiled, move thunderbolt +2",
+    ">p2 switch 3, pass",
+    ">p1 move wavecrash +1, move trickroom",
+    ">p2 move earthpower +2, move protect",
+    ">p1 switch 5, switch 3",
+    ">p1 move protect, move earthpower +2",
+    ">p2 move springtidestorm, move thunderbolt +2"
   ]
 }

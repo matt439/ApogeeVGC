@@ -1,50 +1,32 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"85,158,231,376"}
->player p1 {"name":"Player1","team":"Kingdra||LifeOrb|SwiftSwim|raindance,wavecrash,protect,dracometeor||85,85,85,85,85,85|M|||85|,,,,,Water]Tentacruel||AssaultVest|ClearBody|muddywater,acidspray,icywind,sludgebomb||85,,85,85,85,85|F|,0,,,,||85|,,,,,Grass]Porygon-Z||LifeOrb|Adaptability|shadowball,protect,nastyplot,terablast||85,,85,85,85,85|N|,0,,,,||84|,,,,,Fighting]Charizard||LifeOrb|Blaze|heatwave,hurricane,protect,scorchingsands||85,,85,85,85,85|M|,0,,,,||82|,,,,,Dragon]Whimsicott||SitrusBerry|Prankster|moonblast,taunt,tailwind,encore||85,,85,85,85,85|F|,0,,,,||80|,,,,,Steel]Flapple||SitrusBerry|Ripen|gravapple,dragonrush,suckerpunch,protect||85,85,85,85,85,85|M|||95|,,,,,Grass"}
->player p2 {"name":"Player2","team":"Magmortar||ChoiceSpecs|FlameBody|focusblast,heatwave,thunderbolt,fireblast||85,,85,85,85,85|F|,0,,,,||84|,,,,,Grass]Toxapex||Leftovers|Regenerator|recover,toxic,banefulbunker,infestation||85,,85,85,85,85|F|,0,,,,||92|,,,,,Grass]Kingambit||SitrusBerry|Defiant|protect,ironhead,kowtowcleave,suckerpunch||85,85,85,85,85,85|F|||77|,,,,,Dark]Rillaboom||AssaultVest|GrassySurge|grassyglide,woodhammer,fakeout,uturn||85,85,85,85,85,85|M|||81|,,,,,Steel]Vivillon|VivillonMonsoon|FocusSash|CompoundEyes|sleeppowder,pollenpuff,hurricane,protect||85,,85,85,85,85|F|,0,,,,||88|,,,,,Steel]Zamazenta||LifeOrb|DauntlessShield|crunch,stoneedge,howl,closecombat||85,85,85,85,85,85|N|||72|,,,,,Dark"}
->p1 move wavecrash +2, move acidspray +1
->p2 move thunderbolt +2, move recover
->p1 move wavecrash +2, move acidspray +1
->p2 move thunderbolt +2, move recover
->p1 move dracometeor +2, move icywind
->p2 move thunderbolt +1, move toxic +2
->p1 move protect, move muddywater
->p2 move thunderbolt +2, move infestation +2
->p1 pass, switch 4
->p1 move dracometeor +1, move scorchingsands +1
->p2 move thunderbolt +2, move banefulbunker
->p2 switch 5, pass
->p1 move dracometeor +2, move scorchingsands +2
->p2 move protect, move recover
->p1 move dracometeor +2, move hurricane +1
->p2 move hurricane +2, move toxic +1
+>player p1 {"name":"Player1","team":"Registeel||Leftovers|ClearBody|thunderwave,bodypress,ironhead,irondefense||85,85,85,85,85,85|N|||78|,,,,,Fighting]Banette||LifeOrb|Frisk|gunkshot,protect,shadowsneak,poltergeist||85,85,85,85,85,85|M|||94|,,,,,Ghost]Rotom|RotomFrost|BlunderPolicy|Levitate|thunderbolt,nastyplot,protect,blizzard||85,,85,85,85,85|N|,0,,,,||84|,,,,,Ice]Squawkabilly||LifeOrb|Intimidate|bravebird,doubleedge,protect,quickattack||85,85,85,85,85,85|M|||91|,,,,,Flying]Terapagos||PowerHerb|TeraShift|terastarstorm,darkpulse,protect,meteorbeam||85,,85,85,85,85|F|,0,,,,||73|,,,,,Stellar]Emboar||ChoiceScarf|Reckless|headsmash,wildcharge,flareblitz,closecombat||85,85,85,85,85,85|M|||85|,,,,,Rock"}
+>player p2 {"name":"Player2","team":"Raging Bolt||Leftovers|Protosynthesis|calmmind,thunderclap,dragonpulse,protect||85,,85,85,85,85|N|,0,,,,||77|,,,,,Grass]Glastrier||AssaultVest|ChillingNeigh|heavyslam,highhorsepower,iciclecrash,closecombat||85,85,85,85,85,85|N|||80|,,,,,Fighting]Brute Bonnet||SitrusBerry|Protosynthesis|spore,seedbomb,suckerpunch,closecombat||85,85,85,85,85,85|N|||80|,,,,,Dark]Hitmonchan||AssaultVest|InnerFocus|fakeout,closecombat,poisonjab,knockoff||85,85,85,85,85,85|M|||90|,,,,,Poison]Volcarona||HeavyDutyBoots|FlameBody|heatwave,ragepowder,tailwind,strugglebug||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Stonjourner||LifeOrb|PowerSpot|rockpolish,heatcrash,protect,stoneedge||85,85,85,85,85,85|M|||88|,,,,,Fire"}
+>p1 move bodypress +2, move shadowsneak +1
+>p2 move calmmind, move closecombat +2
+>p1 move ironhead +1, move poltergeist +2
+>p2 move thunderclap +1, move iciclecrash +1
+>p1 move ironhead +2, move gunkshot +1
+>p2 move protect, move closecombat +2
+>p2 pass, switch 5
+>p1 move bodypress +1, move gunkshot +1
+>p2 move dragonpulse +1, move tailwind
+>p1 move irondefense, move protect
+>p2 move protect, move strugglebug
+>p1 move bodypress +2, move poltergeist +2
+>p2 move calmmind, move ragepowder
+>p2 switch 4, switch 6
+>p1 move ironhead +2, move shadowsneak +1
+>p2 move closecombat +1, move heatcrash +1
+>p1 switch 4, pass
+>p1 move quickattack +1, move gunkshot +2
+>p2 move fakeout +1, move protect
+>p1 move quickattack +2, move protect
+>p2 move closecombat +1, move heatcrash +1
 >p1 switch 5, pass
->p1 move encore +1, move heatwave
->p2 move pollenpuff +1, move infestation +1
->p1 pass, switch 3
->p1 move tailwind, move terablast +1
->p2 move hurricane +2, move recover
->p2 switch 4, pass
->p1 move moonblast +2, move nastyplot
->p2 move fakeout +2, move banefulbunker
->p1 move taunt +2, move protect
->p2 move woodhammer +1, move banefulbunker
->p1 move encore +1, move protect
->p2 move woodhammer +2, move infestation +1
->p1 move encore +1, move protect
->p2 move woodhammer +1, move infestation +2
->p1 switch 6, pass
->p1 move protect, move protect
->p2 move woodhammer +2, move infestation +2
->p1 move suckerpunch +1, pass
->p2 move woodhammer +2, move banefulbunker
->p1 move dragonrush +2, pass
->p2 move grassyglide +1, move toxic +1
->p1 move gravapple +1, pass
->p2 move fakeout +2, move toxic +1
->p1 move dragonrush +2, pass
->p2 move uturn +1, move recover
->p2 switch 6, pass
->p1 move gravapple +1, pass
->p2 move stoneedge +2, move recover
->p1 move protect, pass
->p2 move stoneedge +2, move recover
+>p1 move protect, move poltergeist +1
+>p2 move fakeout +1, move protect
+>p2 switch 3, pass
+>p1 move darkpulse +2, move gunkshot +1
+>p2 move closecombat +2, move heatcrash +1
+>p1 move darkpulse +2, move shadowsneak +1
+>p2 pass, move heatcrash +2

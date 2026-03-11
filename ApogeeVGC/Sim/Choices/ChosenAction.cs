@@ -37,7 +37,7 @@ public record ChosenAction : IAction
     public SpecieId? Mega { get; init; }
 
     public IntFalseUnion Order { get; init; } = int.MaxValue;
-    public int Priority { get; init; }
+    public double Priority { get; init; }
     public int Speed { get; init; }
     public int SubOrder { get; init; }
     public int EffectOrder { get; init; }

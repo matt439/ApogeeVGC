@@ -40,6 +40,10 @@ public sealed class Gen5Rng
         // Use the upper 32 bits: (seed[0] << 16) + seed[1]
         uint result = ((uint)_seed[0] << 16) + _seed[1];
         CallCount++;
+        if (TraceEnabled)
+        {
+            Console.Error.WriteLine($"RNG#{CallCount - 1}: raw={result}");
+        }
         return result;
     }
 

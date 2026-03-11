@@ -21,7 +21,7 @@ public record TeamAction : IAction
         }
     }
 
-    public int Priority { get; init; }
+    public double Priority { get; init; }
     public int Speed => 1;
     public required Pokemon Pokemon { get; init; }
     public int Index { get; init; }

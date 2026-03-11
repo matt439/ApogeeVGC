@@ -39,14 +39,14 @@ public sealed record OnAllyPrepareHitEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return result switch
                 {
                     BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
-                    EmptyBoolEmptyVoidUnion => BoolRelayVar.False,
+                    EmptyBoolEmptyVoidUnion => null,
                     VoidUnionBoolEmptyVoidUnion => null,
                     _ => null
                 };

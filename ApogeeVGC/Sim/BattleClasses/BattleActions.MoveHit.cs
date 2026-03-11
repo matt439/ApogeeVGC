@@ -186,13 +186,18 @@ if (tryResult is BoolRelayVar { Value: false } ||
         RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon,
             RunEventSource.FromNullablePokemon(target), move);
 
+        // In Showdown: hitResult = singleEvent('Try') && singleEvent('PrepareHit') && runEvent('PrepareHit')
+        // JS && short-circuits on first falsy value, preserving the specific falsy value.
+        // false → show -fail + [still], return false
+        // null → no message, return false
+        // "" (NOT_FAIL) → no message, return true (NOT_FAIL)
         bool hitResult = tryResult is not BoolRelayVar { Value: false } and not NullRelayVar &&
                         prepareHitResult1 is not BoolRelayVar { Value: false } and not NullRelayVar &&
                         prepareHitResult2 is not BoolRelayVar { Value: false } and not NullRelayVar;
 
         if (!hitResult)
         {
-            // Only show "-fail" for explicit false, not for NullRelayVar (TS null = "failed silently")
+            // Only show "-fail" for explicit false, not for NullRelayVar (NOT_FAIL)
             if (tryResult is BoolRelayVar { Value: false } ||
                 prepareHitResult1 is BoolRelayVar { Value: false } ||
                 prepareHitResult2 is BoolRelayVar { Value: false })
@@ -204,7 +209,13 @@ if (tryResult is BoolRelayVar { Value: false } ||
                 }
             }
 
-            // Return undefined (NOT_FAIL) if any result was null, otherwise return false
+            // Return NOT_FAIL if any result was NullRelayVar (Showdown's "" / NOT_FAIL)
+            // In Showdown: return hitResult === this.NOT_FAIL → "" === "" → true
+            if (tryResult is NullRelayVar || prepareHitResult1 is NullRelayVar || prepareHitResult2 is NullRelayVar)
+            {
+                return new Undefined();
+            }
+            // Return undefined (NOT_FAIL) if any result was C# null (shouldn't happen after SingleEvent, but safety)
             if (tryResult is null || prepareHitResult1 is null || prepareHitResult2 is null)
             {
                 return new Undefined();
@@ -257,55 +268,61 @@ if (tryResult is BoolRelayVar { Value: false } ||
         }
 
         // Run TryHit events for field/side moves
-        if (move.Target == MoveTarget.All && !isSelf)
+        // In Showdown: singleEvent('TryHit', moveData, ...) where moveData is the hitEffect/secondary
+        // When processing self drops or secondaries, moveData is the self/secondary HitEffect which
+        // doesn't have TryHit handlers — so skip the main move's TryHit to avoid re-firing it.
+        if (!isSelf && !isSecondary)
         {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, null,
-                SingleEventTarget.FromNullablePokemon(target), pokemon, move);
-
-            if (!Battle.IsRelayVarTruthy(hitResult))
+            if (move.Target == MoveTarget.All)
             {
-                if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
-                {
-                    Battle.Add("-fail", pokemon);
-                    Battle.AttrLastMove("[still]");
-                }
+                RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, null,
+                    SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
-                damage[0] = BoolIntUndefinedUnion.FromBool(false);
-                return (damage, targets);
+                if (!Battle.IsRelayVarTruthy(hitResult))
+                {
+                    if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
+                    {
+                        Battle.Add("-fail", pokemon);
+                        Battle.AttrLastMove("[still]");
+                    }
+
+                    damage[0] = BoolIntUndefinedUnion.FromBool(false);
+                    return (damage, targets);
+                }
             }
-        }
-        else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam && !isSelf)
-        {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, null,
-                SingleEventTarget.FromNullablePokemon(target), pokemon, move);
-
-            if (!Battle.IsRelayVarTruthy(hitResult))
+            else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam)
             {
-                if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
-                {
-                    Battle.Add("-fail", pokemon);
-                    Battle.AttrLastMove("[still]");
-                }
+                RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, null,
+                    SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
-                damage[0] = BoolIntUndefinedUnion.FromBool(false);
-                return (damage, targets);
+                if (!Battle.IsRelayVarTruthy(hitResult))
+                {
+                    if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
+                    {
+                        Battle.Add("-fail", pokemon);
+                        Battle.AttrLastMove("[still]");
+                    }
+
+                    damage[0] = BoolIntUndefinedUnion.FromBool(false);
+                    return (damage, targets);
+                }
             }
-        }
-        else
-        {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, null,
-                target, pokemon, move);
-
-            if (!Battle.IsRelayVarTruthy(hitResult))
+            else
             {
-                if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
-                {
-                    Battle.Add("-fail", pokemon);
-                    Battle.AttrLastMove("[still]");
-                }
+                RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, null,
+                    target, pokemon, move);
 
-                damage[0] = BoolIntUndefinedUnion.FromBool(false);
-                return (damage, targets);
+                if (!Battle.IsRelayVarTruthy(hitResult))
+                {
+                    if (hitResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
+                    {
+                        Battle.Add("-fail", pokemon);
+                        Battle.AttrLastMove("[still]");
+                    }
+
+                    damage[0] = BoolIntUndefinedUnion.FromBool(false);
+                    return (damage, targets);
+                }
             }
         }
 
@@ -329,7 +346,9 @@ if (tryResult is BoolRelayVar { Value: false } ||
 
             // TypeScript: if (targets[i] && isSecondary && !moveData.self)
             // Skip damage calculation for secondary effects that don't have self-targeting
-            if (targets[i] is PokemonPokemonUnion && isSecondary && move.Self == null)
+            // moveData.self is the secondary's self when processing secondaries
+            bool hasSelf = move.Self != null || (hitEffect as SecondaryEffect)?.Self != null;
+            if (targets[i] is PokemonPokemonUnion && isSecondary && !hasSelf)
             {
                 damage[i] = BoolIntUndefinedUnion.FromBool(true);
             }
@@ -367,7 +386,9 @@ if (tryResult is BoolRelayVar { Value: false } ||
 
         for (int i = 0; i < targets.Count; i++)
         {
-            if (!(damage[i] is IntBoolIntUndefinedUnion || damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
+            // Showdown: if (!damage[i] && damage[i] !== 0) targets[i] = false;
+            // Set target to false if damage is falsy but NOT zero
+            if (!damage[i].IsTruthy() && !damage[i].IsZero())
             {
                 targets[i] = PokemonFalseUnion.FromFalse();
             }
@@ -377,7 +398,16 @@ if (tryResult is BoolRelayVar { Value: false } ||
         Pokemon? activeTarget = Battle.ActiveTarget;
 
         // 4. self drops (start checking for targets[i] === false here)
-        if (move.Self != null && move.SelfDropped != true)
+        // Showdown: if (moveData.self && !move.selfDropped) this.selfDrops(targets, pokemon, move, moveData, isSecondary);
+        // In Showdown, moveData is the secondary effect when processing secondaries.
+        // The secondary's .self (e.g., Rapid Spin's speed boost) must be checked here.
+        HitEffect? secondarySelf = (hitEffect as SecondaryEffect)?.Self;
+        if (secondarySelf != null && move.SelfDropped != true)
+        {
+            if (Battle.DebugMode) Battle.Debug($"[SpreadMoveHit] Calling SelfDrops for secondary's Self on {move.Name}");
+            SelfDropsFromHitEffect(targets, pokemon, move, secondarySelf, isSecondary);
+        }
+        else if (move.Self != null && move.SelfDropped != true)
         {
             if (Battle.DebugMode) Battle.Debug($"[SpreadMoveHit] Calling SelfDrops for {move.Name}");
             SelfDrops(targets, pokemon, move, move, isSecondary);
@@ -400,7 +430,8 @@ if (tryResult is BoolRelayVar { Value: false } ||
 
         for (int i = 0; i < targets.Count; i++)
         {
-            if (!(damage[i] is IntBoolIntUndefinedUnion || damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
+            // Showdown: if (!damage[i] && damage[i] !== 0) targets[i] = false;
+            if (!damage[i].IsTruthy() && !damage[i].IsZero())
             {
                 targets[i] = PokemonFalseUnion.FromFalse();
             }

@@ -3,8 +3,10 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -191,7 +193,7 @@ public partial class Battle
         }
         else if (args.Any(arg => FormatArg(arg) == "[still]"))
         {
-            // If no animation plays, the target should never be known
+            // When [still] is present, clear the target field to match Showdown protocol
             string[] parts = Log[LastMoveLine].Split('|');
             if (parts.Length > 4)
             {
@@ -510,10 +512,24 @@ public partial class Battle
         // Get the health status for the log message
         var healthFunc = target.GetHealth;
 
-        // Determine if this is a drain effect
-        bool isDrain = effect is Condition { Id: ConditionId.Drain };
+        // Match Showdown's heal switch statement (battle.ts lines 2247-2270)
+        // Showdown checks effect?.id which works for both Moves and Conditions.
+        // We need to check both since Rest is a Move but leechseed/drain/wish are Conditions.
+        ConditionId? conditionId = (effect as Condition)?.Id;
+        MoveId? moveId = (effect as Move)?.Id;
 
-        if (isDrain && source != null)
+        if (conditionId is ConditionId.LeechSeed or ConditionId.Rest
+            || moveId == MoveId.Rest)
+        {
+            // Leech Seed and Rest heals are always silent
+            Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[silent]");
+        }
+        else if (conditionId == ConditionId.Wish)
+        {
+            // Wish heals have no message (handled by Wish condition's own logging)
+            return;
+        }
+        else if (conditionId == ConditionId.Drain && source != null)
         {
             // Drain healing shows the source
             Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[from] drain",
@@ -563,7 +579,7 @@ public partial class Battle
                 ConditionId.Burn => "brn",
                 ConditionId.Paralysis => "par",
                 ConditionId.Poison => "psn",
-                ConditionId.Toxic => "tox",
+                ConditionId.Toxic => "psn",
                 ConditionId.Sleep => "slp",
                 ConditionId.Freeze => "frz",
                 _ => condition.FullName,
@@ -571,6 +587,7 @@ public partial class Battle
         }
         if (effect is Item item) return item.FullName;
         if (effect is Ability ability) return $"ability: {ability.Name}";
+        if (effect is Species species) return species.FullName;
         return effect.Name;
     }
 

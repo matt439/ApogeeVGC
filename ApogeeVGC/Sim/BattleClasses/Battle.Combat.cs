@@ -146,11 +146,14 @@ public partial class Battle
                 }
 
                 // Run Damage event
+                // Pass effectForLogging (preserves original IEffect, e.g. the Move) rather than
+                // effectCondition (which is null for moves since Move can't cast to Condition).
+                // This allows item handlers like Focus Sash to check effect.EffectType == Move.
                 RelayVar? damageResult = RunEvent(
                     EventId.Damage,
                     target,
                     RunEventSource.FromNullablePokemon(source),
-                    effectCondition,
+                    effectForLogging,
                     IntRelayVar.Get(targetDamage)
                 );
 
@@ -170,7 +173,7 @@ public partial class Battle
 
             // Apply damage to target
             Debug($"[SpreadDamage] About to apply {targetDamage} damage to {target.Name} (current HP: {target.Hp})");
-            targetDamage = target.Damage(targetDamage, source, effectCondition);
+            targetDamage = target.Damage(targetDamage, source, effectForLogging ?? effectCondition);
             Debug($"[SpreadDamage] Applied {targetDamage} damage to {target.Name} (new HP: {target.Hp})");
             retVals.Add(targetDamage);
 
@@ -179,7 +182,7 @@ public partial class Battle
                 target.HurtThisTurn = target.Hp;
 
             // Track source's last damage if this was a move
-            if (source != null && effectCondition?.EffectType == EffectType.Move)
+            if (source != null && (effectForLogging ?? effectCondition)?.EffectType == EffectType.Move)
                 source.LastDamage = targetDamage;
 
             // Record damage in history
@@ -199,7 +202,7 @@ public partial class Battle
                     move.Drain != null && source != null)
                 {
                     int drainAmount = Trunc(Math.Round(targetDamage * move.Drain.Value.Item1 /
-                                                       (double)move.Drain.Value.Item2));
+                                                       (double)move.Drain.Value.Item2, MidpointRounding.AwayFromZero));
                     Heal(drainAmount, source, target, new DrainBattleHealEffect());
                 }
             }
@@ -326,7 +329,7 @@ public partial class Battle
             source = eventSource.Pokemon;
         }
 
-        // Convert BattleHealEffect to Condition
+        // Convert BattleHealEffect to Condition (for target.Heal and Heal event)
         Condition? effectCondition = effect switch
         {
             DrainBattleHealEffect => Library.Conditions[ConditionId.Drain],
@@ -335,12 +338,15 @@ public partial class Battle
             _ => throw new InvalidOperationException("Unknown BattleHealEffect type."),
         };
 
-        //// Clamp damage to minimum of 1 if positive but less than 1
-        //// This handles cases where rounding might produce fractional values
-        //if (damage > 0 && damage < 1)
-        //{
-        //    damage = 1;
-        //}
+        // Resolve the actual effect for event dispatch (preserves Item/Ability types)
+        // Showdown: if (!effect) effect = this.effect;
+        IEffect? eventEffect = effect switch
+        {
+            DrainBattleHealEffect => Library.Conditions[ConditionId.Drain],
+            EffectBattleHealEffect ebhe => ebhe.Effect,
+            null => Effect,
+            _ => effectCondition,
+        };
 
         // Truncate damage to remove any remaining fractional part
         damage = Trunc(damage);
@@ -350,7 +356,7 @@ public partial class Battle
             EventId.TryHeal,
             RunEventTarget.FromNullablePokemon(target),
             RunEventSource.FromNullablePokemon(source),
-            effectCondition,
+            eventEffect,
             IntRelayVar.Get(damage)
         );
 
@@ -464,6 +470,9 @@ public partial class Battle
         // Gen 9: Check if any foes remain
         if (target.Side.FoePokemonLeft() <= 0) return new BoolBoolZeroUnion(false);
 
+        // Clone boosts before ChangeBoost (Showdown: { ...boost }) to avoid mutating static move data
+        boost = boost.Copy();
+
         // Run ChangeBoost event to allow modifications
         RelayVar modifiedBoost = RunEvent(EventId.ChangeBoost, target,
             RunEventSource.FromNullablePokemon(source), effect, boost) ?? boost;
@@ -476,6 +485,9 @@ public partial class Battle
 
         // Cap the boosts to valid ranges (-6 to +6)
         SparseBoostsTable cappedBoost = target.GetCappedBoost(modifiedBoostTable.Table);
+
+        // Clone boosts before TryBoost (Showdown: { ...boost }) to avoid mutation
+        cappedBoost = cappedBoost.Copy();
 
         // Run TryBoost event to allow prevention
         RelayVar finalBoost = RunEvent(EventId.TryBoost, target,
@@ -491,11 +503,10 @@ public partial class Battle
         bool? success = null;
         bool boosted = isSecondary;
 
-        // Apply each boost
-        foreach (BoostId boostId in Enum.GetValues<BoostId>())
+        // Apply each boost in insertion order (matches Showdown's JS property iteration)
+        foreach (var (boostId, boostVal) in finalBoostTable.Table.GetNonNullBoosts())
         {
-            int? boostValue = finalBoostTable.Table.GetBoost(boostId);
-            if (!boostValue.HasValue) continue;
+            int? boostValue = boostVal;
 
             // Create a sparse table for just this stat
             var currentBoost = new SparseBoostsTable();
@@ -539,7 +550,7 @@ public partial class Battle
 
                             case EffectType.Item:
                                 Add(msg, target, boostId.ConvertToString(), boostBy,
-                                    "[from]", $"item: {effect.Name}");
+                                    $"[from] item: {effect.Name}");
                                 break;
 
                             default:

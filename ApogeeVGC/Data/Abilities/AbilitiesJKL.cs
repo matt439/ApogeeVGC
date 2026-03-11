@@ -228,15 +228,10 @@ public partial record Abilities
                             if (battle.ValidTarget(abilityHolder, source, redirectTarget))
                             {
                                 if (move.SmartTarget == true) move.SmartTarget = false;
-                                if (abilityHolder != target)
+                                if (abilityHolder != target && battle.DisplayUi)
                                 {
-                                    if (battle.DisplayUi)
-                                    {
-                                        battle.Add("-activate", abilityHolder,
-                                            "ability: Lightning Rod");
-                                    }
+                                    battle.Add("-activate", abilityHolder, "ability: Lightning Rod");
                                 }
-
                                 return abilityHolder;
                             }
                         }

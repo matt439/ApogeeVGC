@@ -564,7 +564,8 @@ public partial record Items
                     if (accuracy.HasValue)
                     {
                         battle.Debug("brightpowder - decreasing accuracy");
-                        return battle.ChainModify([3686, 4096]);
+                        battle.ChainModify([3686, 4096]);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1048,7 +1049,7 @@ public partial record Items
                         (_, _, pokemon, _, _) =>
                         {
                             // TS uses (item, source) where source=holder, only checks holder
-                            if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
+                            if (pokemon.BaseSpecies.Id == SpecieId.Ogerpon)
                             {
                                 return BoolRelayVar.False;
                             }

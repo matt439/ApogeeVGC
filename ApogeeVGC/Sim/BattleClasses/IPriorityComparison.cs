@@ -5,7 +5,7 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public interface IPriorityComparison
 {
     IntFalseUnion Order { get; }
-    int Priority { get; }
+    double Priority { get; }
     int Speed { get; }
     int SubOrder { get; }
     int EffectOrder { get; }

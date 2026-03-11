@@ -7,7 +7,7 @@ public record StartGameAction : IAction
 {
     public ActionId Choice => ActionId.Start;
     public IntFalseUnion Order => 2; // Showdown: orders.start = 2
-    public int Priority => 0;
+    public double Priority => 0;
     public int Speed => 0;
     public int SubOrder => 0;
     public int EffectOrder => 0;

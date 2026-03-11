@@ -259,10 +259,10 @@ public partial class Battle
             return num & 0xFFFF;
         }
 
-        // For other bit counts, scale up by 2^bits, truncate, then scale back down
-        // This effectively performs: Math.Floor(num / (2^bits)) * (2^bits)
-        var divisor = 1 << bits; // 2^bits
-        return (num / divisor) * divisor;
+        // For other bit counts, take the lower N bits (unsigned modulo 2^bits).
+        // Matches Showdown's: (num >>> 0) % (2 ** bits)
+        var mask = (1 << bits) - 1;
+        return num & mask;
     }
 
     public int Trunc(double num, int bits = 0)

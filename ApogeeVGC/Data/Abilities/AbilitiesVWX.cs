@@ -66,7 +66,8 @@ public partial record Abilities
                         // Only modify numeric accuracy
                         if (accuracy.HasValue && source.IsAlly(abilityHolder))
                         {
-                            return battle.ChainModify([4506, 4096]);
+                            battle.ChainModify([4506, 4096]);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();

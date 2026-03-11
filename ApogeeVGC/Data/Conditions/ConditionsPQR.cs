@@ -117,7 +117,7 @@ public partial record Conditions
                     }
 
                     battle.Damage(pokemon.BaseMaxHp / (battle.EffectState.BoundDivisor ?? 8));
-                }, 13),
+                }, order: 13),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -178,7 +178,7 @@ public partial record Conditions
                     {
                         battle.Add("-start", pokemon, $"perish{duration}");
                     }
-                }, 24),
+                }, order: 24),
             },
             [ConditionId.PetalDance] = new()
             {
@@ -223,7 +223,7 @@ public partial record Conditions
                 // OnResidualOrder = 9
                 OnResidual = OnResidualEventInfo.Create(
                     (battle, pokemon, _, _) => { battle.Damage(pokemon.BaseMaxHp / 8); },
-                    9),
+                    order: 9),
             },
             [ConditionId.Poltergeist] = new()
             {
@@ -353,7 +353,8 @@ public partial record Conditions
                         if (move.Type == MoveType.Water)
                         {
                             battle.Debug("Rain water boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -366,7 +367,6 @@ public partial record Conditions
                             $"[of] {source}");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -375,8 +375,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    order: 1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -403,9 +405,7 @@ public partial record Conditions
                     return new VoidReturn();
                 }),
                 //OnTryHitPriority = 3,
-                // OnTryHit params: (battle, source=attacker, target=protector, move)
-                // C# convention: GetSourceOrTargetPokemon() → source, GetTargetOrSourcePokemon() → target
-                OnTryHit = OnTryHitEventInfo.Create((battle, source, target, move) =>
+                OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                     {
                         if (!(move.Flags.Protect ?? false))
                         {
@@ -459,7 +459,7 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon,
-                            "protosynthesis" + battle.EffectState.BestStat);
+                            "protosynthesis" + battle.EffectState.BestStat.ToString()!.ToLowerInvariant());
                     }
 
                     return new VoidReturn();
@@ -656,7 +656,8 @@ public partial record Conditions
                             battle.Debug("psychic terrain boost");
                         }
 
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -715,7 +716,7 @@ public partial record Conditions
                     battle.EffectState.BestStat = pokemon.GetBestStat(false, true);
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, "quarkdrive" + battle.EffectState.BestStat);
+                        battle.Add("-start", pokemon, "quarkdrive" + battle.EffectState.BestStat.ToString()!.ToLowerInvariant());
                     }
 
                     return new VoidReturn();
@@ -941,13 +942,15 @@ public partial record Conditions
                         if (move.Type == MoveType.Water)
                         {
                             battle.Debug("rain water boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         if (move.Type == MoveType.Fire)
                         {
                             battle.Debug("rain fire suppress");
-                            return battle.ChainModify(0.5);
+                            battle.ChainModify(0.5);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -969,7 +972,6 @@ public partial record Conditions
                         battle.Add("-weather", "RainDance");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -978,8 +980,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    order: 1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -1137,7 +1141,7 @@ public partial record Conditions
                 OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                }, 25),
+                }, order: 25),
                 OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     // TS: if (target.terastallized) { ... return false; }
@@ -1159,7 +1163,6 @@ public partial record Conditions
                     {
                         battle.Add("-singleturn", target, "move: Roost");
                     }
-
 
                     return null;
                 }),

@@ -183,8 +183,9 @@ public partial class Pokemon
             stats.Hp = Species.MaxHp.Value;
         }
 
-        // Always set HP stats during initial setup (MaxHp == 0) or during transformation
-        // During transformation, preserve current HP
+        // Only set HP stats during initial setup (MaxHp == 0)
+        // Matches Showdown: if (!this.maxhp) { this.baseMaxhp = stats.hp; ... }
+        // For subsequent forme changes, updateMaxHp() handles HP updates
         if (MaxHp == 0)
         {
             // Initial setup - set all HP values
@@ -192,16 +193,7 @@ public partial class Pokemon
             MaxHp = stats.Hp;
             Hp = stats.Hp;
         }
-        else if (!isTransform)
-        {
-            // Not a transform - update HP values and preserve HP ratio
-            // Matches Showdown: hp = (hp === maxhp) ? newMaxHP : Math.round(hp * newMaxHP / maxhp)
-            BaseMaxHp = stats.Hp;
-            int newMaxHp = stats.Hp;
-            Hp = (Hp == MaxHp) ? newMaxHp : (int)Math.Round((double)Hp * newMaxHp / MaxHp);
-            MaxHp = newMaxHp;
-        }
-        // else: isTransform == true, don't change HP values
+        // else: Don't update HP values here - updateMaxHp() in formeChange handles it
 
         if (!isTransform) BaseStoredStats = stats;
         foreach (var stat in StatsExceptHpTable.AllStatIds)
@@ -286,14 +278,20 @@ public partial class Pokemon
             {
                 if (source.EffectType == EffectType.Ability)
                 {
+                    // For Minior etc., use the cosmetic override name (e.g. Minior-Violet)
+                    // only when reverting to the base form (species matches Set.Species)
+                    var displayName = (Set.SpeciesOverrideName != null && species.Id == Set.Species)
+                        ? Set.SpeciesOverrideName
+                        : species.Name;
                     if (message is null)
                     {
-                        Battle.Add("-formechange", this, species.Name,
+                        // Showdown outputs an empty field before [from]: |-formechange|...|Forme||[from]...
+                        Battle.Add("-formechange", this, displayName, "",
                             $"[from] ability: {source.Name}");
                     }
                     else
                     {
-                        Battle.Add("-formechange", this, species.Name, message,
+                        Battle.Add("-formechange", this, displayName, message,
                             $"[from] ability: {source.Name}");
                     }
                 }

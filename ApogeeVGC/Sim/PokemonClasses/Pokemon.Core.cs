@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
@@ -168,7 +169,7 @@ public partial class Pokemon : IPriorityComparison
     public double WeightKg { get; set; }
     public int WeightHg { get; set; }
     public IntFalseUnion Order => int.MaxValue;
-    public int Priority => 0;
+    public double Priority => 0;
     public int Speed { get; set; }
     public int SubOrder => 0;
     public int EffectOrder => 0;
@@ -601,7 +602,7 @@ public partial class Pokemon : IPriorityComparison
         var details = new PokemonDetails
         {
             Id = id,
-            DisplayName = Battle.Library.Species[id].Name,
+            DisplayName = Set.SpeciesOverrideName ?? Battle.Library.Species[id].Name,
             Level = displayLevel,
             Gender = Gender,
             Shiny = Set.Shiny,
@@ -618,7 +619,9 @@ public partial class Pokemon : IPriorityComparison
         var details = Details;
         if (Illusion is not null)
         {
-            details = Illusion.GetUpdatedDetails(Level);
+            // IllusionLevelMod: show the disguise's level, not the real Pokemon's level
+            int? levelOverride = Battle.RuleTable.Has(RuleId.IllusionLevelMod) ? null : Level;
+            details = Illusion.GetUpdatedDetails(levelOverride);
         }
 
         if (Terastallized is not null)

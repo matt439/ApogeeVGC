@@ -67,7 +67,6 @@ public partial record Conditions
                             $"[of] {source}");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -76,8 +75,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -117,7 +118,8 @@ public partial record Conditions
                         if (move.Type == MoveType.Fire)
                         {
                             battle.Debug("Sunny Day fire boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -136,7 +138,6 @@ public partial record Conditions
                     if (type.AsConditionId == ConditionId.Freeze) return false;
                     return new VoidReturn();
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -145,8 +146,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -275,7 +278,8 @@ public partial record Conditions
                     {
                         if (move.Id is MoveId.Earthquake)
                         {
-                            return battle.ChainModify(2);
+                            battle.ChainModify(2);
+                    return new VoidReturn();
                         }
 
                         return damage;
@@ -333,7 +337,7 @@ public partial record Conditions
                 OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                }, 17),
+                }, order: 17),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -397,7 +401,8 @@ public partial record Conditions
                     {
                         if (move.Id is MoveId.Surf or MoveId.Whirlpool)
                         {
-                            return battle.ChainModify(2);
+                            battle.ChainModify(2);
+                    return new VoidReturn();
                         }
 
                         return damage;
@@ -530,7 +535,8 @@ public partial record Conditions
                             !attacker.IsSemiInvulnerable())
                         {
                             battle.Debug("electric terrain boost");
-                            return battle.ChainModify([5325, 4096]);
+                            battle.ChainModify([5325, 4096]);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -678,7 +684,7 @@ public partial record Conditions
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Encore]);
                     }
-                }, 16),
+                }, order: 16),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
@@ -762,7 +768,7 @@ public partial record Conditions
                     {
                         battle.Damage(pokemon.BaseMaxHp / 8, pokemon, pokemon);
                     }
-                }, 5, 1),
+                }, order: 5, subOrder: 1),
                 OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) => { }) with
                 {
                     Order = 26,
@@ -889,7 +895,8 @@ public partial record Conditions
                     {
                         if (move.Id is MoveId.Gust or MoveId.Twister)
                         {
-                            return battle.ChainModify(2);
+                            battle.ChainModify(2);
+                    return new VoidReturn();
                         }
 
                         return damage;
@@ -1034,7 +1041,7 @@ public partial record Conditions
                     }
 
                     if (target.Species.Id == SpecieId.ShayminSky &&
-                        target.BaseSpecies.BaseSpecies == SpecieId.Shaymin)
+                        target.BaseSpecies.Id == SpecieId.Shaymin)
                     {
                         target.FormeChange(SpecieId.Shaymin, battle.Effect, true);
                     }
@@ -1150,7 +1157,7 @@ public partial record Conditions
                         target.Side.RemoveSlotCondition(slotTarget,
                             _library.Conditions[ConditionId.FutureMove]);
                     }
-                }, 3),
+                }, order: 3),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     // Get move data from effectState
