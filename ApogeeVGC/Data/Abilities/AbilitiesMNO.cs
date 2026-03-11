@@ -715,7 +715,17 @@ public partial record Abilities
                     {
                         if (battle.DisplayUi)
                         {
-                            battle.Add("-curestatus", pokemon, pokemon.Status.ToString(),
+                            string statusStr = pokemon.Status switch
+                        {
+                            ConditionId.Burn => "brn",
+                            ConditionId.Paralysis => "par",
+                            ConditionId.Poison => "psn",
+                            ConditionId.Toxic => "tox",
+                            ConditionId.Sleep => "slp",
+                            ConditionId.Freeze => "frz",
+                            _ => pokemon.Status.ToString(),
+                        };
+                        battle.Add("-curestatus", pokemon, statusStr,
                                 "[from] ability: Natural Cure");
                         }
                     }
