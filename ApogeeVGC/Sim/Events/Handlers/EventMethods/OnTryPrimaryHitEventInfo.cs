@@ -46,9 +46,10 @@ public sealed record OnTryPrimaryHitEventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
+                    null => new NullRelayVar(), // Handler returned null → NOT_FAIL (falsy, blocks move without "failure")
                     IntIntBoolVoidUnion i => IntRelayVar.Get(i.Value),
                     BoolIntBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
-                    VoidIntBoolVoidUnion => null,
+                    VoidIntBoolVoidUnion => null, // VoidReturn → no change to relay var
                     _ => null
                 };
             },

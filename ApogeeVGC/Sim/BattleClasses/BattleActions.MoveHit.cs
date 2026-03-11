@@ -502,11 +502,13 @@ if (tryResult is BoolRelayVar { Value: false } ||
   RelayVar? result = Battle.RunEvent(EventId.TryPrimaryHit, target, pokemon, moveData);
 
             // Convert various RelayVar types to BoolIntUndefinedUnion
-  // null means NOT_FAIL/continue - treat as success for hit processing
+  // null means no handlers fired - treat as success for hit processing
+            // NullRelayVar means NOT_FAIL (e.g., Substitute blocked a status move) - treat as blocked
             // VoidReturn means explicit void return - also treat as success
    BoolIntUndefinedUnion damageValue = result switch
      {
-    null => BoolIntUndefinedUnion.FromBool(true), // null means NOT_FAIL/continue
+    null => BoolIntUndefinedUnion.FromBool(true), // no handlers fired → continue
+     NullRelayVar => BoolIntUndefinedUnion.FromBool(false), // NOT_FAIL → blocked (e.g., Substitute vs status move)
      VoidReturnRelayVar => BoolIntUndefinedUnion.FromBool(true), // VoidReturn also means continue
      BoolIntUndefinedUnionRelayVar biuu => biuu.Value, // Already the right type
           BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value), // Convert bool
