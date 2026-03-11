@@ -184,10 +184,13 @@ public partial class BattleActions
             }
 
             // Check force switch
+            // Showdown: hitResult = !!this.battle.canSwitch(target.side)
+            // Must convert int to bool to match — canSwitch returns a count, but
+            // forceSwitch uses it as a boolean so the fail path triggers correctly.
             if (moveData.ForceSwitch != null)
             {
-                int canSwitchResult = Battle.CanSwitch(target.Side);
-                hitResult = canSwitchResult;
+                bool canSwitchResult = Battle.CanSwitch(target.Side) != 0;
+                hitResult = BoolIntUndefinedUnion.FromBool(canSwitchResult);
                 didSomething = CombineResults(didSomething, hitResult);
             }
 
@@ -523,11 +526,10 @@ public partial class BattleActions
                         break;
                 }
             }
-            else if (target.Hp > 0 && source.Hp > 0)
-            {
-                // CanSwitch == 0: no Pokemon to switch to, move fails
-                damage[i] = BoolIntUndefinedUnion.FromBool(false);
-            }
+            // Note: when canSwitch == 0, the target is already falsified by RunMoveEffects
+            // (which sets didSomething = false via the forceSwitch check), so we never reach
+            // here with a live target that can't switch. Matches Showdown's forceSwitch()
+            // which has no else branch.
         }
 
         return damage;
