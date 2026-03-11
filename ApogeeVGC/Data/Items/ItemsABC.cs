@@ -1049,7 +1049,7 @@ public partial record Items
                         (_, _, pokemon, _, _) =>
                         {
                             // TS uses (item, source) where source=holder, only checks holder
-                            if (pokemon.BaseSpecies.Id == SpecieId.Ogerpon)
+                            if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
                                 return BoolRelayVar.False;
                             }

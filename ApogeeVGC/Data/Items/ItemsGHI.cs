@@ -270,7 +270,7 @@ public partial record Items
                         {
                             // Ogerpon cannot have its mask removed
                             // TypeScript only checks the holder (pokemon), not the source
-                            if (pokemon.BaseSpecies.Id == SpecieId.Ogerpon)
+                            if (pokemon.BaseSpecies.BaseSpecies == SpecieId.Ogerpon)
                             {
                                 return BoolRelayVar.False;
                             }
