@@ -176,8 +176,6 @@ public partial class Driver
         }
 
         Console.WriteLine();
-        Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
     }
 
     /// <summary>
@@ -204,10 +202,19 @@ public partial class Driver
         using var process = Process.Start(psi);
         if (process == null) return false;
 
-        // Capture stdout (protocol log) and write to log file
-        string stdout = process.StandardOutput.ReadToEnd();
-        string stderr = process.StandardError.ReadToEnd();
-        process.WaitForExit(30_000);
+        // Read stdout/stderr asynchronously to avoid deadlocks
+        Task<string> stdoutTask = process.StandardOutput.ReadToEndAsync();
+        Task<string> stderrTask = process.StandardError.ReadToEndAsync();
+
+        if (!process.WaitForExit(30_000))
+        {
+            // Process hung — kill it
+            try { process.Kill(true); } catch { /* ignore */ }
+            return false;
+        }
+
+        string stdout = stdoutTask.GetAwaiter().GetResult();
+        string stderr = stderrTask.GetAwaiter().GetResult();
 
         if (process.ExitCode != 0)
         {
