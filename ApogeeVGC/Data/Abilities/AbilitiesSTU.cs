@@ -1529,8 +1529,10 @@ public partial record Abilities
                         }
                         // TS passes a hack object { status: status.id, id: 'synchronize' } without effectType,
                         // so status conditions' onStart don't add [from] ability attribution.
-                        // Passing null matches that behavior.
-                        source.TrySetStatus(status.Id, target);
+                        // Pass the status condition itself as sourceEffect — its EffectType is Status
+                        // (not Ability), preventing the [from] ability: attribution in onStart handlers
+                        // and also preventing the -immune message (which only fires for ActiveMove).
+                        source.TrySetStatus(status.Id, target, status);
                     }),
             },
 
