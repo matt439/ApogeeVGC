@@ -1,70 +1,43 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"239,444,649,1058"}
->player p1 {"name":"Player1","team":"Squawkabilly||LifeOrb|Intimidate|quickattack,bravebird,doubleedge,protect||85,85,85,85,85,85|M|||91|,,,,,Flying]Sudowoodo||LifeOrb|RockHead|woodhammer,suckerpunch,headsmash,highhorsepower||85,85,85,85,85,85|F|||94|,,,,,Grass]Perrserker||SitrusBerry|SteelySpirit|helpinghand,fakeout,closecombat,ironhead||85,85,85,85,85,85|F|||88|,,,,,Fighting]Shiftry||LifeOrb|WindRider|knockoff,protect,tailwind,leafblade||85,85,85,85,85,85|M|||84|,,,,,Ghost]Dedenne||SitrusBerry|CheekPouch|superfang,nuzzle,dazzlinggleam,thunderbolt||85,85,85,85,85,85|F|||85|,,,,,Flying]Vespiquen||SitrusBerry|Unnerve|toxicspikes,hurricane,helpinghand,pollenpuff||85,,85,85,85,85|F|,0,,,,|||,,,,,Steel"}
->player p2 {"name":"Player2","team":"Ogerpon||SitrusBerry|Defiant|knockoff,spikyshield,followme,ivycudgel||85,85,85,85,85,85|F|||78|,,,,,Grass]Maushold|MausholdFour|WideLens|Technician|protect,encore,followme,populationbomb||85,85,85,85,85,85|N|||79|,,,,,Ghost]Florges|FlorgesOrange|Leftovers|FlowerVeil|calmmind,synthesis,moonblast,protect||85,,85,85,85,85|F|,0,,,,||84|,,,,,Steel]Typhlosion||ChoiceSpecs|FlashFire|fireblast,scorchingsands,eruption,heatwave||85,,85,85,85,85|M|,0,,,,||79|,,,,,Fire]Hitmonchan||SitrusBerry|InnerFocus|poisonjab,fakeout,closecombat,coaching||85,85,85,85,85,85|M|||90|,,,,,Poison]Entei||ChoiceBand|InnerFocus|extremespeed,flareblitz,stompingtantrum,sacredfire||85,85,85,85,85,85|N|||77|,,,,,Normal"}
->p1 move doubleedge +1, move suckerpunch +1
->p2 move followme, move followme
->p1 move quickattack +1, move woodhammer +1
->p2 move knockoff +2, move followme
->p2 pass, switch 5
->p1 move quickattack +2, move headsmash +2
->p2 move followme, move fakeout +2
->p1 move doubleedge +1, move headsmash +1
->p2 move knockoff +1, move fakeout +1
->p2 switch 6, pass
->p1 move protect, move woodhammer +2
->p2 move stompingtantrum +1, move fakeout +1
->p2 pass, switch 4
->p1 move bravebird +1, move highhorsepower +2
->p2 move stompingtantrum +1, move scorchingsands +1
->p1 switch 3, switch 4
->p1 move closecombat +2, move leafblade +2
->p2 move stompingtantrum +1, move scorchingsands +2
->p1 move fakeout +1, move protect
->p2 move stompingtantrum +2, move scorchingsands +1
->p1 switch 5, pass
->p1 move superfang +1, move knockoff +1
->p2 move stompingtantrum +2, move scorchingsands +2
->p2 switch 3, pass
->p1 move dazzlinggleam, move protect
->p2 move moonblast +2, move scorchingsands +1
->p1 move thunderbolt +1, move tailwind
->p2 move synthesis, move scorchingsands +1
->p1 move nuzzle +2, move tailwind
->p2 move protect, move scorchingsands +1
+>player p1 {"name":"Player1","team":"Banette||LifeOrb|Frisk|gunkshot,poltergeist,protect,shadowsneak||85,85,85,85,85,85|M|||94|,,,,,Poison]Raichu|RaichuAlola|ChoiceSpecs|SurgeSurfer|voltswitch,thunderbolt,alluringvoice,psychic||85,,85,85,85,85|M|,0,,,,||89|,,,,,Fairy]Beartic||LifeOrb|SwiftSwim|protect,aquajet,closecombat,iciclecrash||85,85,85,85,85,85|M|||91|,,,,,Fighting]Koraidon||ChoiceBand|OrichalcumPulse|collisioncourse,dragonclaw,flareblitz,uturn||85,85,85,85,85,85|N|||66|,,,,,Fire]Noivern||LifeOrb|Frisk|hurricane,tailwind,flamethrower,dracometeor||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon]Lucario||ChoiceBand|InnerFocus|meteormash,extremespeed,rockslide,closecombat||85,85,85,85,85,85|M|||86|,,,,,Normal"}
+>player p2 {"name":"Player2","team":"Flutter Mane||ChoiceSpecs|Protosynthesis|dazzlinggleam,moonblast,shadowball,icywind||85,,85,85,85,85|N|,0,,,,||73|,,,,,Fairy]Ursaluna|UrsalunaBloodmoon|SilkScarf|MindsEye|protect,bloodmoon,earthpower,hypervoice||85,,85,85,85,85|M|,0,,,,||78|,,,,,Normal]Pyroar||LifeOrb|Unnerve|heatwave,taunt,protect,hypervoice||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fire]Dragalge||LifeOrb|Adaptability|dracometeor,hydropump,sludgebomb,protect||85,,85,85,85,85|F|,0,,,,||88|,,,,,Water]Gyarados||ClearAmulet|Intimidate|protect,terablast,dragondance,waterfall||85,85,85,85,85,85|M|||80|,,,,,Flying]Sableye||SitrusBerry|Prankster|disable,thunderwave,fakeout,knockoff||85,85,85,85,85,85|M|||92|,,,,,Steel"}
+>p1 move protect, move thunderbolt +1
+>p2 move shadowball +2, move earthpower +2
+>p1 pass, switch 3
+>p1 move gunkshot +2, move protect
+>p2 move shadowball +2, move earthpower +2
+>p1 move gunkshot +2, move aquajet +1
+>p2 move shadowball +2, move bloodmoon +2
+>p2 switch 5, pass
+>p1 move poltergeist +1, move closecombat +1
+>p2 move terablast +1, move protect
+>p1 move protect, move protect
+>p2 move waterfall +1, move hypervoice
+>p1 move gunkshot +1, move aquajet +2
+>p2 move dragondance, move protect
+>p1 move gunkshot +1, move aquajet +1
+>p2 move dragondance, move hypervoice
+>p1 pass, switch 5
+>p2 switch 4, pass
+>p1 move gunkshot +2, move dracometeor +2
+>p2 move hydropump +1, move earthpower +2
 >p1 switch 6, pass
->p1 move helpinghand -2, move protect
->p2 move protect, move scorchingsands +2
->p1 move hurricane +1, pass
->p2 move synthesis, move scorchingsands +2
->p1 move hurricane +1, pass
->p2 move calmmind, move scorchingsands +2
->p1 move pollenpuff +1, pass
->p2 move protect, move scorchingsands +2
->p1 move toxicspikes, pass
->p2 move moonblast +1, move scorchingsands +1
->p1 move toxicspikes, pass
->p2 move synthesis, move scorchingsands +1
->p1 move hurricane +2, pass
->p2 move synthesis, move scorchingsands +1
->p1 move toxicspikes, pass
->p2 move synthesis, pass
->p1 move hurricane +2, pass
->p2 move protect, pass
->p1 move pollenpuff +2, pass
->p2 move moonblast +1, pass
->p1 move pollenpuff +2, pass
->p2 move moonblast +2, pass
->p1 move pollenpuff +2, pass
->p2 move calmmind, pass
->p1 move pollenpuff +1, pass
->p2 move protect, pass
->p1 move toxicspikes, pass
->p2 move synthesis, pass
->p1 move hurricane +2, pass
->p2 move protect, pass
->p1 move pollenpuff +2, pass
->p2 move protect, pass
->p1 move toxicspikes, pass
->p2 move synthesis, pass
->p1 move toxicspikes, pass
->p2 move moonblast +2, pass
+>p2 pass, switch 3
+>p1 move rockslide, move dracometeor +1
+>p2 move hydropump +1, move hypervoice
+>p2 switch 6, pass
+>p1 move rockslide, move flamethrower +2
+>p2 move disable +2, move heatwave
+>p1 switch 4, pass
+>p1 move collisioncourse +1, move flamethrower +2
+>p2 move fakeout +2, move hypervoice
+>p1 move collisioncourse +1, pass
+>p2 move fakeout +1, pass
+>p1 move collisioncourse +1, pass
+>p2 move disable +1, pass
+>p1 move struggle, pass
+>p2 move disable +2, pass
+>p1 move struggle, pass
+>p2 move thunderwave +1, pass
+>p1 move struggle, pass
+>p2 move thunderwave +2, pass

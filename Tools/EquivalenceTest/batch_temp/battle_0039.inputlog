@@ -1,37 +1,45 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"274,509,744,1213"}
->player p1 {"name":"Player1","team":"Oranguru||SitrusBerry|InnerFocus|instruct,hypervoice,psychic,trickroom||85,,85,85,85,|M|,0,,,,0||90|,,,,,Fairy]Reshiram||LifeOrb|Turboblaze|heatwave,tailwind,protect,dracometeor||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Urshifu||LifeOrb|UnseenFist|poisonjab,wickedblow,closecombat,suckerpunch||85,85,85,85,85,85|F|||75|,,,,,Poison]Poliwrath||SitrusBerry|WaterAbsorb|coaching,closecombat,liquidation,knockoff||85,85,85,85,85,85|M|||90|,,,,,Steel]Talonflame||SitrusBerry|GaleWings|protect,tailwind,overheat,bravebird||85,85,85,85,85,85|M|||82|,,,,,Flying]Haxorus||LoadedDice|Unnerve|swordsdance,ironhead,scaleshot,protect||85,85,85,85,85,85|M|||84|,,,,,Steel"}
->player p2 {"name":"Player2","team":"Froslass||WideLens|CursedBody|taunt,icywind,poltergeist,tripleaxel||85,85,85,85,85,85|F|||88|,,,,,Ghost]Talonflame||SitrusBerry|GaleWings|bravebird,uturn,overheat,tailwind||85,85,85,85,85,85|F|||82|,,,,,Ground]Golem||ChoiceBand|Sturdy|stoneedge,rockslide,firepunch,highhorsepower||85,85,85,85,85,85|F|||87|,,,,,Grass]Arboliva||LifeOrb|SeedSower|hypervoice,earthpower,strengthsap,energyball||85,,85,85,85,85|F|,0,,,,||88|,,,,,Normal]Banette||LifeOrb|Frisk|poltergeist,gunkshot,protect,shadowsneak||85,85,85,85,85,85|F|||94|,,,,,Poison]Magmortar||SitrusBerry|FlameBody|followme,protect,heatwave,focusblast||85,,85,85,85,85|F|,0,,,,||84|,,,,,Fire"}
->p1 move hypervoice, move heatwave
->p2 move taunt +2, move tailwind
->p1 move instruct +1, move heatwave
->p2 move icywind, move overheat +2
->p2 switch 5, pass
->p1 move instruct +2, move heatwave
->p2 move poltergeist +1, move bravebird +1
->p2 pass, switch 4
->p1 move trickroom, move protect
->p2 move poltergeist +1, move earthpower +2
->p1 move trickroom, move protect
->p2 move protect, move energyball +1
->p1 move hypervoice, move protect
->p2 move gunkshot +1, move hypervoice
->p1 switch 4, switch 3
->p1 move coaching -2, move closecombat +1
->p2 move gunkshot +2, move hypervoice
->p1 move closecombat +2, move suckerpunch +2
->p2 move shadowsneak +1, move earthpower +1
->p2 pass, switch 3
->p1 move coaching -2, move suckerpunch +1
->p2 move gunkshot +1, move firepunch +2
->p1 pass, switch 6
+>player p1 {"name":"Player1","team":"Cramorant||SitrusBerry|GulpMissile|tailwind,protect,bravebird,surf||85,85,85,85,85,85|F|||86|,,,,,Ground]Sandaconda||SitrusBerry|ShedSkin|glare,rest,highhorsepower,stoneedge||85,85,85,85,85,85|M|||88|,,,,,Dragon]Zamazenta||RustedShield|DauntlessShield|heavyslam,bodypress,wideguard,irondefense||85,85,85,85,85,85|N|||67|,,,,,Steel]Garchomp||LoadedDice|RoughSkin|swordsdance,scaleshot,earthquake,protect||85,85,85,85,85,85|M|||77|,,,,,Fire]Annihilape||Leftovers|Defiant|drainpunch,bulkup,protect,ragefist||85,85,85,85,85,85|M|||77|,,,,,Water]Froslass||WideLens|CursedBody|tripleaxel,taunt,poltergeist,icywind||85,85,85,85,85,85|F|||88|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Dachsbun||SitrusBerry|WellBakedBody|snarl,bodypress,howl,playrough||85,85,85,85,85,85|F|||90|,,,,,Steel]Arceus|ArceusFighting|FistPlate|Multitype|recover,bodypress,irondefense,snarl||85,,85,85,85,85|N|,0,,,,||71|,,,,,Steel]Toucannon||SitrusBerry|KeenEye|tailwind,protect,bravebird,knockoff||85,85,85,85,85,85|M|||87|,,,,,Steel]Arcanine||HeavyDutyBoots|Intimidate|willowisp,flareblitz,morningsun,closecombat||85,85,85,85,85,85|F|||82|,,,,,Fighting]Slowbro||LifeOrb|Regenerator|psychic,icebeam,scald,trickroom||85,,85,85,85,|M|,0,,,,0||88|,,,,,Dark]Gardevoir||ChoiceScarf|Trace|trick,moonblast,mysticalfire,psychic||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fire"}
+>p1 move bravebird +1, move rest
+>p2 move playrough +1, move irondefense
+>p1 move tailwind, move stoneedge +1
+>p2 move playrough +2, move snarl
+>p1 move tailwind, move highhorsepower +1
+>p2 move playrough +1, move irondefense
+>p1 move surf, move stoneedge +1
+>p2 move playrough +1, move bodypress +1
+>p1 switch 5, pass
+>p1 move ragefist +2, move highhorsepower +1
+>p2 move bodypress +1, move irondefense
 >p2 switch 6, pass
->p1 move coaching -2, move swordsdance
->p2 move protect, move firepunch +1
->p1 move closecombat +2, move swordsdance
->p2 move protect, move firepunch +1
->p1 move liquidation +2, move swordsdance
->p2 move protect, move firepunch +1
->p1 move knockoff +2, move protect
->p2 move followme, pass
->p1 move closecombat +2, move ironhead +1
->p2 move focusblast +2, pass
+>p1 move ragefist +1, move highhorsepower +2
+>p2 move moonblast +2, move irondefense
+>p1 move protect, move rest
+>p2 move moonblast +2, move snarl
+>p1 pass, switch 4
+>p1 move ragefist +1, move protect
+>p2 move moonblast +2, move bodypress +1
+>p2 switch 5, pass
+>p1 move drainpunch +1, move swordsdance
+>p2 move psychic +1, move bodypress +2
+>p1 switch 3, switch 6
+>p1 move irondefense, move taunt +1
+>p2 move trickroom, move irondefense
+>p1 move heavyslam +2, move tripleaxel +2
+>p2 move psychic +1, move bodypress +2
+>p1 move wideguard, move poltergeist +1
+>p2 move scald +1, move snarl
+>p1 move wideguard, move tripleaxel +2
+>p2 move trickroom, move recover
+>p1 move irondefense, move taunt +2
+>p2 move icebeam +1, move irondefense
+>p2 switch 4, pass
+>p1 pass, move poltergeist +2
+>p2 move willowisp +1, move bodypress +2
+>p1 pass, move tripleaxel +1
+>p2 move willowisp +2, move bodypress +2
+>p1 pass, move poltergeist +1
+>p2 move closecombat +2, move snarl
+>p1 pass, move poltergeist +1
+>p2 move flareblitz +1, move recover

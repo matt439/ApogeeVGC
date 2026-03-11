@@ -1,53 +1,49 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"183,340,497,810"}
->player p1 {"name":"Player1","team":"Hippowdon||Leftovers|SandStream|slackoff,stoneedge,whirlwind,highhorsepower||85,85,85,85,85,85|F|||86|,,,,,Water]Zangoose||ToxicOrb|ToxicBoost|protect,knockoff,feint,facade||85,85,85,85,85,85|F|||87|,,,,,Ghost]Volbeat||SitrusBerry|Prankster|thunderwave,encore,tailwind,lunge||85,85,85,85,85,85|M|||82|,,,,,Water]Quagsire||SitrusBerry|WaterAbsorb|icywind,highhorsepower,helpinghand,liquidation||85,85,85,85,85,85|F|||91|,,,,,Poison]Meganium||SitrusBerry|Overgrow|energyball,encore,knockoff,healpulse||85,85,85,85,85,85|F|||91|,,,,,Steel]Baxcalibur||ChoiceBand|ThermalExchange|glaiverush,iceshard,highhorsepower,iciclecrash||85,85,85,85,85,85|F|||78|,,,,,Dragon"}
->player p2 {"name":"Player2","team":"Krookodile||ChoiceBand|Intimidate|rockslide,knockoff,gunkshot,highhorsepower||85,85,85,85,85,85|F|||80|,,,,,Poison]Flygon||LoadedDice|Levitate|scaleshot,protect,tailwind,earthpower||85,85,85,85,85,85|F|||83|,,,,,Steel]Plusle||SitrusBerry|LightningRod|superfang,nuzzle,thunderbolt,encore||85,85,85,85,85,85|F|||92|,,,,,Flying]Mandibuzz||SitrusBerry|Overcoat|snarl,tailwind,uturn,knockoff||85,85,85,85,85,85|F|||85|,,,,,Steel]Scream Tail||SitrusBerry|Protosynthesis|stealthrock,thunderwave,playrough,helpinghand||85,85,85,85,85,85|N|||82|,,,,,Steel]Bruxish||LifeOrb|StrongJaw|psychicfangs,wavecrash,protect,crunch||85,85,85,85,85,85|F|||86|,,,,,Dark"}
->p1 move stoneedge +1, move facade +2
->p2 move highhorsepower +2, move earthpower +1
->p1 move slackoff, move feint +2
->p2 move highhorsepower +1, move scaleshot +1
->p1 move highhorsepower +1, move protect
->p2 move highhorsepower +1, move protect
->p1 pass, switch 3
->p1 move whirlwind +2, move encore +2
->p2 move highhorsepower +1, move scaleshot +1
->p1 move stoneedge +2, move tailwind
->p2 move highhorsepower +1, move psychicfangs +1
->p1 switch 4, pass
->p1 move helpinghand -2, move thunderwave +2
->p2 move highhorsepower +2, move crunch +1
->p1 move helpinghand -2, move encore +2
->p2 move highhorsepower +2, move crunch +2
->p1 pass, switch 6
->p1 move helpinghand -2, move iceshard +1
->p2 move highhorsepower +2, move crunch +2
->p2 switch 3, pass
->p1 move icywind, move iceshard +1
->p2 move encore +1, move crunch +2
->p2 pass, switch 5
->p1 move helpinghand -2, move iceshard +1
->p2 move superfang +2, move stealthrock
->p2 switch 6, pass
->p1 move helpinghand -2, move iceshard +2
->p2 move earthpower +1, move thunderwave +1
->p1 move helpinghand -2, move iceshard +2
->p2 move scaleshot +2, move playrough +1
->p1 pass, switch 5
->p1 move liquidation +2, move healpulse +1
->p2 move protect, move helpinghand -1
->p1 move highhorsepower +2, move encore +2
->p2 move scaleshot +1, move stealthrock
->p1 move highhorsepower +1, move encore +1
->p2 move protect, move stealthrock
->p1 move liquidation +2, move energyball +2
->p2 move tailwind, move stealthrock
+>player p1 {"name":"Player1","team":"Heatran||LifeOrb|FlashFire|earthpower,flashcannon,heatwave,protect||85,,85,85,85,85|M|,0,,,,||78|,,,,,Grass]Pachirisu||SitrusBerry|VoltAbsorb|thunderbolt,nuzzle,followme,superfang||85,85,85,85,85,85|F|||93|,,,,,Flying]Espathra||LifeOrb|SpeedBoost|shadowball,luminacrash,dazzlinggleam,protect||85,,85,85,85,85|F|,0,,,,||83|,,,,,Fairy]Flygon||LoadedDice|Levitate|scaleshot,earthpower,protect,tailwind||85,85,85,85,85,85|M|||83|,,,,,Steel]Pelipper||SitrusBerry|Drizzle|hurricane,hydropump,tailwind,protect||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Dialga||SitrusBerry|Telepathy|fireblast,dracometeor,thunderwave,heavyslam||85,85,85,85,85,85|N|||74|,,,,,Flying"}
+>player p2 {"name":"Player2","team":"Coalossal||SitrusBerry|FlameBody|protect,heatwave,stoneedge,stealthrock||85,85,85,85,85,85|M|||90|,,,,,Water]Empoleon||SitrusBerry|Competitive|yawn,hydropump,flashcannon,icywind||85,,85,85,85,85|F|,0,,,,||83|,,,,,Flying]Scovillain||SitrusBerry|Chlorophyll|protect,energyball,ragepowder,fireblast||85,,85,85,85,85|M|,0,,,,||90|,,,,,Fire]Sinistcha|SinistchaMasterpiece|Leftovers|Hospitality|shadowball,protect,matchagotcha,calmmind||85,,85,85,85,85|N|,0,,,,||81|,,,,,Fairy]Klefki||LightClay|Prankster|thunderwave,reflect,dazzlinggleam,lightscreen||85,,85,85,85,85|M|,0,,,,||81|,,,,,Water]Wyrdeer||SitrusBerry|Intimidate|psychic,thunderwave,earthpower,doubleedge||85,85,85,85,85,85|M|||85|,,,,,Fairy"}
+>p1 move heatwave, move superfang +2
+>p2 move stealthrock, move yawn +2
+>p1 move earthpower +2, move nuzzle +1
+>p2 move stealthrock, move yawn +2
 >p2 pass, switch 4
->p1 move liquidation +2, move energyball +1
->p2 move tailwind, move tailwind
->p1 move icywind, move energyball +1
->p2 pass, move uturn +2
->p1 move helpinghand -2, move knockoff +1
->p2 pass, move tailwind
->p1 move liquidation +2, move knockoff +2
->p2 pass, move tailwind
->p1 move helpinghand -2, move knockoff +1
->p2 pass, move snarl
+>p1 move flashcannon +2, move followme
+>p2 move heatwave, move protect
+>p1 move earthpower +1, move followme
+>p2 move heatwave, move shadowball +1
+>p2 switch 3, pass
+>p1 move protect, move nuzzle +2
+>p2 move energyball +1, move calmmind
+>p1 move heatwave, move superfang +1
+>p2 move protect, move protect
+>p1 move heatwave, move thunderbolt +2
+>p2 move fireblast +2, move calmmind
+>p1 move protect, move thunderbolt +2
+>p2 move fireblast +1, move calmmind
+>p1 pass, switch 4
+>p1 move earthpower +2, move earthpower +1
+>p2 move protect, move shadowball +2
+>p1 move earthpower +2, move earthpower +2
+>p2 move energyball +1, move matchagotcha
+>p1 move protect, move earthpower +1
+>p2 move fireblast +2, move calmmind
+>p1 move earthpower +2, move scaleshot +2
+>p2 move protect, move calmmind
+>p2 pass, switch 5
+>p1 move protect, move earthpower +1
+>p2 move ragepowder, move thunderwave +1
+>p1 move flashcannon +2, move earthpower +2
+>p2 move ragepowder, move thunderwave +1
+>p2 switch 6, pass
+>p1 move flashcannon +1, move tailwind
+>p2 move psychic +2, move dazzlinggleam
+>p1 switch 3, switch 6
+>p1 move protect, move heavyslam +2
+>p2 move psychic +1, move thunderwave +2
+>p1 move dazzlinggleam, move heavyslam +1
+>p2 move thunderwave +1, pass
+>p1 move shadowball +1, move thunderwave +2
+>p2 move thunderwave +2, pass
+>p1 move protect, move heavyslam +1
+>p2 move doubleedge +2, pass
+>p1 move dazzlinggleam, move thunderwave +2
+>p2 move earthpower +2, pass

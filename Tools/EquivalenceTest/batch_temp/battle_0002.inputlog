@@ -1,56 +1,44 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"15,28,41,66"}
->player p1 {"name":"Player1","team":"Skarmory||Leftovers|Sturdy|bravebird,irondefense,tailwind,bodypress||85,85,85,85,85,85|M|||85|,,,,,Fighting]Iron Boulder||LifeOrb|QuarkDrive|swordsdance,closecombat,mightycleave,protect||85,85,85,85,85,85|N|||77|,,,,,Fighting]Clodsire||Leftovers|WaterAbsorb|gunkshot,highhorsepower,toxicspikes,recover||85,85,85,85,85,85|F|||87|,,,,,Flying]Great Tusk||SitrusBerry|Protosynthesis|knockoff,headlongrush,closecombat,protect||85,85,85,85,85,85|N|||81|,,,,,Fire]Hawlucha||WhiteHerb|Unburden|bravebird,protect,closecombat,swordsdance||85,85,85,85,85,85|F|||84|,,,,,Fire]Kyurem|KyuremWhite|BlunderPolicy|Turboblaze|fusionflare,freezedry,blizzard,earthpower||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire"}
->player p2 {"name":"Player2","team":"Enamorus|EnamorusTherian|SitrusBerry|Overcoat|protect,earthpower,moonblast,springtidestorm||85,,85,85,85,85|F|,0,,,,||82|,,,,,Ground]Alomomola||SitrusBerry|Regenerator|wideguard,icywind,scald,flipturn||85,85,85,85,85,85|F|||96|,,,,,Steel]Meowstic||LightClay|Prankster|reflect,psychic,lightscreen,helpinghand||85,,85,85,85,85|M|,0,,,,||88|,,,,,Steel]Rotom|RotomWash|SitrusBerry|Levitate|electroweb,protect,thunderbolt,hydropump||85,,85,85,85,85|N|,0,,,,||83|,,,,,Electric]Darkrai||LifeOrb|BadDreams|protect,focusblast,sludgebomb,darkpulse||85,,85,85,85,85|N|,0,,,,||80|,,,,,Poison]Magmar||Eviolite|FlameBody|knockoff,followme,heatwave,protect||85,85,85,85,85,85|M|||84|,,,,,Grass"}
->p1 move tailwind, move swordsdance
->p2 move springtidestorm, move scald +2
->p1 move tailwind, move swordsdance
->p2 move moonblast +2, move wideguard
->p1 pass, switch 6
->p1 move irondefense, move blizzard
->p2 move earthpower +2, move icywind
->p1 move bodypress +1, move blizzard
->p2 move protect, move flipturn +2
->p2 pass, switch 3
->p1 move bravebird +1, move fusionflare +1
->p2 move moonblast +2, move psychic +2
->p1 pass, switch 5
->p1 move tailwind, move bravebird +1
->p2 move springtidestorm, move psychic +1
->p2 switch 3, pass
->p1 move bravebird +1, move swordsdance
->p2 move icywind, move helpinghand -1
->p1 move bodypress +2, move bravebird +1
->p2 move flipturn +1, move psychic +1
->p2 switch 4, pass
->p1 move irondefense, move swordsdance
->p2 move protect, move lightscreen
->p1 move bravebird +1, move swordsdance
->p2 move protect, move lightscreen
->p1 move bravebird +2, move protect
->p2 move electroweb, move psychic +1
->p1 switch 4, pass
->p1 move headlongrush +2, move bravebird +1
->p2 move protect, move helpinghand -1
->p1 move closecombat +1, move closecombat +2
->p2 move protect, move psychic +1
->p2 pass, switch 4
->p1 move protect, move protect
->p2 move thunderbolt +1, move icywind
->p1 move closecombat +1, move bravebird +2
->p2 move thunderbolt +1, move scald +1
+>player p1 {"name":"Player1","team":"Chi-Yu||LifeOrb|BeadsofRuin|nastyplot,protect,darkpulse,heatwave||85,,85,85,85,85|N|,0,,,,||75|,,,,,Dark]Regice||BlunderPolicy|ClearBody|protect,icywind,thunderbolt,blizzard||85,,85,85,85,85|N|,0,,,,||84|,,,,,Water]Plusle||LifeOrb|LightningRod|alluringvoice,nastyplot,protect,thunderbolt||85,,85,85,85,85|F|,0,,,,||92|,,,,,Flying]Annihilape||Leftovers|Defiant|ragefist,protect,bulkup,drainpunch||85,85,85,85,85,85|F|||77|,,,,,Water]Toxtricity|ToxtricityLowKey|ChoiceSpecs|PunkRock|overdrive,snarl,sludgebomb,voltswitch||85,,85,85,85,85|F|,0,,,,||82|,,,,,Electric]Donphan||AssaultVest|Sturdy|rapidspin,highhorsepower,knockoff,iceshard||85,85,85,85,85,85|M|||87|,,,,,Water"}
+>player p2 {"name":"Player2","team":"Avalugg|AvaluggHisui|LoadedDice|Sturdy|bodypress,protect,iciclespear,rockblast||85,85,85,85,85,85|F|||88|,,,,,Poison]Gengar||LifeOrb|CursedBody|shadowball,protect,encore,sludgebomb||85,,85,85,85,85|M|,0,,,,||84|,,,,,Ghost]Maushold||WideLens|Technician|populationbomb,tidyup,protect,encore||85,85,85,85,85,85|N|||79|,,,,,Normal]Cyclizar||SitrusBerry|Regenerator|breakingswipe,shedtail,doubleedge,knockoff||85,85,85,85,85,85|F|||87|,,,,,Poison]Glimmora||PowerHerb|ToxicDebris|earthpower,spikyshield,meteorbeam,sludgebomb||85,,85,85,85,85|M|,0,,,,||77|,,,,,Ground]Galvantula||SitrusBerry|CompoundEyes|thunder,stickyweb,bugbuzz,protect||85,,85,85,85,85|M|,0,,,,||85|,,,,,Electric"}
+>p1 move nastyplot, move blizzard
+>p2 move iciclespear +2, move sludgebomb +2
+>p1 move nastyplot, move thunderbolt +2
+>p2 move iciclespear +2, move protect
+>p1 move darkpulse +2, move thunderbolt +1
+>p2 move iciclespear +2, move encore +2
 >p1 pass, switch 3
->p2 switch 6, switch 5
->p1 move knockoff +2, move highhorsepower +1
->p2 move protect, move sludgebomb +1
->p1 move headlongrush +2, move highhorsepower +1
->p2 move followme, move protect
->p1 move protect, move recover
->p2 pass, move protect
->p1 move closecombat +2, move recover
->p2 pass, move focusblast +1
->p1 pass, move highhorsepower +2
->p2 pass, move sludgebomb +1
->p1 pass, move highhorsepower +2
->p2 pass, move protect
->p1 pass, move gunkshot +1
->p2 pass, move focusblast +2
+>p2 pass, switch 5
+>p1 move heatwave, move protect
+>p2 move protect, move spikyshield
+>p1 move nastyplot, move nastyplot
+>p2 move protect, move meteorbeam +1
+>p1 switch 5, pass
+>p1 move voltswitch +1, move thunderbolt +1
+>p2 move bodypress +1, move meteorbeam +2
+>p2 switch 3, pass
+>p1 move voltswitch +1, move protect
+>p2 move encore +1, move meteorbeam +2
+>p1 move voltswitch +1, move alluringvoice +1
+>p2 move tidyup, move meteorbeam +2
+>p1 move voltswitch +1, move thunderbolt +2
+>p2 move populationbomb +2, move meteorbeam +2
+>p1 switch 4, switch 6
+>p1 move bulkup, move highhorsepower +2
+>p2 move tidyup, move sludgebomb +1
+>p2 pass, switch 6
+>p1 move bulkup, move rapidspin +2
+>p2 move tidyup, move thunder +1
+>p1 move protect, move rapidspin +2
+>p2 move protect, move stickyweb
+>p1 move ragefist +1, move knockoff +2
+>p2 move protect, move bugbuzz +1
+>p1 move ragefist +2, move rapidspin +1
+>p2 move encore +2, move bugbuzz +1
+>p2 switch 4, pass
+>p1 move bulkup, move knockoff +2
+>p2 move doubleedge +1, pass
+>p1 move bulkup, move knockoff +1
+>p2 move breakingswipe, pass
+>p1 move drainpunch +2, move rapidspin +1
+>p2 move breakingswipe, pass

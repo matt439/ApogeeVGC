@@ -12,7 +12,7 @@ namespace ApogeeVGC.Sim.Core;
 public partial class Driver
 {
     // Equivalence batch evaluation settings
-    private const int EquivalenceBatchNumTests = 50;
+    private const int EquivalenceBatchNumTests = 200;
     private const string EquivalenceBatchFormat = "gen9randomdoublesbattle";
 
     /// <summary>
@@ -57,7 +57,7 @@ public partial class Driver
         int errors = 0;
         int completed = 0;
 
-        Parallel.For(0, EquivalenceBatchNumTests, new ParallelOptions { MaxDegreeOfParallelism = 8 }, i =>
+        Parallel.For(0, EquivalenceBatchNumTests, new ParallelOptions { MaxDegreeOfParallelism = 32 }, i =>
         {
             // Generate a unique seed for each battle
             // Use 4 values as Gen5RNG seed, derived from the test index

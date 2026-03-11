@@ -1,39 +1,55 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"190,353,516,841"}
->player p1 {"name":"Player1","team":"Greninja|GreninjaBond|LifeOrb|BattleBond|protect,gunkshot,darkpulse,hydropump||85,85,85,85,85,85|M|||83|,,,,,Poison]Jolteon||LifeOrb|VoltAbsorb|calmmind,protect,terablast,thunderbolt||85,,85,85,85,85|M|,0,,,,||85|,,,,,Ice]Inteleon||ChoiceSpecs|Torrent|scald,muddywater,hydropump,icebeam||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Glalie||SitrusBerry|InnerFocus|icywind,freezedry,helpinghand,disable||85,,85,85,85,85|M|,0,,,,||94|,,,,,Steel]Diancie||SitrusBerry|ClearBody|protect,bodypress,trickroom,diamondstorm||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Armarouge||PowerHerb|WeakArmor|meteorbeam,psychic,heatwave,protect||85,,85,85,85,85|F|,0,,,,||80|,,,,,Dark"}
->player p2 {"name":"Player2","team":"Gyarados||ClearAmulet|Intimidate|terablast,protect,waterfall,dragondance||85,85,85,85,85,85|M|||80|,,,,,Flying]Eelektross||AssaultVest|Levitate|electroweb,uturn,thunderbolt,flamethrower||85,85,85,85,85,85|M|||86|,,,,,Poison]Charizard||LifeOrb|Blaze|protect,scorchingsands,heatwave,hurricane||85,,85,85,85,85|F|,0,,,,||82|,,,,,Ground]Arboliva||LifeOrb|SeedSower|strengthsap,energyball,pollenpuff,hypervoice||85,,85,85,85,85|F|,0,,,,||88|,,,,,Normal]Victreebel||LifeOrb|Chlorophyll|suckerpunch,protect,powerwhip,sludgebomb||85,85,85,85,85,85|F|||91|,,,,,Grass]Pawmot||ClearAmulet|VoltAbsorb|revivalblessing,doubleshock,closecombat,fakeout||85,85,85,85,85,85|F|||80|,,,,,Electric"}
->p1 move hydropump +2, move thunderbolt +1
->p2 move dragondance, move electroweb
->p2 switch 3, pass
->p1 move hydropump +1, move thunderbolt +1
->p2 move protect, move uturn +2
->p2 pass, switch 4
->p1 move gunkshot +2, move calmmind
->p2 move protect, move pollenpuff +2
->p1 move gunkshot +2, move protect
->p2 move hurricane +2, move strengthsap +2
->p1 move protect, move protect
->p2 move heatwave, move strengthsap +1
->p1 move protect, move terablast +1
->p2 move protect, move strengthsap +2
->p1 move gunkshot +2, move thunderbolt +2
->p2 move hurricane +1, move pollenpuff +2
->p1 move hydropump +1, move terablast +1
->p2 move scorchingsands +2, move energyball +2
->p1 switch 3, switch 6
->p2 switch 4, switch 6
->p1 move hydropump +2, move meteorbeam +1
->p2 move flamethrower +2, move closecombat +1
->p1 move hydropump +2, move psychic +1
->p2 move flamethrower +1, move fakeout +1
->p2 switch 5, pass
->p1 move hydropump +2, move protect
->p2 move protect, pass
->p1 move hydropump +1, move protect
->p2 move suckerpunch +2, pass
->p1 move hydropump +2, move protect
->p2 move protect, pass
->p1 move hydropump +1, move meteorbeam +2
->p2 move sludgebomb +1, pass
+>player p1 {"name":"Player1","team":"Toxtricity|ToxtricityLowKey|ChoiceSpecs|PunkRock|sludgebomb,psychicnoise,overdrive,voltswitch||85,,85,85,85,85|M|,0,,,,||82|,,,,,Flying]Incineroar||HeavyDutyBoots|Intimidate|partingshot,flareblitz,knockoff,fakeout||85,85,85,85,85,85|M|||78|,,,,,Water]Glastrier||SitrusBerry|ChillingNeigh|protect,iciclecrash,heavyslam,closecombat||85,85,85,85,85,85|N|||80|,,,,,Fighting]Espeon||LifeOrb|MagicBounce|protect,psychic,alluringvoice,shadowball||85,,85,85,85,85|F|,0,,,,||84|,,,,,Fairy]Malamar||SitrusBerry|Contrary|superpower,trickroom,knockoff,protect||85,85,85,85,85,|F|,,,,,0||80|,,,,,Fighting]Oricorio|OricorioSensu|SitrusBerry|Dancer|protect,revelationdance,tailwind,hurricane||85,,85,85,85,85|F|,0,,,,||87|,,,,,Ground"}
+>player p2 {"name":"Player2","team":"Perrserker||ChoiceBand|SteelySpirit|knockoff,ironhead,closecombat,uturn||85,85,85,85,85,85|F|||88|,,,,,Steel]Raichu|RaichuAlola|LifeOrb|SurgeSurfer|protect,nastyplot,thunderbolt,psychic||85,,85,85,85,85|M|,0,,,,||89|,,,,,Electric]Klefki||SitrusBerry|Prankster|spikes,thunderwave,foulplay,dazzlinggleam||85,,85,85,85,85|F|,0,,,,||81|,,,,,Water]Umbreon||SitrusBerry|InnerFocus|foulplay,thunderwave,moonlight,snarl||85,,85,85,85,85|M|,0,,,,||85|,,,,,Poison]Mimikyu||LifeOrb|Disguise|swordsdance,shadowclaw,playrough,shadowsneak||85,85,85,85,85,85|F|||82|,,,,,Ghost]Golduck||LifeOrb|CloudNine|grassknot,hydropump,protect,icebeam||85,,85,85,85,85|M|,0,,,,||91|,,,,,Water"}
+>p1 move voltswitch +2, move knockoff +2
+>p2 move ironhead +1, move protect
+>p1 move voltswitch +1, move flareblitz +1
+>p2 move ironhead +1, move psychic +2
 >p1 switch 5, pass
->p1 move bodypress +2, move meteorbeam +2
->p2 move sludgebomb +1, pass
+>p2 switch 4, pass
+>p1 move superpower +2, move partingshot +2
+>p2 move thunderwave +1, move psychic +1
+>p1 pass, switch 4
+>p1 move trickroom, move protect
+>p2 move moonlight, move psychic +2
+>p1 move trickroom, move protect
+>p2 move foulplay +1, move thunderbolt +1
+>p1 move knockoff +1, move psychic +2
+>p2 move thunderwave +2, move nastyplot
+>p1 move protect, move shadowball +1
+>p2 move moonlight, move protect
+>p1 move knockoff +2, move alluringvoice +2
+>p2 move snarl, move thunderbolt +2
+>p2 pass, switch 3
+>p1 move superpower +2, move alluringvoice +1
+>p2 move snarl, move spikes
+>p1 move trickroom, move shadowball +2
+>p2 move moonlight, move thunderwave +2
+>p1 move superpower +2, move shadowball +2
+>p2 move moonlight, move dazzlinggleam
+>p2 pass, switch 5
+>p1 move protect, move alluringvoice +2
+>p2 move snarl, move shadowclaw +2
+>p1 pass, switch 6
+>p1 move superpower +2, move revelationdance +2
+>p2 move foulplay +2, move playrough +1
+>p1 switch 3, pass
+>p1 move closecombat +2, move revelationdance +2
+>p2 move snarl, move shadowsneak +2
+>p2 pass, switch 6
+>p1 move protect, move protect
+>p2 move foulplay +2, move protect
+>p1 move heavyslam +2, move protect
+>p2 move moonlight, move hydropump +1
+>p1 move heavyslam +1, move hurricane +1
+>p2 move moonlight, move grassknot +2
+>p1 move iciclecrash +1, move hurricane +1
+>p2 move thunderwave +2, move protect
+>p1 move heavyslam +2, move tailwind
+>p2 move thunderwave +2, move protect
+>p1 move closecombat +1, move tailwind
+>p2 move snarl, move icebeam +1
+>p1 move closecombat +2, move revelationdance +1
+>p2 pass, move protect
+>p1 move iciclecrash +1, move revelationdance +2
+>p2 pass, move hydropump +1

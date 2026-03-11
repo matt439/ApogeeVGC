@@ -1,28 +1,37 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"267,496,725,1182"}
->player p1 {"name":"Player1","team":"Kyogre||ChoiceScarf|Drizzle|icebeam,waterspout,originpulse,thunder||85,,85,85,85,85|N|,0,,,,||65|,,,,,Water]Tornadus|TornadusTherian|ChoiceSpecs|Regenerator|heatwave,grassknot,focusblast,bleakwindstorm||85,,85,85,85,85|M|,0,,,,||77|,,,,,Fire]Copperajah||AssaultVest|HeavyMetal|heatcrash,stoneedge,heavyslam,highhorsepower||85,85,85,85,85,85|F|||86|,,,,,Fire]Iron Boulder||BoosterEnergy|QuarkDrive|closecombat,protect,zenheadbutt,mightycleave||85,85,85,85,85,85|N|||77|,,,,,Fighting]Fezandipiti||AssaultVest|ToxicChain|icywind,uturn,gunkshot,moonblast||85,85,85,85,85,85|M|||81|,,,,,Dark]Vileplume||SitrusBerry|EffectSpore|pollenpuff,sludgebomb,stunspore,strengthsap||85,,85,85,85,85|M|,0,,,,||89|,,,,,Water"}
->player p2 {"name":"Player2","team":"Sneasler||FocusSash|PoisonTouch|direclaw,fakeout,closecombat,throatchop||85,85,85,85,85,85|F|||77|,,,,,Dark]Clawitzer||ChoiceSpecs|MegaLauncher|aurasphere,dragonpulse,darkpulse,muddywater||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dark]Electrode||LifeOrb|Aftermath|protect,voltswitch,terablast,thunderbolt||85,,85,85,85,85|N|,0,,,,||89|,,,,,Ice]Heracross||ChoiceScarf|Moxie|rockslide,knockoff,megahorn,closecombat||85,85,85,85,85,85|F|||82|,,,,,Rock]Armarouge||ChoiceSpecs|FlashFire|armorcannon,aurasphere,heatwave,psychic||85,,85,85,85,85|M|,0,,,,||80|,,,,,Fighting]Rayquaza||LifeOrb|AirLock|dracometeor,dragonascent,fireblast,protect||85,85,85,85,85,85|N|||75|,,,,,Fire"}
->p1 move thunder +2, move grassknot +1
->p2 move fakeout +2, move aurasphere +1
->p1 move thunder +2, move bleakwindstorm
->p2 move closecombat +1, move aurasphere +2
->p1 switch 3, pass
->p2 pass, switch 6
->p1 move highhorsepower +2, move bleakwindstorm
->p2 move throatchop +1, move fireblast +1
+>player p1 {"name":"Player1","team":"Sylveon||ThroatSpray|Pixilate|quickattack,protect,terablast,hypervoice||85,85,85,85,85,85|M|||79|,,,,,Ground]Great Tusk||AssaultVest|Protosynthesis|icespinner,rapidspin,headlongrush,closecombat||85,85,85,85,85,85|N|||81|,,,,,Fire]Inteleon||ChoiceSpecs|Torrent|scald,muddywater,icebeam,hydropump||85,,85,85,85,85|F|,0,,,,||78|,,,,,Water]Orthworm||Leftovers|EarthEater|heavyslam,irondefense,protect,bodypress||85,85,85,85,85,85|M|||88|,,,,,Fighting]Whiscash||SitrusBerry|Oblivious|icywind,protect,muddywater,highhorsepower||85,85,85,85,85,85|F|||88|,,,,,Steel]Porygon2||Eviolite|Download|thunderbolt,icebeam,trickroom,recover||85,,85,85,85,|N|,0,,,,0||82|,,,,,Ghost"}
+>player p2 {"name":"Player2","team":"Bombirdier||ChoiceBand|RockyPayload|bravebird,knockoff,suckerpunch,rockslide||85,85,85,85,85,85|F|||84|,,,,,Rock]Kilowattrel||FocusSash|Competitive|tailwind,protect,thunderbolt,hurricane||85,,85,85,85,85|F|,0,,,,||80|,,,,,Flying]Dusknoir||LifeOrb|Frisk|poltergeist,leechlife,protect,trickroom||85,85,85,85,85,|F|,,,,,0||89|,,,,,Dark]Wigglytuff||SitrusBerry|Competitive|thunderwave,encore,fireblast,dazzlinggleam||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fire]Incineroar||HeavyDutyBoots|Intimidate|partingshot,knockoff,fakeout,flareblitz||85,85,85,85,85,85|F|||78|,,,,,Water]Bastiodon||Leftovers|Sturdy|bodypress,irondefense,wideguard,foulplay||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting"}
+>p1 move hypervoice, move closecombat +1
+>p2 move rockslide, move protect
 >p2 switch 3, pass
->p1 move highhorsepower +2, move bleakwindstorm
->p2 move thunderbolt +1, move dragonascent +1
->p1 switch 4, pass
->p2 pass, switch 4
->p1 move mightycleave +2, move bleakwindstorm
->p2 move terablast +1, move rockslide
->p2 pass, switch 5
->p1 move zenheadbutt +1, move bleakwindstorm
->p2 move protect, move armorcannon +2
->p1 pass, switch 5
->p1 move closecombat +1, move uturn +1
->p2 move voltswitch +2, move armorcannon +2
+>p1 move hypervoice, move headlongrush +2
+>p2 move leechlife +2, move thunderbolt +1
+>p1 move hypervoice, move closecombat +2
+>p2 move poltergeist +2, move hurricane +2
 >p1 pass, switch 6
->p1 pass, switch 6
->p1 move protect, move gunkshot +2
->p2 pass, move armorcannon +1
+>p2 pass, switch 6
+>p1 move terablast +1, move recover
+>p2 move trickroom, move irondefense
+>p2 switch 4, pass
+>p1 move terablast +1, move thunderbolt +2
+>p2 move encore +2, move bodypress +2
+>p1 move hypervoice, move recover
+>p2 move dazzlinggleam, move bodypress +2
+>p1 pass, switch 3
+>p1 move protect, move muddywater
+>p2 move thunderwave +1, move bodypress +2
+>p1 pass, switch 4
+>p1 move terablast +2, move protect
+>p2 move fireblast +1, move irondefense
+>p1 switch 5, pass
+>p1 move icywind, move protect
+>p2 move encore +1, move wideguard
+>p1 move icywind, move irondefense
+>p2 move encore +1, move wideguard
+>p1 move icywind, move bodypress +1
+>p2 move thunderwave +2, move bodypress +2
+>p2 switch 5, pass
+>p1 move icywind, pass
+>p2 move knockoff +2, move foulplay +1
+>p1 move muddywater, pass
+>p2 move knockoff +1, move foulplay +2

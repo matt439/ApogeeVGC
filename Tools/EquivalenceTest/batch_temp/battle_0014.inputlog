@@ -1,33 +1,32 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"99,184,269,438"}
->player p1 {"name":"Player1","team":"Mamoswine||LifeOrb|ThickFat|protect,iciclecrash,iceshard,highhorsepower||85,85,85,85,85,85|M|||82|,,,,,Water]Gardevoir||ChoiceSpecs|Trace|psychic,mysticalfire,dazzlinggleam,moonblast||85,,85,85,85,85|F|,0,,,,||83|,,,,,Steel]Lapras||SitrusBerry|WaterAbsorb|icywind,freezedry,protect,muddywater||85,,85,85,85,85|M|,0,,,,||83|,,,,,Ground]Ambipom||SilkScarf|Technician|doubleedge,knockoff,fakeout,protect||85,85,85,85,85,85|F|||87|,,,,,Normal]Slowbro|SlowbroGalar|LifeOrb|Regenerator|shellsidearm,trickroom,fireblast,psychic||85,85,85,85,85,|F|,,,,,0||87|,,,,,Fire]Tentacruel||SitrusBerry|ClearBody|sludgebomb,toxicspikes,hydropump,icywind||85,,85,85,85,85|M|,0,,,,||85|,,,,,Grass"}
->player p2 {"name":"Player2","team":"Deoxys||LifeOrb|Pressure|superpower,psychoboost,extremespeed,protect||85,85,85,85,85,85|N|||79|,,,,,Ghost]Quaquaval||LifeOrb|Moxie|closecombat,protect,tripleaxel,aquastep||85,85,85,85,85,85|F|||82|,,,,,Steel]Polteageist|PolteageistAntique|WhiteHerb|CursedBody|shellsmash,protect,batonpass,shadowball||85,,85,85,85,85|N|,0,,,,||85|,,,,,Normal]Yanmega||LifeOrb|SpeedBoost|airslash,protect,bugbuzz,terablast||85,,85,85,85,85|M|,0,,,,||84|,,,,,Ground]Primarina||ChoiceSpecs|LiquidVoice|flipturn,hypervoice,moonblast,hydropump||85,85,85,85,85,85|M|||79|,,,,,Water]Abomasnow||LightClay|SnowWarning|woodhammer,blizzard,auroraveil,protect||85,85,85,85,85,85|M|||81|,,,,,Ice"}
->p1 move iciclecrash +2, move moonblast +2
->p2 move extremespeed +2, move tripleaxel +1
->p2 switch 4, switch 6
->p1 move iciclecrash +1, move moonblast +1
->p2 move airslash +2, move protect
->p2 switch 3, pass
->p1 move iciclecrash +2, move moonblast +1
->p2 move protect, move auroraveil
->p1 move iciclecrash +2, move moonblast +2
->p2 move shadowball +1, move woodhammer +1
->p1 switch 5, pass
->p1 move shellsidearm +2, move moonblast +2
->p2 move shellsmash, move protect
->p1 move fireblast +2, move moonblast +1
->p2 move shadowball +1, move woodhammer +2
->p1 switch 3, switch 6
->p1 move freezedry +1, move sludgebomb +1
->p2 move batonpass, move blizzard
+>player p1 {"name":"Player1","team":"Deoxys||LifeOrb|Pressure|psychoboost,superpower,protect,extremespeed||85,85,85,85,85,85|N|||79|,,,,,Stellar]Grumpig||LifeOrb|ThickFat|psychic,nastyplot,dazzlinggleam,earthpower||85,,85,85,85,85|F|,0,,,,||91|,,,,,Fairy]Flygon||SitrusBerry|Levitate|tailwind,earthpower,protect,breakingswipe||85,85,85,85,85,85|M|||83|,,,,,Steel]Arboliva||LifeOrb|SeedSower|hypervoice,energyball,protect,pollenpuff||85,,85,85,85,85|F|,0,,,,||88|,,,,,Normal]Palkia|PalkiaOrigin|LustrousGlobe|Telepathy|thunderwave,hydropump,protect,spacialrend||85,,85,85,85,85|N|,0,,,,||72|,,,,,Steel]Smeargle||WideLens|Technician|populationbomb,noretreat,spikyshield,batonpass||85,85,85,85,85,85|M||||,,,,,Ghost"}
+>player p2 {"name":"Player2","team":"Magmortar||SitrusBerry|FlameBody|knockoff,focusblast,protect,fireblast||85,85,85,85,85,85|M|||84|,,,,,Grass]Passimian||ChoiceScarf|Defiant|closecombat,rockslide,gunkshot,knockoff||85,85,85,85,85,85|F|||82|,,,,,Poison]Roaring Moon||BoosterEnergy|Protosynthesis|knockoff,acrobatics,breakingswipe,protect||85,85,85,85,85,85|N|||76|,,,,,Flying]Manaphy||SitrusBerry|Hydration|hydropump,protect,energyball,tailglow||85,,85,85,85,85|N|,0,,,,||78|,,,,,Grass]Sunflora||LifeOrb|Chlorophyll|leafstorm,dazzlinggleam,earthpower,protect||85,,85,85,85,85|M|,0,,,,|||,,,,,Fairy]Snorlax||ChoiceBand|ThickFat|crunch,highhorsepower,doubleedge,heatcrash||85,85,85,85,85,85|M|||84|,,,,,Fire"}
+>p1 move superpower +2, move earthpower +1
+>p2 move protect, move gunkshot +1
+>p1 switch 6, pass
+>p1 move spikyshield, move nastyplot
+>p2 move knockoff +1, move gunkshot +2
+>p1 move noretreat, move psychic +1
+>p2 move focusblast +2, move gunkshot +1
 >p2 switch 5, pass
->p2 switch 5, pass
->p1 move icywind, move icywind
->p2 move protect, move auroraveil
->p1 move freezedry +2, move sludgebomb +1
->p2 move shadowball +2, move blizzard
->p1 move muddywater, move hydropump +1
->p2 move protect, pass
->p1 move icywind, move toxicspikes
->p2 move shadowball +1, pass
->p1 move muddywater, move sludgebomb +1
->p2 move batonpass, pass
+>p1 move spikyshield, move dazzlinggleam
+>p2 move leafstorm +1, move gunkshot +1
+>p2 pass, switch 3
+>p1 move spikyshield, move dazzlinggleam
+>p2 move protect, move breakingswipe
+>p2 pass, switch 6
+>p1 move batonpass, move nastyplot
+>p2 move earthpower +2, move highhorsepower +1
+>p1 switch 4, pass
+>p1 move hypervoice, move dazzlinggleam
+>p2 move protect, move highhorsepower +2
+>p1 pass, switch 3
+>p1 move energyball +1, move earthpower +2
+>p2 move protect, move highhorsepower +2
+>p1 move hypervoice, move tailwind
+>p2 move earthpower +1, move highhorsepower +1
+>p2 pass, switch 4
+>p1 move hypervoice, move breakingswipe
+>p2 move dazzlinggleam, move hydropump +1
+>p1 move pollenpuff +1, move earthpower +1
+>p2 pass, move energyball +2

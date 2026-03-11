@@ -37,8 +37,8 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                 handler(
                     context.Battle,
                     context.GetMove(),
-                    context.GetSourceOrTargetPokemon(),
-                    context.TargetPokemon
+                    context.GetTargetOrSourcePokemon(),
+                    context.SourcePokemon
                 );
                 return null;
             },

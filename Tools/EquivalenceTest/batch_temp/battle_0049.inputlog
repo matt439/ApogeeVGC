@@ -1,26 +1,40 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"344,639,934,1523"}
->player p1 {"name":"Player1","team":"Metagross||WeaknessPolicy|ClearBody|stompingtantrum,heavyslam,psychicfangs,agility||85,85,85,85,85,85|N|||80|,,,,,Dragon]Rayquaza||LifeOrb|AirLock|swordsdance,earthquake,dragonascent,extremespeed||85,85,85,85,85,85|N|||75|,,,,,Normal]Dudunsparce||SitrusBerry|Rattled|protect,tailwind,earthpower,boomburst||85,,85,85,85,85|M|,0,,,,||86|,,,,,Normal]Plusle||SitrusBerry|LightningRod|thunderbolt,encore,superfang,nuzzle||85,85,85,85,85,85|M|||92|,,,,,Flying]Samurott|SamurottHisui|ChoiceBand|Sharpness|razorshell,flipturn,ceaselessedge,sacredsword||85,85,85,85,85,85|M|||83|,,,,,Dark]Necrozma||Leftovers|PrismArmor|photongeyser,calmmind,earthpower,protect||85,,85,85,85,85|N|,0,,,,||80|,,,,,Steel"}
->player p2 {"name":"Player2","team":"Heracross||FlameOrb|Guts|knockoff,protect,facade,closecombat||85,85,85,85,85,85|M|||82|,,,,,Normal]Coalossal||SitrusBerry|FlameBody|willowisp,fireblast,protect,stoneedge||85,85,85,85,85,85|F|||90|,,,,,Water]Kyogre||ChoiceScarf|Drizzle|originpulse,icebeam,thunder,waterspout||85,,85,85,85,85|N|,0,,,,||65|,,,,,Water]Espeon||LifeOrb|MagicBounce|protect,shadowball,alluringvoice,psychic||85,,85,85,85,85|M|,0,,,,||84|,,,,,Fairy]Ho-Oh||SitrusBerry|Regenerator|sacredfire,earthpower,tailwind,bravebird||85,85,85,85,85,85|N|||70|,,,,,Ground]Klawf||LifeOrb|Regenerator|rockslide,crabhammer,protect,knockoff||85,85,85,85,85,85|M|||91|,,,,,Dark"}
->p1 move stompingtantrum +1, move swordsdance
->p2 move closecombat +1, move willowisp +1
->p1 move agility, move earthquake
->p2 move knockoff +1, move stoneedge +2
+>player p1 {"name":"Player1","team":"Electrode|ElectrodeHisui|AssaultVest|Static|thunderbolt,leafstorm,voltswitch,electroweb||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Malamar||SitrusBerry|Contrary|knockoff,protect,superpower,psychocut||85,85,85,85,85,85|F|||80|,,,,,Fighting]Pelipper||SitrusBerry|Drizzle|tailwind,hurricane,hydropump,protect||85,,85,85,85,85|F|,0,,,,||83|,,,,,Ground]Arcanine|ArcanineHisui|ChoiceBand|Intimidate|extremespeed,flareblitz,rockslide,stoneedge||85,85,85,85,85,85|M|||79|,,,,,Rock]Skeledirge||Leftovers|Unaware|shadowball,protect,slackoff,torchsong||85,,85,85,85,85|F|,0,,,,||80|,,,,,Fairy]Zacian||RustedSword|IntrepidSword|playrough,closecombat,behemothblade,swordsdance||85,85,85,85,85,85|N|||66|,,,,,Fire"}
+>player p2 {"name":"Player2","team":"Araquanid||SitrusBerry|WaterBubble|protect,hydropump,liquidation,stickyweb||85,85,85,85,85,85|M|||84|,,,,,Water]Kleavor||LifeOrb|Sharpness|protect,stoneaxe,tailwind,xscissor||85,85,85,85,85,85|F|||79|,,,,,Steel]Bombirdier||ChoiceBand|RockyPayload|knockoff,suckerpunch,rockslide,bravebird||85,85,85,85,85,85|M|||84|,,,,,Rock]Perrserker||AssaultVest|SteelySpirit|knockoff,closecombat,fakeout,ironhead||85,85,85,85,85,85|F|||88|,,,,,Steel]Reuniclus||LifeOrb|MagicGuard|focusblast,psychic,shadowball,trickroom||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fighting]Carbink||Leftovers|ClearBody|irondefense,moonblast,bodypress,trickroom||85,,85,85,85,|N|,0,,,,0||88|,,,,,Fighting"}
+>p1 move thunderbolt +1, move knockoff +1
+>p2 move hydropump +2, move xscissor +1
+>p1 switch 4, pass
+>p1 move extremespeed +2, move protect
+>p2 move stickyweb, move stoneaxe +2
+>p1 move extremespeed +1, move psychocut +2
+>p2 move stickyweb, move stoneaxe +1
+>p1 move extremespeed +1, move psychocut +1
+>p2 move stickyweb, move stoneaxe +2
+>p2 switch 4, pass
+>p1 move extremespeed +1, move psychocut +2
+>p2 move ironhead +1, move stoneaxe +1
 >p1 switch 6, pass
->p2 pass, switch 4
->p1 move photongeyser +1, move dragonascent +1
->p2 move closecombat +1, move protect
->p2 switch 5, pass
->p1 move calmmind, move earthquake
->p2 move earthpower +1, move psychic +1
->p1 switch 3, pass
->p1 move tailwind, move dragonascent +2
->p2 move earthpower +1, move psychic +1
->p2 switch 3, switch 6
->p1 move boomburst, move earthquake
->p2 move thunder +1, move protect
->p1 pass, switch 4
->p1 move boomburst, move superfang +2
->p2 pass, move rockslide
->p1 switch 5, pass
->p1 move sacredsword +2, move encore +2
->p2 pass, move crabhammer +1
+>p2 pass, switch 3
+>p1 move closecombat +2, move superpower +2
+>p2 move closecombat +1, move suckerpunch +2
+>p1 move playrough +2, move psychocut +1
+>p2 move knockoff +1, move suckerpunch +1
+>p1 switch 5, switch 3
+>p1 move protect, move hurricane +1
+>p2 move knockoff +2, move suckerpunch +1
+>p1 move slackoff, move hydropump +1
+>p2 move knockoff +1, move suckerpunch +1
+>p2 switch 6, pass
+>p1 move shadowball +2, move hurricane +2
+>p2 move irondefense, move suckerpunch +1
+>p2 pass, switch 5
+>p1 move shadowball +2, move hydropump +1
+>p2 move trickroom, move shadowball +1
+>p1 pass, move protect
+>p2 pass, move psychic +2
+>p1 pass, move protect
+>p2 pass, move shadowball +2
+>p1 pass, move protect
+>p2 pass, move trickroom
+>p1 pass, move protect
+>p2 pass, move psychic +2

@@ -1,49 +1,51 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"211,392,573,934"}
->player p1 {"name":"Player1","team":"Munkidori||ChoiceScarf|ToxicChain|sludgebomb,focusblast,psychic,uturn||85,85,85,85,85,85|M|||80|,,,,,Poison]Swampert||AssaultVest|Torrent|knockoff,icywind,muddywater,highhorsepower||85,85,85,85,85,85|F|||82|,,,,,Steel]Fezandipiti||AssaultVest|ToxicChain|uturn,gunkshot,icywind,moonblast||85,85,85,85,85,85|M|||81|,,,,,Steel]Floatzel||LifeOrb|WaterVeil|icespinner,protect,aquajet,wavecrash||85,85,85,85,85,85|F|||86|,,,,,Water]Azelf||ChoiceSpecs|Levitate|uturn,fireblast,psychic,dazzlinggleam||85,85,85,85,85,85|N|||83|,,,,,Fire]Sawsbuck||LifeOrb|SapSipper|hornleech,highhorsepower,swordsdance,doubleedge||85,85,85,85,85,85|M|||91|,,,,,Normal"}
->player p2 {"name":"Player2","team":"Crawdaunt||ChoiceBand|Adaptability|crabhammer,closecombat,knockoff,aquajet||85,85,85,85,85,85|M|||87|,,,,,Fighting]Phione||Leftovers|Hydration|protect,takeheart,scald,icebeam||85,,85,85,85,85|N|,0,,,,||90|,,,,,Steel]Zamazenta||RustedShield|DauntlessShield|protect,heavyslam,irondefense,bodypress||85,85,85,85,85,85|N|||67|,,,,,Steel]Raging Bolt||AssaultVest|Protosynthesis|snarl,dracometeor,thunderclap,electroweb||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Altaria||SitrusBerry|NaturalCure|willowisp,tailwind,roost,bravebird||85,85,85,85,85,85|F|||91|,,,,,Steel]Deoxys|DeoxysAttack|LifeOrb|Pressure|knockoff,psychoboost,protect,extremespeed||85,85,85,85,85,85|N|||79|,,,,,Ghost"}
->p1 move uturn +1, move knockoff +1
->p2 move crabhammer +2, move scald +1
->p1 switch 5, pass
->p1 move dazzlinggleam, move muddywater
->p2 move aquajet +1, move icebeam +1
->p1 switch 5, pass
->p2 switch 4, pass
->p1 move uturn +1, move muddywater
->p2 move thunderclap +2, move scald +2
->p1 switch 3, pass
->p1 move moonblast +2, move muddywater
->p2 move dracometeor +1, move scald +2
->p1 move uturn +2, move muddywater
->p2 move electroweb, move scald +2
+>player p1 {"name":"Player1","team":"Dewgong||SitrusBerry|ThickFat|fakeout,hydropump,icywind,encore||85,85,85,85,85,85|F|||91|,,,,,Grass]Diancie||SitrusBerry|ClearBody|trickroom,bodypress,diamondstorm,protect||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Flygon||SitrusBerry|Levitate|breakingswipe,protect,earthpower,tailwind||85,85,85,85,85,85|M|||83|,,,,,Steel]Venusaur||LifeOrb|Overgrow|protect,earthpower,sludgebomb,leafstorm||85,,85,85,85,85|F|,0,,,,||86|,,,,,Water]Kingambit||SitrusBerry|Defiant|ironhead,suckerpunch,protect,swordsdance||85,85,85,85,85,85|F|||77|,,,,,Flying]Sandaconda||SitrusBerry|ShedSkin|rest,glare,highhorsepower,stoneedge||85,85,85,85,85,85|F|||88|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Dodrio||ChoiceBand|EarlyBird|quickattack,doubleedge,bravebird,drillrun||85,85,85,85,85,85|M|||85|,,,,,Ground]Dewgong||SitrusBerry|ThickFat|fakeout,hydropump,encore,icywind||85,85,85,85,85,85|F|||91|,,,,,Grass]Slaking||ChoiceBand|Truant|gigaimpact,knockoff,doubleedge,highhorsepower||85,85,85,85,85,85|F|||89|,,,,,Ghost]Lugia||Leftovers|Multiscale|aeroblast,calmmind,recover,earthpower||85,,85,85,85,85|N|,0,,,,||71|,,,,,Ground]Kommo-o||Leftovers|Bulletproof|irondefense,protect,throatchop,bodypress||85,85,85,85,85,85|F|||79|,,,,,Steel]Forretress||ChestoBerry|Sturdy|bodypress,rest,irondefense,ironhead||85,85,85,85,85,85|F|||90|,,,,,Fire"}
+>p1 move fakeout +2, move bodypress +2
+>p2 move quickattack +2, move icywind
+>p1 move encore +2, move protect
+>p2 move quickattack +1, move encore +1
+>p1 move icywind, move protect
+>p2 move quickattack +2, move icywind
+>p1 move encore +2, move trickroom
+>p2 move quickattack +1, move fakeout +1
+>p1 move encore +2, move protect
+>p2 move quickattack +1, move fakeout +1
+>p1 move icywind, move trickroom
+>p2 move quickattack +2, move fakeout +2
+>p1 move hydropump +2, move protect
+>p2 move quickattack +1, move fakeout +2
+>p1 move icywind, move trickroom
+>p2 move quickattack +1, move fakeout +2
+>p2 switch 6, pass
+>p1 move icywind, move bodypress +2
+>p2 move irondefense, move fakeout +2
+>p1 move hydropump +1, move diamondstorm
+>p2 move ironhead +1, move icywind
 >p1 switch 4, pass
->p2 pass, switch 3
->p1 move wavecrash +2, move highhorsepower +2
->p2 move dracometeor +1, move heavyslam +2
->p1 pass, switch 4
->p1 move protect, move uturn +1
->p2 move thunderclap +1, move bodypress +1
->p1 pass, switch 3
->p2 switch 5, pass
->p1 move protect, move focusblast +1
->p2 move roost, move protect
->p1 move protect, move focusblast +1
->p2 move bravebird +1, move bodypress +1
->p1 move protect, move focusblast +2
->p2 move willowisp +2, move bodypress +1
->p2 pass, switch 6
->p1 move wavecrash +2, move focusblast +2
->p2 move willowisp +1, move protect
->p1 move icespinner +1, move focusblast +1
->p2 move tailwind, move psychoboost +1
->p1 switch 3, pass
->p1 move gunkshot +2, move focusblast +2
->p2 move roost, move psychoboost +2
->p1 move uturn +2, move struggle
->p2 move willowisp +2, move protect
->p1 move icywind, move struggle
->p2 move bravebird +2, move knockoff +2
+>p2 pass, switch 5
+>p1 move leafstorm +2, move bodypress +2
+>p2 move bodypress +2, move irondefense
 >p1 pass, switch 6
->p1 move moonblast +2, move swordsdance
->p2 move roost, move psychoboost +2
->p1 move icywind, move doubleedge +1
->p2 move tailwind, pass
+>p1 move earthpower +2, move highhorsepower +2
+>p2 move ironhead +1, move irondefense
+>p1 move leafstorm +1, move highhorsepower +2
+>p2 move ironhead +2, move throatchop +1
+>p1 move earthpower +1, move highhorsepower +1
+>p2 move rest, move protect
+>p1 move sludgebomb +2, move glare +1
+>p2 move ironhead +1, move throatchop +2
+>p1 move sludgebomb +1, move highhorsepower +2
+>p2 move irondefense, move bodypress +1
+>p1 switch 5, pass
+>p1 move swordsdance, move stoneedge +2
+>p2 move rest, move bodypress +1
+>p1 switch 3, pass
+>p1 move earthpower +2, move stoneedge +1
+>p2 move ironhead +2, move irondefense
+>p1 move breakingswipe, move rest
+>p2 move ironhead +1, move bodypress +2
+>p1 move earthpower +1, pass
+>p2 move ironhead +2, move throatchop +1
+>p1 move breakingswipe, pass
+>p2 move bodypress +1, move protect

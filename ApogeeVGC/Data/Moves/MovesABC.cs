@@ -2737,7 +2737,7 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 NonGhostTarget = MoveTarget.Self,
                 Type = MoveType.Ghost,
-                OnModifyMove = OnModifyMoveEventInfo.Create((_, move, source, target) =>
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, source, target) =>
                 {
                     if (!source.HasType(PokemonType.Ghost))
                     {

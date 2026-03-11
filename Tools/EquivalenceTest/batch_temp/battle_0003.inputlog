@@ -1,30 +1,48 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"22,41,60,97"}
->player p1 {"name":"Player1","team":"Reuniclus||LifeOrb|MagicGuard|protect,psychic,trickroom,focusblast||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fighting]Magearna|MagearnaOriginal|AssaultVest|SoulHeart|fleurcannon,aurasphere,flashcannon,dazzlinggleam||85,,85,85,85,85|N|,0,,,,||71|,,,,,Fairy]Chi-Yu||LifeOrb|BeadsofRuin|protect,nastyplot,darkpulse,heatwave||85,,85,85,85,85|N|,0,,,,||75|,,,,,Fire]Swampert||AssaultVest|Torrent|flipturn,highhorsepower,icywind,muddywater||85,85,85,85,85,85|F|||82|,,,,,Fire]Iron Moth||BoosterEnergy|QuarkDrive|fierydance,protect,energyball,sludgewave||85,,85,85,85,85|N|,0,,,,||78|,,,,,Fire]Flygon||LoadedDice|Levitate|protect,scaleshot,earthpower,tailwind||85,85,85,85,85,85|F|||83|,,,,,Steel"}
->player p2 {"name":"Player2","team":"Hitmonlee||WhiteHerb|Unburden|closecombat,protect,poisonjab,knockoff||85,85,85,85,85,85|M|||86|,,,,,Dark]Weavile||ChoiceBand|Pickpocket|iceshard,tripleaxel,lowkick,knockoff||85,85,85,85,85,85|M|||81|,,,,,Dark]Ninetales|NinetalesAlola|LightClay|SnowWarning|moonblast,auroraveil,protect,blizzard||85,,85,85,85,85|F|,0,,,,||75|,,,,,Water]Azumarill||ChoiceBand|HugePower|playrough,knockoff,liquidation,aquajet||85,85,85,85,85,85|F|||83|,,,,,Water]Dusknoir||LifeOrb|Frisk|leechlife,willowisp,poltergeist,shadowsneak||85,85,85,85,85,85|M|||89|,,,,,Dark]Oricorio||SitrusBerry|Dancer|protect,tailwind,revelationdance,hurricane||85,,85,85,85,85|F|,0,,,,||85|,,,,,Ground"}
->p1 move protect, move aurasphere +2
->p2 move poisonjab +1, move lowkick +1
->p1 move trickroom, move aurasphere +1
->p2 move knockoff +2, move lowkick +1
->p1 move psychic +1, move flashcannon +2
->p2 move poisonjab +2, move lowkick +1
+>player p1 {"name":"Player1","team":"Farigiraf||LifeOrb|ArmorTail|hypervoice,trickroom,protect,psychic||85,,85,85,85,|F|,0,,,,0||84|,,,,,Fairy]Forretress||Leftovers|Sturdy|ironhead,thunderwave,irondefense,bodypress||85,85,85,85,85,85|M|||90|,,,,,Fighting]Scovillain||SitrusBerry|Chlorophyll|willowisp,ragepowder,fireblast,energyball||85,,85,85,85,85|F|,0,,,,||90|,,,,,Steel]Delphox||LifeOrb|Blaze|protect,nastyplot,psychic,fireblast||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fire]Altaria||Leftovers|NaturalCure|bravebird,roost,dracometeor,willowisp||85,85,85,85,85,85|F|||91|,,,,,Steel]Mightyena||LifeOrb|Intimidate|playrough,suckerpunch,howl,throatchop||85,85,85,85,85,85|M|||95|,,,,,Fairy"}
+>player p2 {"name":"Player2","team":"Vileplume||Leftovers|EffectSpore|protect,sludgebomb,pollenpuff,leechseed||85,,85,85,85,85|F|,0,,,,||89|,,,,,Steel]Scyther||Eviolite|Technician|protect,dualwingbeat,bugbite,tailwind||85,85,85,85,85,85|M|||80|,,,,,Steel]Qwilfish||SitrusBerry|Intimidate|toxicspikes,icywind,gunkshot,flipturn||85,85,85,85,85,85|F|||87|,,,,,Grass]Gothitelle||SitrusBerry|ShadowTag|fakeout,protect,trickroom,psychic||85,85,85,85,85,|M|,,,,,0||90|,,,,,Steel]Cinccino||LoadedDice|Technician|protect,tailslap,knockoff,tripleaxel||85,85,85,85,85,85|M|||85|,,,,,Normal]Dodrio||ChoiceBand|EarlyBird|bravebird,quickattack,doubleedge,knockoff||85,85,85,85,85,85|M|||85|,,,,,Normal"}
+>p1 move protect, move thunderwave +2
+>p2 move pollenpuff +1, move dualwingbeat +1
+>p1 move hypervoice, move irondefense
+>p2 move leechseed +2, move bugbite +2
+>p1 move hypervoice, move bodypress +1
+>p2 move pollenpuff +2, move protect
+>p1 move protect, move irondefense
+>p2 move pollenpuff +2, move protect
+>p1 move psychic +2, move bodypress +1
+>p2 move sludgebomb +1, move protect
+>p1 move trickroom, move ironhead +2
+>p2 move pollenpuff +2, move tailwind
+>p1 move protect, move bodypress +2
+>p2 move protect, move dualwingbeat +1
+>p1 move hypervoice, move bodypress +1
+>p2 move sludgebomb +1, move bugbite +1
+>p1 switch 5, pass
 >p2 switch 4, switch 6
->p1 move trickroom, move fleurcannon +2
->p2 move playrough +1, move hurricane +1
->p1 switch 6, pass
->p1 move scaleshot +1, move dazzlinggleam
->p2 move playrough +2, move hurricane +1
->p1 move tailwind, move aurasphere +2
->p2 move playrough +2, move tailwind
->p1 move protect, move dazzlinggleam
->p2 move playrough +2, move protect
->p1 pass, switch 5
->p1 move protect, move fierydance +1
->p2 move playrough +1, move tailwind
->p1 switch 3, pass
->p1 move nastyplot, move sludgewave
->p2 move playrough +1, move hurricane +2
->p2 switch 3, switch 5
->p1 move protect, move sludgewave
->p2 move blizzard, move willowisp +2
->p1 move protect, move fierydance +2
->p2 pass, move poltergeist +2
+>p1 move bravebird +2, move thunderwave +2
+>p2 move psychic +1, move bravebird +2
+>p1 pass, switch 6
+>p1 move bravebird +2, move playrough +2
+>p2 move trickroom, move bravebird +2
+>p2 pass, switch 3
+>p1 move willowisp +2, move suckerpunch +2
+>p2 move trickroom, move icywind
+>p1 move bravebird +1, move playrough +1
+>p2 move protect, move gunkshot +2
+>p1 pass, switch 3
+>p1 move willowisp +1, move energyball +1
+>p2 move trickroom, move gunkshot +2
+>p1 move bravebird +2, move energyball +2
+>p2 move fakeout +1, move icywind
+>p2 pass, switch 5
+>p1 move roost, move energyball +1
+>p2 move psychic +1, move tailslap +2
+>p1 switch 4, pass
+>p1 move psychic +1, pass
+>p2 move psychic +2, move tripleaxel +1
+>p1 move psychic +1, pass
+>p2 move fakeout +2, move protect
+>p1 move nastyplot, pass
+>p2 pass, move protect
+>p1 move fireblast +1, pass
+>p2 pass, move tailslap +1

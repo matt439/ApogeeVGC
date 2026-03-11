@@ -1,43 +1,40 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"246,457,668,1089"}
->player p1 {"name":"Player1","team":"Corviknight||Leftovers|MirrorArmor|bravebird,irondefense,roost,bodypress||85,85,85,85,85,85|M||S|80|,,,,,Fighting]Dusknoir||LifeOrb|Frisk|leechlife,willowisp,shadowsneak,poltergeist||85,85,85,85,85,85|M|||89|,,,,,Dark]Raging Bolt||LifeOrb|Protosynthesis|protect,dracometeor,thunderbolt,thunderclap||85,,85,85,85,85|N|,0,,,,||77|,,,,,Grass]Politoed||ChoiceSpecs|Drizzle|weatherball,muddywater,hydropump,icebeam||85,,85,85,85,85|F|,0,,,,||82|,,,,,Water]Kingdra||LifeOrb|SwiftSwim|protect,wavecrash,raindance,dracometeor||85,85,85,85,85,85|M|||85|,,,,,Water]Tauros|TaurosPaldeaBlaze|SitrusBerry|Intimidate|bulkup,protect,closecombat,ragingbull||85,85,85,85,85,85|M|||79|,,,,,Fighting"}
->player p2 {"name":"Player2","team":"Rillaboom||AssaultVest|GrassySurge|grassyglide,uturn,fakeout,woodhammer||85,85,85,85,85,85|F|||81|,,,,,Steel]Reshiram||LifeOrb|Turboblaze|blueflare,dracometeor,tailwind,heatwave||85,,85,85,85,85|N|,0,,,,||72|,,,,,Fire]Araquanid||SitrusBerry|WaterBubble|stickyweb,liquidation,lunge,protect||85,85,85,85,85,85|F|||84|,,,,,Water]Necrozma|NecrozmaDawnWings|PowerHerb|PrismArmor|moongeistbeam,trickroom,photongeyser,meteorbeam||85,,85,85,85,|N|,0,,,,0||74|,,,,,Dark]Wo-Chien||Leftovers|TabletsofRuin|leechseed,protect,ruination,knockoff||85,85,85,85,85,85|N|||85|,,,,,Poison]Archaludon||PowerHerb|Stamina|flashcannon,electroshot,dragonpulse,protect||85,,85,85,85,85|F|,0,,,,||77|,,,,,Flying"}
->p1 move bodypress +2, move leechlife +1
->p2 move fakeout +2, move tailwind
->p1 move bodypress +2, move willowisp +2
->p2 move uturn +1, move blueflare +1
->p2 switch 3, pass
->p1 switch 6, pass
->p1 move closecombat +2, move willowisp +2
->p2 move lunge +1, move tailwind
->p1 move protect, move poltergeist +1
->p2 move lunge +1, move blueflare +1
->p1 move protect, move poltergeist +2
->p2 move lunge +2, move dracometeor +2
->p2 pass, switch 5
->p1 move protect, move leechlife +2
->p2 move protect, move ruination +2
->p1 move closecombat +2, move poltergeist +2
->p2 move stickyweb, move knockoff +1
->p2 pass, switch 4
->p1 move closecombat +2, move willowisp +1
->p2 move lunge +2, move moongeistbeam +1
->p1 switch 4, pass
->p1 move muddywater, move willowisp +1
->p2 move protect, move trickroom
->p1 move muddywater, move willowisp +2
->p2 move stickyweb, move moongeistbeam +1
->p1 move muddywater, move willowisp +2
->p2 move liquidation +2, move meteorbeam +1
+>player p1 {"name":"Player1","team":"Sandslash||LifeOrb|SandRush|swordsdance,highhorsepower,gunkshot,stoneedge||85,85,85,85,85,85|M|||93|,,,,,Poison]Pachirisu||SitrusBerry|VoltAbsorb|helpinghand,nuzzle,followme,thunderbolt||85,85,85,85,85,85|M|||93|,,,,,Flying]Electrode|ElectrodeHisui|LifeOrb|Static|foulplay,leafstorm,thunderbolt,protect||85,,85,85,85,85|N|,0,,,,||88|,,,,,Steel]Landorus|LandorusTherian|AssaultVest|Intimidate|stoneedge,stompingtantrum,terablast,uturn||85,85,85,85,85,85|M|||77|,,,,,Flying]Arceus|ArceusIce|IciclePlate|Multitype|recover,calmmind,judgment,earthpower||85,,85,85,85,85|N|,0,,,,||73|,,,,,Ground]Glastrier||SitrusBerry|ChillingNeigh|iciclecrash,heavyslam,protect,closecombat||85,85,85,85,85,85|N|||80|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Hariyama||FlameOrb|Guts|knockoff,fakeout,facade,closecombat||85,85,85,85,85,85|M|||85|,,,,,Normal]Mightyena||LifeOrb|Intimidate|playrough,howl,throatchop,suckerpunch||85,85,85,85,85,85|F|||95|,,,,,Fairy]Okidogi||SitrusBerry|ToxicChain|gunkshot,bulkup,knockoff,drainpunch||85,85,85,85,85,85|M|||78|,,,,,Dark]Armarouge||PowerHerb|WeakArmor|protect,heatwave,meteorbeam,psychic||85,,85,85,85,85|F|,0,,,,||80|,,,,,Grass]Noivern||SitrusBerry|Frisk|dracometeor,hurricane,tailwind,flamethrower||85,,85,85,85,85|M|,0,,,,||84|,,,,,Dragon]Chandelure||ChoiceScarf|FlashFire|energyball,heatwave,shadowball,trick||85,,85,85,85,85|M|,0,,,,||81|,,,,,Fire"}
+>p1 move swordsdance, move thunderbolt +2
+>p2 move facade +2, move throatchop +1
+>p1 move stoneedge +2, move thunderbolt +2
+>p2 move knockoff +1, move throatchop +2
+>p1 move stoneedge +2, move followme
+>p2 move closecombat +2, move throatchop +2
+>p1 switch 3, switch 4
+>p1 move leafstorm +1, move stoneedge +1
+>p2 move facade +2, move throatchop +2
+>p2 switch 4, switch 5
+>p1 move leafstorm +2, move uturn +2
+>p2 move psychic +1, move tailwind
 >p1 pass, switch 5
->p2 pass, switch 3
->p1 move muddywater, move dracometeor +2
->p2 move stickyweb, move woodhammer +2
->p2 pass, switch 6
->p1 move muddywater, move wavecrash +1
->p2 move stickyweb, move flashcannon +2
->p1 move muddywater, move protect
->p2 pass, move protect
->p1 move muddywater, move wavecrash +1
->p2 pass, move flashcannon +1
->p1 move muddywater, move dracometeor +1
->p2 pass, move flashcannon +2
+>p1 move foulplay +1, move recover
+>p2 move protect, move flamethrower +1
+>p1 switch 6, pass
+>p1 move closecombat +2, move earthpower +2
+>p2 move psychic +1, move tailwind
+>p1 move closecombat +2, move recover
+>p2 move meteorbeam +1, move tailwind
+>p1 switch 5, pass
+>p1 move uturn +2, move calmmind
+>p2 move protect, move hurricane +1
+>p1 move terablast +2, move earthpower +1
+>p2 move protect, move dracometeor +1
+>p1 move stompingtantrum +2, move judgment +1
+>p2 move protect, move flamethrower +2
+>p1 move terablast +1, move calmmind
+>p2 move psychic +2, move dracometeor +2
+>p1 move stompingtantrum +1, move recover
+>p2 move protect, move tailwind
+>p1 move uturn +1, move calmmind
+>p2 move psychic +2, move dracometeor +1
+>p1 pass, move calmmind
+>p2 move heatwave, move tailwind
+>p1 pass, move earthpower +1
+>p2 move psychic +1, move hurricane +1

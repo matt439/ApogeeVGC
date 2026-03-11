@@ -1,33 +1,47 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"176,327,478,779"}
->player p1 {"name":"Player1","team":"Cinccino||LoadedDice|Technician|protect,tripleaxel,tailslap,bulletseed||85,85,85,85,85,85|F|||85|,,,,,Normal]Diancie||SitrusBerry|ClearBody|bodypress,protect,diamondstorm,trickroom||85,85,85,85,85,|N|,,,,,0||77|,,,,,Fighting]Enamorus|EnamorusTherian|SitrusBerry|Overcoat|moonblast,earthpower,springtidestorm,protect||85,,85,85,85,85|F|,0,,,,||82|,,,,,Ground]Quagsire||SitrusBerry|Unaware|liquidation,helpinghand,highhorsepower,icywind||85,85,85,85,85,85|M|||91|,,,,,Fire]Spectrier||LifeOrb|GrimNeigh|protect,shadowball,terablast,nastyplot||85,,85,85,85,85|N|,0,,,,||77|,,,,,Fairy]Kingdra||LifeOrb|SwiftSwim|raindance,wavecrash,protect,dracometeor||85,85,85,85,85,85|F|||85|,,,,,Water"}
->player p2 {"name":"Player2","team":"Golduck||LifeOrb|CloudNine|icebeam,grassknot,hydropump,encore||85,,85,85,85,85|M|,0,,,,||91|,,,,,Grass]Iron Leaves||LifeOrb|QuarkDrive|protect,closecombat,leafblade,psyblade||85,85,85,85,85,85|N|||81|,,,,,Psychic]Enamorus||LifeOrb|Contrary|protect,springtidestorm,tailwind,earthpower||85,,85,85,85,85|F|,0,,,,||79|,,,,,Ground]Yanmega||FocusSash|TintedLens|tailwind,bugbuzz,airslash,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Steel]Blissey||SitrusBerry|Healer|hypervoice,helpinghand,softboiled,thunderwave||85,,85,85,85,85|F|,0,,,,||96|,,,,,Poison]Meowstic|MeowsticF|LifeOrb|Competitive|darkpulse,psychic,thunderbolt,protect||85,,85,85,85,85|F|,0,,,,||89|,,,,,Dark"}
->p1 move bulletseed +2, move protect
->p2 move hydropump +2, move closecombat +2
->p1 move tripleaxel +2, move protect
->p2 move encore +2, move protect
->p1 move tailslap +2, move bodypress +2
->p2 move grassknot +2, move closecombat +2
+>player p1 {"name":"Player1","team":"Cyclizar||SitrusBerry|Regenerator|breakingswipe,shedtail,taunt,doubleedge||85,85,85,85,85,85|F|||87|,,,,,Dragon]Dragalge||LifeOrb|Adaptability|dracometeor,hydropump,sludgebomb,protect||85,,85,85,85,85|M|,0,,,,||88|,,,,,Water]Deoxys|DeoxysAttack|LifeOrb|Pressure|protect,psychoboost,knockoff,extremespeed||85,85,85,85,85,85|N|||79|,,,,,Stellar]Ting-Lu||SitrusBerry|VesselofRuin|ruination,throatchop,protect,stompingtantrum||85,85,85,85,85,85|N|||82|,,,,,Poison]Urshifu||LifeOrb|UnseenFist|poisonjab,closecombat,suckerpunch,wickedblow||85,85,85,85,85,85|M|||75|,,,,,Poison]Scream Tail||SitrusBerry|Protosynthesis|disable,playrough,howl,thunderwave||85,85,85,85,85,85|N|||82|,,,,,Steel"}
+>player p2 {"name":"Player2","team":"Swalot||MagoBerry|Gluttony|gunkshot,thunderwave,knockoff,encore||85,85,85,85,85,85|M|||90|,,,,,Dark]Mamoswine||LifeOrb|ThickFat|highhorsepower,iceshard,iciclecrash,protect||85,85,85,85,85,85|F|||82|,,,,,Ground]Veluza||ChoiceBand|Sharpness|aquajet,psychocut,aquacutter,nightslash||85,85,85,85,85,85|M|||88|,,,,,Water]Giratina||SitrusBerry|Pressure|breakingswipe,icywind,shadowball,willowisp||85,85,85,85,85,85|N|||76|,,,,,Fairy]Tatsugiri||LifeOrb|StormDrain|muddywater,nastyplot,dracometeor,protect||85,,85,85,85,85|M|,0,,,,||84|,,,,,Water]Carbink||Leftovers|ClearBody|irondefense,moonblast,trickroom,bodypress||85,,85,85,85,|N|,0,,,,0||88|,,,,,Fighting"}
+>p1 move breakingswipe, move sludgebomb +1
+>p2 move knockoff +2, move iceshard +1
+>p1 move shedtail, move sludgebomb +1
+>p2 move encore +2, move highhorsepower +2
+>p1 switch 4, pass
+>p1 move ruination +2, move sludgebomb +2
+>p2 move thunderwave +2, move iceshard +2
+>p1 pass, switch 5
+>p1 move ruination +2, move wickedblow +1
+>p2 move gunkshot +2, move protect
+>p1 move stompingtantrum +2, move poisonjab +1
+>p2 move knockoff +1, move iciclecrash +1
+>p2 pass, switch 4
+>p1 move throatchop +2, move wickedblow +2
+>p2 move thunderwave +2, move breakingswipe
+>p1 move throatchop +2, move suckerpunch +1
+>p2 move encore +1, move icywind
 >p2 pass, switch 6
->p1 move bulletseed +1, move trickroom
->p2 move icebeam +2, move darkpulse +1
->p2 switch 4, pass
->p1 move tripleaxel +1, move protect
->p2 move airslash +2, move thunderbolt +1
->p1 move protect, move bodypress +1
->p2 move airslash +2, move darkpulse +1
+>p1 move throatchop +2, move closecombat +1
+>p2 move encore +2, move bodypress +1
+>p1 move throatchop +2, move suckerpunch +2
+>p2 move encore +2, move trickroom
+>p1 move ruination +1, move suckerpunch +2
+>p2 move gunkshot +2, move moonblast +2
+>p1 pass, switch 4
+>p1 move ruination +2, move doubleedge +1
+>p2 move encore +1, move irondefense
 >p2 switch 5, pass
->p1 move tripleaxel +1, move trickroom
->p2 move thunderwave +1, move protect
->p1 move bulletseed +2, move trickroom
->p2 move helpinghand -2, move thunderbolt +1
->p1 switch 6, pass
->p1 move wavecrash +1, move diamondstorm
->p2 move softboiled, move darkpulse +1
->p1 move protect, move bodypress +1
->p2 move softboiled, move thunderbolt +2
->p2 switch 3, pass
->p1 move wavecrash +1, move trickroom
->p2 move earthpower +2, move protect
->p1 switch 5, switch 3
->p1 move protect, move earthpower +2
->p2 move springtidestorm, move thunderbolt +2
+>p1 move ruination +1, move shedtail
+>p2 move nastyplot, move irondefense
+>p1 pass, switch 3
+>p1 move ruination +1, move extremespeed +2
+>p2 move muddywater, move bodypress +2
+>p1 switch 3, switch 6
+>p1 move shedtail, move howl
+>p2 move protect, move bodypress +1
+>p1 pass, move thunderwave +1
+>p2 move dracometeor +1, move trickroom
+>p1 pass, move howl
+>p2 move protect, move bodypress +2
+>p1 pass, move howl
+>p2 move protect, move irondefense
+>p1 pass, move howl
+>p2 move muddywater, move moonblast +1

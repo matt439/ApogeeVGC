@@ -1,38 +1,34 @@
 >start {"formatid":"gen9randomdoublesbattle","seed":"295,548,801,1306"}
->player p1 {"name":"Player1","team":"Toxapex||Leftovers|Regenerator|infestation,recover,toxic,banefulbunker||85,,85,85,85,85|M|,0,,,,||92|,,,,,Steel]Hatterene||LifeOrb|MagicBounce|dazzlinggleam,trickroom,mysticalfire,psychic||85,,85,85,85,|F|,0,,,,0||84|,,,,,Psychic]Araquanid||SitrusBerry|WaterBubble|liquidation,leechlife,stickyweb,wideguard||85,85,85,85,85,85|M|||84|,,,,,Water]Chimecho||SitrusBerry|Levitate|psychic,icywind,encore,protect||85,,85,85,85,85|M|,0,,,,||94|,,,,,Dark]Excadrill||LifeOrb|MoldBreaker|protect,highhorsepower,swordsdance,ironhead||85,85,85,85,85,85|F|||82|,,,,,Flying]Zebstrika||LifeOrb|LightningRod|protect,highhorsepower,overheat,thunderbolt||85,85,85,85,85,85|F|||87|,,,,,Water"}
->player p2 {"name":"Player2","team":"Deoxys||LifeOrb|Pressure|extremespeed,psychoboost,protect,knockoff||85,85,85,85,85,85|N|||79|,,,,,Ghost]Koraidon||ChoiceBand|OrichalcumPulse|uturn,flareblitz,collisioncourse,dragonclaw||85,85,85,85,85,85|N|||66|,,,,,Fire]Gastrodon|GastrodonEast|Leftovers|StormDrain|icebeam,yawn,recover,earthpower||85,,85,85,85,85|M|,0,,,,||82|,,,,,Fire]Necrozma|NecrozmaDuskMane|WeaknessPolicy|PrismArmor|photongeyser,sunsteelstrike,earthquake,dragondance||85,85,85,85,85,85|N|||70|,,,,,Dark]Coalossal||SitrusBerry|FlameBody|protect,stoneedge,heatwave,willowisp||85,85,85,85,85,85|M|||90|,,,,,Water]Regice||SitrusBerry|ClearBody|icywind,icebeam,protect,thunderbolt||85,,85,85,85,85|N|,0,,,,||84|,,,,,Electric"}
->p1 move recover, move dazzlinggleam
->p2 move psychoboost +1, move flareblitz +1
+>player p1 {"name":"Player1","team":"Espathra||LifeOrb|SpeedBoost|batonpass,dazzlinggleam,protect,luminacrash||85,,85,85,85,85|M|,0,,,,||83|,,,,,Fairy]Hariyama||AssaultVest|ThickFat|closecombat,knockoff,fakeout,heavyslam||85,85,85,85,85,85|M|||85|,,,,,Steel]Bruxish||LifeOrb|StrongJaw|protect,crunch,wavecrash,psychicfangs||85,85,85,85,85,85|F|||86|,,,,,Dark]Abomasnow||LightClay|SnowWarning|woodhammer,blizzard,auroraveil,iceshard||85,85,85,85,85,85|F|||81|,,,,,Water]Mudsdale||ChestoBerry|Stamina|bodypress,highhorsepower,heavyslam,rest||85,85,85,85,85,85|F|||84|,,,,,Fighting]Grafaiai||SitrusBerry|Prankster|protect,encore,gunkshot,knockoff||85,85,85,85,85,85|F|||88|,,,,,Dark"}
+>player p2 {"name":"Player2","team":"Hitmonchan||SitrusBerry|InnerFocus|fakeout,coaching,closecombat,knockoff||85,85,85,85,85,85|M|||90|,,,,,Dark]Porygon-Z||ChoiceSpecs|Adaptability|trick,swift,triattack,shadowball||85,,85,85,85,85|N|,0,,,,||84|,,,,,Ghost]Ursaluna||FlameOrb|Guts|headlongrush,protect,earthquake,facade||85,85,85,85,85,85|F|||77|,,,,,Normal]Scizor||SitrusBerry|Technician|swordsdance,closecombat,protect,bulletpunch||85,85,85,85,85,85|F|||80|,,,,,Steel]Venusaur||LifeOrb|Overgrow|protect,earthpower,sludgebomb,gigadrain||85,,85,85,85,85|M|,0,,,,||86|,,,,,Water]Oricorio|OricorioPau|SitrusBerry|Dancer|revelationdance,protect,hurricane,tailwind||85,,85,85,85,85|F|,0,,,,||89|,,,,,Fighting"}
+>p1 move luminacrash +2, move knockoff +1
+>p2 move coaching -2, move swift
+>p1 move luminacrash +1, move closecombat +2
+>p2 move coaching -2, move swift
 >p1 switch 4, pass
 >p2 pass, switch 5
->p1 move encore +2, move psychic +1
->p2 move protect, move stoneedge +2
->p1 move encore +1, move psychic +1
->p2 move psychoboost +2, move stoneedge +2
->p1 pass, switch 3
->p1 move encore +1, move leechlife +2
->p2 move psychoboost +2, move stoneedge +1
->p2 switch 6, pass
->p1 move psychic +2, move liquidation +1
->p2 move protect, move stoneedge +2
->p1 move encore +2, move wideguard
->p2 move icywind, move stoneedge +1
->p1 move protect, move leechlife +1
->p2 move thunderbolt +2, move willowisp +2
->p1 pass, switch 5
->p1 move protect, move highhorsepower +2
->p2 move protect, move protect
->p1 move psychic +1, move swordsdance
->p2 move icebeam +1, move stoneedge +2
->p1 move encore +2, move highhorsepower +1
->p2 move protect, move stoneedge +1
+>p1 move woodhammer +2, move heavyslam +2
+>p2 move closecombat +1, move earthpower +1
 >p1 switch 6, pass
->p1 move thunderbolt +2, move highhorsepower +2
->p2 move icywind, move stoneedge +1
->p2 pass, switch 3
->p1 move overheat +2, move swordsdance
->p2 move protect, move earthpower +2
->p1 move thunderbolt +1, pass
->p2 move thunderbolt +1, move recover
->p1 move thunderbolt +1, pass
->p2 move icywind, move icebeam +1
+>p1 move knockoff +1, move fakeout +1
+>p2 move closecombat +1, move sludgebomb +1
+>p2 switch 3, pass
+>p1 move gunkshot +2, move closecombat +1
+>p2 move earthquake, move gigadrain +1
+>p1 switch 5, switch 3
+>p2 pass, switch 4
+>p1 move highhorsepower +1, move psychicfangs +2
+>p2 move earthquake, move swordsdance
+>p1 move bodypress +2, move wavecrash +1
+>p2 move earthquake, move swordsdance
+>p2 switch 6, pass
+>p1 move bodypress +1, move protect
+>p2 move revelationdance +1, pass
+>p1 move bodypress +2, move wavecrash +2
+>p2 move protect, pass
+>p1 move bodypress +2, move psychicfangs +2
+>p2 move tailwind, pass
+>p1 move heavyslam +1, move psychicfangs +1
+>p2 move hurricane +2, pass
+>p1 move rest, pass
+>p2 move revelationdance +2, pass
