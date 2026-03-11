@@ -631,8 +631,17 @@ public partial record Abilities
                     }
                     battle.EffectState.Counter = 5;
                 }),
-                // Note: Showdown's Slow Start has NO onEnd handler.
-                // The |-end|Slow Start|[silent] message only appears via Neutralizing Gas.
+                OnEnd = OnEndEventInfo.Create((battle, pokemonUnion) =>
+                {
+                    if (pokemonUnion is PokemonSideFieldPokemon { Pokemon: var pokemon })
+                    {
+                        if (pokemon.BeingCalledBack) return;
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-end", pokemon, "Slow Start", "[silent]");
+                        }
+                    }
+                }),
                 // OnResidualOrder = 28, OnResidualSubOrder = 2
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
