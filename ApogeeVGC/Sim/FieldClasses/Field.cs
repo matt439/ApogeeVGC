@@ -88,21 +88,10 @@ public class Field
         }
 
         // Check if weather is already set to this weather
+        // In gen 6+, always return false if weather is already active (matches Showdown)
         if (Weather == status.Id)
         {
-            // Special case for abilities if weather has no duration
-            if (sourceEffect.EffectType == EffectType.Ability)
-            {
-                if (WeatherState.Duration == 0)
-                {
-                    return false;
-                }
-            }
-            // For other effects (gen 9 always satisfies gen > 2)
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         // Run the SetWeather event to check if weather change is allowed
