@@ -15,7 +15,7 @@ public partial class BattleActions
     /// <summary>
     /// Calculates damage for a move.
     /// 0 is a success dealing 0 damage, such as from False Swipe at 1 HP.
-    /// 
+    ///
     /// Normal PS return value rules apply:
     /// undefined = success, null = silent failure, false = loud failure
     /// </summary>
@@ -257,7 +257,7 @@ public partial class BattleActions
             RunEventSource.FromNullablePokemon(source), move, IntRelayVar.Get(defense));
         defense = modifyDefResult is IntRelayVar defIrv ? defIrv.Value : defense;
 
-        // Calculate base damage using the standard Pok�mon damage formula
+        // Calculate base damage using the standard Pokémon damage formula
         // int(int(int(2 * L / 5 + 2) * A * P / D) / 50)
         var baseDamage = Battle.Trunc(
             Battle.Trunc(
@@ -317,6 +317,7 @@ public partial class BattleActions
             }
 
             baseDamage = Battle.Modify(baseDamage, 0.75);
+
         }
 
         // Weather modifier
@@ -336,6 +337,7 @@ public partial class BattleActions
         {
             var critModifier = move.CritModifier ?? 1.5;
             baseDamage = Battle.Trunc((int)(baseDamage * critModifier));
+
         }
 
         // Random factor - also not a modifier
@@ -442,6 +444,8 @@ public partial class BattleActions
             }
         }
 
+
+
         // Final modifier - Life Orb, etc.
         var finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
             RunEventSource.FromNullablePokemon(target), move, IntRelayVar.Get(baseDamage));
@@ -463,25 +467,25 @@ public partial class BattleActions
 
     /// <summary>
     /// Calculates confusion self-hit damage.
-    /// 
+    ///
     /// Confusion damage is unique - most typical modifiers that get run when calculating
     /// damage (e.g. Huge Power, Life Orb, critical hits) don't apply. It also uses a 16-bit
     /// context for its damage, unlike the regular damage formula (though this only comes up
     /// for base damage).
     /// </summary>
-    /// <param name="pokemon">The confused Pok�mon hitting itself</param>
+    /// <param name="pokemon">The confused Pokémon hitting itself</param>
     /// <param name="basePower">Base power of the confusion damage (typically 40)</param>
     /// <returns>The calculated damage amount (minimum 1)</returns>
     public int GetConfusionDamage(Pokemon pokemon, int basePower)
     {
-        // Get the Pok�mon's attack and defense stats with current boosts applied
+        // Get the Pokémon's attack and defense stats with current boosts applied
         var attack =
             pokemon.CalculateStat(StatIdExceptHp.Atk, pokemon.Boosts.GetBoost(BoostId.Atk));
         var defense =
             pokemon.CalculateStat(StatIdExceptHp.Def, pokemon.Boosts.GetBoost(BoostId.Def));
         var level = pokemon.Level;
 
-        // Calculate base damage using the standard Pok�mon damage formula
+        // Calculate base damage using the standard Pokémon damage formula
         // Formula: ((2 * level / 5 + 2) * basePower * attack / defense) / 50 + 2
         // Each step is truncated to match game behavior
         var baseDamage = Battle.Trunc(

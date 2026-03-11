@@ -575,9 +575,8 @@ public partial record Conditions
                 Name = "Electro Shot",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.ElectroShot,
-                Duration = 2,
-                // ElectroShot is a charging move without invulnerability
-                // The SpA boost is handled by the move itself
+                // No Duration — this is a marker volatile without a condition block in Showdown.
+                // Duration is managed by the TwoTurnMove condition.
             },
             [ConditionId.Encore] = new()
             {
