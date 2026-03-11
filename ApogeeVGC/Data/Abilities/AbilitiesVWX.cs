@@ -91,7 +91,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Sleep) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Vital Spirit");
                     }
@@ -256,7 +256,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Water Bubble");
                     }
@@ -296,7 +296,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Water Veil");
                     }

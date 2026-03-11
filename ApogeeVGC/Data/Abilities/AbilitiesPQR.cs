@@ -101,7 +101,7 @@ public partial record Abilities
                 {
                     if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
                         return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         if (battle.DisplayUi)
                         {
@@ -116,7 +116,7 @@ public partial record Abilities
                     {
                         if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
                             return PokemonFalseVoidUnion.FromVoid();
-                        if (effect is ActiveMove { Status: not ConditionId.None })
+                        if (effect is ActiveMove { Status: not null })
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
@@ -699,7 +699,11 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, _, target, _, effect) =>
                 {
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    // Showdown: (effect as Move)?.status — only truthy when the move has
+                    // a primary status (e.g. Thunder Wave), not for secondary effects
+                    // (e.g. Volt Tackle's 10% paralysis). Must check "not null" since
+                    // null satisfies "not ConditionId.None" in C# pattern matching.
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Purifying Salt");
                     }

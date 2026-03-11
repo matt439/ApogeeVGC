@@ -555,7 +555,7 @@ public partial record Abilities
                     // Only Minior-Meteor is immune to status, and not if transformed
                     if (target.Species.Id != SpecieId.MiniorMeteor || target.Transformed)
                         return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         if (battle.DisplayUi)
                         {
@@ -1781,7 +1781,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         if (battle.DisplayUi)
                         {

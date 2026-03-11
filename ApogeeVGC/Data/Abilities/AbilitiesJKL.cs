@@ -94,7 +94,7 @@ public partial record Abilities
                     ConditionId weather = target.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
-                        if (effect is ActiveMove { Status: not ConditionId.None })
+                        if (effect is ActiveMove { Status: not null })
                         {
                             if (battle.DisplayUi)
                             {
@@ -260,7 +260,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Paralysis) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         if (battle.DisplayUi)
                         {
