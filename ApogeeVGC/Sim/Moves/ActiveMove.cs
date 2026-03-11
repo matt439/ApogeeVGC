@@ -20,7 +20,14 @@ public record ActiveMove : Move, IEffect
     /// which is a flat memory copy — faster than the record copy constructor
     /// chain (HitEffect → Move → ActiveMove) for this ~900-byte object.
     /// </summary>
-    internal ActiveMove ShallowClone() => (ActiveMove)MemberwiseClone();
+    internal ActiveMove ShallowClone()
+    {
+        var clone = (ActiveMove)MemberwiseClone();
+        // Deep-copy secondaries to prevent mutations from leaking to the library template
+        clone.Secondaries = clone.Secondaries?.Select(s => s with { }).ToArray();
+        if (clone.Self is not null) clone.Self = clone.Self with { };
+        return clone;
+    }
 
     /// <summary>
     /// Resets all mutable fields of this instance to match the given template.
@@ -52,8 +59,8 @@ public record ActiveMove : Move, IEffect
         SelfSwitch = template.SelfSwitch;
         SpreadHit = template.SpreadHit;
         MindBlownRecoil = template.MindBlownRecoil;
-        Secondaries = template.Secondaries;
-        Self = template.Self;
+        Secondaries = template.Secondaries?.Select(s => s with { }).ToArray();
+        Self = template.Self is not null ? template.Self with { } : null;
         HasSheerForce = template.HasSheerForce;
         ForceStab = template.ForceStab;
         IgnoreAbility = template.IgnoreAbility;
@@ -108,8 +115,11 @@ public record ActiveMove : Move, IEffect
     [SetsRequiredMembers]
     public ActiveMove(Move source) : base(source)
     {
-        // Handle secondaries wrapping (match TypeScript behavior)
-        Secondaries ??= Secondary != null ? [Secondary] : null;
+        // Deep-copy secondaries to prevent mutations from leaking to the library template
+        // (e.g., Serene Grace doubling Chance values in-place)
+        Secondaries = Secondaries?.Select(s => s with { }).ToArray()
+                      ?? (Secondary != null ? [Secondary with { }] : null);
+        Self = Self is not null ? Self with { } : null;
 
         // Share pre-built handler cache from base Move
         _handlerCache = source.MoveHandlerCache;
