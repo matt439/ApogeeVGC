@@ -335,7 +335,10 @@ public partial class BattleActions
 
         foreach (PokemonFalseUnion targetUnion in targets)
         {
-            if (targetUnion is not PokemonPokemonUnion)
+            // Showdown: if (target === false) continue;
+            // Only skip explicitly false targets. Null targets (from Substitute hits) still
+            // allow self effects to fire (e.g., Close Combat's -def/-spd through Substitute).
+            if (targetUnion is FalsePokemonUnion)
             {
                 continue;
             }
@@ -382,7 +385,8 @@ public partial class BattleActions
     {
         foreach (PokemonFalseUnion targetUnion in targets)
         {
-            if (targetUnion is not PokemonPokemonUnion) continue;
+            // Showdown: if (target === false) continue;
+            if (targetUnion is FalsePokemonUnion) continue;
 
             if (move.SelfDropped == true) break;
 

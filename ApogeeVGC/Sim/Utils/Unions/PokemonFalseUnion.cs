@@ -18,3 +18,10 @@ public static implicit operator PokemonFalseUnion(Pokemon pokemon) => new Pokemo
 
 public record PokemonPokemonUnion(Pokemon Pokemon) : PokemonFalseUnion;
 public record FalsePokemonUnion : PokemonFalseUnion;
+
+/// <summary>
+/// Represents null in Showdown's targets array.
+/// Used when a Substitute absorbed the hit — the target is "gone" but self effects still apply.
+/// In Showdown: targets[i] = null after HIT_SUBSTITUTE, selfDrops checks target === false (not null).
+/// </summary>
+public record NullPokemonUnion : PokemonFalseUnion;

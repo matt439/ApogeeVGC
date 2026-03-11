@@ -341,7 +341,10 @@ if (tryResult is BoolRelayVar { Value: false } ||
             if (damage[i] == Battle.HitSubstitute)
             {
                 damage[i] = BoolIntUndefinedUnion.FromBool(true);
-                targets[i] = PokemonFalseUnion.FromFalse();
+                // Showdown sets targets[i] = null (not false) here.
+                // null targets are still processed by selfDrops (self effects apply through Substitute),
+                // but false targets are skipped. Use NullPokemonUnion to match this distinction.
+                targets[i] = new NullPokemonUnion();
             }
 
             // TypeScript: if (targets[i] && isSecondary && !moveData.self)
