@@ -397,7 +397,19 @@ public partial class Driver
                 else
                 {
                     mismatches++;
-                    firstMismatch ??= $"Line {j}: C#=\"{Truncate(csLine, 60)}\" SD=\"{Truncate(sdLine, 60)}\"";
+                    if (firstMismatch == null)
+                    {
+                        // Build context with 3 lines before the mismatch
+                        var ctx = new System.Text.StringBuilder();
+                        int ctxStart = Math.Max(0, j - 3);
+                        for (int k = ctxStart; k < j; k++)
+                        {
+                            string prevCs = k < csharpFiltered.Count ? csharpFiltered[k] : "(missing)";
+                            ctx.AppendLine($"  [{k}] {Truncate(prevCs, 80)}");
+                        }
+                        ctx.Append($"  >>>[{j}] C#=\"{Truncate(csLine, 80)}\" SD=\"{Truncate(sdLine, 80)}\"");
+                        firstMismatch = ctx.ToString();
+                    }
                 }
             }
 

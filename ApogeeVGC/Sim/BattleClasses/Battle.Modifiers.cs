@@ -122,7 +122,7 @@ public partial class Battle
         // Calculate the 4096-based fixed-point modifier
         var modifier = Trunc(numerator * 4096 / denominator);
 
-        // Apply the modifier with proper rounding
+        // Apply the modifier with proper rounding (matches Showdown's modify())
         return Trunc((Trunc(value * modifier) + 2048 - 1) / 4096);
     }
 
@@ -146,7 +146,7 @@ public partial class Battle
 
         // Convert the double fraction to a fixed-point representation
         var fixedPointFraction = Trunc((int)(fraction * 4096));
-        // Apply the fixed-point modification
+        // Apply the fixed-point modification (matches Showdown's modify())
         return Trunc((Trunc(value * fixedPointFraction) + 2048 - 1) / 4096);
     }
 

@@ -1075,7 +1075,7 @@ public partial record Conditions
                     if (!(move.Flags.Defrost ?? false)) return;
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-curestatus", pokemon, "frz", $"[from] move: {move}");
+                        battle.Add("-curestatus", pokemon, "frz", $"[from] {move.FullName}");
                     }
 
                     pokemon.ClearStatus();
