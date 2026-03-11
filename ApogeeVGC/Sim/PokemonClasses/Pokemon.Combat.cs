@@ -181,9 +181,9 @@ public partial class Pokemon
             DamageValue = damage,
         });
 
-        // Increment timesAttacked counter (used by Rage Fist)
-        // Matches Showdown: pokemon.timesAttacked++ in gotAttacked()
-        TimesAttacked++;
+        // Note: TimesAttacked is NOT incremented here.
+        // It is incremented in BattleActions.HitSteps (applyDamage equivalent),
+        // matching Showdown which increments timesAttacked in battle-actions.ts, not pokemon.ts.
     }
 
     public Attacker? GetLastAttackedBy()
