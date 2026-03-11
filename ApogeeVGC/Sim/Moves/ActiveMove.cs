@@ -74,7 +74,7 @@ public record ActiveMove : Move, IEffect
         OverrideOffensiveStat = template.OverrideOffensiveStat;
 
         // --- ActiveMove mutable fields (reset to defaults) ---
-        Weather = null;
+        Weather = template.Weather;
         Hit = 0;
         MoveHitData = null;
         HitTargets = null;
@@ -120,6 +120,10 @@ public record ActiveMove : Move, IEffect
         Secondaries = Secondaries?.Select(s => s with { }).ToArray()
                       ?? (Secondary != null ? [Secondary with { }] : null);
         Self = Self is not null ? Self with { } : null;
+
+        // Copy Weather from base HitEffect (ActiveMove.Weather hides HitEffect.Weather,
+        // so the record copy constructor doesn't propagate it automatically)
+        Weather = source.Weather;
 
         // Share pre-built handler cache from base Move
         _handlerCache = source.MoveHandlerCache;
