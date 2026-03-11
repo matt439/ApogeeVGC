@@ -1391,6 +1391,7 @@ public partial record Conditions
                 Id = ConditionId.Trapped,
                 Name = "Trapped",
                 NoCopy = true,
+                ImmuneTypes = [PokemonType.Ghost],
                 OnTrapPokemon = OnTrapPokemonEventInfo.Create((_, pokemon) => { pokemon.TryTrap(); }),
                 OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {

@@ -96,8 +96,8 @@ public partial class Driver
                 break;
             case DriverMode.EquivalenceTest:
                 RunEquivalenceTest(
-                    "Tools/EquivalenceTest/batch_temp/battle_0001.fixture.json",
-                    "Tools/EquivalenceTest/batch_temp/battle_0001.log");
+                    "Tools/EquivalenceTest/batch_temp/battle_0000.fixture.json",
+                    "Tools/EquivalenceTest/batch_temp/battle_0000.log");
                 break;
             case DriverMode.EquivalenceBatchTest:
                 RunEquivalenceBatchTest();
