@@ -193,12 +193,20 @@ public partial class Battle
         }
         else if (args.Any(arg => FormatArg(arg) == "[still]"))
         {
-            // When [still] is present, clear the target field to match Showdown protocol
+            // When [still] is present, clear the target field to match Showdown protocol.
+            // In JS, parts[4] = '' extends the array if it only has 4 elements;
+            // in C# we must handle both cases explicitly.
             string[] parts = Log[LastMoveLine].Split('|');
             if (parts.Length > 4)
             {
                 parts[4] = string.Empty;
                 Log[LastMoveLine] = string.Join("|", parts);
+            }
+            else
+            {
+                // Move line has no target field — insert an empty one at position 4
+                var partsList = new List<string>(parts) { string.Empty };
+                Log[LastMoveLine] = string.Join("|", partsList);
             }
         }
 
