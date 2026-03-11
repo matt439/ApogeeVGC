@@ -111,18 +111,31 @@ public partial class Side
         Move move = Battle.Library.Moves[moveid];
 
         // Step 7: Validate targeting
+        // Use the request's target type if available (handles special cases like Curse
+        // for non-Ghost users showing "self" instead of "normal" in the request).
+        // This matches Showdown's chooseMove which uses request.moves[idx].target.
+        MoveTarget targetType = move.Target;
+        foreach (PokemonMoveData reqMove in request.Moves)
+        {
+            if (reqMove.Id == moveid && reqMove.Target is MoveTarget overrideTarget)
+            {
+                targetType = overrideTarget;
+                break;
+            }
+        }
+
         if (autoChoose)
         {
             targetLoc = 0;
         }
-        else if (Battle.Actions.TargetTypeChoices(move.Target))
+        else if (Battle.Actions.TargetTypeChoices(targetType))
         {
             if (targetLoc == 0 && Active.Count >= 2)
             {
                 return EmitChoiceError($"Can't move: {move.Name} needs a target");
             }
 
-            if (!Battle.ValidTargetLoc(targetLoc, pokemon, move.Target))
+            if (!Battle.ValidTargetLoc(targetLoc, pokemon, targetType))
             {
                 return EmitChoiceError($"Can't move: Invalid target for {move.Name}");
             }
