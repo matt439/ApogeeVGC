@@ -443,8 +443,10 @@ public partial class BattleActions
         string moveName = activeMove.Name;
         string attrs = "";
         // Only add [from] for meaningful source effects (not the default battle/format effect).
-        // Matches Showdown: sourceEffect is only truthy when explicitly set (e.g. lockedmove, Dancer).
-        if (sourceEffect != null && sourceEffect != Battle.Effect)
+        // Showdown checks !(sourceEffect as Format)?.effectType — i.e., skip Format-type effects.
+        // We must NOT compare by reference (sourceEffect != Battle.Effect) because during ability
+        // handler dispatch, Battle.Effect is temporarily set to the ability being processed.
+        if (sourceEffect != null && sourceEffect.EffectType != EffectType.Format)
             attrs += $"|[from] {sourceEffect.FullName}";
 
         // Log move usage to battle log (before getMoveTargets, matching Showdown order)
