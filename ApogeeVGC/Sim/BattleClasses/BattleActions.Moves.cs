@@ -608,8 +608,6 @@ public partial class BattleActions
             Battle.SingleEvent(EventId.MoveFail, activeMove, null, target, pokemon,
                 activeMove);
 
-            // Ensure move result is set to false
-            pokemon.MoveThisTurnResult = false;
             return false;
         }
 
