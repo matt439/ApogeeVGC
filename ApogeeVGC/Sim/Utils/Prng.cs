@@ -25,6 +25,9 @@ public class Prng
     /// <summary>Access the underlying Gen5Rng (null if in .NET mode).</summary>
     public Gen5Rng? Gen5 => _gen5Rng;
 
+    /// <summary>Debug: count of PRNG calls made.</summary>
+    public int CallCount { get; private set; }
+
     public Prng(PrngSeed? seed)
     {
         if (seed?.Gen5Seed is { } gen5Seed)
@@ -51,6 +54,7 @@ public class Prng
     /// </summary>
     public double Random()
     {
+        CallCount++;
         if (_gen5Rng != null)
             return _gen5Rng.Next() / (double)(1L << 32);
         return _dotnetRng!.NextDouble();
@@ -61,6 +65,7 @@ public class Prng
     /// </summary>
     public int Random(int max)
     {
+        CallCount++;
         if (_gen5Rng != null)
         {
             // Match Showdown: Math.floor(result * from / 2**32)
@@ -75,6 +80,7 @@ public class Prng
     /// </summary>
     public int Random(int min, int max)
     {
+        CallCount++;
         if (_gen5Rng != null)
         {
             // Match Showdown: Math.floor(result * (to - from) / 2**32) + from

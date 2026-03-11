@@ -26,7 +26,11 @@ public partial class Driver
         int CSharpLines,
         int ShowdownLines,
         string? FirstMismatchContext,
-        Exception? Exception);
+        Exception? Exception,
+        int CSharpPrngCalls = 0,
+        int ShowdownPrngCalls = 0,
+        string? CSharpPrngFinal = null,
+        string? ShowdownPrngFinal = null);
 
     /// <summary>
     /// Runs multiple equivalence tests by generating random Showdown battles
@@ -146,11 +150,19 @@ public partial class Driver
                 if (r.Mismatches > 0 || r.Exception != null)
                 {
                     string status = r.Exception != null ? "ERROR" : "FAIL";
-                    Console.WriteLine($"  [{status}] --seed {r.SeedStr}  ({r.Matches}/{r.TotalLines} match)");
+                    string prngMatch = (r.CSharpPrngFinal != null && r.ShowdownPrngFinal != null)
+                        ? (r.CSharpPrngFinal == r.ShowdownPrngFinal ? "PRNG=OK" : "PRNG=DIFF")
+                        : "PRNG=?";
+                    string callInfo = r.ShowdownPrngCalls > 0
+                        ? $"calls=C#{r.CSharpPrngCalls}/SD{r.ShowdownPrngCalls}"
+                        : $"calls=C#{r.CSharpPrngCalls}";
+                    Console.WriteLine($"  [{status}] --seed {r.SeedStr}  ({r.Matches}/{r.TotalLines} match) {callInfo} {prngMatch}");
                     if (r.FirstMismatchContext != null)
                         Console.WriteLine($"         {r.FirstMismatchContext}");
                     if (r.Exception != null)
                         Console.WriteLine($"         {r.Exception.GetType().Name}: {r.Exception.Message}");
+                    if (prngMatch == "PRNG=DIFF")
+                        Console.WriteLine($"         C#={r.CSharpPrngFinal} SD={r.ShowdownPrngFinal}");
                 }
             }
         }
@@ -342,6 +354,27 @@ public partial class Driver
                     break;
             }
 
+            // Get PRNG state
+            int prngCalls = battle.Prng.CallCount;
+            string? csharpPrngFinal = null;
+            if (battle.Prng.Gen5 is { } gen5)
+            {
+                var finalSeed = gen5.GetSeed();
+                csharpPrngFinal = $"{finalSeed.S0},{finalSeed.S1},{finalSeed.S2},{finalSeed.S3}";
+            }
+
+            // Get Showdown PRNG final seed and call count from fixture
+            string? showdownPrngFinal = null;
+            int showdownPrngCalls = 0;
+            if (root.TryGetProperty("prngFinalSeed", out JsonElement prngProp) && prngProp.ValueKind == JsonValueKind.String)
+            {
+                showdownPrngFinal = prngProp.GetString();
+            }
+            if (root.TryGetProperty("prngCallCount", out JsonElement callCountProp) && callCountProp.ValueKind == JsonValueKind.Number)
+            {
+                showdownPrngCalls = callCountProp.GetInt32();
+            }
+
             // Compare protocol output
             string[] showdownLines = File.ReadAllLines(showdownLogPath);
             var csharpFiltered = FilterProtocolLines(battle.Log);
@@ -371,7 +404,7 @@ public partial class Driver
             return new EquivalenceResult(
                 seedStr, maxLines, matches, mismatches,
                 csharpFiltered.Count, showdownFiltered.Count,
-                firstMismatch, null);
+                firstMismatch, null, prngCalls, showdownPrngCalls, csharpPrngFinal, showdownPrngFinal);
         }
         catch (Exception ex)
         {
