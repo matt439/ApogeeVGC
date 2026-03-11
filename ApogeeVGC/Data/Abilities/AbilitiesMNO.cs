@@ -49,7 +49,7 @@ public partial record Abilities
 
                     // Bounce the move back to source
                     battle.Actions.UseMove(newMove, target,
-                        new UseMoveOptions { Target = source, SourceEffect = battle.Effect });
+                        new UseMoveOptions { Target = source, SourceEffect = battle.Library.Abilities[AbilityId.MagicBounce] });
                     return null;
                 }, 1),
                 OnAllyTryHitSide = OnAllyTryHitSideEventInfo.Create((battle, target, source, move) =>
@@ -74,7 +74,7 @@ public partial record Abilities
 
                     // Bounce the move back to source from the ability holder
                     battle.Actions.UseMove(newMove, abilityHolder,
-                        new UseMoveOptions { Target = source, SourceEffect = battle.Effect });
+                        new UseMoveOptions { Target = source, SourceEffect = battle.Library.Abilities[AbilityId.MagicBounce] });
                     move.HasBounced = true; // only bounce once in free-for-all battles
                     return null;
                 }),
