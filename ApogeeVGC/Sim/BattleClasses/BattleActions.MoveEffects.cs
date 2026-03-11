@@ -416,22 +416,37 @@ public partial class BattleActions
 
         foreach (PokemonFalseUnion targetUnion in targets)
         {
-            if (targetUnion is not PokemonPokemonUnion pokemonUnion)
+            // Showdown: if (target === false) continue;
+            // Only skip FalsePokemonUnion (explicit failure). NullPokemonUnion (substitute absorbed)
+            // must still be processed to consume PRNG calls for secondary effect chances,
+            // matching Showdown where null !== false so the loop body still runs.
+            if (targetUnion is FalsePokemonUnion)
             {
                 continue;
             }
 
-            Pokemon target = pokemonUnion.Pokemon;
+            // Extract target Pokemon. For NullPokemonUnion (substitute), target will be null.
+            Pokemon? target = targetUnion is PokemonPokemonUnion pokemonUnion
+                ? pokemonUnion.Pokemon
+                : null;
 
-            if (Battle.DebugMode) Battle.Debug($"[Secondaries] Processing secondary effects for target {target.Name}");
+            if (Battle.DebugMode) Battle.Debug($"[Secondaries] Processing secondary effects for target {target?.Name ?? "null (substitute)"}");
 
             // Run ModifySecondaries event to get the list of secondary effects
-            RelayVar? modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
-                moveData.Secondaries);
-
-            var secondaries = modifyResult is SecondaryEffectArrayRelayVar secListRv
-                ? secListRv.Effects
-                : moveData.Secondaries;
+            // For null targets (substitute absorbed), use the unmodified secondaries list
+            SecondaryEffect[] secondaries;
+            if (target != null)
+            {
+                RelayVar? modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
+                    moveData.Secondaries);
+                secondaries = modifyResult is SecondaryEffectArrayRelayVar secListRv
+                    ? secListRv.Effects
+                    : moveData.Secondaries;
+            }
+            else
+            {
+                secondaries = moveData.Secondaries;
+            }
 
             foreach (SecondaryEffect secondary in secondaries)
             {
@@ -453,7 +468,11 @@ public partial class BattleActions
                 if (secondary.Chance == null || secondaryRoll < effectiveChance)
                 {
                     if (Battle.DebugMode) Battle.Debug($"[Secondaries] Applying secondary effect, calling MoveHit");
-                    MoveHit(target, source, move, secondary, true, isSelf);
+                    // Only apply the secondary effect if we have an actual target (not substitute)
+                    if (target != null)
+                    {
+                        MoveHit(target, source, move, secondary, true, isSelf);
+                    }
                 }
                 else
                 {
