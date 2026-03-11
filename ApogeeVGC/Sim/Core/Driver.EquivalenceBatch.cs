@@ -50,13 +50,14 @@ public partial class Driver
         // Create temp directory for fixtures
         Directory.CreateDirectory(tempDir);
 
-        var results = new List<EquivalenceResult>();
+        var results = new EquivalenceResult[EquivalenceBatchNumTests];
         var stopwatch = Stopwatch.StartNew();
         int passed = 0;
         int failed = 0;
         int errors = 0;
+        int completed = 0;
 
-        for (int i = 0; i < EquivalenceBatchNumTests; i++)
+        Parallel.For(0, EquivalenceBatchNumTests, new ParallelOptions { MaxDegreeOfParallelism = 8 }, i =>
         {
             // Generate a unique seed for each battle
             // Use 4 values as Gen5RNG seed, derived from the test index
@@ -82,40 +83,46 @@ public partial class Driver
 
                 if (!generated)
                 {
-                    results.Add(new EquivalenceResult(seedStr, 0, 0, 0, 0, 0, "Showdown generation failed", null));
-                    errors++;
-                    Console.WriteLine($"  [{i + 1}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR (Showdown gen failed)");
-                    continue;
+                    results[i] = new EquivalenceResult(seedStr, 0, 0, 0, 0, 0, "Showdown generation failed", null);
+                    int done = Interlocked.Increment(ref completed);
+                    Console.WriteLine($"  [{done}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR (Showdown gen failed)");
+                    return;
                 }
 
                 // Step 2: Run equivalence comparison
                 EquivalenceResult result = RunEquivalenceComparison(fixtureFile, logFile, seedStr);
-                results.Add(result);
+                results[i] = result;
 
+                int doneNow = Interlocked.Increment(ref completed);
                 if (result.Mismatches == 0 && result.Exception == null)
                 {
-                    passed++;
-                    Console.WriteLine($"  [{i + 1}/{EquivalenceBatchNumTests}] SEED {seedStr} — PASS ({result.TotalLines} lines)");
+                    Console.WriteLine($"  [{doneNow}/{EquivalenceBatchNumTests}] SEED {seedStr} — PASS ({result.TotalLines} lines)");
                 }
                 else if (result.Exception != null)
                 {
-                    errors++;
-                    Console.WriteLine($"  [{i + 1}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR: {result.Exception.Message}");
+                    Console.WriteLine($"  [{doneNow}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR: {result.Exception.Message}");
                 }
                 else
                 {
-                    failed++;
-                    Console.WriteLine($"  [{i + 1}/{EquivalenceBatchNumTests}] SEED {seedStr} — FAIL ({result.Matches}/{result.TotalLines} match)");
+                    Console.WriteLine($"  [{doneNow}/{EquivalenceBatchNumTests}] SEED {seedStr} — FAIL ({result.Matches}/{result.TotalLines} match)");
                     if (result.FirstMismatchContext != null)
                         Console.WriteLine($"    {result.FirstMismatchContext}");
                 }
             }
             catch (Exception ex)
             {
-                errors++;
-                results.Add(new EquivalenceResult(seedStr, 0, 0, 0, 0, 0, null, ex));
-                Console.WriteLine($"  [{i + 1}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR: {ex.Message}");
+                results[i] = new EquivalenceResult(seedStr, 0, 0, 0, 0, 0, null, ex);
+                int done = Interlocked.Increment(ref completed);
+                Console.WriteLine($"  [{done}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR: {ex.Message}");
             }
+        });
+
+        // Count results
+        foreach (EquivalenceResult r in results)
+        {
+            if (r.Exception != null) errors++;
+            else if (r.Mismatches == 0) passed++;
+            else failed++;
         }
 
         stopwatch.Stop();

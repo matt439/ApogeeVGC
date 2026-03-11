@@ -441,11 +441,16 @@ public partial class BattleActions
 
         // Build move message attributes
         string moveName = activeMove.Name;
+        string attrs = "";
+        // Only add [from] for meaningful source effects (not the default battle/format effect).
+        // Matches Showdown: sourceEffect is only truthy when explicitly set (e.g. lockedmove, Dancer).
+        if (sourceEffect != null && sourceEffect != Battle.Effect)
+            attrs += $"|[from] {sourceEffect.FullName}";
 
         // Log move usage to battle log (before getMoveTargets, matching Showdown order)
         if (Battle.DisplayUi)
         {
-            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, target?.ToString() ?? pokemon.ToString());
+            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, $"{target?.ToString() ?? pokemon.ToString()}{attrs}");
         }
 
         // Handle no target
