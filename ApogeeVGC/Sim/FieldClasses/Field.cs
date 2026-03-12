@@ -179,7 +179,11 @@ public class Field
         EffectState weatherState = WeatherState;
         Battle.SingleEvent(EventId.FieldEnd, prevWeather, weatherState, this);
         Weather = ConditionId.None;
+        // ClearEffectState(ref local) only reassigns the local variable, not the property.
+        // We must write back to WeatherState so stale Duration values don't cause phantom
+        // residual handlers and spurious PRNG shuffles in FieldEvent.
         Battle.ClearEffectState(ref weatherState);
+        WeatherState = weatherState;
         Battle.EachEvent(EventId.WeatherChange);
         return true;
     }
@@ -310,7 +314,11 @@ public class Field
         EffectState terrainState = TerrainState;
         Battle.SingleEvent(EventId.FieldEnd, prevTerrain, terrainState, this);
         Terrain = ConditionId.None;
+        // ClearEffectState(ref local) only reassigns the local variable, not the property.
+        // We must write back to TerrainState so stale Duration values don't cause phantom
+        // residual handlers and spurious PRNG shuffles in FieldEvent.
         Battle.ClearEffectState(ref terrainState);
+        TerrainState = terrainState;
         Battle.EachEvent(EventId.TerrainChange);
         return true;
     }
