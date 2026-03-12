@@ -802,8 +802,9 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Fire)
                     {
-                        // Note: In TS, move.accuracy is set to true here
-                        // We cannot modify init-only Accuracy, but the hit will still be blocked
+                        // Showdown: move.accuracy = true — prevents accuracy check for
+                        // remaining targets of spread moves (e.g., Heat Wave)
+                        move.Accuracy = IntTrueUnion.FromTrue();
                         RelayVar addResult = target.AddVolatile(ConditionId.FlashFire);
                         if (addResult is BoolRelayVar { Value: false })
                         {
