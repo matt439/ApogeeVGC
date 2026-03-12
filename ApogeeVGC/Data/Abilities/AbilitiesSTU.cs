@@ -1028,10 +1028,9 @@ public partial record Abilities
                     {
                         battle.Debug("Steelworker boost");
                         battle.ChainModify(1.5);
-                        return new VoidReturn();
                     }
 
-                    return atk;
+                    return new VoidReturn();
                 }, 5),
                 // OnModifySpAPriority = 5
                 OnModifySpA = OnModifySpAEventInfo.Create((battle, spa, _, _, move) =>
@@ -1040,10 +1039,9 @@ public partial record Abilities
                     {
                         battle.Debug("Steelworker boost");
                         battle.ChainModify(1.5);
-                        return new VoidReturn();
                     }
 
-                    return spa;
+                    return new VoidReturn();
                 }, 5),
             },
             [AbilityId.SteelySpirit] = new()
@@ -1059,10 +1057,9 @@ public partial record Abilities
                     {
                         battle.Debug("Steely Spirit boost");
                         battle.ChainModify(1.5);
-                        return new VoidReturn();
                     }
 
-                    return basePower;
+                    return new VoidReturn();
                 }, 22),
             },
             [AbilityId.Stench] = new()

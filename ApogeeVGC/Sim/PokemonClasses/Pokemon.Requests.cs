@@ -107,27 +107,10 @@ public partial class Pokemon
     {
         Battle.Debug($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
 
-        // Clear disabled states before evaluating them for this turn
-        // This ensures disabled states are re-evaluated fresh each turn
-        foreach (var moveSlot in MoveSlots)
-        {
-            moveSlot.Disabled = false;
-            moveSlot.DisabledSource = null;
-        }
-
-        // Trigger DisableMove event to re-apply disabled states
-        // This allows conditions like ChoiceLock and items like Assault Vest
-        // to disable appropriate moves
-        Battle.RunEvent(EventId.DisableMove, this);
-
-        if (Battle.DebugMode)
-        {
-            Battle.Debug($"[GetMoveRequestData] {Name}: After DisableMove event, move states:");
-            foreach (var moveSlot in MoveSlots)
-            {
-                Battle.Debug($"  - {Battle.Library.Moves[moveSlot.Id].Name}: Disabled={moveSlot.Disabled}");
-            }
-        }
+        // Disabled states are already set by Battle.Lifecycle (makeRequest preprocessing)
+        // which clears and re-runs RunEvent(DisableMove) for each Pokemon.
+        // Do NOT re-run DisableMove here — it consumes PRNG calls via SpeedSort
+        // that Showdown's getMoveRequestData() does not make.
 
         // Get locked move if Pokemon is not maybe-locked
         var lockedMove = MaybeLocked == true ? null : GetLockedMove();
