@@ -279,6 +279,21 @@ public partial class BattleActions
                 Battle.Faint(source, source, move);
             }
 
+            // Showdown lines 1307-1313: selfSwitch sets didSomething = true inside the
+            // per-target loop (before combining into didAnything). This ensures that moves
+            // like U-turn still count as "succeeded" even when damage is 0 (e.g. Disguise).
+            if (moveData.SelfSwitch != null)
+            {
+                if (Battle.CanSwitch(source.Side) != 0 && !source.Volatiles.ContainsKey(ConditionId.Commanded))
+                {
+                    didSomething = BoolIntUndefinedUnion.FromBool(true);
+                }
+                else
+                {
+                    didSomething = CombineResults(didSomething, BoolIntUndefinedUnion.FromBool(false));
+                }
+            }
+
             // Move didn't fail because it didn't try to do anything
             if (didSomething is UndefinedBoolIntUndefinedUnion)
             {
@@ -296,9 +311,11 @@ public partial class BattleActions
                     ? BoolIntUndefinedUnion.FromBool(false)
                     : didSomething;
                 damage[i] = CombineResults(damage[i], effectiveDidSomething);
-                // didAnything uses the unconverted value (matches Showdown line 1317)
-                didAnything = CombineResults(didAnything, didSomething);
             }
+            // didAnything always updated (matches Showdown line 1317), even when damage[i]
+            // is an integer. This ensures selfSwitch's didSomething=true propagates to
+            // moveSucceeded even when damage is 0 (e.g. U-turn vs Disguise).
+            didAnything = CombineResults(didAnything, didSomething);
         }
 
         // Check if move succeeded
