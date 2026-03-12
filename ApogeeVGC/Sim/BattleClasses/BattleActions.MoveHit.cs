@@ -48,24 +48,35 @@ public partial class BattleActions
         }
 
         // Run preliminary events to check if the move can be used at all
+        // These must be short-circuit evaluated to match Showdown's JS && chaining:
+        //   hitResult = singleEvent('Try') && singleEvent('PrepareHit') && runEvent('PrepareHit')
+        // If Try fails (e.g., Sucker Punch target not attacking), PrepareHit must NOT fire
+        // (otherwise abilities like Protean would incorrectly activate on failed moves).
         RelayVar? tryResult = Battle.SingleEvent(EventId.Try, move, null, pokemon,
             targets.Count > 0 ? SingleEventSource.FromNullablePokemon(targets[0]) : null, move);
 
-        RelayVar? prepareHitResult1 = Battle.SingleEvent(EventId.PrepareHit, move,
-     null,
-          targets.Count > 0 ? SingleEventTarget.FromNullablePokemon(targets[0]) : null,
-  pokemon, move);
+        bool tryPassed = tryResult is not BoolRelayVar { Value: false } and not NullRelayVar;
 
-        RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon,
-  targets.Count > 0 ? RunEventSource.FromNullablePokemon(targets[0]) : null, move);
+        RelayVar? prepareHitResult1 = tryPassed
+            ? Battle.SingleEvent(EventId.PrepareHit, move, null,
+                targets.Count > 0 ? SingleEventTarget.FromNullablePokemon(targets[0]) : null,
+                pokemon, move)
+            : null;
 
-    bool hitResult = tryResult is not BoolRelayVar { Value: false } and not NullRelayVar &&
-      prepareHitResult1 is not BoolRelayVar { Value: false } and not NullRelayVar &&
-        prepareHitResult2 is not BoolRelayVar { Value: false } and not NullRelayVar;
+        bool preparePassed = tryPassed &&
+            prepareHitResult1 is not BoolRelayVar { Value: false } and not NullRelayVar;
+
+        RelayVar? prepareHitResult2 = preparePassed
+            ? Battle.RunEvent(EventId.PrepareHit, pokemon,
+                targets.Count > 0 ? RunEventSource.FromNullablePokemon(targets[0]) : null, move)
+            : null;
+
+        bool hitResult = preparePassed &&
+            prepareHitResult2 is not BoolRelayVar { Value: false } and not NullRelayVar;
 
    if (!hitResult)
      {
-// Move failed preliminary checks � only show "-fail" for explicit false,
+// Move failed preliminary checks — only show "-fail" for explicit false,
 // not for NullRelayVar (TS null = "failed silently")
 if (tryResult is BoolRelayVar { Value: false } ||
        prepareHitResult1 is BoolRelayVar { Value: false } ||
@@ -78,8 +89,14 @@ if (tryResult is BoolRelayVar { Value: false } ||
   }
       }
 
-      // Return true only if this is a "not a failure" case (null result means NOT_FAIL)
-    return tryResult is null || prepareHitResult1 is null || prepareHitResult2 is null;
+      // Showdown: return hitResult === this.NOT_FAIL
+      // NOT_FAIL is the empty string ''. hitResult here is the first falsy value
+      // from the && chain. NullRelayVar represents JS null (from event returning null).
+      // Only return true (NOT_FAIL) if the actual failing event returned NullRelayVar.
+      // If the event wasn't called (null due to short-circuit), that's not NOT_FAIL.
+      if (!tryPassed) return tryResult is NullRelayVar;
+      if (!preparePassed) return prepareHitResult1 is NullRelayVar;
+      return prepareHitResult2 is NullRelayVar;
     }
 
         // Process each hit validation step
