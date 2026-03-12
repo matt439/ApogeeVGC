@@ -110,48 +110,10 @@ public partial class Side
 
         Move move = Battle.Library.Moves[moveid];
 
-        // Step 7: Validate targeting
-        // Use the request's target type if available (handles special cases like Curse
-        // for non-Ghost users showing "self" instead of "normal" in the request).
-        // This matches Showdown's chooseMove which uses request.moves[idx].target.
-        // When the request move has no target (e.g. Recharge), Showdown defaults to "normal"
-        // via `move2.target || "normal"`, which allows a target location to be specified
-        // even though it will be ignored by the locked move handler.
-        MoveTarget targetType = move.Target;
-        foreach (PokemonMoveData reqMove in request.Moves)
-        {
-            if (reqMove.Id == moveid)
-            {
-                targetType = reqMove.Target ?? MoveTarget.Normal;
-                break;
-            }
-        }
-
-        if (autoChoose)
-        {
-            targetLoc = 0;
-        }
-        else if (Battle.Actions.TargetTypeChoices(targetType))
-        {
-            if (targetLoc == 0 && Active.Count >= 2)
-            {
-                return EmitChoiceError($"Can't move: {move.Name} needs a target");
-            }
-
-            if (!Battle.ValidTargetLoc(targetLoc, pokemon, targetType))
-            {
-                return EmitChoiceError($"Can't move: Invalid target for {move.Name}");
-            }
-        }
-        else
-        {
-            if (targetLoc != 0)
-            {
-                return EmitChoiceError($"Can't move: You can't choose a target for {move.Name}");
-            }
-        }
-
-        // Step 8: Handle locked moves (multi-turn moves like Outrage)
+        // Step 7a: Handle locked moves BEFORE target validation (multi-turn moves like Outrage)
+        // This must come first because locked moves (e.g. Recharge) may not have a target
+        // in the request data, and Showdown defaults missing targets to "normal" which allows
+        // a target location to be specified even though it's ignored by the locked move handler.
         var lockedMove = pokemon.GetLockedMove();
         if (lockedMove != null)
         {
@@ -178,6 +140,44 @@ public partial class Side
             ];
 
             return true;
+        }
+
+        // Step 7b: Validate targeting
+        // Use the request's target type if available (handles special cases like Curse
+        // for non-Ghost users showing "self" instead of "normal" in the request).
+        // This matches Showdown's chooseMove which uses request.moves[idx].target.
+        MoveTarget targetType = move.Target;
+        foreach (PokemonMoveData reqMove in request.Moves)
+        {
+            if (reqMove.Id == moveid && reqMove.Target is MoveTarget overrideTarget)
+            {
+                targetType = overrideTarget;
+                break;
+            }
+        }
+
+        if (autoChoose)
+        {
+            targetLoc = 0;
+        }
+        else if (Battle.Actions.TargetTypeChoices(targetType))
+        {
+            if (targetLoc == 0 && Active.Count >= 2)
+            {
+                return EmitChoiceError($"Can't move: {move.Name} needs a target");
+            }
+
+            if (!Battle.ValidTargetLoc(targetLoc, pokemon, targetType))
+            {
+                return EmitChoiceError($"Can't move: Invalid target for {move.Name}");
+            }
+        }
+        else
+        {
+            if (targetLoc != 0)
+            {
+                return EmitChoiceError($"Can't move: You can't choose a target for {move.Name}");
+            }
         }
 
         // Step 9: Handle Struggle when no moves have PP
