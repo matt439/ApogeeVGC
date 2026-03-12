@@ -64,13 +64,20 @@ public partial class Side
                 // Parse a move ID directly
                 moveid = moveIdUnion.MoveId;
 
-                // Find the move in the request
-                bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
-
-                if (!found)
+                // Struggle is always valid as a choice — it's handled in Step 9
+                // when no moves have PP. Skip the request validation for Struggle
+                // because the request may show the locked move (e.g. Choice Lock)
+                // rather than Struggle, even though the Pokemon must Struggle.
+                if (moveid != MoveId.Struggle)
                 {
-                    return EmitChoiceError(
-                        $"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
+                    // Find the move in the request
+                    bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
+
+                    if (!found)
+                    {
+                        return EmitChoiceError(
+                            $"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
+                    }
                 }
 
                 break;
@@ -180,8 +187,9 @@ public partial class Side
             }
         }
 
-        // Step 9: Handle Struggle when no moves have PP
-        if (moves.Length == 0)
+        // Step 9: Handle Struggle when no moves have PP,
+        // or when the player explicitly chose Struggle (e.g. Choice Lock + 0 PP on locked move)
+        if (moves.Length == 0 || moveid == MoveId.Struggle)
         {
             // Gen 4 and earlier announce Pokemon has no moves left
             if (Battle.Gen <= 4)
