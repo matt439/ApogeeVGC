@@ -1684,8 +1684,10 @@ public partial record Moves
                 Type = MoveType.Ice,
                 OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
-                    // If already charged (volatile exists), remove it and execute the attack
-                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        attacker.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn();
                     }

@@ -322,8 +322,10 @@ public partial record Moves
                 BreaksProtect = true,
                 OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
-                    // If we have the volatile from turn 1, remove it and continue with the attack
-                    if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        source.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn(); // Continue with the attack
                     }

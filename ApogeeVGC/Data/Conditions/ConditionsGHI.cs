@@ -236,6 +236,13 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.IceBurn] = new()
+            {
+                Id = ConditionId.IceBurn,
+                Name = "Ice Burn",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
+            },
             [ConditionId.Gravity] = new()
             {
                 Id = ConditionId.Gravity,

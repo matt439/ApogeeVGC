@@ -117,6 +117,13 @@ public partial record Conditions
                 AssociatedMove = MoveId.MeanLook,
                 // Uses Trapped condition
             },
+            [ConditionId.MeteorBeam] = new()
+            {
+                Id = ConditionId.MeteorBeam,
+                Name = "Meteor Beam",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
+            },
             [ConditionId.Metronome] = new()
             {
                 Id = ConditionId.Metronome,

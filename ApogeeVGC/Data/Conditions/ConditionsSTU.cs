@@ -297,6 +297,13 @@ public partial record Conditions
                     return new[] { type };
                 }, 1),
             },
+            [ConditionId.SkyAttack] = new()
+            {
+                Id = ConditionId.SkyAttack,
+                Name = "Sky Attack",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
+            },
             [ConditionId.SimpleBeam] = new()
             {
                 Id = ConditionId.SimpleBeam,
@@ -422,6 +429,20 @@ public partial record Conditions
                     return null;
                 }),
                 // Groundedness implemented in Pokemon.IsGrounded()
+            },
+            [ConditionId.SolarBeam] = new()
+            {
+                Id = ConditionId.SolarBeam,
+                Name = "Solar Beam",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
+            },
+            [ConditionId.SolarBlade] = new()
+            {
+                Id = ConditionId.SolarBlade,
+                Name = "Solar Blade",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
             },
             [ConditionId.Snowscape] = new()
             {
