@@ -578,6 +578,17 @@ public partial record Conditions
 
                     return null;
                 }),
+                OnDisableMove = OnDisableMoveEventInfo.Create((_, pokemon) =>
+                {
+                    // Disable moves with the 'heal' flag so they appear disabled in the request
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                    {
+                        if (_library.Moves[moveSlot.Id].Flags.Heal == true)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
                 OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, move) =>
                 {
                     // Block moves with the 'heal' flag (Recover, Drain Punch, Heal Pulse, etc.)
