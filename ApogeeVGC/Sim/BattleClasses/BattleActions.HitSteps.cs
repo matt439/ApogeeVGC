@@ -155,11 +155,17 @@ public partial class BattleActions
         var convertedResults = new List<BoolIntEmptyUndefinedUnion>(hitResults.Count);
         foreach (RelayVar? result in hitResults)
         {
-            // If result is NOT_FAIL (null), keep it as undefined
-            // Otherwise convert to boolean (default false if not a boolean)
-            if (result is UndefinedRelayVar or NullRelayVar or null)
+            // EmptyRelayVar = Showdown NOT_FAIL ('') → keep as undefined (NOT_FAIL)
+            // NullRelayVar = handler returned null → JS: null || false → false (failure)
+            if (result is UndefinedRelayVar or EmptyRelayVar or null)
             {
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
+            }
+            else if (result is NullRelayVar)
+            {
+                // Handler returned null (e.g., Earth Eater blocking) — in Showdown,
+                // hitStepTryHitEvent converts: null !== '' → true → null || false → false
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
             }
             else if (result is BoolRelayVar brv2)
             {

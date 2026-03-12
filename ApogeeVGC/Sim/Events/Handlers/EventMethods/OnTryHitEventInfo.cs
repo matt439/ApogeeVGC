@@ -45,9 +45,9 @@ public sealed record OnTryHitEventInfo : EventHandlerInfo
                     IntBoolIntEmptyVoidUnion i => IntRelayVar.Get(i.Value),
                     // Empty = NOT_FAIL (Showdown's empty string ""). Must return non-null falsy
                     // RelayVar so RunEvent processes it (C# null = TS undefined = passthrough).
-                    EmptyBoolIntEmptyVoidUnion => new NullRelayVar(),
+                    EmptyBoolIntEmptyVoidUnion => new EmptyRelayVar(),
                     VoidUnionBoolIntEmptyVoidUnion => null,
-                    // null result also = NOT_FAIL
+                    // Handler returned null (JS null) → blocked silently, distinct from NOT_FAIL
                     null => new NullRelayVar(),
                     _ => null
                 };

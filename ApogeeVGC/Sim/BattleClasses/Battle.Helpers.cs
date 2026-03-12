@@ -31,6 +31,7 @@ public partial class Battle
         {
             null => false,
             NullRelayVar => false,
+            EmptyRelayVar => false,
             BoolRelayVar boolVar => boolVar.Value,
             IntRelayVar intVar => intVar.Value != 0,
             StringRelayVar strVar => !string.IsNullOrEmpty(strVar.Value),

@@ -46,7 +46,7 @@ public sealed record OnSourceTryHitEventInfo : EventHandlerInfo
                 {
                     BoolBoolIntEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     IntBoolIntEmptyVoidUnion i => IntRelayVar.Get(i.Value),
-                    EmptyBoolIntEmptyVoidUnion => new NullRelayVar(),
+                    EmptyBoolIntEmptyVoidUnion => new EmptyRelayVar(),
                     VoidUnionBoolIntEmptyVoidUnion => null,
                     _ => null
                 };

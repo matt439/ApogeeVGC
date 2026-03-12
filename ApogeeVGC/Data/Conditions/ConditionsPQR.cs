@@ -430,7 +430,7 @@ public partial record Conditions
                             source.DeleteVolatile(ConditionId.LockedMove);
                         }
 
-                        return null; // NOT_FAIL — blocks move without showing fail message
+                        return new Empty(); // NOT_FAIL — blocks move without showing fail message
                     },
                     3),
             },
@@ -648,7 +648,7 @@ public partial record Conditions
                         battle.Add("-activate", target, "move: Psychic Terrain");
                     }
 
-                    return null; // Silent failure - block the move
+                    return new Empty(); // NOT_FAIL — block the move without showing fail message
                 }, 4),
                 // OnBasePowerPriority = 6
                 OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, attacker, _, move) =>
