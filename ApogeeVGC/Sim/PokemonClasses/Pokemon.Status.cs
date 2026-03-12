@@ -131,6 +131,25 @@ public partial class Pokemon
         ConditionId prevStatus = Status;
         EffectState prevStatusState = StatusState;
 
+        // Run SetStatus event (abilities like Purifying Salt fire here)
+        // This must run BEFORE Sleep Clause to match Showdown, where both are
+        // event handlers sorted by speed — ability handlers (speed > 0) fire
+        // before format rules (speed = 0).
+        if (status.Id != ConditionId.None)
+        {
+            RelayVar? result =
+                Battle.RunEvent(EventId.SetStatus, this, source, sourceEffect, status);
+            if (result is BoolRelayVar { Value: false })
+            {
+                if (Battle.DisplayUi)
+                {
+                    Battle.Debug($"set status [{status.Id}] interrupted");
+                }
+
+                return false;
+            }
+        }
+
         // Sleep Clause Mod: prevent putting multiple Pokemon on the same side to sleep
         if (Battle.RuleTable.Has(RuleId.SleepClauseMod) && status.Id == ConditionId.Sleep)
         {
@@ -153,22 +172,6 @@ public partial class Pokemon
                         }
                     }
                 }
-            }
-        }
-
-        // Run SetStatus event
-        if (status.Id != ConditionId.None)
-        {
-            RelayVar? result =
-                Battle.RunEvent(EventId.SetStatus, this, source, sourceEffect, status);
-            if (result is BoolRelayVar { Value: false })
-            {
-                if (Battle.DisplayUi)
-                {
-                    Battle.Debug($"set status [{status.Id}] interrupted");
-                }
-
-                return false;
             }
         }
 
