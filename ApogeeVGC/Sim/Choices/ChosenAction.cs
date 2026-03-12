@@ -38,7 +38,7 @@ public record ChosenAction : IAction
 
     public IntFalseUnion Order { get; init; } = int.MaxValue;
     public double Priority { get; init; }
-    public int Speed { get; init; }
+    public double Speed { get; init; }
     public int SubOrder { get; init; }
     public int EffectOrder { get; init; }
 }

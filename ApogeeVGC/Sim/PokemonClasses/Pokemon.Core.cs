@@ -170,7 +170,7 @@ public partial class Pokemon : IPriorityComparison
     public int WeightHg { get; set; }
     public IntFalseUnion Order => int.MaxValue;
     public double Priority => 0;
-    public int Speed { get; set; }
+    public double Speed { get; set; }
     public int SubOrder => 0;
     public int EffectOrder => 0;
 

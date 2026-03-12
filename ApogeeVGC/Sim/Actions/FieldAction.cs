@@ -21,7 +21,7 @@ public record FieldAction : IAction
         }
     }
     public double Priority { get; init; }
-    public int Speed => 1;
+    public double Speed => 1;
     public Pokemon? Pokemon => null;
 
     // Properties to satisfy IPriorityComparison

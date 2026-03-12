@@ -42,7 +42,7 @@ public record SwitchAction : IAction
         }
     }
     public double Priority { get; init; }
-    public int Speed { get; set; }
+    public double Speed { get; set; }
     public required Pokemon Pokemon { get; init; }
     public required Pokemon Target { get; init; }
     public IEffect? SourceEffect { get; init; }

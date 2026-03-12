@@ -7,7 +7,7 @@ public record RunSwitchAction : IAction
 {
     public IntFalseUnion Order { get; init; } = IntFalseUnion.FromFalse();
     public double Priority { get; init; }
-    public int Speed { get; init; }
+    public double Speed { get; init; }
     public int SubOrder { get; init; }
     public int EffectOrder { get; init; }
     public ActionId Choice => ActionId.RunSwitch;

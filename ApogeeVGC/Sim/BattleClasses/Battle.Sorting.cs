@@ -136,7 +136,7 @@ public partial class Battle
         // Calculate speed if the handler is held by a Pokemon
         // Showdown always assigns speed from pokemon.speed for Pokemon-held handlers,
         // regardless of event type (Residual, SwitchIn, etc.)
-        int speed = 0;
+        double speed = 0;
         if (h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
         {
             Pokemon pokemon = pokemonEffectHolder.Pokemon;
@@ -151,7 +151,8 @@ public partial class Battle
             }
 
             // Apply fractional speed adjustment for switch-in events
-            // Check if event is a SwitchIn event
+            // Showdown uses floating-point division to produce fractional speed values
+            // (e.g., 0.25, 0.5, 0.75) that break ties between same-speed Pokemon
             bool usesFractionalSpeed = callbackName is
                 EventId.SwitchIn or
                 EventId.AnySwitchIn;
@@ -159,7 +160,7 @@ public partial class Battle
             if (usesFractionalSpeed)
             {
                 int fieldPositionValue = pokemon.Side.N * Sides.Count + pokemon.Position;
-                speed -= SpeedOrder.IndexOf(fieldPositionValue) / (ActivePerHalf * 2);
+                speed -= (double)SpeedOrder.IndexOf(fieldPositionValue) / (ActivePerHalf * 2);
             }
         }
 
