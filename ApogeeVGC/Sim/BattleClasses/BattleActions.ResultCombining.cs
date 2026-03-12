@@ -7,10 +7,35 @@ public partial class BattleActions
     public static BoolIntUndefinedUnion CombineResults(BoolIntUndefinedUnion? left,
         BoolIntUndefinedUnion? right)
     {
-        return CombineResults(
-                BoolIntEmptyUndefinedUnion.FromNullableBoolIntUndefinedUnion(left),
-                BoolIntEmptyUndefinedUnion.FromNullableBoolIntUndefinedUnion(right)).
-            ToBoolIntUndefinedUnion();
+        // Treat C# null and NullBoolIntUndefinedUnion as JS null
+        bool leftIsJsNull = left is null or NullBoolIntUndefinedUnion;
+        bool rightIsJsNull = right is null or NullBoolIntUndefinedUnion;
+
+        // Both JS-null → JS null
+        if (leftIsJsNull && rightIsJsNull) return NullBoolIntUndefinedUnion.Instance;
+
+        // Left JS-null → return right (JS: return right)
+        if (leftIsJsNull) return right!;
+
+        // Right JS-null → if left is truthy return left, else return JS null
+        // Matches JS: `if (left && !right && right !== 0) return left;` then `return right;`
+        if (rightIsJsNull) return left!.IsTruthy() ? left! : NullBoolIntUndefinedUnion.Instance;
+
+        // Neither is null: standard combineResults logic
+        // If left is truthy and right is falsy (but not 0)
+        if (left!.IsTruthy() && !right!.IsTruthy() && !right!.IsZero())
+        {
+            return left;
+        }
+
+        // If both are numbers, sum them
+        if (left is IntBoolIntUndefinedUnion leftInt && right is IntBoolIntUndefinedUnion rightInt)
+        {
+            return BoolIntUndefinedUnion.FromInt(leftInt.Value + rightInt.Value);
+        }
+
+        // Otherwise return right
+        return right!;
     }
 
     /// <summary>

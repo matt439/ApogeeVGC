@@ -57,3 +57,19 @@ public record UndefinedBoolIntUndefinedUnion(Undefined Value) : BoolIntUndefined
         "Cannot convert Undefined to int. Undefined and 0 are semantically different. " +
     "Check for Undefined before calling ToInt().");
 }
+
+/// <summary>
+/// Represents JavaScript null in a BoolIntUndefined context.
+/// Null is falsy (like undefined) but semantically distinct:
+/// - undefined means "nothing was attempted"
+/// - null means "something was attempted but produced no result" (e.g., boost blocked by Clear Amulet)
+/// This distinction matters for combineResults and the "didn't try to do anything" check.
+/// </summary>
+public record NullBoolIntUndefinedUnion : BoolIntUndefinedUnion
+{
+    public static readonly NullBoolIntUndefinedUnion Instance = new();
+    public override bool IsTruthy() => false;
+    public override bool IsZero() => false;
+    public override int ToInt() =>
+        throw new InvalidOperationException("Cannot convert null to int.");
+}

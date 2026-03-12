@@ -880,10 +880,9 @@ public partial class BattleActions
                 moveDamage = moveDamageThisHit;
             }
 
-            if (!moveDamage.Any(val => val is not BoolBoolIntUndefinedUnion
-                {
-                    Value: false
-                })) break;
+            // Showdown: if (!moveDamage.some(x => x || x === 0)) break;
+            // Break if no target had a truthy or zero result (meaning all failed)
+            if (!moveDamage.Any(val => val.IsTruthy() || val.IsZero())) break;
             nullDamage = false;
 
             for (int i = 0; i < moveDamage.Count; i++)
