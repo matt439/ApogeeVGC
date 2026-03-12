@@ -781,7 +781,7 @@ public partial record Conditions
                         int damage = battle.Actions.GetConfusionDamage(pokemon, 40);
 
                         battle.Damage(damage, pokemon, pokemon,
-                            BattleDamageEffect.FromIEffect(_library.Conditions[ConditionId.Confusion]));
+                            BattleDamageEffect.FromIEffect(PseudoMoveEffect.Confused));
                         return false;
                     },
                     3),

@@ -485,7 +485,13 @@ public partial class Battle
                 break;
 
             default:
-                if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
+                // Confusion self-hit uses PseudoMoveEffect.Confused (EffectType.Move to bypass
+                // Magic Guard) but still needs [from] confusion attribution
+                if (effect is PseudoMoveEffect { Id: "confused" })
+                {
+                    Add("-damage", target, target.GetHealth, damageTag, "[from] confusion");
+                }
+                else if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
                 {
                     // Simple damage from a move or no effect
                     Add("-damage", target, target.GetHealth, damageTag);
