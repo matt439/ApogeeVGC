@@ -496,10 +496,17 @@ public partial class BattleActions
                 if (secondary.Chance == null || secondaryRoll < effectiveChance)
                 {
                     if (Battle.DebugMode) Battle.Debug($"[Secondaries] Applying secondary effect, calling MoveHit");
-                    // Only apply the secondary effect if we have an actual target (not substitute)
                     if (target != null)
                     {
                         MoveHit(target, source, move, secondary, true, isSelf);
+                    }
+                    else if (secondary.Self != null && move.SelfDropped != true)
+                    {
+                        // Target is null (Substitute absorbed). In Showdown, moveHit(null, ...) is
+                        // still called, and spreadMoveHit skips damage/hit steps but still processes
+                        // selfDrops for the secondary's .self (e.g., Aqua Step's speed boost).
+                        if (move.MultiHit == null) move.SelfDropped = true;
+                        MoveHit(source, source, move, secondary.Self, true, true);
                     }
                 }
                 else
