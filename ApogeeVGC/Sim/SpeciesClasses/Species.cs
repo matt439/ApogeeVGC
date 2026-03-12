@@ -59,7 +59,7 @@ public record Species : IEffect, ICopyable<Species>
     /// <summary>
     /// Weight (in integer multiples of 0.1kg).
     /// </summary>
-    public int WeightHg => (int)WeightKg * 10;
+    public int WeightHg => (int)(WeightKg * 10);
     public double HeightM { get; init; } // in meters
     public string Color { get; init; } = string.Empty;
 
