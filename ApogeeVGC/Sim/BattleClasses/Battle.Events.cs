@@ -18,6 +18,9 @@ public partial class Battle
         IEffect? sourceEffect = null,
         RelayVar? relayVar = null, EffectDelegate? customCallback = null)
     {
+        // Match Showdown: when relayVar is not provided, default to true
+        // (Showdown line 593-594: if (relayVar === undefined) { relayVar = true; })
+        relayVar ??= BoolRelayVar.True;
         // Debug logging for event entry
         if (DisplayUi && eventId == EventId.SwitchIn)
         {
