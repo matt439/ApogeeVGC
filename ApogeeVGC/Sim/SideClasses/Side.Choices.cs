@@ -114,12 +114,15 @@ public partial class Side
         // Use the request's target type if available (handles special cases like Curse
         // for non-Ghost users showing "self" instead of "normal" in the request).
         // This matches Showdown's chooseMove which uses request.moves[idx].target.
+        // When the request move has no target (e.g. Recharge), Showdown defaults to "normal"
+        // via `move2.target || "normal"`, which allows a target location to be specified
+        // even though it will be ignored by the locked move handler.
         MoveTarget targetType = move.Target;
         foreach (PokemonMoveData reqMove in request.Moves)
         {
-            if (reqMove.Id == moveid && reqMove.Target is MoveTarget overrideTarget)
+            if (reqMove.Id == moveid)
             {
-                targetType = overrideTarget;
+                targetType = reqMove.Target ?? MoveTarget.Normal;
                 break;
             }
         }
