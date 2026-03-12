@@ -289,7 +289,14 @@ public partial class BattleActions
             // If damage was dealt, preserve that integer value instead of replacing it with a boolean
             if (damage[i] is not IntBoolIntUndefinedUnion)
             {
-                damage[i] = CombineResults(damage[i], didSomething);
+                // Showdown: damage[i] = this.combineResults(damage[i], didSomething === null ? false : didSomething)
+                // Null didSomething (e.g. Clear Amulet blocking all boosts) must be converted to false
+                // for damage tracking, so the target is correctly filtered as "move failed on this target"
+                BoolIntUndefinedUnion effectiveDidSomething = didSomething is NullBoolIntUndefinedUnion
+                    ? BoolIntUndefinedUnion.FromBool(false)
+                    : didSomething;
+                damage[i] = CombineResults(damage[i], effectiveDidSomething);
+                // didAnything uses the unconverted value (matches Showdown line 1317)
                 didAnything = CombineResults(didAnything, didSomething);
             }
         }
