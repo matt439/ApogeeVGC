@@ -101,13 +101,11 @@ public partial class Pokemon
                     null, boosts);
 
                 if (relayVar is BoostsTableRelayVar brv)
-                {
                     boosts = brv.Table;
-                }
+                else if (relayVar is SparseBoostsTableRelayVar sbrv)
+                    boosts = sbrv.Table.ToBoostsTable();
                 else
-                {
-                    throw new InvalidOperationException("boosts must be a BoostsTableRelayVar");
-                }
+                    throw new InvalidOperationException("boosts must be a BoostsTableRelayVar or SparseBoostsTableRelayVar");
             }
 
             stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));

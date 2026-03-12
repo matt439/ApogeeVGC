@@ -2139,7 +2139,9 @@ public partial record Abilities
                         boosts.Accuracy = 0;
                     }
 
-                    return new VoidReturn();
+                    // Must return modified boosts (C# value semantics — unlike JS, in-place mutation
+                    // doesn't propagate through the event relay var without an explicit return)
+                    return boosts;
                 }),
             },
             [AbilityId.Unburden] = new()

@@ -376,9 +376,9 @@ public partial class BattleActions
                             null, boostsTable);
 
                         if (boostEvent is BoostsTableRelayVar brv)
-                        {
                             boostsTable = brv.Table;
-                        }
+                        else if (boostEvent is SparseBoostsTableRelayVar sbrv)
+                            boostsTable = sbrv.Table.ToBoostsTable();
 
                         boost = Battle.ClampIntRange(boostsTable.Accuracy, -6, 6);
                     }
@@ -403,9 +403,9 @@ public partial class BattleActions
                             null, targetBoostsTable);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
-                        {
                             targetBoostsTable = tbrv.Table;
-                        }
+                        else if (targetBoostEvent is SparseBoostsTableRelayVar stbrv)
+                            targetBoostsTable = stbrv.Table.ToBoostsTable();
 
                         boost = Battle.ClampIntRange(boost - targetBoostsTable.Evasion, -6, 6);
                     }
@@ -779,9 +779,9 @@ public partial class BattleActions
                             null, boosts);
 
                         if (boostEvent is BoostsTableRelayVar brv)
-                        {
                             boosts = brv.Table;
-                        }
+                        else if (boostEvent is SparseBoostsTableRelayVar sbrv)
+                            boosts = sbrv.Table.ToBoostsTable();
 
                         int boost = Battle.ClampIntRange(boosts.Accuracy, -6, 6);
                         if (boost > 0)
@@ -812,9 +812,9 @@ public partial class BattleActions
                             null, targetBoosts);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
-                        {
                             targetBoosts = tbrv.Table;
-                        }
+                        else if (targetBoostEvent is SparseBoostsTableRelayVar stbrv)
+                            targetBoosts = stbrv.Table.ToBoostsTable();
 
                         int boost = Battle.ClampIntRange(targetBoosts.Evasion, -6, 6);
                         switch (boost)
