@@ -510,7 +510,7 @@ public partial record Conditions
 
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.MustRecharge]);
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Truant]);
-                        return null;
+                        return new NullRelayVar();
                     },
                     11),
                 OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>

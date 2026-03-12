@@ -105,7 +105,7 @@ public partial class BattleActions
             }
         }
 
-        if (willTryMove is BoolRelayVar { Value: false } or null)
+        if (willTryMove is BoolRelayVar { Value: false } or NullRelayVar or null)
         {
             Battle.Debug($"[RunMove] Move prevented by BeforeMove event");
             Battle.RunEvent(EventId.MoveAborted, pokemon,
