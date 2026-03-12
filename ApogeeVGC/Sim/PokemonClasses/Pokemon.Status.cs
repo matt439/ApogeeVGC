@@ -358,7 +358,7 @@ public partial class Pokemon
         RelayVar? tryResult = Battle.RunEvent(EventId.TryAddVolatile, this, source, sourceEffect,
             condition);
 
-        if (tryResult is BoolRelayVar { Value: false } or null)
+        if (tryResult is BoolRelayVar { Value: false } or NullRelayVar or null)
         {
             if (Battle.DisplayUi)
             {
