@@ -1,0 +1,45 @@
+# Equivalence Test Bugfixes Index
+
+Documented bugfixes discovered and resolved through equivalence testing of the C# battle simulator against Pokemon Showdown.
+
+- [ability-item-state-reinit-switchin](ability-item-state-reinit-switchin.md) -- AbilityState and ItemState were not re-initialized on switch-in, causing per-appearance flags (e.g., Protean) to persist across switches.
+- [attrlastmove-still-empty-target](attrlastmove-still-empty-target.md) -- The `[still]` tag on move protocol lines was missing an empty target field when the parts array had only 4 segments.
+- [choosemove-locked-move-target-validation](choosemove-locked-move-target-validation.md) -- Locked moves (e.g., Recharge) were rejected by ChooseMove because target validation ran before the locked-move bypass.
+- [collision-course-electro-drift-effectiveness](collision-course-electro-drift-effectiveness.md) -- Collision Course and Electro Drift checked raw effectiveness enum values instead of calling `.ToModifier()` for the super-effective boost.
+- [constant-union-event-handlers](constant-union-event-handlers.md) -- Constant-value event handlers in union types (e.g., `OnCriticalHit = false`) were silently ignored due to a missing interface implementation.
+- [curse-move-target-type](curse-move-target-type.md) -- Curse showed the wrong target type in request data for non-Ghost users, causing choice validation to incorrectly require a target location.
+- [disablemove-duplicate-runevent](disablemove-duplicate-runevent.md) -- `GetMoveRequestData()` redundantly re-ran `RunEvent(DisableMove)`, consuming extra PRNG calls via SpeedSort shuffles and desynchronizing damage randomizer values.
+- [effectstate-shallowclone-incomplete](effectstate-shallowclone-incomplete.md) -- `EffectState.ShallowClone()` only copied ~8 fields, causing Shed Tail/Baton Pass transferred Substitute volatiles to have 0 HP.
+- [electroshot-spurious-duration](electroshot-spurious-duration.md) -- ElectroShot's volatile had a spurious `Duration = 2` causing an extra residual tick and PRNG desynchronization.
+- [forceswitch-int-vs-bool](forceswitch-int-vs-bool.md) -- ForceSwitch used `CanSwitch`'s raw int return instead of converting to bool, preventing the `[still]` tag on failed force-switches.
+- [from-source-effect-type-check](from-source-effect-type-check.md) -- The `[from]` attribution tag used reference equality instead of EffectType checks, causing incorrect presence or absence of attribution.
+- [fractional-speed-integer-division](fractional-speed-integer-division.md) -- `IPriorityComparison.Speed` was `int`, truncating fractional speed adjustments to zero and breaking switch-in ability ordering for same-speed Pokemon.
+- [frozen-cure-tostring-dump](frozen-cure-tostring-dump.md) -- Defrost cure messages included the ActiveMove's `ToString()` dump instead of the move's display name.
+- [full-equivalence-omnibus](full-equivalence-omnibus.md) -- Broad omnibus fix addressing action ordering, protocol formatting, event return semantics, damage attribution, and choice replay logic.
+- [ghost-type-trapped](ghost-type-trapped.md) -- Ghost-type Pokemon were incorrectly trapped because the Trapped condition was missing its `ImmuneTypes` declaration.
+- [hustle-chainmodify-vs-modify](hustle-chainmodify-vs-modify.md) -- Hustle used `ChainModify` instead of `Modify` for its attack multiplier, producing different intermediate rounding from Showdown.
+- [magic-bounce-source-effect](magic-bounce-source-effect.md) -- Magic Bounce did not correctly attribute `[from] ability: Magic Bounce` on reflected moves because it passed `battle.Effect` instead of the explicit ability reference.
+- [mustrecharge-beforemove-null](mustrecharge-beforemove-null.md) -- MustRecharge's OnBeforeMove returned C# `null` instead of `NullRelayVar`, failing to block move execution on the recharge turn.
+- [natural-cure-status-protocol-id](natural-cure-status-protocol-id.md) -- Natural Cure logged C# enum names (e.g., `"Burn"`) instead of Showdown protocol status abbreviations (e.g., `"brn"`).
+- [ogerpon-mask-base-species-chain](ogerpon-mask-base-species-chain.md) -- Ogerpon mask items could be removed because the OnTakeItem check did not walk the species chain to the root `Ogerpon` base species.
+- [on-modify-move-param-swap](on-modify-move-param-swap.md) -- The equivalence batch runner used synchronous stdout/stderr reads causing deadlocks, plus leftover debug prompts blocked automated runs.
+- [protean-libero-effectstate-vs-abilitystate](protean-libero-effectstate-vs-abilitystate.md) -- Protean/Libero stored their activation flag on event-scoped `EffectState` instead of persistent `AbilityState`, allowing multiple activations per switch-in.
+- [rage-fist-double-counting](rage-fist-double-counting.md) -- Rage Fist's `TimesAttacked` counter was incremented in both `GotAttacked()` and `HitSteps`, double-counting hits.
+- [secondary-prng-substitute](secondary-prng-substitute.md) -- Secondary effect PRNG rolls were skipped entirely when Substitute absorbed a hit, desynchronizing the RNG from Showdown.
+- [self-effects-through-substitute](self-effects-through-substitute.md) -- Self-targeting secondary effects (e.g., Close Combat stat drops) were skipped when the move hit a Substitute.
+- [shared-secondary-effect-mutation](shared-secondary-effect-mutation.md) -- Secondary effect objects were shared references to library templates, causing in-place mutations (e.g., Serene Grace) to leak across battles.
+- [simultaneous-faint-win-condition](simultaneous-faint-win-condition.md) -- Simultaneous faint win condition was reversed, awarding the win to the wrong side.
+- [singleevent-relayvar-default](singleevent-relayvar-default.md) -- `SingleEvent` did not default `relayVar` to `true` when called without one, causing null relay variables in downstream handlers.
+- [slow-start-onend-handler](slow-start-onend-handler.md) -- Slow Start was missing its OnEnd handler, so the `|-end|Slow Start|[silent]` message was not emitted on faint.
+- [spurious-immune-after-protection](spurious-immune-after-protection.md) -- Protection moves emitted spurious `|-immune|` messages, and Heal Block (Psychic Noise) was missing its OnBeforeMove handler to block healing moves.
+- [status-pattern-matching-null](status-pattern-matching-null.md) -- Status-immunity abilities matched `Status: not ConditionId.None` which incorrectly treated `null` as a primary status, showing immunity messages on secondary effects.
+- [stomping-tantrum-protect-doubling](stomping-tantrum-protect-doubling.md) -- Stomping Tantrum incorrectly doubled after Protect because the protection path set `MoveThisTurnResult = false`.
+- [substitute-blocking-status-tryprimaryhit](substitute-blocking-status-tryprimaryhit.md) -- Substitute did not block status moves (Yawn, Encore, etc.) because TryPrimaryHit's `null` return was not converted to `NullRelayVar`.
+- [swapped-on-try-hit-params](swapped-on-try-hit-params.md) -- Soundproof, Sap Sipper, and Sturdy had swapped source/target parameters in their OnTryHit handlers.
+- [synchronize-immune-message](synchronize-immune-message.md) -- Synchronize did not trigger the `|-immune|` message when attempting to inflict status on a type-immune target.
+- [synchronize-status-attribution](synchronize-status-attribution.md) -- Synchronize passed `null` as sourceEffect instead of the status Condition, causing incorrect attribution and missing immune messages.
+- [throat-chop-residual-ordering](throat-chop-residual-ordering.md) -- Throat Chop's residual fired at the default order instead of the correct `order: 22`, misplacing its end message in the protocol log.
+- [tryaddvolatile-null-to-falsy](tryaddvolatile-null-to-falsy.md) -- Prefixed TryAddVolatile handlers did not convert `null` returns to `NullRelayVar`, allowing volatiles to be added when handlers intended to block them.
+- [weather-property-hiding-active-move](weather-property-hiding-active-move.md) -- ActiveMove's `Weather` property hid the inherited one, and `Reset()` did not copy the value from the template, so weather moves had no effect.
+- [weather-reactivation-same-active](weather-reactivation-same-active.md) -- Setting weather that was already active sometimes re-activated it instead of silently returning false.
+- [wish-missing-slotcondition](wish-missing-slotcondition.md) -- Wish's move definition was missing its `SlotCondition` property, so it had no delayed healing effect.
