@@ -126,11 +126,13 @@ public partial class Side
         {
             int lockedMoveTargetLoc = pokemon.LastMoveTargetLoc ?? 0;
 
-            // Check if the TwoTurnMove volatile has a stored target location
-            if (pokemon.Volatiles.TryGetValue(ConditionId.TwoTurnMove, out EffectState? twoTurnVolatile) &&
-                twoTurnVolatile is { TargetLoc: not null })
+            // Check if the move-specific volatile has a stored target location
+            // Showdown: pokemon.volatiles[lockedMoveID]?.targetLoc
+            if (Enum.TryParse(lockedMove.Value.ToString(), out ConditionId moveConditionId) &&
+                pokemon.Volatiles.TryGetValue(moveConditionId, out EffectState? moveVolatile) &&
+                moveVolatile is { TargetLoc: not null })
             {
-                lockedMoveTargetLoc = twoTurnVolatile.TargetLoc.Value;
+                lockedMoveTargetLoc = moveVolatile.TargetLoc.Value;
             }
 
             if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;

@@ -1485,7 +1485,7 @@ public partial record Conditions
                             // note that this is not updated for moves called by other moves (e.g., Metronome calling Dig)
                             int? moveTargetLoc = attacker.LastMoveTargetLoc;
 
-                            if (effect is ActiveMove { SourceEffect: not null } &&
+                            if (effect is ActiveMove { SourceEffect: MoveEffectStateId } &&
                                 _library.Moves.TryGetValue(move.Id, out Move? moveData) &&
                                 moveData.Target != MoveTarget.Self)
                             {
