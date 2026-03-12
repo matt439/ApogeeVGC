@@ -452,7 +452,7 @@ public partial class BattleActions
         // Log move usage to battle log (before getMoveTargets, matching Showdown order)
         if (Battle.DisplayUi)
         {
-            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, $"{target?.ToString() ?? pokemon.ToString()}{attrs}");
+            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, $"{target?.ToString() ?? "null"}{attrs}");
         }
 
         // Handle no target
