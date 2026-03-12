@@ -54,7 +54,13 @@ context.GetSourceOrTargetPokemon(),
    return result switch
    {
     BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
-  EmptyBoolEmptyVoidUnion => new NullRelayVar(),
+  // Empty = NOT_FAIL (Showdown's ""). Return C# null so SingleEvent
+  // returns the default relayVar (true). This ensures the damage entry
+  // stays non-false, preventing the hitStepMoveHitLoop break check from
+  // triggering prematurely (e.g., Shore Up heal failure at full HP).
+  // NullRelayVar would map to JS null, which the null→false conversion
+  // in RunMoveEffects incorrectly converts to false.
+  EmptyBoolEmptyVoidUnion => null,
    VoidUnionBoolEmptyVoidUnion => null,
           _ => null
      };
