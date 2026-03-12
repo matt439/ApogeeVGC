@@ -240,20 +240,26 @@ if (tryResult is BoolRelayVar { Value: false } ||
             return IntUndefinedFalseEmptyUnion.FromFalse();
         }
 
+        // Showdown: hitResult = runEvent('TryHitField'/'TryHitSide', ...)
+        // then: if (!hitResult) { if (hitResult === false) { add('-fail') } return hitResult === NOT_FAIL; }
+        // null from handler (e.g., Magic Bounce) is falsy → stops move, but no fail message.
+        // false from handler is falsy → stops move, WITH fail message.
+        RelayVar? hitSideFieldResult;
         if (move.Target == MoveTarget.All)
         {
-            RelayVar? fieldHitResult = Battle.RunEvent(EventId.TryHitField, target, pokemon, move);
-            hitResult = fieldHitResult is not BoolRelayVar { Value: false };
+            hitSideFieldResult = Battle.RunEvent(EventId.TryHitField, target, pokemon, move);
         }
         else
         {
-            RelayVar? sideHitResult = Battle.RunEvent(EventId.TryHitSide, target, pokemon, move);
-            hitResult = sideHitResult is not BoolRelayVar { Value: false };
+            hitSideFieldResult = Battle.RunEvent(EventId.TryHitSide, target, pokemon, move);
         }
+
+        hitResult = Battle.IsRelayVarTruthy(hitSideFieldResult);
 
         if (!hitResult)
         {
-            if (Battle.DisplayUi)
+            // Only show fail for explicit false, not for null (e.g., Magic Bounce)
+            if (hitSideFieldResult is BoolRelayVar { Value: false } && Battle.DisplayUi)
             {
                 Battle.Add("-fail", pokemon);
                 Battle.AttrLastMove("[still]");
