@@ -417,8 +417,11 @@ if (tryResult is BoolRelayVar { Value: false } ||
         }
 
         // 5. secondary effects
-        // Only process secondaries if this is not already a secondary effect (prevents infinite recursion)
-        if (move.Secondaries != null && !isSecondary)
+        // Showdown checks moveData.secondaries (hitEffect parameter), not move.secondaries.
+        // When called from selfDrops (isSelf=true), hitEffect is the Self HitEffect which has
+        // no secondaries, so Showdown skips this. We must also skip when isSelf=true.
+        // When called from secondaries processing (isSecondary=true), also skip to prevent recursion.
+        if (move.Secondaries != null && !isSecondary && !isSelf)
         {
             Secondaries(targets, pokemon, move, move, isSelf);
         }
