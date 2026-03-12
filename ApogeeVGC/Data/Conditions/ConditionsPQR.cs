@@ -239,6 +239,8 @@ public partial record Conditions
                 Id = ConditionId.Powder,
                 Name = "Powder",
                 EffectType = EffectType.Condition,
+                // Grass types are immune to powder moves/effects (Showdown typechart: Grass has powder: 3)
+                ImmuneTypes = [PokemonType.Grass],
                 Duration = 1,
                 // Note: Powder is marked as isNonstandard: "Past" in TypeScript, meaning it's not in Gen 9.
                 // Implementing for completeness in case it's ever needed.
