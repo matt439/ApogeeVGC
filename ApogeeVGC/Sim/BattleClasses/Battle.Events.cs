@@ -564,6 +564,10 @@ public partial class Battle
             effect ??= Effect;
 
             // Sort by speed (highest to lowest) with proper speed tie resolution
+            if (Prng.TraceEnabled)
+            {
+                Console.Error.WriteLine($"[EachEvent] {eventId} speeds: {string.Join(", ", actives.Select(p => $"{p.Name}={p.Speed}"))}");
+            }
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
 
             // Convert bool? to RelayVar? for RunEvent
@@ -705,7 +709,6 @@ public partial class Battle
 
                 if (handler.State.Duration <= 0)
                 {
-
                     // Effect has expired, trigger its end callback
                     // Use provided EndCallArgs or empty array for no args
                     object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? [];

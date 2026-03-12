@@ -12,7 +12,7 @@ namespace ApogeeVGC.Sim.Core;
 public partial class Driver
 {
     // Equivalence batch evaluation settings
-    private const int EquivalenceBatchNumTests = 500;
+    private const int EquivalenceBatchNumTests = 2000;
     private const string EquivalenceBatchFormat = "gen9randomdoublesbattle";
 
     /// <summary>

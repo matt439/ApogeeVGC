@@ -873,7 +873,7 @@ public partial record Moves
                 Priority = 4,
                 Flags = new MoveFlags(),
                 StallingMove = true,
-                VolatileStatus = ConditionId.SilkTrap,
+                VolatileStatus = ConditionId.Stall,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, pokemon, _, _) =>
                     battle.Queue.WillAct() is not null &&
                     battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }
@@ -881,7 +881,7 @@ public partial record Moves
                         : false),
                 OnHit = OnHitEventInfo.Create((_, pokemon, _, _) =>
                 {
-                    pokemon.AddVolatile(ConditionId.Stall);
+                    pokemon.AddVolatile(ConditionId.SilkTrap);
                     return new VoidReturn();
                 }),
                 Secondary = null,
@@ -1985,7 +1985,7 @@ public partial record Moves
                     FailCopycat = true,
                 },
                 StallingMove = true,
-                VolatileStatus = ConditionId.SpikyShield,
+                VolatileStatus = ConditionId.Stall,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, pokemon, _, _) =>
                     battle.Queue.WillAct() is not null &&
                     battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }
@@ -1993,7 +1993,7 @@ public partial record Moves
                         : false),
                 OnHit = OnHitEventInfo.Create((_, pokemon, _, _) =>
                 {
-                    pokemon.AddVolatile(ConditionId.Stall);
+                    pokemon.AddVolatile(ConditionId.SpikyShield);
                     return new VoidReturn();
                 }),
                 Secondary = null,

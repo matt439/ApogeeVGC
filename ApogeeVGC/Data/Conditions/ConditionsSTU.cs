@@ -596,8 +596,12 @@ public partial record Conditions
                 }),
                 OnStallMove = OnStallMoveEventInfo.Create((battle, pokemon) =>
                 {
-                    // Get the counter from the Pokemon's Stall volatile state
-                    int counter = 1; // Default for first use
+                    // TS (compiled): const counter = this.effectState.counter || 1;
+                    //     const success = this.randomChance(1, counter);
+                    //     if (!success) delete pokemon.volatiles["stall"];
+                    //     return success;
+                    // Counter tripling happens ONLY in OnRestart, not here.
+                    int counter = 1;
 
                     if (pokemon.Volatiles.TryGetValue(ConditionId.Stall,
                             out EffectState? stallState))
@@ -605,21 +609,10 @@ public partial record Conditions
                         counter = stallState.Counter ?? 1;
                     }
 
-                    battle.Debug(
-                        $"[Stall.OnStallMove] {pokemon.Name}: Checking with counter={counter}, Success chance: {Math.Round(100.0 / counter, 2)}%");
-
                     bool success = battle.RandomChance(1, counter);
 
                     if (!success)
-                    {
-                        battle.Debug(
-                            $"[Stall.OnStallMove] {pokemon.Name}: FAILED! Deleting Stall volatile");
                         pokemon.DeleteVolatile(ConditionId.Stall);
-                    }
-                    else
-                    {
-                        battle.Debug($"[Stall.OnStallMove] {pokemon.Name}: SUCCESS!");
-                    }
 
                     return success;
                 }),

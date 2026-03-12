@@ -1140,39 +1140,22 @@ public partial record Moves
                     FailCopycat = true,
                 },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Protect,
+                VolatileStatus = ConditionId.Stall,
 
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // TS: return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
-                    // Short-circuit: if willAct is false, don't run StallMove event
                     if (battle.Queue.WillAct() is null)
-                    {
                         return (BoolEmptyVoidUnion)false;
-                    }
 
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
                     return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
 
-                OnHit = OnHitEventInfo.Create((battle, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    // source is the Pokemon using Protect
-                    battle.Debug(
-                        $"[Protect.OnHit] BEFORE AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
-
-                    source.AddVolatile(ConditionId.Stall);
-
-                    battle.Debug(
-                        $"[Protect.OnHit] AFTER AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
-                    if (source.Volatiles.TryGetValue(ConditionId.Stall,
-                            out EffectState? stallState))
-                    {
-                        battle.Debug(
-                            $"[Protect.OnHit] Stall volatile state: Counter={stallState.Counter}, Duration={stallState.Duration}");
-                    }
-
+                    source.AddVolatile(ConditionId.Protect);
                     return new VoidReturn();
                 }),
                 Condition = _library.Conditions[ConditionId.Protect],

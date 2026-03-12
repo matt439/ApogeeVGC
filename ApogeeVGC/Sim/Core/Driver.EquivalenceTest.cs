@@ -131,6 +131,7 @@ public partial class Driver
         };
 
         var battle = new Battle(battleOptions, Library);
+        battle.Prng.TraceEnabled = true;
         battle.Start();
 
         // Parse choice entries from input log (skip start/player setup lines)

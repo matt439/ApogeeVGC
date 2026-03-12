@@ -308,38 +308,49 @@ public partial class BattleActions
             didAnything = CombineResults(didAnything, didSomething);
         }
 
-        // Check if move succeeded
-        // For moves with damage: non-zero integer = success, zero = immunity/failure
-        // For moves without damage: any truthy value = success
-        // Undefined (NOT_FAIL) means move succeeded but did nothing measurable (e.g., Protect)
-      bool moveSucceeded = didAnything switch
+        // Showdown post-loop logic (lines 1320-1330):
+        //   if (!didAnything && didAnything !== 0 && !moveData.self && !moveData.selfdestruct) {
+        //     if (!isSelf && !isSecondary) { if (didAnything === false) { add('-fail'); attrLastMove('[still]'); } }
+        //     debug('move failed because it did nothing');
+        //   } else if (move.selfSwitch && source.hp && !source.volatiles['commanded']) {
+        //     source.switchFlag = move.id;
+        //   }
+        //
+        // Key: !didAnything is true for 0, false, null, undefined.
+        //      didAnything !== 0 is true for everything EXCEPT 0.
+        //      Combined: fail only when didAnything is false, null, or undefined — NOT when 0.
+        //      (undefined is handled by the "didn't try" check at line 1315, so effectively fail = false or null)
+        bool didAnythingFalsy = didAnything switch
         {
-            IntBoolIntUndefinedUnion intResult => intResult.Value > 0,  // Only non-zero damage counts as success
-            BoolBoolIntUndefinedUnion boolResult => boolResult.Value,   // Boolean true = success
-            UndefinedBoolIntUndefinedUnion => true,  // Undefined means NOT_FAIL - move succeeded
-            _ => false  // null or false = failure
+            IntBoolIntUndefinedUnion i => i.Value == 0,  // !0 = true in JS
+            BoolBoolIntUndefinedUnion b => !b.Value,     // !false = true, !true = false
+            UndefinedBoolIntUndefinedUnion => true,       // !undefined = true
+            NullBoolIntUndefinedUnion => true,            // !null = true
+            null => true,
+            _ => true
         };
+        bool didAnythingNotZero = didAnything is not IntBoolIntUndefinedUnion { Value: 0 };
+        bool moveFailed = didAnythingFalsy && didAnythingNotZero;
 
-        // Check if move failed completely
-        if (!moveSucceeded && moveData.Self == null && moveData.SelfDestruct == null)
+        if (moveFailed && moveData.Self == null && moveData.SelfDestruct == null)
         {
             if (!isSelf && !isSecondary)
             {
-     if (didAnything is BoolBoolIntUndefinedUnion { Value: false })
+                if (didAnything is BoolBoolIntUndefinedUnion { Value: false })
                 {
-     if (Battle.DisplayUi)
-      {
-      Battle.Add("-fail", source);
-            Battle.AttrLastMove("[still]");
-      }
-}
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Add("-fail", source);
+                        Battle.AttrLastMove("[still]");
+                    }
+                }
             }
 
-        Battle.Debug("move failed because it did nothing");
+            Battle.Debug("move failed because it did nothing");
         }
-        else if (moveSucceeded && move.SelfSwitch != null && source.Hp > 0 && !source.Volatiles.ContainsKey(ConditionId.Commanded))
+        else if (move.SelfSwitch != null && source.Hp > 0 && !source.Volatiles.ContainsKey(ConditionId.Commanded))
         {
-       source.SwitchFlag = move.Id;
+            source.SwitchFlag = move.Id;
         }
 
         return damage;

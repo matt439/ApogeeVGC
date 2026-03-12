@@ -279,22 +279,21 @@ public partial record Moves
                 Priority = 4,
                 Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Protect,
+                VolatileStatus = ConditionId.Stall,
                 Target = MoveTarget.Self,
                 Type = MoveType.Fighting,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
-                    // Check if queue will act and run StallMove event
-                    bool willAct = battle.Queue.WillAct() is not null;
+                    if (battle.Queue.WillAct() is null)
+                        return (BoolEmptyVoidUnion)false;
+
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    bool result = willAct && stallSuccess;
-                    return result ? true : (BoolEmptyVoidUnion)false;
+                    return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
                 OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    // Add Stall volatile to track consecutive uses
-                    source.AddVolatile(ConditionId.Stall);
+                    source.AddVolatile(ConditionId.Protect);
                     return new VoidReturn();
                 }),
             },
@@ -1465,22 +1464,21 @@ public partial record Moves
                 Priority = 4,
                 Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Endure,
+                VolatileStatus = ConditionId.Stall,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
-                    // Check if queue will act and run StallMove event
-                    bool willAct = battle.Queue.WillAct() is not null;
+                    if (battle.Queue.WillAct() is null)
+                        return (BoolEmptyVoidUnion)false;
+
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    bool result = willAct && stallSuccess;
-                    return result ? true : (BoolEmptyVoidUnion)false;
+                    return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
                 OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    // Add Stall volatile to track consecutive uses
-                    source.AddVolatile(ConditionId.Stall);
+                    source.AddVolatile(ConditionId.Endure);
                     return new VoidReturn();
                 }),
             },
