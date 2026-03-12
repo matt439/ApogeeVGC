@@ -17,261 +17,254 @@ public partial class BattleActions
 
         for (int i = 0; i < targets.Count; i++)
         {
-            if (targets[i] is not PokemonPokemonUnion pokemonUnion)
+            // Showdown: if (target === false) continue;
+            // Only skip false targets. Null targets (Substitute absorbed) must still be
+            // processed for selfSwitch, selfDestruct, and didAnything/damage combining.
+            if (targets[i] is FalsePokemonUnion)
             {
                 continue;
             }
 
-            Pokemon target = pokemonUnion.Pokemon;
+            // Extract target — null for Substitute hits (NullPokemonUnion)
+            Pokemon? target = targets[i] is PokemonPokemonUnion pokemonUnion
+                ? pokemonUnion.Pokemon
+                : null;
             BoolIntUndefinedUnion? hitResult;
             BoolIntUndefinedUnion didSomething = BoolIntUndefinedUnion.FromUndefined();
 
-            // Apply boosts
-            // Check moveData.Boosts directly (inherited from HitEffect base class),
-            // then fall back to the separate HitEffect property (used for secondary effects)
-            SparseBoostsTable? boostsToApply = moveData.Boosts ?? moveData.HitEffect?.Boosts ?? move.Boosts;
-            if (boostsToApply != null && !target.Fainted)
+            // All target-dependent effects are guarded by target != null
+            if (target != null)
             {
-                BoolZeroUnion? boostResult = Battle.Boost(boostsToApply, target, source, move, isSecondary, isSelf);
-                hitResult = boostResult switch
+                // Apply boosts
+                SparseBoostsTable? boostsToApply = moveData.Boosts ?? moveData.HitEffect?.Boosts ?? move.Boosts;
+                if (boostsToApply != null && !target.Fainted)
                 {
-                    BoolBoolZeroUnion bbz => bbz.Value,
-                    ZeroBoolZeroUnion => 0,
-                    null => null,
-                    _ => throw new InvalidOperationException("Unexpected boost result type.")
-                };
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Apply healing
-            // Showdown: moveData is hitEffect (SecondaryEffect) for self/secondary calls, which has no Heal.
-            // In C# moveData is always the move, so skip heal for isSelf to match Showdown behavior.
-            if (moveData.Heal != null && !isSelf && !target.Fainted)
-            {
-                if (target.Hp >= target.MaxHp)
-                {
-                    if (Battle.DisplayUi)
+                    BoolZeroUnion? boostResult = Battle.Boost(boostsToApply, target, source, move, isSecondary, isSelf);
+                    hitResult = boostResult switch
                     {
-                        Battle.Add("-fail", target, "heal");
-                        Battle.AttrLastMove("[still]");
-                    }
-                    damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
-                    didAnything = CombineResults(didAnything, null);
-                    continue;
+                        BoolBoolZeroUnion bbz => bbz.Value,
+                        ZeroBoolZeroUnion => 0,
+                        null => null,
+                        _ => throw new InvalidOperationException("Unexpected boost result type.")
+                    };
+                    didSomething = CombineResults(didSomething, hitResult);
                 }
 
-                // Use float division to match Showdown (JS number arithmetic)
-                // JS Math.round uses "round half up", C# Math.Round uses "round half to even"
-                double amount = (double)(target.BaseMaxHp * moveData.Heal[0]) / moveData.Heal[1];
-                int roundedAmount = Battle.Gen < 5 ? (int)Math.Floor(amount) : (int)Math.Round(amount, MidpointRounding.AwayFromZero);
-
-                IntFalseUnion? healResult = Battle.Heal(roundedAmount, target, source,
-                    BattleHealEffect.FromIEffect(move));
-
-                if (healResult is not { IsInt: true } intHeal || (intHeal.Value == 0 && healResult is { IsFalse: true }))
+                // Apply healing
+                if (moveData.Heal != null && !isSelf && !target.Fainted)
                 {
-                    if (healResult is not null)
+                    if (target.Hp >= target.MaxHp)
                     {
                         if (Battle.DisplayUi)
                         {
-                            Battle.Add("-fail", source);
+                            Battle.Add("-fail", target, "heal");
                             Battle.AttrLastMove("[still]");
                         }
+                        damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
+                        didAnything = CombineResults(didAnything, null);
+                        continue;
                     }
-                    Battle.Debug("heal interrupted");
-                    damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
-                    didAnything = CombineResults(didAnything, null);
-                    continue;
-                }
 
-                didSomething = BoolIntUndefinedUnion.FromBool(true);
-            }
+                    double amount = (double)(target.BaseMaxHp * moveData.Heal[0]) / moveData.Heal[1];
+                    int roundedAmount = Battle.Gen < 5 ? (int)Math.Floor(amount) : (int)Math.Round(amount, MidpointRounding.AwayFromZero);
 
-            // Try to apply status
-            // Check both moveData.Status and move.HitEffect?.Status (for secondary effects)
-            ConditionId? statusToApply = moveData.Status ?? (move.HitEffect as HitEffect)?.Status;
-            if (statusToApply != null)
-            {
-                bool statusResult = target.TrySetStatus(statusToApply.Value, source,
-                    moveData.Ability != null ? Library.Abilities[moveData.Ability.Id] : move);
-                hitResult = BoolIntUndefinedUnion.FromBool(statusResult);
+                    IntFalseUnion? healResult = Battle.Heal(roundedAmount, target, source,
+                        BattleHealEffect.FromIEffect(move));
 
-                if (!statusResult && (move.Status != null || (move.HitEffect as HitEffect)?.Status != null))
-                {
-                    damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
-                    didAnything = CombineResults(didAnything, null);
-                    continue;
-                }
-
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Force status (bypasses immunity)
-            // ForceStatus is a Move-level property, not on HitEffect — skip for isSelf
-            if (moveData.ForceStatus != null && !isSelf)
-            {
-                bool forceStatusResult = target.SetStatus(moveData.ForceStatus.Value, source, move);
-                hitResult = BoolIntUndefinedUnion.FromBool(forceStatusResult);
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Apply volatile status
-            // Check both moveData.VolatileStatus and move.HitEffect?.VolatileStatus (for secondary effects)
-            ConditionId? volatileToApply = moveData.VolatileStatus ?? (move.HitEffect as HitEffect)?.VolatileStatus;
-            if (volatileToApply != null)
-            {
-                if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] Attempting to apply volatile status {volatileToApply.Value} to {target.Name}");
-                RelayVar volatileResult = target.AddVolatile(volatileToApply.Value, source, move);
-                if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] AddVolatile returned: {volatileResult?.GetType().Name ?? "null"}");
-                if (volatileResult is BoolRelayVar brvCheck)
-                {
-                    if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] Volatile application result: {brvCheck.Value}");
-                }
-                hitResult = volatileResult switch
-                {
-                    BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
-                    IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                    _ => BoolIntUndefinedUnion.FromUndefined()
-                };
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Apply side condition
-            if (moveData.SideCondition != null)
-            {
-                bool sideCondResult = target.Side.AddSideCondition(
-                    Library.Conditions[moveData.SideCondition.Value], source, move);
-                hitResult = BoolIntUndefinedUnion.FromBool(sideCondResult);
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Apply slot condition
-            ConditionId? slotCondToApply = moveData.SlotCondition ?? moveData.HitEffect?.SlotCondition;
-            if (slotCondToApply != null)
-            {
-                bool slotCondResult = target.Side.AddSlotCondition(target,
-                    Library.Conditions[slotCondToApply.Value], source, move);
-                hitResult = BoolIntUndefinedUnion.FromBool(slotCondResult);
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Set weather
-            if (moveData.Weather != null)
-            {
-                bool weatherResult = Battle.Field.SetWeather(
-                    Library.Conditions[moveData.Weather.Value], source, move);
-                hitResult = BoolIntUndefinedUnion.FromBool(weatherResult);
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Set terrain
-            ConditionId? terrainToApply = moveData.Terrain ?? moveData.HitEffect?.Terrain;
-            if (terrainToApply != null)
-            {
-                bool terrainResult = Battle.Field.SetTerrain(
-                    Library.Conditions[terrainToApply.Value], source, move);
-                hitResult = BoolIntUndefinedUnion.FromBool(terrainResult);
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Add pseudo weather
-            if (moveData.PseudoWeather != null)
-            {
-                bool pseudoWeatherResult = Battle.Field.AddPseudoWeather(
-                    Library.Conditions[moveData.PseudoWeather.Value], source, move);
-                hitResult = BoolIntUndefinedUnion.FromBool(pseudoWeatherResult);
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Check force switch
-            // Showdown: hitResult = !!this.battle.canSwitch(target.side)
-            // Must convert int to bool to match — canSwitch returns a count, but
-            // forceSwitch uses it as a boolean so the fail path triggers correctly.
-            if (moveData.ForceSwitch != null)
-            {
-                bool canSwitchResult = Battle.CanSwitch(target.Side) != 0;
-                hitResult = BoolIntUndefinedUnion.FromBool(canSwitchResult);
-                didSomething = CombineResults(didSomething, hitResult);
-            }
-
-            // Hit events
-            // These are like the TryHit events, except we don't need a FieldHit event.
-            if (move.Target == MoveTarget.All && !isSelf)
-            {
-                if (moveData.OnHitField != null)
-                {
-                    RelayVar? fieldHitResult = Battle.SingleEvent(EventId.HitField, moveData, null,
-                        target, source, move);
-                    hitResult = fieldHitResult switch
+                    if (healResult is not { IsInt: true } intHeal || (intHeal.Value == 0 && healResult is { IsFalse: true }))
                     {
-                        BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
-                        IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                        NullRelayVar => null,
-                        _ => BoolIntUndefinedUnion.FromUndefined(),
-                    };
-                    didSomething = CombineResults(didSomething, hitResult);
-                }
-            }
-            else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide && !isSelf)
-            {
-                if (moveData.OnHitSide != null)
-                {
-                    RelayVar? sideHitResult = Battle.SingleEvent(EventId.HitSide, moveData, null,
-                        target.Side, source, move);
-                    hitResult = sideHitResult switch
-                    {
-                        BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
-                        IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                        NullRelayVar => null,
-                        _ => BoolIntUndefinedUnion.FromUndefined(),
-                    };
-                    didSomething = CombineResults(didSomething, hitResult);
-                }
-            }
-            else
-            {
-                // In Showdown, moveData is the secondary/self object when processing those,
-                // so moveData.onHit refers to the secondary/self's handler. In C#, moveData
-                // is always the move itself, so for secondary/self we check move.HitEffect
-                // for the raw delegate, and skip the move's primary OnHit handler.
-                if (isSecondary || isSelf)
-                {
-                    // For secondary/self: invoke the hitEffect's OnHit delegate (if any)
-                    var hitEffectOnHit = (move.HitEffect as HitEffect)?.OnHit;
-                    if (hitEffectOnHit != null)
-                    {
-                        var result = hitEffectOnHit(Battle, target, source, move);
-                        hitResult = result switch
+                        if (healResult is not null)
                         {
-                            BoolBoolEmptyVoidUnion b => BoolIntUndefinedUnion.FromBool(b.Value),
-                            EmptyBoolEmptyVoidUnion => null,
-                            VoidUnionBoolEmptyVoidUnion => BoolIntUndefinedUnion.FromUndefined(),
-                            null => BoolIntUndefinedUnion.FromUndefined(),
-                            _ => BoolIntUndefinedUnion.FromUndefined(),
-                        };
-                        didSomething = CombineResults(didSomething, hitResult);
+                            if (Battle.DisplayUi)
+                            {
+                                Battle.Add("-fail", source);
+                                Battle.AttrLastMove("[still]");
+                            }
+                        }
+                        Battle.Debug("heal interrupted");
+                        damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
+                        didAnything = CombineResults(didAnything, null);
+                        continue;
                     }
+
+                    didSomething = BoolIntUndefinedUnion.FromBool(true);
                 }
-                else if (moveData.OnHit != null)
+
+                // Try to apply status
+                ConditionId? statusToApply = moveData.Status ?? (move.HitEffect as HitEffect)?.Status;
+                if (statusToApply != null)
                 {
-                    // Primary hit: invoke the move's OnHit through the event system
-                    RelayVar? hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
-                        target, source, move);
-                    hitResult = hitEventResult switch
+                    bool statusResult = target.TrySetStatus(statusToApply.Value, source,
+                        moveData.Ability != null ? Library.Abilities[moveData.Ability.Id] : move);
+                    hitResult = BoolIntUndefinedUnion.FromBool(statusResult);
+
+                    if (!statusResult && (move.Status != null || (move.HitEffect as HitEffect)?.Status != null))
+                    {
+                        damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
+                        didAnything = CombineResults(didAnything, null);
+                        continue;
+                    }
+
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Force status (bypasses immunity)
+                if (moveData.ForceStatus != null && !isSelf)
+                {
+                    bool forceStatusResult = target.SetStatus(moveData.ForceStatus.Value, source, move);
+                    hitResult = BoolIntUndefinedUnion.FromBool(forceStatusResult);
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Apply volatile status
+                ConditionId? volatileToApply = moveData.VolatileStatus ?? (move.HitEffect as HitEffect)?.VolatileStatus;
+                if (volatileToApply != null)
+                {
+                    if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] Attempting to apply volatile status {volatileToApply.Value} to {target.Name}");
+                    RelayVar volatileResult = target.AddVolatile(volatileToApply.Value, source, move);
+                    if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] AddVolatile returned: {volatileResult?.GetType().Name ?? "null"}");
+                    if (volatileResult is BoolRelayVar brvCheck)
+                    {
+                        if (Battle.DebugMode) Battle.Debug($"[RunMoveEffects] Volatile application result: {brvCheck.Value}");
+                    }
+                    hitResult = volatileResult switch
                     {
                         BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
                         IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                        NullRelayVar => null,
                         _ => BoolIntUndefinedUnion.FromUndefined()
                     };
                     didSomething = CombineResults(didSomething, hitResult);
                 }
 
-                if (!isSelf && !isSecondary)
+                // Apply side condition
+                if (moveData.SideCondition != null)
                 {
-                    Battle.RunEvent(EventId.Hit, target, source, move);
+                    bool sideCondResult = target.Side.AddSideCondition(
+                        Library.Conditions[moveData.SideCondition.Value], source, move);
+                    hitResult = BoolIntUndefinedUnion.FromBool(sideCondResult);
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Apply slot condition
+                ConditionId? slotCondToApply = moveData.SlotCondition ?? moveData.HitEffect?.SlotCondition;
+                if (slotCondToApply != null)
+                {
+                    bool slotCondResult = target.Side.AddSlotCondition(target,
+                        Library.Conditions[slotCondToApply.Value], source, move);
+                    hitResult = BoolIntUndefinedUnion.FromBool(slotCondResult);
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Set weather
+                if (moveData.Weather != null)
+                {
+                    bool weatherResult = Battle.Field.SetWeather(
+                        Library.Conditions[moveData.Weather.Value], source, move);
+                    hitResult = BoolIntUndefinedUnion.FromBool(weatherResult);
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Set terrain
+                ConditionId? terrainToApply = moveData.Terrain ?? moveData.HitEffect?.Terrain;
+                if (terrainToApply != null)
+                {
+                    bool terrainResult = Battle.Field.SetTerrain(
+                        Library.Conditions[terrainToApply.Value], source, move);
+                    hitResult = BoolIntUndefinedUnion.FromBool(terrainResult);
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Add pseudo weather
+                if (moveData.PseudoWeather != null)
+                {
+                    bool pseudoWeatherResult = Battle.Field.AddPseudoWeather(
+                        Library.Conditions[moveData.PseudoWeather.Value], source, move);
+                    hitResult = BoolIntUndefinedUnion.FromBool(pseudoWeatherResult);
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Check force switch
+                if (moveData.ForceSwitch != null)
+                {
+                    bool canSwitchResult = Battle.CanSwitch(target.Side) != 0;
+                    hitResult = BoolIntUndefinedUnion.FromBool(canSwitchResult);
+                    didSomething = CombineResults(didSomething, hitResult);
+                }
+
+                // Hit events
+                if (move.Target == MoveTarget.All && !isSelf)
+                {
+                    if (moveData.OnHitField != null)
+                    {
+                        RelayVar? fieldHitResult = Battle.SingleEvent(EventId.HitField, moveData, null,
+                            target, source, move);
+                        hitResult = fieldHitResult switch
+                        {
+                            BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
+                            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
+                            NullRelayVar => null,
+                            _ => BoolIntUndefinedUnion.FromUndefined(),
+                        };
+                        didSomething = CombineResults(didSomething, hitResult);
+                    }
+                }
+                else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide && !isSelf)
+                {
+                    if (moveData.OnHitSide != null)
+                    {
+                        RelayVar? sideHitResult = Battle.SingleEvent(EventId.HitSide, moveData, null,
+                            target.Side, source, move);
+                        hitResult = sideHitResult switch
+                        {
+                            BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
+                            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
+                            NullRelayVar => null,
+                            _ => BoolIntUndefinedUnion.FromUndefined(),
+                        };
+                        didSomething = CombineResults(didSomething, hitResult);
+                    }
+                }
+                else
+                {
+                    if (isSecondary || isSelf)
+                    {
+                        var hitEffectOnHit = (move.HitEffect as HitEffect)?.OnHit;
+                        if (hitEffectOnHit != null)
+                        {
+                            var result = hitEffectOnHit(Battle, target, source, move);
+                            hitResult = result switch
+                            {
+                                BoolBoolEmptyVoidUnion b => BoolIntUndefinedUnion.FromBool(b.Value),
+                                EmptyBoolEmptyVoidUnion => null,
+                                VoidUnionBoolEmptyVoidUnion => BoolIntUndefinedUnion.FromUndefined(),
+                                null => BoolIntUndefinedUnion.FromUndefined(),
+                                _ => BoolIntUndefinedUnion.FromUndefined(),
+                            };
+                            didSomething = CombineResults(didSomething, hitResult);
+                        }
+                    }
+                    else if (moveData.OnHit != null)
+                    {
+                        RelayVar? hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
+                            target, source, move);
+                        hitResult = hitEventResult switch
+                        {
+                            BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
+                            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
+                            NullRelayVar => null,
+                            _ => BoolIntUndefinedUnion.FromUndefined()
+                        };
+                        didSomething = CombineResults(didSomething, hitResult);
+                    }
+
+                    if (!isSelf && !isSecondary)
+                    {
+                        Battle.RunEvent(EventId.Hit, target, source, move);
+                    }
                 }
             }
+
+            // --- Non-target-dependent effects (run for both Pokemon and null/Substitute targets) ---
 
             // Handle self-destruct on hit
             if (moveData.SelfDestruct is IfHitMoveSelfDestruct && damage[i] is not BoolBoolIntUndefinedUnion { Value: false })
@@ -281,7 +274,8 @@ public partial class BattleActions
 
             // Showdown lines 1307-1313: selfSwitch sets didSomething = true inside the
             // per-target loop (before combining into didAnything). This ensures that moves
-            // like U-turn still count as "succeeded" even when damage is 0 (e.g. Disguise).
+            // like U-turn still count as "succeeded" even when damage is 0 (e.g. Disguise)
+            // or when the hit was absorbed by Substitute (null target).
             if (moveData.SelfSwitch != null)
             {
                 if (Battle.CanSwitch(source.Side) != 0 && !source.Volatiles.ContainsKey(ConditionId.Commanded))
@@ -301,12 +295,8 @@ public partial class BattleActions
             }
 
             // Only combine didSomething into damage if damage isn't already an integer (actual damage dealt)
-            // If damage was dealt, preserve that integer value instead of replacing it with a boolean
             if (damage[i] is not IntBoolIntUndefinedUnion)
             {
-                // Showdown: damage[i] = this.combineResults(damage[i], didSomething === null ? false : didSomething)
-                // Null didSomething (e.g. Clear Amulet blocking all boosts) must be converted to false
-                // for damage tracking, so the target is correctly filtered as "move failed on this target"
                 BoolIntUndefinedUnion effectiveDidSomething = didSomething is NullBoolIntUndefinedUnion
                     ? BoolIntUndefinedUnion.FromBool(false)
                     : didSomething;
