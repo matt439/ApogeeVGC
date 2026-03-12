@@ -528,10 +528,12 @@ public partial record Abilities
                 Num = 55,
                 Rating = 3.5,
                 // OnModifyAtkPriority = 5
+                // Hustle applies modify directly to the stat, not via chainModify
+                // (Showdown comment: "This should be applied directly to the stat
+                //  as opposed to chaining with the others")
                 OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
                 {
-                    battle.ChainModify(1.5);
-                    return new VoidReturn();
+                    return battle.Modify(atk, 1.5);
                 }, 5),
                 // OnSourceModifyAccuracyPriority = -1
                 OnSourceModifyAccuracy = OnSourceModifyAccuracyEventInfo.Create(
