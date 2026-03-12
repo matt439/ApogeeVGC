@@ -26,6 +26,7 @@ public record ActiveMove : Move, IEffect
         // Deep-copy secondaries to prevent mutations from leaking to the library template
         clone.Secondaries = clone.Secondaries?.Select(s => s with { }).ToArray();
         if (clone.Self is not null) clone.Self = clone.Self with { };
+        clone.Flags = clone.Flags with { };
         return clone;
     }
 
@@ -55,7 +56,7 @@ public record ActiveMove : Move, IEffect
         Type = template.Type;
         Priority = template.Priority;
         Target = template.Target;
-        Flags = template.Flags;
+        Flags = template.Flags with { };
         SelfSwitch = template.SelfSwitch;
         SpreadHit = template.SpreadHit;
         MindBlownRecoil = template.MindBlownRecoil;
