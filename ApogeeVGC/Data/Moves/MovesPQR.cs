@@ -1977,7 +1977,10 @@ public partial record Moves
                 BasePp = 1,
                 Priority = 0,
                 Flags = new MoveFlags(),
-                Target = MoveTarget.Self,
+                // Showdown's "recharge" pseudo-move has no target type (undefined),
+                // which causes getTarget -> getRandomTarget -> randomFoe() to be called
+                // during runMove. Using None replicates this PRNG-consuming behavior.
+                Target = MoveTarget.None,
                 Type = MoveType.Normal,
             },
             [MoveId.Recover] = new()

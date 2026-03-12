@@ -12,7 +12,7 @@ namespace ApogeeVGC.Sim.Core;
 public partial class Driver
 {
     // Equivalence batch evaluation settings
-    private const int EquivalenceBatchNumTests = 200;
+    private const int EquivalenceBatchNumTests = 500;
     private const string EquivalenceBatchFormat = "gen9randomdoublesbattle";
 
     /// <summary>
@@ -297,6 +297,11 @@ public partial class Driver
             };
 
             var battle = new Battle(battleOptions, Library);
+            // Enable PRNG tracing for a specific seed
+            if (Environment.GetEnvironmentVariable("TRACE_SEED") == seedStr)
+            {
+                battle.Prng.TraceEnabled = true;
+            }
             battle.Start();
 
             // Parse choices

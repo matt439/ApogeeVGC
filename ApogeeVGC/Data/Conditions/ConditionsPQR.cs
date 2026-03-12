@@ -596,6 +596,9 @@ public partial record Conditions
                         battle.Add("-end", pokemon, "move: Heal Block");
                     }
                 }),
+                // onResidualOrder: 20 in Showdown (healblock condition in moves.ts line 8617)
+                // No actual onResidual callback — order-only handler for correct sort position
+                OnResidual = OnResidualEventInfo.Create((_, _, _, _) => { }, order: 20),
                 OnTryHeal = new OnTryHealEventInfo(false),
             },
             [ConditionId.PsychicTerrain] = new()

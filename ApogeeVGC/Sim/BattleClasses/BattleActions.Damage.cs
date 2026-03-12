@@ -317,7 +317,6 @@ public partial class BattleActions
             }
 
             baseDamage = Battle.Modify(baseDamage, 0.75);
-
         }
 
         // Weather modifier
@@ -337,7 +336,6 @@ public partial class BattleActions
         {
             var critModifier = move.CritModifier ?? 1.5;
             baseDamage = Battle.Trunc((int)(baseDamage * critModifier));
-
         }
 
         // Random factor - also not a modifier
@@ -443,8 +441,6 @@ public partial class BattleActions
                 baseDamage = Battle.Modify(baseDamage, 0.5);
             }
         }
-
-
 
         // Final modifier - Life Orb, etc.
         var finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
