@@ -1134,7 +1134,15 @@ public partial record Abilities
                 Num = 142,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                // OnImmunity for 'sandstorm', 'hail', and 'powder' handled in Pokemon.RunImmunity
+                OnImmunity = OnImmunityEventInfo.Create((_, type, _) =>
+                {
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
+                    {
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
                 // OnTryHitPriority = 1
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {
