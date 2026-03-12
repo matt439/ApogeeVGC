@@ -338,7 +338,7 @@ public partial record Abilities
                     }
 
                     return new VoidReturn();
-                }, 1),
+                }),
             },
             [AbilityId.WhiteSmoke] = new()
             {

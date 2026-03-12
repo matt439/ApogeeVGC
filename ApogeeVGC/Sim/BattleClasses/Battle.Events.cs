@@ -356,6 +356,15 @@ public partial class Battle
             IEffect effect = handler.Effect;
             EffectHolder effectHolder = handler.EffectHolder;
 
+            // Skip fainted Pokemon unless this is a slot condition (Showdown: battle.ts line 512)
+            if (effectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
+            {
+                if (handler.State?.IsSlotCondition != true)
+                {
+                    continue;
+                }
+            }
+
             // Check if status has changed
             if (effect.EffectType == EffectType.Status &&
                 effectHolder is PokemonEffectHolder pokemonHolder)
