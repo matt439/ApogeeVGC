@@ -45,7 +45,16 @@ public partial class Pokemon
         // Check for duplicate status
         if (Status == status.Id)
         {
-            if (sourceEffect is ActiveMove move && move.Status == Status)
+            // Showdown checks (sourceEffect as Move)?.status via duck-typing.
+            // This matches both real moves with a .status field AND the Synchronize
+            // hack object { status: status.id, id: 'synchronize' }.
+            // In C#, Synchronize passes the status Condition (EffectType.Status) as sourceEffect,
+            // so we also need to match Condition objects whose Id equals the current status.
+            bool sourceHasMatchingStatus =
+                (sourceEffect is ActiveMove move && move.Status == Status) ||
+                (sourceEffect is Condition { EffectType: EffectType.Status } cond && cond.Id == Status);
+
+            if (sourceHasMatchingStatus)
             {
                 if (Battle.DisplayUi)
                 {
