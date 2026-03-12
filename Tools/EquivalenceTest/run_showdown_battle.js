@@ -52,9 +52,13 @@ async function runRandom(formatid, seedStr, p1SeedStr, p2SeedStr, outputPath) {
     const stream = new BattleStream({ debug: false });
     const streams = getPlayerStreams(stream);
 
-    // Generate random teams using Showdown's team generator
-    const team1 = Teams.pack(Teams.generate(formatid));
-    const team2 = Teams.pack(Teams.generate(formatid));
+    // Generate random teams using Showdown's team generator with deterministic seeds
+    // Derive team seeds from the battle seed to ensure reproducibility
+    const seed = seedStr.split(',').map(Number);
+    const team1Seed = [seed[0] ^ 0x1234, seed[1] ^ 0x5678, seed[2] ^ 0x9ABC, seed[3] ^ 0xDEF0];
+    const team2Seed = [seed[0] ^ 0xFEDC, seed[1] ^ 0xBA98, seed[2] ^ 0x7654, seed[3] ^ 0x3210];
+    const team1 = Teams.pack(Teams.generate(formatid, { seed: team1Seed }));
+    const team2 = Teams.pack(Teams.generate(formatid, { seed: team2Seed }));
 
     // Collect protocol output
     const protocolLines = [];

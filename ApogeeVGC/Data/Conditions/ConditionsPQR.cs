@@ -567,14 +567,6 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 2, // Psychic Noise blocks healing for 2 turns
                 AssociatedMove = MoveId.PsychicNoise,
-                // Note: In Gen 9, Psychic Noise prevents the target from healing for 2 turns.
-                // TypeScript uses the 'healblock' volatile with duration 2 when applied via Psychic Noise.
-                // The move's secondary applies this condition, and related code checks for it when blocking heals.
-                // TODO: The TS healblock condition also has onBeforeMove (priority 6) that blocks moves with
-                // the 'heal' flag (e.g. Recover, Drain Punch) before execution, and onDisableMove that
-                // disables healing moves in the selection menu. Currently only OnTryHeal blocks healing
-                // effects, but healing MOVES like Drain Punch can still execute (dealing damage without
-                // healing). To fully match TS, add OnBeforeMove and OnDisableMove handlers.
                 OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
@@ -584,6 +576,17 @@ public partial record Conditions
 
                     return null;
                 }),
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, move) =>
+                {
+                    // Block moves with the 'heal' flag (Recover, Drain Punch, Heal Pulse, etc.)
+                    if (move.Flags.Heal == true)
+                    {
+                        battle.Add("cant", pokemon, "move: Heal Block", move);
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }, priority: 6),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)

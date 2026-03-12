@@ -104,8 +104,10 @@ public partial class Pokemon
 
                         // Showdown checks (sourceEffect as Move)?.status — true for moves
                         // with a status field AND the Synchronize hack object {status: id}.
-                        // In C#, Synchronize passes the Condition itself as sourceEffect.
-                        if (sourceEffect is ActiveMove { Status: not null } or Condition)
+                        // In C#, Synchronize passes the status Condition (EffectType.Status).
+                        // Protection conditions (BanefulBunker etc.) have EffectType.Condition
+                        // and should NOT trigger |-immune|.
+                        if (sourceEffect is ActiveMove { Status: not null } or Condition { EffectType: EffectType.Status })
                         {
                             Battle.Add("-immune", this);
                         }
