@@ -562,7 +562,7 @@ public partial record Abilities
                 Rating = 4.0,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, source, _, move) =>
                 {
-                    if (battle.EffectState.Protean == true) return new VoidReturn();
+                    if (source.AbilityState.Protean == true) return new VoidReturn();
                     if (move.HasBounced == true || move.Flags.FutureMove == true ||
                         move.CallsMove == true)
                         return new VoidReturn();
@@ -577,7 +577,7 @@ public partial record Abilities
                         if (currentTypes.Length != 1 || currentTypes[0] != pokemonType)
                         {
                             if (!source.SetType([pokemonType])) return new VoidReturn();
-                            battle.EffectState.Protean = true;
+                            source.AbilityState.Protean = true;
                             if (battle.DisplayUi)
                             {
                                 battle.Add("-start", source, "typechange", type.ToString(),

@@ -142,7 +142,7 @@ public partial record Abilities
                 Rating = 4.0,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, source, _, move) =>
                 {
-                    if (battle.EffectState.Libero == true) return new VoidReturn();
+                    if (source.AbilityState.Libero == true) return new VoidReturn();
                     // Note: TypeScript also checks move.sourceEffect === 'snatch', but Snatch
                     // was removed in Gen 8+, so this check is omitted for Gen 9 targeting.
                     if (move.HasBounced == true || move.Flags.FutureMove == true ||
@@ -162,7 +162,7 @@ public partial record Abilities
                     if (type != MoveType.Unknown && joinedTypes != moveTypeStr)
                     {
                         if (!source.SetType(pokemonType)) return new VoidReturn();
-                        battle.EffectState.Libero = true;
+                        source.AbilityState.Libero = true;
                         if (battle.DisplayUi)
                         {
                             battle.Add("-start", source, "typechange", type.ToString(),
