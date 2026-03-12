@@ -185,7 +185,8 @@ public partial record Conditions
 
                     int[] dmgMod = [4096, 4915, 5734, 6553, 7372, 8192];
                     int numConsecutive = Math.Min(effectState.NumConsecutive ?? 0, 5);
-                    return new DecimalRelayVar((decimal)battle.ChainModify([dmgMod[numConsecutive], 4096]));
+                    battle.ChainModify([dmgMod[numConsecutive], 4096]);
+                    return null;
                 }),
             },
             [ConditionId.MicleBerry] = new()

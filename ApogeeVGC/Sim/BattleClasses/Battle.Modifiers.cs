@@ -75,7 +75,7 @@ public partial class Battle
         return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
 
-    public double ChainModify(int numerator, int denominator = 1)
+    public void ChainModify(int numerator, int denominator = 1)
     {
         // Get the current modifier from the event state as fixed-point
         // Default to 1.0 (4096 in fixed-point) if null
@@ -88,10 +88,9 @@ public partial class Battle
         // The >> 12 is a right shift by 12 bits (equivalent to dividing by 4096)
         // Add 2048 for proper rounding before the shift
         Event.Modifier = ((previousMod * nextMod + 2048) >> 12) / 4096.0;
-        return nextMod;
     }
 
-    public double ChainModify(int[] fraction)
+    public void ChainModify(int[] fraction)
     {
         if (fraction.Length != 2)
         {
@@ -99,10 +98,10 @@ public partial class Battle
                 nameof(fraction));
         }
 
-        return ChainModify(fraction[0], fraction[1]);
+        ChainModify(fraction[0], fraction[1]);
     }
 
-    public double ChainModify(double fraction)
+    public void ChainModify(double fraction)
     {
         if (fraction <= 0.0)
         {
@@ -114,7 +113,6 @@ public partial class Battle
         // Chain the fixed-point modification
         var previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
         Event.Modifier = ((previousMod * fixedPointFraction + 2048) >> 12) / 4096.0;
-        return fixedPointFraction;
     }
 
     public int Modify(int value, int numerator, int denominator = 1)

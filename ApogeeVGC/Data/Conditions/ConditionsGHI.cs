@@ -106,7 +106,10 @@ public partial record Conditions
                 // Damage is doubled against the Glaive Rush user
                 OnSourceModifyDamage =
                     OnSourceModifyDamageEventInfo.Create((battle, _, _, _, _) =>
-                        battle.ChainModify(2)),
+                    {
+                        battle.ChainModify(2);
+                        return null;
+                    }),
                 // Remove the Glaive Rush drawback before the pokemon attacks
                 OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, _) =>
                 {
