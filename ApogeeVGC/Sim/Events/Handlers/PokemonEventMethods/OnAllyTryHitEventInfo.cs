@@ -43,11 +43,13 @@ public sealed record OnAllyTryHitEventInfo : EventHandlerInfo
                 context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
+                // null from handler = TS null = falsy (block the hit)
+                if (result == null) return new NullRelayVar();
                 return result switch
                 {
                     BoolBoolIntEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
                     IntBoolIntEmptyVoidUnion i => IntRelayVar.Get(i.Value),
-                    EmptyBoolIntEmptyVoidUnion => null,
+                    EmptyBoolIntEmptyVoidUnion => new NullRelayVar(),
                     VoidUnionBoolIntEmptyVoidUnion => null,
                     _ => null
                 };

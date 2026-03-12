@@ -1396,7 +1396,7 @@ public partial record Abilities
                             }
                         }
 
-                        return null;
+                        return false;
                     }
 
                     return new VoidReturn();

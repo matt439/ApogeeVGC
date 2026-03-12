@@ -1021,7 +1021,7 @@ public partial record Abilities
                             }
                         }
 
-                        return null;
+                        return false;
                     }),
                 OnAllyTryAddVolatile =
                     OnAllyTryAddVolatileEventInfo.Create((battle, status, target, _, _) =>
