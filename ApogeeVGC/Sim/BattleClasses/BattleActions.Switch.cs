@@ -169,7 +169,11 @@ public partial class BattleActions
             moveSlot.Used = false;
         }
 
+        // Re-initialize ability and item state on switch-in (resets once-per-switch-in
+        // flags like Protean/Libero), matching Showdown's switchIn behavior
+        pokemon.AbilityState = Battle.InitEffectState(pokemon.Ability, null, pokemon);
         pokemon.AbilityState.EffectOrder = Battle.EffectOrder++;
+        pokemon.ItemState = Battle.InitEffectState(pokemon.Item, null, pokemon);
         pokemon.ItemState.EffectOrder = Battle.EffectOrder++;
 
         // Run BeforeSwitchIn event
