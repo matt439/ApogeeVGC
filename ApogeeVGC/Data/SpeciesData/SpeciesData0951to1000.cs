@@ -967,6 +967,7 @@ public partial record SpeciesData
                 HeightM = 2.2,
                 WeightKg = 320,
                 Color = "Purple",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.ScreamTail] = new()
             {
@@ -991,6 +992,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 8,
                 Color = "Pink",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.BruteBonnet] = new()
             {
@@ -1015,6 +1017,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 21,
                 Color = "White",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.FlutterMane] = new()
             {
@@ -1039,6 +1042,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 4,
                 Color = "Gray",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.SlitherWing] = new()
             {
@@ -1063,6 +1067,7 @@ public partial record SpeciesData
                 HeightM = 3.2,
                 WeightKg = 92,
                 Color = "White",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.SandyShocks] = new()
             {
@@ -1087,6 +1092,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 60,
                 Color = "Gray",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.IronTreads] = new()
             {
@@ -1111,6 +1117,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 240,
                 Color = "Gray",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.IronBundle] = new()
             {
@@ -1135,6 +1142,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 11,
                 Color = "Red",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.IronHands] = new()
             {
@@ -1159,6 +1167,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 380.7,
                 Color = "Gray",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.IronJugulis] = new()
             {
@@ -1183,6 +1192,7 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 111,
                 Color = "Blue",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.IronMoth] = new()
             {
@@ -1207,6 +1217,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 36,
                 Color = "White",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.IronThorns] = new()
             {
@@ -1231,6 +1242,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 303,
                 Color = "Green",
+                Tags = [SpeciesTag.Paradox],
             },
             [SpecieId.Frigibax] = new()
             {
