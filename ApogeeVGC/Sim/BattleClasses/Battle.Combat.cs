@@ -370,7 +370,7 @@ public partial class Battle
 
         if (healAmount.Value == 0)
         {
-            return IntFalseUnion.FromInt(0);
+            return IntFalseUnion.FromFalse();
         }
 
         damage = healAmount.Value;
