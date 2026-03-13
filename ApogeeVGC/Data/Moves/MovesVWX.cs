@@ -391,7 +391,9 @@ public partial record Moves
                 BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    int bp = move.BasePower * source.Hp / source.MaxHp;
+                    // Showdown: clampIntRange(Math.floor(Math.max(1, hp) * 150 / maxhp), 1)
+                    int bp = Math.Max(1, source.Hp) * move.BasePower / source.MaxHp;
+                    bp = battle.ClampIntRange(bp, 1, null);
                     battle.Debug($"BP: {bp}");
                     return bp;
                 }),
