@@ -360,10 +360,12 @@ public partial class Battle
             IntRelayVar.Get(damage)
         );
 
-        // If event prevented healing, return the result
+        // If event prevented healing (e.g., Heal Block / Psychic Noise onTryHeal returns false),
+        // return false — not 0. In Showdown, heal() returns the falsy value from runEvent,
+        // and callers like Heal Pulse use !!this.heal() to detect failure.
         if (tryHealResult is not IntRelayVar healAmount)
         {
-            return IntFalseUnion.FromInt(0);
+            return IntFalseUnion.FromFalse();
         }
 
         if (healAmount.Value == 0)
