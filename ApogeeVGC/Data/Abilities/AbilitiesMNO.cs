@@ -1136,7 +1136,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnImmunity = OnImmunityEventInfo.Create((_, type, _) =>
                 {
-                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm or ConditionId.Snowscape or ConditionId.Powder })
                     {
                         return false;
                     }
