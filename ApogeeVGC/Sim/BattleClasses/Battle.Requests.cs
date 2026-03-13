@@ -521,19 +521,14 @@ public partial class Battle
         {
             Queue.AddChoice(side.Choice.Actions);
         }
-
         Debug($"Added {Queue.List.Count} actions to queue");
         Debug($"[CommitChoices] After adding side actions, queue size = {Queue.List.Count}");
-
-        // Update action speeds now that Pokemon speeds have been recalculated
-        for (int i = 0; i < Queue.List.Count; i++)
-        {
-            Queue.List[i] = GetActionSpeed(Queue.List[i]);
-        }
 
         ClearRequest();
 
         // Sort the new actions by priority/speed
+        // Note: action speeds are already calculated by ResolveAction → GetActionSpeed
+        // during AddChoice, matching Showdown's commitChoices flow (no separate loop).
         Queue.Sort();
 
         Debug($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
