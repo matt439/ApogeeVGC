@@ -613,18 +613,6 @@ public partial class Battle
 
     public void FieldEvent(EventId eventId, List<Pokemon>? targets = null)
     {
-        // Debug logging for event entry
-        if (DisplayUi && eventId == EventId.SwitchIn)
-        {
-            string targetsStr = targets != null
-                ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
-                : "all";
-            Debug($"[FieldEvent] ENTRY: {eventId} | Targets: {targetsStr}");
-        }
-
-        // Debug: uncomment to trace residual handlers
-        // if (eventId == EventId.Residual) { ... }
-
         // Determine if we should track duration for this event
         EffectStateKey? getKey = eventId == EventId.Residual ? EffectStateKey.Duration : null;
 
@@ -693,12 +681,6 @@ public partial class Battle
 
             IEffect effect = handler.Effect;
 
-            if (DisplayUi && eventId == EventId.SwitchIn)
-            {
-                Debug(
-                    $"[FieldEvent] Processing handler {handlerIndex}: {effect.Name} ({effect.EffectType})");
-            }
-
             // Skip fainted Pokemon unless this is a slot condition
             if (handler.EffectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
             {
@@ -706,11 +688,6 @@ public partial class Battle
                 {
                     continue;
                 }
-            }
-
-            if (DisplayUi && eventId == EventId.SwitchIn)
-            {
-                Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
             }
 
             // Handle duration tracking for Residual events

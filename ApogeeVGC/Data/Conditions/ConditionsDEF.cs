@@ -633,7 +633,9 @@ public partial record Conditions
                         battle.EffectState.Duration++;
                     }
 
-                    return null;
+                    // Return void (success) - Showdown's implicit undefined return maps to
+                    // singleEvent's default relayVar=true, so this must not return null/false
+                    return RelayVar.FromVoid();
                 }),
                 OnOverrideAction = OnOverrideActionEventInfo.Create((battle, _, _, move) =>
                 {
