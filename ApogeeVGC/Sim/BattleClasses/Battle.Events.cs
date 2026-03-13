@@ -356,14 +356,10 @@ public partial class Battle
             IEffect effect = handler.Effect;
             EffectHolder effectHolder = handler.EffectHolder;
 
-            // Skip fainted Pokemon unless this is a slot condition (Showdown: battle.ts line 512)
-            if (effectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
-            {
-                if (handler.State?.IsSlotCondition != true)
-                {
-                    continue;
-                }
-            }
+            // NOTE: Showdown only skips fainted Pokemon handlers in fieldEvent (battle.ts line 512),
+            // NOT in runEvent. The fainted check is in FieldEvent() below, not here.
+            // Removing it from RunEvent fixes Magician stealing items from fainted targets
+            // whose item has an OnTakeItem guard (e.g., Sky Plate on Arceus).
 
             // Check if status has changed
             if (effect.EffectType == EffectType.Status &&
