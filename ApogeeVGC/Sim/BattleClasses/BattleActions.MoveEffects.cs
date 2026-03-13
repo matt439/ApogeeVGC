@@ -132,6 +132,7 @@ public partial class BattleActions
                     {
                         BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
                         IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
+                        NullRelayVar => null,
                         _ => BoolIntUndefinedUnion.FromUndefined()
                     };
                     didSomething = CombineResults(didSomething, hitResult);
