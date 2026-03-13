@@ -246,7 +246,7 @@ public partial class BattleActions
                 int speedDiff = a.StoredStats[StatIdExceptHp.Spe] -
                                 b.StoredStats[StatIdExceptHp.Spe];
                 if (speedDiff != 0) return speedDiff;
-                return a.AbilityState.EffectOrder - b.AbilityState.EffectOrder;
+                return b.AbilityState.EffectOrder - a.AbilityState.EffectOrder;
             });
 
             Pokemon? targetOf1StDance = Battle.ActiveTarget;
