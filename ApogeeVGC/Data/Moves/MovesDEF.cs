@@ -279,7 +279,7 @@ public partial record Moves
                 Priority = 4,
                 Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Stall,
+                VolatileStatus = ConditionId.Protect,
                 Target = MoveTarget.Self,
                 Type = MoveType.Fighting,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
@@ -293,7 +293,7 @@ public partial record Moves
                 }),
                 OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    source.AddVolatile(ConditionId.Protect);
+                    source.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 }),
             },
@@ -1464,7 +1464,7 @@ public partial record Moves
                 Priority = 4,
                 Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Stall,
+                VolatileStatus = ConditionId.Endure,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
@@ -1478,7 +1478,7 @@ public partial record Moves
                 }),
                 OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    source.AddVolatile(ConditionId.Endure);
+                    source.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 }),
             },

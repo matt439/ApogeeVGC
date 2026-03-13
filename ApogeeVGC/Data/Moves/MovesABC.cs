@@ -845,7 +845,7 @@ public partial record Moves
                 Priority = 4,
                 Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Stall,
+                VolatileStatus = ConditionId.BanefulBunker,
                 Condition = _library.Conditions[ConditionId.BanefulBunker],
                 Target = MoveTarget.Self,
                 Type = MoveType.Poison,
@@ -853,7 +853,7 @@ public partial record Moves
                     battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }),
                 OnHit = OnHitEventInfo.Create((_, _, pokemon, _) =>
                 {
-                    pokemon.AddVolatile(ConditionId.BanefulBunker);
+                    pokemon.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 }),
             },
@@ -1740,7 +1740,7 @@ public partial record Moves
                 Priority = 4,
                 Flags = new MoveFlags { Metronome = true, NoAssist = true, FailCopycat = true },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Stall,
+                VolatileStatus = ConditionId.BurningBulwark,
                 Condition = _library.Conditions[ConditionId.BurningBulwark],
                 Target = MoveTarget.Self,
                 Type = MoveType.Fire,
@@ -1748,7 +1748,7 @@ public partial record Moves
                     battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }),
                 OnHit = OnHitEventInfo.Create((_, _, pokemon, _) =>
                 {
-                    pokemon.AddVolatile(ConditionId.BurningBulwark);
+                    pokemon.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 }),
             },

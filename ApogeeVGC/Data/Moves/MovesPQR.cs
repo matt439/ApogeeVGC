@@ -1142,7 +1142,7 @@ public partial record Moves
                     FailCopycat = true,
                 },
                 StallingMove = true,
-                VolatileStatus = ConditionId.Stall,
+                VolatileStatus = ConditionId.Protect,
 
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
@@ -1157,7 +1157,7 @@ public partial record Moves
 
                 OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    source.AddVolatile(ConditionId.Protect);
+                    source.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 }),
                 Condition = _library.Conditions[ConditionId.Protect],
