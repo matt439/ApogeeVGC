@@ -573,9 +573,12 @@ public partial class Battle
             effect ??= Effect;
 
             // Sort by speed (highest to lowest) with proper speed tie resolution
+            // Uses stored pokemon.Speed field, matching Showdown's eachEvent:
+            // this.speedSort(actives, (a, b) => b.speed - a.speed)
             if (Prng.TraceEnabled)
             {
-                Console.Error.WriteLine($"[EachEvent] {eventId} speeds: {string.Join(", ", actives.Select(p => $"{p.Name}={p.Speed}"))}");
+                var caller = new System.Diagnostics.StackTrace().GetFrame(1)?.GetMethod()?.Name ?? "?";
+                Console.Error.WriteLine($"[EachEvent] {eventId} speeds: {string.Join(", ", actives.Select(p => $"{p.Name}={p.Speed}"))} [from {caller}]");
             }
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
 
@@ -866,6 +869,23 @@ public partial class Battle
             if (DisplayUi && eventId == EventId.SwitchIn)
             {
                 Debug($"[FieldEvent] {effect.Name}: Determined handlerEventId={handlerEventId}");
+            }
+
+            // Check ability suppression (NoTransform, Gastro Acid, Neutralizing Gas)
+            // Matches Showdown's runEvent check: if effectHolder.ignoringAbility() continue
+            if (effect.EffectType == EffectType.Ability &&
+                handler.EffectHolder is PokemonEffectHolder pokemonAbilityHolder &&
+                pokemonAbilityHolder.Pokemon.IgnoringAbility())
+            {
+                continue;
+            }
+
+            // Check item suppression (Embargo, Klutz, Magic Room)
+            if (effect.EffectType == EffectType.Item &&
+                handler.EffectHolder is PokemonEffectHolder pokemonItemHolder &&
+                pokemonItemHolder.Pokemon.IgnoringItem())
+            {
+                continue;
             }
 
             // Execute the handler's callback
