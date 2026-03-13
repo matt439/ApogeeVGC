@@ -202,7 +202,8 @@ public partial record Conditions
                     OnAnyModifyDamageEventInfo.Create((battle, damage, source, target, move) =>
                     {
                         if (target != source &&
-                            target.Side.GetSideCondition(ConditionId.AuroraVeil) != null)
+                            battle.EffectState.Target is SideEffectStateTarget side &&
+                            side.Side.HasAlly(target))
                         {
                             // Don't stack with Reflect or Light Screen
                             if ((target.Side.GetSideCondition(ConditionId.Reflect) != null &&
