@@ -277,7 +277,9 @@ public partial class Battle
         }
 
         // Check volatile conditions (confusion, flinch, etc.)
-        foreach ((ConditionId volatileId, EffectState volatileState) in pokemon.Volatiles)
+        // Iterate in EffectOrder to match JavaScript's insertion-order property iteration
+        foreach ((ConditionId volatileId, EffectState volatileState) in
+            pokemon.Volatiles.OrderBy(kvp => kvp.Value.EffectOrder))
         {
             Condition volatileCondition = Library.Conditions[volatileId];
             handlerInfo = volatileCondition.HasAnyEventHandlers
@@ -416,7 +418,9 @@ public partial class Battle
         }
 
         // Check volatile conditions — iterate once for both prefixes
-        foreach ((ConditionId volatileId, EffectState volatileState) in pokemon.Volatiles)
+        // Iterate in EffectOrder to match JavaScript's insertion-order property iteration
+        foreach ((ConditionId volatileId, EffectState volatileState) in
+            pokemon.Volatiles.OrderBy(kvp => kvp.Value.EffectOrder))
         {
             Condition volatileCondition = Library.Conditions[volatileId];
             if (!volatileCondition.HasPrefixedHandlers) continue;
@@ -674,7 +678,10 @@ public partial class Battle
         EventPrefix prefix = EventPrefix.None, EffectStateKey? getKey = null,
         Pokemon? customHolder = null)
     {
-        foreach ((ConditionId id, EffectState sideConditionData) in side.SideConditions)
+        // Iterate in EffectOrder (creation order) to match JavaScript's insertion-order
+        // property iteration. C#'s Dictionary may reorder entries after deletions.
+        foreach ((ConditionId id, EffectState sideConditionData) in
+            side.SideConditions.OrderBy(kvp => kvp.Value.EffectOrder))
         {
             Condition sideCondition = Library.Conditions[id];
             EventHandlerInfo? handlerInfo =
