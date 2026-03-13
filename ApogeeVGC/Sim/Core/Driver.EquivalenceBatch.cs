@@ -12,7 +12,7 @@ namespace ApogeeVGC.Sim.Core;
 public partial class Driver
 {
     // Equivalence batch evaluation settings
-    private const int EquivalenceBatchNumTests = 10000;
+    private const int EquivalenceBatchNumTests = 100000;
     private const string EquivalenceBatchFormat = "gen9randomdoublesbattle";
 
     /// <summary>
@@ -43,15 +43,17 @@ public partial class Driver
     {
         string solutionRoot = FindSolutionRoot(AppContext.BaseDirectory);
         string toolDir = Path.Combine(solutionRoot, "Tools", "EquivalenceTest");
+        string cacheDir = Path.Combine(toolDir, "batch_cache");
         string tempDir = Path.Combine(toolDir, "batch_temp");
 
         Console.WriteLine($"[EquivBatch] Starting batch equivalence test");
         Console.WriteLine($"[EquivBatch] Format: {EquivalenceBatchFormat}");
         Console.WriteLine($"[EquivBatch] Tests: {EquivalenceBatchNumTests}");
-        Console.WriteLine($"[EquivBatch] Temp dir: {tempDir}");
+        Console.WriteLine($"[EquivBatch] Cache dir: {cacheDir}");
         Console.WriteLine();
 
-        // Create temp directory for fixtures
+        // Create directories for fixtures
+        Directory.CreateDirectory(cacheDir);
         Directory.CreateDirectory(tempDir);
 
         var results = new EquivalenceResult[EquivalenceBatchNumTests];
@@ -60,6 +62,7 @@ public partial class Driver
         int failed = 0;
         int errors = 0;
         int completed = 0;
+        int cacheHits = 0;
 
         Parallel.For(0, EquivalenceBatchNumTests, new ParallelOptions { MaxDegreeOfParallelism = 32 }, i =>
         {
@@ -75,22 +78,43 @@ public partial class Driver
             string p1Seed = $"{(i * 41 + 10) % 65536},{(i * 43 + 20) % 65536},{(i * 47 + 30) % 65536},{(i * 53 + 40) % 65536}";
             string p2Seed = $"{(i * 59 + 50) % 65536},{(i * 61 + 60) % 65536},{(i * 67 + 70) % 65536},{(i * 71 + 80) % 65536}";
 
-            string outputBase = Path.Combine(tempDir, $"battle_{i:D4}");
-            string fixtureFile = outputBase + ".fixture.json";
-            string logFile = outputBase + ".log";
+            // Use persistent cache directory for Showdown output
+            string cacheBase = Path.Combine(cacheDir, $"battle_{i:D6}");
+            string cachedFixture = cacheBase + ".fixture.json";
+            string cachedLog = cacheBase + ".log";
+
+            // Also keep temp dir path for failures that need debugging
+            string tempBase = Path.Combine(tempDir, $"battle_{i:D6}");
+
+            string fixtureFile;
+            string logFile;
 
             try
             {
-                // Step 1: Generate Showdown battle via Node.js
-                bool generated = GenerateShowdownFixture(
-                    toolDir, EquivalenceBatchFormat, seedStr, p1Seed, p2Seed, outputBase, logFile);
-
-                if (!generated)
+                // Step 1: Check cache, generate Showdown battle via Node.js only if not cached
+                if (File.Exists(cachedFixture) && File.Exists(cachedLog))
                 {
-                    results[i] = new EquivalenceResult(seedStr, 0, 0, 0, 0, 0, "Showdown generation failed", null);
-                    int done = Interlocked.Increment(ref completed);
-                    Console.WriteLine($"  [{done}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR (Showdown gen failed)");
-                    return;
+                    // Cache hit — skip Node.js entirely
+                    fixtureFile = cachedFixture;
+                    logFile = cachedLog;
+                    Interlocked.Increment(ref cacheHits);
+                }
+                else
+                {
+                    // Cache miss — generate and cache
+                    bool generated = GenerateShowdownFixture(
+                        toolDir, EquivalenceBatchFormat, seedStr, p1Seed, p2Seed, cacheBase, cachedLog);
+
+                    if (!generated)
+                    {
+                        results[i] = new EquivalenceResult(seedStr, 0, 0, 0, 0, 0, "Showdown generation failed", null);
+                        int done = Interlocked.Increment(ref completed);
+                        Console.WriteLine($"  [{done}/{EquivalenceBatchNumTests}] SEED {seedStr} — ERROR (Showdown gen failed)");
+                        return;
+                    }
+
+                    fixtureFile = cachedFixture;
+                    logFile = cachedLog;
                 }
 
                 // Step 2: Run equivalence comparison
@@ -138,6 +162,7 @@ public partial class Driver
         Console.WriteLine($"  Passed: {passed}");
         Console.WriteLine($"  Failed: {failed}");
         Console.WriteLine($"  Errors: {errors}");
+        Console.WriteLine($"  Cache:  {cacheHits}/{EquivalenceBatchNumTests} hits");
         Console.WriteLine($"  Time:   {stopwatch.Elapsed.TotalSeconds:F1}s ({stopwatch.Elapsed.TotalSeconds / EquivalenceBatchNumTests:F2}s/test)");
 
         // List all failures with seeds for easy reproduction
@@ -172,19 +197,22 @@ public partial class Driver
             Console.WriteLine($"  ALL {EquivalenceBatchNumTests} TESTS PASSED!");
         }
 
-        // Clean up temp files on full success
+        // Clean up temp directory (batch_temp is no longer used for fixtures)
+        try
+        {
+            if (Directory.Exists(tempDir))
+                Directory.Delete(tempDir, true);
+        }
+        catch { /* ignore cleanup errors */ }
+
         if (failed + errors == 0)
         {
-            try
-            {
-                Directory.Delete(tempDir, true);
-                Console.WriteLine($"  Cleaned up temp directory: {tempDir}");
-            }
-            catch { /* ignore cleanup errors */ }
+            Console.WriteLine($"  Showdown cache preserved for reuse: {cacheDir}");
         }
         else
         {
-            Console.WriteLine($"\n  Fixture files preserved in: {tempDir}");
+            Console.WriteLine($"\n  Cached fixtures in: {cacheDir}");
+            Console.WriteLine($"  To debug a failure, point EquivalenceTest mode at the cached fixture file.");
         }
 
         Console.WriteLine();
