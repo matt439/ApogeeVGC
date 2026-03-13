@@ -31,6 +31,7 @@ public partial class BattleActions
                 : null;
             BoolIntUndefinedUnion? hitResult;
             BoolIntUndefinedUnion didSomething = BoolIntUndefinedUnion.FromUndefined();
+            bool onHitReturnedNotFail = false;
 
             // All target-dependent effects are guarded by target != null
             if (target != null)
@@ -198,13 +199,21 @@ public partial class BattleActions
                     {
                         RelayVar? fieldHitResult = Battle.SingleEvent(EventId.HitField, moveData, null,
                             target, source, move);
-                        hitResult = fieldHitResult switch
+                        if (fieldHitResult is EmptyRelayVar)
                         {
-                            BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
-                            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                            NullRelayVar => null,
-                            _ => BoolIntUndefinedUnion.FromUndefined(),
-                        };
+                            hitResult = BoolIntUndefinedUnion.FromUndefined();
+                            onHitReturnedNotFail = true;
+                        }
+                        else
+                        {
+                            hitResult = fieldHitResult switch
+                            {
+                                BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
+                                IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
+                                NullRelayVar => null,
+                                _ => BoolIntUndefinedUnion.FromUndefined(),
+                            };
+                        }
                         didSomething = CombineResults(didSomething, hitResult);
                     }
                 }
@@ -214,13 +223,21 @@ public partial class BattleActions
                     {
                         RelayVar? sideHitResult = Battle.SingleEvent(EventId.HitSide, moveData, null,
                             target.Side, source, move);
-                        hitResult = sideHitResult switch
+                        if (sideHitResult is EmptyRelayVar)
                         {
-                            BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
-                            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                            NullRelayVar => null,
-                            _ => BoolIntUndefinedUnion.FromUndefined(),
-                        };
+                            hitResult = BoolIntUndefinedUnion.FromUndefined();
+                            onHitReturnedNotFail = true;
+                        }
+                        else
+                        {
+                            hitResult = sideHitResult switch
+                            {
+                                BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
+                                IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
+                                NullRelayVar => null,
+                                _ => BoolIntUndefinedUnion.FromUndefined(),
+                            };
+                        }
                         didSomething = CombineResults(didSomething, hitResult);
                     }
                 }
@@ -232,14 +249,21 @@ public partial class BattleActions
                         if (hitEffectOnHit != null)
                         {
                             var result = hitEffectOnHit(Battle, target, source, move);
-                            hitResult = result switch
+                            if (result is EmptyBoolEmptyVoidUnion)
                             {
-                                BoolBoolEmptyVoidUnion b => BoolIntUndefinedUnion.FromBool(b.Value),
-                                EmptyBoolEmptyVoidUnion => null,
-                                VoidUnionBoolEmptyVoidUnion => BoolIntUndefinedUnion.FromUndefined(),
-                                null => BoolIntUndefinedUnion.FromUndefined(),
-                                _ => BoolIntUndefinedUnion.FromUndefined(),
-                            };
+                                hitResult = BoolIntUndefinedUnion.FromUndefined();
+                                onHitReturnedNotFail = true;
+                            }
+                            else
+                            {
+                                hitResult = result switch
+                                {
+                                    BoolBoolEmptyVoidUnion b => BoolIntUndefinedUnion.FromBool(b.Value),
+                                    VoidUnionBoolEmptyVoidUnion => BoolIntUndefinedUnion.FromUndefined(),
+                                    null => BoolIntUndefinedUnion.FromUndefined(),
+                                    _ => BoolIntUndefinedUnion.FromUndefined(),
+                                };
+                            }
                             didSomething = CombineResults(didSomething, hitResult);
                         }
                     }
@@ -247,13 +271,21 @@ public partial class BattleActions
                     {
                         RelayVar? hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
                             target, source, move);
-                        hitResult = hitEventResult switch
+                        if (hitEventResult is EmptyRelayVar)
                         {
-                            BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
-                            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                            NullRelayVar => null,
-                            _ => BoolIntUndefinedUnion.FromUndefined()
-                        };
+                            hitResult = BoolIntUndefinedUnion.FromUndefined();
+                            onHitReturnedNotFail = true;
+                        }
+                        else
+                        {
+                            hitResult = hitEventResult switch
+                            {
+                                BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
+                                IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
+                                NullRelayVar => null,
+                                _ => BoolIntUndefinedUnion.FromUndefined()
+                            };
+                        }
                         didSomething = CombineResults(didSomething, hitResult);
                     }
 
@@ -289,7 +321,10 @@ public partial class BattleActions
             }
 
             // Move didn't fail because it didn't try to do anything
-            if (didSomething is UndefinedBoolIntUndefinedUnion)
+            // Showdown: if (didSomething === undefined) didSomething = true;
+            // Skip when onHit returned NOT_FAIL — that IS a deliberate result (Showdown's '')
+            // which should stay falsy, not be promoted to true.
+            if (didSomething is UndefinedBoolIntUndefinedUnion && !onHitReturnedNotFail)
             {
                 didSomething = BoolIntUndefinedUnion.FromBool(true);
             }

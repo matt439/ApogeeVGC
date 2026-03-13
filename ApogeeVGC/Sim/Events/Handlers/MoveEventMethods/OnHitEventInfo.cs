@@ -54,13 +54,12 @@ context.GetSourceOrTargetPokemon(),
    return result switch
    {
     BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
-  // Empty = NOT_FAIL (Showdown's ""). Return C# null so SingleEvent
-  // returns the default relayVar (true). This ensures the damage entry
-  // stays non-false, preventing the hitStepMoveHitLoop break check from
-  // triggering prematurely (e.g., Shore Up heal failure at full HP).
-  // NullRelayVar would map to JS null, which the null→false conversion
-  // in RunMoveEffects incorrectly converts to false.
-  EmptyBoolEmptyVoidUnion => null,
+  // Empty = NOT_FAIL (Showdown's ""). Return EmptyRelayVar so
+  // RunMoveEffects can distinguish NOT_FAIL from success (true) and
+  // failure (false). NOT_FAIL has JS type priority 1 ('string'),
+  // between undefined (0) and null (2), so it gets overridden by
+  // boolean false in combineResults (e.g., Baton Pass fail + selfSwitch).
+  EmptyBoolEmptyVoidUnion => new EmptyRelayVar(),
    VoidUnionBoolEmptyVoidUnion => null,
           _ => null
      };
