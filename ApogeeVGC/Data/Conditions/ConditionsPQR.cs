@@ -669,7 +669,7 @@ public partial record Conditions
                         battle.Add("-activate", target, "move: Psychic Terrain");
                     }
 
-                    return new Empty(); // NOT_FAIL — block the move without showing fail message
+                    return null; // JS null — block the move silently (NOT the same as NOT_FAIL/empty string)
                 }, 4),
                 // OnBasePowerPriority = 6
                 OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, attacker, _, move) =>
