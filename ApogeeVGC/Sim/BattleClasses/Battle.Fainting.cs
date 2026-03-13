@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -26,6 +27,11 @@ public partial class Battle
             {
                 if (pokemon is { Fainted: true })
                 {
+                    // Overwrite any existing status (e.g. burn) to prevent fainted Pokemon's
+                    // status handlers (like burn's onResidual) from being collected in future
+                    // FieldEvent calls. Showdown sets this to 'fnt'; we use None since there's
+                    // no Fnt ConditionId and the effect is equivalent (no onResidual handler).
+                    pokemon.Status = ConditionId.None;
                     // Mark that this Pokémon needs to be switched out
                     pokemon.SwitchFlag = true;
                 }
