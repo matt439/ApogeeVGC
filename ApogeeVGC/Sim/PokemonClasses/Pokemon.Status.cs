@@ -490,11 +490,16 @@ public partial class Pokemon
     public bool RemoveVolatile(Condition status)
     {
         // Check if Pokemon is fainted (equivalent to !this.hp)
-        if (Hp <= 0) return false;
+        if (Hp <= 0)
+        {
+            return false;
+        }
 
         // Check if the volatile exists
         if (!Volatiles.TryGetValue(status.Id, out EffectState? volatileData))
+        {
             return false;
+        }
 
         // Extract linked data (equivalent to destructuring)
         var linkedPokemon = volatileData.LinkedPokemon;

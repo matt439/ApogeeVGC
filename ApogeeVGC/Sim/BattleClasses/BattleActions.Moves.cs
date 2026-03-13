@@ -335,8 +335,11 @@ public partial class BattleActions
             sourceEffect = Battle.Effect;
         }
 
-        // Clear sourceEffect for Instruct and Custap Berry
-        if (sourceEffect is ActiveMove { Id: MoveId.Instruct } or Item { Id: ItemId.CustapBerry })
+        // Clear sourceEffect for Format-type effects (Showdown: if (sourceEffect as Format).effectType)
+        // Also clear for Instruct and Custap Berry
+        if (sourceEffect != null &&
+            (sourceEffect.EffectType == EffectType.Format ||
+             sourceEffect is ActiveMove { Id: MoveId.Instruct } or Item { Id: ItemId.CustapBerry }))
         {
             sourceEffect = null;
         }
