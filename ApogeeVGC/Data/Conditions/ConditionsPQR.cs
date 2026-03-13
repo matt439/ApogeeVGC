@@ -600,6 +600,16 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }, priority: 6),
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
+                {
+                    if (move.Flags.Heal == true)
+                    {
+                        battle.Add("cant", pokemon, "move: Heal Block", move);
+                        return VoidFalseUnion.FromFalse();
+                    }
+
+                    return VoidFalseUnion.FromVoid();
+                }),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
