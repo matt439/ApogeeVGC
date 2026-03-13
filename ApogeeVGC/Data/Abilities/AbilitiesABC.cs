@@ -655,20 +655,26 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamage = OnDamageEventInfo.Create((battle, _, _, source, effect) =>
                 {
-                    if (effect is not ActiveMove move)
+                    // Showdown: if (effect.effectType === "Move" && !effect.multihit && ...)
+                    // Must check EffectType, not just ActiveMove, because PseudoMoveEffect
+                    // (confusion self-hit) also has EffectType.Move and should block berry eating.
+                    if (effect?.EffectType == EffectType.Move)
                     {
-                        battle.EffectState.CheckedBerserk = true;
-                        return new VoidReturn();
-                    }
-
-                    if (move.MultiHit != null ||
-                        (move.HasSheerForce == true && source.HasAbility(AbilityId.SheerForce)))
-                    {
-                        battle.EffectState.CheckedBerserk = true;
+                        if (effect is ActiveMove move &&
+                            (move.MultiHit != null ||
+                             (move.HasSheerForce == true &&
+                              source.HasAbility(AbilityId.SheerForce))))
+                        {
+                            battle.EffectState.CheckedBerserk = true;
+                        }
+                        else
+                        {
+                            battle.EffectState.CheckedBerserk = false;
+                        }
                     }
                     else
                     {
-                        battle.EffectState.CheckedBerserk = false;
+                        battle.EffectState.CheckedBerserk = true;
                     }
 
                     return new VoidReturn();
