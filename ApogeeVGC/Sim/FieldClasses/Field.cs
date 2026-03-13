@@ -468,9 +468,6 @@ SingleEventSource.FromNullablePokemon(source),
             Battle.Debug($"[AddPseudoWeather] Added {status.Id} with duration {state.Duration}");
   }
 
-        // Update all Pokemon speeds since pseudo-weather like Trick Room affects speed calculation
-     Battle.UpdateSpeed();
-
         // Trigger pseudo-weather change event for all handlers
         Battle.RunEvent(
   EventId.PseudoWeatherChange,
@@ -514,9 +511,6 @@ PseudoWeather.TryGetValue(status.Id, out EffectState? state);
 Battle.Debug($"[RemovePseudoWeather] Removed {status.Id}, still exists: {PseudoWeather.ContainsKey(status.Id)}");
         }
 
-     // Update all Pokemon speeds since removing pseudo-weather like Trick Room affects speed calculation
-     Battle.UpdateSpeed();
-        
    return true;
     }
 
