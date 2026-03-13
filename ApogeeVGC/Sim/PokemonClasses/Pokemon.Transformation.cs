@@ -61,10 +61,6 @@ public partial class Pokemon
             StoredStats[stat] = pokemon.StoredStats[stat];
         }
 
-        // Update Speed to reflect copied stats (SetSpecie calculated at our level, not the target's)
-        // Showdown's pokemon.speed is a live getter reading from storedStats, so this is automatic there.
-        UpdateSpeed();
-
         // Copy timesAttacked
         TimesAttacked = pokemon.TimesAttacked;
 
