@@ -365,6 +365,7 @@ public partial record Abilities
                             ConditionId.Attract,
                             ConditionId.Disable,
                             ConditionId.Encore,
+                            ConditionId.PsychicNoise,
                             ConditionId.Taunt,
                             ConditionId.Torment,
                         ];
