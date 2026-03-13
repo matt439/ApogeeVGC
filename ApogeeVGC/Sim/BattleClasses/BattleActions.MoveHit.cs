@@ -379,7 +379,9 @@ if (tryResult is BoolRelayVar { Value: false } ||
                 damage[i] = BoolIntUndefinedUnion.FromBool(true);
             }
 
-            if (damage[i] is BoolBoolIntUndefinedUnion { Value: false })
+            // Showdown: if (!damage[i]) targets[i] = false;
+            // General falsiness check — catches false, null, undefined, 0
+            if (!damage[i].IsTruthy())
             {
                 targets[i] = PokemonFalseUnion.FromFalse();
             }
@@ -534,7 +536,7 @@ if (tryResult is BoolRelayVar { Value: false } ||
    BoolIntUndefinedUnion damageValue = result switch
      {
     null => BoolIntUndefinedUnion.FromBool(true), // no handlers fired → continue
-     NullRelayVar => BoolIntUndefinedUnion.FromBool(false), // NOT_FAIL → blocked (e.g., Substitute vs status move)
+     NullRelayVar => NullBoolIntUndefinedUnion.Instance, // null → Substitute blocked a status move; must stay null (not false) so hitStepMoveHitLoop doesn't break
      VoidReturnRelayVar => BoolIntUndefinedUnion.FromBool(true), // VoidReturn also means continue
      BoolIntUndefinedUnionRelayVar biuu => biuu.Value, // Already the right type
           BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value), // Convert bool

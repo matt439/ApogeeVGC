@@ -106,8 +106,9 @@ public partial class Battle
                 _ => null,
             };
 
-            // Handle undefined damage values FIRST before calling ToInt()
-            if (curDamage[0] is UndefinedBoolIntUndefinedUnion)
+            // Handle falsy non-zero damage values FIRST before calling ToInt()
+            // Mirrors Showdown: !(targetDamage || targetDamage === 0) catches null, undefined, false
+            if (!curDamage[0].IsTruthy() && !curDamage[0].IsZero())
             {
                 retVals.Add(curDamage[0]);
                 continue;
