@@ -83,7 +83,8 @@ public partial class Pokemon
                     Battle.Add("-fail", this, statusStr);
                 }
             }
-            else if (sourceEffect is ActiveMove { Status: not null })
+            else if (sourceEffect is ActiveMove { Status: not null }
+                     or Condition { EffectType: EffectType.Status })
             {
                 if (Battle.DisplayUi)
                 {
