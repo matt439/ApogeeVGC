@@ -702,7 +702,7 @@ public partial class BattleActions
                               Library.Moves.TryGetValue(mesi.MoveId, out Move? sourceMove) &&
                               sourceMove.SleepUsable == true);
 
-        var targetsCopy = new List<Pokemon>(targets.Count);
+        var targetsCopy = new List<Pokemon?>(targets.Count);
         int hit;
 
         for (hit = 1; hit <= targetHitResult; hit++)
@@ -872,11 +872,22 @@ public partial class BattleActions
             }
 
             // Modifies targetsCopy (which is why it's a copy)
-            (SpreadMoveDamage moveDamageThisHit, SpreadMoveTargets _) = SpreadMoveHit(
+            // Showdown: [moveDamageThisHit, targetsCopy] = this.spreadMoveHit(targetsCopy, ...)
+            // We must capture the modified targets so that after the hit loop,
+            // targets nullified by Substitute are properly skipped (gotAttacked, timesAttacked).
+            (SpreadMoveDamage moveDamageThisHit, SpreadMoveTargets modifiedTargets) = SpreadMoveHit(
                 SpreadMoveTargets.FromPokemonList(targetsCopy),
                 pokemon,
                 move,
                 new HitEffect { OnHit = move.OnHit?.Handler as ResultMoveHandler });
+
+            // Update targetsCopy to reflect modifications from spreadMoveHit
+            // (e.g., targets set to null when Substitute absorbed the hit)
+            targetsCopy.Clear();
+            for (int ti = 0; ti < modifiedTargets.Count; ti++)
+            {
+                targetsCopy.Add(modifiedTargets[ti] is PokemonPokemonUnion p ? p.Pokemon : null!);
+            }
 
             // When Dragon Darts targets two different pokemon, targetsCopy is a length 1 array each hit
             // so spreadMoveHit returns a length 1 damage array
@@ -1016,8 +1027,10 @@ public partial class BattleActions
 
         for (int i = 0; i < targetsCopy.Count; i++)
         {
-            Pokemon target = targetsCopy[i];
-            if (pokemon != target)
+            Pokemon? target = targetsCopy[i];
+            // Showdown: if (target && pokemon !== target)
+            // target can be null when Substitute absorbed the hit
+            if (target != null && pokemon != target)
             {
                 IntFalseUnion? dmg = moveDamage[i] switch
                 {
