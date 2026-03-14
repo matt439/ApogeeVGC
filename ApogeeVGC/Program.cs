@@ -9,22 +9,19 @@ public class Program
         var driver = new Driver();
         // Parse --mode argument
         var mode = DriverMode.EquivalenceBatchTest;
+        string? format = null;
         // First bare argument is the mode name
         if (args.Length > 0 && Enum.TryParse<DriverMode>(args[0], true, out var parsedMode))
         {
             mode = parsedMode;
         }
-        else
+        for (int i = 0; i < args.Length - 1; i++)
         {
-            for (int i = 0; i < args.Length - 1; i++)
-            {
-                if (args[i] == "--mode" && Enum.TryParse<DriverMode>(args[i + 1], true, out var parsed))
-                {
-                    mode = parsed;
-                    break;
-                }
-            }
+            if (args[i] == "--mode" && Enum.TryParse<DriverMode>(args[i + 1], true, out var parsed))
+                mode = parsed;
+            else if (args[i] == "--format")
+                format = args[i + 1];
         }
-        driver.Start(mode);
+        driver.Start(mode, format);
     }
 }

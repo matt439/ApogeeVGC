@@ -39,22 +39,50 @@ public partial class Driver
     /// Usage pattern: run this batch to find failures, then copy the failing
     /// seed into RunEquivalenceTest (EquivalenceTest mode) for debugging.
     /// </summary>
-    private void RunEquivalenceBatchTest()
+    private void RunEquivalenceBatchTest(string? formatOverride = null)
     {
+        string format = formatOverride ?? EquivalenceBatchFormat;
         string solutionRoot = FindSolutionRoot(AppContext.BaseDirectory);
         string toolDir = Path.Combine(solutionRoot, "Tools", "EquivalenceTest");
-        string cacheDir = Path.Combine(toolDir, "batch_cache");
-        string tempDir = Path.Combine(toolDir, "batch_temp");
+        string cacheDir = Path.Combine(toolDir, "batch_cache", format);
+        string tempDir = Path.Combine(toolDir, "batch_temp", format);
 
         Console.WriteLine($"[EquivBatch] Starting batch equivalence test");
-        Console.WriteLine($"[EquivBatch] Format: {EquivalenceBatchFormat}");
+        Console.WriteLine($"[EquivBatch] Format: {format}");
         Console.WriteLine($"[EquivBatch] Tests: {EquivalenceBatchNumTests}");
         Console.WriteLine($"[EquivBatch] Cache dir: {cacheDir}");
-        Console.WriteLine();
 
         // Create directories for fixtures
         Directory.CreateDirectory(cacheDir);
         Directory.CreateDirectory(tempDir);
+
+        // Validate Showdown version against cache
+        string showdownDir = Path.Combine(solutionRoot, "pokemon-showdown");
+        string currentCommit = GetShowdownCommitId(showdownDir);
+        string versionFile = Path.Combine(cacheDir, "showdown_version.txt");
+        if (File.Exists(versionFile))
+        {
+            string cachedCommit = File.ReadAllText(versionFile).Trim();
+            if (cachedCommit != currentCommit)
+            {
+                Console.WriteLine($"[EquivBatch] WARNING: Showdown version mismatch!");
+                Console.WriteLine($"[EquivBatch]   Cache was built with: {cachedCommit}");
+                Console.WriteLine($"[EquivBatch]   Current checkout:     {currentCommit}");
+                Console.WriteLine($"[EquivBatch]   Cached fixtures may be stale. Delete the cache dir to regenerate.");
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine($"[EquivBatch] Showdown version: {currentCommit} (matches cache)");
+            }
+        }
+        else if (currentCommit != "unknown")
+        {
+            // First run — record the version
+            File.WriteAllText(versionFile, currentCommit);
+            Console.WriteLine($"[EquivBatch] Showdown version: {currentCommit} (recorded to cache)");
+        }
+        Console.WriteLine();
 
         var results = new EquivalenceResult[EquivalenceBatchNumTests];
         var stopwatch = Stopwatch.StartNew();
@@ -103,7 +131,7 @@ public partial class Driver
                 {
                     // Cache miss — generate and cache
                     bool generated = GenerateShowdownFixture(
-                        toolDir, EquivalenceBatchFormat, seedStr, p1Seed, p2Seed, cacheBase, cachedLog);
+                        toolDir, format, seedStr, p1Seed, p2Seed, cacheBase, cachedLog);
 
                     if (!generated)
                     {
@@ -459,4 +487,32 @@ public partial class Driver
 
     private static string Truncate(string s, int maxLen) =>
         s.Length <= maxLen ? s : s[..maxLen] + "...";
+
+    /// <summary>
+    /// Gets the current git commit ID of the pokemon-showdown checkout.
+    /// </summary>
+    private static string GetShowdownCommitId(string showdownDir)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "git",
+                Arguments = "rev-parse HEAD",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = showdownDir,
+            };
+            using var process = Process.Start(psi);
+            if (process == null) return "unknown";
+            string output = process.StandardOutput.ReadToEnd().Trim();
+            process.WaitForExit(5_000);
+            return process.ExitCode == 0 ? output : "unknown";
+        }
+        catch
+        {
+            return "unknown";
+        }
+    }
 }

@@ -54,7 +54,7 @@ public partial class Driver
     // !! EDIT THIS to change the format for all driver modes (except DeterministicRegressionTest) !!
     private const FormatId ActiveFormatId = FormatId.Gen9VgcRegulationI;
 
-    public void Start(DriverMode mode)
+    public void Start(DriverMode mode, string? formatOverride = null)
     {
         switch (mode)
         {
@@ -100,7 +100,7 @@ public partial class Driver
                     "Tools/EquivalenceTest/batch_cache/battle_000000.log");
                 break;
             case DriverMode.EquivalenceBatchTest:
-                RunEquivalenceBatchTest();
+                RunEquivalenceBatchTest(formatOverride);
                 break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
