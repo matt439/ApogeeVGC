@@ -1,0 +1,349 @@
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#1] raw=1631747923 caller=Side.RandomFoe <- Battle.GetRandomTarget <- BattleQueue.ResolveAction <- BattleQueue.AddChoice
+  -> random(2) = 0
+[EachEvent] BeforeTurn speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#2] raw=1341404769 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 31
+[HITSTEPACC] move=Population Bomb accuracy=IntIntTrueUnion { Value = 99 } hits=True target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#3] raw=986016834 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 5
+[RNG#4] raw=369869325 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 1
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=2 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#5] raw=3137784001 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 73
+[MULTIACC] hit=2 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#6] raw=3135490692 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 17
+[RNG#7] raw=4246344871 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 15
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=3 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#8] raw=333228927 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 7
+[MULTIACC] hit=3 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#9] raw=4230470014 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 23
+[RNG#10] raw=114580440 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 0
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=4 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#11] raw=3937560478 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 91
+[MULTIACC] hit=4 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#12] raw=2548652831 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 14
+[RNG#13] raw=1182916898 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 4
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=5 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#14] raw=1797231695 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 41
+[MULTIACC] hit=5 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#15] raw=2249132941 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 12
+[RNG#16] raw=1970945621 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 7
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=6 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#17] raw=3641630701 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 84
+[MULTIACC] hit=6 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#18] raw=3170788421 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 17
+[RNG#19] raw=1857233064 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 6
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=7 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#20] raw=3822529318 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 89
+[MULTIACC] hit=7 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#21] raw=3915067496 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 21
+[RNG#22] raw=903013336 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 3
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=8 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#23] raw=1084011604 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 25
+[MULTIACC] hit=8 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#24] raw=1983392988 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 11
+[RNG#25] raw=832314744 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 3
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=9 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#26] raw=3613962608 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 84
+[MULTIACC] hit=9 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#27] raw=2816322091 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 15
+[RNG#28] raw=4145673776 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 15
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=10 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#29] raw=3302561941 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 76
+[MULTIACC] hit=10 accuracy=IntIntTrueUnion { Value = 99 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#30] raw=1814400921 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 10
+[RNG#31] raw=2926140699 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 10
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#32] raw=1600487815 caller=Side.RandomFoe <- Battle.GetRandomTarget <- Battle.GetTarget <- BattleActions.RunMove
+  -> random(2) = 0
+[RNG#33] raw=3565613847 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 83
+[RNG#34] raw=4238420974 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 23
+[RNG#35] raw=540868549 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 2
+[RNG#36] raw=999003169 caller=Battle.Random <- BattleActions.Secondaries <- BattleActions.SpreadMoveHit <- BattleActions.HitStepMoveHitLoop
+  -> random(100) = 23
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#37] raw=1647869186 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(1,3) = 1
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=177, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#38] raw=3546097138 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 82
+[RNG#39] raw=3633435474 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 20
+[RNG#40] raw=2401338632 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 8
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#41] raw=2837372520 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(0,2) = 1
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#42] raw=2557752402 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(1,3) = 2
+[RNG#43] raw=1595243466 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(3,5) = 3
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#44] raw=153060251 caller=Prng.RandomChance <- Battle.RandomChance <- <>c.<CreateConditionsStu>b__14_33 <- <>c__DisplayClass3_0.<Create>b__0
+  -> random(3) = 0
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#45] raw=2221079773 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(1,3) = 2
+[RNG#46] raw=2422170517 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(3,5) = 4
+[RNG#47] raw=1491931560 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(5,7) = 5
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#48] raw=3938375668 caller=Prng.RandomChance <- Battle.RandomChance <- <>c.<CreateConditionsStu>b__14_33 <- <>c__DisplayClass3_0.<Create>b__0
+  -> random(9) = 8
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#49] raw=2978443120 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 69
+[HITSTEPACC] move=Population Bomb accuracy=IntIntTrueUnion { Value = 74 } hits=True target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#50] raw=2320463902 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 12
+[RNG#51] raw=2408648313 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 8
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=2 move=Population Bomb target=Blastoise prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#52] raw=3724521482 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 86
+[MULTIACC] hit=2 accuracy=IntIntTrueUnion { Value = 75 } hits=False prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from RunAction]
+[RNG#53] raw=2860509198 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 66
+[RNG#54] raw=975355965 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 5
+[RNG#55] raw=13141658 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 0
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Crabominable=127, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Maushold=221 [from RunAction]
+[RNG#56] raw=3358555192 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(1,3) = 2
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[RNG#57] raw=3558548362 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 82
+[RNG#58] raw=2438905871 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 13
+[RNG#59] raw=1628664159 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 6
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[RNG#60] raw=1032184630 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 24
+[RNG#61] raw=2500151494 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 13
+[RNG#62] raw=924442956 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 3
+[RNG#63] raw=3049612275 caller=Battle.Random <- BattleActions.Secondaries <- BattleActions.SpreadMoveHit <- BattleActions.HitStepMoveHitLoop
+  -> random(100) = 71
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[RNG#64] raw=4144739744 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 96
+[HITSTEPACC] move=Population Bomb accuracy=IntIntTrueUnion { Value = 74 } hits=False target=Corviknight prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from RunAction]
+[RNG#65] raw=1822236242 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 42
+[RNG#66] raw=3789120299 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 21
+[RNG#67] raw=275605136 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 1
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=354, Corviknight=153, Zacian=234, Maushold=221 [from RunAction]
+[RNG#68] raw=869468763 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(1,3) = 1
+[RNG#69] raw=4184699640 caller=Prng.Shuffle <- Battle.SpeedSort <- Battle.FieldEvent <- Battle.RunAction
+  -> random(3,5) = 4
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=708, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[RNG#70] raw=1614248815 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 37
+[HITSTEPACC] move=Population Bomb accuracy=IntIntTrueUnion { Value = 74 } hits=True target=Corviknight prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#71] raw=1279291462 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 7
+[RNG#72] raw=2396839007 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 8
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=2 move=Population Bomb target=Corviknight prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#73] raw=1425728495 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 33
+[MULTIACC] hit=2 accuracy=IntIntTrueUnion { Value = 75 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#74] raw=117811117 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 0
+[RNG#75] raw=1234571316 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 4
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=3 move=Population Bomb target=Corviknight prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#76] raw=1064758952 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 24
+[MULTIACC] hit=3 accuracy=IntIntTrueUnion { Value = 75 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#77] raw=84904301 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 0
+[RNG#78] raw=3963514479 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 14
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=4 move=Population Bomb target=Corviknight prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#79] raw=216368167 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 5
+[MULTIACC] hit=4 accuracy=IntIntTrueUnion { Value = 75 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#80] raw=2669983813 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 14
+[RNG#81] raw=1622461190 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 6
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=5 move=Population Bomb target=Corviknight prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#82] raw=3171090624 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 73
+[MULTIACC] hit=5 accuracy=IntIntTrueUnion { Value = 75 } hits=True prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#83] raw=1335726455 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 7
+[RNG#84] raw=3729801393 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 13
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[MULTIACC] hit=6 move=Population Bomb target=Corviknight prngSeed=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[RNG#85] raw=3682160430 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepMoveHitLoop <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 85
+[MULTIACC] hit=6 accuracy=IntIntTrueUnion { Value = 75 } hits=False prngSeedAfter=[PrngSeed { Seed = 0, Gen5Seed = 58386,33533,8680,24509 }]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] BeforeTurn speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[RNG#86] raw=4146376663 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 96
+[RNG#87] raw=565261752 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.GetDamage <- BattleActions.GetSpreadDamage
+  -> random(24) = 3
+[RNG#88] raw=3909140252 caller=Battle.Random <- Battle.Randomizer <- BattleActions.ModifyDamage <- BattleActions.GetDamage
+  -> random(16) = 14
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[RNG#89] raw=512808777 caller=Prng.RandomChance <- Battle.RandomChance <- BattleActions.HitStepAccuracy <- BattleActions.TrySpreadMoveHit
+  -> random(100) = 11
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from HitStepMoveHitLoop]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
+[EachEvent] Update speeds: Blastoise=1062, Corviknight=306, Zacian=234, Maushold=221 [from RunAction]
