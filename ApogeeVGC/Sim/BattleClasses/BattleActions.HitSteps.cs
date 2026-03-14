@@ -828,7 +828,10 @@ public partial class BattleActions
                         }
                     }
 
-                    accuracy = IntTrueUnion.FromInt((int)accValue);
+                    // Use Ceiling to match Showdown's float-based comparison.
+                    // Showdown keeps accuracy as a float (e.g., 67.5) and checks random(100) < 67.5,
+                    // which passes for random=67. Truncation to 67 would fail that check.
+                    accuracy = IntTrueUnion.FromInt((int)Math.Ceiling(accValue));
                 }
 
                 RelayVar? modifyAccEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
