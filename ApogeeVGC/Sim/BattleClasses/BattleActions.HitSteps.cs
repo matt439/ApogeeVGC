@@ -457,7 +457,6 @@ public partial class BattleActions
                 IntIntTrueUnion intAcc => Battle.RandomChance(intAcc.Value, 100), // Roll for hit
                 _ => false,
             };
-
             if (!hits)
             {
                 // Move missed
@@ -758,6 +757,14 @@ public partial class BattleActions
                 IntTrueUnion accuracy = move.Accuracy;
                 double[] boostTable = [1, 4.0 / 3, 5.0 / 3, 2, 7.0 / 3, 8.0 / 3, 3];
 
+                // Track whether boost calculation produces a fractional accuracy.
+                // Showdown keeps accuracy as a float throughout. Its runEvent FinalModify
+                // only applies the chainModify modifier when relayVar is an integer
+                // (checks: relayVar === Math.abs(Math.floor(relayVar))).
+                // When boosts produce a float (e.g., 67.5), FinalModify is skipped,
+                // so ModifyAccuracy modifiers (like Wide Lens) are silently dropped.
+                bool accIsFloat = false;
+
                 if (accuracy is IntIntTrueUnion intAccuracy)
                 {
                     double accValue = intAccuracy.Value;
@@ -828,34 +835,54 @@ public partial class BattleActions
                         }
                     }
 
-                    // Use Ceiling to match Showdown's float-based comparison.
-                    // Showdown keeps accuracy as a float (e.g., 67.5) and checks random(100) < 67.5,
-                    // which passes for random=67. Truncation to 67 would fail that check.
-                    accuracy = IntTrueUnion.FromInt((int)Math.Ceiling(accValue));
+                    accIsFloat = accValue != Math.Floor(accValue);
+
+                    if (accIsFloat)
+                    {
+                        // Showdown keeps the float through runEvent. FinalModify is skipped
+                        // for non-integers, so modifiers from ModifyAccuracy (e.g., Wide Lens)
+                        // are silently dropped. Use Ceiling for randomChance since
+                        // random(100) < 67.5 (float) ≡ random(100) < 68 (int) for integers.
+                        accuracy = IntTrueUnion.FromInt((int)Math.Ceiling(accValue));
+                    }
+                    else
+                    {
+                        accuracy = IntTrueUnion.FromInt((int)accValue);
+                    }
                 }
 
+                // Run ModifyAccuracy event. When accIsFloat, the result is discarded
+                // (Showdown's FinalModify skips modifier application for float relay vars).
                 RelayVar? modifyAccEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
                     move, RelayVar.FromIntTrueUnion(accuracy));
 
-                if (modifyAccEvent is IntRelayVar irv)
+                if (!accIsFloat)
                 {
-                    accuracy = IntTrueUnion.FromInt(irv.Value);
-                }
-                else if (modifyAccEvent is BoolRelayVar { Value: true })
-                {
-                    accuracy = IntTrueUnion.FromTrue();
+                    if (modifyAccEvent is IntRelayVar irv)
+                    {
+                        accuracy = IntTrueUnion.FromInt(irv.Value);
+                    }
+                    else if (modifyAccEvent is BoolRelayVar { Value: true })
+                    {
+                        accuracy = IntTrueUnion.FromTrue();
+                    }
                 }
 
                 if (move.AlwaysHit != true)
                 {
+                    // Run Accuracy event. Same float handling as ModifyAccuracy.
                     RelayVar? accEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
                         move, RelayVar.FromIntTrueUnion(accuracy));
 
-                    if (accEvent is IntRelayVar aerv)
+                    if (!accIsFloat)
                     {
-                        accuracy = IntTrueUnion.FromInt(aerv.Value);
+                        if (accEvent is IntRelayVar aerv)
+                        {
+                            accuracy = IntTrueUnion.FromInt(aerv.Value);
+                        }
                     }
-                    else if (accEvent is BoolRelayVar { Value: true })
+                    // Always honor explicit true (e.g., Telekinesis makes moves always hit)
+                    if (accEvent is BoolRelayVar { Value: true })
                     {
                         accuracy = IntTrueUnion.FromTrue();
                     }
