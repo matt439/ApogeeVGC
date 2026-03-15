@@ -5,7 +5,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using BenchmarkDotNet.Attributes;
 using Microsoft.VSDiagnostics;
 
-namespace BenchmarkSuite1;
+namespace ApogeeVGC.Benchmarks;
 [CPUUsageDiagnoser]
 public class RandomTeamGeneratorBenchmark
 {

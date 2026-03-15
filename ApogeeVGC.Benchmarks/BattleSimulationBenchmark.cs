@@ -8,7 +8,7 @@ using ApogeeVGC.Sim.Utils;
 using BenchmarkDotNet.Attributes;
 using Microsoft.VSDiagnostics;
 
-namespace BenchmarkSuite1;
+namespace ApogeeVGC.Benchmarks;
 [CPUUsageDiagnoser]
 public class BattleSimulationBenchmark
 {
