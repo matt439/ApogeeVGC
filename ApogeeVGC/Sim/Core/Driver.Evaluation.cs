@@ -39,7 +39,7 @@ public partial class Driver
     private const int MctsDlIterations = 1000;
 
     // DL-Greedy evaluation settings (argmax policy, no search)
-    private const int DlGreedyEvaluationNumTest = 1000;
+    private const int DlGreedyEvaluationNumTest = 10000;
     private const int DlGreedyNumThreads = 32;
 
     /// <summary>

@@ -33,32 +33,3 @@ python -m experiments.battle_run_all --regulation gen9vgc2025regi --data-root /w
 ## Retrieving results (Terminal 2)
 
 scp -P PORT -i ~/.ssh/id_ed25519 -r root@HOST:/workspace/results c:/VSProjects/ApogeeVGC/Tools/DLModel/results
-
-
-
-# Local PC Instructions
-
-## Terminal 1 — ReplayScraper
-
-pip install -r requirements.txt
-
-#### Scrape replays
-python scraper.py --format gen9vgc2025regi
-
-#### Parse replays (produces parsed.jsonl, parsed_1200.jsonl, parsed_1500.jsonl)
-python parser.py --format gen9vgc2025regi
-
-## Terminal 2 — DLModel
-
-pip install -r requirements.txt
-
-python -c "import torch; print(torch.cuda.get_device_name(0))"
-
-#### Quick smoke test first (to catch errors before burning GPU hours)
-python -m experiments.preview_run_all --regulation gen9vgc2025regi --n-trials 3 --epochs 5 --tiers all
-
-#### Team Preview full pipeline (all rating tiers)
-python -m experiments.preview_run_all --regulation gen9vgc2025regi
-
-#### BattleNet full pipeline (all rating tiers)
-python -m experiments.battle_run_all --regulation gen9vgc2025regi

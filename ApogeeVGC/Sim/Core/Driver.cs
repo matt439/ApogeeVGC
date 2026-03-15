@@ -11,13 +11,22 @@ public partial class Driver
     private const int Team1EvalSeed = 54321;
     private const int Team2EvalSeed = 67890;
 
-    // Shared model paths (used by evaluation and ShowdownAssist)
-    private const string MctsModelPath = "Tools/DLModel/battle_model.onnx";
-    private const string MctsVocabPath = "Tools/DLModel/battle_model_vocab.json";
-    private const string MctsTeamPreviewModelPath = "Tools/DLModel/team_preview_model.onnx";
-
     // !! EDIT THIS to change the format for all driver modes (except DeterministicRegressionTest) !!
     private const FormatId ActiveFormatId = FormatId.Gen9VgcRegulationI;
+
+    // Model paths derived from the active regulation
+    private static string MctsModelPath => $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/battle_model.onnx";
+    private static string MctsVocabPath => $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/battle_model_vocab.json";
+    private static string MctsTeamPreviewModelPath => $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/team_preview_model.onnx";
+
+    private static string GetRegulationName(FormatId formatId) => formatId switch
+    {
+        FormatId.Gen9VgcRegulationG => "gen9vgc2024regg",
+        FormatId.Gen9VgcRegulationH => "gen9vgc2024regh",
+        FormatId.Gen9VgcRegulationI => "gen9vgc2025regi",
+        FormatId.Gen9VgcMega => "gen9vgcmega",
+        _ => throw new NotSupportedException($"No model mapping for format: {formatId}"),
+    };
 
     public void Start(DriverMode mode, string? formatOverride = null)
     {
