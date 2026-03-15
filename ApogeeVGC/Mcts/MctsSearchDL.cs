@@ -25,7 +25,8 @@ public sealed class MctsSearchDL(MctsConfig config, ModelInference model, Action
         Battle battle,
         SideId sideId,
         IChoiceRequest request,
-        BattlePerspective perspective)
+        BattlePerspective perspective,
+        bool verbose = false)
     {
         // Get legal actions with vocab indices for model mapping
         LegalActionSet legalActions = actionMapper.GetLegalActions(request, perspective);
@@ -33,6 +34,11 @@ public sealed class MctsSearchDL(MctsConfig config, ModelInference model, Action
         // Single action, no search needed
         if (legalActions.SlotA.Count == 1 && legalActions.SlotB.Count <= 1)
         {
+            if (verbose)
+            {
+                Console.WriteLine("  [MCTS-DL] Only one legal action — no search needed.");
+            }
+
             return (legalActions.SlotA[0],
                 legalActions.SlotB.Count > 0 ? legalActions.SlotB[0] : null);
         }
@@ -49,6 +55,11 @@ public sealed class MctsSearchDL(MctsConfig config, ModelInference model, Action
         {
             bool[] maskB = actionMapper.BuildLegalMask(legalActions.SlotB);
             probsB = ModelInference.MaskedSoftmax(output.PolicyB, maskB);
+        }
+
+        if (verbose)
+        {
+            PrintDLPriors(legalActions, probsA, probsB, output.Value);
         }
 
         // Create root node with DL policy priors
@@ -68,7 +79,14 @@ public sealed class MctsSearchDL(MctsConfig config, ModelInference model, Action
             });
 
         // Select the action pair with the most visits
-        return SelectBestAction(root);
+        (LegalAction bestA, LegalAction? bestB) = SelectBestAction(root);
+
+        if (verbose)
+        {
+            PrintMctsResults(root, bestA, bestB);
+        }
+
+        return (bestA, bestB);
     }
 
     /// <summary>
@@ -427,6 +445,95 @@ public sealed class MctsSearchDL(MctsConfig config, ModelInference model, Action
                 MoveId = MoveId.None,
             },
         };
+    }
+
+    // ── Verbose debug output ─────────────────────────────────────────
+
+    private void PrintDLPriors(LegalActionSet legalActions, float[] probsA, float[]? probsB, float value)
+    {
+        Vocab vocab = MctsResources.Vocab;
+        Console.WriteLine($"  ┌─ DL Evaluation ─ Value: {value:F4} ─────────────────────────────");
+        Console.WriteLine($"  │ Slot A actions ({legalActions.SlotA.Count}):");
+        Console.WriteLine($"  │   {"Action",-30} {"Policy",8}");
+        Console.WriteLine($"  │   {"------",-30} {"------",8}");
+        foreach (LegalAction a in legalActions.SlotA)
+        {
+            string label = FormatAction(a, vocab);
+            Console.WriteLine($"  │   {label,-30} {probsA[a.VocabIndex],8:P2}");
+        }
+
+        if (probsB != null && legalActions.SlotB.Count > 0)
+        {
+            Console.WriteLine($"  │ Slot B actions ({legalActions.SlotB.Count}):");
+            Console.WriteLine($"  │   {"Action",-30} {"Policy",8}");
+            Console.WriteLine($"  │   {"------",-30} {"------",8}");
+            foreach (LegalAction b in legalActions.SlotB)
+            {
+                string label = FormatAction(b, vocab);
+                Console.WriteLine($"  │   {label,-30} {probsB[b.VocabIndex],8:P2}");
+            }
+        }
+    }
+
+    private static void PrintMctsResults(MctsNode root, LegalAction bestA, LegalAction? bestB)
+    {
+        Vocab vocab = MctsResources.Vocab;
+        int totalVisits = root.VisitCount;
+
+        // Sort edges by visit count descending
+        List<MctsEdge> sorted = root.Edges.OrderByDescending(e => e.VisitCount).ToList();
+
+        Console.WriteLine($"  │ MCTS Results ({totalVisits} iterations):");
+
+        if (bestB.HasValue)
+        {
+            // Joint action space (doubles)
+            Console.WriteLine($"  │   {"Action A",-20} {"Action B",-20} {"Visits",7} {"Visit%",7} {"Q",7} {"Prior",7}");
+            Console.WriteLine($"  │   {"--------",-20} {"--------",-20} {"------",7} {"------",7} {"-----",7} {"-----",7}");
+            foreach (MctsEdge edge in sorted)
+            {
+                string labelA = FormatAction(edge.ActionA, vocab);
+                string labelB = edge.ActionB.HasValue ? FormatAction(edge.ActionB.Value, vocab) : "—";
+                bool isSelected = edge.ActionA.VocabIndex == bestA.VocabIndex &&
+                                  edge.ActionA.ChoiceType == bestA.ChoiceType &&
+                                  edge.ActionB.HasValue && bestB.HasValue &&
+                                  edge.ActionB.Value.VocabIndex == bestB.Value.VocabIndex &&
+                                  edge.ActionB.Value.ChoiceType == bestB.Value.ChoiceType;
+                string marker = isSelected ? " <<<" : "";
+                float visitPct = totalVisits > 0 ? (float)edge.VisitCount / totalVisits : 0f;
+                Console.WriteLine($"  │   {labelA,-20} {labelB,-20} {edge.VisitCount,7} {visitPct,7:P1} {edge.Q,7:F3} {edge.PriorP,7:F3}{marker}");
+            }
+        }
+        else
+        {
+            // Single-slot
+            Console.WriteLine($"  │   {"Action",-30} {"Visits",7} {"Visit%",7} {"Q",7} {"Prior",7}");
+            Console.WriteLine($"  │   {"------",-30} {"------",7} {"------",7} {"-----",7} {"-----",7}");
+            foreach (MctsEdge edge in sorted)
+            {
+                string label = FormatAction(edge.ActionA, vocab);
+                bool isSelected = edge.ActionA.VocabIndex == bestA.VocabIndex &&
+                                  edge.ActionA.ChoiceType == bestA.ChoiceType;
+                string marker = isSelected ? " <<<" : "";
+                float visitPct = totalVisits > 0 ? (float)edge.VisitCount / totalVisits : 0f;
+                Console.WriteLine($"  │   {label,-30} {edge.VisitCount,7} {visitPct,7:P1} {edge.Q,7:F3} {edge.PriorP,7:F3}{marker}");
+            }
+        }
+
+        string selectedA = FormatAction(bestA, vocab);
+        string selectedB = bestB.HasValue ? " + " + FormatAction(bestB.Value, vocab) : "";
+        Console.WriteLine($"  └─ Selected: {selectedA}{selectedB}");
+        Console.WriteLine();
+    }
+
+    private static string FormatAction(LegalAction action, Vocab vocab)
+    {
+        string key = vocab.GetActionKey(action.VocabIndex);
+        if (action.Terastallize.HasValue)
+            return key + " [Tera]";
+        if (action.Mega.HasValue)
+            return key + " [Mega]";
+        return key;
     }
 
     // ── Dirichlet noise ────────────────────────────────────────────────

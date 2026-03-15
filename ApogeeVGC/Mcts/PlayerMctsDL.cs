@@ -78,7 +78,7 @@ public sealed class PlayerMctsDL(
         // No info tracking — use raw perspective directly
         BattlePerspective perspective = perspectiveFactory();
 
-        (LegalAction actionA, LegalAction? actionB) = search.Search(battle, SideId, request, perspective);
+        (LegalAction actionA, LegalAction? actionB) = search.Search(battle, SideId, request, perspective, verbose: PrintDebug);
 
         return actionMapper.BuildChoice(actionA, actionB);
     }

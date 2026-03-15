@@ -62,6 +62,9 @@ public partial class Driver
             case DriverMode.SingleBattleDebug:
                 RunSingleBattleDebug(ActiveFormatId);
                 break;
+            case DriverMode.MctsDlSingleBattleDebug:
+                RunMctsDlSingleBattleDebug(ActiveFormatId);
+                break;
             case DriverMode.Gen5RngVerification:
                 RunGen5RngVerification();
                 break;

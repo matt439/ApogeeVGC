@@ -34,6 +34,14 @@ public enum DriverMode
     SingleBattleDebug,
 
     /// <summary>
+    /// Runs a single MCTS-DL vs Random battle with verbose decision logging.
+    /// At every decision point, prints all legal actions with DL policy priors,
+    /// MCTS visit counts, Q-values, and the final selected action.
+    /// Edit seed constants in Driver.Debug.cs to reproduce specific battles.
+    /// </summary>
+    MctsDlSingleBattleDebug,
+
+    /// <summary>
     /// Verify Gen5RNG port matches Showdown's PRNG output.
     /// Compare with: node Tools/EquivalenceTest/gen5rng_test.js
     /// </summary>
