@@ -27,7 +27,7 @@ public class BattleCorrectnessTests(LibraryFixture fixture, ITestOutputHelper ou
     private readonly Library _library = fixture.Library;
 
     [Theory]
-    [InlineData(FormatId.Gen9VgcRegulationI, 1000)]
+    [InlineData(FormatId.Gen9VgcRegulationI, 100000)]
     //[InlineData(FormatId.Gen9VgcMega, 1000)]
     public void ParallelBattles_CompleteWithoutExceptions(FormatId formatId, int numBattles)
     {
