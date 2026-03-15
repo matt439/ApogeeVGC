@@ -24,7 +24,7 @@ public record ActiveMove : Move, IEffect
     {
         var clone = (ActiveMove)MemberwiseClone();
         // Deep-copy secondaries to prevent mutations from leaking to the library template
-        clone.Secondaries = clone.Secondaries?.Select(s => s with { }).ToArray();
+        clone.Secondaries = CloneSecondaries(clone.Secondaries);
         if (clone.Self is not null) clone.Self = clone.Self with { };
         clone.Flags = clone.Flags with { };
         return clone;
@@ -60,7 +60,7 @@ public record ActiveMove : Move, IEffect
         SelfSwitch = template.SelfSwitch;
         SpreadHit = template.SpreadHit;
         MindBlownRecoil = template.MindBlownRecoil;
-        Secondaries = template.Secondaries?.Select(s => s with { }).ToArray();
+        Secondaries = CloneSecondaries(template.Secondaries);
         Self = template.Self is not null ? template.Self with { } : null;
         HasSheerForce = template.HasSheerForce;
         ForceStab = template.ForceStab;
@@ -118,7 +118,7 @@ public record ActiveMove : Move, IEffect
     {
         // Deep-copy secondaries to prevent mutations from leaking to the library template
         // (e.g., Serene Grace doubling Chance values in-place)
-        Secondaries = Secondaries?.Select(s => s with { }).ToArray()
+        Secondaries = CloneSecondaries(Secondaries)
                       ?? (Secondary != null ? [Secondary with { }] : null);
         Self = Self is not null ? Self with { } : null;
 
@@ -148,6 +148,19 @@ public record ActiveMove : Move, IEffect
     /// Required members (Name, Accuracy, MoveSlot) must be set in the initializer.
     /// </summary>
     public ActiveMove() { }
+
+    /// <summary>
+    /// Clones a secondaries array without LINQ to avoid delegate and iterator allocations.
+    /// Returns null if the input is null.
+    /// </summary>
+    private static SecondaryEffect[]? CloneSecondaries(SecondaryEffect[]? source)
+    {
+        if (source is null) return null;
+        var result = new SecondaryEffect[source.Length];
+        for (int i = 0; i < source.Length; i++)
+            result[i] = source[i] with { };
+        return result;
+    }
 
     public EffectType EffectType => EffectType.Move;
 

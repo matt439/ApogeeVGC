@@ -42,7 +42,7 @@ public partial class Side
     /// Avoids LINQ OrderBy allocations in the hot event-handler discovery path.
     /// </summary>
     private readonly List<ConditionId> _sideConditionOrder = [];
-    internal IReadOnlyList<ConditionId> SideConditionOrder => _sideConditionOrder;
+    internal List<ConditionId> SideConditionOrder => _sideConditionOrder;
 
     public List<Dictionary<ConditionId, EffectState>> SlotConditions { get; set; }
 

@@ -31,7 +31,7 @@ public class BattleSimulationBenchmark
     {
         var player1Options = new PlayerOptions
         {
-            Type = ApogeeVGC.Sim.Player.PlayerType.Random,
+            Type = Sim.Player.PlayerType.Random,
             Name = "Random 1",
             Team = _team1,
             Seed = new PrngSeed(12345),
@@ -39,7 +39,7 @@ public class BattleSimulationBenchmark
         };
         var player2Options = new PlayerOptions
         {
-            Type = ApogeeVGC.Sim.Player.PlayerType.Random,
+            Type = Sim.Player.PlayerType.Random,
             Name = "Random 2",
             Team = _team2,
             Seed = new PrngSeed(1818),

@@ -73,7 +73,7 @@ public partial class Pokemon : IPriorityComparison
     /// Avoids LINQ OrderBy allocations in the hot event-handler discovery path.
     /// </summary>
     private readonly List<ConditionId> _volatileOrder = [];
-    internal IReadOnlyList<ConditionId> VolatileOrder => _volatileOrder;
+    internal List<ConditionId> VolatileOrder => _volatileOrder;
 
     public bool? ShowCure { get; set; }
 

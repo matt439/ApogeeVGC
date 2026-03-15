@@ -1,9 +1,11 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.FieldClasses;
@@ -207,15 +209,26 @@ public class Field
     /// </summary>
     public bool SuppressingWeather()
     {
-        return Battle.Sides.Any(side =>
-            (from pokemon in side.Active
-                where pokemon != null // Check for null pokemon in active slots
-                where !pokemon.Fainted
-                where !pokemon.IgnoringAbility()
-                let ability = pokemon.GetAbility()
-                where ability.SuppressWeather
-                select pokemon).Any(pokemon =>
-                !(pokemon.AbilityState.Ending ?? false)));
+        List<Side> sides = Battle.Sides;
+        for (int s = 0; s < sides.Count; s++)
+        {
+            List<Pokemon?> active = sides[s].Active;
+            for (int i = 0; i < active.Count; i++)
+            {
+                Pokemon? pokemon = active[i];
+                if (pokemon is null || pokemon.Fainted || pokemon.IgnoringAbility())
+                    continue;
+
+                Ability ability = pokemon.GetAbility();
+                if (!ability.SuppressWeather)
+                    continue;
+
+                if (!(pokemon.AbilityState.Ending ?? false))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     public bool IsWeather(ConditionId weather)
