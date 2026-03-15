@@ -21,7 +21,7 @@ public class SimulatorSync : SimulatorBase
         PrintDebug = printDebug;
 
         // Validate teams against format rules
-        var validator = new TeamValidator(library, Battle.Format);
+        TeamValidator validator = new(library, Battle.Format);
         ValidateTeams(validator, battleOptions, printDebug);
 
         // Subscribe to Battle events
@@ -66,10 +66,10 @@ public class SimulatorSync : SimulatorBase
                 }
 
                 Console.WriteLine("Stack trace (last 10 frames):");
-                var frames = ex.StackTrace?.Split('\n').Take(10);
+                IEnumerable<string>? frames = ex.StackTrace?.Split('\n').Take(10);
                 if (frames != null)
                 {
-                    foreach (var frame in frames)
+                    foreach (string frame in frames)
                     {
                         Console.WriteLine($"  {frame.Trim()}");
                     }

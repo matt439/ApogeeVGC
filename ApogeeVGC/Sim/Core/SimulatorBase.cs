@@ -48,7 +48,7 @@ public abstract class SimulatorBase : IBattleController
 
     protected void OnUpdateRequested(object? sender, BattleUpdateEventArgs e)
     {
-        var player = GetPlayer(e.SideId);
+        IPlayer player = GetPlayer(e.SideId);
         player.UpdateEvents(e.Events);
     }
 
@@ -119,15 +119,15 @@ public abstract class SimulatorBase : IBattleController
 
     protected static void ValidateTeams(TeamValidator validator, BattleOptions battleOptions, bool printDebug)
     {
-        var player1Result = validator.ValidateTeam(battleOptions.Player1Options.Team);
-        var player2Result = validator.ValidateTeam(battleOptions.Player2Options.Team);
+        ValidationResult player1Result = validator.ValidateTeam(battleOptions.Player1Options.Team);
+        ValidationResult player2Result = validator.ValidateTeam(battleOptions.Player2Options.Team);
 
-        var allProblems = new List<string>();
+        List<string> allProblems = [];
 
         if (!player1Result.IsValid)
         {
             allProblems.Add($"Player 1 ({battleOptions.Player1Options.Name}) team validation failed:");
-            foreach (var problem in player1Result.Problems)
+            foreach (string problem in player1Result.Problems)
             {
                 allProblems.Add($"  - {problem}");
             }
@@ -136,7 +136,7 @@ public abstract class SimulatorBase : IBattleController
         if (!player2Result.IsValid)
         {
             allProblems.Add($"Player 2 ({battleOptions.Player2Options.Name}) team validation failed:");
-            foreach (var problem in player2Result.Problems)
+            foreach (string problem in player2Result.Problems)
             {
                 allProblems.Add($"  - {problem}");
             }
@@ -144,7 +144,7 @@ public abstract class SimulatorBase : IBattleController
 
         if (allProblems.Count > 0)
         {
-            var errorMessage = string.Join(Environment.NewLine, allProblems);
+            string errorMessage = string.Join(Environment.NewLine, allProblems);
             if (printDebug)
             {
                 Console.WriteLine($"[Simulator] Team validation failed:{Environment.NewLine}{errorMessage}");
@@ -171,7 +171,7 @@ public abstract class SimulatorBase : IBattleController
             throw new InvalidOperationException("Battle is not initialized");
         }
 
-        var side = Battle.Sides.First(s => s.Id == sideId);
+        Side side = Battle.Sides.First(s => s.Id == sideId);
         Battle.Win(side);
     }
 
@@ -198,7 +198,7 @@ public abstract class SimulatorBase : IBattleController
             throw new InvalidOperationException("Battle is not initialized");
         }
 
-        var side = Battle.Sides.First(s => s.Id == sideId);
+        Side side = Battle.Sides.First(s => s.Id == sideId);
         Battle.Lose(side);
     }
 }

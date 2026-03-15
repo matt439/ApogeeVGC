@@ -26,7 +26,7 @@ public static class EquivalenceTestHelper
     /// </summary>
     public static List<string> FilterProtocolLines(IEnumerable<string> lines)
     {
-        var result = new List<string>();
+        List<string> result = [];
         foreach (string line in lines)
         {
             if (string.IsNullOrWhiteSpace(line)) continue;
@@ -98,7 +98,7 @@ public static class EquivalenceTestHelper
     public static PokemonSet[] ParseShowdownTeam(
         JsonElement teamArray, ShowdownNameResolver resolver, Library library)
     {
-        var sets = new List<PokemonSet>();
+        List<PokemonSet> sets = [];
         foreach (JsonElement mon in teamArray.EnumerateArray())
         {
             string species = mon.GetProperty("species").GetString()!;
@@ -110,7 +110,7 @@ public static class EquivalenceTestHelper
             }
 
             // Moves
-            var moves = new List<MoveId>();
+            List<MoveId> moves = [];
             foreach (JsonElement m in mon.GetProperty("moves").EnumerateArray())
             {
                 string moveName = m.GetString()!;
@@ -133,36 +133,36 @@ public static class EquivalenceTestHelper
             // Nature
             string natureName = mon.TryGetProperty("nature", out JsonElement natElem)
                 ? natElem.GetString() ?? "Serious" : "Serious";
-            NatureId natureId = Enum.TryParse<NatureId>(natureName, true, out var nid) ? nid : NatureId.Serious;
+            NatureId natureId = Enum.TryParse<NatureId>(natureName, true, out NatureId nid) ? nid : NatureId.Serious;
             Nature nature = library.Natures[natureId];
 
             // EVs
-            var evs = new StatsTable();
+            StatsTable evs = new();
             if (mon.TryGetProperty("evs", out JsonElement evsElem))
             {
                 evs = new StatsTable
                 {
-                    Hp = evsElem.TryGetProperty("hp", out var hp) ? hp.GetInt32() : 0,
-                    Atk = evsElem.TryGetProperty("atk", out var atk) ? atk.GetInt32() : 0,
-                    Def = evsElem.TryGetProperty("def", out var def) ? def.GetInt32() : 0,
-                    SpA = evsElem.TryGetProperty("spa", out var spa) ? spa.GetInt32() : 0,
-                    SpD = evsElem.TryGetProperty("spd", out var spd) ? spd.GetInt32() : 0,
-                    Spe = evsElem.TryGetProperty("spe", out var spe) ? spe.GetInt32() : 0,
+                    Hp = evsElem.TryGetProperty("hp", out JsonElement hp) ? hp.GetInt32() : 0,
+                    Atk = evsElem.TryGetProperty("atk", out JsonElement atk) ? atk.GetInt32() : 0,
+                    Def = evsElem.TryGetProperty("def", out JsonElement def) ? def.GetInt32() : 0,
+                    SpA = evsElem.TryGetProperty("spa", out JsonElement spa) ? spa.GetInt32() : 0,
+                    SpD = evsElem.TryGetProperty("spd", out JsonElement spd) ? spd.GetInt32() : 0,
+                    Spe = evsElem.TryGetProperty("spe", out JsonElement spe) ? spe.GetInt32() : 0,
                 };
             }
 
             // IVs
-            var ivs = StatsTable.PerfectIvs;
+            StatsTable ivs = StatsTable.PerfectIvs;
             if (mon.TryGetProperty("ivs", out JsonElement ivsElem))
             {
                 ivs = new StatsTable
                 {
-                    Hp = ivsElem.TryGetProperty("hp", out var hp) ? hp.GetInt32() : 31,
-                    Atk = ivsElem.TryGetProperty("atk", out var atk) ? atk.GetInt32() : 31,
-                    Def = ivsElem.TryGetProperty("def", out var def) ? def.GetInt32() : 31,
-                    SpA = ivsElem.TryGetProperty("spa", out var spa) ? spa.GetInt32() : 31,
-                    SpD = ivsElem.TryGetProperty("spd", out var spd) ? spd.GetInt32() : 31,
-                    Spe = ivsElem.TryGetProperty("spe", out var spe) ? spe.GetInt32() : 31,
+                    Hp = ivsElem.TryGetProperty("hp", out JsonElement hp) ? hp.GetInt32() : 31,
+                    Atk = ivsElem.TryGetProperty("atk", out JsonElement atk) ? atk.GetInt32() : 31,
+                    Def = ivsElem.TryGetProperty("def", out JsonElement def) ? def.GetInt32() : 31,
+                    SpA = ivsElem.TryGetProperty("spa", out JsonElement spa) ? spa.GetInt32() : 31,
+                    SpD = ivsElem.TryGetProperty("spd", out JsonElement spd) ? spd.GetInt32() : 31,
+                    Spe = ivsElem.TryGetProperty("spe", out JsonElement spe) ? spe.GetInt32() : 31,
                 };
             }
 
@@ -178,7 +178,7 @@ public static class EquivalenceTestHelper
             }
 
             // Gender
-            var gender = GenderId.N;
+            GenderId gender = GenderId.N;
             if (mon.TryGetProperty("gender", out JsonElement genderElem))
             {
                 string g = genderElem.GetString() ?? "";
@@ -230,7 +230,7 @@ public static class EquivalenceTestHelper
     {
         string scriptPath = Path.Combine(toolDir, "run_showdown_battle.js");
 
-        var psi = new ProcessStartInfo
+        ProcessStartInfo psi = new()
         {
             FileName = "node",
             Arguments = $"\"{scriptPath}\" --random --format {format} --seed {seed} --p1seed {p1Seed} --p2seed {p2Seed} --out \"{outputBase}\"",
@@ -241,7 +241,7 @@ public static class EquivalenceTestHelper
             WorkingDirectory = toolDir,
         };
 
-        using var process = Process.Start(psi);
+        using Process? process = Process.Start(psi);
         if (process == null) return false;
 
         // Read stdout/stderr asynchronously to avoid deadlocks
@@ -275,7 +275,7 @@ public static class EquivalenceTestHelper
     {
         try
         {
-            var psi = new ProcessStartInfo
+            ProcessStartInfo psi = new()
             {
                 FileName = "git",
                 Arguments = "rev-parse HEAD",
@@ -284,7 +284,7 @@ public static class EquivalenceTestHelper
                 CreateNoWindow = true,
                 WorkingDirectory = showdownDir,
             };
-            using var process = Process.Start(psi);
+            using Process? process = Process.Start(psi);
             if (process == null) return "unknown";
             string output = process.StandardOutput.ReadToEnd().Trim();
             process.WaitForExit(5_000);

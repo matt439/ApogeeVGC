@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
@@ -32,8 +33,8 @@ public partial class Driver
 
         try
         {
-            var team1 = new RandomTeamGenerator(Library, formatId, debugTeam1Seed).GenerateTeam();
-            var team2 = new RandomTeamGenerator(Library, formatId, debugTeam2Seed).GenerateTeam();
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, debugTeam1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, debugTeam2Seed).GenerateTeam();
 
             PlayerOptions player1Options = new()
             {
@@ -64,7 +65,7 @@ public partial class Driver
                 MaxTurns = 2000,
             };
 
-            var simulator = new SimulatorSync();
+            SimulatorSync simulator = new();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
 
             Console.WriteLine();

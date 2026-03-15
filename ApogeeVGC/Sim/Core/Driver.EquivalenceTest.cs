@@ -19,30 +19,30 @@ public partial class Driver
         Console.WriteLine("=== Gen5RNG Verification ===");
         Console.WriteLine("Compare output with: node Tools/EquivalenceTest/gen5rng_test.js\n");
 
-        var seed = new Gen5RngSeed(1, 2, 3, 4);
+        Gen5RngSeed seed = new(1, 2, 3, 4);
 
         // Test raw next() values
-        var rng = new Gen5Rng(seed);
+        Gen5Rng rng = new(seed);
         Console.WriteLine("=== Raw next() values (100) ===");
-        for (var i = 0; i < 100; i++)
+        for (int i = 0; i < 100; i++)
         {
             uint val = rng.Next();
             Console.WriteLine($"{i}: {val}");
         }
 
         // Test random(N) via Prng wrapper
-        var prng = new Prng(PrngSeed.FromGen5(seed));
+        Prng prng = new(PrngSeed.FromGen5(seed));
         Console.WriteLine("\n=== random(256) values (100) ===");
-        for (var i = 0; i < 100; i++)
+        for (int i = 0; i < 100; i++)
         {
             int val = prng.Random(256);
             Console.WriteLine($"{i}: {val}");
         }
 
         // Test random(min, max)
-        var prng2 = new Prng(PrngSeed.FromGen5(seed));
+        Prng prng2 = new(PrngSeed.FromGen5(seed));
         Console.WriteLine("\n=== random(10, 20) values (50) ===");
-        for (var i = 0; i < 50; i++)
+        for (int i = 0; i < 50; i++)
         {
             int val = prng2.Random(10, 20);
             Console.WriteLine($"{i}: {val}");
@@ -79,7 +79,7 @@ public partial class Driver
         // Parse seed
         string seedStr = root.GetProperty("seed").GetString()!;
         string[] seedParts = seedStr.Split(',');
-        var gen5Seed = new Gen5RngSeed(
+        Gen5RngSeed gen5Seed = new(
             ushort.Parse(seedParts[0]),
             ushort.Parse(seedParts[1]),
             ushort.Parse(seedParts[2]),
@@ -90,23 +90,23 @@ public partial class Driver
         FormatId fmtId = EquivalenceTestHelper.ResolveFormatId(formatId);
 
         // Parse teams
-        var resolver = new ShowdownNameResolver(Library);
-        var p1Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p1Team"), resolver, Library);
-        var p2Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p2Team"), resolver, Library);
+        ShowdownNameResolver resolver = new(Library);
+        PokemonSet[] p1Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p1Team"), resolver, Library);
+        PokemonSet[] p2Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p2Team"), resolver, Library);
 
         Console.WriteLine($"[Equivalence] Format: {formatId}, Seed: {gen5Seed}");
         Console.WriteLine($"[Equivalence] P1 team: {string.Join(", ", p1Team.Select(p => p.Name))}");
         Console.WriteLine($"[Equivalence] P2 team: {string.Join(", ", p2Team.Select(p => p.Name))}");
 
         // Parse input log (choices)
-        var inputLog = new List<string>();
+        List<string> inputLog = [];
         foreach (JsonElement entry in root.GetProperty("inputLog").EnumerateArray())
         {
             inputLog.Add(entry.GetString()!);
         }
 
         // Create battle with Gen5RNG seed
-        var battleOptions = new BattleOptions
+        BattleOptions battleOptions = new()
         {
             Id = fmtId,
             Sync = true,
@@ -125,12 +125,12 @@ public partial class Driver
             MaxTurns = 1000,
         };
 
-        var battle = new Battle(battleOptions, Library);
+        Battle battle = new(battleOptions, Library);
         battle.Prng.TraceEnabled = true;
         battle.Start();
 
         // Parse choice entries from input log (skip start/player setup lines)
-        var choices = new Queue<string>();
+        Queue<string> choices = new();
         foreach (string logEntry in inputLog)
         {
             if (!logEntry.StartsWith(">")) continue;
@@ -143,18 +143,18 @@ public partial class Driver
         // Battle.Start() sets up the first request, then we feed choices
         // and call CommitChoices(), which runs TurnLoop and may generate
         // new requests (forced switches after fainting, etc.)
-        var choicesApplied = 0;
+        int choicesApplied = 0;
         while (!battle.Ended && battle.RequestState != RequestState.None)
         {
             // Feed choices for both sides from the input log
             // Feed choices from the queue, handling the case where one side
             // is already done (e.g. no forced switch needed)
-            var madeProgress = true;
+            bool madeProgress = true;
             while (choices.Count > 0 && !battle.AllChoicesDone() && madeProgress)
             {
                 madeProgress = false;
                 // Scan through queued choices to find ones we can apply
-                var scanned = 0;
+                int scanned = 0;
                 int total = choices.Count;
                 while (scanned < total && !battle.AllChoicesDone())
                 {
@@ -162,7 +162,7 @@ public partial class Driver
                     scanned++;
 
                     Side? side = null;
-                    var choice = "";
+                    string choice = "";
                     if (line.StartsWith("p1 "))
                     {
                         side = battle.P1;
@@ -210,14 +210,14 @@ public partial class Driver
         string[] showdownLines = File.ReadAllLines(showdownLogPath);
 
         // Filter to game-state-affecting lines for comparison
-        var csharpFiltered = EquivalenceTestHelper.FilterProtocolLines(battle.Log);
-        var showdownFiltered = EquivalenceTestHelper.FilterProtocolLines(showdownLines);
+        List<string> csharpFiltered = EquivalenceTestHelper.FilterProtocolLines(battle.Log);
+        List<string> showdownFiltered = EquivalenceTestHelper.FilterProtocolLines(showdownLines);
 
         Console.WriteLine($"[Equivalence] Filtered: C# {csharpFiltered.Count} lines, Showdown {showdownFiltered.Count} lines");
 
         // Find first mismatch and dump context around it
         int firstMismatchIdx = -1;
-        for (var d = 0; d < Math.Min(csharpFiltered.Count, showdownFiltered.Count); d++)
+        for (int d = 0; d < Math.Min(csharpFiltered.Count, showdownFiltered.Count); d++)
         {
             if (csharpFiltered[d] != showdownFiltered[d]) { firstMismatchIdx = d; break; }
         }
@@ -247,11 +247,11 @@ public partial class Driver
         }
 
         // Compare
-        var matches = 0;
-        var mismatches = 0;
+        int matches = 0;
+        int mismatches = 0;
         int maxLines = Math.Max(csharpFiltered.Count, showdownFiltered.Count);
 
-        for (var i = 0; i < maxLines; i++)
+        for (int i = 0; i < maxLines; i++)
         {
             string csLine = i < csharpFiltered.Count ? csharpFiltered[i] : "(missing)";
             string sdLine = i < showdownFiltered.Count ? showdownFiltered[i] : "(missing)";

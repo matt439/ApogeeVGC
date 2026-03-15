@@ -97,7 +97,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SimulatorSync();
+            SimulatorSync simulator = new();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
@@ -164,7 +164,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SimulatorSync();
+            SimulatorSync simulator = new();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
@@ -231,7 +231,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SimulatorSync();
+            SimulatorSync simulator = new();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
@@ -300,7 +300,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SimulatorSync();
+            SimulatorSync simulator = new();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
@@ -369,7 +369,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SimulatorSync();
+            SimulatorSync simulator = new();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
@@ -436,7 +436,7 @@ public partial class Driver
                 MaxTurns = 5000,
             };
 
-            var simulator = new SimulatorSync();
+            SimulatorSync simulator = new();
             SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
             return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
         }
@@ -516,7 +516,7 @@ public partial class Driver
     private static void LogInnerExceptions(Exception ex)
     {
         Exception? inner = ex.InnerException;
-        var depth = 1;
+        int depth = 1;
         while (inner != null)
         {
             Console.WriteLine();
@@ -537,7 +537,7 @@ public partial class Driver
     {
         try
         {
-            var processStartInfo = new ProcessStartInfo
+            ProcessStartInfo processStartInfo = new()
             {
                 FileName = "git",
                 Arguments = "rev-parse --short HEAD",

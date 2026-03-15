@@ -2,6 +2,7 @@ using ApogeeVGC.Gui;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
@@ -17,8 +18,8 @@ public partial class Driver
         Console.WriteLine($"[Driver] Starting Console vs Random ({Library.Formats[formatId].Name})");
         const bool debug = true;
 
-        var team1 = new RandomTeamGenerator(Library, formatId, Team1EvalSeed).GenerateTeam();
-        var team2 = new RandomTeamGenerator(Library, formatId, Team2EvalSeed).GenerateTeam();
+        List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, Team1EvalSeed).GenerateTeam();
+        List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, Team2EvalSeed).GenerateTeam();
 
         PlayerOptions player1Options = new()
         {
@@ -47,7 +48,7 @@ public partial class Driver
             Seed = new PrngSeed(BattleSeed),
         };
 
-        var simulator = new SimulatorAsync();
+        SimulatorAsync simulator = new();
         Console.WriteLine("[Driver] Simulator created");
 
         SimulatorResult result =
@@ -61,10 +62,10 @@ public partial class Driver
         Console.WriteLine($"[Driver] Starting GUI vs Random ({Library.Formats[formatId].Name})");
         const bool debug = true;
 
-        var team1 = new RandomTeamGenerator(Library, formatId, Team1EvalSeed).GenerateTeam();
-        var team2 = new RandomTeamGenerator(Library, formatId, Team2EvalSeed).GenerateTeam();
+        List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, Team1EvalSeed).GenerateTeam();
+        List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, Team2EvalSeed).GenerateTeam();
 
-        using var game = new BattleGame();
+        using BattleGame game = new();
 
         PlayerOptions player1Options = new()
         {
@@ -95,7 +96,7 @@ public partial class Driver
             Seed = new PrngSeed(BattleSeed),
         };
 
-        var simulator = new SimulatorAsync();
+        SimulatorAsync simulator = new();
         Console.WriteLine("[Driver] Simulator created");
 
         game.StartBattle(Library, battleOptions, simulator);

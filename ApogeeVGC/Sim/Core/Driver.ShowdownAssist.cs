@@ -11,16 +11,16 @@ public partial class Driver
         Console.WriteLine("[Driver] Starting Showdown Live Assist mode");
         Console.WriteLine("[Driver] Loading library and models...");
 
-        var vocab = Vocab.Load(MctsVocabPath, Library);
-        var encoder = new StateEncoder(vocab);
+        Vocab vocab = Vocab.Load(MctsVocabPath, Library);
+        StateEncoder encoder = new(vocab);
 
-        using var battleModel = new ModelInference(MctsModelPath, encoder);
-        using var previewModel = new TeamPreviewInference(MctsTeamPreviewModelPath, vocab);
+        using ModelInference battleModel = new(MctsModelPath, encoder);
+        using TeamPreviewInference previewModel = new(MctsTeamPreviewModelPath, vocab);
 
         // MCTS enabled: shadow battle constructed from Showdown protocol
-        var mctsConfig = new MctsConfig { NumIterations = 200 };
+        MctsConfig mctsConfig = new() { NumIterations = 200 };
 
-        var server = new ShowdownServer(
+        ShowdownServer server = new(
             Library, vocab, battleModel, previewModel,
             mctsConfig,
             formatId,

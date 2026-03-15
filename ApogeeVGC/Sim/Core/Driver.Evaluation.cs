@@ -34,9 +34,9 @@ public partial class Driver
     private const int MctsStandaloneIterations = 1000;
 
     // MCTS-DL evaluation settings (DL priors + value, no info tracking)
-    private const int MctsDlEvaluationNumTest = 10;
+    private const int MctsDlEvaluationNumTest = 20;
     private const int MctsDlNumThreads = 32;
-    private const int MctsDlIterations = 100000;
+    private const int MctsDlIterations = 10000;
 
     // DL-Greedy evaluation settings (argmax policy, no search)
     private const int DlGreedyEvaluationNumTest = 10000;
@@ -85,15 +85,15 @@ public partial class Driver
 
         // Pre-generate all teams before timing so the benchmark measures only battle simulation
         Console.WriteLine("[Driver] Pre-generating teams...");
-        var battles = new EvaluationBattleInput[RandomEvaluationNumTest];
-        for (var i = 0; i < RandomEvaluationNumTest; i++)
+        EvaluationBattleInput[] battles = new EvaluationBattleInput[RandomEvaluationNumTest];
+        for (int i = 0; i < RandomEvaluationNumTest; i++)
         {
             int baseOffset = i * 5 + 1;
             int team1Seed = Team1EvalSeed + baseOffset;
             int team2Seed = Team2EvalSeed + baseOffset + 1;
 
-            var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-            var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
 
             battles[i] = new EvaluationBattleInput(
                 team1, team2,
@@ -105,23 +105,22 @@ public partial class Driver
 
         Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
 
-        var stopwatch = Stopwatch.StartNew();
+        Stopwatch stopwatch = Stopwatch.StartNew();
 
-        var completedBattles = 0;
+        int completedBattles = 0;
 
         // Milestone timestamps for throughput analysis (one entry per 100 battles)
-        int numMilestones = RandomEvaluationNumTest / 100;
-        var milestoneTicks = new long[numMilestones];
+        const int numMilestones = RandomEvaluationNumTest / 100;
+        long[] milestoneTicks = new long[numMilestones];
 
         // Merged results collected from thread-local state after parallel loop
-        var allResults = new List<SimulatorResult>();
-        var allTurns = new List<int>();
-        var allExceptions =
-            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
-                Exception)>();
+        List<SimulatorResult> allResults = [];
+        List<int> allTurns = [];
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> allExceptions =
+            [];
 
         // Run simulations in parallel with thread-local state to eliminate contention
-        var parallelOptions = new ParallelOptions
+        ParallelOptions parallelOptions = new()
         {
             MaxDegreeOfParallelism = NumThreads,
         };
@@ -196,9 +195,9 @@ public partial class Driver
 
         stopwatch.Stop();
 
-        var resultsList = allResults;
-        var turnsList = allTurns;
-        var exceptionsList = allExceptions;
+        List<SimulatorResult> resultsList = allResults;
+        List<int> turnsList = allTurns;
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> exceptionsList = allExceptions;
 
         int successfulBattles = resultsList.Count;
         int failedBattles = exceptionsList.Count;
@@ -215,8 +214,8 @@ public partial class Driver
         double meanTurns = 0;
         double stdDevTurns = 0;
         double medianTurns = 0;
-        var minTurns = 0;
-        var maxTurns = 0;
+        int minTurns = 0;
+        int maxTurns = 0;
 
         if (turnsList.Count > 0)
         {
@@ -244,7 +243,7 @@ public partial class Driver
         {
             sb.AppendLine("??  EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (var i = 0; i < exceptionsList.Count; i++)
+            for (int i = 0; i < exceptionsList.Count; i++)
             {
                 (int t1Seed, int t2Seed, int p1Seed, int p2Seed, int bSeed, Exception ex) = exceptionsList[i];
                 sb.AppendLine($"Exception #{i + 1}:");
@@ -348,15 +347,15 @@ public partial class Driver
 
         // Pre-generate all teams before timing
         Console.WriteLine("[Driver] Pre-generating teams...");
-        var battles = new EvaluationBattleInput[GreedyEvaluationNumTest];
-        for (var i = 0; i < GreedyEvaluationNumTest; i++)
+        EvaluationBattleInput[] battles = new EvaluationBattleInput[GreedyEvaluationNumTest];
+        for (int i = 0; i < GreedyEvaluationNumTest; i++)
         {
             int baseOffset = i * 5 + 1;
             int team1Seed = Team1EvalSeed + baseOffset;
             int team2Seed = Team2EvalSeed + baseOffset + 1;
 
-            var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-            var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
 
             battles[i] = new EvaluationBattleInput(
                 team1, team2,
@@ -368,16 +367,15 @@ public partial class Driver
 
         Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
 
-        var stopwatch = Stopwatch.StartNew();
-        var completedBattles = 0;
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        int completedBattles = 0;
 
-        var allResults = new List<SimulatorResult>();
-        var allTurns = new List<int>();
-        var allExceptions =
-            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
-                Exception)>();
+        List<SimulatorResult> allResults = [];
+        List<int> allTurns = [];
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> allExceptions =
+            [];
 
-        var parallelOptions = new ParallelOptions
+        ParallelOptions parallelOptions = new()
         {
             MaxDegreeOfParallelism = GreedyNumThreads,
         };
@@ -464,7 +462,7 @@ public partial class Driver
         {
             sb.AppendLine("EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (var i = 0; i < allExceptions.Count; i++)
+            for (int i = 0; i < allExceptions.Count; i++)
             {
                 (int t1, int t2, int p1, int p2, int b, Exception ex) = allExceptions[i];
                 sb.AppendLine($"Exception #{i + 1}: {ex.GetType().Name}: {ex.Message}");
@@ -543,15 +541,15 @@ public partial class Driver
 
         // Pre-generate teams
         Console.WriteLine("[Driver] Pre-generating teams...");
-        var battles = new EvaluationBattleInput[MctsEvaluationNumTest];
-        for (var i = 0; i < MctsEvaluationNumTest; i++)
+        EvaluationBattleInput[] battles = new EvaluationBattleInput[MctsEvaluationNumTest];
+        for (int i = 0; i < MctsEvaluationNumTest; i++)
         {
             int baseOffset = i * 5 + 1;
             int team1Seed = Team1EvalSeed + baseOffset;
             int team2Seed = Team2EvalSeed + baseOffset + 1;
 
-            var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-            var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
 
             battles[i] = new EvaluationBattleInput(
                 team1, team2,
@@ -563,16 +561,15 @@ public partial class Driver
 
         Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
 
-        var stopwatch = Stopwatch.StartNew();
-        var completedBattles = 0;
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        int completedBattles = 0;
 
-        var allResults = new List<SimulatorResult>();
-        var allTurns = new List<int>();
-        var allExceptions =
-            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
-                Exception)>();
+        List<SimulatorResult> allResults = [];
+        List<int> allTurns = [];
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> allExceptions =
+            [];
 
-        var parallelOptions = new ParallelOptions
+        ParallelOptions parallelOptions = new()
         {
             MaxDegreeOfParallelism = MctsNumThreads,
         };
@@ -660,7 +657,7 @@ public partial class Driver
         {
             sb.AppendLine("EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (var i = 0; i < allExceptions.Count; i++)
+            for (int i = 0; i < allExceptions.Count; i++)
             {
                 (int t1, int t2, int p1, int p2, int b, Exception ex) = allExceptions[i];
                 sb.AppendLine($"Exception #{i + 1}: {ex.GetType().Name}: {ex.Message}");
@@ -716,7 +713,7 @@ public partial class Driver
         Console.WriteLine($"[Driver] Running {MctsStandaloneEvaluationNumTest} battles with {MctsStandaloneNumThreads} threads");
         Console.WriteLine($"[Driver] MCTS iterations per search: {MctsStandaloneIterations}");
 
-        var mctsConfig = new Mcts.MctsConfig
+        MctsConfig mctsConfig = new()
         {
             NumIterations = MctsStandaloneIterations,
             MaxDegreeOfParallelism = MctsStandaloneNumThreads,
@@ -725,15 +722,15 @@ public partial class Driver
 
         // Pre-generate teams
         Console.WriteLine("[Driver] Pre-generating teams...");
-        var battles = new EvaluationBattleInput[MctsStandaloneEvaluationNumTest];
-        for (var i = 0; i < MctsStandaloneEvaluationNumTest; i++)
+        EvaluationBattleInput[] battles = new EvaluationBattleInput[MctsStandaloneEvaluationNumTest];
+        for (int i = 0; i < MctsStandaloneEvaluationNumTest; i++)
         {
             int baseOffset = i * 5 + 1;
             int team1Seed = Team1EvalSeed + baseOffset;
             int team2Seed = Team2EvalSeed + baseOffset + 1;
 
-            var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-            var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
 
             battles[i] = new EvaluationBattleInput(
                 team1, team2,
@@ -745,16 +742,15 @@ public partial class Driver
 
         Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
 
-        var stopwatch = Stopwatch.StartNew();
-        var completedBattles = 0;
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        int completedBattles = 0;
 
-        var allResults = new List<SimulatorResult>();
-        var allTurns = new List<int>();
-        var allExceptions =
-            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
-                Exception)>();
+        List<SimulatorResult> allResults = [];
+        List<int> allTurns = [];
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> allExceptions =
+            [];
 
-        var parallelOptions = new ParallelOptions
+        ParallelOptions parallelOptions = new()
         {
             MaxDegreeOfParallelism = MctsStandaloneNumThreads,
         };
@@ -843,7 +839,7 @@ public partial class Driver
         {
             sb.AppendLine("EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (var i = 0; i < allExceptions.Count; i++)
+            for (int i = 0; i < allExceptions.Count; i++)
             {
                 (int t1, int t2, int p1, int p2, int b, Exception ex) = allExceptions[i];
                 sb.AppendLine($"Exception #{i + 1}: {ex.GetType().Name}: {ex.Message}");
@@ -912,7 +908,7 @@ public partial class Driver
             return;
         }
 
-        var mctsConfig = new Mcts.MctsConfig
+        MctsConfig mctsConfig = new()
         {
             NumIterations = MctsDlIterations,
         };
@@ -929,15 +925,15 @@ public partial class Driver
 
         // Pre-generate teams
         Console.WriteLine("[Driver] Pre-generating teams...");
-        var battles = new EvaluationBattleInput[MctsDlEvaluationNumTest];
-        for (var i = 0; i < MctsDlEvaluationNumTest; i++)
+        EvaluationBattleInput[] battles = new EvaluationBattleInput[MctsDlEvaluationNumTest];
+        for (int i = 0; i < MctsDlEvaluationNumTest; i++)
         {
             int baseOffset = i * 5 + 1;
             int team1Seed = Team1EvalSeed + baseOffset;
             int team2Seed = Team2EvalSeed + baseOffset + 1;
 
-            var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-            var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
 
             battles[i] = new EvaluationBattleInput(
                 team1, team2,
@@ -949,16 +945,15 @@ public partial class Driver
 
         Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
 
-        var stopwatch = Stopwatch.StartNew();
-        var completedBattles = 0;
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        int completedBattles = 0;
 
-        var allResults = new List<SimulatorResult>();
-        var allTurns = new List<int>();
-        var allExceptions =
-            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
-                Exception)>();
+        List<SimulatorResult> allResults = [];
+        List<int> allTurns = [];
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> allExceptions =
+            [];
 
-        var parallelOptions = new ParallelOptions
+        ParallelOptions parallelOptions = new()
         {
             MaxDegreeOfParallelism = MctsDlNumThreads,
         };
@@ -1051,7 +1046,7 @@ public partial class Driver
         {
             sb.AppendLine("EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (var i = 0; i < allExceptions.Count; i++)
+            for (int i = 0; i < allExceptions.Count; i++)
             {
                 (int t1, int t2, int p1, int p2, int b, Exception ex) = allExceptions[i];
                 sb.AppendLine($"Exception #{i + 1}: {ex.GetType().Name}: {ex.Message}");
@@ -1134,15 +1129,15 @@ public partial class Driver
         const bool debug = false;
 
         Console.WriteLine("[Driver] Pre-generating teams...");
-        var battles = new EvaluationBattleInput[DlGreedyEvaluationNumTest];
-        for (var i = 0; i < DlGreedyEvaluationNumTest; i++)
+        EvaluationBattleInput[] battles = new EvaluationBattleInput[DlGreedyEvaluationNumTest];
+        for (int i = 0; i < DlGreedyEvaluationNumTest; i++)
         {
             int baseOffset = i * 5 + 1;
             int team1Seed = Team1EvalSeed + baseOffset;
             int team2Seed = Team2EvalSeed + baseOffset + 1;
 
-            var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-            var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
 
             battles[i] = new EvaluationBattleInput(
                 team1, team2,
@@ -1154,16 +1149,15 @@ public partial class Driver
 
         Console.WriteLine("[Driver] Team pre-generation complete. Starting battles...");
 
-        var stopwatch = Stopwatch.StartNew();
-        var completedBattles = 0;
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        int completedBattles = 0;
 
-        var allResults = new List<SimulatorResult>();
-        var allTurns = new List<int>();
-        var allExceptions =
-            new List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception
-                Exception)>();
+        List<SimulatorResult> allResults = [];
+        List<int> allTurns = [];
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)> allExceptions =
+            [];
 
-        var parallelOptions = new ParallelOptions
+        ParallelOptions parallelOptions = new()
         {
             MaxDegreeOfParallelism = DlGreedyNumThreads,
         };
@@ -1254,7 +1248,7 @@ public partial class Driver
         {
             sb.AppendLine("EXCEPTION SUMMARY:");
             sb.AppendLine("-----------------------------------------------------------");
-            for (var i = 0; i < allExceptions.Count; i++)
+            for (int i = 0; i < allExceptions.Count; i++)
             {
                 (int t1, int t2, int p1, int p2, int b, Exception ex) = allExceptions[i];
                 sb.AppendLine($"Exception #{i + 1}: {ex.GetType().Name}: {ex.Message}");
@@ -1314,15 +1308,15 @@ public partial class Driver
         const int battlesPerFormat = 200;
         const bool debug = false;
 
-        var formats = new (FormatId Id, string Label)[]
-        {
+        (FormatId Id, string Label)[] formats =
+        [
             (FormatId.Gen9VgcRegulationI, "VGC Reg I"),
             (FormatId.Gen9VgcMega, "VGC Mega"),
-        };
+        ];
 
-        var stopwatch = Stopwatch.StartNew();
-        var resultBytes = new List<byte>();
-        var totalExceptions = 0;
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        List<byte> resultBytes = [];
+        int totalExceptions = 0;
 
         StringBuilder sb = new();
         sb.AppendLine();
@@ -1336,15 +1330,15 @@ public partial class Driver
 
             int p1Wins = 0, p2Wins = 0, ties = 0, exceptions = 0;
 
-            for (var i = 0; i < battlesPerFormat; i++)
+            for (int i = 0; i < battlesPerFormat; i++)
             {
                 // Deterministic seed derivation — same seeds produce same results
                 int baseOffset = i * 5 + 1;
                 int team1Seed = Team1EvalSeed + baseOffset;
                 int team2Seed = Team2EvalSeed + baseOffset + 1;
 
-                var team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-                var team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+                List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+                List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
 
                 try
                 {

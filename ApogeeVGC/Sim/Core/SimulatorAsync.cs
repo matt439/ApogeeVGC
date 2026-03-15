@@ -1,3 +1,4 @@
+using System.Text;
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
@@ -69,7 +70,7 @@ public class SimulatorAsync : SimulatorBase
         PrintDebug = printDebug;
 
         // Validate teams against format rules
-        var validator = new TeamValidator(library, Battle.Format);
+        TeamValidator validator = new(library, Battle.Format);
         ValidateTeams(validator, battleOptions, printDebug);
 
         // Subscribe to Battle events
@@ -94,20 +95,20 @@ public class SimulatorAsync : SimulatorBase
                 TimeSpan.FromSeconds(300)); // Shorter timeout for testing
 
             // Start the battle loop task
-            var battleLoopTask = Task.Run(RunBattleLoop, _cancellationTokenSource.Token);
+            Task battleLoopTask = Task.Run(RunBattleLoop, _cancellationTokenSource.Token);
 
             // Start processing choice responses
-            var choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
+            Task choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
 
             // Wait for either the battle to end or a timeout
-            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(300), _cancellationTokenSource.Token);
-            var completedTask = await Task.WhenAny(
+            Task timeoutTask = Task.Delay(TimeSpan.FromSeconds(300), _cancellationTokenSource.Token);
+            Task completedTask = await Task.WhenAny(
                 battleLoopTask,
                 choiceProcessingTask,
                 timeoutTask
             );
 
-            var taskName = completedTask == battleLoopTask ? "battleLoop" :
+            string taskName = completedTask == battleLoopTask ? "battleLoop" :
                 completedTask == choiceProcessingTask ? "choiceProcessing" : "timeout";
             if (PrintDebug)
             {
@@ -191,10 +192,10 @@ public class SimulatorAsync : SimulatorBase
                 }
 
                 Console.WriteLine("Stack trace (last 10 frames):");
-                var frames = ex.StackTrace?.Split('\n').Take(10);
+                IEnumerable<string>? frames = ex.StackTrace?.Split('\n').Take(10);
                 if (frames != null)
                 {
-                    foreach (var frame in frames)
+                    foreach (string frame in frames)
                     {
                         Console.WriteLine($"  {frame.Trim()}");
                     }
@@ -303,15 +304,15 @@ public class SimulatorAsync : SimulatorBase
         }
 
         // Start an async task to get the choice
-        var choiceTask = Task.Run(async () =>
+        Task choiceTask = Task.Run(async () =>
         {
             try
             {
-                var player = GetPlayer(e.SideId);
+                IPlayer player = GetPlayer(e.SideId);
 
                 // Request choice from the player
-                using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-                var choice = await player.GetNextChoiceAsync(
+                using CancellationTokenSource cts = new(TimeSpan.FromMinutes(5));
+                Choice choice = await player.GetNextChoiceAsync(
                     e.Request,
                     e.RequestType,
                     e.Perspective,
@@ -333,7 +334,7 @@ public class SimulatorAsync : SimulatorBase
                             $"[SimulatorAsync.OnChoiceRequested] Empty choice received for {e.SideId}, using AutoChoose");
                     }
 
-                    var side = Battle!.Sides.First(s => s.Id == e.SideId);
+                    Side side = Battle!.Sides.First(s => s.Id == e.SideId);
                     if (PrintDebug)
                     {
                         Console.WriteLine(
@@ -375,7 +376,7 @@ public class SimulatorAsync : SimulatorBase
                 }
 
                 // Auto-choose on timeout
-                var side = Battle!.Sides.First(s => s.Id == e.SideId);
+                Side side = Battle!.Sides.First(s => s.Id == e.SideId);
                 side.AutoChoose();
 
                 await _choiceResponseChannel!.Writer.WriteAsync(new ChoiceResponse
@@ -470,7 +471,7 @@ public class SimulatorAsync : SimulatorBase
                 Console.WriteLine("[SimulatorAsync.ProcessChoiceResponsesAsync] Starting");
             }
 
-            await foreach (var response in _choiceResponseChannel!.Reader.ReadAllAsync(
+            await foreach (ChoiceResponse response in _choiceResponseChannel!.Reader.ReadAllAsync(
                                cancellationToken))
             {
                 if (PrintDebug)
@@ -657,7 +658,7 @@ public class SimulatorAsync : SimulatorBase
             throw new InvalidOperationException("Battle is not initialized");
         }
 
-        var sb = new System.Text.StringBuilder();
+        StringBuilder sb = new();
 
         // Add start command with options (simplified)
         sb.AppendLine($">start {{\"formatid\":\"{Battle.Format.FormatId}\"}}");
@@ -666,7 +667,7 @@ public class SimulatorAsync : SimulatorBase
         sb.AppendLine($">reseed {Battle.PrngSeed}");
 
         // Add all logged choices and commands
-        foreach (var log in InputLog)
+        foreach (string log in InputLog)
         {
             sb.AppendLine(log);
         }
@@ -680,7 +681,7 @@ public class SimulatorAsync : SimulatorBase
     private void LogChoice(SideId sideId, Choice choice)
     {
         // Format choice as battle-stream protocol
-        var choiceStr = FormatChoiceForLog(choice);
+        string choiceStr = FormatChoiceForLog(choice);
         InputLog.Add($">{sideId.ToString().ToLower()} {choiceStr}");
     }
 
@@ -695,8 +696,8 @@ public class SimulatorAsync : SimulatorBase
             return "pass";
         }
 
-        var parts = new List<string>();
-        foreach (var action in choice.Actions)
+        List<string> parts = [];
+        foreach (ChosenAction action in choice.Actions)
         {
             // Format each action - this is a simplified version
             parts.Add(action.ToString() ?? "default");
