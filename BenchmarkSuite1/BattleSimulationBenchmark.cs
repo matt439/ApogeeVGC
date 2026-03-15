@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
@@ -7,9 +5,10 @@ using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
+using BenchmarkDotNet.Attributes;
 using Microsoft.VSDiagnostics;
 
-namespace ApogeeVGC.Benchmarks;
+namespace BenchmarkSuite1;
 [CPUUsageDiagnoser]
 public class BattleSimulationBenchmark
 {

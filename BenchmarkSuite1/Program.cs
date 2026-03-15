@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Running;
-using ApogeeVGC.Benchmarks;
 
 namespace BenchmarkSuite1
 {
