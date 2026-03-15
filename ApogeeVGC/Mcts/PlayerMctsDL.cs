@@ -98,6 +98,27 @@ public sealed class PlayerMctsDL(
         int teamSize = request.Side.Pokemon.Count;
         int bringCount = request.MaxChosenTeamSize ?? 4;
 
+        if (PrintDebug)
+        {
+            Console.WriteLine("  ┌─ Team Preview ─ DL Scores ─────────────────────────────────");
+            Console.WriteLine($"  │ My team ({teamSize} Pokemon, bringing {bringCount}):");
+            Console.WriteLine($"  │   {"Pokemon",-20} {"Bring",8} {"Lead",8}");
+            Console.WriteLine($"  │   {"-------",-20} {"-----",8} {"----",8}");
+            for (int i = 0; i < teamSize && i < output.BringScores.Length; i++)
+            {
+                string name = perspective.PlayerSide.Pokemon[i].Name;
+                Console.WriteLine($"  │   {name,-20} {output.BringScores[i],8:F4} {output.LeadScores[i],8:F4}");
+            }
+            Console.WriteLine($"  │ Opponent team:");
+            Console.WriteLine($"  │   {"Pokemon",-20}");
+            Console.WriteLine($"  │   {"-------",-20}");
+            for (int i = 0; i < perspective.OpponentSide.Pokemon.Count; i++)
+            {
+                string name = perspective.OpponentSide.Pokemon[i].Name;
+                Console.WriteLine($"  │   {name,-20}");
+            }
+        }
+
         // Select top bringCount Pokemon by bring score
         var bringIndices = Enumerable.Range(0, teamSize)
             .OrderByDescending(i => output.BringScores[i])
@@ -110,8 +131,7 @@ public sealed class PlayerMctsDL(
             .Take(2)
             .ToHashSet();
 
-        // Build ordering: leads first, then remaining brought, then unbrought
-        var brought = new HashSet<int>(bringIndices);
+        // Build ordering: leads first, then remaining brought (only bringCount total)
         var ordered = new List<int>();
 
         ordered.AddRange(bringIndices.Where(i => leadIndices.Contains(i))
@@ -120,10 +140,17 @@ public sealed class PlayerMctsDL(
         ordered.AddRange(bringIndices.Where(i => !leadIndices.Contains(i))
             .OrderByDescending(i => output.BringScores[i]));
 
-        for (int i = 0; i < teamSize; i++)
+        if (PrintDebug)
         {
-            if (!brought.Contains(i))
-                ordered.Add(i);
+            Console.WriteLine($"  │ Decision:");
+            Console.Write("  │   Leads: ");
+            Console.WriteLine(string.Join(", ", ordered.Take(2)
+                .Select(i => perspective.PlayerSide.Pokemon[i].Name)));
+            Console.Write("  │   Backs: ");
+            Console.WriteLine(string.Join(", ", ordered.Skip(2)
+                .Select(i => perspective.PlayerSide.Pokemon[i].Name)));
+            Console.WriteLine("  └────────────────────────────────────────────────────────────");
+            Console.WriteLine();
         }
 
         var actions = ordered.Select((originalIndex, newPosition) => new ChosenAction
