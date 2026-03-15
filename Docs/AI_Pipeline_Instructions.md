@@ -23,8 +23,5 @@ python -m experiments.preview_run_all --regulation gen9vgc2025regi
 #### BattleNet full pipeline (all rating tiers)
 python -m experiments.battle_run_all --regulation gen9vgc2025regi
 
-
-
+#### Generate ONNX files (pick one tier for production — each overwrites the same output folder)
 python export_best.py --regulation gen9vgc2025regi --tier all
-python export_best.py --regulation gen9vgc2025regi --tier 1200+
-python export_best.py --regulation gen9vgc2025regi --tier 1500+
