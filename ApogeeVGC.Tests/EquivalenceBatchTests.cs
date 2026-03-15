@@ -21,7 +21,7 @@ namespace ApogeeVGC.Tests;
 [Trait("Category", "Integration")]
 public class EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper output)
 {
-    private const int DefaultNumTests = 100;
+    private const int DefaultNumTests = 100000;
     private const string DefaultFormat = "gen9randomdoublesbattle";
 
     private readonly Library _library = fixture.Library;
