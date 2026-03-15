@@ -463,6 +463,7 @@ public partial class Driver
         "gen9vgc2024regh" => FormatId.Gen9VgcRegulationH,
         "gen9vgc2024regi" or "gen9vgc2025regi" => FormatId.Gen9VgcRegulationI,
         "gen9vgcmega" => FormatId.Gen9VgcMega,
+        "gen9randombattle" => FormatId.Gen9RandomBattle,
         "gen9randomdoublesbattle" => FormatId.Gen9RandomDoublesBattle,
         _ => throw new ArgumentException($"Unknown format: {formatId}"),
     };
