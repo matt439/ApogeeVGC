@@ -170,7 +170,7 @@ def build_vocab(parsed_path: str) -> dict:
                     if info.get('tera_type'):
                         tera_types.add(info['tera_type'])
 
-            for turn in game.get('turns', []):
+            for turn in game.get('decision_points', game.get('turns', [])):
                 for slot, state in turn.get('active', {}).items():
                     species.add(state['species'])
                 for action in turn.get('actions', []):
@@ -236,7 +236,7 @@ class VGCDataset(Dataset):
         # Pre-count samples (skip games with no winner)
         valid_games = [g for g in games if g.get('winner') in ('p1', 'p2')]
         samples_per_turn = 1 if winners_only else 2
-        n = sum(len(g['turns']) * samples_per_turn for g in valid_games)
+        n = sum(len(g.get('decision_points', g.get('turns', []))) * samples_per_turn for g in valid_games)
 
         self.species_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
         self.move_ids = torch.zeros(n, NUM_SPECIES_SLOTS, 4, dtype=torch.long)
@@ -292,7 +292,7 @@ class VGCDataset(Dataset):
             }
             prog_tera: dict[str, dict[str, str]] = {'p1': {}, 'p2': {}}
 
-            game_turns = game.get('turns', [])
+            game_turns = game.get('decision_points', game.get('turns', []))
             max_turn = max(len(game_turns), 1)
 
             for turn in game_turns:

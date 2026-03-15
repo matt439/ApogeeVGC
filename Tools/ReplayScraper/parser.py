@@ -6,13 +6,18 @@ Parses replay JSON files into structured data for analysis and DL training.
 Output per replay:
   - Metadata: players, ratings (before/after), winner, format
   - Teams: full team preview + which 4 were brought
-  - Turn-by-turn: state snapshot at start of each turn + actions taken
+  - Decision points: state snapshot + actions at every player decision
   - Revealed info: moves, items, abilities, tera types seen per pokemon
 
+Decision points are emitted whenever a player must choose an action:
+  - turn_start:   both players choose moves/switches at the start of each turn
+  - faint_switch:  a player must send in a replacement after a KO
+  - force_switch:  a player chooses a switch-in after U-turn, Volt Switch, etc.
+
 Always generates 3 output files per format, filtered by player rating:
-  - parsed.jsonl      — all games
-  - parsed_1200.jsonl — both players rated >= 1200
-  - parsed_1500.jsonl — both players rated >= 1500
+  - parsed.jsonl      -- all games
+  - parsed_1200.jsonl -- both players rated >= 1200
+  - parsed_1500.jsonl -- both players rated >= 1500
 
 Usage:
   python parser.py                                    # parse all downloaded replays
@@ -30,6 +35,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from pathlib import Path
 from typing import Any
 
@@ -55,7 +61,7 @@ except ImportError:
         return json.dumps(obj, indent=2, ensure_ascii=False)
 
 
-# ── Pre-compiled regexes ──────────────────────────────────────────────────────
+# -- Pre-compiled regexes -----------------------------------------------------
 
 _RE_RATING = re.compile(
     r"(.+?)'s rating: (\d+) &rarr; <strong>(\d+)</strong>"
@@ -63,16 +69,21 @@ _RE_RATING = re.compile(
 _RE_FROM_ABILITY = re.compile(r"\[from\] ability: (.+?)(?:\||\[|$)")
 _RE_OF_SLOT = re.compile(r"\[of\] (p[12][ab]): (.+?)(?:\||$)")
 _RE_FROM_ITEM = re.compile(r"\[from\] item: (.+?)(?:\||\[|$)")
+_RE_FROM_MOVE = re.compile(r"\[from\] (?:move: )?(.+?)(?:\||\[|$)")
+
+# Moves that cause the USER to switch out (player chooses replacement)
+_SELF_SWITCH_MOVES = frozenset({
+    "U-turn", "Volt Switch", "Flip Turn", "Parting Shot", "Baton Pass",
+    "Teleport",
+})
+
+# Phazing moves drag opponent out with no choice (use |drag| not |switch|)
+_PHAZING_MOVES = frozenset({
+    "Whirlwind", "Roar", "Dragon Tail", "Circle Throw",
+})
 
 
-# ── Data structures ──────────────────────────────────────────────────────────
-
-
-@dataclass
-class Pokemon:
-    species: str
-    level: int = 50
-    gender: str | None = None  # M, F, or None (genderless)
+# -- Data structures ----------------------------------------------------------
 
 
 @dataclass
@@ -104,7 +115,7 @@ class FieldState:
     p2_aurora_veil: bool = False
 
     def to_dict(self) -> dict:
-        d = {}
+        d: dict[str, Any] = {}
         if self.weather:
             d["weather"] = self.weather
         if self.terrain:
@@ -117,29 +128,15 @@ class FieldState:
                     d[f"{side}_{screen}"] = True
         return d
 
-
-@dataclass
-class TurnAction:
-    """An action taken by one active pokemon in a turn."""
-    slot: str  # p1a, p1b, p2a, p2b
-    action_type: str  # "move", "switch", "cant", "none"
-    detail: str = ""  # move name, or switch-in species, or cant reason
-    target: str = ""  # target slot if applicable
-    tera: str | None = None  # tera type if terastallized this turn
-    mega: bool = False
-
-
-@dataclass
-class TurnData:
-    turn: int
-    # State at start of turn (before actions)
-    active: dict[str, dict]  # slot -> {species, hp, status, boosts, tera}
-    field: dict  # field state
-    # Actions taken this turn
-    actions: list[dict]  # list of action dicts
-    # What happened
-    faints: list[str]  # slots that fainted (e.g. ["p1a", "p2b"])
-    switches_in: list[dict]  # forced switches after faints
+    def swap_sides(self) -> None:
+        """Swap all side conditions between p1 and p2 (Court Change)."""
+        for screen in ("tailwind", "reflect", "light_screen", "aurora_veil"):
+            p1_attr = f"p1_{screen}"
+            p2_attr = f"p2_{screen}"
+            p1_val = getattr(self, p1_attr)
+            p2_val = getattr(self, p2_attr)
+            setattr(self, p1_attr, p2_val)
+            setattr(self, p2_attr, p1_val)
 
 
 @dataclass
@@ -151,7 +148,13 @@ class RevealedInfo:
     tera_type: str | None = None
 
 
-# ── Parser ───────────────────────────────────────────────────────────────────
+class Phase(Enum):
+    PRE_BATTLE = auto()     # before turn 1
+    TURN_ACTIVE = auto()    # between |turn|N and |upkeep| (or next |turn|)
+    BETWEEN_TURNS = auto()  # after |upkeep|, before next |turn|
+
+
+# -- Parsing helpers -----------------------------------------------------------
 
 
 def parse_hp(hp_str: str) -> tuple[int, int]:
@@ -185,7 +188,6 @@ def parse_species_detail(detail: str) -> tuple[str, int, str | None]:
     """Parse 'Lunala, L50, F' into ('Lunala', 50, 'F')."""
     parts = [p.strip() for p in detail.split(",")]
     species = parts[0]
-    # Strip shiny/tera markers from species detail
     species = species.replace(", shiny", "").strip()
     level = 50
     gender = None
@@ -198,16 +200,19 @@ def parse_species_detail(detail: str) -> tuple[str, int, str | None]:
                 pass
         elif p in ("M", "F"):
             gender = p
-        elif p == "shiny":
+        elif p in ("shiny",):
             pass
         elif p.startswith("tera:"):
-            pass  # already terastallized info
+            pass
     return species, level, gender
 
 
 def player_side(slot: str) -> str:
     """'p1a' -> 'p1', 'p2b' -> 'p2'."""
     return slot[:2]
+
+
+# -- Main parser ---------------------------------------------------------------
 
 
 def parse_replay(replay_data: dict) -> dict | None:
@@ -218,42 +223,47 @@ def parse_replay(replay_data: dict) -> dict | None:
 
     lines = log.split("\n")
 
-    # ── Metadata ──
+    # -- Metadata --
     players: dict[str, dict] = {}
     team_preview: dict[str, list[dict]] = {"p1": [], "p2": []}
     team_brought: dict[str, list[str]] = {"p1": [], "p2": []}
-    winner: str | None = None  # "p1", "p2", or None (tie/forfeit)
+    winner: str | None = None
     winner_name: str | None = None
     is_doubles = False
 
-    # ── Runtime state ──
+    # -- Runtime state --
     active: dict[str, ActivePokemon] = {}  # slot -> ActivePokemon
-    # bench tracks pokemon not currently on field: species -> {hp, max_hp, status, fainted}
     bench: dict[str, dict[str, dict]] = {"p1": {}, "p2": {}}
-    field = FieldState()
-    nickname_to_species: dict[str, str] = {}  # "p1a: Lunala" key -> species
-    slot_species: dict[str, str] = {}  # slot -> current species
+    field_state = FieldState()
+    nickname_to_species: dict[str, str] = {}
+    slot_species: dict[str, str] = {}
 
-    # ── Revealed info ──
+    # -- Revealed info --
     revealed: dict[str, dict[str, RevealedInfo]] = {"p1": {}, "p2": {}}
 
-    # ── Turn tracking ──
-    turns: list[dict] = []
+    # -- Decision point tracking --
+    decision_points: list[dict] = []
     current_turn = 0
-    turn_actions: list[TurnAction] = []
-    turn_faints: list[str] = []
-    turn_switches: list[dict] = []
+    phase = Phase.PRE_BATTLE
+    turn_actions: list[dict] = []
     turn_tera: dict[str, str] = {}
-    pending_state: dict | None = None  # state snapshot at turn start
-    pending_field: dict | None = None  # field snapshot at turn start
-    pending_bench: dict | None = None  # bench snapshot at turn start
+    pending_state: dict | None = None
+    pending_field: dict | None = None
+    pending_bench: dict | None = None
 
-    def snapshot_state() -> dict:
+    # Faint switch tracking
+    pending_faint_slots: list[str] = []  # slots needing replacement
+    faint_switch_state: dict | None = None
+    faint_switch_field: dict | None = None
+    faint_switch_bench: dict | None = None
+    faint_switch_actions: list[dict] = []
+
+    def snapshot_active() -> dict:
         """Capture current active pokemon state."""
-        active_snapshot = {}
+        snap = {}
         for slot, poke in active.items():
             if poke is not None:
-                active_snapshot[slot] = {
+                snap[slot] = {
                     "species": poke.species,
                     "hp": poke.hp,
                     "status": poke.status,
@@ -261,11 +271,11 @@ def parse_replay(replay_data: dict) -> dict | None:
                     "tera": poke.tera_type,
                     "fainted": poke.fainted,
                 }
-        return active_snapshot
+        return snap
 
     def snapshot_bench() -> dict[str, list[dict]]:
         """Capture bench pokemon state for both sides."""
-        result = {}
+        result: dict[str, list[dict]] = {}
         for side in ("p1", "p2"):
             bench_list = []
             for species, info in bench[side].items():
@@ -286,60 +296,146 @@ def parse_replay(replay_data: dict) -> dict | None:
 
     def resolve_species(slot: str, nickname: str) -> str:
         """Resolve a nickname to species, or return nickname if unknown."""
-        key = f"{slot}: {nickname}"
-        # Try exact slot match first
         if slot in slot_species:
             return slot_species[slot]
-        # Fall back to nickname map
+        key = f"{slot}: {nickname}"
         return nickname_to_species.get(key, nickname)
 
-    def flush_turn():
-        """Save the current turn's data."""
+    def emit_turn_start():
+        """Emit a turn_start decision point for the current turn."""
         nonlocal pending_state, pending_field, pending_bench
-        if current_turn == 0:
-            return
-        if pending_state is None:
+        if current_turn == 0 or pending_state is None:
             return
 
-        actions = []
-        for a in turn_actions:
-            ad = {
-                "slot": a.slot,
-                "type": a.action_type,
-                "detail": a.detail,
-            }
-            if a.target:
-                ad["target"] = a.target
-            if a.tera:
-                ad["tera"] = a.tera
-            actions.append(ad)
-
-        turn_data = {
+        dp = {
             "turn": current_turn,
+            "type": "turn_start",
             "active": pending_state,
             "field": pending_field or {},
-            "actions": actions,
-            "faints": list(turn_faints),
+            "actions": list(turn_actions),
         }
         if pending_bench:
-            turn_data["bench"] = pending_bench
-        turns.append(turn_data)
+            dp["bench"] = pending_bench
+        decision_points.append(dp)
 
-    # ── Parse lines ──
+    def emit_force_switch(slot: str, species_in: str, trigger: str):
+        """Emit a force_switch decision point."""
+        side = player_side(slot)
+        dp = {
+            "turn": current_turn,
+            "type": "force_switch",
+            "trigger": trigger,
+            "deciding_side": side,
+            "deciding_slots": [slot],
+            "active": snapshot_active(),
+            "field": field_state.to_dict(),
+            "actions": [{"slot": slot, "type": "switch", "detail": species_in}],
+        }
+        b = snapshot_bench()
+        if b:
+            dp["bench"] = b
+        decision_points.append(dp)
+
+    def start_faint_switch_collection():
+        """Snapshot state for pending faint switches."""
+        nonlocal faint_switch_state, faint_switch_field, faint_switch_bench
+        nonlocal faint_switch_actions
+        faint_switch_state = snapshot_active()
+        faint_switch_field = field_state.to_dict()
+        faint_switch_bench = snapshot_bench()
+        faint_switch_actions = []
+
+    def flush_faint_switches():
+        """Emit a faint_switch decision point if there are pending faint replacements."""
+        nonlocal pending_faint_slots, faint_switch_state
+        if not faint_switch_actions:
+            pending_faint_slots.clear()
+            faint_switch_state = None
+            return
+
+        # Determine which sides are deciding
+        deciding_sides = sorted(set(
+            player_side(a["slot"]) for a in faint_switch_actions
+        ))
+        deciding_slots = [a["slot"] for a in faint_switch_actions]
+
+        dp = {
+            "turn": current_turn,
+            "type": "faint_switch",
+            "deciding_sides": deciding_sides,
+            "deciding_slots": deciding_slots,
+            "active": faint_switch_state or {},
+            "field": faint_switch_field or {},
+            "actions": list(faint_switch_actions),
+        }
+        if faint_switch_bench:
+            dp["bench"] = faint_switch_bench
+        decision_points.append(dp)
+
+        pending_faint_slots.clear()
+        faint_switch_state = None
+        faint_switch_actions.clear()
+
+    def has_bench_alive(side: str) -> bool:
+        """Check if a side has any non-fainted bench pokemon."""
+        for info in bench[side].values():
+            if not info.get("fainted", False):
+                return True
+        return False
+
+    def do_switch(slot: str, nickname: str, detail: str, hp_str: str):
+        """Process a switch/drag event and update state."""
+        species, level, gender = parse_species_detail(detail)
+        hp, max_hp = parse_hp(hp_str)
+        status = parse_status_from_hp(hp_str)
+        side = player_side(slot)
+
+        # Save outgoing pokemon to bench
+        if slot in active and active[slot] is not None:
+            old = active[slot]
+            bench[side][old.species] = {
+                "hp": old.hp,
+                "max_hp": old.max_hp,
+                "status": old.status,
+                "fainted": old.fainted,
+            }
+
+        # Remove incoming pokemon from bench
+        if species in bench[side]:
+            del bench[side][species]
+
+        # Track mappings
+        nickname_to_species[f"{slot}: {nickname}"] = species
+        slot_species[slot] = species
+
+        if species not in team_brought.get(side, []):
+            team_brought[side].append(species)
+
+        active[slot] = ActivePokemon(
+            species=species,
+            slot=slot,
+            nickname=nickname,
+            hp=hp,
+            max_hp=max_hp,
+            status=status,
+        )
+
+        return species
+
+    # -- Parse lines --
     for line in lines:
         if not line.startswith("|"):
             continue
 
         parts = line.split("|")
-        # parts[0] is empty string before first |
         if len(parts) < 2:
             continue
         cmd = parts[1]
 
         try:
-            # ── Metadata ──
+            # -- Metadata --
             if cmd == "player" and len(parts) >= 4:
-                pid = parts[2].strip()  # p1 or p2
+                pid = parts[2].strip()
                 name = parts[3].strip()
                 rating = None
                 if len(parts) >= 6 and parts[5].strip():
@@ -352,11 +448,10 @@ def parse_replay(replay_data: dict) -> dict | None:
             elif cmd == "gametype":
                 is_doubles = parts[2].strip() == "doubles"
 
-            # ── Team preview ──
+            # -- Team preview --
             elif cmd == "poke" and len(parts) >= 4:
                 side = parts[2].strip()
                 detail = parts[3].strip()
-                # Strip trailing | item info
                 species, level, gender = parse_species_detail(detail)
                 team_preview[side].append({
                     "species": species,
@@ -364,82 +459,156 @@ def parse_replay(replay_data: dict) -> dict | None:
                     "gender": gender,
                 })
 
-            # ── Team brought (from teamsize) ──
-            elif cmd == "teamsize" and len(parts) >= 4:
-                pass  # We track brought via switches
+            elif cmd == "teamsize":
+                pass
 
-            # ── Turn marker ──
+            # -- Turn marker --
             elif cmd == "turn" and len(parts) >= 3:
-                # Flush previous turn
-                flush_turn()
+                # Flush pending faint switches from between turns
+                if pending_faint_slots:
+                    flush_faint_switches()
+
+                # Emit previous turn's decision point
+                emit_turn_start()
+
                 current_turn = int(parts[2].strip())
+                phase = Phase.TURN_ACTIVE
                 turn_actions = []
-                turn_faints = []
-                turn_switches = []
                 turn_tera = {}
-                pending_state = snapshot_state()
-                pending_field = field.to_dict()
+                pending_state = snapshot_active()
+                pending_field = field_state.to_dict()
                 pending_bench = snapshot_bench()
 
-            # ── Switch / Drag (forced switch) ──
-            elif cmd in ("switch", "drag") and len(parts) >= 5:
+            # -- Upkeep (end of turn effects) --
+            elif cmd == "upkeep":
+                phase = Phase.BETWEEN_TURNS
+                # Check if there are fainted pokemon that need replacements
+                if pending_faint_slots:
+                    # Filter to slots where the side has bench pokemon alive
+                    pending_faint_slots = [
+                        s for s in pending_faint_slots
+                        if has_bench_alive(player_side(s))
+                    ]
+                    if pending_faint_slots:
+                        start_faint_switch_collection()
+
+            # -- Switch / Drag --
+            elif cmd in ("switch", "drag", "replace") and len(parts) >= 5:
                 slot, nickname = parse_slot(parts[2].strip())
                 detail = parts[3].strip()
                 hp_str = parts[4].strip()
-                species, level, gender = parse_species_detail(detail)
-                hp, max_hp = parse_hp(hp_str)
-                status = parse_status_from_hp(hp_str)
-
                 side = player_side(slot)
 
-                # Save outgoing pokemon to bench
-                if slot in active and active[slot] is not None:
-                    old = active[slot]
-                    bench[side][old.species] = {
-                        "hp": old.hp,
-                        "max_hp": old.max_hp,
-                        "status": old.status,
-                        "fainted": old.fainted,
+                # Detect force switch from [from] tag
+                from_tag = ""
+                for p in parts[5:]:
+                    stripped = p.strip()
+                    if stripped.startswith("[from]"):
+                        from_tag = stripped
+                        break
+
+                is_force_switch = False
+                force_trigger = ""
+                if cmd == "switch" and from_tag and current_turn > 0:
+                    m = _RE_FROM_MOVE.search(from_tag)
+                    if m:
+                        trigger_name = m.group(1).strip()
+                        if trigger_name not in _PHAZING_MOVES:
+                            is_force_switch = True
+                            force_trigger = trigger_name
+                    elif "item:" in from_tag:
+                        m2 = _RE_FROM_ITEM.search(from_tag)
+                        if m2:
+                            is_force_switch = True
+                            force_trigger = m2.group(1).strip()
+                    elif "ability:" in from_tag:
+                        m2 = _RE_FROM_ABILITY.search(from_tag)
+                        if m2:
+                            is_force_switch = True
+                            force_trigger = m2.group(1).strip()
+
+                if is_force_switch:
+                    # Snapshot state BEFORE the switch for the decision point
+                    pre_switch_active = snapshot_active()
+                    pre_switch_field = field_state.to_dict()
+                    pre_switch_bench = snapshot_bench()
+
+                    species_in = do_switch(slot, nickname, detail, hp_str)
+
+                    # Emit force switch decision point with pre-switch state
+                    dp = {
+                        "turn": current_turn,
+                        "type": "force_switch",
+                        "trigger": force_trigger,
+                        "deciding_side": side,
+                        "deciding_slots": [slot],
+                        "active": pre_switch_active,
+                        "field": pre_switch_field,
+                        "actions": [{"slot": slot, "type": "switch",
+                                     "detail": species_in}],
                     }
+                    if pre_switch_bench:
+                        dp["bench"] = pre_switch_bench
+                    decision_points.append(dp)
 
-                # Remove incoming pokemon from bench
-                if species in bench[side]:
-                    del bench[side][species]
+                elif cmd == "replace":
+                    # Illusion breaking -- update species without treating as switch
+                    species, level, gender = parse_species_detail(detail)
+                    if slot in active:
+                        old_species = active[slot].species
+                        active[slot].species = species
+                        active[slot].nickname = nickname
+                        slot_species[slot] = species
+                        nickname_to_species[f"{slot}: {nickname}"] = species
+                        # Move revealed info from illusion species to real species
+                        side = player_side(slot)
+                        if old_species in revealed[side]:
+                            old_info = revealed[side].pop(old_species)
+                            ri = get_revealed(side, species)
+                            ri.moves = old_info.moves
+                            if old_info.item:
+                                ri.item = old_info.item
+                            if old_info.ability:
+                                ri.ability = old_info.ability
+                            if old_info.tera_type:
+                                ri.tera_type = old_info.tera_type
 
-                # Track nickname -> species mapping
-                nickname_to_species[f"{slot}: {nickname}"] = species
-                slot_species[slot] = species
+                else:
+                    # Check if this is a faint replacement (between turns)
+                    is_faint_replacement = (
+                        phase == Phase.BETWEEN_TURNS
+                        and slot in pending_faint_slots
+                    )
 
-                if species not in team_brought.get(side, []):
-                    if side not in team_brought:
-                        team_brought[side] = []
-                    team_brought[side].append(species)
+                    species_in = do_switch(slot, nickname, detail, hp_str)
 
-                active[slot] = ActivePokemon(
-                    species=species,
-                    slot=slot,
-                    nickname=nickname,
-                    hp=hp,
-                    max_hp=max_hp,
-                    status=status,
-                )
+                    if is_faint_replacement:
+                        faint_switch_actions.append({
+                            "slot": slot,
+                            "type": "switch",
+                            "detail": species_in,
+                        })
+                        pending_faint_slots.remove(slot)
+                        # If all faint slots resolved, flush
+                        if not pending_faint_slots:
+                            flush_faint_switches()
 
-                # If this is within a turn (not initial leads), record as action
-                if current_turn > 0 and cmd == "switch":
-                    turn_actions.append(TurnAction(
-                        slot=slot,
-                        action_type="switch",
-                        detail=species,
-                    ))
+                    elif current_turn > 0 and cmd == "switch":
+                        # Voluntary switch as a turn action
+                        turn_actions.append({
+                            "slot": slot,
+                            "type": "switch",
+                            "detail": species_in,
+                        })
 
-            # ── Move ──
+            # -- Move --
             elif cmd == "move" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 move_name = parts[3].strip()
                 target = ""
                 if len(parts) >= 5 and parts[4].strip():
                     target_str = parts[4].strip()
-                    if ":" in target_str:
+                    if ":" in target_str and not target_str.startswith("["):
                         target, _ = parse_slot(target_str)
 
                 side = player_side(slot)
@@ -448,28 +617,30 @@ def parse_replay(replay_data: dict) -> dict | None:
                 if move_name not in ri.moves:
                     ri.moves.append(move_name)
 
-                # Check if tera happened this turn for this slot
                 tera = turn_tera.get(slot)
 
-                turn_actions.append(TurnAction(
-                    slot=slot,
-                    action_type="move",
-                    detail=move_name,
-                    target=target,
-                    tera=tera,
-                ))
+                action = {
+                    "slot": slot,
+                    "type": "move",
+                    "detail": move_name,
+                }
+                if target:
+                    action["target"] = target
+                if tera:
+                    action["tera"] = tera
+                turn_actions.append(action)
 
-            # ── Can't move ──
+            # -- Can't move --
             elif cmd == "cant" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 reason = parts[3].strip()
-                turn_actions.append(TurnAction(
-                    slot=slot,
-                    action_type="cant",
-                    detail=reason,
-                ))
+                turn_actions.append({
+                    "slot": slot,
+                    "type": "cant",
+                    "detail": reason,
+                })
 
-            # ── Damage ──
+            # -- Damage --
             elif cmd == "-damage" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 hp_str = parts[3].strip()
@@ -483,7 +654,7 @@ def parse_replay(replay_data: dict) -> dict | None:
                     if hp == 0:
                         active[slot].fainted = True
 
-            # ── Heal ──
+            # -- Heal --
             elif cmd == "-heal" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 hp_str = parts[3].strip()
@@ -492,16 +663,34 @@ def parse_replay(replay_data: dict) -> dict | None:
                     active[slot].hp = hp
                     active[slot].max_hp = max_hp
                     status = parse_status_from_hp(hp_str)
-                    if status:
-                        active[slot].status = status
+                    active[slot].status = status  # clear or set
 
-            # ── Faint ──
+            # -- Set HP (Pain Split) --
+            elif cmd == "-sethp" and len(parts) >= 4:
+                slot, nickname = parse_slot(parts[2].strip())
+                hp_str = parts[3].strip()
+                hp, max_hp = parse_hp(hp_str)
+                if slot in active:
+                    active[slot].hp = hp
+                    active[slot].max_hp = max_hp
+                # Pain Split can affect a second pokemon
+                if len(parts) >= 6:
+                    try:
+                        slot2, nickname2 = parse_slot(parts[4].strip())
+                        hp_str2 = parts[5].strip()
+                        hp2, max_hp2 = parse_hp(hp_str2)
+                        if slot2 in active:
+                            active[slot2].hp = hp2
+                            active[slot2].max_hp = max_hp2
+                    except (IndexError, ValueError):
+                        pass
+
+            # -- Faint --
             elif cmd == "faint" and len(parts) >= 3:
                 slot, nickname = parse_slot(parts[2].strip())
                 if slot in active:
                     active[slot].hp = 0
                     active[slot].fainted = True
-                    # Move fainted pokemon to bench so it appears in bench snapshots
                     side = player_side(slot)
                     bench[side][active[slot].species] = {
                         "hp": 0,
@@ -509,9 +698,9 @@ def parse_replay(replay_data: dict) -> dict | None:
                         "status": active[slot].status,
                         "fainted": True,
                     }
-                turn_faints.append(slot)
+                pending_faint_slots.append(slot)
 
-            # ── Boost / Unboost ──
+            # -- Boost --
             elif cmd == "-boost" and len(parts) >= 5:
                 slot, nickname = parse_slot(parts[2].strip())
                 stat = parts[3].strip()
@@ -519,6 +708,7 @@ def parse_replay(replay_data: dict) -> dict | None:
                 if slot in active:
                     active[slot].boosts[stat] = active[slot].boosts.get(stat, 0) + amount
 
+            # -- Unboost --
             elif cmd == "-unboost" and len(parts) >= 5:
                 slot, nickname = parse_slot(parts[2].strip())
                 stat = parts[3].strip()
@@ -526,7 +716,78 @@ def parse_replay(replay_data: dict) -> dict | None:
                 if slot in active:
                     active[slot].boosts[stat] = active[slot].boosts.get(stat, 0) - amount
 
-            # ── Status ──
+            # -- Set boost (Belly Drum, etc.) --
+            elif cmd == "-setboost" and len(parts) >= 5:
+                slot, nickname = parse_slot(parts[2].strip())
+                stat = parts[3].strip()
+                amount = int(parts[4].strip())
+                if slot in active:
+                    active[slot].boosts[stat] = amount
+
+            # -- Clear boost (Clear Smog, etc.) --
+            elif cmd == "-clearboost" and len(parts) >= 3:
+                slot, nickname = parse_slot(parts[2].strip())
+                if slot in active:
+                    active[slot].boosts.clear()
+
+            # -- Clear all boosts (Haze) --
+            elif cmd == "-clearallboost":
+                for poke in active.values():
+                    if poke is not None:
+                        poke.boosts.clear()
+
+            # -- Copy boost (Psych Up, etc.) --
+            elif cmd == "-copyboost" and len(parts) >= 4:
+                src_slot, _ = parse_slot(parts[2].strip())
+                dst_slot, _ = parse_slot(parts[3].strip())
+                if src_slot in active and dst_slot in active:
+                    active[dst_slot].boosts = dict(active[src_slot].boosts)
+
+            # -- Swap boost (Speed Swap, etc.) --
+            elif cmd == "-swapboost" and len(parts) >= 4:
+                slot1, _ = parse_slot(parts[2].strip())
+                slot2, _ = parse_slot(parts[3].strip())
+                # parts[4] lists which stats, e.g. "spe" or "atk, def, spa, spd, spe"
+                if slot1 in active and slot2 in active:
+                    stats_to_swap = ["atk", "def", "spa", "spd", "spe"]
+                    if len(parts) >= 5 and parts[4].strip():
+                        stats_to_swap = [s.strip() for s in parts[4].strip().split(",")]
+                    for stat in stats_to_swap:
+                        v1 = active[slot1].boosts.get(stat, 0)
+                        v2 = active[slot2].boosts.get(stat, 0)
+                        if v2 != 0:
+                            active[slot1].boosts[stat] = v2
+                        elif stat in active[slot1].boosts:
+                            del active[slot1].boosts[stat]
+                        if v1 != 0:
+                            active[slot2].boosts[stat] = v1
+                        elif stat in active[slot2].boosts:
+                            del active[slot2].boosts[stat]
+
+            # -- Invert boost (Topsy-Turvy) --
+            elif cmd == "-invertboost" and len(parts) >= 3:
+                slot, _ = parse_slot(parts[2].strip())
+                if slot in active:
+                    active[slot].boosts = {
+                        s: -v for s, v in active[slot].boosts.items()
+                    }
+
+            # -- Clear negative/positive boosts --
+            elif cmd == "-clearnegativeboost" and len(parts) >= 3:
+                slot, _ = parse_slot(parts[2].strip())
+                if slot in active:
+                    active[slot].boosts = {
+                        s: v for s, v in active[slot].boosts.items() if v > 0
+                    }
+
+            elif cmd == "-clearpositiveboost" and len(parts) >= 3:
+                slot, _ = parse_slot(parts[2].strip())
+                if slot in active:
+                    active[slot].boosts = {
+                        s: v for s, v in active[slot].boosts.items() if v < 0
+                    }
+
+            # -- Status --
             elif cmd == "-status" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 status = parts[3].strip()
@@ -537,8 +798,24 @@ def parse_replay(replay_data: dict) -> dict | None:
                 slot, nickname = parse_slot(parts[2].strip())
                 if slot in active:
                     active[slot].status = None
+                else:
+                    # Bench pokemon cured (Heal Bell, Aromatherapy)
+                    side = player_side(slot)
+                    species = resolve_species(slot, nickname)
+                    if species in bench[side]:
+                        bench[side][species]["status"] = None
 
-            # ── Terastallize ──
+            elif cmd == "-cureteam" and len(parts) >= 3:
+                # Heal Bell / Aromatherapy cures entire team
+                slot, _ = parse_slot(parts[2].strip())
+                side = player_side(slot)
+                for poke in active.values():
+                    if poke is not None and player_side(poke.slot) == side:
+                        poke.status = None
+                for info in bench[side].values():
+                    info["status"] = None
+
+            # -- Terastallize --
             elif cmd == "-terastallize" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 tera_type = parts[3].strip()
@@ -549,59 +826,63 @@ def parse_replay(replay_data: dict) -> dict | None:
                 species = resolve_species(slot, nickname)
                 get_revealed(side, species).tera_type = tera_type
 
-            # ── Weather ──
+            # -- Weather --
             elif cmd == "-weather" and len(parts) >= 3:
                 weather = parts[2].strip()
                 if weather == "none":
-                    field.weather = None
+                    field_state.weather = None
                 elif "[upkeep]" not in line:
-                    field.weather = weather
+                    field_state.weather = weather
 
-            # ── Field start/end (terrain, trick room) ──
+            # -- Field start/end (terrain, trick room) --
             elif cmd == "-fieldstart" and len(parts) >= 3:
                 effect = parts[2].strip()
                 effect_lower = effect.lower()
                 if "terrain" in effect_lower:
-                    field.terrain = effect.replace("move: ", "")
+                    field_state.terrain = effect.replace("move: ", "")
                 elif "trick room" in effect_lower:
-                    field.trick_room = True
+                    field_state.trick_room = True
 
             elif cmd == "-fieldend" and len(parts) >= 3:
                 effect = parts[2].strip()
                 effect_lower = effect.lower()
                 if "terrain" in effect_lower:
-                    field.terrain = None
+                    field_state.terrain = None
                 elif "trick room" in effect_lower:
-                    field.trick_room = False
+                    field_state.trick_room = False
 
-            # ── Side conditions (screens, tailwind) ──
+            # -- Side conditions (screens, tailwind) --
             elif cmd == "-sidestart" and len(parts) >= 4:
                 side_str = parts[2].strip()
                 side = "p1" if "p1" in side_str else "p2"
                 effect = parts[3].strip().lower()
                 if "tailwind" in effect:
-                    setattr(field, f"{side}_tailwind", True)
+                    setattr(field_state, f"{side}_tailwind", True)
                 elif "reflect" in effect:
-                    setattr(field, f"{side}_reflect", True)
+                    setattr(field_state, f"{side}_reflect", True)
                 elif "light screen" in effect:
-                    setattr(field, f"{side}_light_screen", True)
+                    setattr(field_state, f"{side}_light_screen", True)
                 elif "aurora veil" in effect:
-                    setattr(field, f"{side}_aurora_veil", True)
+                    setattr(field_state, f"{side}_aurora_veil", True)
 
             elif cmd == "-sideend" and len(parts) >= 4:
                 side_str = parts[2].strip()
                 side = "p1" if "p1" in side_str else "p2"
                 effect = parts[3].strip().lower()
                 if "tailwind" in effect:
-                    setattr(field, f"{side}_tailwind", False)
+                    setattr(field_state, f"{side}_tailwind", False)
                 elif "reflect" in effect:
-                    setattr(field, f"{side}_reflect", False)
+                    setattr(field_state, f"{side}_reflect", False)
                 elif "light screen" in effect:
-                    setattr(field, f"{side}_light_screen", False)
+                    setattr(field_state, f"{side}_light_screen", False)
                 elif "aurora veil" in effect:
-                    setattr(field, f"{side}_aurora_veil", False)
+                    setattr(field_state, f"{side}_aurora_veil", False)
 
-            # ── Item revealed ──
+            # -- Swap side conditions (Court Change) --
+            elif cmd == "-swapsideconditions":
+                field_state.swap_sides()
+
+            # -- Item revealed --
             elif cmd in ("-enditem", "-item") and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 item = parts[3].strip()
@@ -609,7 +890,7 @@ def parse_replay(replay_data: dict) -> dict | None:
                 species = resolve_species(slot, nickname)
                 get_revealed(side, species).item = item
 
-            # ── Ability revealed ──
+            # -- Ability revealed --
             elif cmd == "-ability" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 ability = parts[3].strip()
@@ -617,10 +898,9 @@ def parse_replay(replay_data: dict) -> dict | None:
                 species = resolve_species(slot, nickname)
                 get_revealed(side, species).ability = ability
 
-            # ── Swap (slot swap, e.g. Ally Switch) ──
+            # -- Swap (slot swap, e.g. Ally Switch) --
             elif cmd == "swap" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
-                # In doubles, swap slots a <-> b on same side
                 side = player_side(slot)
                 slot_a = f"{side}a"
                 slot_b = f"{side}b"
@@ -628,13 +908,21 @@ def parse_replay(replay_data: dict) -> dict | None:
                     active[slot_a], active[slot_b] = active[slot_b], active[slot_a]
                     active[slot_a].slot = slot_a
                     active[slot_b].slot = slot_b
-                    # Update slot_species
                     slot_species[slot_a], slot_species[slot_b] = (
                         slot_species.get(slot_b, ""),
                         slot_species.get(slot_a, ""),
                     )
 
-            # ── Details change (form change) ──
+            # -- Form change (temporary, e.g. Aegislash) --
+            elif cmd == "-formechange" and len(parts) >= 4:
+                slot, nickname = parse_slot(parts[2].strip())
+                detail = parts[3].strip()
+                new_species, _, _ = parse_species_detail(detail)
+                if slot in active:
+                    active[slot].species = new_species
+                slot_species[slot] = new_species
+
+            # -- Details change (permanent form change) --
             elif cmd == "detailschange" and len(parts) >= 4:
                 slot, nickname = parse_slot(parts[2].strip())
                 detail = parts[3].strip()
@@ -643,7 +931,26 @@ def parse_replay(replay_data: dict) -> dict | None:
                     active[slot].species = new_species
                 slot_species[slot] = new_species
 
-            # ── Winner ──
+            # -- Transform (Ditto, etc.) --
+            elif cmd == "-transform" and len(parts) >= 4:
+                slot, nickname = parse_slot(parts[2].strip())
+                target_ref = parts[3].strip()
+                target_slot, target_nick = parse_slot(target_ref)
+                if slot in active and target_slot in active:
+                    target = active[target_slot]
+                    active[slot].species = target.species
+                    active[slot].boosts = dict(target.boosts)
+
+            # -- Mega evolution --
+            elif cmd == "-mega" and len(parts) >= 5:
+                slot, nickname = parse_slot(parts[2].strip())
+                mega_species = parts[3].strip()
+                mega_stone = parts[4].strip()
+                side = player_side(slot)
+                species = resolve_species(slot, nickname)
+                get_revealed(side, species).item = mega_stone
+
+            # -- Winner --
             elif cmd == "win" and len(parts) >= 3:
                 winner_name = parts[2].strip()
                 if players.get("p1", {}).get("name") == winner_name:
@@ -651,10 +958,9 @@ def parse_replay(replay_data: dict) -> dict | None:
                 elif players.get("p2", {}).get("name") == winner_name:
                     winner = "p2"
 
-            # ── Rating changes ──
+            # -- Rating changes --
             elif cmd == "raw" and len(parts) >= 3:
                 raw_text = parts[2].strip()
-                # Parse: "Name's rating: 1305 &rarr; <strong>1333</strong><br />..."
                 m = _RE_RATING.match(raw_text)
                 if m:
                     name = m.group(1)
@@ -666,12 +972,10 @@ def parse_replay(replay_data: dict) -> dict | None:
                             pdata["rating_after"] = rating_after
                             break
 
-            # ── Ability from [from] tags (in other events) ──
-            # Many events have [from] ability: X at the end
+            # -- Ability from [from] tags (in other events) --
             if "[from] ability:" in line:
                 m = _RE_FROM_ABILITY.search(line)
                 if m and len(parts) >= 3:
-                    # Try to find which pokemon this is about via [of]
                     of_match = _RE_OF_SLOT.search(line)
                     if of_match:
                         slot = of_match.group(1)
@@ -679,11 +983,10 @@ def parse_replay(replay_data: dict) -> dict | None:
                         species = resolve_species(slot, of_match.group(2).strip())
                         get_revealed(side, species).ability = m.group(1).strip()
 
-            # ── Item from [from] item: tags ──
+            # -- Item from [from] item: tags --
             if "[from] item:" in line:
                 m = _RE_FROM_ITEM.search(line)
                 if m and len(parts) >= 3:
-                    # The pokemon with the item is the subject of the event
                     try:
                         slot, nickname = parse_slot(parts[2].strip())
                         side = player_side(slot)
@@ -695,13 +998,17 @@ def parse_replay(replay_data: dict) -> dict | None:
         except (IndexError, ValueError):
             continue  # Skip malformed lines
 
-    # Flush final turn
-    flush_turn()
+    # Flush any pending faint switches
+    if pending_faint_slots:
+        flush_faint_switches()
+
+    # Emit final turn's decision point
+    emit_turn_start()
 
     if not players:
         return None
 
-    # ── Build output ──
+    # -- Build output --
     revealed_out: dict[str, dict[str, dict]] = {}
     for side in ("p1", "p2"):
         revealed_out[side] = {}
@@ -725,14 +1032,14 @@ def parse_replay(replay_data: dict) -> dict | None:
         "winner": winner,
         "team_preview": team_preview,
         "team_brought": team_brought,
-        "turns": turns,
+        "decision_points": decision_points,
         "turn_count": current_turn,
         "revealed": revealed_out,
     }
     return result
 
 
-# ── Rating tiers ─────────────────────────────────────────────────────────────
+# -- Rating tiers --------------------------------------------------------------
 
 RATING_TIERS: list[tuple[str, int]] = [
     ("all", 0),
@@ -748,7 +1055,7 @@ def tier_filename(tier_name: str) -> str:
     return f"parsed_{tier_name.replace('+', '')}.jsonl"
 
 
-# ── Worker for multiprocessing ────────────────────────────────────────────────
+# -- Worker for multiprocessing ------------------------------------------------
 
 
 def _parse_file(filepath: str) -> tuple[str | None, str, int | None]:
@@ -766,7 +1073,6 @@ def _parse_file(filepath: str) -> tuple[str | None, str, int | None]:
         if result is None:
             return None, "error", None
 
-        # Extract minimum player rating for tier assignment
         players = result.get("players", {})
         r1 = players.get("p1", {}).get("rating_before")
         r2 = players.get("p2", {}).get("rating_before")
@@ -778,7 +1084,7 @@ def _parse_file(filepath: str) -> tuple[str | None, str, int | None]:
         return None, "error", None
 
 
-# ── Batch processing ─────────────────────────────────────────────────────────
+# -- Batch processing ----------------------------------------------------------
 
 _WRITE_BUFFER_SIZE = 4096  # flush to disk every N results
 
@@ -790,7 +1096,6 @@ def parse_all(
     workers: int | None = None,
 ) -> None:
     if single_file:
-        # Parse a single file for debugging
         with open(single_file, "rb") as f:
             data = json_loads(f.read())
         result = parse_replay(data)
@@ -817,7 +1122,6 @@ def parse_all(
     if workers is None:
         workers = min(multiprocessing.cpu_count(), 16)
 
-    # Build output paths for each rating tier
     tier_paths = {
         name: out_dir / tier_filename(name) for name, _ in RATING_TIERS
     }
@@ -833,7 +1137,6 @@ def parse_all(
     tier_counts = {name: 0 for name, _ in RATING_TIERS}
     tier_bufs: dict[str, list[str]] = {name: [] for name, _ in RATING_TIERS}
 
-    # Open all output files
     tier_files = {
         name: open(tier_paths[name], "w", encoding="utf-8")
         for name, _ in RATING_TIERS
@@ -846,7 +1149,6 @@ def parse_all(
             ):
                 if status == "ok":
                     parsed += 1
-                    # Write to each tier file where the game qualifies
                     for name, min_r in RATING_TIERS:
                         if min_r == 0 or (
                             min_player_rating is not None
@@ -864,7 +1166,6 @@ def parse_all(
                 if (i + 1) % 10000 == 0:
                     print(f"  {i + 1}/{total} processed ({parsed} parsed)")
 
-            # Flush remaining buffers
             for name, _ in RATING_TIERS:
                 if tier_bufs[name]:
                     tier_files[name].write("".join(tier_bufs[name]))
@@ -876,7 +1177,7 @@ def parse_all(
     print(f"  Total parsed: {parsed}")
     print(f"  Skipped (error): {skipped_error}")
     for name, min_r in RATING_TIERS:
-        print(f"  {name}: {tier_counts[name]:,} games → {tier_paths[name]}")
+        print(f"  {name}: {tier_counts[name]:,} games -> {tier_paths[name]}")
 
 
 def main():

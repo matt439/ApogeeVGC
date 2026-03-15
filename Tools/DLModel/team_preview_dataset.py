@@ -63,7 +63,7 @@ class TeamPreviewDataset(Dataset):
             preview = game.get('team_preview', {})
             brought = game.get('team_brought', {})
             revealed = game.get('revealed', {})
-            turns = game.get('turns', [])
+            turns = game.get('decision_points', game.get('turns', []))
 
             # Extract leads from first turn's active slots
             leads: dict[str, set[str]] = {'p1': set(), 'p2': set()}
