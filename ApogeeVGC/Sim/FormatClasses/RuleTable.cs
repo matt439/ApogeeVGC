@@ -15,6 +15,30 @@ public record Rule;
 /// </summary>
 public class RuleTable : Dictionary<RuleId, Rule>
 {
+    public RuleTable() { }
+
+    /// <summary>
+    /// Copy constructor — creates a per-battle clone so parallel battles
+    /// never mutate the shared Library instance.
+    /// </summary>
+    public RuleTable(RuleTable source) : base(source)
+    {
+        MinTeamSize = source.MinTeamSize;
+        MaxTeamSize = source.MaxTeamSize;
+        PickedTeamSize = source.PickedTeamSize;
+        MaxTotalLevel = source.MaxTotalLevel;
+        MinLevel = source.MinLevel;
+        MaxLevel = source.MaxLevel;
+        DefaultLevel = source.DefaultLevel;
+        AdjustLevel = source.AdjustLevel;
+        AdjustLevelDown = source.AdjustLevelDown;
+        MaxMoveCount = source.MaxMoveCount;
+        EvLimit = source.EvLimit;
+        AllowMegaEvolution = source.AllowMegaEvolution;
+        AllowTerastallization = source.AllowTerastallization;
+        MinSourceGen = source.MinSourceGen;
+    }
+
     // Team composition settings
     public int MinTeamSize { get; set; } = 1;
     public int MaxTeamSize { get; set; } = 6;

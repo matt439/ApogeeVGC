@@ -56,6 +56,7 @@ public partial class Side
         }
 
         SideConditions[status.Id] = effectState;
+        _sideConditionOrder.Add(status.Id);
 
         // Step 6: SideStart event
         RelayVar? sideStartResult = Battle.SingleEvent(EventId.SideStart, status, effectState, (SingleEventTarget)this, source, sourceEffect);
@@ -65,6 +66,7 @@ public partial class Side
         if (sideStartResult is BoolRelayVar { Value: false })
       {
      SideConditions.Remove(status.Id);
+     _sideConditionOrder.Remove(status.Id);
  return false;
       }
 
@@ -103,6 +105,7 @@ public partial class Side
         if (!SideConditions.TryGetValue(condition.Id, out EffectState? sideCondition)) return false;
         Battle.SingleEvent(EventId.SideEnd, condition, sideCondition, (SingleEventTarget)this);
         SideConditions.Remove(condition.Id);
+        _sideConditionOrder.Remove(condition.Id);
         return true;
     }
 
@@ -119,6 +122,30 @@ public partial class Side
     public bool RemoveSideCondition(Condition status)
     {
         return RemoveSideCondition(status.Id);
+    }
+
+    /// <summary>
+    /// Directly removes a side condition from the dictionary and order list
+    /// without running the SideEnd event. Used by Court Change which handles
+    /// its own event logic.
+    /// </summary>
+    internal bool DeleteSideCondition(ConditionId id)
+    {
+        if (!SideConditions.Remove(id)) return false;
+        _sideConditionOrder.Remove(id);
+        return true;
+    }
+
+    /// <summary>
+    /// Directly adds a side condition to the dictionary and order list
+    /// without running events. Used by Court Change which swaps conditions
+    /// between sides.
+    /// </summary>
+    internal void DirectSetSideCondition(ConditionId id, EffectState state)
+    {
+        SideConditions[id] = state;
+        if (!_sideConditionOrder.Contains(id))
+            _sideConditionOrder.Add(id);
     }
 
     public bool AddSlotCondition(PokemonIntUnion target, ConditionId status, Pokemon? source = null,

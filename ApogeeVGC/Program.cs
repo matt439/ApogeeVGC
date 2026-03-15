@@ -8,16 +8,16 @@ public class Program
     {
         var driver = new Driver();
         // Parse --mode argument
-        var mode = DriverMode.EquivalenceBatchTest;
+        var mode = DriverMode.RndVsRndEvaluation;
         string? format = null;
         // First bare argument is the mode name
-        if (args.Length > 0 && Enum.TryParse<DriverMode>(args[0], true, out var parsedMode))
+        if (args.Length > 0 && Enum.TryParse(args[0], true, out DriverMode parsedMode))
         {
             mode = parsedMode;
         }
-        for (int i = 0; i < args.Length - 1; i++)
+        for (var i = 0; i < args.Length - 1; i++)
         {
-            if (args[i] == "--mode" && Enum.TryParse<DriverMode>(args[i + 1], true, out var parsed))
+            if (args[i] == "--mode" && Enum.TryParse(args[i + 1], true, out DriverMode parsed))
                 mode = parsed;
             else if (args[i] == "--format")
                 format = args[i + 1];

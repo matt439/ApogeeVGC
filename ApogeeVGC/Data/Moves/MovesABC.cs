@@ -2512,14 +2512,14 @@ public partial record Moves
                         if (sourceSide.SideConditions.TryGetValue(id, out EffectState? sourceState))
                         {
                             sourceConditions[id] = sourceState;
-                            sourceSide.SideConditions.Remove(id);
+                            sourceSide.DeleteSideCondition(id);
                             success = true;
                         }
 
                         if (targetSide.SideConditions.TryGetValue(id, out EffectState? targetState))
                         {
                             targetConditions[id] = targetState;
-                            targetSide.SideConditions.Remove(id);
+                            targetSide.DeleteSideCondition(id);
                             success = true;
                         }
                     }
@@ -2528,13 +2528,13 @@ public partial record Moves
                     foreach ((ConditionId id, EffectState state) in sourceConditions)
                     {
                         state.Target = targetSide;
-                        targetSide.SideConditions[id] = state;
+                        targetSide.DirectSetSideCondition(id, state);
                     }
 
                     foreach ((ConditionId id, EffectState state) in targetConditions)
                     {
                         state.Target = sourceSide;
-                        sourceSide.SideConditions[id] = state;
+                        sourceSide.DirectSetSideCondition(id, state);
                     }
 
                     if (!success) return false;

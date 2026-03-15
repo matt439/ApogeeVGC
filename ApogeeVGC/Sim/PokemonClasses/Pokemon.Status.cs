@@ -383,6 +383,7 @@ public partial class Pokemon
 
         // Create the volatile effect state
         Volatiles[status] = Battle.InitEffectState(status, null, this);
+        _volatileOrder.Add(status);
         EffectState volatileState = Volatiles[status];
 
         // Set source information
@@ -444,6 +445,7 @@ public partial class Pokemon
         {
             // Cancel - remove the volatile we just added
             Volatiles.Remove(status);
+            _volatileOrder.Remove(status);
             return startResult ?? BoolRelayVar.False;
         }
 
@@ -510,6 +512,7 @@ public partial class Pokemon
 
         // Remove the volatile (equivalent to delete this.volatiles[status.id])
         Volatiles.Remove(status.Id);
+        _volatileOrder.Remove(status.Id);
 
         // Handle linked Pokemon cleanup
         if (linkedPokemon is not null && linkedStatus is not null)
@@ -546,7 +549,9 @@ public partial class Pokemon
     /// </summary>
     public bool DeleteVolatile(ConditionId volatileId)
     {
-        return Volatiles.Remove(volatileId);
+        if (!Volatiles.Remove(volatileId)) return false;
+        _volatileOrder.Remove(volatileId);
+        return true;
     }
 
     public void CopyVolatileFrom(Pokemon pokemon, ConditionIdBoolUnion? switchCause = null)
@@ -600,6 +605,7 @@ public partial class Pokemon
 
             // Initialize the effect state for this Pok�mon
             Volatiles[conditionId] = clonedState;
+            _volatileOrder.Add(conditionId);
 
             // Handle linked Pok�mon (for moves like Bind, Wrap, etc.)
             if (clonedState.LinkedPokemon is null || clonedState.LinkedStatus is null) continue;
@@ -668,6 +674,7 @@ public partial class Pokemon
         }
 
         Volatiles.Clear();
+        _volatileOrder.Clear();
 
         if (includeSwitchFlags)
         {

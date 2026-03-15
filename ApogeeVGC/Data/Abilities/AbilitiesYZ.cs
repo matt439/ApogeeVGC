@@ -72,7 +72,7 @@ public partial record Abilities
                         pokemon.Hp == 0) return;
 
                     pokemon.Transformed = false;
-                    pokemon.Volatiles.Remove(ConditionId.ZenMode);
+                    pokemon.DeleteVolatile(ConditionId.ZenMode);
 
                     // If in a battle-only forme, revert
                     if (pokemon.Species is

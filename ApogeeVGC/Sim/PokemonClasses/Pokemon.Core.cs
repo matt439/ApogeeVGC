@@ -67,6 +67,14 @@ public partial class Pokemon : IPriorityComparison
     public EffectState StatusState { get; set; }
 
     public Dictionary<ConditionId, EffectState> Volatiles { get; set; }
+
+    /// <summary>
+    /// Tracks volatile condition keys in EffectOrder (insertion) order.
+    /// Avoids LINQ OrderBy allocations in the hot event-handler discovery path.
+    /// </summary>
+    private readonly List<ConditionId> _volatileOrder = [];
+    internal IReadOnlyList<ConditionId> VolatileOrder => _volatileOrder;
+
     public bool? ShowCure { get; set; }
 
     public StatsTable BaseStoredStats { get; set; }
@@ -553,6 +561,7 @@ public partial class Pokemon : IPriorityComparison
         Volatiles = source.Volatiles.ToDictionary(
             kvp => kvp.Key,
             kvp => kvp.Value.DeepClone());
+        _volatileOrder = new List<ConditionId>(source._volatileOrder);
 
         // Pokemon references — null/empty (remapped in Pass 2)
         Illusion = null;

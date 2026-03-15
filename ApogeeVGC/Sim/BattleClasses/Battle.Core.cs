@@ -308,7 +308,7 @@ public partial class Battle
         Field = new Field(this);
 
         Format = options.Format ?? Library.Formats[options.Id];
-        RuleTable = Format.RuleTable ?? new RuleTable();
+        RuleTable = Format.RuleTable != null ? new RuleTable(Format.RuleTable) : new RuleTable();
 
         // Populate RuleTable from Format.Ruleset so Has(RuleId) works for random formats
         // (which define rules in Ruleset but don't create an explicit RuleTable)
