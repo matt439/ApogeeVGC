@@ -17,7 +17,7 @@ public partial class Driver
     private const int BattleEvalSeed = 9876;
 
     // Random vs Random evaluation settings
-    private const int RandomEvaluationNumTest = 50000;
+    private const int RandomEvaluationNumTest = 100000;
     private const int NumThreads = 16;
 
     // Greedy evaluation settings
@@ -34,9 +34,9 @@ public partial class Driver
     private const int MctsStandaloneIterations = 1000;
 
     // MCTS-DL evaluation settings (DL priors + value, no info tracking)
-    private const int MctsDlEvaluationNumTest = 100;
+    private const int MctsDlEvaluationNumTest = 10;
     private const int MctsDlNumThreads = 32;
-    private const int MctsDlIterations = 1000;
+    private const int MctsDlIterations = 100000;
 
     // DL-Greedy evaluation settings (argmax policy, no search)
     private const int DlGreedyEvaluationNumTest = 10000;
