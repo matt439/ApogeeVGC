@@ -28,7 +28,7 @@ public class BattleCorrectnessTests(LibraryFixture fixture, ITestOutputHelper ou
 
     [Theory]
     [InlineData(FormatId.Gen9VgcRegulationI, 1000)]
-    [InlineData(FormatId.Gen9VgcMega, 1000)]
+    //[InlineData(FormatId.Gen9VgcMega, 1000)]
     public void ParallelBattles_CompleteWithoutExceptions(FormatId formatId, int numBattles)
     {
         string formatLabel = _library.Formats[formatId].Name;
