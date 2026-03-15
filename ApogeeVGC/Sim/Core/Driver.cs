@@ -5,6 +5,11 @@ namespace ApogeeVGC.Sim.Core;
 
 public partial class Driver
 {
+    /// <summary>
+    /// When false, skips all Console.ReadLine() pauses so the process exits automatically.
+    /// </summary>
+    private const bool WaitForInput = false;
+
     private Library Library { get; } = new();
 
     // Seeds for random team generation (shared between evaluation and interactive)

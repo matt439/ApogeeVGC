@@ -328,7 +328,7 @@ public partial class Driver
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     #region Greedy vs Random Evaluation
@@ -502,7 +502,7 @@ public partial class Driver
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     #endregion
@@ -695,7 +695,7 @@ public partial class Driver
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     #endregion
@@ -877,7 +877,7 @@ public partial class Driver
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     #endregion
@@ -1087,7 +1087,7 @@ public partial class Driver
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     #endregion
@@ -1289,7 +1289,7 @@ public partial class Driver
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     #endregion
@@ -1399,7 +1399,7 @@ public partial class Driver
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     #endregion

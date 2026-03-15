@@ -49,7 +49,7 @@ public partial class Driver
         }
 
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     /// <summary>

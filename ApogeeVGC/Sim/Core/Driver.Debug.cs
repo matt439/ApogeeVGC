@@ -88,7 +88,7 @@ public partial class Driver
 
         Console.WriteLine();
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 
     /// <summary>
@@ -201,6 +201,6 @@ public partial class Driver
 
         Console.WriteLine();
         Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        if (WaitForInput) Console.ReadLine();
     }
 }
