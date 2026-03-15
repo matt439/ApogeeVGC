@@ -18,7 +18,7 @@ public partial class BattleActions
         // Validate the Pokemon exists and is not already active
         if (pokemon.IsActive)
         {
-            Battle.Hint("A switch failed because the Pok�mon trying to switch in is already in.");
+            Battle.Hint("A switch failed because the Pok�mon trying to switch in is already in.");
             return false;
         }
 
@@ -32,7 +32,7 @@ public partial class BattleActions
 
         // Handle initial switch-in where Active[pos] is null
         Pokemon? oldActive = side.Active[pos];
-        Pokemon? unfaintedActive = oldActive?.Hp > 0 ? oldActive : null;
+        Pokemon? unfaintedActive = (oldActive is { Fainted: false, Hp: > 0 }) ? oldActive : null;
 
         if (unfaintedActive != null)
         {
@@ -88,7 +88,9 @@ public partial class BattleActions
                 newMove = oldActive.LastMove;
             }
 
-            // Copy volatiles if needed (U-turn, Shed Tail, etc.)
+            // Copy volatiles if needed (Baton Pass, Shed Tail)
+            // U-turn/Flip Turn (BoolMoveSelfSwitch) just switch — they do NOT copy volatiles/boosts.
+            // Only CopyVolatileMoveSelfSwitch (Baton Pass) copies volatiles/boosts.
             if (switchCopyFlag != null)
             {
                 switch (switchCopyFlag)
@@ -96,9 +98,10 @@ public partial class BattleActions
                     case ShedTailMoveSelfSwitch:
                         pokemon.CopyVolatileFrom(oldActive, ConditionId.ShedTail);
                         break;
-                    default:
+                    case CopyVolatileMoveSelfSwitch:
                         pokemon.CopyVolatileFrom(oldActive, false);
                         break;
+                    // BoolMoveSelfSwitch (U-turn, Flip Turn, etc.) — no volatile copy
                 }
             }
 
@@ -166,8 +169,11 @@ public partial class BattleActions
             moveSlot.Used = false;
         }
 
-        pokemon.AbilityState.EffectOrder = Battle.EffectOrder++;
-        pokemon.ItemState.EffectOrder = Battle.EffectOrder++;
+        // Re-initialize ability and item state on switch-in (resets once-per-switch-in
+        // flags like Protean/Libero), matching Showdown's switchIn behavior.
+        // InitEffectState auto-increments EffectOrder for active Pokemon targets.
+        pokemon.AbilityState = Battle.InitEffectState(pokemon.Ability, null, pokemon);
+        pokemon.ItemState = Battle.InitEffectState(pokemon.Item, null, pokemon);
 
         // Run BeforeSwitchIn event
         Battle.RunEvent(EventId.BeforeSwitchIn, pokemon);
@@ -178,7 +184,7 @@ public partial class BattleActions
             if (sourceEffect != null)
             {
                 Battle.AddWithPerspective(preSwitchPerspective, isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails,
-                    $"[from] {sourceEffect.EffectStateId}");
+                    $"[from] {sourceEffect.Name}");
             }
             else
             {

@@ -44,6 +44,7 @@ public sealed record OnFoeTryAddVolatileEventInfo : EventHandlerInfo
                 context.GetSourceOrTargetPokemon(),
                 context.GetSourceEffect<IEffect>()
                 );
+                if (result == null) return new NullRelayVar();
                 return result switch
                 {
                     BoolBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),

@@ -50,8 +50,8 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                     context.GetMove(),
-                    context.GetSourceOrTargetPokemon(),
-                    context.TargetPokemon // Direct access, can be null
+                    context.GetTargetOrSourcePokemon(),
+                    context.SourcePokemon // Direct access, can be null
                 );
 
                 // Convert VoidFalseUnion to RelayVar using implicit operator
@@ -81,8 +81,8 @@ public sealed record OnModifyMoveEventInfo : EventHandlerInfo
                 handler(
                     context.Battle,
                     context.GetMove(),
-                    context.GetSourceOrTargetPokemon(),
-                    context.TargetPokemon
+                    context.GetTargetOrSourcePokemon(),
+                    context.SourcePokemon
                 );
                 return null;
             },

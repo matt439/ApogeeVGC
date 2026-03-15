@@ -130,7 +130,7 @@ public partial record Conditions
                         ? 4
                         : 8;
                     battle.Damage(pokemon.BaseMaxHp / divisor, pokemon);
-                }, 13),
+                }, order: 13),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -144,6 +144,7 @@ public partial record Conditions
                 Id = ConditionId.Sandstorm,
                 Name = "Sandstorm",
                 EffectType = EffectType.Weather,
+                ImmuneTypes = [PokemonType.Ground, PokemonType.Rock, PokemonType.Steel],
                 Duration = 5,
                 DurationCallback = DurationCallbackEventInfo.Create((_, _, source, _) =>
                     source?.HasItem(ItemId.SmoothRock) == true ? 8 : 5),
@@ -175,7 +176,6 @@ public partial record Conditions
                         battle.Add("-weather", "Sandstorm");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -187,8 +187,10 @@ public partial record Conditions
                         {
                             battle.EachEvent(EventId.Weather);
                         }
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnWeather = OnWeatherEventInfo.Create((battle, target, _, _) => { battle.Damage(target.BaseMaxHp / 16); }),
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
@@ -294,6 +296,13 @@ public partial record Conditions
 
                     return new[] { type };
                 }, 1),
+            },
+            [ConditionId.SkyAttack] = new()
+            {
+                Id = ConditionId.SkyAttack,
+                Name = "Sky Attack",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
             },
             [ConditionId.SimpleBeam] = new()
             {
@@ -421,6 +430,20 @@ public partial record Conditions
                 }),
                 // Groundedness implemented in Pokemon.IsGrounded()
             },
+            [ConditionId.SolarBeam] = new()
+            {
+                Id = ConditionId.SolarBeam,
+                Name = "Solar Beam",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
+            },
+            [ConditionId.SolarBlade] = new()
+            {
+                Id = ConditionId.SolarBlade,
+                Name = "Solar Blade",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
+            },
             [ConditionId.Snowscape] = new()
             {
                 Id = ConditionId.Snowscape,
@@ -455,7 +478,6 @@ public partial record Conditions
                         battle.Add("-weather", "Snowscape");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -467,8 +489,10 @@ public partial record Conditions
                         {
                             battle.EachEvent(EventId.Weather);
                         }
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -593,8 +617,12 @@ public partial record Conditions
                 }),
                 OnStallMove = OnStallMoveEventInfo.Create((battle, pokemon) =>
                 {
-                    // Get the counter from the Pokemon's Stall volatile state
-                    int counter = 1; // Default for first use
+                    // TS (compiled): const counter = this.effectState.counter || 1;
+                    //     const success = this.randomChance(1, counter);
+                    //     if (!success) delete pokemon.volatiles["stall"];
+                    //     return success;
+                    // Counter tripling happens ONLY in OnRestart, not here.
+                    int counter = 1;
 
                     if (pokemon.Volatiles.TryGetValue(ConditionId.Stall,
                             out EffectState? stallState))
@@ -602,21 +630,10 @@ public partial record Conditions
                         counter = stallState.Counter ?? 1;
                     }
 
-                    battle.Debug(
-                        $"[Stall.OnStallMove] {pokemon.Name}: Checking with counter={counter}, Success chance: {Math.Round(100.0 / counter, 2)}%");
-
                     bool success = battle.RandomChance(1, counter);
 
                     if (!success)
-                    {
-                        battle.Debug(
-                            $"[Stall.OnStallMove] {pokemon.Name}: FAILED! Deleting Stall volatile");
                         pokemon.DeleteVolatile(ConditionId.Stall);
-                    }
-                    else
-                    {
-                        battle.Debug($"[Stall.OnStallMove] {pokemon.Name}: SUCCESS!");
-                    }
 
                     return success;
                 }),
@@ -944,20 +961,23 @@ public partial record Conditions
                             !attacker.HasItem(ItemId.UtilityUmbrella))
                         {
                             battle.Debug("Sunny Day Hydro Steam boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
                         if (move.Type == MoveType.Fire)
                         {
                             battle.Debug("Sunny Day fire boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         if (move.Type == MoveType.Water)
                         {
                             battle.Debug("Sunny Day water suppress");
-                            return battle.ChainModify(0.5);
+                            battle.ChainModify(0.5);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -982,7 +1002,6 @@ public partial record Conditions
                     if (type.AsConditionId == ConditionId.Freeze) return false;
                     return new VoidReturn();
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -991,8 +1010,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -1033,7 +1054,7 @@ public partial record Conditions
                 {
                     battle.Boost(new SparseBoostsTable { Spe = -1 },
                         pokemon, battle.EffectState.Source);
-                }, 14),
+                }, order: 14),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -1149,7 +1170,7 @@ public partial record Conditions
                 OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                }, 15),
+                }, order: 15),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
@@ -1238,7 +1259,7 @@ public partial record Conditions
 
                     return VoidFalseUnion.FromVoid();
                 }),
-                //OnResidualOrder = 22,
+                OnResidual = OnResidualEventInfo.Create((_, _, _, _) => { }, order: 22),
                 OnEnd = OnEndEventInfo.Create((battle, target) =>
                 {
                     if (battle.DisplayUi)
@@ -1319,7 +1340,7 @@ public partial record Conditions
                         battle.Damage(battle.ClampIntRange(pokemon.BaseMaxHp / 16, 1, null) *
                                       (battle.EffectState.Stage ?? 0));
                     },
-                    9),
+                    order: 9),
             },
             [ConditionId.ToxicSpikes] = new()
             {
@@ -1384,6 +1405,7 @@ public partial record Conditions
                 Id = ConditionId.Trapped,
                 Name = "Trapped",
                 NoCopy = true,
+                ImmuneTypes = [PokemonType.Ghost],
                 OnTrapPokemon = OnTrapPokemonEventInfo.Create((_, pokemon) => { pokemon.TryTrap(); }),
                 OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
@@ -1433,8 +1455,11 @@ public partial record Conditions
                         battle.Debug("[TrickRoom.OnFieldRestart] After RemovePseudoWeather call");
                     }
                 }),
-                //OnFieldResidualOrder = 27,
-                //OnFieldResidualSubOrder = 1,
+                OnFieldResidual = OnFieldResidualEventInfo.Create((_, _, _, _) => { }) with
+                {
+                    Order = 27,
+                    SubOrder = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -1481,7 +1506,7 @@ public partial record Conditions
                             // note that this is not updated for moves called by other moves (e.g., Metronome calling Dig)
                             int? moveTargetLoc = attacker.LastMoveTargetLoc;
 
-                            if (effect is ActiveMove { SourceEffect: not null } &&
+                            if (effect is ActiveMove { SourceEffect: MoveEffectStateId } &&
                                 _library.Moves.TryGetValue(move.Id, out Move? moveData) &&
                                 moveData.Target != MoveTarget.Self)
                             {
@@ -1624,7 +1649,7 @@ public partial record Conditions
                     {
                         battle.Add("-start", target, "Uproar", "[upkeep]");
                     }
-                }, 28, 1),
+                }, order: 28, subOrder: 1),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)

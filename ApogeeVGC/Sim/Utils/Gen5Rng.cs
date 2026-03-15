@@ -17,6 +17,12 @@ public sealed class Gen5Rng
 
     private ushort[] _seed;
 
+    /// <summary>Number of times Next() has been called (for debugging RNG divergence).</summary>
+    public int CallCount { get; private set; }
+
+    /// <summary>Enable to write each RNG call to console for debugging.</summary>
+    public bool TraceEnabled { get; set; }
+
     public Gen5Rng(Gen5RngSeed seed)
     {
         _seed = [seed.S0, seed.S1, seed.S2, seed.S3];
@@ -32,7 +38,13 @@ public sealed class Gen5Rng
     {
         _seed = NextFrame(_seed);
         // Use the upper 32 bits: (seed[0] << 16) + seed[1]
-        return ((uint)_seed[0] << 16) + _seed[1];
+        uint result = ((uint)_seed[0] << 16) + _seed[1];
+        CallCount++;
+        if (TraceEnabled)
+        {
+            Console.Error.WriteLine($"RNG#{CallCount - 1}: raw={result}");
+        }
+        return result;
     }
 
     /// <summary>

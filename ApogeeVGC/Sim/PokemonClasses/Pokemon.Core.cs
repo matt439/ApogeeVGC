@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
@@ -66,6 +67,14 @@ public partial class Pokemon : IPriorityComparison
     public EffectState StatusState { get; set; }
 
     public Dictionary<ConditionId, EffectState> Volatiles { get; set; }
+
+    /// <summary>
+    /// Tracks volatile condition keys in EffectOrder (insertion) order.
+    /// Avoids LINQ OrderBy allocations in the hot event-handler discovery path.
+    /// </summary>
+    private readonly List<ConditionId> _volatileOrder = [];
+    internal List<ConditionId> VolatileOrder => _volatileOrder;
+
     public bool? ShowCure { get; set; }
 
     public StatsTable BaseStoredStats { get; set; }
@@ -168,8 +177,8 @@ public partial class Pokemon : IPriorityComparison
     public double WeightKg { get; set; }
     public int WeightHg { get; set; }
     public IntFalseUnion Order => int.MaxValue;
-    public int Priority => 0;
-    public int Speed { get; set; }
+    public double Priority => 0;
+    public double Speed { get; set; }
     public int SubOrder => 0;
     public int EffectOrder => 0;
 
@@ -537,6 +546,7 @@ public partial class Pokemon : IPriorityComparison
         Details = new PokemonDetails
         {
             Id = source.Details.Id,
+            DisplayName = source.Details.DisplayName,
             Level = source.Details.Level,
             Gender = source.Details.Gender,
             Shiny = source.Details.Shiny,
@@ -551,6 +561,7 @@ public partial class Pokemon : IPriorityComparison
         Volatiles = source.Volatiles.ToDictionary(
             kvp => kvp.Key,
             kvp => kvp.Value.DeepClone());
+        _volatileOrder = new List<ConditionId>(source._volatileOrder);
 
         // Pokemon references — null/empty (remapped in Pass 2)
         Illusion = null;
@@ -577,10 +588,10 @@ public partial class Pokemon : IPriorityComparison
     public override string ToString()
     {
         // Determine the full name to display (real or illusion)
-        var fullname = Illusion != null ? Illusion.Fullname : FullName;
+        var fullname = Illusion != null ? Illusion.Fullname : Fullname;
 
-        // If active, combine slot identifier with name (skip first 2 chars of fullname)
-        // Otherwise just return the full name
+        // Use slot identifier (p2a) for active Pokemon only, matching Showdown's isActive check.
+        // Fainted/benched Pokemon use fullname format (e.g. "p2: Kleavor" without slot letter).
         return IsActive ? GetSlot() + fullname[2..] : fullname;
     }
 
@@ -600,6 +611,7 @@ public partial class Pokemon : IPriorityComparison
         var details = new PokemonDetails
         {
             Id = id,
+            DisplayName = Set.SpeciesOverrideName ?? Battle.Library.Species[id].Name,
             Level = displayLevel,
             Gender = Gender,
             Shiny = Set.Shiny,
@@ -616,7 +628,9 @@ public partial class Pokemon : IPriorityComparison
         var details = Details;
         if (Illusion is not null)
         {
-            details = Illusion.GetUpdatedDetails(Level);
+            // IllusionLevelMod: show the disguise's level, not the real Pokemon's level
+            int? levelOverride = Battle.RuleTable.Has(RuleId.IllusionLevelMod) ? null : Level;
+            details = Illusion.GetUpdatedDetails(levelOverride);
         }
 
         if (Terastallized is not null)
@@ -724,10 +738,20 @@ public partial class Pokemon : IPriorityComparison
             }
         }
 
-        // Append status condition if present
+        // Append status condition if present (using Showdown protocol abbreviations)
         if (Status != ConditionId.None)
         {
-            string statusSuffix = string.Concat(" ", Status.ToString());
+            string statusAbbr = Status switch
+            {
+                ConditionId.Burn => "brn",
+                ConditionId.Paralysis => "par",
+                ConditionId.Poison => "psn",
+                ConditionId.Toxic => "tox",
+                ConditionId.Sleep => "slp",
+                ConditionId.Freeze => "frz",
+                _ => Status.ToString().ToLowerInvariant(),
+            };
+            string statusSuffix = string.Concat(" ", statusAbbr);
             secretStr = string.Concat(secretStr, statusSuffix);
             sharedStr = string.Concat(sharedStr, statusSuffix);
         }

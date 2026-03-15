@@ -564,7 +564,8 @@ public partial record Items
                     if (accuracy.HasValue)
                     {
                         battle.Debug("brightpowder - decreasing accuracy");
-                        return battle.ChainModify([3686, 4096]);
+                        battle.ChainModify([3686, 4096]);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();

@@ -3,8 +3,10 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -191,12 +193,20 @@ public partial class Battle
         }
         else if (args.Any(arg => FormatArg(arg) == "[still]"))
         {
-            // If no animation plays, hide the target (index 4) to prevent information leak
+            // When [still] is present, clear the target field to match Showdown protocol.
+            // In JS, parts[4] = '' extends the array if it only has 4 elements;
+            // in C# we must handle both cases explicitly.
             string[] parts = Log[LastMoveLine].Split('|');
             if (parts.Length > 4)
             {
                 parts[4] = string.Empty;
                 Log[LastMoveLine] = string.Join("|", parts);
+            }
+            else
+            {
+                // Move line has no target field — insert an empty one at position 4
+                var partsList = new List<string>(parts) { string.Empty };
+                Log[LastMoveLine] = string.Join("|", partsList);
             }
         }
 
@@ -401,8 +411,9 @@ public partial class Battle
             DoublePart d => d.Value.ToString("F"),
             BoolPart b => b.Value.ToString().ToLowerInvariant(),
             PokemonPart p => p.Pokemon.ToString(),
-            SidePart s => s.Side.Id.GetSideIdName(),
+            SidePart s => $"{s.Side.Id.GetSideIdName()}: {s.Side.Name}",
             MovePart m => m.Move.Name,
+            EffectPart e when e.Effect is Condition c => GetProtocolEffectName(c) ?? c.Name,
             EffectPart e => e.Effect.Name,
             UndefinedPart => "undefined",
             _ => string.Empty,
@@ -435,17 +446,20 @@ public partial class Battle
     /// <param name="source">The Pokemon that caused the damage (optional)</param>
     /// <param name="effect">The effect that caused the damage (optional)</param>
     private void PrintDamageMessage(Pokemon target, int damageAmount, Pokemon? source,
-        Condition? effect)
+        IEffect? effect)
     {
         if (!DisplayUi) return;
 
-        // Get the effect name, converting "tox" to "psn" for display
-        string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
+        // Get the effect name, converting condition names to protocol abbreviations
+        string? effectName = GetProtocolEffectName(effect);
 
         // Add damage amount tag for parser
         string damageTag = $"[dmg]{damageAmount}";
 
-        switch (effect?.Id)
+        // Check for special condition cases
+        ConditionId? conditionId = effect is Condition cond ? cond.Id : null;
+
+        switch (conditionId)
         {
             case ConditionId.PartiallyTrapped:
                 // Get the source effect from the volatile condition
@@ -471,7 +485,13 @@ public partial class Battle
                 break;
 
             default:
-                if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
+                // Confusion self-hit uses PseudoMoveEffect.Confused (EffectType.Move to bypass
+                // Magic Guard) but still needs [from] confusion attribution
+                if (effect is PseudoMoveEffect { Id: "confused" })
+                {
+                    Add("-damage", target, target.GetHealth, damageTag, "[from] confusion");
+                }
+                else if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
                 {
                     // Simple damage from a move or no effect
                     Add("-damage", target, target.GetHealth, damageTag);
@@ -506,10 +526,24 @@ public partial class Battle
         // Get the health status for the log message
         var healthFunc = target.GetHealth;
 
-        // Determine if this is a drain effect
-        bool isDrain = effect is Condition { Id: ConditionId.Drain };
+        // Match Showdown's heal switch statement (battle.ts lines 2247-2270)
+        // Showdown checks effect?.id which works for both Moves and Conditions.
+        // We need to check both since Rest is a Move but leechseed/drain/wish are Conditions.
+        ConditionId? conditionId = (effect as Condition)?.Id;
+        MoveId? moveId = (effect as Move)?.Id;
 
-        if (isDrain && source != null)
+        if (conditionId is ConditionId.LeechSeed or ConditionId.Rest
+            || moveId == MoveId.Rest)
+        {
+            // Leech Seed and Rest heals are always silent
+            Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[silent]");
+        }
+        else if (conditionId == ConditionId.Wish)
+        {
+            // Wish heals have no message (handled by Wish condition's own logging)
+            return;
+        }
+        else if (conditionId == ConditionId.Drain && source != null)
         {
             // Drain healing shows the source
             Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[from] drain",
@@ -517,24 +551,25 @@ public partial class Battle
         }
         else if (effect != null && effect.EffectType != EffectType.Format)
         {
-            // Healing from a specific effect
-            string effectName = effect switch
+            if (effect.EffectType == EffectType.Move)
             {
-                Condition { FullName: "tox" } => "psn",
-                Condition condition => condition.FullName,
-                Item item => $"item: {item.Name}",
-                Ability ability => $"ability: {ability.Name}",
-                _ => effect.Name
-            };
-
-            if (source != null && source != target)
-            {
-                Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}",
-                    $"[of] {source}");
+                // Move heals (e.g. Strength Sap) show no [from] attribution
+                Add("-heal", target, healthFunc, $"[heal]{healAmount}");
             }
             else
             {
-                Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
+                // Healing from a specific effect (item, ability, condition)
+                string effectName = GetProtocolEffectName(effect)!;
+
+                if (source != null && source != target)
+                {
+                    Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}",
+                        $"[of] {source}");
+                }
+                else
+                {
+                    Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
+                }
             }
         }
         else
@@ -542,6 +577,32 @@ public partial class Battle
             // Simple heal with no effect
             Add("-heal", target, healthFunc, $"[heal]{healAmount}");
         }
+    }
+
+    /// <summary>
+    /// Converts an effect's name to Showdown protocol abbreviation.
+    /// Status conditions use abbreviations (brn, par, psn, slp, frz, tox).
+    /// </summary>
+    private static string? GetProtocolEffectName(IEffect? effect)
+    {
+        if (effect == null) return null;
+        if (effect is Condition condition)
+        {
+            return condition.Id switch
+            {
+                ConditionId.Burn => "brn",
+                ConditionId.Paralysis => "par",
+                ConditionId.Poison => "psn",
+                ConditionId.Toxic => "psn",
+                ConditionId.Sleep => "slp",
+                ConditionId.Freeze => "frz",
+                _ => condition.FullName,
+            };
+        }
+        if (effect is Item item) return item.FullName;
+        if (effect is Ability ability) return $"ability: {ability.Name}";
+        if (effect is Species species) return species.FullName;
+        return effect.Name;
     }
 
     /// <summary>

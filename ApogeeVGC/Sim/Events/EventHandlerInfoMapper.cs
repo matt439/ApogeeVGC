@@ -120,6 +120,10 @@ public static class EventHandlerInfoMapper
                 [EventId.WeatherChange] = e => e.OnWeatherChange,
                 [EventId.WeatherModifyDamage] = e => e.OnWeatherModifyDamage,
 
+                // Item-specific event handlers (only fired via SingleEvent on items)
+                [EventId.Eat] = e => (e as Item)?.OnEat,
+                [EventId.Use] = e => (e as Item)?.OnUse,
+
                 // Condition/Item-specific lifecycle event handlers
                 // Abilities use AbilityEventMethodsMap (checked first), so these only match Conditions and Items
                 [EventId.Start] = e => e switch
@@ -718,7 +722,7 @@ public static class EventHandlerInfoMapper
         if (IsSwitchInFallbackCandidate(effect) &&
             cache.TryGetValue((EventId.Start, EventPrefix.None, EventSuffix.None), out EventHandlerInfo startHandler) &&
             !cache.ContainsKey((EventId.SwitchIn, EventPrefix.None, EventSuffix.None)) &&
-            !cache.ContainsKey((EventId.AnySwitchIn, EventPrefix.None, EventSuffix.None)))
+            !cache.ContainsKey((EventId.SwitchIn, EventPrefix.Any, EventSuffix.None)))
         {
             cache[(EventId.SwitchIn, EventPrefix.None, EventSuffix.None)] =
                 startHandler with { Id = EventId.SwitchIn };

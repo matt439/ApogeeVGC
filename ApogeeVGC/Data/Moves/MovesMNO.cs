@@ -213,7 +213,7 @@ public partial record Moves
                 },
                 VolatileStatus = ConditionId.MagnetRise,
                 Condition = _library.Conditions[ConditionId.MagnetRise],
-                OnTry = OnTryEventInfo.Create((battle, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, move) =>
                 {
                     // Fail if source has Smack Down or Ingrain
                     if (source.Volatiles.ContainsKey(ConditionId.SmackDown) ||
@@ -482,7 +482,7 @@ public partial record Moves
                     return IntFalseUnion.FromInt(0);
                 }),
                 // Check that the user was damaged this turn before allowing the move
-                OnTry = OnTryEventInfo.Create((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, source, _, _) =>
                 {
                     // Find if any damage was taken this turn
                     Attacker? lastDamagedBy = source.GetLastDamagedBy(true);
@@ -582,8 +582,10 @@ public partial record Moves
                 },
                 OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
-                    // If already charged (TwoTurnMove volatile exists with this move), remove it and execute the attack
-                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        attacker.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn();
                     }
@@ -850,7 +852,7 @@ public partial record Moves
                 {
                     pokemon.AddVolatile(ConditionId.MirrorCoat);
                 }),
-                OnTry = OnTryEventInfo.Create((_, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((_, source, _, _) =>
                 {
                     if (!source.Volatiles.TryGetValue(ConditionId.MirrorCoat,
                             out EffectState? effectState))
@@ -936,7 +938,8 @@ public partial record Moves
                         (source.IsGrounded() ?? false))
                     {
                         battle.Debug("misty terrain boost");
-                        return battle.ChainModify(1.5);
+                        battle.ChainModify(1.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1480,7 +1483,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 VolatileStatus = ConditionId.NoRetreat,
-                OnTry = OnTryEventInfo.Create((_, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((_, source, _, move) =>
                 {
                     // Fail if source already has No Retreat
                     if (source.Volatiles.ContainsKey(ConditionId.NoRetreat))

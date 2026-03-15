@@ -802,8 +802,9 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Fire)
                     {
-                        // Note: In TS, move.accuracy is set to true here
-                        // We cannot modify init-only Accuracy, but the hit will still be blocked
+                        // Showdown: move.accuracy = true — prevents accuracy check for
+                        // remaining targets of spread moves (e.g., Heat Wave)
+                        move.Accuracy = IntTrueUnion.FromTrue();
                         RelayVar addResult = target.AddVolatile(ConditionId.FlashFire);
                         if (addResult is BoolRelayVar { Value: false })
                         {
@@ -837,18 +838,12 @@ public partial record Abilities
                     NoTrace = true,
                     Breakable = true,
                 },
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) =>
-                {
-                    // Trigger the weather check to potentially change forme
-                    // This is implemented via OnStart which calls OnWeatherChange
-                }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     // Trigger the weather change event to potentially change forme
                     // OnStart delegates to the weather change logic
                     if (!pokemon.IsActive ||
-                        pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                        pokemon.BaseSpecies.Id != SpecieId.Cherrim ||
                         pokemon.Transformed) return;
                     if (pokemon.Hp == 0) return;
 
@@ -869,11 +864,11 @@ public partial record Abilities
                                 message: "[msg]");
                         }
                     }
-                }),
+                }, -2),
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (!pokemon.IsActive ||
-                        pokemon.BaseSpecies.BaseSpecies != SpecieId.Cherrim ||
+                        pokemon.BaseSpecies.Id != SpecieId.Cherrim ||
                         pokemon.Transformed) return;
                     if (pokemon.Hp == 0) return;
 
@@ -903,7 +898,7 @@ public partial record Abilities
                             Pokemon: var flowerGiftHolder,
                         })
                         return atk;
-                    if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return atk;
+                    if (flowerGiftHolder.BaseSpecies.Id != SpecieId.Cherrim) return atk;
                     ConditionId? weather = pokemon.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
@@ -921,7 +916,7 @@ public partial record Abilities
                             Pokemon: var flowerGiftHolder,
                         })
                         return spd;
-                    if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return spd;
+                    if (flowerGiftHolder.BaseSpecies.Id != SpecieId.Cherrim) return spd;
                     ConditionId? weather = pokemon.EffectiveWeather();
                     if (weather is ConditionId.SunnyDay or ConditionId.DesolateLand)
                     {
@@ -1027,7 +1022,7 @@ public partial record Abilities
                             }
                         }
 
-                        return null;
+                        return false;
                     }),
                 OnAllyTryAddVolatile =
                     OnAllyTryAddVolatileEventInfo.Create((battle, status, target, _, _) =>
@@ -1080,15 +1075,9 @@ public partial record Abilities
                     NoEntrain = true,
                     NoTrace = true,
                 },
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) =>
-                {
-                    // Trigger the weather check to potentially change forme
-                    // This is implemented via OnStart which calls OnWeatherChange
-                }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Castform ||
                         pokemon.Transformed) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();
@@ -1105,10 +1094,10 @@ public partial record Abilities
                     {
                         pokemon.FormeChange(targetForme, battle.Effect, false, message: "[msg]");
                     }
-                }),
+                }, -2),
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Castform ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Castform ||
                         pokemon.Transformed) return;
 
                     ConditionId? weather = pokemon.EffectiveWeather();

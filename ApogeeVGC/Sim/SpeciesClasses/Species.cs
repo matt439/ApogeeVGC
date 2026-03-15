@@ -22,8 +22,8 @@ public record Species : IEffect, ICopyable<Species>
     public EffectType EffectType => EffectType.Specie;
     public int Num { get; init; }
     public required string Name { get; init; }
-    public string FullName => $"{Name}{(Forme != BaseForme ? $"-{Forme}" : string.Empty)}";
-    public SpecieId BaseSpecies { get; init; }
+    public string FullName => $"pokemon: {Name}";
+    public SpecieId BaseSpecies { get => field == default ? Id : field; init; }
     public FormeId Forme { get; init; } = FormeId.None;
     public FormeId BaseForme { get; init; } = FormeId.None;
     public IReadOnlyList<FormeId>? CosmeticFormes { get; init; }
@@ -37,14 +37,14 @@ public record Species : IEffect, ICopyable<Species>
 
     // null if no prevo
     public SpecieId? Prevo { get; init; }
-    public IReadOnlyList<SpecieId> Evos { get; init; } = [];
+    public IReadOnlyList<SpecieId> Evos { get; set; } = [];
     public EvoType? EvoType { get; init; }
     public string? EvoCondition { get; init; }
     public int? EvoItem { get; init; }
     public int? EvoMove { get; init; }
     public EvoRegion? EvoRegion { get; init; }
     public int? EvoLevel { get; init; }
-    public bool Nfe { get; init; }
+    public bool Nfe => Evos is { Count: > 0 };
     public IReadOnlyList<EggGroup> EggGroups { get; init; } = [];
     public bool CanHatch { get; init; }
     public bool IsCosmeticForme { get; init; }
@@ -59,7 +59,7 @@ public record Species : IEffect, ICopyable<Species>
     /// <summary>
     /// Weight (in integer multiples of 0.1kg).
     /// </summary>
-    public int WeightHg => (int)WeightKg * 10;
+    public int WeightHg => (int)(WeightKg * 10);
     public double HeightM { get; init; } // in meters
     public string Color { get; init; } = string.Empty;
 

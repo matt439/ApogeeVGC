@@ -43,7 +43,7 @@ public sealed record OnModifyAccuracyEventInfo : EventHandlerInfo
                 );
                 return result switch
                 {
-                    DoubleDoubleVoidUnion => null,
+                    DoubleDoubleVoidUnion d => IntRelayVar.Get((int)d.Value),
                     VoidDoubleVoidUnion => null,
                     _ => null
                 };

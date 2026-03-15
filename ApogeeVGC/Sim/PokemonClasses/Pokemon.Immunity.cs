@@ -279,7 +279,7 @@ public partial class Pokemon
         }
 
         // Levitate ability provides immunity (unless ability is being suppressed)
-        if (HasAbility(AbilityId.Levitate))
+        if (HasAbility(AbilityId.Levitate) && !Battle.SuppressingAbility(this))
         {
             return null; // Special return value indicating Levitate immunity
         }

@@ -114,6 +114,7 @@ public partial class Battle
         }
 
         // Calculate default subOrder if not set
+        // Showdown: if (!handler.subOrder) handler.subOrder = effectType === 'Ability' ? 7 : effectType === 'Item' ? 8 : 0
         if (subOrder == 0)
         {
             subOrder = CalculateDefaultSubOrder(h);
@@ -132,26 +133,11 @@ public partial class Battle
             ? (h.State?.EffectOrder ?? 0)
             : 0;
 
-        // Determine if this event uses speed for sorting  
-        bool usesSpeed = callbackName is not (
-            EventId.Residual or
-            EventId.FieldResidual or
-            EventId.SideResidual or
-            EventId.End or
-            EventId.FieldEnd or
-            EventId.SideEnd or
-            EventId.Start or
-            EventId.FieldStart or
-            EventId.SideStart or
-            EventId.Restart or
-            EventId.FieldRestart or
-            EventId.SideRestart or
-            EventId.Update
-            );
-
-        // Calculate speed if needed
-        int speed = 0;
-        if (usesSpeed && h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
+        // Calculate speed if the handler is held by a Pokemon
+        // Showdown always assigns speed from pokemon.speed for Pokemon-held handlers,
+        // regardless of event type (Residual, SwitchIn, etc.)
+        double speed = 0;
+        if (h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
         {
             Pokemon pokemon = pokemonEffectHolder.Pokemon;
             speed = pokemon.Speed;
@@ -165,7 +151,8 @@ public partial class Battle
             }
 
             // Apply fractional speed adjustment for switch-in events
-            // Check if event is a SwitchIn event
+            // Showdown uses floating-point division to produce fractional speed values
+            // (e.g., 0.25, 0.5, 0.75) that break ties between same-speed Pokemon
             bool usesFractionalSpeed = callbackName is
                 EventId.SwitchIn or
                 EventId.AnySwitchIn;
@@ -173,7 +160,7 @@ public partial class Battle
             if (usesFractionalSpeed)
             {
                 int fieldPositionValue = pokemon.Side.N * Sides.Count + pokemon.Position;
-                speed -= SpeedOrder.IndexOf(fieldPositionValue) / (ActivePerHalf * 2);
+                speed -= (double)SpeedOrder.IndexOf(fieldPositionValue) / (ActivePerHalf * 2);
             }
         }
 
@@ -237,7 +224,7 @@ public partial class Battle
             // This is used by Quick Guard to block moves with artificially enhanced priority
             if (Gen > 5)
             {
-                moveAction.Move.Priority = priority;
+                move.Priority = priority;
             }
 
             // Update the speed directly — no record clone needed
@@ -247,7 +234,7 @@ public partial class Battle
         }
 
         // Get the Pokemon's action speed (factors in speed stat, paralysis, etc.)
-        // The other Action types have constant speed values so do not need to be set.
+        // Matches Showdown: if (!action.pokemon) action.speed = 1; else action.speed = pokemon.getActionSpeed();
         switch (action)
         {
             case SwitchAction switchAction:
@@ -256,6 +243,11 @@ public partial class Battle
             case PokemonAction pokemonAction:
                 pokemonAction.Speed = pokemonAction.Pokemon.GetActionSpeed();
                 return pokemonAction;
+            case RunSwitchAction runSwitchAction:
+                return runSwitchAction with
+                {
+                    Speed = runSwitchAction.Pokemon?.GetActionSpeed() ?? 1,
+                };
             default:
                 return action;
         }
@@ -374,9 +366,13 @@ public partial class Battle
     private int CalculateDefaultSubOrder(EventListenerWithoutPriority listener)
     {
         // Effect type hierarchy for subOrder
+        // Matches Showdown's resolvePriority logic:
+        //   Condition: isSlotCondition→3, target instanceof Pokemon→2, else→5
+        //   Weather/Format/Rule/Ruleset: 5
+        //   Ability: 7, Item: 8
         int subOrder = listener.Effect.EffectType switch
         {
-            EffectType.Condition => 2,
+            EffectType.Condition => 5, // Default for conditions (field conditions, etc.)
             EffectType.Weather => 5,
             EffectType.Format => 5,
             EffectType.Rule => 5,
@@ -386,17 +382,23 @@ public partial class Battle
             _ => 0,
         };
 
-        // Refine for conditions
-        if (listener.Effect.EffectType == EffectType.Condition && listener.State?.Target != null)
+        // Refine for conditions based on target type
+        // Showdown: isSlotCondition→3, target instanceof Pokemon→2, else→5
+        if (listener.Effect.EffectType == EffectType.Condition)
         {
-            subOrder = listener.State.Target switch
+            if (listener.State?.IsSlotCondition == true)
             {
-                SideEffectStateTarget when listener.State.IsSlotCondition ==
-                                           true => 3, // Slot condition
-                SideEffectStateTarget => 4, // Side condition
-                FieldEffectStateTarget => 5, // Field condition
-                _ => subOrder,
-            };
+                subOrder = 3; // Slot condition (e.g., Wish)
+            }
+            else if (listener.State?.Target is PokemonEffectStateTarget)
+            {
+                subOrder = 2; // Volatile/status on a Pokemon
+            }
+            else if (listener.State?.Target is SideEffectStateTarget)
+            {
+                subOrder = 4; // Side condition (e.g., Stealth Rock)
+            }
+            // else: stays at 5 (field conditions like Trick Room, or null target)
         }
 
         // Special abilities

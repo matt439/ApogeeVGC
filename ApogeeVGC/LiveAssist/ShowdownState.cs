@@ -1487,7 +1487,60 @@ public sealed class ShowdownNameResolver
     public SpecieId ResolveSpecies(string name)
     {
         if (_speciesByName.TryGetValue(name, out SpecieId id)) return id;
+
+        // Handle cosmetic form variants that map to their base species
+        string? baseName = GetCosmeticFormBase(name);
+        if (baseName != null && _speciesByName.TryGetValue(baseName, out id)) return id;
+
         return default;
+    }
+
+    /// <summary>
+    /// Maps cosmetic form names (e.g. "Minior-Indigo", "Vivillon-Continental") to their
+    /// base species name. Returns null if the name is not a known cosmetic form.
+    /// </summary>
+    private static string? GetCosmeticFormBase(string name)
+    {
+        // Minior color forms (all map to base Minior except Minior-Meteor which is separate)
+        if (name.StartsWith("Minior-", StringComparison.OrdinalIgnoreCase) &&
+            !name.Equals("Minior-Meteor", StringComparison.OrdinalIgnoreCase))
+            return "Minior";
+
+        // Vivillon regional pattern forms (Fancy and Pokeball are separate entries)
+        if (name.StartsWith("Vivillon-", StringComparison.OrdinalIgnoreCase) &&
+            !name.Equals("Vivillon-Fancy", StringComparison.OrdinalIgnoreCase) &&
+            !name.Equals("Vivillon-Pokeball", StringComparison.OrdinalIgnoreCase))
+            return "Vivillon";
+
+        // Florges color forms
+        if (name.StartsWith("Florges-", StringComparison.OrdinalIgnoreCase))
+            return "Florges";
+
+        // Furfrou trim forms
+        if (name.StartsWith("Furfrou-", StringComparison.OrdinalIgnoreCase))
+            return "Furfrou";
+
+        // Alcremie flavor/topping forms
+        if (name.StartsWith("Alcremie-", StringComparison.OrdinalIgnoreCase))
+            return "Alcremie";
+
+        // Sawsbuck seasonal forms
+        if (name.StartsWith("Sawsbuck-", StringComparison.OrdinalIgnoreCase))
+            return "Sawsbuck";
+
+        // Gastrodon forms
+        if (name.StartsWith("Gastrodon-", StringComparison.OrdinalIgnoreCase))
+            return "Gastrodon";
+
+        // Shellos forms
+        if (name.StartsWith("Shellos-", StringComparison.OrdinalIgnoreCase))
+            return "Shellos";
+
+        // Deerling seasonal forms
+        if (name.StartsWith("Deerling-", StringComparison.OrdinalIgnoreCase))
+            return "Deerling";
+
+        return null;
     }
 
     public MoveId ResolveMove(string nameOrId)

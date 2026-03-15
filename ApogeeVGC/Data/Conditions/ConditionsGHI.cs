@@ -70,7 +70,8 @@ public partial record Conditions
                 OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, _) =>
                     {
                         battle.Debug("Gem Boost");
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                    return new VoidReturn();
                     },
                     14),
             },
@@ -105,7 +106,10 @@ public partial record Conditions
                 // Damage is doubled against the Glaive Rush user
                 OnSourceModifyDamage =
                     OnSourceModifyDamageEventInfo.Create((battle, _, _, _, _) =>
-                        battle.ChainModify(2)),
+                    {
+                        battle.ChainModify(2);
+                        return null;
+                    }),
                 // Remove the Glaive Rush drawback before the pokemon attacks
                 OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, _) =>
                 {
@@ -137,7 +141,7 @@ public partial record Conditions
                 OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                }, 26, 9),
+                }, order: 26, subOrder: 9),
                 OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
                     if (battle.DisplayUi)
@@ -172,14 +176,16 @@ public partial record Conditions
                         !defender.IsSemiInvulnerable())
                     {
                         battle.Debug("move weakened by grassy terrain");
-                        return battle.ChainModify(0.5);
+                        battle.ChainModify(0.5);
+                    return new VoidReturn();
                     }
 
                     // Boost Grass moves if attacker is grounded
                     if (move.Type == MoveType.Grass && (attacker.IsGrounded() ?? false))
                     {
                         battle.Debug("grassy terrain boost");
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -213,7 +219,7 @@ public partial record Conditions
                                 "Pokemon semi-invuln or not grounded; Grassy Terrain skipped");
                         }
                     }
-                }, 5) with
+                }, order: 5) with
                 {
                     SubOrder = 2,
                 },
@@ -229,6 +235,13 @@ public partial record Conditions
                         battle.Add("-fieldend", "move: Grassy Terrain");
                     }
                 }),
+            },
+            [ConditionId.IceBurn] = new()
+            {
+                Id = ConditionId.IceBurn,
+                Name = "Ice Burn",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
             },
             [ConditionId.Gravity] = new()
             {
@@ -272,7 +285,8 @@ public partial record Conditions
                 {
                     // Only modify accuracy for moves with numeric accuracy (not always-hit moves)
                     if (accuracy == null) return new VoidReturn();
-                    return battle.ChainModify([6840, 4096]);
+                    battle.ChainModify([6840, 4096]);
+                    return new VoidReturn();
                 }),
                 OnDisableMove = OnDisableMoveEventInfo.Create((_, pokemon) =>
                 {
@@ -426,8 +440,15 @@ public partial record Conditions
                 OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, _, _) =>
                 {
                     battle.Debug($"Boosting from Helping Hand: {battle.EffectState.DoubleMultiplier}");
-                    return battle.ChainModify(battle.EffectState.DoubleMultiplier ?? 1.0);
+                    battle.ChainModify(battle.EffectState.DoubleMultiplier ?? 1.0);
+                    return new VoidReturn();
                 }, 10),
+            },
+            [ConditionId.HighJumpKick] = new()
+            {
+                Id = ConditionId.HighJumpKick,
+                Name = "highjumpkick",
+                EffectType = EffectType.Condition,
             },
             [ConditionId.Imprison] = new()
             {
@@ -502,7 +523,7 @@ public partial record Conditions
                 }),
                 OnTrapPokemon = OnTrapPokemonEventInfo.Create((_, pokemon) => { pokemon.TryTrap(); }),
                 OnResidual = OnResidualEventInfo.Create(
-                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon); }, 7),
+                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon, pokemon); }, order: 7),
                 // groundedness implemented in Pokemon.IsGrounded()
                 OnDragOut = OnDragOutEventInfo.Create((battle, pokemon, _, _) =>
                 {

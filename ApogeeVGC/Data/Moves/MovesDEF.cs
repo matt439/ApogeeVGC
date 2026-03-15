@@ -77,7 +77,7 @@ public partial record Moves
                 Status = ConditionId.Sleep,
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Dark,
-                OnTry = OnTryEventInfo.Create((battle, _, source, move) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, move) =>
                 {
                     // Only Darkrai can use Dark Void (or if the move has bounced)
                     if (source.Species.BaseSpecies == SpecieId.Darkrai || (move.HasBounced ?? false))
@@ -284,16 +284,15 @@ public partial record Moves
                 Type = MoveType.Fighting,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
-                    // Check if queue will act and run StallMove event
-                    bool willAct = battle.Queue.WillAct() is not null;
+                    if (battle.Queue.WillAct() is null)
+                        return (BoolEmptyVoidUnion)false;
+
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    bool result = willAct && stallSuccess;
-                    return result ? true : (BoolEmptyVoidUnion)false;
+                    return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
                 OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    // Add Stall volatile to track consecutive uses
                     source.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 }),
@@ -862,7 +861,9 @@ public partial record Moves
                 BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    int bp = move.BasePower * source.Hp / source.MaxHp;
+                    // Showdown: clampIntRange(Math.floor(Math.max(1, hp) * 150 / maxhp), 1)
+                    int bp = Math.Max(1, source.Hp) * move.BasePower / source.MaxHp;
+                    bp = battle.ClampIntRange(bp, 1, null);
                     battle.Debug($"[Dragon Energy] BP: {bp}");
                     return bp;
                 }),
@@ -1306,10 +1307,11 @@ public partial record Moves
                 },
                 OnBasePower = OnBasePowerEventInfo.Create((battle, _, _, target, move) =>
                 {
-                    if (target.RunEffectiveness(move) <= 0) return new VoidReturn();
+                    if (target.RunEffectiveness(move).ToModifier() <= 0) return new VoidReturn();
                     // Only apply buff when super effective (> 0)
                     battle.Debug("electro drift super effective buff");
-                    return battle.ChainModify([5461, 4096]);
+                    battle.ChainModify([5461, 4096]);
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -1469,16 +1471,15 @@ public partial record Moves
                 Type = MoveType.Normal,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
-                    // Check if queue will act and run StallMove event
-                    bool willAct = battle.Queue.WillAct() is not null;
+                    if (battle.Queue.WillAct() is null)
+                        return (BoolEmptyVoidUnion)false;
+
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
-                    bool result = willAct && stallSuccess;
-                    return result ? true : (BoolEmptyVoidUnion)false;
+                    return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
                 OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    // Add Stall volatile to track consecutive uses
                     source.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 }),
@@ -1576,7 +1577,9 @@ public partial record Moves
                 BasePowerCallback = BasePowerCallbackEventInfo.Create((battle, source, _, move) =>
                 {
                     // Base power scales with user's HP percentage
-                    int bp = move.BasePower * source.Hp / source.MaxHp;
+                    // Showdown: clampIntRange(Math.floor(Math.max(1, hp) * 150 / maxhp), 1)
+                    int bp = Math.Max(1, source.Hp) * move.BasePower / source.MaxHp;
+                    bp = battle.ClampIntRange(bp, 1, null);
                     battle.Debug($"[Eruption] BP: {bp}");
                     return bp;
                 }),
@@ -1624,7 +1627,8 @@ public partial record Moves
                         (source.IsGrounded() ?? false))
                     {
                         battle.Debug("terrain buff");
-                        return battle.ChainModify(3, 2); // 1.5x = 3/2
+                        battle.ChainModify(3, 2);
+                    return new VoidReturn(); // 1.5x = 3/2
                     }
 
                     return new VoidReturn();
@@ -1712,7 +1716,8 @@ public partial record Moves
                         pokemon.Status != ConditionId.Sleep)
                     {
                         battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1932,7 +1937,8 @@ public partial record Moves
                             battle.Add("-activate", pokemon, "move: Fickle Beam");
                         }
 
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -3113,7 +3119,8 @@ public partial record Moves
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionFlare)
                     {
                         battle.Debug("double power");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -3138,7 +3145,8 @@ public partial record Moves
                     if (battle.LastSuccessfulMoveThisTurn == MoveId.FusionBolt)
                     {
                         battle.Debug("double power");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();

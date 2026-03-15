@@ -22,8 +22,8 @@ public record PokemonAction : IAction
         }
     }
 
-    public int Priority { get; init; }
-    public int Speed { get; set; }
+    public double Priority { get; init; }
+    public double Speed { get; set; }
     
     public required Pokemon Pokemon { get; init; }
     public Pokemon? Dragger { get; init; }
@@ -31,5 +31,5 @@ public record PokemonAction : IAction
 
     public int SubOrder => 0;
     public int EffectOrder => 0;
-    public IntFalseUnion Order => int.MaxValue;
+    public IntFalseUnion Order { get; init; } = IntFalseUnion.FromFalse();
 }

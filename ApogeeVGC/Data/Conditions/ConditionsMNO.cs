@@ -117,6 +117,13 @@ public partial record Conditions
                 AssociatedMove = MoveId.MeanLook,
                 // Uses Trapped condition
             },
+            [ConditionId.MeteorBeam] = new()
+            {
+                Id = ConditionId.MeteorBeam,
+                Name = "Meteor Beam",
+                EffectType = EffectType.Condition,
+                // Marker volatile for TwoTurnMove charge turn (no invulnerability)
+            },
             [ConditionId.Metronome] = new()
             {
                 Id = ConditionId.Metronome,
@@ -185,7 +192,8 @@ public partial record Conditions
 
                     int[] dmgMod = [4096, 4915, 5734, 6553, 7372, 8192];
                     int numConsecutive = Math.Min(effectState.NumConsecutive ?? 0, 5);
-                    return new DecimalRelayVar((decimal)battle.ChainModify([dmgMod[numConsecutive], 4096]));
+                    battle.ChainModify([dmgMod[numConsecutive], 4096]);
+                    return null;
                 }),
             },
             [ConditionId.MicleBerry] = new()
@@ -245,7 +253,8 @@ public partial record Conditions
                     ];
                     if (stompingMoves.Contains(move.Id))
                     {
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return DoubleVoidUnion.FromVoid();
@@ -460,7 +469,8 @@ public partial record Conditions
                             !defender.IsSemiInvulnerable())
                         {
                             battle.Debug("misty terrain weaken");
-                            return battle.ChainModify([2048, 4096]);
+                            battle.ChainModify([2048, 4096]);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -508,7 +518,7 @@ public partial record Conditions
 
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.MustRecharge]);
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Truant]);
-                        return null;
+                        return new NullRelayVar();
                     },
                     11),
                 OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>

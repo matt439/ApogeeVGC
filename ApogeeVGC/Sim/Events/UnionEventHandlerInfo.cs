@@ -7,7 +7,7 @@ namespace ApogeeVGC.Sim.Events;
 /// Examples: OnCriticalHit (func | bool), OnTakeItem (func | bool), OnTryHeal (func1 | func2 | bool)
 /// </summary>
 /// <typeparam name="TUnion">The union type (OnCriticalHit, OnFlinch, OnTakeItem, etc.)</typeparam>
-public abstract record UnionEventHandlerInfo<TUnion> : EventHandlerInfo
+public abstract record UnionEventHandlerInfo<TUnion> : EventHandlerInfo, IUnionEventHandler
     where TUnion : IUnionEventHandler
 {
     /// <summary>
@@ -23,6 +23,11 @@ public abstract record UnionEventHandlerInfo<TUnion> : EventHandlerInfo
     {
         return UnionValue?.GetDelegate();
     }
+
+    // IUnionEventHandler implementation — delegates to UnionValue
+    Delegate? IUnionEventHandler.GetDelegate() => UnionValue?.GetDelegate();
+    bool IUnionEventHandler.IsConstant() => UnionValue?.IsConstant() ?? false;
+    object? IUnionEventHandler.GetConstantValue() => UnionValue?.GetConstantValue();
 
     /// <summary>
     /// Checks if the union contains a constant value (e.g., true/false) rather than a delegate.

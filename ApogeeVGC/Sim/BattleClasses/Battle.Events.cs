@@ -18,6 +18,9 @@ public partial class Battle
         IEffect? sourceEffect = null,
         RelayVar? relayVar = null, EffectDelegate? customCallback = null)
     {
+        // Match Showdown: when relayVar is not provided, default to true
+        // (Showdown line 593-594: if (relayVar === undefined) { relayVar = true; })
+        relayVar ??= BoolRelayVar.True;
         // Debug logging for event entry
         if (DisplayUi && eventId == EventId.SwitchIn)
         {
@@ -172,11 +175,10 @@ public partial class Battle
             Event = parentEvent;
         }
 
-        // If handler returned null and no relayVar was explicitly provided,
-        // return null instead of the default BoolRelayVar.True.
-        // This matches pokemon-showdown's singleEvent behavior where undefined
-        // handler returns propagate as undefined, not as a truthy default.
-        return returnVal ?? (hasRelayVar ? relayVar : null);
+        // If handler returned null (TS undefined), return relayVar (defaults to true).
+        // This matches pokemon-showdown's singleEvent (line 651): returnVal === undefined ? relayVar : returnVal
+        // where relayVar defaults to true (line 594) when not explicitly provided.
+        return returnVal ?? relayVar;
     }
 
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null,
@@ -354,6 +356,11 @@ public partial class Battle
             IEffect effect = handler.Effect;
             EffectHolder effectHolder = handler.EffectHolder;
 
+            // NOTE: Showdown only skips fainted Pokemon handlers in fieldEvent (battle.ts line 512),
+            // NOT in runEvent. The fainted check is in FieldEvent() below, not here.
+            // Removing it from RunEvent fixes Magician stealing items from fainted targets
+            // whose item has an OnTakeItem guard (e.g., Sky Plate on Arceus).
+
             // Check if status has changed
             if (effect.EffectType == EffectType.Status &&
                 effectHolder is PokemonEffectHolder pokemonHolder)
@@ -468,6 +475,7 @@ public partial class Battle
                         Event.Source,
                         sourceEffect
                     );
+
                 }
             }
             finally
@@ -561,6 +569,13 @@ public partial class Battle
             effect ??= Effect;
 
             // Sort by speed (highest to lowest) with proper speed tie resolution
+            // Uses stored pokemon.Speed field, matching Showdown's eachEvent:
+            // this.speedSort(actives, (a, b) => b.speed - a.speed)
+            if (Prng.TraceEnabled)
+            {
+                var caller = new System.Diagnostics.StackTrace().GetFrame(1)?.GetMethod()?.Name ?? "?";
+                Console.Error.WriteLine($"[EachEvent] {eventId} speeds: {string.Join(", ", actives.Select(p => $"{p.Name}={p.Speed}"))} [from {caller}]");
+            }
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
 
             // Convert bool? to RelayVar? for RunEvent
@@ -594,31 +609,6 @@ public partial class Battle
 
     public void FieldEvent(EventId eventId, List<Pokemon>? targets = null)
     {
-        // Debug logging for event entry
-        if (DisplayUi && eventId == EventId.SwitchIn)
-        {
-            string targetsStr = targets != null
-                ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
-                : "all";
-            Debug($"[FieldEvent] ENTRY: {eventId} | Targets: {targetsStr}");
-        }
-
-        // if (eventId == EventId.Residual)
-        // {
-        //     Debug("[FieldEvent] Residual: Starting to collect handlers");
-        //     foreach (Side side in Sides)
-        //     {
-        //         foreach (Pokemon? active in side.Active)
-        //         {
-        //        if (active != null)
-        //  {
-        // Debug(
-        //     $"[FieldEvent] Residual: Active Pokemon: {active.Name}, Item: {active.Item}");
-        //       }
-        //         }
-        //     }
-        // }
-
         // Determine if we should track duration for this event
         EffectStateKey? getKey = eventId == EventId.Residual ? EffectStateKey.Duration : null;
 
@@ -675,28 +665,6 @@ public partial class Battle
         // Sort handlers by speed order
         SpeedSort(handlers);
 
-        // Debug logging for handler count
-        if (DisplayUi && eventId == EventId.SwitchIn)
-        {
-            Debug($"[FieldEvent] {eventId}: Found {handlers.Count} handlers to process");
-        }
-// if (eventId == EventId.Residual && handlers.Count is > 0 and <= 10)
-        // {
-        //     foreach (EventListener h in handlers.Take(10))
-        //     {
-        //         string holderStr = h.EffectHolder switch
-        //         {
-        //  PokemonEffectHolder peh => peh.Pokemon.Name,
-        //     SideEffectHolder seh => $"Side {seh.Side.Id}",
-        // FieldEffectHolder => "Field",
-        //             BattleEffectHolder => "Battle",
-        //    _ => "Unknown",
-        //         };
-        //         Debug(
-        //     $"[FieldEvent]   - Handler: {h.Effect.Name} ({h.Effect.EffectType}) on {holderStr}");
-        //     }
-        // }
-
         // Execute each handler in order
         int handlerIndex = 0;
         try
@@ -709,44 +677,14 @@ public partial class Battle
 
             IEffect effect = handler.Effect;
 
-            if (DisplayUi && eventId == EventId.SwitchIn)
-            {
-                Debug(
-                    $"[FieldEvent] Processing handler {handlerIndex}: {effect.Name} ({effect.EffectType})");
-            }
-
-            // Debug($"[FieldEvent] Loop iteration {handlerIndex}: Processing {effect.Name}");
-
-            // string holderName = handler.EffectHolder switch
-            // {
-            //     PokemonEffectHolder peh => peh.Pokemon.Name,
-            //     SideEffectHolder seh => $"Side {seh.Side.Id}",
-            //     FieldEffectHolder => "Field",
-            //     _ => "Unknown"
-            // };
-            // Debug(
-            //     $"[FieldEvent] {eventId}: Handler {handlerIndex}/{handlerIndex + handlers.Count} - {effect.Name} ({effect.EffectType}) on {holderName}");
-
             // Skip fainted Pokemon unless this is a slot condition
             if (handler.EffectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
             {
                 if (handler.State?.IsSlotCondition != true)
                 {
-                    if (DisplayUi && eventId == EventId.SwitchIn)
-                    {
-                        Debug($"[FieldEvent] Skipping {effect.Name} (Pokemon fainted)");
-                    }
-
                     continue;
                 }
             }
-
-            if (DisplayUi && eventId == EventId.SwitchIn)
-            {
-                Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
-            }
-
-            // Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
 
             // Handle duration tracking for Residual events
             if (eventId == EventId.Residual &&
@@ -754,13 +692,8 @@ public partial class Battle
             {
                 handler.State.Duration--;
 
-                // Debug(
-                // $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
-
                 if (handler.State.Duration <= 0)
                 {
-                    // Debug($"[FieldEvent] {eventId}: {effect.Name} expired, calling end callback");
-
                     // Effect has expired, trigger its end callback
                     // Use provided EndCallArgs or empty array for no args
                     object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? [];
@@ -805,9 +738,9 @@ public partial class Battle
                     Pokemon pokemon = pokemonTarget.Pokemon;
 
                     // Determine where this effect's state should be stored
-                    // Check if this is an ability state (not starting with "ability:" prefix means it's the main ability)
+                    // Check if this is the main ability state (AbilityEffectStateId = main ability)
                     if (effect is
-                        { EffectType: EffectType.Ability, EffectStateId: not AbilityEffectStateId })
+                        { EffectType: EffectType.Ability, EffectStateId: AbilityEffectStateId })
                     {
                         expectedStateLocation = pokemon.AbilityState;
 
@@ -909,6 +842,23 @@ public partial class Battle
             if (DisplayUi && eventId == EventId.SwitchIn)
             {
                 Debug($"[FieldEvent] {effect.Name}: Determined handlerEventId={handlerEventId}");
+            }
+
+            // Check ability suppression (NoTransform, Gastro Acid, Neutralizing Gas)
+            // Matches Showdown's runEvent check: if effectHolder.ignoringAbility() continue
+            if (effect.EffectType == EffectType.Ability &&
+                handler.EffectHolder is PokemonEffectHolder pokemonAbilityHolder &&
+                pokemonAbilityHolder.Pokemon.IgnoringAbility())
+            {
+                continue;
+            }
+
+            // Check item suppression (Embargo, Klutz, Magic Room)
+            if (effect.EffectType == EffectType.Item &&
+                handler.EffectHolder is PokemonEffectHolder pokemonItemHolder &&
+                pokemonItemHolder.Pokemon.IgnoringItem())
+            {
+                continue;
             }
 
             // Execute the handler's callback

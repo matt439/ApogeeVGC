@@ -39,8 +39,8 @@ public sealed record OnAllyAfterHitEventInfo : EventHandlerInfo
             {
                 var result = handler(
                     context.Battle,
-                context.GetSourceOrTargetPokemon(),
                 context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon(),
                 context.GetMove()
                 );
                 return result switch

@@ -277,8 +277,11 @@ public partial class Battle
         }
 
         // Check volatile conditions (confusion, flinch, etc.)
-        foreach ((ConditionId volatileId, EffectState volatileState) in pokemon.Volatiles)
+        // Iterate via VolatileOrder (maintained in EffectOrder) to match JavaScript's
+        // insertion-order property iteration without LINQ allocation.
+        foreach (ConditionId volatileId in pokemon.VolatileOrder)
         {
+            EffectState volatileState = pokemon.Volatiles[volatileId];
             Condition volatileCondition = Library.Conditions[volatileId];
             handlerInfo = volatileCondition.HasAnyEventHandlers
                 ? volatileCondition.GetEventHandlerInfo(callbackName, prefix)
@@ -416,8 +419,11 @@ public partial class Battle
         }
 
         // Check volatile conditions — iterate once for both prefixes
-        foreach ((ConditionId volatileId, EffectState volatileState) in pokemon.Volatiles)
+        // Iterate via VolatileOrder (maintained in EffectOrder) to match JavaScript's
+        // insertion-order property iteration without LINQ allocation.
+        foreach (ConditionId volatileId in pokemon.VolatileOrder)
         {
+            EffectState volatileState = pokemon.Volatiles[volatileId];
             Condition volatileCondition = Library.Conditions[volatileId];
             if (!volatileCondition.HasPrefixedHandlers) continue;
 
@@ -674,8 +680,11 @@ public partial class Battle
         EventPrefix prefix = EventPrefix.None, EffectStateKey? getKey = null,
         Pokemon? customHolder = null)
     {
-        foreach ((ConditionId id, EffectState sideConditionData) in side.SideConditions)
+        // Iterate via SideConditionOrder (maintained in EffectOrder) to match JavaScript's
+        // insertion-order property iteration without LINQ allocation.
+        foreach (ConditionId id in side.SideConditionOrder)
         {
+            EffectState sideConditionData = side.SideConditions[id];
             Condition sideCondition = Library.Conditions[id];
             EventHandlerInfo? handlerInfo =
                 GetHandlerInfo(side, sideCondition, callbackName, prefix);

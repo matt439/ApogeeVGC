@@ -125,15 +125,26 @@ public partial class Pokemon
             MoveSlot moveSlot = MoveSlots[idx];
             MoveId moveName = moveSlot.Move;
 
-            // Special move target modifications
+            // Special move target modifications (must match Showdown's getMoves)
+            MoveTarget? targetOverride = null;
             switch (moveSlot.Id)
             {
+                case MoveId.Curse:
+                    // Non-Ghost users target self instead of normal
+                    if (!HasType(PokemonType.Ghost))
+                    {
+                        Move curseMove = Battle.Library.Moves[MoveId.Curse];
+                        targetOverride = curseMove.NonGhostTarget ?? MoveTarget.Self;
+                    }
+                    break;
+                // Note: Pollen Puff + Heal Block target override not implemented
+                // (Heal Block is not a standard Gen 9 condition)
                 case MoveId.TeraStarStorm:
                     // Terapagos-Stellar gets spread targeting
                     if (Species.Id == SpecieId.TerapagosStellar)
                     {
+                        targetOverride = MoveTarget.AllAdjacentFoes;
                     }
-
                     break;
             }
 
@@ -173,7 +184,7 @@ public partial class Pokemon
             moves[idx] = new PokemonMoveData
             {
                 Move = moveObject,
-                Target = null, // Target is not set in this context
+                Target = targetOverride,
                 Disabled = disabledUnion,
                 DisabledSource = moveSlot.DisabledSource,
                 Pp = moveSlot.Pp,

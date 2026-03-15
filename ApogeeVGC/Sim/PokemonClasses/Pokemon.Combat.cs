@@ -180,6 +180,10 @@ public partial class Pokemon
             PokemonSlot = source.GetSlot(),
             DamageValue = damage,
         });
+
+        // Note: TimesAttacked is NOT incremented here.
+        // It is incremented in BattleActions.HitSteps (applyDamage equivalent),
+        // matching Showdown which increments timesAttacked in battle-actions.ts, not pokemon.ts.
     }
 
     public Attacker? GetLastAttackedBy()

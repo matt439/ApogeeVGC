@@ -263,14 +263,16 @@ public sealed class EventContext
     // TargetPokemon ?? SourcePokemon. Use when either participant may be null.
 
     /// <summary>
-    /// Gets a Pokemon preferring source, falling back to target.
-    /// Used for "source" position params when the caller may not provide a source.
+    /// Gets the Pokemon at the handler's first Pokemon param position.
+    /// In Showdown's runEvent callback: (relayVar, target, source, effect)
+    /// "target" = runEvent's first arg = Event.Target (attacker for damage events).
     /// </summary>
     public Pokemon GetSourceOrTargetPokemon() => (SourcePokemon ?? TargetPokemon)!;
 
     /// <summary>
-    /// Gets a Pokemon preferring target, falling back to source.
-    /// Used for "target" position params when the caller may not provide a target.
+    /// Gets the Pokemon at the handler's second Pokemon param position.
+    /// In Showdown's runEvent callback: (relayVar, target, source, effect)
+    /// "source" = runEvent's second arg = Event.Source (defender for damage events).
     /// </summary>
     public Pokemon GetTargetOrSourcePokemon() => (TargetPokemon ?? SourcePokemon)!;
 

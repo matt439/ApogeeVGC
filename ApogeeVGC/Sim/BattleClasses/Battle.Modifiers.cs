@@ -75,7 +75,7 @@ public partial class Battle
         return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
 
-    public double ChainModify(int numerator, int denominator = 1)
+    public void ChainModify(int numerator, int denominator = 1)
     {
         // Get the current modifier from the event state as fixed-point
         // Default to 1.0 (4096 in fixed-point) if null
@@ -88,10 +88,9 @@ public partial class Battle
         // The >> 12 is a right shift by 12 bits (equivalent to dividing by 4096)
         // Add 2048 for proper rounding before the shift
         Event.Modifier = ((previousMod * nextMod + 2048) >> 12) / 4096.0;
-        return nextMod;
     }
 
-    public double ChainModify(int[] fraction)
+    public void ChainModify(int[] fraction)
     {
         if (fraction.Length != 2)
         {
@@ -99,10 +98,10 @@ public partial class Battle
                 nameof(fraction));
         }
 
-        return ChainModify(fraction[0], fraction[1]);
+        ChainModify(fraction[0], fraction[1]);
     }
 
-    public double ChainModify(double fraction)
+    public void ChainModify(double fraction)
     {
         if (fraction <= 0.0)
         {
@@ -114,7 +113,6 @@ public partial class Battle
         // Chain the fixed-point modification
         var previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
         Event.Modifier = ((previousMod * fixedPointFraction + 2048) >> 12) / 4096.0;
-        return fixedPointFraction;
     }
 
     public int Modify(int value, int numerator, int denominator = 1)
@@ -122,7 +120,7 @@ public partial class Battle
         // Calculate the 4096-based fixed-point modifier
         var modifier = Trunc(numerator * 4096 / denominator);
 
-        // Apply the modifier with proper rounding
+        // Apply the modifier with proper rounding (matches Showdown's modify())
         return Trunc((Trunc(value * modifier) + 2048 - 1) / 4096);
     }
 
@@ -146,7 +144,7 @@ public partial class Battle
 
         // Convert the double fraction to a fixed-point representation
         var fixedPointFraction = Trunc((int)(fraction * 4096));
-        // Apply the fixed-point modification
+        // Apply the fixed-point modification (matches Showdown's modify())
         return Trunc((Trunc(value * fixedPointFraction) + 2048 - 1) / 4096);
     }
 
@@ -259,10 +257,10 @@ public partial class Battle
             return num & 0xFFFF;
         }
 
-        // For other bit counts, scale up by 2^bits, truncate, then scale back down
-        // This effectively performs: Math.Floor(num / (2^bits)) * (2^bits)
-        var divisor = 1 << bits; // 2^bits
-        return (num / divisor) * divisor;
+        // For other bit counts, take the lower N bits (unsigned modulo 2^bits).
+        // Matches Showdown's: (num >>> 0) % (2 ** bits)
+        var mask = (1 << bits) - 1;
+        return num & mask;
     }
 
     public int Trunc(double num, int bits = 0)

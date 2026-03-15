@@ -66,7 +66,8 @@ public partial record Abilities
                         // Only modify numeric accuracy
                         if (accuracy.HasValue && source.IsAlly(abilityHolder))
                         {
-                            return battle.ChainModify([4506, 4096]);
+                            battle.ChainModify([4506, 4096]);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -90,7 +91,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Sleep) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Vital Spirit");
                     }
@@ -128,7 +129,7 @@ public partial record Abilities
                     }
 
                     return new VoidReturn();
-                }, 1),
+                }),
             },
 
             // ==================== 'W' Abilities ====================
@@ -193,7 +194,7 @@ public partial record Abilities
                     }
 
                     return new VoidReturn();
-                }, 1),
+                }),
             },
             [AbilityId.WaterBubble] = new()
             {
@@ -255,7 +256,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Water Bubble");
                     }
@@ -295,7 +296,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Burn) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Water Veil");
                     }
@@ -337,7 +338,7 @@ public partial record Abilities
                     }
 
                     return new VoidReturn();
-                }, 1),
+                }),
             },
             [AbilityId.WhiteSmoke] = new()
             {

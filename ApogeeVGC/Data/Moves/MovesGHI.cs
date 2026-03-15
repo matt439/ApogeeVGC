@@ -447,7 +447,8 @@ public partial record Moves
                 {
                     if (battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
                     {
-                        return battle.ChainModify(1.5);
+                        battle.ChainModify(1.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1331,7 +1332,8 @@ public partial record Moves
                 OnMoveFail = OnMoveFailEventInfo.Create((battle, _, source, move) =>
                 {
                     battle.Damage(source.BaseMaxHp / 2, source, source,
-                        BattleDamageEffect.FromIEffect(move));
+                        BattleDamageEffect.FromIEffect(
+                            battle.Library.Conditions[ConditionId.HighJumpKick]));
                 }),
             },
             [MoveId.HoneClaws] = new()
@@ -1562,7 +1564,7 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
-                OnTry = OnTryEventInfo.Create((battle, _, source, _) =>
+                OnTry = OnTryEventInfo.Create((battle, source, _, _) =>
                 {
                     if (source.Species.Id == SpecieId.HoopaUnbound)
                     {
@@ -1682,8 +1684,10 @@ public partial record Moves
                 Type = MoveType.Ice,
                 OnTryMove = OnTryMoveEventInfo.Create((battle, attacker, defender, move) =>
                 {
-                    // If already charged (volatile exists), remove it and execute the attack
-                    if (attacker.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        attacker.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn();
                     }

@@ -59,4 +59,14 @@ public class PokemonSlot(SideId sideId, int positionOffset)
     {
         return $"{SideId.GetSideIdName()}{PositionLetter.ToString().ToLowerInvariant()}";
     }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is PokemonSlot other && SideId == other.SideId && PositionLetter == other.PositionLetter;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(SideId, PositionLetter);
+    }
 }

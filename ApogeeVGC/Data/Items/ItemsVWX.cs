@@ -160,11 +160,22 @@ public partial record Items
                     }
                 },
                 OnStart = OnStartEventInfo.Create(TryUseWhiteHerb),
-                OnAnySwitchIn = OnAnySwitchInEventInfo.Create(TryUseWhiteHerb, priority: -2),
-                OnAnyAfterMega = OnAnyAfterMegaEventInfo.Create(TryUseWhiteHerb),
+                // Showdown: onAnySwitchIn() { this.effect.onStart.call(this, this.effectState.target); }
+                // All "Any" prefix handlers use effectState.target (the item holder), not the event target
+                OnAnySwitchIn = OnAnySwitchInEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var holder })
+                        TryUseWhiteHerb(battle, holder);
+                }, priority: -2),
+                OnAnyAfterMega = OnAnyAfterMegaEventInfo.Create((battle, pokemon) =>
+                {
+                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var holder })
+                        TryUseWhiteHerb(battle, holder);
+                }),
                 OnAnyAfterMove = OnAnyAfterMoveEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    TryUseWhiteHerb(battle, pokemon);
+                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var holder })
+                        TryUseWhiteHerb(battle, holder);
                     return null;
                 }),
                 OnResidual = OnResidualEventInfo.Create(

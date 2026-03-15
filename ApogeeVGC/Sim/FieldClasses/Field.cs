@@ -1,9 +1,11 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.FieldClasses;
@@ -88,21 +90,10 @@ public class Field
         }
 
         // Check if weather is already set to this weather
+        // In gen 6+, always return false if weather is already active (matches Showdown)
         if (Weather == status.Id)
         {
-            // Special case for abilities if weather has no duration
-            if (sourceEffect.EffectType == EffectType.Ability)
-            {
-                if (WeatherState.Duration == 0)
-                {
-                    return false;
-                }
-            }
-            // For other effects (gen 9 always satisfies gen > 2)
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         // Run the SetWeather event to check if weather change is allowed
@@ -190,7 +181,11 @@ public class Field
         EffectState weatherState = WeatherState;
         Battle.SingleEvent(EventId.FieldEnd, prevWeather, weatherState, this);
         Weather = ConditionId.None;
+        // ClearEffectState(ref local) only reassigns the local variable, not the property.
+        // We must write back to WeatherState so stale Duration values don't cause phantom
+        // residual handlers and spurious PRNG shuffles in FieldEvent.
         Battle.ClearEffectState(ref weatherState);
+        WeatherState = weatherState;
         Battle.EachEvent(EventId.WeatherChange);
         return true;
     }
@@ -214,15 +209,26 @@ public class Field
     /// </summary>
     public bool SuppressingWeather()
     {
-        return Battle.Sides.Any(side =>
-            (from pokemon in side.Active
-                where pokemon != null // Check for null pokemon in active slots
-                where !pokemon.Fainted
-                where !pokemon.IgnoringAbility()
-                let ability = pokemon.GetAbility()
-                where ability.SuppressWeather
-                select pokemon).Any(pokemon =>
-                !(pokemon.AbilityState.Ending ?? false)));
+        List<Side> sides = Battle.Sides;
+        for (int s = 0; s < sides.Count; s++)
+        {
+            List<Pokemon?> active = sides[s].Active;
+            for (int i = 0; i < active.Count; i++)
+            {
+                Pokemon? pokemon = active[i];
+                if (pokemon is null || pokemon.Fainted || pokemon.IgnoringAbility())
+                    continue;
+
+                Ability ability = pokemon.GetAbility();
+                if (!ability.SuppressWeather)
+                    continue;
+
+                if (!(pokemon.AbilityState.Ending ?? false))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     public bool IsWeather(ConditionId weather)
@@ -321,7 +327,11 @@ public class Field
         EffectState terrainState = TerrainState;
         Battle.SingleEvent(EventId.FieldEnd, prevTerrain, terrainState, this);
         Terrain = ConditionId.None;
+        // ClearEffectState(ref local) only reassigns the local variable, not the property.
+        // We must write back to TerrainState so stale Duration values don't cause phantom
+        // residual handlers and spurious PRNG shuffles in FieldEvent.
         Battle.ClearEffectState(ref terrainState);
+        TerrainState = terrainState;
         Battle.EachEvent(EventId.TerrainChange);
         return true;
     }
@@ -471,9 +481,6 @@ SingleEventSource.FromNullablePokemon(source),
             Battle.Debug($"[AddPseudoWeather] Added {status.Id} with duration {state.Duration}");
   }
 
-        // Update all Pokemon speeds since pseudo-weather like Trick Room affects speed calculation
-     Battle.UpdateSpeed();
-
         // Trigger pseudo-weather change event for all handlers
         Battle.RunEvent(
   EventId.PseudoWeatherChange,
@@ -517,9 +524,6 @@ PseudoWeather.TryGetValue(status.Id, out EffectState? state);
 Battle.Debug($"[RemovePseudoWeather] Removed {status.Id}, still exists: {PseudoWeather.ContainsKey(status.Id)}");
         }
 
-     // Update all Pokemon speeds since removing pseudo-weather like Trick Room affects speed calculation
-     Battle.UpdateSpeed();
-        
    return true;
     }
 

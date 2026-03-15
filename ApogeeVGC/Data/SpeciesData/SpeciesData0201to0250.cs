@@ -60,6 +60,7 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 28.5,
                 Color = "Blue",
+                Prevo = SpecieId.Wynaut,
             },
             [SpecieId.Girafarig] = new()
             {
@@ -136,6 +137,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 125.8,
                 Color = "Purple",
+                Prevo = SpecieId.Pineco,
             },
             [SpecieId.Dunsparce] = new()
             {
@@ -214,6 +216,7 @@ public partial record SpeciesData
                 HeightM = 9.2,
                 WeightKg = 400,
                 Color = "Gray",
+                Prevo = SpecieId.Onix,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.SteelixMega] = new()
@@ -294,6 +297,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 48.7,
                 Color = "Purple",
+                Prevo = SpecieId.Snubbull,
             },
             [SpecieId.Qwilfish] = new()
             {
@@ -374,6 +378,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 118,
                 Color = "Red",
+                Prevo = SpecieId.Scyther,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.ScizorMega] = new()
@@ -588,6 +593,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 125.8,
                 Color = "Brown",
+                Prevo = SpecieId.Teddiursa,
             },
             [SpecieId.Slugma] = new()
             {
@@ -640,6 +646,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 55,
                 Color = "Red",
+                Prevo = SpecieId.Slugma,
             },
             [SpecieId.Swinub] = new()
             {
@@ -692,6 +699,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 55.8,
                 Color = "Brown",
+                Prevo = SpecieId.Swinub,
             },
             [SpecieId.Corsola] = new()
             {
@@ -797,6 +805,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 28.5,
                 Color = "Red",
+                Prevo = SpecieId.Remoraid,
             },
             [SpecieId.Delibird] = new()
             {
@@ -849,6 +858,7 @@ public partial record SpeciesData
                 HeightM = 2.1,
                 WeightKg = 220,
                 Color = "Purple",
+                Prevo = SpecieId.Mantyke,
             },
             [SpecieId.Skarmory] = new()
             {
@@ -957,6 +967,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 35,
                 Color = "Black",
+                Prevo = SpecieId.Houndour,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.HoundoomMega] = new()
@@ -1011,6 +1022,7 @@ public partial record SpeciesData
                 HeightM = 1.8,
                 WeightKg = 152,
                 Color = "Blue",
+                Prevo = SpecieId.Seadra,
             },
             [SpecieId.Phanpy] = new()
             {
@@ -1061,6 +1073,7 @@ public partial record SpeciesData
                 HeightM = 1.1,
                 WeightKg = 120,
                 Color = "Gray",
+                Prevo = SpecieId.Phanpy,
             },
             [SpecieId.Porygon2] = new()
             {
@@ -1087,6 +1100,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 32.5,
                 Color = "Red",
+                Prevo = SpecieId.Porygon,
             },
             [SpecieId.Stantler] = new()
             {
@@ -1191,6 +1205,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 48,
                 Color = "Brown",
+                Prevo = SpecieId.Tyrogue,
             },
             [SpecieId.Smoochum] = new()
             {
@@ -1319,6 +1334,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 46.8,
                 Color = "Pink",
+                Prevo = SpecieId.Chansey,
             },
             [SpecieId.Raikou] = new()
             {
@@ -1443,6 +1459,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 152,
                 Color = "Gray",
+                Prevo = SpecieId.Larvitar,
             },
             [SpecieId.Tyranitar] = new()
             {
@@ -1468,6 +1485,7 @@ public partial record SpeciesData
                 HeightM = 2.0,
                 WeightKg = 202,
                 Color = "Green",
+                Prevo = SpecieId.Pupitar,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.TyranitarMega] = new()

@@ -27,7 +27,7 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     public EffectStateId EffectStateId => Id;
     public EffectType EffectType => EffectType.Item;
     public required string Name { get; init; }
-    public string FullName => $"Item: {Name}";
+    public string FullName => $"item: {Name}";
     public int SpriteNum { get; init; }
 
     public FlingData? Fling

@@ -74,4 +74,4 @@ i am debugging my pokemon simulator by running battles between two random player
 
 ## RunRndVsRndVgcRegIEvaluation()
 
-@profiler i am running  #method:'ApogeeVGC.Sim.Core.Driver.RunRandomTeamEvaluation':1639-13569  . i want to profile and optimise the program. i am most interested in GC pressure. The program currently performs best with 16/32 threads (9950X3D). 
+@profiler i am running  #method:'ApogeeVGC.Sim.Core.Driver.RunRandomTeamEvaluation':1639-13569  . i want to profile and optimise the program. i am most interested in GC pressure. The program currently performs best with 16/32 threads (9950X3D).  there is a test in #class:'ApogeeVGC.Benchmarks.BattleSimulationBenchmark':322-2061 .

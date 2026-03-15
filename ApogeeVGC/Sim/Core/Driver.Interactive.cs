@@ -8,6 +8,10 @@ namespace ApogeeVGC.Sim.Core;
 
 public partial class Driver
 {
+    // Seeds for interactive test runs — can be changed freely
+    private const int PlayerRandom2Seed = 1826;
+    private const int BattleSeed = 9885;
+
     private void RunConsoleVsRandom(FormatId formatId)
     {
         Console.WriteLine($"[Driver] Starting Console vs Random ({Library.Formats[formatId].Name})");

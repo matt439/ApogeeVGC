@@ -1,13 +1,9 @@
 using System.Text.Json;
 using ApogeeVGC.LiveAssist;
-using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
-using ApogeeVGC.Sim.Items;
-using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.SpeciesClasses;
-using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
@@ -28,7 +24,7 @@ public partial class Driver
         // Test raw next() values
         var rng = new Gen5Rng(seed);
         Console.WriteLine("=== Raw next() values (100) ===");
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             uint val = rng.Next();
             Console.WriteLine($"{i}: {val}");
@@ -37,7 +33,7 @@ public partial class Driver
         // Test random(N) via Prng wrapper
         var prng = new Prng(PrngSeed.FromGen5(seed));
         Console.WriteLine("\n=== random(256) values (100) ===");
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             int val = prng.Random(256);
             Console.WriteLine($"{i}: {val}");
@@ -46,7 +42,7 @@ public partial class Driver
         // Test random(min, max)
         var prng2 = new Prng(PrngSeed.FromGen5(seed));
         Console.WriteLine("\n=== random(10, 20) values (50) ===");
-        for (int i = 0; i < 50; i++)
+        for (var i = 0; i < 50; i++)
         {
             int val = prng2.Random(10, 20);
             Console.WriteLine($"{i}: {val}");
@@ -64,6 +60,15 @@ public partial class Driver
     /// </summary>
     public void RunEquivalenceTest(string fixturePath, string showdownLogPath)
     {
+        // Resolve paths relative to the solution root (walk up from bin output dir)
+        // This handles both `dotnet run` (CWD = project root) and running the built exe
+        if (!File.Exists(fixturePath))
+        {
+            string solutionRoot = EquivalenceTestHelper.FindSolutionRoot(AppContext.BaseDirectory);
+            fixturePath = Path.Combine(solutionRoot, fixturePath);
+            showdownLogPath = Path.Combine(solutionRoot, showdownLogPath);
+        }
+
         Console.WriteLine($"[Equivalence] Loading fixture: {fixturePath}");
         Console.WriteLine($"[Equivalence] Loading Showdown log: {showdownLogPath}");
 
@@ -82,12 +87,12 @@ public partial class Driver
 
         // Parse format
         string formatId = root.GetProperty("formatid").GetString()!;
-        FormatId fmtId = ResolveFormatId(formatId);
+        FormatId fmtId = EquivalenceTestHelper.ResolveFormatId(formatId);
 
         // Parse teams
         var resolver = new ShowdownNameResolver(Library);
-        PokemonSet[] p1Team = ParseShowdownTeam(root.GetProperty("p1Team"), resolver);
-        PokemonSet[] p2Team = ParseShowdownTeam(root.GetProperty("p2Team"), resolver);
+        var p1Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p1Team"), resolver, Library);
+        var p2Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p2Team"), resolver, Library);
 
         Console.WriteLine($"[Equivalence] Format: {formatId}, Seed: {gen5Seed}");
         Console.WriteLine($"[Equivalence] P1 team: {string.Join(", ", p1Team.Select(p => p.Name))}");
@@ -105,7 +110,7 @@ public partial class Driver
         {
             Id = fmtId,
             Sync = true,
-            DisplayUi = false,
+            DisplayUi = true,
             Seed = PrngSeed.FromGen5(gen5Seed),
             Player1Options = new PlayerOptions
             {
@@ -121,32 +126,79 @@ public partial class Driver
         };
 
         var battle = new Battle(battleOptions, Library);
+        battle.Prng.TraceEnabled = true;
         battle.Start();
 
-        // Replay choices from input log
-        int choicesApplied = 0;
+        // Parse choice entries from input log (skip start/player setup lines)
+        var choices = new Queue<string>();
         foreach (string logEntry in inputLog)
         {
             if (!logEntry.StartsWith(">")) continue;
-            string line = logEntry[1..]; // strip leading >
+            string line = logEntry[1..];
+            if (line.StartsWith("start") || line.StartsWith("player")) continue;
+            choices.Enqueue(line);
+        }
 
-            if (line.StartsWith("p1 "))
+        // Replay choices using the same loop pattern as SimulatorSync:
+        // Battle.Start() sets up the first request, then we feed choices
+        // and call CommitChoices(), which runs TurnLoop and may generate
+        // new requests (forced switches after fainting, etc.)
+        var choicesApplied = 0;
+        while (!battle.Ended && battle.RequestState != RequestState.None)
+        {
+            // Feed choices for both sides from the input log
+            // Feed choices from the queue, handling the case where one side
+            // is already done (e.g. no forced switch needed)
+            var madeProgress = true;
+            while (choices.Count > 0 && !battle.AllChoicesDone() && madeProgress)
             {
-                string choice = line[3..];
-                battle.P1.Choose(choice);
-                choicesApplied++;
-            }
-            else if (line.StartsWith("p2 "))
-            {
-                string choice = line[3..];
-                battle.P2.Choose(choice);
-                choicesApplied++;
+                madeProgress = false;
+                // Scan through queued choices to find ones we can apply
+                var scanned = 0;
+                int total = choices.Count;
+                while (scanned < total && !battle.AllChoicesDone())
+                {
+                    string line = choices.Dequeue();
+                    scanned++;
+
+                    Side? side = null;
+                    var choice = "";
+                    if (line.StartsWith("p1 "))
+                    {
+                        side = battle.P1;
+                        choice = line[3..];
+                    }
+                    else if (line.StartsWith("p2 "))
+                    {
+                        side = battle.P2;
+                        choice = line[3..];
+                    }
+
+                    if (side is not null && !side.IsChoiceDone())
+                    {
+                        bool ok = side.Choose(choice);
+                        if (!ok)
+                            Console.WriteLine($"  [T{battle.Turn}] {side.Id} choice rejected: {choice} (State={battle.RequestState})");
+                        choicesApplied++;
+                        madeProgress = true;
+                    }
+                    else if (side is not null && side.IsChoiceDone())
+                    {
+                        // Side is already done — re-enqueue for later
+                        choices.Enqueue(line);
+                    }
+                    // else: skip unknown lines
+                }
             }
 
-            // After both sides have chosen, commit
             if (battle.AllChoicesDone())
             {
                 battle.CommitChoices();
+            }
+            else
+            {
+                Console.WriteLine($"  [T{battle.Turn}] Stuck: not all choices done, {choices.Count} entries remain (State={battle.RequestState})");
+                break;
             }
         }
 
@@ -158,17 +210,48 @@ public partial class Driver
         string[] showdownLines = File.ReadAllLines(showdownLogPath);
 
         // Filter to game-state-affecting lines for comparison
-        var csharpFiltered = FilterProtocolLines(battle.Log);
-        var showdownFiltered = FilterProtocolLines(showdownLines);
+        var csharpFiltered = EquivalenceTestHelper.FilterProtocolLines(battle.Log);
+        var showdownFiltered = EquivalenceTestHelper.FilterProtocolLines(showdownLines);
 
         Console.WriteLine($"[Equivalence] Filtered: C# {csharpFiltered.Count} lines, Showdown {showdownFiltered.Count} lines");
 
+        // Find first mismatch and dump context around it
+        int firstMismatchIdx = -1;
+        for (var d = 0; d < Math.Min(csharpFiltered.Count, showdownFiltered.Count); d++)
+        {
+            if (csharpFiltered[d] != showdownFiltered[d]) { firstMismatchIdx = d; break; }
+        }
+        if (firstMismatchIdx >= 0)
+        {
+            int start = Math.Max(0, firstMismatchIdx - 3);
+            int end = Math.Min(Math.Min(csharpFiltered.Count, showdownFiltered.Count), firstMismatchIdx + 10);
+            Console.WriteLine($"\n=== Context around first mismatch (line {firstMismatchIdx}) ===");
+            for (int d = start; d < end; d++)
+            {
+                string marker = d == firstMismatchIdx ? ">>>" : "   ";
+                Console.WriteLine($"  {marker} C# [{d}]: {csharpFiltered[d]}");
+                Console.WriteLine($"  {marker} SD [{d}]: {showdownFiltered[d]}");
+            }
+        }
+        else if (csharpFiltered.Count < showdownFiltered.Count)
+        {
+            // C# ended early — show the last few C# lines and what SD expects next
+            Console.WriteLine($"\n=== C# ended early (has {csharpFiltered.Count} vs SD {showdownFiltered.Count}) ===");
+            int start = Math.Max(0, csharpFiltered.Count - 5);
+            Console.WriteLine("  Last C# lines:");
+            for (int d = start; d < csharpFiltered.Count; d++)
+                Console.WriteLine($"    [{d}]: {csharpFiltered[d]}");
+            Console.WriteLine("  Next SD lines:");
+            for (int d = csharpFiltered.Count; d < Math.Min(showdownFiltered.Count, csharpFiltered.Count + 10); d++)
+                Console.WriteLine($"    [{d}]: {showdownFiltered[d]}");
+        }
+
         // Compare
-        int matches = 0;
-        int mismatches = 0;
+        var matches = 0;
+        var mismatches = 0;
         int maxLines = Math.Max(csharpFiltered.Count, showdownFiltered.Count);
 
-        for (int i = 0; i < maxLines; i++)
+        for (var i = 0; i < maxLines; i++)
         {
             string csLine = i < csharpFiltered.Count ? csharpFiltered[i] : "(missing)";
             string sdLine = i < showdownFiltered.Count ? showdownFiltered[i] : "(missing)";
@@ -195,162 +278,10 @@ public partial class Driver
             Console.WriteLine("[Equivalence] PASS — protocols are identical!");
         else
             Console.WriteLine("[Equivalence] FAIL — protocols diverge");
+
+        //// press Enter to exit so we can review the output
+        //Console.WriteLine("Press Enter key to exit...");
+        //Console.ReadLine();
     }
 
-    /// <summary>
-    /// Filter protocol lines to game-state-affecting entries only.
-    /// Strips animation hints, empty lines, and channel markers.
-    /// </summary>
-    private static List<string> FilterProtocolLines(IEnumerable<string> lines)
-    {
-        var result = new List<string>();
-        foreach (string line in lines)
-        {
-            if (string.IsNullOrWhiteSpace(line)) continue;
-
-            // Skip channel/split markers and meta-protocol
-            if (line.StartsWith("|split|")) continue;
-            if (line.StartsWith("|upkeep")) continue;
-            if (line == "|") continue;
-            if (line.StartsWith("update")) continue;
-            if (line.StartsWith("sideupdate")) continue;
-
-            // Skip animation-only lines
-            if (line.StartsWith("|-anim|")) continue;
-
-            // Include game-state lines
-            if (line.StartsWith("|") || line.StartsWith("|-"))
-            {
-                result.Add(line);
-            }
-        }
-        return result;
     }
-
-    /// <summary>
-    /// Parse a Showdown JSON team array into C# PokemonSet[].
-    /// Expects the unpacked team format from Teams.unpack() (species, moves, ability, item, etc.).
-    /// </summary>
-    private PokemonSet[] ParseShowdownTeam(JsonElement teamArray, ShowdownNameResolver resolver)
-    {
-        var sets = new List<PokemonSet>();
-        foreach (JsonElement mon in teamArray.EnumerateArray())
-        {
-            string species = mon.GetProperty("species").GetString()!;
-            SpecieId specieId = resolver.ResolveSpecies(species);
-            if (specieId == default)
-            {
-                Console.WriteLine($"  WARNING: Unknown species '{species}', skipping");
-                continue;
-            }
-
-            // Moves
-            var moves = new List<MoveId>();
-            foreach (JsonElement m in mon.GetProperty("moves").EnumerateArray())
-            {
-                string moveName = m.GetString()!;
-                MoveId moveId = resolver.ResolveMove(moveName);
-                if (moveId != MoveId.None)
-                    moves.Add(moveId);
-                else
-                    Console.WriteLine($"  WARNING: Unknown move '{moveName}' on {species}");
-            }
-            if (moves.Count == 0) moves.Add(MoveId.Tackle);
-
-            // Ability
-            string abilityName = mon.GetProperty("ability").GetString() ?? "";
-            AbilityId abilityId = resolver.ResolveAbility(abilityName);
-
-            // Item
-            string itemName = mon.GetProperty("item").GetString() ?? "";
-            ItemId itemId = resolver.ResolveItem(itemName);
-
-            // Nature
-            string natureName = mon.TryGetProperty("nature", out JsonElement natElem)
-                ? natElem.GetString() ?? "Serious" : "Serious";
-            NatureId natureId = Enum.TryParse<NatureId>(natureName, true, out var nid) ? nid : NatureId.Serious;
-            Nature nature = Library.Natures[natureId];
-
-            // EVs
-            var evs = new StatsTable();
-            if (mon.TryGetProperty("evs", out JsonElement evsElem))
-            {
-                evs = new StatsTable
-                {
-                    Hp = evsElem.TryGetProperty("hp", out var hp) ? hp.GetInt32() : 0,
-                    Atk = evsElem.TryGetProperty("atk", out var atk) ? atk.GetInt32() : 0,
-                    Def = evsElem.TryGetProperty("def", out var def) ? def.GetInt32() : 0,
-                    SpA = evsElem.TryGetProperty("spa", out var spa) ? spa.GetInt32() : 0,
-                    SpD = evsElem.TryGetProperty("spd", out var spd) ? spd.GetInt32() : 0,
-                    Spe = evsElem.TryGetProperty("spe", out var spe) ? spe.GetInt32() : 0,
-                };
-            }
-
-            // IVs
-            var ivs = StatsTable.PerfectIvs;
-            if (mon.TryGetProperty("ivs", out JsonElement ivsElem))
-            {
-                ivs = new StatsTable
-                {
-                    Hp = ivsElem.TryGetProperty("hp", out var hp) ? hp.GetInt32() : 31,
-                    Atk = ivsElem.TryGetProperty("atk", out var atk) ? atk.GetInt32() : 31,
-                    Def = ivsElem.TryGetProperty("def", out var def) ? def.GetInt32() : 31,
-                    SpA = ivsElem.TryGetProperty("spa", out var spa) ? spa.GetInt32() : 31,
-                    SpD = ivsElem.TryGetProperty("spd", out var spd) ? spd.GetInt32() : 31,
-                    Spe = ivsElem.TryGetProperty("spe", out var spe) ? spe.GetInt32() : 31,
-                };
-            }
-
-            // Level
-            int level = mon.TryGetProperty("level", out JsonElement lvl) ? lvl.GetInt32() : 50;
-
-            // Tera type
-            MoveType teraType = default;
-            if (mon.TryGetProperty("teraType", out JsonElement tera))
-            {
-                string teraStr = tera.GetString() ?? "";
-                teraType = resolver.ResolveTeraType(teraStr);
-            }
-
-            // Gender
-            GenderId gender = GenderId.N;
-            if (mon.TryGetProperty("gender", out JsonElement genderElem))
-            {
-                string g = genderElem.GetString() ?? "";
-                gender = g switch
-                {
-                    "M" => GenderId.M,
-                    "F" => GenderId.F,
-                    _ => GenderId.N,
-                };
-            }
-
-            sets.Add(new PokemonSet
-            {
-                Name = mon.TryGetProperty("name", out JsonElement nameElem)
-                    ? nameElem.GetString() ?? species : species,
-                Species = specieId,
-                Item = itemId,
-                Ability = abilityId,
-                Moves = moves,
-                Nature = nature,
-                Evs = evs,
-                Ivs = ivs,
-                Level = level,
-                TeraType = teraType,
-                Gender = gender,
-            });
-        }
-
-        return sets.ToArray();
-    }
-
-    private static FormatId ResolveFormatId(string formatId) => formatId switch
-    {
-        "gen9vgc2024regg" => FormatId.Gen9VgcRegulationG,
-        "gen9vgc2024regh" => FormatId.Gen9VgcRegulationH,
-        "gen9vgc2024regi" or "gen9vgc2025regi" => FormatId.Gen9VgcRegulationI,
-        "gen9vgcmega" => FormatId.Gen9VgcMega,
-        _ => throw new ArgumentException($"Unknown format: {formatId}"),
-    };
-}

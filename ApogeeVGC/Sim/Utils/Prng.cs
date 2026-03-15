@@ -22,6 +22,15 @@ public class Prng
     private Rng? _dotnetRng;
     private Gen5Rng? _gen5Rng;
 
+    /// <summary>Access the underlying Gen5Rng (null if in .NET mode).</summary>
+    public Gen5Rng? Gen5 => _gen5Rng;
+
+    /// <summary>Debug: count of PRNG calls made.</summary>
+    public int CallCount { get; private set; }
+
+    /// <summary>When true, log every PRNG call to stderr for trace comparison.</summary>
+    public bool TraceEnabled { get; set; }
+
     public Prng(PrngSeed? seed)
     {
         if (seed?.Gen5Seed is { } gen5Seed)
@@ -48,6 +57,7 @@ public class Prng
     /// </summary>
     public double Random()
     {
+        CallCount++;
         if (_gen5Rng != null)
             return _gen5Rng.Next() / (double)(1L << 32);
         return _dotnetRng!.NextDouble();
@@ -58,11 +68,26 @@ public class Prng
     /// </summary>
     public int Random(int max)
     {
+        CallCount++;
         if (_gen5Rng != null)
         {
             // Match Showdown: Math.floor(result * from / 2**32)
             uint result = _gen5Rng.Next();
-            return (int)(result * (ulong)max >> 32);
+            int val = (int)(result * (ulong)max >> 32);
+            if (TraceEnabled)
+            {
+                var st = new System.Diagnostics.StackTrace(1, false);
+                var frames = new System.Text.StringBuilder();
+                for (int i = 0; i < Math.Min(4, st.FrameCount); i++)
+                {
+                    var f = st.GetFrame(i)?.GetMethod();
+                    if (f != null) frames.Append($"{f.DeclaringType?.Name}.{f.Name}");
+                    if (i < 3) frames.Append(" <- ");
+                }
+                Console.Error.WriteLine($"[RNG#{CallCount}] raw={result} caller={frames}");
+                Console.Error.WriteLine($"  -> random({max}) = {val}");
+            }
+            return val;
         }
         return _dotnetRng!.Next(max);
     }
@@ -72,11 +97,26 @@ public class Prng
     /// </summary>
     public int Random(int min, int max)
     {
+        CallCount++;
         if (_gen5Rng != null)
         {
             // Match Showdown: Math.floor(result * (to - from) / 2**32) + from
             uint result = _gen5Rng.Next();
-            return (int)(result * (ulong)(max - min) >> 32) + min;
+            int val = (int)(result * (ulong)(max - min) >> 32) + min;
+            if (TraceEnabled)
+            {
+                var st = new System.Diagnostics.StackTrace(1, false);
+                var frames = new System.Text.StringBuilder();
+                for (int i = 0; i < Math.Min(4, st.FrameCount); i++)
+                {
+                    var f = st.GetFrame(i)?.GetMethod();
+                    if (f != null) frames.Append($"{f.DeclaringType?.Name}.{f.Name}");
+                    if (i < 3) frames.Append(" <- ");
+                }
+                Console.Error.WriteLine($"[RNG#{CallCount}] raw={result} caller={frames}");
+                Console.Error.WriteLine($"  -> random({min},{max}) = {val}");
+            }
+            return val;
         }
         return _dotnetRng!.Next(min, max);
     }

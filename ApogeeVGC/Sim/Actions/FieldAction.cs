@@ -20,12 +20,12 @@ public record FieldAction : IAction
             }
         }
     }
-    public int Priority { get; init; }
-    public int Speed => 1;
+    public double Priority { get; init; }
+    public double Speed => 1;
     public Pokemon? Pokemon => null;
 
     // Properties to satisfy IPriorityComparison
-    public IntFalseUnion Order => int.MaxValue;
+    public IntFalseUnion Order { get; init; } = IntFalseUnion.FromFalse();
     public int SubOrder => 0;
     public int EffectOrder => 0;
 }

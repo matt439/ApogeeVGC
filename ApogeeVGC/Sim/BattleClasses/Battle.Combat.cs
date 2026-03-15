@@ -14,12 +14,12 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class Battle
 {
     /// <summary>
-    /// Applies damage to a single Pokémon.
+    /// Applies damage to a single Pokï¿½mon.
     /// This is a convenience wrapper around SpreadDamage for single-target damage.
     /// </summary>
     /// <param name="damage">Amount of damage to deal</param>
-    /// <param name="target">Target Pokémon (defaults to event target)</param>
-    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
+    /// <param name="target">Target Pokï¿½mon (defaults to event target)</param>
+    /// <param name="source">Source Pokï¿½mon causing the damage (defaults to event source)</param>
     /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
     /// <param name="instafaint">If true, immediately processes fainting instead of queueing it</param>
     /// <returns>
@@ -68,21 +68,27 @@ public partial class Battle
 
         var retVals = new SpreadMoveDamage();
 
-        // Convert effect to Condition
+        // Convert effect to Condition for game logic (event running, status checks)
         Condition? effectCondition;
+        // Keep original IEffect for logging (items, abilities need proper attribution)
+        IEffect? effectForLogging;
         switch (effect)
         {
             case EffectBattleDamageEffect ebde:
                 effectCondition = ebde.Effect as Condition;
+                effectForLogging = ebde.Effect;
                 break;
             case DrainBattleDamageEffect:
                 effectCondition = Library.Conditions[ConditionId.Drain];
+                effectForLogging = effectCondition;
                 break;
             case RecoilBattleDamageEffect:
                 effectCondition = Library.Conditions[ConditionId.Recoil];
+                effectForLogging = effectCondition;
                 break;
             case null:
                 effectCondition = null;
+                effectForLogging = null;
                 break;
             default:
                 throw new InvalidOperationException("Unknown BattleDamageEffect type.");
@@ -100,8 +106,9 @@ public partial class Battle
                 _ => null,
             };
 
-            // Handle undefined damage values FIRST before calling ToInt()
-            if (curDamage[0] is UndefinedBoolIntUndefinedUnion)
+            // Handle falsy non-zero damage values FIRST before calling ToInt()
+            // Mirrors Showdown: !(targetDamage || targetDamage === 0) catches null, undefined, false
+            if (!curDamage[0].IsTruthy() && !curDamage[0].IsZero())
             {
                 retVals.Add(curDamage[0]);
                 continue;
@@ -140,11 +147,14 @@ public partial class Battle
                 }
 
                 // Run Damage event
+                // Pass effectForLogging (preserves original IEffect, e.g. the Move) rather than
+                // effectCondition (which is null for moves since Move can't cast to Condition).
+                // This allows item handlers like Focus Sash to check effect.EffectType == Move.
                 RelayVar? damageResult = RunEvent(
                     EventId.Damage,
                     target,
                     RunEventSource.FromNullablePokemon(source),
-                    effectCondition,
+                    effectForLogging,
                     IntRelayVar.Get(targetDamage)
                 );
 
@@ -164,7 +174,7 @@ public partial class Battle
 
             // Apply damage to target
             Debug($"[SpreadDamage] About to apply {targetDamage} damage to {target.Name} (current HP: {target.Hp})");
-            targetDamage = target.Damage(targetDamage, source, effectCondition);
+            targetDamage = target.Damage(targetDamage, source, effectForLogging ?? effectCondition);
             Debug($"[SpreadDamage] Applied {targetDamage} damage to {target.Name} (new HP: {target.Hp})");
             retVals.Add(targetDamage);
 
@@ -173,7 +183,7 @@ public partial class Battle
                 target.HurtThisTurn = target.Hp;
 
             // Track source's last damage if this was a move
-            if (source != null && effectCondition?.EffectType == EffectType.Move)
+            if (source != null && (effectForLogging ?? effectCondition)?.EffectType == EffectType.Move)
                 source.LastDamage = targetDamage;
 
             // Record damage in history
@@ -184,16 +194,16 @@ public partial class Battle
 
             // Log damage messages with the actual damage amount
             Debug($"[SpreadDamage] Calling PrintDamageMessage for {target.Name}, damage={targetDamage}");
-            PrintDamageMessage(target, targetDamage, source, effectCondition);
+            PrintDamageMessage(target, targetDamage, source, effectForLogging ?? effectCondition);
 
             // Handle drain for moves (Gen 9 uses rounding)
             if (effect is EffectBattleDamageEffect { Effect: ActiveMove move })
             {
-                if (targetDamage > 0 && effectCondition?.EffectType == EffectType.Move &&
+                if (targetDamage > 0 && move.EffectType == EffectType.Move &&
                     move.Drain != null && source != null)
                 {
                     int drainAmount = Trunc(Math.Round(targetDamage * move.Drain.Value.Item1 /
-                                                       (double)move.Drain.Value.Item2));
+                                                       (double)move.Drain.Value.Item2, MidpointRounding.AwayFromZero));
                     Heal(drainAmount, source, target, new DrainBattleHealEffect());
                 }
             }
@@ -225,13 +235,13 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Applies damage directly to a Pokémon without triggering the Damage event.
+    /// Applies damage directly to a Pokï¿½mon without triggering the Damage event.
     /// Used for recoil damage, struggle damage, confusion damage, and other effects
     /// that should bypass normal damage modification abilities/items.
     /// </summary>
     /// <param name="damage">Amount of damage to deal</param>
-    /// <param name="target">Target Pokémon (defaults to event target)</param>
-    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
+    /// <param name="target">Target Pokï¿½mon (defaults to event target)</param>
+    /// <param name="source">Source Pokï¿½mon causing the damage (defaults to event source)</param>
     /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
     /// <returns>The actual amount of damage dealt (0 if target has no HP or damage was 0)</returns>
     public int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null,
@@ -320,7 +330,7 @@ public partial class Battle
             source = eventSource.Pokemon;
         }
 
-        // Convert BattleHealEffect to Condition
+        // Convert BattleHealEffect to Condition (for target.Heal and Heal event)
         Condition? effectCondition = effect switch
         {
             DrainBattleHealEffect => Library.Conditions[ConditionId.Drain],
@@ -329,12 +339,15 @@ public partial class Battle
             _ => throw new InvalidOperationException("Unknown BattleHealEffect type."),
         };
 
-        //// Clamp damage to minimum of 1 if positive but less than 1
-        //// This handles cases where rounding might produce fractional values
-        //if (damage > 0 && damage < 1)
-        //{
-        //    damage = 1;
-        //}
+        // Resolve the actual effect for event dispatch (preserves Item/Ability types)
+        // Showdown: if (!effect) effect = this.effect;
+        IEffect? eventEffect = effect switch
+        {
+            DrainBattleHealEffect => Library.Conditions[ConditionId.Drain],
+            EffectBattleHealEffect ebhe => ebhe.Effect,
+            null => Effect,
+            _ => effectCondition,
+        };
 
         // Truncate damage to remove any remaining fractional part
         damage = Trunc(damage);
@@ -344,19 +357,21 @@ public partial class Battle
             EventId.TryHeal,
             RunEventTarget.FromNullablePokemon(target),
             RunEventSource.FromNullablePokemon(source),
-            effectCondition,
+            eventEffect,
             IntRelayVar.Get(damage)
         );
 
-        // If event prevented healing, return the result
+        // If event prevented healing (e.g., Heal Block / Psychic Noise onTryHeal returns false),
+        // return false â€” not 0. In Showdown, heal() returns the falsy value from runEvent,
+        // and callers like Heal Pulse use !!this.heal() to detect failure.
         if (tryHealResult is not IntRelayVar healAmount)
         {
-            return IntFalseUnion.FromInt(0);
+            return IntFalseUnion.FromFalse();
         }
 
         if (healAmount.Value == 0)
         {
-            return IntFalseUnion.FromInt(0);
+            return IntFalseUnion.FromFalse();
         }
 
         damage = healAmount.Value;
@@ -381,7 +396,7 @@ public partial class Battle
 
         if (target is null)
         {
-            throw new InvalidOperationException("Target Pokémon is null.");
+            throw new InvalidOperationException("Target Pokï¿½mon is null.");
         }
 
         // Apply healing to target
@@ -417,7 +432,7 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Modifies a Pokémon's stat stages (boosts) during battle.
+    /// Modifies a Pokï¿½mon's stat stages (boosts) during battle.
     /// 
     /// Process:
     /// 1. Validates the target has HP and is active
@@ -458,6 +473,9 @@ public partial class Battle
         // Gen 9: Check if any foes remain
         if (target.Side.FoePokemonLeft() <= 0) return new BoolBoolZeroUnion(false);
 
+        // Clone boosts before ChangeBoost (Showdown: { ...boost }) to avoid mutating static move data
+        boost = boost.Copy();
+
         // Run ChangeBoost event to allow modifications
         RelayVar modifiedBoost = RunEvent(EventId.ChangeBoost, target,
             RunEventSource.FromNullablePokemon(source), effect, boost) ?? boost;
@@ -470,6 +488,9 @@ public partial class Battle
 
         // Cap the boosts to valid ranges (-6 to +6)
         SparseBoostsTable cappedBoost = target.GetCappedBoost(modifiedBoostTable.Table);
+
+        // Clone boosts before TryBoost (Showdown: { ...boost }) to avoid mutation
+        cappedBoost = cappedBoost.Copy();
 
         // Run TryBoost event to allow prevention
         RelayVar finalBoost = RunEvent(EventId.TryBoost, target,
@@ -485,11 +506,10 @@ public partial class Battle
         bool? success = null;
         bool boosted = isSecondary;
 
-        // Apply each boost
-        foreach (BoostId boostId in Enum.GetValues<BoostId>())
+        // Apply each boost in insertion order (matches Showdown's JS property iteration)
+        foreach (var (boostId, boostVal) in finalBoostTable.Table.GetNonNullBoosts())
         {
-            int? boostValue = finalBoostTable.Table.GetBoost(boostId);
-            if (!boostValue.HasValue) continue;
+            int? boostValue = boostVal;
 
             // Create a sparse table for just this stat
             var currentBoost = new SparseBoostsTable();
@@ -521,7 +541,7 @@ public partial class Battle
                         // Use -setboost for moves that set boosts to maximum
                         Add("-setboost", target, boostId.ConvertToString(),
                             target.Boosts.GetBoost(boostId),
-                            "[from]", PartFuncUnion.FromIEffect(effect!));
+                            $"[from] {effect!.FullName}");
                     }
                     else if (effect is not null)
                     {
@@ -533,7 +553,7 @@ public partial class Battle
 
                             case EffectType.Item:
                                 Add(msg, target, boostId.ConvertToString(), boostBy,
-                                    "[from]", $"item: {effect.Name}");
+                                    $"[from] item: {effect.Name}");
                                 break;
 
                             default:

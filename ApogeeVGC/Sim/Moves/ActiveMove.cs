@@ -20,7 +20,15 @@ public record ActiveMove : Move, IEffect
     /// which is a flat memory copy — faster than the record copy constructor
     /// chain (HitEffect → Move → ActiveMove) for this ~900-byte object.
     /// </summary>
-    internal ActiveMove ShallowClone() => (ActiveMove)MemberwiseClone();
+    internal ActiveMove ShallowClone()
+    {
+        var clone = (ActiveMove)MemberwiseClone();
+        // Deep-copy secondaries to prevent mutations from leaking to the library template
+        clone.Secondaries = CloneSecondaries(clone.Secondaries);
+        if (clone.Self is not null) clone.Self = clone.Self with { };
+        clone.Flags = clone.Flags with { };
+        return clone;
+    }
 
     /// <summary>
     /// Resets all mutable fields of this instance to match the given template.
@@ -48,12 +56,12 @@ public record ActiveMove : Move, IEffect
         Type = template.Type;
         Priority = template.Priority;
         Target = template.Target;
-        Flags = template.Flags;
+        Flags = template.Flags with { };
         SelfSwitch = template.SelfSwitch;
         SpreadHit = template.SpreadHit;
         MindBlownRecoil = template.MindBlownRecoil;
-        Secondaries = template.Secondaries;
-        Self = template.Self;
+        Secondaries = CloneSecondaries(template.Secondaries);
+        Self = template.Self is not null ? template.Self with { } : null;
         HasSheerForce = template.HasSheerForce;
         ForceStab = template.ForceStab;
         IgnoreAbility = template.IgnoreAbility;
@@ -67,7 +75,7 @@ public record ActiveMove : Move, IEffect
         OverrideOffensiveStat = template.OverrideOffensiveStat;
 
         // --- ActiveMove mutable fields (reset to defaults) ---
-        Weather = null;
+        Weather = template.Weather;
         Hit = 0;
         MoveHitData = null;
         HitTargets = null;
@@ -108,8 +116,15 @@ public record ActiveMove : Move, IEffect
     [SetsRequiredMembers]
     public ActiveMove(Move source) : base(source)
     {
-        // Handle secondaries wrapping (match TypeScript behavior)
-        Secondaries ??= Secondary != null ? [Secondary] : null;
+        // Deep-copy secondaries to prevent mutations from leaking to the library template
+        // (e.g., Serene Grace doubling Chance values in-place)
+        Secondaries = CloneSecondaries(Secondaries)
+                      ?? (Secondary != null ? [Secondary with { }] : null);
+        Self = Self is not null ? Self with { } : null;
+
+        // Copy Weather from base HitEffect (ActiveMove.Weather hides HitEffect.Weather,
+        // so the record copy constructor doesn't propagate it automatically)
+        Weather = source.Weather;
 
         // Share pre-built handler cache from base Move
         _handlerCache = source.MoveHandlerCache;
@@ -133,6 +148,19 @@ public record ActiveMove : Move, IEffect
     /// Required members (Name, Accuracy, MoveSlot) must be set in the initializer.
     /// </summary>
     public ActiveMove() { }
+
+    /// <summary>
+    /// Clones a secondaries array without LINQ to avoid delegate and iterator allocations.
+    /// Returns null if the input is null.
+    /// </summary>
+    private static SecondaryEffect[]? CloneSecondaries(SecondaryEffect[]? source)
+    {
+        if (source is null) return null;
+        var result = new SecondaryEffect[source.Length];
+        for (int i = 0; i < source.Length; i++)
+            result[i] = source[i] with { };
+        return result;
+    }
 
     public EffectType EffectType => EffectType.Move;
 

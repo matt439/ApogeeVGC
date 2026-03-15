@@ -322,8 +322,10 @@ public partial record Moves
                 BreaksProtect = true,
                 OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
-                    // If we have the volatile from turn 1, remove it and continue with the attack
-                    if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        source.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn(); // Continue with the attack
                     }
@@ -1145,34 +1147,17 @@ public partial record Moves
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, _, source, _) =>
                 {
                     // TS: return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
-                    // Short-circuit: if willAct is false, don't run StallMove event
                     if (battle.Queue.WillAct() is null)
-                    {
                         return (BoolEmptyVoidUnion)false;
-                    }
 
                     RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
                     bool stallSuccess = stallResult is BoolRelayVar { Value: true };
                     return stallSuccess ? true : (BoolEmptyVoidUnion)false;
                 }),
 
-                OnHit = OnHitEventInfo.Create((battle, _, source, _) =>
+                OnHit = OnHitEventInfo.Create((_, _, source, _) =>
                 {
-                    // source is the Pokemon using Protect
-                    battle.Debug(
-                        $"[Protect.OnHit] BEFORE AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
-
                     source.AddVolatile(ConditionId.Stall);
-
-                    battle.Debug(
-                        $"[Protect.OnHit] AFTER AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
-                    if (source.Volatiles.TryGetValue(ConditionId.Stall,
-                            out EffectState? stallState))
-                    {
-                        battle.Debug(
-                            $"[Protect.OnHit] Stall volatile state: Counter={stallState.Counter}, Duration={stallState.Duration}");
-                    }
-
                     return new VoidReturn();
                 }),
                 Condition = _library.Conditions[ConditionId.Protect],
@@ -1227,7 +1212,8 @@ public partial record Moves
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         battle.Debug("psyblade electric terrain boost");
-                        return battle.ChainModify(1.5);
+                        battle.ChainModify(1.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1976,7 +1962,10 @@ public partial record Moves
                 BasePp = 1,
                 Priority = 0,
                 Flags = new MoveFlags(),
-                Target = MoveTarget.Self,
+                // Showdown's "recharge" pseudo-move has no target type (undefined),
+                // which causes getTarget -> getRandomTarget -> randomFoe() to be called
+                // during runMove. Using None replicates this PRNG-consuming behavior.
+                Target = MoveTarget.None,
                 Type = MoveType.Normal,
             },
             [MoveId.Recover] = new()
@@ -2255,7 +2244,8 @@ public partial record Moves
                     if (source.Side.FaintedLastTurn != null)
                     {
                         battle.Debug("Boosted for a faint last turn");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();

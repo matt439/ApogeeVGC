@@ -36,6 +36,14 @@ public partial class Side
     public int TotalFainted { get; set; }
 
     public Dictionary<ConditionId, EffectState> SideConditions { get; set; }
+
+    /// <summary>
+    /// Tracks side condition keys in EffectOrder (insertion) order.
+    /// Avoids LINQ OrderBy allocations in the hot event-handler discovery path.
+    /// </summary>
+    private readonly List<ConditionId> _sideConditionOrder = [];
+    internal List<ConditionId> SideConditionOrder => _sideConditionOrder;
+
     public List<Dictionary<ConditionId, EffectState>> SlotConditions { get; set; }
 
     public IChoiceRequest? ActiveRequest { get; set; }
@@ -204,6 +212,7 @@ public partial class Side
         SideConditions = source.SideConditions.ToDictionary(
             kvp => kvp.Key,
             kvp => kvp.Value.DeepClone());
+        _sideConditionOrder = new List<ConditionId>(source._sideConditionOrder);
 
         SlotConditions = source.SlotConditions
             .Select(dict => dict.ToDictionary(

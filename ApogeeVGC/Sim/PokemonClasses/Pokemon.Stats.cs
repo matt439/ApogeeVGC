@@ -101,13 +101,11 @@ public partial class Pokemon
                     null, boosts);
 
                 if (relayVar is BoostsTableRelayVar brv)
-                {
                     boosts = brv.Table;
-                }
+                else if (relayVar is SparseBoostsTableRelayVar sbrv)
+                    boosts = sbrv.Table.ToBoostsTable();
                 else
-                {
-                    throw new InvalidOperationException("boosts must be a BoostsTableRelayVar");
-                }
+                    throw new InvalidOperationException("boosts must be a BoostsTableRelayVar or SparseBoostsTableRelayVar");
             }
 
             stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
@@ -150,7 +148,7 @@ public partial class Pokemon
             speed = TrickRoomSpeedOffset - speed;
         }
 
-        return speed;
+        return Battle.Trunc(speed, 13);
     }
 
     public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
@@ -205,9 +203,9 @@ public partial class Pokemon
         var newMaxHp = BaseMaxHp;
         Hp = Hp <= 0 ? 0 : Math.Max(1, newMaxHp - (MaxHp - Hp));
         MaxHp = newMaxHp;
-        if (Hp > 0)
+        if (Hp > 0 && Battle.DisplayUi)
         {
-            //UiGenerator.PrintHealEvent(this, Hp.ToString());
+            Battle.Add("-heal", this, $"{Hp}/{MaxHp}", "[silent]");
         }
     }
 

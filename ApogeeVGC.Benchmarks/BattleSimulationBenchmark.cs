@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
@@ -7,6 +5,7 @@ using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
+using BenchmarkDotNet.Attributes;
 using Microsoft.VSDiagnostics;
 
 namespace ApogeeVGC.Benchmarks;
@@ -32,7 +31,7 @@ public class BattleSimulationBenchmark
     {
         var player1Options = new PlayerOptions
         {
-            Type = ApogeeVGC.Sim.Player.PlayerType.Random,
+            Type = Sim.Player.PlayerType.Random,
             Name = "Random 1",
             Team = _team1,
             Seed = new PrngSeed(12345),
@@ -40,7 +39,7 @@ public class BattleSimulationBenchmark
         };
         var player2Options = new PlayerOptions
         {
-            Type = ApogeeVGC.Sim.Player.PlayerType.Random,
+            Type = Sim.Player.PlayerType.Random,
             Name = "Random 2",
             Team = _team2,
             Seed = new PrngSeed(1818),

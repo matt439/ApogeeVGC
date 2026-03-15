@@ -105,7 +105,7 @@ public partial class BattleActions
             }
         }
 
-        if (willTryMove is BoolRelayVar { Value: false } or null)
+        if (willTryMove is BoolRelayVar { Value: false } or NullRelayVar or null)
         {
             Battle.Debug($"[RunMove] Move prevented by BeforeMove event");
             Battle.RunEvent(EventId.MoveAborted, pokemon,
@@ -246,7 +246,7 @@ public partial class BattleActions
                 int speedDiff = a.StoredStats[StatIdExceptHp.Spe] -
                                 b.StoredStats[StatIdExceptHp.Spe];
                 if (speedDiff != 0) return speedDiff;
-                return a.AbilityState.EffectOrder - b.AbilityState.EffectOrder;
+                return b.AbilityState.EffectOrder - a.AbilityState.EffectOrder;
             });
 
             Pokemon? targetOf1StDance = Battle.ActiveTarget;
@@ -335,8 +335,11 @@ public partial class BattleActions
             sourceEffect = Battle.Effect;
         }
 
-        // Clear sourceEffect for Instruct and Custap Berry
-        if (sourceEffect is ActiveMove { Id: MoveId.Instruct } or Item { Id: ItemId.CustapBerry })
+        // Clear sourceEffect for Format-type effects (Showdown: if (sourceEffect as Format).effectType)
+        // Also clear for Instruct and Custap Berry
+        if (sourceEffect != null &&
+            (sourceEffect.EffectType == EffectType.Format ||
+             sourceEffect is ActiveMove { Id: MoveId.Instruct } or Item { Id: ItemId.CustapBerry }))
         {
             sourceEffect = null;
         }
@@ -441,6 +444,19 @@ public partial class BattleActions
 
         // Build move message attributes
         string moveName = activeMove.Name;
+        string attrs = "";
+        // Only add [from] for meaningful source effects (not the default battle/format effect).
+        // Showdown checks !(sourceEffect as Format)?.effectType — i.e., skip Format-type effects.
+        // We must NOT compare by reference (sourceEffect != Battle.Effect) because during ability
+        // handler dispatch, Battle.Effect is temporarily set to the ability being processed.
+        if (sourceEffect != null && sourceEffect.EffectType != EffectType.Format)
+            attrs += $"|[from] {sourceEffect.FullName}";
+
+        // Log move usage to battle log (before getMoveTargets, matching Showdown order)
+        if (Battle.DisplayUi)
+        {
+            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, $"{target?.ToString() ?? "null"}{attrs}");
+        }
 
         // Handle no target
         if (target == null)
@@ -455,7 +471,7 @@ public partial class BattleActions
             return false;
         }
 
-        // Get move targets for Pressure PP deduction
+        // Get move targets (may retarget via Follow Me, Rage Powder, etc.)
         Pokemon.MoveTargets moveTargets = pokemon.GetMoveTargets(activeMove, target);
         var targets = moveTargets.Targets;
         var pressureTargets = moveTargets.PressureTargets;
@@ -496,7 +512,7 @@ public partial class BattleActions
             }
         }
 
-        // Run TryMove events
+        // Run TryMove events (short-circuit: if SingleEvent fails, don't call RunEvent)
         bool tryMoveResult = Battle.SingleEvent(EventId.TryMove, activeMove, null, pokemon,
                                      SingleEventSource.FromNullablePokemon(target), activeMove)
                                  is not BoolRelayVar { Value: false } and not NullRelayVar
@@ -513,12 +529,6 @@ public partial class BattleActions
         // Run UseMoveMessage event
         Battle.SingleEvent(EventId.UseMoveMessage, activeMove, null, pokemon,
             SingleEventSource.FromNullablePokemon(target), activeMove);
-
-        // Log move usage to battle log
-        if (Battle.DisplayUi)
-        {
-            Battle.AddMove("move", pokemon.ToString(), activeMove.Name, target?.ToString() ?? pokemon.ToString());
-        }
 
         // Set default ignoreImmunity for Status moves
         activeMove.IgnoreImmunity ??= activeMove.Category == MoveCategory.Status;
@@ -601,8 +611,6 @@ public partial class BattleActions
             Battle.SingleEvent(EventId.MoveFail, activeMove, null, target, pokemon,
                 activeMove);
 
-            // Ensure move result is set to false
-            pokemon.MoveThisTurnResult = false;
             return false;
         }
 

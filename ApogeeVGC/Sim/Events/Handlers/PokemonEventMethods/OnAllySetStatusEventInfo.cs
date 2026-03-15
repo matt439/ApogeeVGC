@@ -46,12 +46,14 @@ public sealed record OnAllySetStatusEventInfo : EventHandlerInfo
                     context.GetSourceOrTargetPokemon(),
                     context.GetSourceEffect<IEffect>()
                 );
+                // null from handler = TS null = falsy (block the status)
+                // This must be non-null falsy so RunEvent propagates it as a blocking result
+                if (result == null) return new NullRelayVar();
                 return result switch
                 {
                     PokemonPokemonFalseVoidUnion p => new PokemonRelayVar(p.Pokemon),
                     FalsePokemonFalseVoidUnion => BoolRelayVar.False,
                     VoidPokemonFalseVoidUnion => null,
-                    null => null,
                     _ => null
                 };
             },

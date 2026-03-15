@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 // ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
@@ -472,15 +473,13 @@ public partial record Abilities
                 Name = "Hospitality",
                 Num = 299,
                 Rating = 0.0,
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     foreach (Pokemon ally in pokemon.AdjacentAllies())
                     {
                         battle.Heal(ally.BaseMaxHp / 4, ally, pokemon);
                     }
-                }),
+                }, -2),
             },
             [AbilityId.HugePower] = new()
             {
@@ -529,8 +528,13 @@ public partial record Abilities
                 Num = 55,
                 Rating = 3.5,
                 // OnModifyAtkPriority = 5
-                // Note: In TS this uses this.modify() directly instead of chainModify
-                OnModifyAtk = OnModifyAtkEventInfo.Create((_, atk, _, _, _) => (int)(atk * 1.5), 5),
+                // Hustle applies modify directly to the stat, not via chainModify
+                // (Showdown comment: "This should be applied directly to the stat
+                //  as opposed to chaining with the others")
+                OnModifyAtk = OnModifyAtkEventInfo.Create((battle, atk, _, _, _) =>
+                {
+                    return battle.Modify(atk, 1.5);
+                }, 5),
                 // OnSourceModifyAccuracyPriority = -1
                 OnSourceModifyAccuracy = OnSourceModifyAccuracyEventInfo.Create(
                     (battle, accuracy, _, _, move) =>
@@ -539,7 +543,8 @@ public partial record Abilities
                         // (TypeScript checks: move.category === 'Physical' && typeof accuracy === 'number')
                         if (move.Category == MoveCategory.Physical && accuracy.HasValue)
                         {
-                            return battle.ChainModify([3277, 4096]);
+                            battle.ChainModify([3277, 4096]);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -625,8 +630,6 @@ public partial record Abilities
                     Breakable = true,
                     NoTransform = true,
                 },
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.Field.IsWeather([ConditionId.Snowscape]) &&
@@ -639,7 +642,7 @@ public partial record Abilities
                         battle.EffectState.Busted = false;
                         pokemon.FormeChange(SpecieId.Eiscue, battle.Effect, true);
                     }
-                }),
+                }, -2),
                 // OnDamagePriority = 1
                 OnDamage = OnDamageEventInfo.Create((battle, _, target, _, effect) =>
                 {
@@ -808,6 +811,10 @@ public partial record Abilities
                         {
                             battle.Add("replace", pokemon, details.ToString());
                             battle.Add("-end", pokemon, "Illusion");
+                            if (battle.RuleTable.Has(RuleId.IllusionLevelMod))
+                            {
+                                battle.Hint("Illusion Level Mod is active, so this Pok\u00e9mon's true level was hidden.", true);
+                            }
                         }
                     }
                 }),
@@ -835,7 +842,7 @@ public partial record Abilities
                 {
                     if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
                         return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         if (battle.DisplayUi)
                         {
@@ -943,7 +950,7 @@ public partial record Abilities
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, status, target, _, effect) =>
                 {
                     if (status.Id != ConditionId.Sleep) return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         if (battle.DisplayUi)
                         {

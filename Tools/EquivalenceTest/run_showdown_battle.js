@@ -20,8 +20,12 @@ const path = require('path');
 const fs = require('fs');
 
 // Showdown must be built first: cd pokemon-showdown && node build
-const showdownPath = path.resolve(__dirname, '../../pokemon-showdown');
-const simPath = path.join(showdownPath, '.sim-dist');
+// Try sibling of ApogeeVGC repo first, then sibling within repo
+const showdownPath = fs.existsSync(path.resolve(__dirname, '../../../pokemon-showdown'))
+    ? path.resolve(__dirname, '../../../pokemon-showdown')
+    : path.resolve(__dirname, '../../pokemon-showdown');
+// Showdown builds to dist/sim/ (not .sim-dist)
+const simPath = path.join(showdownPath, 'dist', 'sim');
 
 if (!fs.existsSync(simPath)) {
     console.error(`ERROR: Showdown not built. Run: cd ${showdownPath} && node build`);
@@ -32,13 +36,29 @@ const { BattleStream, getPlayerStreams } = require(path.join(simPath, 'index.js'
 const { RandomPlayerAI } = require(path.join(simPath, 'tools', 'random-player-ai.js'));
 const { Teams } = require(path.join(simPath, 'index.js'));
 
+function instrumentPrng(battle) {
+    // Monkey-patch the PRNG to count calls
+    if (battle && battle.prng) {
+        const origRandom = battle.prng.random.bind(battle.prng);
+        battle.prng._callCount = 0;
+        battle.prng.random = function(...args) {
+            battle.prng._callCount++;
+            return origRandom(...args);
+        };
+    }
+}
+
 async function runRandom(formatid, seedStr, p1SeedStr, p2SeedStr, outputPath) {
     const stream = new BattleStream({ debug: false });
     const streams = getPlayerStreams(stream);
 
-    // Generate random teams using Showdown's team generator
-    const team1 = Teams.pack(Teams.generate(formatid));
-    const team2 = Teams.pack(Teams.generate(formatid));
+    // Generate random teams using Showdown's team generator with deterministic seeds
+    // Derive team seeds from the battle seed to ensure reproducibility
+    const seed = seedStr.split(',').map(Number);
+    const team1Seed = [seed[0] ^ 0x1234, seed[1] ^ 0x5678, seed[2] ^ 0x9ABC, seed[3] ^ 0xDEF0];
+    const team2Seed = [seed[0] ^ 0xFEDC, seed[1] ^ 0xBA98, seed[2] ^ 0x7654, seed[3] ^ 0x3210];
+    const team1 = Teams.pack(Teams.generate(formatid, { seed: team1Seed }));
+    const team2 = Teams.pack(Teams.generate(formatid, { seed: team2Seed }));
 
     // Collect protocol output
     const protocolLines = [];
@@ -66,6 +86,9 @@ async function runRandom(formatid, seedStr, p1SeedStr, p2SeedStr, outputPath) {
         `>start ${startCmd}\n>player p1 ${p1Cmd}\n>player p2 ${p2Cmd}`
     );
 
+    // Instrument PRNG after battle is created (small delay for initialization)
+    if (stream.battle) instrumentPrng(stream.battle);
+
     await outputDone;
 
     // Write protocol to stdout
@@ -73,10 +96,24 @@ async function runRandom(formatid, seedStr, p1SeedStr, p2SeedStr, outputPath) {
         console.log(line);
     }
 
+    // Dump PRNG call trace if requested
+    if (stream.battle && process.env.PRNG_TRACE) {
+        // The PRNG calls were already logged by our monkey-patch
+    }
+
     // Write input log to file
     if (stream.battle && outputPath) {
         const inputLog = stream.battle.inputLog.join('\n');
         fs.writeFileSync(outputPath + '.inputlog', inputLog);
+
+        // Get final PRNG state for equivalence verification
+        let prngFinalSeed = null;
+        let prngCallCount = null;
+        try {
+            prngFinalSeed = stream.battle.prng.getSeed();
+            // Try to get call count if we instrumented the PRNG
+            prngCallCount = stream.battle.prng._callCount || null;
+        } catch (e) { /* ignore */ }
 
         // Write teams as unpacked JSON so C# can reconstruct them
         const teamsData = {
@@ -89,6 +126,8 @@ async function runRandom(formatid, seedStr, p1SeedStr, p2SeedStr, outputPath) {
             p1Team: Teams.unpack(team1),
             p2Team: Teams.unpack(team2),
             inputLog: stream.battle.inputLog,
+            prngFinalSeed: prngFinalSeed,
+            prngCallCount: prngCallCount,
         };
         fs.writeFileSync(outputPath + '.fixture.json', JSON.stringify(teamsData, null, 2));
     }

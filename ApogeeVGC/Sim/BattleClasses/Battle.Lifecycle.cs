@@ -60,12 +60,12 @@ public partial class Battle
         // Call format's OnBegin handler
         Format.OnBegin?.Invoke(this);
 
-        // Call OnBegin for each rule in the rule table
-        foreach (Format subFormat in from rule in RuleTable.Keys
-                 let ruleString = rule.ToString()
-                 where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
-                 select Library.Rulesets[rule])
+        // Call OnBegin for each rule in the rule table (skip rules not in Library.Rulesets)
+        foreach (RuleId rule in RuleTable.Keys)
         {
+            string ruleString = rule.ToString();
+            if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+            if (!Library.Rulesets.TryGetValue(rule, out Format? subFormat)) continue;
             subFormat.OnBegin?.Invoke(this);
         }
 
@@ -93,7 +93,7 @@ public partial class Battle
 
         Debug($"[Battle.Start] RunPickTeam() returned, RequestState = {RequestState}");
 
-        // Set mid-turn flag
+        // Set mid-turn flag for the initial StartGameAction processing
         MidTurn = true;
 
         // Start turn loop if no request is pending
@@ -291,7 +291,8 @@ public partial class Battle
                         : staleness;
                 }
 
-                pokemon.ActiveTurns++;
+                // ActiveTurns is now incremented in BeforeTurn action handler
+                // to match Showdown's nextTurn() timing (before residual fires).
             }
 
             trappedBySide.Add(sideTrapped);
@@ -485,7 +486,7 @@ public partial class Battle
                 {
                     string ruleString = rule.ToString();
                     if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
-                    Format subFormat = Library.Rulesets[rule];
+                    if (!Library.Rulesets.TryGetValue(rule, out Format? subFormat)) continue;
                     subFormat.OnBattleStart?.Invoke(this);
                 }
 
@@ -535,9 +536,8 @@ public partial class Battle
                 Debug($"[RunAction.Move] Calling Actions.RunMove for {moveAction.Move.Name}");
 
                 // Reuse the cached ActiveMove from MoveAction to avoid a heap allocation.
-                // This also preserves PranksterBoosted set during GetActionSpeed.
+                // This preserves Priority and PranksterBoosted set during GetActionSpeed.
                 var cachedActiveMove = moveAction.GetOrCreateActiveMove();
-                cachedActiveMove.Priority = moveAction.Move.Priority;
 
                 Actions.RunMove(cachedActiveMove, moveAction.Pokemon, moveAction.TargetLoc,
                     new BattleActions.RunMoveOptions
@@ -699,6 +699,13 @@ public partial class Battle
             }
 
             case ActionId.BeforeTurn:
+                // Increment ActiveTurns at the start of each turn (matching Showdown's nextTurn).
+                // This must happen before the Residual action so that abilities like
+                // Speed Boost (which check ActiveTurns > 0) activate on the correct turn.
+                foreach (Pokemon activePoke in EnumerateAllActive())
+                {
+                    activePoke.ActiveTurns++;
+                }
                 EachEvent(EventId.BeforeTurn);
                 break;
 
@@ -750,25 +757,19 @@ public partial class Battle
 
         ClearActiveMove();
 
-        // Fainting
-        FaintMessages();
+        // Fainting — forceCheck ensures win is detected even when faint queue is already empty
+        // (e.g., faints processed during hitSteps with checkWin=false, recoil applied, then this call)
+        FaintMessages(forceCheck: true);
         if (Ended) return true;
 
-        // Cancel queued actions for all fainted Pokemon
-        foreach (Side side in Sides)
+        // Switching (fainted pokemon, U-turn, Baton Pass, etc)
+        // In Gen 4+, faint replacement switches only happen when the queue is empty
+        // (all remaining turn actions execute first before requesting switches)
+        if (Queue.Peek() == null)
         {
-            // Create snapshot to avoid collection modification during enumeration
-            Pokemon?[] activeSnapshot = [.. side.Active];
-            foreach (Pokemon? pokemon in activeSnapshot)
-            {
-                if (pokemon?.Fainted == true)
-                {
-                    Queue.CancelAction(pokemon);
-                }
-            }
+            CheckFainted();
         }
 
-        // Switching (fainted pokemon, U-turn, Baton Pass, etc)
         if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
         {
             return false;

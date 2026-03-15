@@ -538,8 +538,13 @@ public partial record Moves
                 BreaksProtect = true,
                 OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
-                    // If we have the volatile from turn 1, remove it and continue with the attack
-                    if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // If we have the move-specific volatile from turn 1, remove it and continue
+                    // Showdown: if (attacker.removeVolatile(move.id)) return;
+                    // Important: remove the MOVE-specific volatile (e.g., ShadowForce), not TwoTurnMove.
+                    // TwoTurnMove is removed via the residual duration mechanism.
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        source.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn(); // Continue with the attack
                     }
@@ -876,7 +881,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.SilkTrap,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, pokemon, _, _) =>
                     battle.Queue.WillAct() is not null &&
-                    battle.RunEvent(EventId.StallMove, pokemon) is not null
+                    battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }
                         ? new VoidReturn()
                         : false),
                 OnHit = OnHitEventInfo.Create((_, pokemon, _, _) =>
@@ -1146,8 +1151,10 @@ public partial record Moves
                 CritRatio = 2,
                 OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
-                    // If we have the volatile from turn 1, remove it and continue with the attack
-                    if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        source.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn(); // Continue with the attack
                     }
@@ -1652,8 +1659,10 @@ public partial record Moves
                 },
                 OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
-                    // If we have the volatile from turn 1, remove it and continue with the attack
-                    if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        source.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn(); // Continue with the attack
                     }
@@ -1700,7 +1709,8 @@ public partial record Moves
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
-                        return battle.ChainModify(0.5);
+                        battle.ChainModify(0.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1732,8 +1742,10 @@ public partial record Moves
                 },
                 OnTryMove = OnTryMoveEventInfo.Create((battle, source, target, move) =>
                 {
-                    // If we have the volatile from turn 1, remove it and continue with the attack
-                    if (source.RemoveVolatile(battle.Library.Conditions[ConditionId.TwoTurnMove]))
+                    // Remove the move-specific volatile, not TwoTurnMove (handled by residual)
+                    if (Enum.TryParse(move.Id.ToString(), out ConditionId moveCondId) &&
+                        battle.Library.Conditions.TryGetValue(moveCondId, out Condition? moveCond) &&
+                        source.RemoveVolatile(moveCond))
                     {
                         return new VoidReturn(); // Continue with the attack
                     }
@@ -1780,7 +1792,8 @@ public partial record Moves
                     if (weakWeathers.Contains(weather))
                     {
                         battle.Debug("weakened by weather");
-                        return battle.ChainModify(0.5);
+                        battle.ChainModify(0.5);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -1986,7 +1999,7 @@ public partial record Moves
                 VolatileStatus = ConditionId.SpikyShield,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, pokemon, _, _) =>
                     battle.Queue.WillAct() is not null &&
-                    battle.RunEvent(EventId.StallMove, pokemon) is not null
+                    battle.RunEvent(EventId.StallMove, pokemon) is not BoolRelayVar { Value: false }
                         ? new VoidReturn()
                         : false),
                 OnHit = OnHitEventInfo.Create((_, pokemon, _, _) =>

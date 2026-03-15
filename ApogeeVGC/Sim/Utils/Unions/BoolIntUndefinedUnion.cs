@@ -35,7 +35,9 @@ public abstract record BoolIntUndefinedUnion
 public record BoolBoolIntUndefinedUnion(bool Value) : BoolIntUndefinedUnion
 {
     public override bool IsTruthy() => Value;
-    public override bool IsZero() => !Value;
+    // In JS, false !== 0 is true — a boolean false is NOT the integer 0.
+    // This must return false so that the Showdown pattern `!x && x !== 0` works correctly.
+    public override bool IsZero() => false;
     public override int ToInt() => Value ? 1 : 0;
 }
 
@@ -54,4 +56,20 @@ public record UndefinedBoolIntUndefinedUnion(Undefined Value) : BoolIntUndefined
     throw new InvalidOperationException(
         "Cannot convert Undefined to int. Undefined and 0 are semantically different. " +
     "Check for Undefined before calling ToInt().");
+}
+
+/// <summary>
+/// Represents JavaScript null in a BoolIntUndefined context.
+/// Null is falsy (like undefined) but semantically distinct:
+/// - undefined means "nothing was attempted"
+/// - null means "something was attempted but produced no result" (e.g., boost blocked by Clear Amulet)
+/// This distinction matters for combineResults and the "didn't try to do anything" check.
+/// </summary>
+public record NullBoolIntUndefinedUnion : BoolIntUndefinedUnion
+{
+    public static readonly NullBoolIntUndefinedUnion Instance = new();
+    public override bool IsTruthy() => false;
+    public override bool IsZero() => false;
+    public override int ToInt() =>
+        throw new InvalidOperationException("Cannot convert null to int.");
 }

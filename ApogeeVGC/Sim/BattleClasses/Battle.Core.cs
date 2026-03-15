@@ -308,7 +308,14 @@ public partial class Battle
         Field = new Field(this);
 
         Format = options.Format ?? Library.Formats[options.Id];
-        RuleTable = Format.RuleTable ?? new RuleTable();
+        RuleTable = Format.RuleTable != null ? new RuleTable(Format.RuleTable) : new RuleTable();
+
+        // Populate RuleTable from Format.Ruleset so Has(RuleId) works for random formats
+        // (which define rules in Ruleset but don't create an explicit RuleTable)
+        foreach (var ruleId in Format.Ruleset)
+        {
+            RuleTable.TryAdd(ruleId, new Rule());
+        }
         DebugMode = options.Debug;
         DisplayUi = options.DisplayUi ?? !options.Sync;
         FormatData = InitEffectState(Format.FormatId);
@@ -468,11 +475,11 @@ public partial class Battle
     public EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot,
         int? duration)
     {
-        // Use the first overload to handle basic initialization and effect ordering
-        // Pass the source Pokemon wrapped in EffectStateTarget for effect ordering purposes
-        EffectStateTarget? targetWrapper =
-            source != null ? new PokemonEffectStateTarget(source) : null;
-        EffectState state = InitEffectState(id, effectOrder: null, target: targetWrapper);
+        // Matches Showdown's initEffectState({id, source, sourceSlot, duration}).
+        // The source Pokemon is NOT the target — target is set separately by callers
+        // that need it (e.g., addVolatile sets target: pokemon, addSideCondition sets
+        // target: side). Field conditions like Trick Room don't set target at all.
+        EffectState state = InitEffectState(id, effectOrder: null, target: null);
 
         // Add the additional properties specific to this overload
         state.Source = source;

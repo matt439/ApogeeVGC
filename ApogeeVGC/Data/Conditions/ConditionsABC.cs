@@ -69,7 +69,7 @@ public partial record Conditions
                     return null;
                 }),
                 OnResidual = OnResidualEventInfo.Create(
-                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon); }, 6),
+                    (battle, pokemon, _, _) => { battle.Heal(pokemon.BaseMaxHp / 16, pokemon); }, order: 6),
             },
             [ConditionId.Arceus] = new()
             {
@@ -202,7 +202,8 @@ public partial record Conditions
                     OnAnyModifyDamageEventInfo.Create((battle, damage, source, target, move) =>
                     {
                         if (target != source &&
-                            target.Side.GetSideCondition(ConditionId.AuroraVeil) != null)
+                            battle.EffectState.Target is SideEffectStateTarget side &&
+                            side.Side.HasAlly(target))
                         {
                             // Don't stack with Reflect or Light Screen
                             if ((target.Side.GetSideCondition(ConditionId.Reflect) != null &&
@@ -241,7 +242,7 @@ public partial record Conditions
                 OnSideResidual = OnSideResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Handled by duration
-                }, 26, 10),
+                }, order: 26, subOrder: 10),
                 OnSideEnd = OnSideEndEventInfo.Create((battle, side) =>
                 {
                     if (battle.DisplayUi)
@@ -372,7 +373,8 @@ public partial record Conditions
                     {
                         if (move.Id is MoveId.Gust or MoveId.Twister)
                         {
-                            return battle.ChainModify(2);
+                            battle.ChainModify(2);
+                    return new VoidReturn();
                         }
 
                         return DoubleVoidUnion.FromVoid();
@@ -404,10 +406,9 @@ public partial record Conditions
 
                     return new VoidReturn();
                 }),
-                //OnResidualOrder = 10,
                 OnResidual = OnResidualEventInfo.Create(
                     (battle, pokemon, _, _) => { battle.Damage(pokemon.BaseMaxHp / 16); },
-                    10),
+                    order: 10),
             },
             [ConditionId.BurningBulwark] = new()
             {
@@ -519,7 +520,8 @@ public partial record Conditions
                     if (move.Type == MoveType.Electric)
                     {
                         battle.Debug("charge boost");
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                    return new VoidReturn();
                     }
 
                     return DoubleVoidUnion.FromVoid();
@@ -779,17 +781,8 @@ public partial record Conditions
                         battle.ActiveTarget = pokemon;
                         int damage = battle.Actions.GetConfusionDamage(pokemon, 40);
 
-                        ActiveMove activeMove = new()
-                        {
-                            Name = "Confused",
-                            Id = MoveId.None,
-                            Accuracy = IntTrueUnion.FromTrue(),
-                            Num = 100200,
-                            Type = MoveType.Unknown, // TS uses type: '???' (typeless)
-                            MoveSlot = new MoveSlot(),
-                        };
                         battle.Damage(damage, pokemon, pokemon,
-                            BattleDamageEffect.FromIEffect(activeMove));
+                            BattleDamageEffect.FromIEffect(PseudoMoveEffect.Confused));
                         return false;
                     },
                     3),
@@ -857,7 +850,7 @@ public partial record Conditions
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     battle.Damage(pokemon.BaseMaxHp / 4);
-                }, 12),
+                }, order: 12),
             },
         };
     }

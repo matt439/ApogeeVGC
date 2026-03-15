@@ -64,13 +64,20 @@ public partial class Side
                 // Parse a move ID directly
                 moveid = moveIdUnion.MoveId;
 
-                // Find the move in the request
-                bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
-
-                if (!found)
+                // Struggle is always valid as a choice — it's handled in Step 9
+                // when no moves have PP. Skip the request validation for Struggle
+                // because the request may show the locked move (e.g. Choice Lock)
+                // rather than Struggle, even though the Pokemon must Struggle.
+                if (moveid != MoveId.Struggle)
                 {
-                    return EmitChoiceError(
-                        $"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
+                    // Find the move in the request
+                    bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
+
+                    if (!found)
+                    {
+                        return EmitChoiceError(
+                            $"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
+                    }
                 }
 
                 break;
@@ -110,42 +117,22 @@ public partial class Side
 
         Move move = Battle.Library.Moves[moveid];
 
-        // Step 7: Validate targeting
-        if (autoChoose)
-        {
-            targetLoc = 0;
-        }
-        else if (Battle.Actions.TargetTypeChoices(move.Target))
-        {
-            if (targetLoc == 0 && Active.Count >= 2)
-            {
-                return EmitChoiceError($"Can't move: {move.Name} needs a target");
-            }
-
-            if (!Battle.ValidTargetLoc(targetLoc, pokemon, move.Target))
-            {
-                return EmitChoiceError($"Can't move: Invalid target for {move.Name}");
-            }
-        }
-        else
-        {
-            if (targetLoc != 0)
-            {
-                return EmitChoiceError($"Can't move: You can't choose a target for {move.Name}");
-            }
-        }
-
-        // Step 8: Handle locked moves (multi-turn moves like Outrage)
+        // Step 7a: Handle locked moves BEFORE target validation (multi-turn moves like Outrage)
+        // This must come first because locked moves (e.g. Recharge) may not have a target
+        // in the request data, and Showdown defaults missing targets to "normal" which allows
+        // a target location to be specified even though it's ignored by the locked move handler.
         var lockedMove = pokemon.GetLockedMove();
         if (lockedMove != null)
         {
             int lockedMoveTargetLoc = pokemon.LastMoveTargetLoc ?? 0;
 
-            // Check if the TwoTurnMove volatile has a stored target location
-            if (pokemon.Volatiles.TryGetValue(ConditionId.TwoTurnMove, out EffectState? twoTurnVolatile) &&
-                twoTurnVolatile is { TargetLoc: not null })
+            // Check if the move-specific volatile has a stored target location
+            // Showdown: pokemon.volatiles[lockedMoveID]?.targetLoc
+            if (Enum.TryParse(lockedMove.Value.ToString(), out ConditionId moveConditionId) &&
+                pokemon.Volatiles.TryGetValue(moveConditionId, out EffectState? moveVolatile) &&
+                moveVolatile is { TargetLoc: not null })
             {
-                lockedMoveTargetLoc = twoTurnVolatile.TargetLoc.Value;
+                lockedMoveTargetLoc = moveVolatile.TargetLoc.Value;
             }
 
             if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;
@@ -164,8 +151,47 @@ public partial class Side
             return true;
         }
 
-        // Step 9: Handle Struggle when no moves have PP
-        if (moves.Length == 0)
+        // Step 7b: Validate targeting
+        // Use the request's target type if available (handles special cases like Curse
+        // for non-Ghost users showing "self" instead of "normal" in the request).
+        // This matches Showdown's chooseMove which uses request.moves[idx].target.
+        MoveTarget targetType = move.Target;
+        foreach (PokemonMoveData reqMove in request.Moves)
+        {
+            if (reqMove.Id == moveid && reqMove.Target is MoveTarget overrideTarget)
+            {
+                targetType = overrideTarget;
+                break;
+            }
+        }
+
+        if (autoChoose)
+        {
+            targetLoc = 0;
+        }
+        else if (Battle.Actions.TargetTypeChoices(targetType))
+        {
+            if (targetLoc == 0 && Active.Count >= 2)
+            {
+                return EmitChoiceError($"Can't move: {move.Name} needs a target");
+            }
+
+            if (!Battle.ValidTargetLoc(targetLoc, pokemon, targetType))
+            {
+                return EmitChoiceError($"Can't move: Invalid target for {move.Name}");
+            }
+        }
+        else
+        {
+            if (targetLoc != 0)
+            {
+                return EmitChoiceError($"Can't move: You can't choose a target for {move.Name}");
+            }
+        }
+
+        // Step 9: Handle Struggle when no moves have PP,
+        // or when the player explicitly chose Struggle (e.g. Choice Lock + 0 PP on locked move)
+        if (moves.Length == 0 || moveid == MoveId.Struggle)
         {
             // Gen 4 and earlier announce Pokemon has no moves left
             if (Battle.Gen <= 4)
@@ -469,9 +495,6 @@ public partial class Side
             }
 
             Choice.ForcedSwitchesLeft--;
-
-            // Clear the switch flag so IsChoiceDone() knows this Pokemon's switch has been handled
-            pokemon.SwitchFlag = false;
         }
 
         // Step 11: Record the switch
@@ -599,6 +622,12 @@ public partial class Side
     {
         if (string.IsNullOrWhiteSpace(input))
             return EmitChoiceError("Can't choose: empty input");
+
+        // Clear any previous/stale choice state before parsing new input.
+        // This matches Showdown's choose() which calls clearChoice() first.
+        // Important because IsChoiceDone() -> GetChoiceIndex() may have auto-passed
+        // fainted Pokemon as a side effect.
+        ClearChoice();
 
         string[] parts = input.Split(',');
 

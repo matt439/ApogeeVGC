@@ -46,9 +46,10 @@ return new OnTryAddVolatileEventInfo(
    context.GetSourceOrTargetPokemon(),
      context.GetSourceEffect<IEffect>()
     );
-  // null from handler = TS null = "silent failure" (block the volatile)
-  // This must be falsy so RunEvent propagates it as a blocking result
-  if (result == null) return BoolRelayVar.False;
+  // null from handler = TS null = "silent block" (prevent the volatile)
+  // Must return NullRelayVar (not BoolRelayVar.False) so addVolatile
+  // returns null, matching Showdown. False would cause -fail messages.
+  if (result == null) return new NullRelayVar();
      return result switch
    {
       BoolBoolVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),

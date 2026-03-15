@@ -85,6 +85,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 21.6,
                 Color = "Green",
+                Prevo = SpecieId.Treecko,
             },
             [SpecieId.Sceptile] = new()
             {
@@ -110,6 +111,7 @@ public partial record SpeciesData
                 HeightM = 1.7,
                 WeightKg = 52.2,
                 Color = "Green",
+                Prevo = SpecieId.Grovyle,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.SceptileMega] = new()
@@ -188,6 +190,7 @@ public partial record SpeciesData
                 HeightM = 0.9,
                 WeightKg = 19.5,
                 Color = "Red",
+                Prevo = SpecieId.Torchic,
             },
             [SpecieId.Blaziken] = new()
             {
@@ -213,6 +216,7 @@ public partial record SpeciesData
                 HeightM = 1.9,
                 WeightKg = 52,
                 Color = "Red",
+                Prevo = SpecieId.Combusken,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.BlazikenMega] = new()
@@ -291,6 +295,7 @@ public partial record SpeciesData
                 HeightM = 0.7,
                 WeightKg = 28,
                 Color = "Blue",
+                Prevo = SpecieId.Mudkip,
             },
             [SpecieId.Swampert] = new()
             {
@@ -316,6 +321,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 81.9,
                 Color = "Blue",
+                Prevo = SpecieId.Marshtomp,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.SwampertMega] = new()
@@ -396,6 +402,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 37,
                 Color = "Gray",
+                Prevo = SpecieId.Poochyena,
             },
             [SpecieId.Zigzagoon] = new()
             {
@@ -476,6 +483,7 @@ public partial record SpeciesData
                 HeightM = 0.5,
                 WeightKg = 32.5,
                 Color = "White",
+                Prevo = SpecieId.Zigzagoon,
             },
             [SpecieId.LinooneGalar] = new()
             {
@@ -504,6 +512,7 @@ public partial record SpeciesData
                 HeightM = 0.5,
                 WeightKg = 32.5,
                 Color = "White",
+                Prevo = SpecieId.ZigzagoonGalar,
             },
             [SpecieId.Wurmple] = new()
             {
@@ -553,6 +562,7 @@ public partial record SpeciesData
                 HeightM = 0.6,
                 WeightKg = 10,
                 Color = "White",
+                Prevo = SpecieId.Wurmple,
             },
             [SpecieId.Beautifly] = new()
             {
@@ -578,6 +588,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 28.4,
                 Color = "Yellow",
+                Prevo = SpecieId.Silcoon,
             },
             [SpecieId.Cascoon] = new()
             {
@@ -602,6 +613,7 @@ public partial record SpeciesData
                 HeightM = 0.7,
                 WeightKg = 11.5,
                 Color = "Purple",
+                Prevo = SpecieId.Wurmple,
             },
             [SpecieId.Dustox] = new()
             {
@@ -627,6 +639,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 31.6,
                 Color = "Green",
+                Prevo = SpecieId.Cascoon,
             },
             [SpecieId.Lotad] = new()
             {
@@ -679,6 +692,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 32.5,
                 Color = "Green",
+                Prevo = SpecieId.Lotad,
             },
             [SpecieId.Ludicolo] = new()
             {
@@ -705,6 +719,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 55,
                 Color = "Green",
+                Prevo = SpecieId.Lombre,
             },
             [SpecieId.Seedot] = new()
             {
@@ -757,6 +772,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 28,
                 Color = "Brown",
+                Prevo = SpecieId.Seedot,
             },
             [SpecieId.Shiftry] = new()
             {
@@ -783,6 +799,7 @@ public partial record SpeciesData
                 HeightM = 1.3,
                 WeightKg = 59.6,
                 Color = "Brown",
+                Prevo = SpecieId.Nuzleaf,
             },
             [SpecieId.Taillow] = new()
             {
@@ -833,6 +850,7 @@ public partial record SpeciesData
                 HeightM = 0.7,
                 WeightKg = 19.8,
                 Color = "Blue",
+                Prevo = SpecieId.Taillow,
             },
             [SpecieId.Wingull] = new()
             {
@@ -885,6 +903,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 28,
                 Color = "Yellow",
+                Prevo = SpecieId.Wingull,
             },
             [SpecieId.Ralts] = new()
             {
@@ -937,6 +956,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 20.2,
                 Color = "White",
+                Prevo = SpecieId.Ralts,
             },
             [SpecieId.Gardevoir] = new()
             {
@@ -963,6 +983,7 @@ public partial record SpeciesData
                 HeightM = 1.6,
                 WeightKg = 48.4,
                 Color = "White",
+                Prevo = SpecieId.Kirlia,
                 OtherFormes = [FormeId.Mega],
             },
             [SpecieId.GardevoirMega] = new()
@@ -1041,6 +1062,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 3.6,
                 Color = "Blue",
+                Prevo = SpecieId.Surskit,
             },
             [SpecieId.Shroomish] = new()
             {
@@ -1093,6 +1115,7 @@ public partial record SpeciesData
                 HeightM = 1.2,
                 WeightKg = 39.2,
                 Color = "Green",
+                Prevo = SpecieId.Shroomish,
             },
             [SpecieId.Slakoth] = new()
             {
@@ -1141,6 +1164,7 @@ public partial record SpeciesData
                 HeightM = 1.4,
                 WeightKg = 46.5,
                 Color = "White",
+                Prevo = SpecieId.Slakoth,
             },
             [SpecieId.Slaking] = new()
             {
@@ -1165,6 +1189,7 @@ public partial record SpeciesData
                 HeightM = 2,
                 WeightKg = 130.5,
                 Color = "Brown",
+                Prevo = SpecieId.Vigoroth,
             },
             [SpecieId.Nincada] = new()
             {
@@ -1215,6 +1240,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 12,
                 Color = "Yellow",
+                Prevo = SpecieId.Nincada,
             },
             [SpecieId.Shedinja] = new()
             {
@@ -1239,6 +1265,7 @@ public partial record SpeciesData
                 HeightM = 0.8,
                 WeightKg = 1.2,
                 Color = "Brown",
+                Prevo = SpecieId.Nincada,
             },
             [SpecieId.Whismur] = new()
             {
@@ -1289,6 +1316,7 @@ public partial record SpeciesData
                 HeightM = 1,
                 WeightKg = 40.5,
                 Color = "Blue",
+                Prevo = SpecieId.Whismur,
             },
             [SpecieId.Exploud] = new()
             {
@@ -1314,6 +1342,7 @@ public partial record SpeciesData
                 HeightM = 1.5,
                 WeightKg = 84,
                 Color = "Blue",
+                Prevo = SpecieId.Loudred,
             },
             [SpecieId.Makuhita] = new()
             {
@@ -1366,6 +1395,7 @@ public partial record SpeciesData
                 HeightM = 2.3,
                 WeightKg = 253.8,
                 Color = "Brown",
+                Prevo = SpecieId.Makuhita,
             },
             [SpecieId.Azurill] = new()
             {

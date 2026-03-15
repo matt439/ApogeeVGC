@@ -309,7 +309,9 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
                 }
 
                 // Random target location (0 for auto-targeting, will be resolved by battle engine)
-                int targetLoc = GetRandomTargetLocation(selectedMove.Move.Target);
+                // Use request target override if available (e.g. Curse → Self for non-Ghost users)
+                MoveTarget effectiveTarget = selectedMove.Target ?? selectedMove.Move.Target;
+                int targetLoc = GetRandomTargetLocation(effectiveTarget);
 
                 actions[pokemonIndex] = new ChosenAction
                 {

@@ -54,7 +54,12 @@ context.GetSourceOrTargetPokemon(),
    return result switch
    {
     BoolBoolEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
-  EmptyBoolEmptyVoidUnion => new NullRelayVar(),
+  // Empty = NOT_FAIL (Showdown's ""). Return EmptyRelayVar so
+  // RunMoveEffects can distinguish NOT_FAIL from success (true) and
+  // failure (false). NOT_FAIL has JS type priority 1 ('string'),
+  // between undefined (0) and null (2), so it gets overridden by
+  // boolean false in combineResults (e.g., Baton Pass fail + selfSwitch).
+  EmptyBoolEmptyVoidUnion => new EmptyRelayVar(),
    VoidUnionBoolEmptyVoidUnion => null,
           _ => null
      };

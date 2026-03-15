@@ -122,6 +122,17 @@ public class BattleQueue(Battle battle)
                                  "InstaSwitch action requires a Target"),
                     Order = 3, // Order for instant switches
                 },
+                ChoiceType.RevivalBlessing => new SwitchAction
+                {
+                    Choice = ActionId.RevivalBlessing,
+                    Pokemon = chosenAction.Pokemon ??
+                              throw new InvalidOperationException(
+                                  "RevivalBlessing action requires a Pokemon"),
+                    Target = chosenAction.Target ??
+                             throw new InvalidOperationException(
+                                  "RevivalBlessing action requires a Target"),
+                    Order = 103,
+                },
                 _ => action as IAction ??
                      throw new InvalidOperationException(
                          "ChosenAction must be convertible to IAction"),
@@ -155,8 +166,12 @@ public class BattleQueue(Battle battle)
                     case SwitchAction sa:
                         currentAction = sa with { Order = order };
                         break;
-                    case PokemonAction:
-                        break; // PokemonAction.Order returns int.MaxValue
+                    case RunSwitchAction rsa:
+                        currentAction = rsa with { Order = order };
+                        break;
+                    case PokemonAction pa:
+                        currentAction = pa with { Order = order };
+                        break;
                 }
             }
             else
@@ -242,10 +257,10 @@ public class BattleQueue(Battle battle)
                     0
                 );
 
-                int fractionalPriority = fractionalPriorityEvent switch
+                double fractionalPriority = fractionalPriorityEvent switch
                 {
                     IntRelayVar irv => irv.Value,
-                    DecimalRelayVar drv => (int)drv.Value,
+                    DecimalRelayVar drv => (double)drv.Value,
                     _ => 0,
                 };
 

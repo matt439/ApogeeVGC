@@ -41,14 +41,14 @@ public sealed record OnBasePowerEventInfo : EventHandlerInfo
                 var result = handler(
                     context.Battle,
                     context.GetIntRelayVar(),
-                    context.GetSourceOrTargetPokemon(),
                     context.GetTargetOrSourcePokemon(),
+                    context.GetSourceOrTargetPokemon(),
                     context.GetMove()
                 );
                 // Pattern match DoubleVoidUnion
                 return result switch
                 {
-                    DoubleDoubleVoidUnion => null,
+                    DoubleDoubleVoidUnion d => IntRelayVar.Get((int)d.Value),
                     VoidDoubleVoidUnion => null,
                     _ => null,
                 };

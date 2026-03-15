@@ -109,3 +109,10 @@ public record VoidReturnRelayVar : RelayVar;
 /// = passthrough/no opinion) and BoolRelayVar(false) (= TS false = "this action failed").
 /// </summary>
 public record NullRelayVar : RelayVar;
+
+/// <summary>
+/// Represents Showdown's NOT_FAIL (empty string ''). In hitStepTryHitEvent, results
+/// equal to NOT_FAIL are preserved as-is (not converted to false). Distinct from
+/// NullRelayVar (JS null → handler blocked silently, gets || false'd to false).
+/// </summary>
+public record EmptyRelayVar : RelayVar;

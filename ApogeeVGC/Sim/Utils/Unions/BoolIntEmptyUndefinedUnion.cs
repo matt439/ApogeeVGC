@@ -31,6 +31,7 @@ public abstract record BoolIntEmptyUndefinedUnion
             BoolBoolIntUndefinedUnion b => b.Value,
          IntBoolIntUndefinedUnion i => i.Value,
        UndefinedBoolIntUndefinedUnion => new Undefined(),
+       NullBoolIntUndefinedUnion => null,
   null => null,
   _ => throw new InvalidOperationException(),
         };

@@ -155,21 +155,31 @@ public partial class BattleActions
         var convertedResults = new List<BoolIntEmptyUndefinedUnion>(hitResults.Count);
         foreach (RelayVar? result in hitResults)
         {
-            // If result is NOT_FAIL (null), keep it as undefined
-            // Otherwise convert to boolean (default false if not a boolean)
-            if (result is UndefinedRelayVar or null)
+            // EmptyRelayVar = Showdown NOT_FAIL ('') → keep as undefined (NOT_FAIL)
+            // NullRelayVar = handler returned null → JS: null || false → false (failure)
+            if (result is UndefinedRelayVar or EmptyRelayVar or null)
             {
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
+            }
+            else if (result is NullRelayVar)
+            {
+                // Handler returned null (e.g., Earth Eater blocking) — in Showdown,
+                // hitStepTryHitEvent converts: null !== '' → true → null || false → false
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
             }
             else if (result is BoolRelayVar brv2)
             {
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(brv2.Value));
             }
+            else if (result is IntRelayVar irv)
+            {
+                // Integer relay vars are truthy if non-zero (matching Showdown's JS truthiness)
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(irv.Value != 0));
+            }
             else
             {
-                // Any other RelayVar type defaults to false
-                Battle.Debug("[HitStepTryEvent] Unknown type, defaulting to false");
-                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
+                // Any other RelayVar type (VoidReturn, etc.) - treat as truthy (no change)
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
             }
         }
 
@@ -210,11 +220,12 @@ public partial class BattleActions
         {
             bool canHit = true;
 
-            // Gen 6+: Check powder move immunity (Grass-types and Overcoat ability)
+            // Gen 6+: Check powder move immunity (Grass-types are immune)
+            // Showdown: dex.getImmunity('powder', target) — Grass type has damageTaken['powder'] = 3
             if (Battle.Gen >= 6 &&
                 move.Flags.Powder == true &&
                 target != pokemon &&
-                !Battle.Dex.GetImmunity(move.Condition?.Id ?? ConditionId.None, target.Types))
+                target.HasType(PokemonType.Grass))
             {
                 Battle.Debug("natural powder immunity");
 
@@ -365,9 +376,9 @@ public partial class BattleActions
                             null, boostsTable);
 
                         if (boostEvent is BoostsTableRelayVar brv)
-                        {
                             boostsTable = brv.Table;
-                        }
+                        else if (boostEvent is SparseBoostsTableRelayVar sbrv)
+                            boostsTable = sbrv.Table.ToBoostsTable();
 
                         boost = Battle.ClampIntRange(boostsTable.Accuracy, -6, 6);
                     }
@@ -392,9 +403,9 @@ public partial class BattleActions
                             null, targetBoostsTable);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
-                        {
                             targetBoostsTable = tbrv.Table;
-                        }
+                        else if (targetBoostEvent is SparseBoostsTableRelayVar stbrv)
+                            targetBoostsTable = stbrv.Table.ToBoostsTable();
 
                         boost = Battle.ClampIntRange(boost - targetBoostsTable.Evasion, -6, 6);
                     }
@@ -446,7 +457,6 @@ public partial class BattleActions
                 IntIntTrueUnion intAcc => Battle.RandomChance(intAcc.Value, 100), // Roll for hit
                 _ => false,
             };
-
             if (!hits)
             {
                 // Move missed
@@ -691,7 +701,7 @@ public partial class BattleActions
                               Library.Moves.TryGetValue(mesi.MoveId, out Move? sourceMove) &&
                               sourceMove.SleepUsable == true);
 
-        var targetsCopy = new List<Pokemon>(targets.Count);
+        var targetsCopy = new List<Pokemon?>(targets.Count);
         int hit;
 
         for (hit = 1; hit <= targetHitResult; hit++)
@@ -747,6 +757,14 @@ public partial class BattleActions
                 IntTrueUnion accuracy = move.Accuracy;
                 double[] boostTable = [1, 4.0 / 3, 5.0 / 3, 2, 7.0 / 3, 8.0 / 3, 3];
 
+                // Track whether boost calculation produces a fractional accuracy.
+                // Showdown keeps accuracy as a float throughout. Its runEvent FinalModify
+                // only applies the chainModify modifier when relayVar is an integer
+                // (checks: relayVar === Math.abs(Math.floor(relayVar))).
+                // When boosts produce a float (e.g., 67.5), FinalModify is skipped,
+                // so ModifyAccuracy modifiers (like Wide Lens) are silently dropped.
+                bool accIsFloat = false;
+
                 if (accuracy is IntIntTrueUnion intAccuracy)
                 {
                     double accValue = intAccuracy.Value;
@@ -768,9 +786,9 @@ public partial class BattleActions
                             null, boosts);
 
                         if (boostEvent is BoostsTableRelayVar brv)
-                        {
                             boosts = brv.Table;
-                        }
+                        else if (boostEvent is SparseBoostsTableRelayVar sbrv)
+                            boosts = sbrv.Table.ToBoostsTable();
 
                         int boost = Battle.ClampIntRange(boosts.Accuracy, -6, 6);
                         if (boost > 0)
@@ -801,9 +819,9 @@ public partial class BattleActions
                             null, targetBoosts);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
-                        {
                             targetBoosts = tbrv.Table;
-                        }
+                        else if (targetBoostEvent is SparseBoostsTableRelayVar stbrv)
+                            targetBoosts = stbrv.Table.ToBoostsTable();
 
                         int boost = Battle.ClampIntRange(targetBoosts.Evasion, -6, 6);
                         switch (boost)
@@ -817,31 +835,54 @@ public partial class BattleActions
                         }
                     }
 
-                    accuracy = IntTrueUnion.FromInt((int)accValue);
+                    accIsFloat = accValue != Math.Floor(accValue);
+
+                    if (accIsFloat)
+                    {
+                        // Showdown keeps the float through runEvent. FinalModify is skipped
+                        // for non-integers, so modifiers from ModifyAccuracy (e.g., Wide Lens)
+                        // are silently dropped. Use Ceiling for randomChance since
+                        // random(100) < 67.5 (float) ≡ random(100) < 68 (int) for integers.
+                        accuracy = IntTrueUnion.FromInt((int)Math.Ceiling(accValue));
+                    }
+                    else
+                    {
+                        accuracy = IntTrueUnion.FromInt((int)accValue);
+                    }
                 }
 
+                // Run ModifyAccuracy event. When accIsFloat, the result is discarded
+                // (Showdown's FinalModify skips modifier application for float relay vars).
                 RelayVar? modifyAccEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
                     move, RelayVar.FromIntTrueUnion(accuracy));
 
-                if (modifyAccEvent is IntRelayVar irv)
+                if (!accIsFloat)
                 {
-                    accuracy = IntTrueUnion.FromInt(irv.Value);
-                }
-                else if (modifyAccEvent is BoolRelayVar { Value: true })
-                {
-                    accuracy = IntTrueUnion.FromTrue();
+                    if (modifyAccEvent is IntRelayVar irv)
+                    {
+                        accuracy = IntTrueUnion.FromInt(irv.Value);
+                    }
+                    else if (modifyAccEvent is BoolRelayVar { Value: true })
+                    {
+                        accuracy = IntTrueUnion.FromTrue();
+                    }
                 }
 
                 if (move.AlwaysHit != true)
                 {
+                    // Run Accuracy event. Same float handling as ModifyAccuracy.
                     RelayVar? accEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
                         move, RelayVar.FromIntTrueUnion(accuracy));
 
-                    if (accEvent is IntRelayVar aerv)
+                    if (!accIsFloat)
                     {
-                        accuracy = IntTrueUnion.FromInt(aerv.Value);
+                        if (accEvent is IntRelayVar aerv)
+                        {
+                            accuracy = IntTrueUnion.FromInt(aerv.Value);
+                        }
                     }
-                    else if (accEvent is BoolRelayVar { Value: true })
+                    // Always honor explicit true (e.g., Telekinesis makes moves always hit)
+                    if (accEvent is BoolRelayVar { Value: true })
                     {
                         accuracy = IntTrueUnion.FromTrue();
                     }
@@ -858,11 +899,22 @@ public partial class BattleActions
             }
 
             // Modifies targetsCopy (which is why it's a copy)
-            (SpreadMoveDamage moveDamageThisHit, SpreadMoveTargets _) = SpreadMoveHit(
+            // Showdown: [moveDamageThisHit, targetsCopy] = this.spreadMoveHit(targetsCopy, ...)
+            // We must capture the modified targets so that after the hit loop,
+            // targets nullified by Substitute are properly skipped (gotAttacked, timesAttacked).
+            (SpreadMoveDamage moveDamageThisHit, SpreadMoveTargets modifiedTargets) = SpreadMoveHit(
                 SpreadMoveTargets.FromPokemonList(targetsCopy),
                 pokemon,
                 move,
                 new HitEffect { OnHit = move.OnHit?.Handler as ResultMoveHandler });
+
+            // Update targetsCopy to reflect modifications from spreadMoveHit
+            // (e.g., targets set to null when Substitute absorbed the hit)
+            targetsCopy.Clear();
+            for (int ti = 0; ti < modifiedTargets.Count; ti++)
+            {
+                targetsCopy.Add(modifiedTargets[ti] is PokemonPokemonUnion p ? p.Pokemon : null!);
+            }
 
             // When Dragon Darts targets two different pokemon, targetsCopy is a length 1 array each hit
             // so spreadMoveHit returns a length 1 damage array
@@ -875,10 +927,10 @@ public partial class BattleActions
                 moveDamage = moveDamageThisHit;
             }
 
-            if (!moveDamage.Any(val => val is not BoolBoolIntUndefinedUnion
-                {
-                    Value: false
-                })) break;
+            // Showdown: if (!moveDamage.some(val => val !== false)) break;
+            // Break only if ALL entries are exactly boolean false (strict equality).
+            // null, undefined, 0, empty string, etc. are NOT false and should NOT trigger break.
+            if (!moveDamage.Any(val => val is not BoolBoolIntUndefinedUnion { Value: false })) break;
             nullDamage = false;
 
             for (int i = 0; i < moveDamage.Count; i++)
@@ -913,7 +965,7 @@ public partial class BattleActions
             {
                 int hpBeforeRecoil = pokemon.Hp;
 
-                Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
+                Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0, MidpointRounding.AwayFromZero), pokemon, pokemon,
                     BattleDamageEffect.FromIEffect(move),
                     true);
 
@@ -982,7 +1034,7 @@ public partial class BattleActions
         {
             int hpBeforeRecoil = pokemon.Hp;
             int recoilDamage =
-                Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0), 1, null);
+                Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0, MidpointRounding.AwayFromZero), 1, null);
 
             Battle.DirectDamage(recoilDamage, pokemon, pokemon,
                 Library.Conditions[ConditionId.StruggleRecoil]);
@@ -1002,8 +1054,10 @@ public partial class BattleActions
 
         for (int i = 0; i < targetsCopy.Count; i++)
         {
-            Pokemon target = targetsCopy[i];
-            if (pokemon != target)
+            Pokemon? target = targetsCopy[i];
+            // Showdown: if (target && pokemon !== target)
+            // target can be null when Substitute absorbed the hit
+            if (target != null && pokemon != target)
             {
                 IntFalseUnion? dmg = moveDamage[i] switch
                 {

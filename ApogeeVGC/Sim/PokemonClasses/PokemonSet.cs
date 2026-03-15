@@ -65,6 +65,11 @@ public record PokemonSet
     }
     public PokeballId Pokeball { get; init; } = PokeballId.Pokeball;
     public MoveType TeraType { get; init; }
+    /// <summary>
+    /// Override display name for cosmetic forms (e.g. "Florges-Yellow") that map
+    /// to a single SpecieId but display differently in protocol output.
+    /// </summary>
+    public string? SpeciesOverrideName { get; init; }
 }
 
 

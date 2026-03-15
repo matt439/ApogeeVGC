@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -26,6 +27,11 @@ public partial class Battle
             {
                 if (pokemon is { Fainted: true })
                 {
+                    // Overwrite any existing status (e.g. burn) to prevent fainted Pokemon's
+                    // status handlers (like burn's onResidual) from being collected in future
+                    // FieldEvent calls. Showdown sets this to 'fnt'; we use None since there's
+                    // no Fnt ConditionId and the effect is equivalent (no onResidual handler).
+                    pokemon.Status = ConditionId.None;
                     // Mark that this Pokémon needs to be switched out
                     pokemon.SwitchFlag = true;
                 }
@@ -155,15 +161,6 @@ public partial class Battle
             }
         }
 
-        // Safety net: if any side has no Pokemon left, always check for a winner
-        // regardless of the checkWin parameter. This guards against callers that pass
-        // checkWin=false based only on the attacker's HP, missing target-side faints
-        // (e.g., HitStepMoveHitLoop passing checkWin = attacker.Hp <= 0).
-        if (!checkWin && Sides.Any(side => side.PokemonLeft <= 0))
-        {
-            checkWin = true;
-        }
-
         // Check for battle end
         if (checkWin && CheckWin(faintData) == true)
         {
@@ -182,12 +179,6 @@ public partial class Battle
             );
         }
 
-        // Check for fainted Pokemon and set their switch flags
-        CheckFainted();
-
-        // Flush events so faint messages are sent before switch requests
-        FlushEvents();
-
         return false;
     }
 
@@ -196,11 +187,13 @@ public partial class Battle
         // If all sides have no Pokemon left, it's a tie (or last-faint-wins in Gen 5+)
         if (Sides.All(side => side.PokemonLeft <= 0))
         {
-            // In Gen 5+, the side whose Pokemon fainted last loses (so their foe wins)
+            // In Gen 5+, the side whose Pokemon fainted last wins
+            // (they dealt the last KO before fainting from recoil/Life Orb/etc.)
+            // Matches Showdown: this.win(faintData.target.side)
             // In earlier gens, it's a tie
             if (faintData != null && Gen > 4)
             {
-                return Win(faintData.Target.Side.Foe);
+                return Win(faintData.Target.Side);
             }
             else
             {

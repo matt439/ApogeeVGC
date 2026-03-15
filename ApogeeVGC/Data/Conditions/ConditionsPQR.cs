@@ -117,7 +117,7 @@ public partial record Conditions
                     }
 
                     battle.Damage(pokemon.BaseMaxHp / (battle.EffectState.BoundDivisor ?? 8));
-                }, 13),
+                }, order: 13),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -178,7 +178,7 @@ public partial record Conditions
                     {
                         battle.Add("-start", pokemon, $"perish{duration}");
                     }
-                }, 24),
+                }, order: 24),
             },
             [ConditionId.PetalDance] = new()
             {
@@ -223,7 +223,7 @@ public partial record Conditions
                 // OnResidualOrder = 9
                 OnResidual = OnResidualEventInfo.Create(
                     (battle, pokemon, _, _) => { battle.Damage(pokemon.BaseMaxHp / 8); },
-                    9),
+                    order: 9),
             },
             [ConditionId.Poltergeist] = new()
             {
@@ -239,6 +239,8 @@ public partial record Conditions
                 Id = ConditionId.Powder,
                 Name = "Powder",
                 EffectType = EffectType.Condition,
+                // Grass types are immune to powder moves/effects (Showdown typechart: Grass has powder: 3)
+                ImmuneTypes = [PokemonType.Grass],
                 Duration = 1,
                 // Note: Powder is marked as isNonstandard: "Past" in TypeScript, meaning it's not in Gen 9.
                 // Implementing for completeness in case it's ever needed.
@@ -353,7 +355,8 @@ public partial record Conditions
                         if (move.Type == MoveType.Water)
                         {
                             battle.Debug("Rain water boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -366,7 +369,6 @@ public partial record Conditions
                             $"[of] {source}");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -375,8 +377,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    order: 1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -405,9 +409,6 @@ public partial record Conditions
                 //OnTryHitPriority = 3,
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                     {
-                        battle.Debug(
-                            $"[Protect.OnTryHit] CALLED! Target={target.Name}, Source={source.Name}, Move={move.Name}, HasProtectFlag={move.Flags.Protect ?? false}");
-
                         if (!(move.Flags.Protect ?? false))
                         {
                             return new VoidReturn();
@@ -426,14 +427,10 @@ public partial record Conditions
                         if (lockedMove is not null &&
                             source.Volatiles[ConditionId.LockedMove].Duration == 2)
                         {
-                            // TS uses `delete source.volatiles['lockedmove']` which bypasses OnEnd.
-                            // Use DeleteVolatile (not RemoveVolatile) to avoid triggering
-                            // LockedMove's OnEnd handler (which would cause confusion).
                             source.DeleteVolatile(ConditionId.LockedMove);
                         }
 
-                        battle.Debug("[Protect.OnTryHit] Returning Empty (block move)");
-                        return new Empty(); // in place of Battle.NOT_FAIL ("")
+                        return new Empty(); // NOT_FAIL — blocks move without showing fail message
                     },
                     3),
             },
@@ -464,7 +461,7 @@ public partial record Conditions
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon,
-                            "protosynthesis" + battle.EffectState.BestStat);
+                            "protosynthesis" + battle.EffectState.BestStat.ToString()!.ToLowerInvariant());
                     }
 
                     return new VoidReturn();
@@ -572,14 +569,6 @@ public partial record Conditions
                 EffectType = EffectType.Condition,
                 Duration = 2, // Psychic Noise blocks healing for 2 turns
                 AssociatedMove = MoveId.PsychicNoise,
-                // Note: In Gen 9, Psychic Noise prevents the target from healing for 2 turns.
-                // TypeScript uses the 'healblock' volatile with duration 2 when applied via Psychic Noise.
-                // The move's secondary applies this condition, and related code checks for it when blocking heals.
-                // TODO: The TS healblock condition also has onBeforeMove (priority 6) that blocks moves with
-                // the 'heal' flag (e.g. Recover, Drain Punch) before execution, and onDisableMove that
-                // disables healing moves in the selection menu. Currently only OnTryHeal blocks healing
-                // effects, but healing MOVES like Drain Punch can still execute (dealing damage without
-                // healing). To fully match TS, add OnBeforeMove and OnDisableMove handlers.
                 OnStart = OnStartEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     if (battle.DisplayUi)
@@ -589,6 +578,38 @@ public partial record Conditions
 
                     return null;
                 }),
+                OnDisableMove = OnDisableMoveEventInfo.Create((_, pokemon) =>
+                {
+                    // Disable moves with the 'heal' flag so they appear disabled in the request
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                    {
+                        if (_library.Moves[moveSlot.Id].Flags.Heal == true)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
+                OnBeforeMove = OnBeforeMoveEventInfo.Create((battle, pokemon, _, move) =>
+                {
+                    // Block moves with the 'heal' flag (Recover, Drain Punch, Heal Pulse, etc.)
+                    if (move.Flags.Heal == true)
+                    {
+                        battle.Add("cant", pokemon, "move: Heal Block", move);
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }, priority: 6),
+                OnModifyMove = OnModifyMoveEventInfo.Create((battle, move, pokemon, _) =>
+                {
+                    if (move.Flags.Heal == true)
+                    {
+                        battle.Add("cant", pokemon, "move: Heal Block", move);
+                        return VoidFalseUnion.FromFalse();
+                    }
+
+                    return VoidFalseUnion.FromVoid();
+                }),
                 OnEnd = OnEndEventInfo.Create((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
@@ -596,6 +617,9 @@ public partial record Conditions
                         battle.Add("-end", pokemon, "move: Heal Block");
                     }
                 }),
+                // onResidualOrder: 20 in Showdown (healblock condition in moves.ts line 8617)
+                // No actual onResidual callback — order-only handler for correct sort position
+                OnResidual = OnResidualEventInfo.Create((_, _, _, _) => { }, order: 20),
                 OnTryHeal = new OnTryHealEventInfo(false),
             },
             [ConditionId.PsychicTerrain] = new()
@@ -645,7 +669,7 @@ public partial record Conditions
                         battle.Add("-activate", target, "move: Psychic Terrain");
                     }
 
-                    return null; // Silent failure - block the move
+                    return null; // JS null — block the move silently (NOT the same as NOT_FAIL/empty string)
                 }, 4),
                 // OnBasePowerPriority = 6
                 OnBasePower = OnBasePowerEventInfo.Create((battle, basePower, attacker, _, move) =>
@@ -661,7 +685,8 @@ public partial record Conditions
                             battle.Debug("psychic terrain boost");
                         }
 
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                    return new VoidReturn();
                     }
 
                     return new VoidReturn();
@@ -720,7 +745,7 @@ public partial record Conditions
                     battle.EffectState.BestStat = pokemon.GetBestStat(false, true);
                     if (battle.DisplayUi)
                     {
-                        battle.Add("-start", pokemon, "quarkdrive" + battle.EffectState.BestStat);
+                        battle.Add("-start", pokemon, "quarkdrive" + battle.EffectState.BestStat.ToString()!.ToLowerInvariant());
                     }
 
                     return new VoidReturn();
@@ -946,13 +971,15 @@ public partial record Conditions
                         if (move.Type == MoveType.Water)
                         {
                             battle.Debug("rain water boost");
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                    return new VoidReturn();
                         }
 
                         if (move.Type == MoveType.Fire)
                         {
                             battle.Debug("rain fire suppress");
-                            return battle.ChainModify(0.5);
+                            battle.ChainModify(0.5);
+                    return new VoidReturn();
                         }
 
                         return new VoidReturn();
@@ -974,7 +1001,6 @@ public partial record Conditions
                         battle.Add("-weather", "RainDance");
                     }
                 }),
-                //OnFieldResidualOrder = 1,
                 OnFieldResidual = OnFieldResidualEventInfo.Create((battle, _, _, _) =>
                     {
                         if (battle.DisplayUi)
@@ -983,8 +1009,10 @@ public partial record Conditions
                         }
 
                         battle.EachEvent(EventId.Weather);
-                    },
-                    order: 1),
+                    }) with
+                {
+                    Order = 1,
+                },
                 OnFieldEnd = OnFieldEndEventInfo.Create((battle, _) =>
                 {
                     if (battle.DisplayUi)
@@ -1142,7 +1170,7 @@ public partial record Conditions
                 OnResidual = OnResidualEventInfo.Create((_, _, _, _) =>
                 {
                     // Duration handled automatically
-                }, 25),
+                }, order: 25),
                 OnStart = OnStartEventInfo.Create((battle, target, _, _) =>
                 {
                     // TS: if (target.terastallized) { ... return false; }
@@ -1164,7 +1192,6 @@ public partial record Conditions
                     {
                         battle.Add("-singleturn", target, "move: Roost");
                     }
-
 
                     return null;
                 }),

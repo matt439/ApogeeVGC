@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -32,7 +33,7 @@ public partial class Pokemon
         // Resolve source and sourceEffect from battle event if not provided
         if (Battle.Event is not null)
         {
-            sourceEffect ??= Battle.Event.Effect;
+            sourceEffect ??= Battle.Effect;
             if (source == null && Battle.Event.Source is { IsPokemon: true } pses)
             {
                 source = pses.Pokemon;
@@ -44,7 +45,16 @@ public partial class Pokemon
         // Check for duplicate status
         if (Status == status.Id)
         {
-            if (sourceEffect is ActiveMove move && move.Status == Status)
+            // Showdown checks (sourceEffect as Move)?.status via duck-typing.
+            // This matches both real moves with a .status field AND the Synchronize
+            // hack object { status: status.id, id: 'synchronize' }.
+            // In C#, Synchronize passes the status Condition (EffectType.Status) as sourceEffect,
+            // so we also need to match Condition objects whose Id equals the current status.
+            bool sourceHasMatchingStatus =
+                (sourceEffect is ActiveMove move && move.Status == Status) ||
+                (sourceEffect is Condition { EffectType: EffectType.Status } cond && cond.Id == Status);
+
+            if (sourceHasMatchingStatus)
             {
                 if (Battle.DisplayUi)
                 {
@@ -57,10 +67,24 @@ public partial class Pokemon
                         );
                     }
 
-                    Battle.Add("-fail", this, Battle.Library.Conditions[Status]);
+                    // Use the status ID string directly: psn for Poison, tox for Toxic
+                    // (GetProtocolEffectName maps both to "psn" for [from] tags,
+                    // but -fail messages need the actual status ID)
+                    string statusStr = Status switch
+                    {
+                        ConditionId.Burn => "brn",
+                        ConditionId.Paralysis => "par",
+                        ConditionId.Poison => "psn",
+                        ConditionId.Toxic => "tox",
+                        ConditionId.Sleep => "slp",
+                        ConditionId.Freeze => "frz",
+                        _ => Battle.Library.Conditions[Status].Name,
+                    };
+                    Battle.Add("-fail", this, statusStr);
                 }
             }
-            else if (sourceEffect is ActiveMove { Status: not null })
+            else if (sourceEffect is ActiveMove { Status: not null }
+                     or Condition { EffectType: EffectType.Status })
             {
                 if (Battle.DisplayUi)
                 {
@@ -88,7 +112,12 @@ public partial class Pokemon
                     {
                         Battle.Debug("immune to status");
 
-                        if (sourceEffect is ActiveMove { Status: not null })
+                        // Showdown checks (sourceEffect as Move)?.status — true for moves
+                        // with a status field AND the Synchronize hack object {status: id}.
+                        // In C#, Synchronize passes the status Condition (EffectType.Status).
+                        // Protection conditions (BanefulBunker etc.) have EffectType.Condition
+                        // and should NOT trigger |-immune|.
+                        if (sourceEffect is ActiveMove { Status: not null } or Condition { EffectType: EffectType.Status })
                         {
                             Battle.Add("-immune", this);
                         }
@@ -103,7 +132,10 @@ public partial class Pokemon
         ConditionId prevStatus = Status;
         EffectState prevStatusState = StatusState;
 
-        // Run SetStatus event
+        // Run SetStatus event (abilities like Purifying Salt fire here)
+        // This must run BEFORE Sleep Clause to match Showdown, where both are
+        // event handlers sorted by speed — ability handlers (speed > 0) fire
+        // before format rules (speed = 0).
         if (status.Id != ConditionId.None)
         {
             RelayVar? result =
@@ -116,6 +148,31 @@ public partial class Pokemon
                 }
 
                 return false;
+            }
+        }
+
+        // Sleep Clause Mod: prevent putting multiple Pokemon on the same side to sleep
+        if (Battle.RuleTable.Has(RuleId.SleepClauseMod) && status.Id == ConditionId.Sleep)
+        {
+            // Skip clause for self-inflicted sleep (e.g., Rest)
+            if (source == null || !source.IsAlly(this))
+            {
+                foreach (Pokemon pokemon in Side.Pokemon)
+                {
+                    if (pokemon.Hp > 0 && pokemon.Status == ConditionId.Sleep)
+                    {
+                        // Only count sleep from enemies (not self-induced via Rest)
+                        if (pokemon.StatusState.Source == null || !pokemon.StatusState.Source.IsAlly(pokemon))
+                        {
+                            if (Battle.DisplayUi)
+                            {
+                                Battle.Add("-message", "Sleep Clause Mod activated.");
+                                Battle.Hint("Sleep Clause Mod prevents players from putting more than one of their opponent's Pok\u00e9mon to sleep at a time");
+                            }
+                            return false;
+                        }
+                    }
+                }
             }
         }
 
@@ -229,10 +286,19 @@ public partial class Pokemon
         if (Hp <= 0 || Status == ConditionId.None) return false;
 
         // Add cure status message to battle log
+        // Toxic uses "tox" in protocol for -curestatus (not "psn" like residual damage)
         if (Battle.DisplayUi)
         {
-            Battle.Add("-curestatus", this, Battle.Library.Conditions[Status],
-                silent ? "[silent]" : "[msg]");
+            if (Status == ConditionId.Toxic)
+            {
+                Battle.Add("-curestatus", this, "tox",
+                    silent ? "[silent]" : "[msg]");
+            }
+            else
+            {
+                Battle.Add("-curestatus", this, Battle.Library.Conditions[Status],
+                    silent ? "[silent]" : "[msg]");
+            }
         }
 
         // Clear the status (equivalent to setStatus(''))
@@ -264,7 +330,7 @@ public partial class Pokemon
                 source = pses.Pokemon;
             }
 
-            sourceEffect ??= Battle.Event.Effect;
+            sourceEffect ??= Battle.Effect;
         }
 
         source ??= this; // Default source to this Pokemon
@@ -305,7 +371,7 @@ public partial class Pokemon
         RelayVar? tryResult = Battle.RunEvent(EventId.TryAddVolatile, this, source, sourceEffect,
             condition);
 
-        if (tryResult is BoolRelayVar { Value: false } or null)
+        if (tryResult is BoolRelayVar { Value: false } or NullRelayVar or null)
         {
             if (Battle.DisplayUi)
             {
@@ -317,6 +383,7 @@ public partial class Pokemon
 
         // Create the volatile effect state
         Volatiles[status] = Battle.InitEffectState(status, null, this);
+        _volatileOrder.Add(status);
         EffectState volatileState = Volatiles[status];
 
         // Set source information
@@ -378,6 +445,7 @@ public partial class Pokemon
         {
             // Cancel - remove the volatile we just added
             Volatiles.Remove(status);
+            _volatileOrder.Remove(status);
             return startResult ?? BoolRelayVar.False;
         }
 
@@ -424,11 +492,16 @@ public partial class Pokemon
     public bool RemoveVolatile(Condition status)
     {
         // Check if Pokemon is fainted (equivalent to !this.hp)
-        if (Hp <= 0) return false;
+        if (Hp <= 0)
+        {
+            return false;
+        }
 
         // Check if the volatile exists
         if (!Volatiles.TryGetValue(status.Id, out EffectState? volatileData))
+        {
             return false;
+        }
 
         // Extract linked data (equivalent to destructuring)
         var linkedPokemon = volatileData.LinkedPokemon;
@@ -439,6 +512,7 @@ public partial class Pokemon
 
         // Remove the volatile (equivalent to delete this.volatiles[status.id])
         Volatiles.Remove(status.Id);
+        _volatileOrder.Remove(status.Id);
 
         // Handle linked Pokemon cleanup
         if (linkedPokemon is not null && linkedStatus is not null)
@@ -475,7 +549,9 @@ public partial class Pokemon
     /// </summary>
     public bool DeleteVolatile(ConditionId volatileId)
     {
-        return Volatiles.Remove(volatileId);
+        if (!Volatiles.Remove(volatileId)) return false;
+        _volatileOrder.Remove(volatileId);
+        return true;
     }
 
     public void CopyVolatileFrom(Pokemon pokemon, ConditionIdBoolUnion? switchCause = null)
@@ -529,6 +605,7 @@ public partial class Pokemon
 
             // Initialize the effect state for this Pok�mon
             Volatiles[conditionId] = clonedState;
+            _volatileOrder.Add(conditionId);
 
             // Handle linked Pok�mon (for moves like Bind, Wrap, etc.)
             if (clonedState.LinkedPokemon is null || clonedState.LinkedStatus is null) continue;
@@ -597,6 +674,7 @@ public partial class Pokemon
         }
 
         Volatiles.Clear();
+        _volatileOrder.Clear();
 
         if (includeSwitchFlags)
         {

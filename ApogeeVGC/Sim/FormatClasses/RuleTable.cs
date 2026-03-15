@@ -4,11 +4,41 @@ using System.Data;
 namespace ApogeeVGC.Sim.FormatClasses;
 
 /// <summary>
+/// Minimal rule entry in the RuleTable dictionary.
+/// In Showdown, rules carry sub-rules and values; here we just need presence tracking.
+/// </summary>
+public record Rule;
+
+/// <summary>
 /// Tracks rules, bans, and numeric settings for a format.
 /// Mirrors the RuleTable from Pokemon Showdown's dex-formats.ts.
 /// </summary>
 public class RuleTable : Dictionary<RuleId, Rule>
 {
+    public RuleTable() { }
+
+    /// <summary>
+    /// Copy constructor — creates a per-battle clone so parallel battles
+    /// never mutate the shared Library instance.
+    /// </summary>
+    public RuleTable(RuleTable source) : base(source)
+    {
+        MinTeamSize = source.MinTeamSize;
+        MaxTeamSize = source.MaxTeamSize;
+        PickedTeamSize = source.PickedTeamSize;
+        MaxTotalLevel = source.MaxTotalLevel;
+        MinLevel = source.MinLevel;
+        MaxLevel = source.MaxLevel;
+        DefaultLevel = source.DefaultLevel;
+        AdjustLevel = source.AdjustLevel;
+        AdjustLevelDown = source.AdjustLevelDown;
+        MaxMoveCount = source.MaxMoveCount;
+        EvLimit = source.EvLimit;
+        AllowMegaEvolution = source.AllowMegaEvolution;
+        AllowTerastallization = source.AllowTerastallization;
+        MinSourceGen = source.MinSourceGen;
+    }
+
     // Team composition settings
     public int MinTeamSize { get; set; } = 1;
     public int MaxTeamSize { get; set; } = 6;

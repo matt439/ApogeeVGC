@@ -365,6 +365,7 @@ public partial record Abilities
                             ConditionId.Attract,
                             ConditionId.Disable,
                             ConditionId.Encore,
+                            ConditionId.PsychicNoise,
                             ConditionId.Taunt,
                             ConditionId.Torment,
                         ];
@@ -398,10 +399,6 @@ public partial record Abilities
                 Name = "As One (Glastrier)",
                 Num = 266,
                 Rating = 3.5,
-                //OnSwitchInPriority = 1,
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { },
-                    1
-                ),
                 OnStart = OnStartEventInfo.Create(
                     (battle, pokemon) =>
                     {
@@ -442,10 +439,6 @@ public partial record Abilities
                 Name = "As One (Spectrier)",
                 Num = 267,
                 Rating = 3.5,
-                //OnSwitchInPriority = 1,
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { },
-                    1
-                ),
                 OnStart = OnStartEventInfo.Create(
                     (battle, pokemon) =>
                     {
@@ -662,20 +655,26 @@ public partial record Abilities
                 Rating = 2.0,
                 OnDamage = OnDamageEventInfo.Create((battle, _, _, source, effect) =>
                 {
-                    if (effect is not ActiveMove move)
+                    // Showdown: if (effect.effectType === "Move" && !effect.multihit && ...)
+                    // Must check EffectType, not just ActiveMove, because PseudoMoveEffect
+                    // (confusion self-hit) also has EffectType.Move and should block berry eating.
+                    if (effect?.EffectType == EffectType.Move)
                     {
-                        battle.EffectState.CheckedBerserk = true;
-                        return new VoidReturn();
-                    }
-
-                    if (move.MultiHit != null ||
-                        (move.HasSheerForce == true && source.HasAbility(AbilityId.SheerForce)))
-                    {
-                        battle.EffectState.CheckedBerserk = true;
+                        if (effect is ActiveMove move &&
+                            (move.MultiHit != null ||
+                             (move.HasSheerForce == true &&
+                              source.HasAbility(AbilityId.SheerForce))))
+                        {
+                            battle.EffectState.CheckedBerserk = true;
+                        }
+                        else
+                        {
+                            battle.EffectState.CheckedBerserk = false;
+                        }
                     }
                     else
                     {
-                        battle.EffectState.CheckedBerserk = false;
+                        battle.EffectState.CheckedBerserk = true;
                     }
 
                     return new VoidReturn();
@@ -1065,7 +1064,8 @@ public partial record Abilities
                     {
                         if (!accuracy.HasValue) return new VoidReturn();
                         battle.Debug("compoundeyes - enhancing accuracy");
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                    return new VoidReturn();
                     }, -1),
             },
             [AbilityId.Contrary] = new()
@@ -1319,8 +1319,8 @@ public partial record Abilities
         if (pokemon.SwitchFlag.IsTrue() || ally?.SwitchFlag.IsTrue() == true) return;
 
         if (ally == null ||
-            pokemon.BaseSpecies.BaseSpecies != SpecieId.Tatsugiri ||
-            ally.BaseSpecies.BaseSpecies != SpecieId.Dondozo)
+            pokemon.BaseSpecies.Id != SpecieId.Tatsugiri ||
+            ally.BaseSpecies.Id != SpecieId.Dondozo)
         {
             // Handle edge cases - remove commanding volatile if present
             if (pokemon.GetVolatile(ConditionId.Commanding) != null)

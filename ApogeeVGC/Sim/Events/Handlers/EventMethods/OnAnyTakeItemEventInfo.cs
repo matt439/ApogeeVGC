@@ -37,8 +37,8 @@ public sealed record OnAnyTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
                 var result = handler(
                     context.Battle,
                 context.GetEffectParam<Item>(),
-                context.GetSourceOrTargetPokemon(),
-                context.GetTargetOrSourcePokemon()
+                context.GetTargetOrSourcePokemon(),
+                context.GetSourceOrTargetPokemon()
                 );
                 return result switch
                 {

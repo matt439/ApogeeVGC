@@ -54,7 +54,7 @@ context.GetTargetOrSourcePokemon(),
  {
        BoolBoolIntEmptyVoidUnion b => (b.Value ? BoolRelayVar.True : BoolRelayVar.False),
     IntBoolIntEmptyVoidUnion i => IntRelayVar.Get(i.Value),
-     EmptyBoolIntEmptyVoidUnion => new NullRelayVar(),
+     EmptyBoolIntEmptyVoidUnion => new EmptyRelayVar(),
  VoidUnionBoolIntEmptyVoidUnion => new VoidReturnRelayVar(),
     _ => new VoidReturnRelayVar()
    };

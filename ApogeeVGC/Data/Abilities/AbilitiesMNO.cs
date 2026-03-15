@@ -48,7 +48,8 @@ public partial record Abilities
                     newMove.PranksterBoosted = false;
 
                     // Bounce the move back to source
-                    battle.Actions.UseMove(newMove, target, new UseMoveOptions { Target = source });
+                    battle.Actions.UseMove(newMove, target,
+                        new UseMoveOptions { Target = source, SourceEffect = battle.Library.Abilities[AbilityId.MagicBounce] });
                     return null;
                 }, 1),
                 OnAllyTryHitSide = OnAllyTryHitSideEventInfo.Create((battle, target, source, move) =>
@@ -73,7 +74,7 @@ public partial record Abilities
 
                     // Bounce the move back to source from the ability holder
                     battle.Actions.UseMove(newMove, abilityHolder,
-                        new UseMoveOptions { Target = source });
+                        new UseMoveOptions { Target = source, SourceEffect = battle.Library.Abilities[AbilityId.MagicBounce] });
                     move.HasBounced = true; // only bounce once in free-for-all battles
                     return null;
                 }),
@@ -247,13 +248,11 @@ public partial record Abilities
                 Name = "Mimicry",
                 Num = 250,
                 Rating = 0.0,
-                // OnSwitchInPriority = -1
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -1),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState,
                         pokemon);
-                }),
+                }, -1),
                 OnTerrainChange = OnTerrainChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     ConditionId terrain = battle.Field.Terrain;
@@ -716,7 +715,17 @@ public partial record Abilities
                     {
                         if (battle.DisplayUi)
                         {
-                            battle.Add("-curestatus", pokemon, pokemon.Status.ToString(),
+                            string statusStr = pokemon.Status switch
+                        {
+                            ConditionId.Burn => "brn",
+                            ConditionId.Paralysis => "par",
+                            ConditionId.Poison => "psn",
+                            ConditionId.Toxic => "tox",
+                            ConditionId.Sleep => "slp",
+                            ConditionId.Freeze => "frz",
+                            _ => pokemon.Status.ToString(),
+                        };
+                        battle.Add("-curestatus", pokemon, statusStr,
                                 "[from] ability: Natural Cure");
                         }
                     }
@@ -1125,7 +1134,15 @@ public partial record Abilities
                 Num = 142,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                // OnImmunity for 'sandstorm', 'hail', and 'powder' handled in Pokemon.RunImmunity
+                OnImmunity = OnImmunityEventInfo.Create((_, type, _) =>
+                {
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm or ConditionId.Snowscape or ConditionId.Powder })
+                    {
+                        return false;
+                    }
+
+                    return new VoidReturn();
+                }),
                 // OnTryHitPriority = 1
                 OnTryHit = OnTryHitEventInfo.Create((battle, target, source, move) =>
                 {

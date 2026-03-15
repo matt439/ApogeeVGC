@@ -11,6 +11,11 @@ public partial class Pokemon
     public class PokemonDetails
     {
         public SpecieId Id { get; init; }
+        /// <summary>
+        /// The display name for protocol output (e.g. "Keldeo-Resolute", "Brute Bonnet").
+        /// Falls back to Id.ToString() if not set.
+        /// </summary>
+        public string? DisplayName { get; init; }
         public int Level { get; init; }
         public GenderId Gender { get; init; }
         public bool Shiny { get; init; }
@@ -44,7 +49,7 @@ public partial class Pokemon
         {
             if (_cachedBaseString is not null) return _cachedBaseString;
 
-            var parts = new List<string> { Id.ToString() };
+            var parts = new List<string> { DisplayName ?? Id.ToString() };
 
             if (Level != 100)
             {

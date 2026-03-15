@@ -101,7 +101,7 @@ public partial record Abilities
                 {
                     if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
                         return new VoidReturn();
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    if (effect is ActiveMove { Status: not null })
                     {
                         if (battle.DisplayUi)
                         {
@@ -116,7 +116,7 @@ public partial record Abilities
                     {
                         if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
                             return PokemonFalseVoidUnion.FromVoid();
-                        if (effect is ActiveMove { Status: not ConditionId.None })
+                        if (effect is ActiveMove { Status: not null })
                         {
                             if (battle.EffectState.Target is PokemonEffectStateTarget
                                 {
@@ -386,7 +386,7 @@ public partial record Abilities
                 // OnResidualOrder = 29
                 OnResidual = OnResidualEventInfo.Create((battle, pokemon, _, _) =>
                 {
-                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Zygarde ||
+                    if (pokemon.BaseSpecies.Id != SpecieId.Zygarde ||
                         pokemon.Transformed ||
                         pokemon.Hp == 0) return;
                     if (pokemon.Species.Id == SpecieId.ZygardeComplete ||
@@ -452,6 +452,7 @@ public partial record Abilities
                 Name = "Prankster",
                 Num = 158,
                 Rating = 4.0,
+                ImmuneTypes = [PokemonType.Dark],
                 OnModifyPriority = OnModifyPriorityEventInfo.Create((_, priority, _, _, move) =>
                 {
                     if (move == null || move.Category != MoveCategory.Status) return new VoidReturn();
@@ -561,7 +562,7 @@ public partial record Abilities
                 Rating = 4.0,
                 OnPrepareHit = OnPrepareHitEventInfo.Create((battle, source, _, move) =>
                 {
-                    if (battle.EffectState.Protean == true) return new VoidReturn();
+                    if (source.AbilityState.Protean == true) return new VoidReturn();
                     if (move.HasBounced == true || move.Flags.FutureMove == true ||
                         move.CallsMove == true)
                         return new VoidReturn();
@@ -576,7 +577,7 @@ public partial record Abilities
                         if (currentTypes.Length != 1 || currentTypes[0] != pokemonType)
                         {
                             if (!source.SetType([pokemonType])) return new VoidReturn();
-                            battle.EffectState.Protean = true;
+                            source.AbilityState.Protean = true;
                             if (battle.DisplayUi)
                             {
                                 battle.Add("-start", source, "typechange", type.ToString(),
@@ -595,13 +596,11 @@ public partial record Abilities
                 Num = 281,
                 Rating = 3.0,
                 Condition = ConditionId.Protosynthesis,
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.WeatherChange, battle.Effect, battle.EffectState,
                         pokemon);
-                }),
+                }, -2),
                 OnWeatherChange = OnWeatherChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     // Protosynthesis is not affected by Utility Umbrella
@@ -700,7 +699,11 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnSetStatus = OnSetStatusEventInfo.Create((battle, _, target, _, effect) =>
                 {
-                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    // Showdown: (effect as Move)?.status — only truthy when the move has
+                    // a primary status (e.g. Thunder Wave), not for secondary effects
+                    // (e.g. Volt Tackle's 10% paralysis). Must check "not null" since
+                    // null satisfies "not ConditionId.None" in C# pattern matching.
+                    if (effect is ActiveMove { Status: not null })
                     {
                         battle.Add("-immune", target, "[from] ability: Purifying Salt");
                     }
@@ -751,13 +754,11 @@ public partial record Abilities
                 Num = 282,
                 Rating = 3.0,
                 Condition = ConditionId.QuarkDrive,
-                // OnSwitchInPriority = -2
-                OnSwitchIn = OnSwitchInEventInfo.Create((_, _) => { }, -2),
                 OnStart = OnStartEventInfo.Create((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState,
                         pokemon);
-                }),
+                }, -2),
                 OnTerrainChange = OnTerrainChangeEventInfo.Create((battle, pokemon, _, _) =>
                 {
                     Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];

@@ -219,7 +219,7 @@ public partial class Pokemon
             // Activate Tera Shell - make move not very effective
             if (Battle.DisplayUi)
             {
-                Battle.Add("-activate", this, PartFuncUnion.FromIEffect(Battle.Library.Abilities[AbilityId.TeraShell]));
+                Battle.Add("-activate", this, "ability: Tera Shell");
             }
             AbilityState.Resisted = true;
             return MoveEffectiveness.NotVeryEffective05X;

@@ -1,0 +1,212 @@
+[Equivalence] Loading fixture: C:\VSProjects\ApogeeVGC\Tools/EquivalenceTest/battle_output.fixture.json
+[Equivalence] Loading Showdown log: C:\VSProjects\ApogeeVGC\Tools/EquivalenceTest/battle_output.log
+[Equivalence] Format: gen9randomdoublesbattle, Seed: 1,2,3,4
+[Equivalence] P1 team: Orthworm, Honchkrow, Hitmonchan, Squawkabilly, Dewgong, Iron Thorns
+[Equivalence] P2 team: Dialga, Cresselia, Floatzel, Klefki, Staraptor, Terapagos
+[DMG] Honchkrow Brave Bird vs Cresselia: lvl=85 bp=120 atk=261 def=222 baseDmg=101
+[DMG-MOD] Pre-random baseDmg=103 spread= crit=False
+[DMG-MOD] Post-random baseDmg=92
+[DMG-MOD] Post-STAB baseDmg=138 stab=1.5
+[DMG-MOD] Pre-final baseDmg=138 typeMod=0
+[EVT] ModifyDamage handler Life Orb(Item) returned VoidReturnRelayVar val=VoidReturnRelayVar { } modifier=1.2998046875 relayVar=138
+[DMG-MOD] Final baseDmg=179
+[EVT] BasePower handler Adamant Crystal(Item) returned IntRelayVar val=130 modifier=1 relayVar=130
+[DMG] Dialga Draco Meteor vs Orthworm: lvl=74 bp=130 atk=265 def=147 baseDmg=145
+[DMG-MOD] Pre-random baseDmg=147 spread= crit=False
+[DMG-MOD] Post-random baseDmg=127
+[DMG-MOD] Post-STAB baseDmg=190 stab=1.5
+[DMG-MOD] Pre-final baseDmg=95 typeMod=-1
+[DMG-MOD] Final baseDmg=95
+[DMG] Orthworm Heavy Slam vs Dialga: lvl=88 bp=60 atk=200 def=221 baseDmg=40
+[DMG-MOD] Pre-random baseDmg=42 spread= crit=False
+[DMG-MOD] Post-random baseDmg=36
+[DMG-MOD] Post-STAB baseDmg=54 stab=1.5
+[DMG-MOD] Pre-final baseDmg=27 typeMod=-1
+[DMG-MOD] Final baseDmg=27
+[DMG] Honchkrow Sucker Punch vs Dialga: lvl=85 bp=70 atk=261 def=221 baseDmg=59
+[DMG-MOD] Pre-random baseDmg=61 spread= crit=False
+[DMG-MOD] Post-random baseDmg=56
+[DMG-MOD] Post-STAB baseDmg=84 stab=1.5
+[DMG-MOD] Pre-final baseDmg=84 typeMod=0
+[EVT] ModifyDamage handler Life Orb(Item) returned VoidReturnRelayVar val=VoidReturnRelayVar { } modifier=1.2998046875 relayVar=84
+[DMG-MOD] Final baseDmg=109
+[EVT] BasePower handler Adamant Crystal(Item) returned IntRelayVar val=80 modifier=1 relayVar=80
+[EVT] BasePower handler Helping Hand(Condition) returned IntRelayVar val=6144 modifier=1.5 relayVar=80
+[DMG] Dialga Flash Cannon vs Honchkrow: lvl=74 bp=9216 atk=106 def=137 baseDmg=4420
+[DMG-MOD] Pre-random baseDmg=4422 spread= crit=False
+[DMG-MOD] Post-random baseDmg=3847
+[DMG-MOD] Post-STAB baseDmg=5770 stab=1.5
+[DMG-MOD] Pre-final baseDmg=5770 typeMod=0
+[DMG-MOD] Final baseDmg=5770
+  [T4] P1 choice rejected: move hydropump +1, move protect (State=SwitchIn)
+  [T4] P1 choice rejected: move icywind, move suckerpunch +1 (State=SwitchIn)
+  [T4] P1 choice rejected: move hydropump +2, move heatwave (State=SwitchIn)
+  [T5] P2 choice rejected: switch 3, pass (State=Move)
+  [T5] P2 choice rejected: move flipturn +1, move psychic +1 (State=Move)
+  [T5] P2 choice rejected: switch 5, pass (State=Move)
+  [T5] P2 choice rejected: move closecombat +2, move icywind (State=Move)
+  [T5] P2 choice rejected: switch 4, pass (State=Move)
+  [T5] P2 choice rejected: move spikes, move psychic +1 (State=Move)
+  [T5] P2 choice rejected: move spikes, move icywind (State=Move)
+  [T5] P2 choice rejected: move dazzlinggleam, move icywind (State=Move)
+  [T5] P2 choice rejected: pass, switch 5 (State=Move)
+  [T5] P2 choice rejected: move spikes, move wavecrash +1 (State=Move)
+  [T5] P2 choice rejected: move thunderwave +2, move wavecrash +2 (State=Move)
+  [T5] P2 choice rejected: move dazzlinggleam, move wavecrash +2 (State=Move)
+  [T5] P2 choice rejected: move spikes, move wavecrash +1 (State=Move)
+  [T5] P2 choice rejected: move dazzlinggleam, move wavecrash +2 (State=Move)
+[EVT] BasePower handler Knock Off(Move) returned null val=null modifier=1.5 relayVar=65
+[DMG] Hitmonchan Knock Off vs Dialga: lvl=90 bp=97 atk=240 def=221 baseDmg=80
+[DMG-MOD] Pre-random baseDmg=82 spread= crit=False
+[DMG-MOD] Post-random baseDmg=70
+[DMG-MOD] Post-STAB baseDmg=70 stab=1
+[DMG-MOD] Pre-final baseDmg=70 typeMod=0
+[DMG-MOD] Final baseDmg=70
+[DMG] Dewgong Hydro Pump vs Dialga: lvl=91 bp=110 atk=179 def=221 baseDmg=67
+[DMG-MOD] Pre-random baseDmg=69 spread= crit=False
+[DMG-MOD] Post-random baseDmg=68
+[DMG-MOD] Post-STAB baseDmg=102 stab=1.5
+[DMG-MOD] Pre-final baseDmg=51 typeMod=-1
+[DMG-MOD] Final baseDmg=51
+[DMG] Dewgong Icy Wind vs Dialga: lvl=91 bp=55 atk=179 def=221 baseDmg=33
+[DMG-MOD] Pre-random baseDmg=26 spread=True crit=False
+[DMG-MOD] Post-random baseDmg=22
+[DMG-MOD] Post-STAB baseDmg=33 stab=1.5
+[DMG-MOD] Pre-final baseDmg=33 typeMod=0
+[DMG-MOD] Final baseDmg=33
+[DMG] Dewgong Icy Wind vs Cresselia: lvl=91 bp=55 atk=179 def=238 baseDmg=31
+[DMG-MOD] Pre-random baseDmg=25 spread=True crit=False
+[DMG-MOD] Post-random baseDmg=24
+[DMG-MOD] Post-STAB baseDmg=36 stab=1.5
+[DMG-MOD] Pre-final baseDmg=36 typeMod=0
+[DMG-MOD] Final baseDmg=36
+[EVT] BasePower handler Adamant Crystal(Item) returned IntRelayVar val=80 modifier=1 relayVar=80
+[DMG] Dialga Flash Cannon vs Hitmonchan: lvl=74 bp=80 atk=106 def=249 baseDmg=21
+[DMG-MOD] Pre-random baseDmg=23 spread= crit=False
+[DMG-MOD] Post-random baseDmg=20
+[DMG-MOD] Post-STAB baseDmg=30 stab=1.5
+[DMG-MOD] Pre-final baseDmg=30 typeMod=0
+[DMG-MOD] Final baseDmg=30
+[DMG] Hitmonchan Close Combat vs Dialga: lvl=90 bp=120 atk=240 def=221 baseDmg=99
+[DMG-MOD] Pre-random baseDmg=101 spread= crit=False
+[DMG-MOD] Post-random baseDmg=97
+[DMG-MOD] Post-STAB baseDmg=145 stab=1.5
+[DMG-MOD] Pre-final baseDmg=290 typeMod=1
+[DMG-MOD] Final baseDmg=290
+  [T7] Stuck: not all choices done, 10 entries remain (State=SwitchIn)
+[Equivalence] Applied 34 choices, battle ended at turn 7
+[Equivalence] Winner: none/tie
+[Equivalence] C# log: 135 lines
+[Equivalence] Filtered: C# 95 lines, Showdown 260 lines
+
+=== Context around first mismatch (line 26) ===
+      C# [23]: |-miss|p2b: Cresselia|p1a: Orthworm
+      SD [23]: |-miss|p2b: Cresselia|p1a: Orthworm
+      C# [24]: |move|p2a: Dialga|Draco Meteor|p1a: Orthworm
+      SD [24]: |move|p2a: Dialga|Draco Meteor|p1a: Orthworm
+      C# [25]: |-resisted|p1a: Orthworm
+      SD [25]: |-resisted|p1a: Orthworm
+  >>> C# [26]: |-damage|p1a: Orthworm|171/266
+  >>> SD [26]: |-damage|p1a: Orthworm|152/266
+      C# [27]: |-unboost|p2a: Dialga|spa|2
+      SD [27]: |-unboost|p2a: Dialga|spa|2
+      C# [28]: |move|p1a: Orthworm|Heavy Slam|p2a: Dialga
+      SD [28]: |move|p1a: Orthworm|Heavy Slam|p2a: Dialga
+      C# [29]: |-resisted|p2a: Dialga
+      SD [29]: |-resisted|p2a: Dialga
+      C# [30]: |-damage|p2a: Dialga|243/270
+      SD [30]: |-damage|p2a: Dialga|252/270
+      C# [31]: |turn|3
+      SD [31]: |turn|3
+      C# [32]: |move|p2b: Cresselia|Helping Hand|p2a: Dialga
+      SD [32]: |move|p2b: Cresselia|Helping Hand|p2a: Dialga
+      C# [33]: |-singleturn|p2a: Dialga|Helping Hand|[of] p2b: Cresselia
+      SD [33]: |-singleturn|p2a: Dialga|Helping Hand|[of] p2b: Cresselia
+      C# [34]: |move|p2a: Dialga|Protect|p2a: Dialga
+      SD [34]: |move|p2a: Dialga|Protect|p2a: Dialga
+      C# [35]: |-singleturn|p2a: Dialga|Protect
+      SD [35]: |-singleturn|p2a: Dialga|Protect
+
+  MISMATCH at line 26:
+    C#:  |-damage|p1a: Orthworm|171/266
+    SD:  |-damage|p1a: Orthworm|152/266
+
+  MISMATCH at line 30:
+    C#:  |-damage|p2a: Dialga|243/270
+    SD:  |-damage|p2a: Dialga|252/270
+
+  MISMATCH at line 40:
+    C#:  |-damage|p1a: Orthworm|38/266
+    SD:  |-damage|p1a: Orthworm|19/266
+
+  MISMATCH at line 42:
+    C#:  |-heal|p1a: Orthworm|104/266|[from] item: Sitrus Berry
+    SD:  |-heal|p1a: Orthworm|85/266|[from] item: Sitrus Berry
+
+  MISMATCH at line 58:
+    C#:  |-damage|p1b: Honchkrow|0 fnt
+    SD:  |-damage|p1b: Honchkrow|91/309
+
+  MISMATCH at line 59:
+    C#:  |faint|p1b: Honchkrow
+    SD:  |turn|5
+
+  MISMATCH at line 60:
+    C#:  |switch|p1b: Hitmonchan|Hitmonchan, L90, M|236/236
+    SD:  |move|p2b: Cresselia|Helping Hand|p2a: Dialga
+
+  MISMATCH at line 61:
+    C#:  |turn|5
+    SD:  |-singleturn|p2a: Dialga|Helping Hand|[of] p2b: Cresselia
+
+  MISMATCH at line 62:
+    C#:  |move|p2b: Cresselia|Helping Hand|p2a: Dialga
+    SD:  |move|p1b: Honchkrow|Protect|p1b: Honchkrow
+
+  MISMATCH at line 63:
+    C#:  |-singleturn|p2a: Dialga|Helping Hand|[of] p2b: Cresselia
+    SD:  |-singleturn|p1b: Honchkrow|Protect
+
+  MISMATCH at line 64:
+    C#:  |move|p1b: Hitmonchan|Knock Off|p2a: Dialga
+    SD:  |move|p1a: Dewgong|Hydro Pump|p2a: Dialga|[miss]
+
+  MISMATCH at line 65:
+    C#:  |-damage|p2a: Dialga|64/270
+    SD:  |-miss|p1a: Dewgong|p2a: Dialga
+
+  MISMATCH at line 66:
+    C#:  |move|p1a: Dewgong|Hydro Pump|p2a: Dialga
+    SD:  |move|p2a: Dialga|Draco Meteor|p1a: Dewgong
+
+  MISMATCH at line 67:
+    C#:  |-resisted|p2a: Dialga
+    SD:  |-damage|p1a: Dewgong|212/312
+
+  MISMATCH at line 68:
+    C#:  |-damage|p2a: Dialga|13/270
+    SD:  |-unboost|p2a: Dialga|spa|2
+
+  MISMATCH at line 69:
+    C#:  |move|p2a: Dialga|Draco Meteor|p1a: Dewgong|[miss]
+    SD:  |turn|6
+
+  MISMATCH at line 70:
+    C#:  |-miss|p2a: Dialga|p1a: Dewgong
+    SD:  |move|p1b: Honchkrow|Sucker Punch|p2a: Dialga
+
+  MISMATCH at line 71:
+    C#:  |turn|6
+    SD:  |-damage|p2a: Dialga|21/270
+
+  MISMATCH at line 72:
+    C#:  |move|p1b: Hitmonchan|Coaching|p1a: Dewgong
+    SD:  |-damage|p1b: Honchkrow|61/309|[from] item: Life Orb
+
+  MISMATCH at line 74:
+    C#:  |-heal|p2a: Dialga|80/270
+    SD:  |-heal|p2a: Dialga|88/270
+
+[Equivalence] Result: 64 matches, 196 mismatches out of 260 lines
+[Equivalence] FAIL — protocols diverge
+Press Enter key to exit...
