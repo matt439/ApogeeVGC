@@ -169,6 +169,7 @@ public sealed class PlayerMctsDL(
     private Choice GetRandomTeamPreviewChoice(TeamPreviewRequest request)
     {
         var pokemon = request.Side.Pokemon;
+        int bringCount = request.MaxChosenTeamSize ?? pokemon.Count;
         var order = Enumerable.Range(0, pokemon.Count).ToList();
 
         for (int i = order.Count - 1; i > 0; i--)
@@ -176,6 +177,8 @@ public sealed class PlayerMctsDL(
             int j = _rng.Random(0, i + 1);
             (order[i], order[j]) = (order[j], order[i]);
         }
+
+        order = order.Take(bringCount).ToList();
 
         var actions = order.Select((originalIndex, newPosition) => new ChosenAction
         {

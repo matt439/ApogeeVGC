@@ -123,6 +123,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         }
 
         var pokemon = request.Side.Pokemon;
+        int bringCount = request.MaxChosenTeamSize ?? pokemon.Count;
 
         // Generate a random order for the team
         var order = Enumerable.Range(0, pokemon.Count).ToList();
@@ -133,6 +134,9 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             int j = _random.Random(0, i + 1);
             (order[i], order[j]) = (order[j], order[i]);
         }
+
+        // Only bring the required number of Pokemon
+        order = order.Take(bringCount).ToList();
 
         if (PrintDebug)
         {

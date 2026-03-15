@@ -8,7 +8,7 @@ public partial class Driver
     /// <summary>
     /// When false, skips all Console.ReadLine() pauses so the process exits automatically.
     /// </summary>
-    private const bool WaitForInput = false;
+    private const bool WaitForInput = true;
 
     private Library Library { get; } = new();
 

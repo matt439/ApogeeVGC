@@ -143,8 +143,7 @@ public sealed class PlayerMcts(
             .Take(2)
             .ToHashSet();
 
-        // Build ordering: leads first, then remaining brought, then unbrought
-        var brought = new HashSet<int>(bringIndices);
+        // Build ordering: leads first, then remaining brought (only bringCount total)
         var ordered = new List<int>();
 
         // Leads first (ordered by lead score descending)
@@ -154,15 +153,6 @@ public sealed class PlayerMcts(
         // Remaining brought (ordered by bring score descending)
         ordered.AddRange(bringIndices.Where(i => !leadIndices.Contains(i))
             .OrderByDescending(i => output.BringScores[i]));
-
-        // Unbrought Pokemon last
-        for (var i = 0; i < teamSize; i++)
-        {
-            if (!brought.Contains(i))
-                ordered.Add(i);
-        }
-
-        Debug.Assert(ordered.Count == teamSize);
 
         if (PrintDebug)
         {
@@ -191,6 +181,7 @@ public sealed class PlayerMcts(
             Console.WriteLine($"[PlayerMcts] Generating random team preview choice for {SideId}");
 
         var pokemon = request.Side.Pokemon;
+        int bringCount = request.MaxChosenTeamSize ?? pokemon.Count;
         var order = Enumerable.Range(0, pokemon.Count).ToList();
 
         // Fisher-Yates shuffle
@@ -199,6 +190,8 @@ public sealed class PlayerMcts(
             int j = _rng.Random(0, i + 1);
             (order[i], order[j]) = (order[j], order[i]);
         }
+
+        order = order.Take(bringCount).ToList();
 
         var actions = order.Select((originalIndex, newPosition) => new ChosenAction
         {

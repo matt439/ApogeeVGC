@@ -173,7 +173,6 @@ public sealed class PlayerDLGreedy(
             .Take(2)
             .ToHashSet();
 
-        var brought = new HashSet<int>(bringIndices);
         var ordered = new List<int>();
 
         ordered.AddRange(bringIndices.Where(i => leadIndices.Contains(i))
@@ -181,12 +180,6 @@ public sealed class PlayerDLGreedy(
 
         ordered.AddRange(bringIndices.Where(i => !leadIndices.Contains(i))
             .OrderByDescending(i => output.BringScores[i]));
-
-        for (int i = 0; i < teamSize; i++)
-        {
-            if (!brought.Contains(i))
-                ordered.Add(i);
-        }
 
         var actions = ordered.Select((originalIndex, newPosition) => new ChosenAction
         {
@@ -204,6 +197,7 @@ public sealed class PlayerDLGreedy(
     private Choice GetRandomTeamPreviewChoice(TeamPreviewRequest request)
     {
         var pokemon = request.Side.Pokemon;
+        int bringCount = request.MaxChosenTeamSize ?? pokemon.Count;
         var order = Enumerable.Range(0, pokemon.Count).ToList();
 
         for (int i = order.Count - 1; i > 0; i--)
@@ -211,6 +205,8 @@ public sealed class PlayerDLGreedy(
             int j = _rng.Random(0, i + 1);
             (order[i], order[j]) = (order[j], order[i]);
         }
+
+        order = order.Take(bringCount).ToList();
 
         var actions = order.Select((originalIndex, newPosition) => new ChosenAction
         {
