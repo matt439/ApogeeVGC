@@ -85,9 +85,6 @@ public partial class Driver
             case DriverMode.ShowdownAssist:
                 RunShowdownAssist(ActiveFormatId);
                 break;
-            case DriverMode.DeterministicRegressionTest:
-                RunDeterministicRegressionTest();
-                break;
             case DriverMode.SingleBattleDebug:
                 RunSingleBattleDebug(ActiveFormatId);
                 break;
@@ -98,9 +95,6 @@ public partial class Driver
                 RunEquivalenceTest(
                     "Tools/EquivalenceTest/batch_cache/battle_000000.fixture.json",
                     "Tools/EquivalenceTest/batch_cache/battle_000000.log");
-                break;
-            case DriverMode.EquivalenceBatchTest:
-                RunEquivalenceBatchTest(formatOverride);
                 break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
