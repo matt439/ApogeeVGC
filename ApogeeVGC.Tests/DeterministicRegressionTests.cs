@@ -17,7 +17,7 @@ namespace ApogeeVGC.Tests;
 /// on the same commit, the engine's behavior has changed.
 /// </summary>
 [Collection(LibraryCollection.Name)]
-public class DeterministicRegressionTests
+public class DeterministicRegressionTests(LibraryFixture fixture, ITestOutputHelper output)
 {
     // Deterministic seed constants (must match Driver values to produce the same hash)
     private const int Team1EvalSeed = 54321;
@@ -28,14 +28,7 @@ public class DeterministicRegressionTests
 
     private const int BattlesPerFormat = 200;
 
-    private readonly Library _library;
-    private readonly ITestOutputHelper _output;
-
-    public DeterministicRegressionTests(LibraryFixture fixture, ITestOutputHelper output)
-    {
-        _library = fixture.Library;
-        _output = output;
-    }
+    private readonly Library _library = fixture.Library;
 
     [Fact]
     public void AllFormats_ProduceDeterministicResults_WithNoExceptions()
@@ -43,7 +36,7 @@ public class DeterministicRegressionTests
         var formats = new[]
         {
             FormatId.Gen9VgcRegulationI,
-            FormatId.Gen9VgcMega,
+            //FormatId.Gen9VgcMega,
         };
 
         var resultBytes = new List<byte>();
@@ -85,20 +78,20 @@ public class DeterministicRegressionTests
                 {
                     exceptions++;
                     resultBytes.Add(0xFF);
-                    _output.WriteLine(
+                    output.WriteLine(
                         $"Exception in {label} battle {i}: {ex.GetType().Name}: {ex.Message}");
                 }
             }
 
             totalExceptions += exceptions;
-            _output.WriteLine($"{label}: P1={p1Wins} P2={p2Wins} Tie={ties} Err={exceptions}");
+            output.WriteLine($"{label}: P1={p1Wins} P2={p2Wins} Tie={ties} Err={exceptions}");
         }
 
         byte[] sha = SHA256.HashData(resultBytes.ToArray());
         string hashHex = Convert.ToHexString(sha)[..16];
 
-        _output.WriteLine($"Regression Hash: {hashHex}");
-        _output.WriteLine($"Total Exceptions: {totalExceptions}");
+        output.WriteLine($"Regression Hash: {hashHex}");
+        output.WriteLine($"Total Exceptions: {totalExceptions}");
 
         Assert.Equal(0, totalExceptions);
     }

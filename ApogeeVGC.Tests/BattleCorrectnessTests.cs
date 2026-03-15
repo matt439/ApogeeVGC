@@ -4,7 +4,6 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using Xunit.Abstractions;
 using PlayerType = ApogeeVGC.Sim.Player.PlayerType;
@@ -17,7 +16,7 @@ namespace ApogeeVGC.Tests;
 /// measurement (throughput, JIT warm-up analysis) stays in Driver.
 /// </summary>
 [Collection(LibraryCollection.Name)]
-public class BattleCorrectnessTests
+public class BattleCorrectnessTests(LibraryFixture fixture, ITestOutputHelper output)
 {
     private const int Team1EvalSeed = 54321;
     private const int Team2EvalSeed = 67890;
@@ -25,14 +24,7 @@ public class BattleCorrectnessTests
     private const int PlayerRandom2EvalSeed = 1818;
     private const int BattleEvalSeed = 9876;
 
-    private readonly Library _library;
-    private readonly ITestOutputHelper _output;
-
-    public BattleCorrectnessTests(LibraryFixture fixture, ITestOutputHelper output)
-    {
-        _library = fixture.Library;
-        _output = output;
-    }
+    private readonly Library _library = fixture.Library;
 
     [Theory]
     [InlineData(FormatId.Gen9VgcRegulationI, 1000)]
@@ -40,7 +32,7 @@ public class BattleCorrectnessTests
     public void ParallelBattles_CompleteWithoutExceptions(FormatId formatId, int numBattles)
     {
         string formatLabel = _library.Formats[formatId].Name;
-        _output.WriteLine($"Running {numBattles} parallel battles for {formatLabel}");
+        output.WriteLine($"Running {numBattles} parallel battles for {formatLabel}");
 
         var exceptions = new ConcurrentBag<(int Index, string Seeds, Exception Exception)>();
 
@@ -55,8 +47,8 @@ public class BattleCorrectnessTests
 
             try
             {
-                List<PokemonSet> team1 = new RandomTeamGenerator(_library, formatId, team1Seed).GenerateTeam();
-                List<PokemonSet> team2 = new RandomTeamGenerator(_library, formatId, team2Seed).GenerateTeam();
+                var team1 = new RandomTeamGenerator(_library, formatId, team1Seed).GenerateTeam();
+                var team2 = new RandomTeamGenerator(_library, formatId, team2Seed).GenerateTeam();
 
                 var battleOptions = new BattleOptions
                 {
@@ -88,7 +80,7 @@ public class BattleCorrectnessTests
             }
             catch (Exception ex)
             {
-                string seeds = $"T1={team1Seed} T2={team2Seed} P1={player1Seed} P2={player2Seed} B={battleSeed}";
+                var seeds = $"T1={team1Seed} T2={team2Seed} P1={player1Seed} P2={player2Seed} B={battleSeed}";
                 exceptions.Add((i, seeds, ex));
             }
         });
@@ -97,12 +89,12 @@ public class BattleCorrectnessTests
         {
             foreach ((int index, string seeds, Exception ex) in exceptions.OrderBy(e => e.Index))
             {
-                _output.WriteLine($"Battle {index} failed: {ex.GetType().Name}: {ex.Message}");
-                _output.WriteLine($"  Seeds: {seeds}");
+                output.WriteLine($"Battle {index} failed: {ex.GetType().Name}: {ex.Message}");
+                output.WriteLine($"  Seeds: {seeds}");
             }
         }
 
-        _output.WriteLine($"Completed {numBattles} battles, {exceptions.Count} failures");
+        output.WriteLine($"Completed {numBattles} battles, {exceptions.Count} failures");
         Assert.Empty(exceptions);
     }
 }

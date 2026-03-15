@@ -6,7 +6,6 @@ using ApogeeVGC.LiveAssist;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.FormatClasses;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils;
 using Xunit.Abstractions;
@@ -20,19 +19,12 @@ namespace ApogeeVGC.Tests;
 /// </summary>
 [Collection(LibraryCollection.Name)]
 [Trait("Category", "Integration")]
-public class EquivalenceBatchTests
+public class EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper output)
 {
     private const int DefaultNumTests = 100;
     private const string DefaultFormat = "gen9randomdoublesbattle";
 
-    private readonly Library _library;
-    private readonly ITestOutputHelper _output;
-
-    public EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper output)
-    {
-        _library = fixture.Library;
-        _output = output;
-    }
+    private readonly Library _library = fixture.Library;
 
     [Fact]
     public void EquivalenceBatch_AllBattlesMatchShowdown()
@@ -54,7 +46,7 @@ public class EquivalenceBatchTests
             string cachedCommit = File.ReadAllText(versionFile).Trim();
             if (cachedCommit != currentCommit)
             {
-                _output.WriteLine($"WARNING: Showdown version mismatch! Cache={cachedCommit}, Current={currentCommit}");
+                output.WriteLine($"WARNING: Showdown version mismatch! Cache={cachedCommit}, Current={currentCommit}");
             }
         }
         else if (currentCommit != "unknown")
@@ -63,9 +55,9 @@ public class EquivalenceBatchTests
         }
 
         var failures = new ConcurrentBag<string>();
-        int passed = 0;
-        int errors = 0;
-        int cacheHits = 0;
+        var passed = 0;
+        var errors = 0;
+        var cacheHits = 0;
 
         Parallel.For(0, DefaultNumTests, new ParallelOptions { MaxDegreeOfParallelism = 32 }, i =>
         {
@@ -73,10 +65,10 @@ public class EquivalenceBatchTests
             int s2 = (i * 13 + 2) % 65536;
             int s3 = (i * 19 + 3) % 65536;
             int s4 = (i * 31 + 4) % 65536;
-            string seedStr = $"{s1},{s2},{s3},{s4}";
+            var seedStr = $"{s1},{s2},{s3},{s4}";
 
-            string p1Seed = $"{(i * 41 + 10) % 65536},{(i * 43 + 20) % 65536},{(i * 47 + 30) % 65536},{(i * 53 + 40) % 65536}";
-            string p2Seed = $"{(i * 59 + 50) % 65536},{(i * 61 + 60) % 65536},{(i * 67 + 70) % 65536},{(i * 71 + 80) % 65536}";
+            var p1Seed = $"{(i * 41 + 10) % 65536},{(i * 43 + 20) % 65536},{(i * 47 + 30) % 65536},{(i * 53 + 40) % 65536}";
+            var p2Seed = $"{(i * 59 + 50) % 65536},{(i * 61 + 60) % 65536},{(i * 67 + 70) % 65536},{(i * 71 + 80) % 65536}";
 
             string cacheBase = Path.Combine(cacheDir, $"battle_{i:D6}");
             string cachedFixture = cacheBase + ".fixture.json";
@@ -110,7 +102,7 @@ public class EquivalenceBatchTests
                 }
 
                 (int matches, int mismatches, int totalLines, string? firstMismatch, Exception? ex)
-                    = RunComparison(fixtureFile, logFile, seedStr);
+                    = RunComparison(fixtureFile, logFile);
 
                 if (ex != null)
                 {
@@ -119,7 +111,7 @@ public class EquivalenceBatchTests
                 }
                 else if (mismatches > 0)
                 {
-                    string msg = $"SEED {seedStr} — FAIL ({matches}/{totalLines} match)";
+                    var msg = $"SEED {seedStr} — FAIL ({matches}/{totalLines} match)";
                     if (firstMismatch != null) msg += $"\n  {firstMismatch}";
                     failures.Add(msg);
                 }
@@ -135,16 +127,16 @@ public class EquivalenceBatchTests
             }
         });
 
-        _output.WriteLine($"Total: {DefaultNumTests}, Passed: {passed}, Failed: {failures.Count - errors}, Errors: {errors}");
-        _output.WriteLine($"Cache: {cacheHits}/{DefaultNumTests} hits");
+        output.WriteLine($"Total: {DefaultNumTests}, Passed: {passed}, Failed: {failures.Count - errors}, Errors: {errors}");
+        output.WriteLine($"Cache: {cacheHits}/{DefaultNumTests} hits");
 
         if (!failures.IsEmpty)
         {
-            _output.WriteLine("");
-            _output.WriteLine("=== Failed Seeds ===");
+            output.WriteLine("");
+            output.WriteLine("=== Failed Seeds ===");
             foreach (string failure in failures)
             {
-                _output.WriteLine(failure);
+                output.WriteLine(failure);
             }
         }
 
@@ -163,7 +155,7 @@ public class EquivalenceBatchTests
     /// Runs the equivalence comparison for a single fixture against the C# sim.
     /// </summary>
     private (int Matches, int Mismatches, int TotalLines, string? FirstMismatch, Exception? Exception)
-        RunComparison(string fixturePath, string showdownLogPath, string seedStr)
+        RunComparison(string fixturePath, string showdownLogPath)
     {
         try
         {
@@ -183,8 +175,8 @@ public class EquivalenceBatchTests
             FormatId fmtId = EquivalenceTestHelper.ResolveFormatId(formatId);
 
             var resolver = new ShowdownNameResolver(_library);
-            PokemonSet[] p1Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p1Team"), resolver, _library);
-            PokemonSet[] p2Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p2Team"), resolver, _library);
+            var p1Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p1Team"), resolver, _library);
+            var p2Team = EquivalenceTestHelper.ParseShowdownTeam(root.GetProperty("p2Team"), resolver, _library);
 
             var inputLog = new List<string>();
             foreach (JsonElement entry in root.GetProperty("inputLog").EnumerateArray())
@@ -226,11 +218,11 @@ public class EquivalenceBatchTests
 
             while (!battle.Ended && battle.RequestState != RequestState.None)
             {
-                bool madeProgress = true;
+                var madeProgress = true;
                 while (choices.Count > 0 && !battle.AllChoicesDone() && madeProgress)
                 {
                     madeProgress = false;
-                    int scanned = 0;
+                    var scanned = 0;
                     int total = choices.Count;
                     while (scanned < total && !battle.AllChoicesDone())
                     {
@@ -238,7 +230,7 @@ public class EquivalenceBatchTests
                         scanned++;
 
                         Side? side = null;
-                        string choice = "";
+                        var choice = "";
                         if (line.StartsWith("p1 "))
                         {
                             side = battle.P1;
@@ -270,15 +262,15 @@ public class EquivalenceBatchTests
 
             // Compare protocol output
             string[] showdownLines = File.ReadAllLines(showdownLogPath);
-            List<string> csharpFiltered = EquivalenceTestHelper.FilterProtocolLines(battle.Log);
-            List<string> showdownFiltered = EquivalenceTestHelper.FilterProtocolLines(showdownLines);
+            var csharpFiltered = EquivalenceTestHelper.FilterProtocolLines(battle.Log);
+            var showdownFiltered = EquivalenceTestHelper.FilterProtocolLines(showdownLines);
 
-            int matches = 0;
-            int mismatches = 0;
+            var matches = 0;
+            var mismatches = 0;
             int maxLines = Math.Max(csharpFiltered.Count, showdownFiltered.Count);
             string? firstMismatch = null;
 
-            for (int j = 0; j < maxLines; j++)
+            for (var j = 0; j < maxLines; j++)
             {
                 string csLine = j < csharpFiltered.Count ? csharpFiltered[j] : "(missing)";
                 string sdLine = j < showdownFiltered.Count ? showdownFiltered[j] : "(missing)";
