@@ -23,7 +23,7 @@ def open_db(format_id: str, *, readonly: bool = False) -> sqlite3.Connection:
 
     if readonly:
         uri = f"file:{db_path}?mode=ro"
-        conn = sqlite3.connect(uri, uri=True)
+        conn = sqlite3.connect(uri, uri=True, check_same_thread=False)
     else:
         conn = sqlite3.connect(str(db_path))
 
