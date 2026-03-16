@@ -31,7 +31,7 @@ def find_best_seed(summary_path: Path) -> int:
         summary = json.load(f)
 
     seeds = summary['seeds']
-    losses = summary['total_loss']['values']
+    losses = summary.get('total_loss', summary.get('loss', {}))['values']
     best_idx = losses.index(min(losses))
     return seeds[best_idx]
 
