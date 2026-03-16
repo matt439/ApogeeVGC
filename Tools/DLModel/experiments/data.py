@@ -120,7 +120,7 @@ def get_or_build_vocab(data_path: str | Path, output_dir: Path) -> dict:
 
 _PREVIEW_TENSOR_ATTRS = [
     'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
-    'bring_target', 'lead_target', 'value_target',
+    'config_target', 'value_target',
 ]
 
 _BATTLE_TENSOR_ATTRS = [
@@ -144,6 +144,9 @@ def _load_preview_cache(path: Path, n_games: int) -> TeamPreviewDataset | None:
         return None
     data = torch.load(path, weights_only=False)
     if data.get('n_games', -1) != n_games:
+        return None
+    # Invalidate cache if it lacks config_target (pre-combinatorial format)
+    if 'config_target' not in data:
         return None
     ds = object.__new__(TeamPreviewDataset)
     ds.n = data['n']
@@ -223,8 +226,13 @@ def _build_parallel(build_fn, games, vocab, winners_only, num_workers, attrs):
 
 
 def _default_num_workers() -> int:
-    """Default to logical cores, capped at 16 to avoid fd exhaustion."""
-    return min(max(os.cpu_count() or 1, 1), 32)
+    """Default to logical cores, capped to avoid memory exhaustion.
+
+    On Windows each worker process loads torch via spawn, so we cap at 8
+    to prevent paging file OOM.
+    """
+    cap = 8 if sys.platform == 'win32' else 16
+    return min(max(os.cpu_count() or 1, 1), cap)
 
 
 def build_preview_datasets(
