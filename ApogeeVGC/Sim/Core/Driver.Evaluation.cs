@@ -4,7 +4,6 @@ using ApogeeVGC.Sim.Generators;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace ApogeeVGC.Sim.Core;
@@ -39,7 +38,7 @@ public partial class Driver
     private const int MctsDlIterations = 10000;
 
     // DL-Greedy evaluation settings (argmax policy, no search)
-    private const int DlGreedyEvaluationNumTest = 10000;
+    private const int DlGreedyEvaluationNumTest = 30000;
     private const int DlGreedyNumThreads = 32;
 
     /// <summary>
@@ -887,7 +886,7 @@ public partial class Driver
     /// <summary>
     /// Runs MCTS with DL models (policy priors + value eval, no info tracking) vs Random evaluation.
     /// </summary>
-    private void RunMctsDLVsRandomEvaluation(FormatId formatId)
+    private void RunMctsDlVsRandomEvaluation(FormatId formatId)
     {
         string formatLabel = Library.Formats[formatId].Name;
         Console.WriteLine($"[Driver] Starting MCTS-DL vs Random {formatLabel} Evaluation");
@@ -1096,7 +1095,7 @@ public partial class Driver
     /// Isolates DL model quality from MCTS search performance.
     /// Includes value head diagnostics via MctsLogger.
     /// </summary>
-    private void RunDLGreedyVsRandomEvaluation(FormatId formatId)
+    private void RunDlGreedyVsRandomEvaluation(FormatId formatId)
     {
         string formatLabel = Library.Formats[formatId].Name;
         Console.WriteLine($"[Driver] Starting DL-Greedy vs Random {formatLabel} Evaluation");
@@ -1283,116 +1282,6 @@ public partial class Driver
         sb.AppendLine();
         sb.AppendLine(MctsLogger.FormatSummary());
 
-        Console.WriteLine(sb.ToString());
-
-        Console.WriteLine("Press Enter key to exit...");
-        if (WaitForInput) Console.ReadLine();
-    }
-
-    #endregion
-
-    #region Deterministic Regression Test
-
-    /// <summary>
-    /// Runs a fixed set of battles across multiple formats with deterministic seeds.
-    /// Computes a hash of all results — if the hash changes between runs on the same
-    /// commit, the engine's behavior has changed.
-    /// </summary>
-    private void RunDeterministicRegressionTest()
-    {
-        Console.WriteLine("[Driver] Starting Deterministic Regression Test");
-
-        const int battlesPerFormat = 200;
-        const bool debug = false;
-
-        (FormatId Id, string Label)[] formats =
-        [
-            (FormatId.Gen9VgcRegulationI, "VGC Reg I"),
-            (FormatId.Gen9VgcMega, "VGC Mega"),
-        ];
-
-        Stopwatch stopwatch = Stopwatch.StartNew();
-        List<byte> resultBytes = [];
-        int totalExceptions = 0;
-
-        StringBuilder sb = new();
-        sb.AppendLine();
-        sb.AppendLine($"Deterministic Regression Test ({battlesPerFormat} battles x {formats.Length} formats)");
-        sb.AppendLine($"Git Commit: {GetGitCommitId()}");
-        sb.AppendLine();
-
-        foreach ((FormatId formatId, string label) in formats)
-        {
-            Console.WriteLine($"[Driver] Running {label}...");
-
-            int p1Wins = 0, p2Wins = 0, ties = 0, exceptions = 0;
-
-            for (int i = 0; i < battlesPerFormat; i++)
-            {
-                // Deterministic seed derivation — same seeds produce same results
-                int baseOffset = i * 5 + 1;
-                int team1Seed = Team1EvalSeed + baseOffset;
-                int team2Seed = Team2EvalSeed + baseOffset + 1;
-
-                List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
-                List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
-
-                try
-                {
-                    (SimulatorResult result, int _) = RunBattleWithPrebuiltTeamsDirect(
-                        team1, team2,
-                        team1Seed, team2Seed,
-                        PlayerRandom1EvalSeed + baseOffset + 2,
-                        PlayerRandom2EvalSeed + baseOffset + 3,
-                        BattleEvalSeed + baseOffset + 4,
-                        formatId,
-                        debug);
-
-                    // Feed result into hash (deterministic order since single-threaded)
-                    resultBytes.Add((byte)result);
-
-                    switch (result)
-                    {
-                        case SimulatorResult.Player1Win: p1Wins++; break;
-                        case SimulatorResult.Player2Win: p2Wins++; break;
-                        case SimulatorResult.Tie: ties++; break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    exceptions++;
-                    // Hash the exception so failures also change the hash
-                    resultBytes.Add(0xFF);
-                    Console.WriteLine($"[Driver] Exception in {label} battle {i}: {ex.GetType().Name}: {ex.Message}");
-                }
-            }
-
-            totalExceptions += exceptions;
-            sb.AppendLine($"{label}: P1={p1Wins} P2={p2Wins} Tie={ties} Err={exceptions}");
-        }
-
-        stopwatch.Stop();
-
-        byte[] sha = SHA256.HashData(resultBytes.ToArray());
-        string hashHex = Convert.ToHexString(sha)[..16]; // first 16 hex chars (64 bits)
-
-        sb.AppendLine();
-        sb.AppendLine($"Regression Hash: {hashHex}");
-        sb.AppendLine($"Total Exceptions: {totalExceptions}");
-        sb.AppendLine($@"Total Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
-        sb.AppendLine();
-
-        if (totalExceptions == 0)
-        {
-            sb.AppendLine("PASS: All battles completed without exceptions.");
-        }
-        else
-        {
-            sb.AppendLine($"WARN: {totalExceptions} battles threw exceptions.");
-        }
-
-        sb.AppendLine();
-        sb.AppendLine("If the hash changes between runs on the same commit, engine behavior has changed.");
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press Enter key to exit...");

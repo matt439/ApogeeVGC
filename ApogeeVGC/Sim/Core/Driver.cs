@@ -56,10 +56,10 @@ public partial class Driver
                 RunMctsStandaloneVsRandomEvaluation(ActiveFormatId);
                 break;
             case DriverMode.MctsDlVsRndEvaluation:
-                RunMctsDLVsRandomEvaluation(ActiveFormatId);
+                RunMctsDlVsRandomEvaluation(ActiveFormatId);
                 break;
             case DriverMode.DlGreedyVsRndEvaluation:
-                RunDLGreedyVsRandomEvaluation(ActiveFormatId);
+                RunDlGreedyVsRandomEvaluation(ActiveFormatId);
                 break;
             case DriverMode.ShowdownAssist:
                 RunShowdownAssist(ActiveFormatId);
