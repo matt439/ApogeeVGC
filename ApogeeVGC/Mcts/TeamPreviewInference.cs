@@ -6,9 +6,9 @@ using ApogeeVGC.Sim.PokemonClasses;
 namespace ApogeeVGC.Mcts;
 
 /// <summary>
-/// A single VGC team preview configuration: which 4 to bring, which 2 to lead.
+/// A team preview configuration: which pokemon to bring, lead, and bench.
 /// </summary>
-public readonly struct VgcConfig
+public readonly struct PreviewConfig
 {
     public int[] Bring { get; init; }
     public int[] Lead { get; init; }
@@ -20,43 +20,44 @@ public readonly struct VgcConfig
 /// </summary>
 public readonly struct TeamPreviewOutput
 {
-    /// <summary>Ordered team indices: leads first, then bench (4 total for VGC).</summary>
+    /// <summary>Ordered team indices: leads first, then bench.</summary>
     public int[] OrderedIndices { get; init; }
 
     /// <summary>Softmax probability of the selected configuration.</summary>
     public float Confidence { get; init; }
 
-    /// <summary>All 90 configuration softmax probabilities.</summary>
+    /// <summary>All configuration softmax probabilities.</summary>
     public float[] ConfigScores { get; init; }
 
-    /// <summary>Index of the selected configuration (0-89).</summary>
+    /// <summary>Index of the selected configuration.</summary>
     public int ConfigIndex { get; init; }
 }
 
 /// <summary>
-/// Wraps the ONNX InferenceSession for the VGC team preview model.
-/// The model outputs 90 logits over all possible VGC configurations
-/// (C(6,4) bring × C(4,2) lead = 90).
+/// Wraps the ONNX InferenceSession for the team preview model.
+/// Supports any format (VGC, Doubles OU, Singles) — the config enumeration
+/// is generated from teamSize and numLeads parameters.
 /// Thread-safe for concurrent reads (ONNX Runtime sessions are thread-safe).
 /// </summary>
 public sealed class TeamPreviewInference : IDisposable
 {
     private const int NumSlots = 12; // 6 my Pokemon + 6 opponent Pokemon
     private const int NumMovesPerSlot = 4;
-    private const int NumVgcConfigs = 90;
 
-    /// <summary>All 90 VGC configurations in canonical order (matches Python).</summary>
-    public static readonly VgcConfig[] VgcConfigs = GenerateVgcConfigs();
+    /// <summary>All configurations in canonical order (matches Python).</summary>
+    public PreviewConfig[] Configs { get; }
 
     private readonly InferenceSession _session;
     private readonly Vocab _vocab;
 
-    public TeamPreviewInference(string onnxModelPath, Vocab vocab)
+    public TeamPreviewInference(string onnxModelPath, Vocab vocab,
+        int teamSize = 4, int numLeads = 2, int totalPokemon = 6)
     {
         var sessionOptions = new SessionOptions();
         sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
         _session = new InferenceSession(Path.GetFullPath(onnxModelPath), sessionOptions);
         _vocab = vocab;
+        Configs = GenerateConfigs(totalPokemon, teamSize, numLeads);
     }
 
     /// <summary>
@@ -111,7 +112,7 @@ public sealed class TeamPreviewInference : IDisposable
                 bestIdx = i;
         }
 
-        VgcConfig config = VgcConfigs[bestIdx];
+        PreviewConfig config = Configs[bestIdx];
 
         // Ordered: leads first, then bench
         int[] ordered = new int[config.Lead.Length + config.Bench.Length];
@@ -163,32 +164,24 @@ public sealed class TeamPreviewInference : IDisposable
     }
 
     /// <summary>
-    /// Generate all 90 VGC configurations in lexicographic order.
+    /// Generate all configurations in lexicographic order for the given format.
     /// Matches the Python itertools.combinations enumeration exactly.
     /// </summary>
-    private static VgcConfig[] GenerateVgcConfigs()
+    public static PreviewConfig[] GenerateConfigs(int totalPokemon, int teamSize, int numLeads)
     {
-        var configs = new List<VgcConfig>();
+        var configs = new List<PreviewConfig>();
 
-        // C(6,4) bring combinations in lexicographic order
-        for (int a = 0; a < 3; a++)
-        for (int b = a + 1; b < 4; b++)
-        for (int c = b + 1; c < 5; c++)
-        for (int d = c + 1; d < 6; d++)
+        foreach (int[] bring in Combinations(totalPokemon, teamSize))
         {
-            int[] bring = [a, b, c, d];
-
-            // C(4,2) lead combinations from bring indices
-            for (int li = 0; li < 3; li++)
-            for (int lj = li + 1; lj < 4; lj++)
+            foreach (int[] lead in CombinationsFrom(bring, numLeads))
             {
-                int[] lead = [bring[li], bring[lj]];
+                var leadSet = new HashSet<int>(lead);
                 var bench = new List<int>();
-                for (int k = 0; k < 4; k++)
-                    if (k != li && k != lj)
-                        bench.Add(bring[k]);
+                foreach (int b in bring)
+                    if (!leadSet.Contains(b))
+                        bench.Add(b);
 
-                configs.Add(new VgcConfig
+                configs.Add(new PreviewConfig
                 {
                     Bring = bring,
                     Lead = lead,
@@ -198,6 +191,45 @@ public sealed class TeamPreviewInference : IDisposable
         }
 
         return configs.ToArray();
+    }
+
+    /// <summary>Generate all C(n, k) combinations of {0..n-1} in lexicographic order.</summary>
+    private static IEnumerable<int[]> Combinations(int n, int k)
+    {
+        int[] indices = new int[k];
+        for (int i = 0; i < k; i++) indices[i] = i;
+
+        yield return (int[])indices.Clone();
+
+        while (true)
+        {
+            int i = k - 1;
+            while (i >= 0 && indices[i] == i + n - k) i--;
+            if (i < 0) yield break;
+            indices[i]++;
+            for (int j = i + 1; j < k; j++) indices[j] = indices[j - 1] + 1;
+            yield return (int[])indices.Clone();
+        }
+    }
+
+    /// <summary>Generate all C(source.Length, k) combinations from a source array.</summary>
+    private static IEnumerable<int[]> CombinationsFrom(int[] source, int k)
+    {
+        int n = source.Length;
+        int[] indices = new int[k];
+        for (int i = 0; i < k; i++) indices[i] = i;
+
+        yield return indices.Select(i => source[i]).ToArray();
+
+        while (true)
+        {
+            int i = k - 1;
+            while (i >= 0 && indices[i] == i + n - k) i--;
+            if (i < 0) yield break;
+            indices[i]++;
+            for (int j = i + 1; j < k; j++) indices[j] = indices[j - 1] + 1;
+            yield return indices.Select(idx => source[idx]).ToArray();
+        }
     }
 
     public void Dispose()

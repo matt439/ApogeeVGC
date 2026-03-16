@@ -24,7 +24,8 @@ from torch.utils.data import DataLoader
 
 from dataset import build_vocab
 from team_preview_dataset import TeamPreviewDataset
-from team_preview_model import TeamPreviewNet, VGC_CONFIGS, NUM_VGC_CONFIGS
+from team_preview_model import TeamPreviewNet
+from format_spec import FormatSpec, VGC, FORMAT_REGISTRY
 
 
 def load_games(path: str, min_rating: int = 0) -> list[dict]:
@@ -49,33 +50,38 @@ def compute_config_accuracy(logits: torch.Tensor, targets: torch.Tensor) -> floa
     return (preds == targets).float().mean().item()
 
 
-def compute_bring_accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
+def compute_bring_accuracy(logits: torch.Tensor, targets: torch.Tensor,
+                           fmt: FormatSpec) -> float:
     """Bring-set accuracy: does the predicted config's bring set match?"""
     preds = logits.argmax(dim=1)
+    configs = fmt.configs
     correct = 0
     total = preds.size(0)
     for i in range(total):
-        pred_bring = set(VGC_CONFIGS[preds[i].item()][0])
-        true_bring = set(VGC_CONFIGS[targets[i].item()][0])
+        pred_bring = set(configs[preds[i].item()][0])
+        true_bring = set(configs[targets[i].item()][0])
         if pred_bring == true_bring:
             correct += 1
     return correct / max(total, 1)
 
 
-def compute_lead_accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
+def compute_lead_accuracy(logits: torch.Tensor, targets: torch.Tensor,
+                          fmt: FormatSpec) -> float:
     """Lead-set accuracy: does the predicted config's lead pair match?"""
     preds = logits.argmax(dim=1)
+    configs = fmt.configs
     correct = 0
     total = preds.size(0)
     for i in range(total):
-        pred_lead = set(VGC_CONFIGS[preds[i].item()][1])
-        true_lead = set(VGC_CONFIGS[targets[i].item()][1])
+        pred_lead = set(configs[preds[i].item()][1])
+        true_lead = set(configs[targets[i].item()][1])
         if pred_lead == true_lead:
             correct += 1
     return correct / max(total, 1)
 
 
 def train(args: argparse.Namespace) -> None:
+    fmt = FORMAT_REGISTRY[args.format]
     torch.manual_seed(args.seed)
     random.seed(args.seed)
 
@@ -120,8 +126,8 @@ def train(args: argparse.Namespace) -> None:
 
     print('Building datasets...')
     t0 = time.time()
-    train_ds = TeamPreviewDataset(train_games, vocab)
-    val_ds = TeamPreviewDataset(val_games, vocab)
+    train_ds = TeamPreviewDataset(train_games, vocab, format_spec=fmt)
+    val_ds = TeamPreviewDataset(val_games, vocab, format_spec=fmt)
     print(f'  {len(train_ds):,} train, {len(val_ds):,} val '
           f'({time.time() - t0:.1f}s)')
 
@@ -142,6 +148,7 @@ def train(args: argparse.Namespace) -> None:
         num_abilities=vocab['num_abilities'],
         num_items=vocab['num_items'],
         num_tera_types=vocab['num_tera_types'],
+        format_spec=fmt,
         species_embed_dim=args.embed_dim,
         feat_embed_dim=args.feat_embed_dim,
         pokemon_dim=args.pokemon_dim,
@@ -149,7 +156,8 @@ def train(args: argparse.Namespace) -> None:
     ).to(device)
     total_params = sum(p.numel() for p in model.parameters())
     print(f'Model: {total_params:,} parameters')
-    print(f'Output classes: {NUM_VGC_CONFIGS} VGC configurations')
+    print(f'Format: {fmt.name} (bring {fmt.team_size}, lead {fmt.num_leads}, '
+          f'{fmt.num_configs} configs)')
 
     optimizer = torch.optim.Adam(
         model.parameters(), lr=args.lr, weight_decay=1e-5)
@@ -216,8 +224,8 @@ def train(args: argparse.Namespace) -> None:
 
                 v_loss += loss.item()
                 config_acc_sum += compute_config_accuracy(logits, cfg_tgt)
-                bring_acc_sum += compute_bring_accuracy(logits, cfg_tgt)
-                lead_acc_sum += compute_lead_accuracy(logits, cfg_tgt)
+                bring_acc_sum += compute_bring_accuracy(logits, cfg_tgt, fmt)
+                lead_acc_sum += compute_lead_accuracy(logits, cfg_tgt, fmt)
                 n_vbatches += 1
 
         avg_t = t_loss / n_batches
@@ -274,6 +282,9 @@ def main():
     parser.add_argument('--val-split', type=float, default=0.2)
     parser.add_argument('--patience', type=int, default=5)
     parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--format', default='vgc',
+                        choices=list(FORMAT_REGISTRY.keys()),
+                        help='Battle format (determines config space)')
     parser.add_argument('--output', default='team_preview_model.pt')
     args = parser.parse_args()
     train(args)

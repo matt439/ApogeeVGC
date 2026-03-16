@@ -205,7 +205,7 @@ public sealed class ShowdownServer
             BattlePerspective perspective = state.BuildTeamPreviewPerspective();
             TeamPreviewOutput output = _previewModel.Evaluate(perspective);
 
-            VgcConfig config = TeamPreviewInference.VgcConfigs[output.ConfigIndex];
+            PreviewConfig config = _previewModel.Configs[output.ConfigIndex];
             HashSet<int> leadSet = new(config.Lead);
             HashSet<int> bringSet = new(config.Bring);
 

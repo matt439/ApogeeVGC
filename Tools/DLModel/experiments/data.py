@@ -27,6 +27,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dataset import build_vocab, VGCDataset
 from team_preview_dataset import TeamPreviewDataset
+from format_spec import FormatSpec, VGC
 
 from .config import DataConfig
 
@@ -174,8 +175,10 @@ def _load_battle_cache(path: Path, n_games: int) -> VGCDataset | None:
 
 def _build_and_cache_preview(
     games: list[dict], vocab: dict, winners_only: bool, cache_path: Path | None,
+    format_spec: FormatSpec = VGC,
 ) -> TeamPreviewDataset:
-    ds = TeamPreviewDataset(games, vocab, winners_only=winners_only)
+    ds = TeamPreviewDataset(games, vocab, winners_only=winners_only,
+                            format_spec=format_spec)
     ds._n_games = len(games)
     if cache_path is not None:
         _save_dataset_cache(ds, _PREVIEW_TENSOR_ATTRS, cache_path)
@@ -194,13 +197,14 @@ def _build_and_cache_battle(
 
 def _build_preview_chunk(args):
     """Build a TeamPreviewDataset from a chunk of games (top-level for pickling)."""
-    games, vocab, winners_only = args
-    return TeamPreviewDataset(games, vocab, winners_only=winners_only)
+    games, vocab, winners_only, format_spec = args
+    return TeamPreviewDataset(games, vocab, winners_only=winners_only,
+                              format_spec=format_spec)
 
 
 def _build_battle_chunk(args):
     """Build a VGCDataset from a chunk of games (top-level for pickling)."""
-    games, vocab, winners_only = args
+    games, vocab, winners_only, *_rest = args
     return VGCDataset(games, vocab, winners_only=winners_only)
 
 
@@ -213,11 +217,12 @@ def _merge_datasets(datasets, attrs):
     return merged
 
 
-def _build_parallel(build_fn, games, vocab, winners_only, num_workers, attrs):
+def _build_parallel(build_fn, games, vocab, winners_only, num_workers, attrs,
+                    format_spec: FormatSpec = VGC):
     """Build a dataset using multiple worker processes."""
     chunk_size = (len(games) + num_workers - 1) // num_workers
     chunks = [games[i:i + chunk_size] for i in range(0, len(games), chunk_size)]
-    args_list = [(chunk, vocab, winners_only) for chunk in chunks]
+    args_list = [(chunk, vocab, winners_only, format_spec) for chunk in chunks]
 
     with ProcessPoolExecutor(max_workers=num_workers) as pool:
         datasets = list(pool.map(build_fn, args_list))
@@ -242,6 +247,7 @@ def build_preview_datasets(
     winners_only: bool = True,
     cache_dir: Path | None = None,
     num_workers: int = 0,
+    format_spec: FormatSpec = VGC,
 ) -> tuple[TeamPreviewDataset, TeamPreviewDataset]:
     """Build TeamPreviewNet datasets (expensive — call once, reuse across trials).
 
@@ -270,14 +276,17 @@ def build_preview_datasets(
         print(f'  Building preview datasets with {nw} workers...')
         train_ds = _build_parallel(
             _build_preview_chunk, train_games, vocab, winners_only,
-            nw, _PREVIEW_TENSOR_ATTRS)
+            nw, _PREVIEW_TENSOR_ATTRS, format_spec=format_spec)
         train_ds._n_games = len(train_games)
         if train_cache is not None:
             _save_dataset_cache(train_ds, _PREVIEW_TENSOR_ATTRS, train_cache)
-        val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache)
+        val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache,
+                                          format_spec=format_spec)
     else:
-        train_ds = _build_and_cache_preview(train_games, vocab, winners_only, train_cache)
-        val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache)
+        train_ds = _build_and_cache_preview(train_games, vocab, winners_only, train_cache,
+                                            format_spec=format_spec)
+        val_ds = _build_and_cache_preview(val_games, vocab, winners_only, val_cache,
+                                          format_spec=format_spec)
 
     print(f'  Built preview datasets in {time.time() - t0:.1f}s'
           + (f' (cached to {cd})' if cache_dir else ''))
@@ -338,6 +347,7 @@ def build_preview_test_dataset(
     vocab: dict,
     winners_only: bool = True,
     cache_dir: Path | None = None,
+    format_spec: FormatSpec = VGC,
 ) -> TeamPreviewDataset:
     """Build (or load cached) a single TeamPreviewDataset for test evaluation."""
     wo_tag = 'wo' if winners_only else 'all'
@@ -349,6 +359,7 @@ def build_preview_test_dataset(
     ds = _build_and_cache_preview(
         test_games, vocab, winners_only,
         (cache_dir / 'dataset_cache' / f'preview_test_{wo_tag}.pt') if cache_dir else None,
+        format_spec=format_spec,
     )
     return ds
 

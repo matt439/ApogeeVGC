@@ -23,6 +23,7 @@ from torch.utils.data import DataLoader
 
 from dataset import VGCDataset, build_vocab
 from model import BattleNet
+from format_spec import FORMAT_REGISTRY
 
 
 def load_games(path: str, min_rating: int = 0) -> list[dict]:
@@ -43,6 +44,7 @@ def load_games(path: str, min_rating: int = 0) -> list[dict]:
 
 
 def train(args: argparse.Namespace) -> None:
+    fmt = FORMAT_REGISTRY[args.format]
     torch.manual_seed(args.seed)
     random.seed(args.seed)
 
@@ -90,12 +92,12 @@ def train(args: argparse.Namespace) -> None:
 
     print('Building train dataset...')
     t0 = time.time()
-    train_ds = VGCDataset(train_games, vocab)
+    train_ds = VGCDataset(train_games, vocab, format_spec=fmt)
     print(f'  {len(train_ds):,} samples ({time.time() - t0:.1f}s)')
 
     print('Building val dataset...')
     t0 = time.time()
-    val_ds = VGCDataset(val_games, vocab)
+    val_ds = VGCDataset(val_games, vocab, format_spec=fmt)
     print(f'  {len(val_ds):,} samples ({time.time() - t0:.1f}s)')
 
     cuda = device.type == 'cuda'
@@ -116,6 +118,7 @@ def train(args: argparse.Namespace) -> None:
         num_abilities=vocab['num_abilities'],
         num_items=vocab['num_items'],
         num_tera_types=vocab['num_tera_types'],
+        format_spec=fmt,
         embed_dim=args.embed_dim,
         feat_embed_dim=args.feat_embed_dim,
         pokemon_dim=args.pokemon_dim,
@@ -123,6 +126,8 @@ def train(args: argparse.Namespace) -> None:
     ).to(device)
     total_params = sum(p.numel() for p in model.parameters())
     print(f'Model: {total_params:,} parameters')
+    print(f'Format: {fmt.name} ({fmt.num_battle_slots} slots, '
+          f'{fmt.num_leads} policy heads, {fmt.numeric_dim}D numeric)')
 
     # torch.compile fuses GPU ops → fewer kernel launches, higher utilization
     # Requires Triton (Linux/Mac only); skipped on Windows
@@ -161,12 +166,17 @@ def train(args: argparse.Namespace) -> None:
                 x.to(device, non_blocking=True) for x in batch[:9]]
 
             with autocast('cuda', enabled=use_amp):
-                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                outputs = model(sids, mids, aids, iids, tids, num)
+                value = outputs[0]
+                policies = outputs[1:]
 
             v_loss = value_loss_fn(value.float(), vtgt)
-            p_loss_a = policy_loss_fn(pol_a.float(), pa_tgt)
-            p_loss_b = policy_loss_fn(pol_b.float(), pb_tgt)
-            loss = v_loss + p_loss_a + p_loss_b
+            p_loss_a = policy_loss_fn(policies[0].float(), pa_tgt)
+            p_loss = p_loss_a
+            if fmt.num_leads >= 2:
+                p_loss_b = policy_loss_fn(policies[1].float(), pb_tgt)
+                p_loss = p_loss + p_loss_b
+            loss = v_loss + p_loss
 
             optimizer.zero_grad()
             scaler.scale(loss).backward()
@@ -177,7 +187,7 @@ def train(args: argparse.Namespace) -> None:
 
             train_loss += loss.item()
             train_vloss += v_loss.item()
-            train_ploss += (p_loss_a.item() + p_loss_b.item()) / 2
+            train_ploss += p_loss.item() / fmt.num_leads
             n_batches += 1
 
         scheduler.step()
@@ -201,16 +211,21 @@ def train(args: argparse.Namespace) -> None:
                     x.to(device, non_blocking=True) for x in batch[:9]]
 
                 with autocast('cuda', enabled=use_amp):
-                    value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                    outputs = model(sids, mids, aids, iids, tids, num)
+                    value = outputs[0]
+                    policies = outputs[1:]
 
                 v_loss = value_loss_fn(value.float(), vtgt)
-                p_loss_a = policy_loss_fn(pol_a.float(), pa_tgt)
-                p_loss_b = policy_loss_fn(pol_b.float(), pb_tgt)
-                loss = v_loss + p_loss_a + p_loss_b
+                p_loss_a = policy_loss_fn(policies[0].float(), pa_tgt)
+                p_loss = p_loss_a
+                if fmt.num_leads >= 2:
+                    p_loss_b = policy_loss_fn(policies[1].float(), pb_tgt)
+                    p_loss = p_loss + p_loss_b
+                loss = v_loss + p_loss
 
                 val_loss += loss.item()
                 val_vloss += v_loss.item()
-                val_ploss += (p_loss_a.item() + p_loss_b.item()) / 2
+                val_ploss += p_loss.item() / fmt.num_leads
                 n_val_batches += 1
 
                 bs = vtgt.size(0)
@@ -220,16 +235,17 @@ def train(args: argparse.Namespace) -> None:
                 mask_a = pa_tgt > 0
                 if mask_a.any():
                     val_pacc_a += (
-                        pol_a.argmax(1)[mask_a] == pa_tgt[mask_a]
+                        policies[0].argmax(1)[mask_a] == pa_tgt[mask_a]
                     ).sum().item()
                     n_val_policy_a += mask_a.sum().item()
 
-                mask_b = pb_tgt > 0
-                if mask_b.any():
-                    val_pacc_b += (
-                        pol_b.argmax(1)[mask_b] == pb_tgt[mask_b]
-                    ).sum().item()
-                    n_val_policy_b += mask_b.sum().item()
+                if fmt.num_leads >= 2:
+                    mask_b = pb_tgt > 0
+                    if mask_b.any():
+                        val_pacc_b += (
+                            policies[1].argmax(1)[mask_b] == pb_tgt[mask_b]
+                        ).sum().item()
+                        n_val_policy_b += mask_b.sum().item()
 
         # ── Metrics ──
         t_loss = train_loss / n_batches
@@ -259,6 +275,7 @@ def train(args: argparse.Namespace) -> None:
                 'model_state_dict': model.state_dict(),
                 'vocab': vocab,
                 'args': vars(args),
+                'format': fmt.to_dict(),
                 'epoch': epoch + 1,
                 'val_loss': v_loss_avg,
             }, args.output)
@@ -296,6 +313,9 @@ def main():
     parser.add_argument('--val-split', type=float, default=0.2)
     parser.add_argument('--patience', type=int, default=5)
     parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--format', default='vgc',
+                        choices=list(FORMAT_REGISTRY.keys()),
+                        help='Battle format (determines slot count and policy heads)')
     parser.add_argument('--output', default='model.pt')
     args = parser.parse_args()
     train(args)

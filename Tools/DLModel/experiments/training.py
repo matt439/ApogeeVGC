@@ -18,7 +18,8 @@ from torch.utils.data import DataLoader
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from team_preview_model import TeamPreviewNetV2, VGC_CONFIGS, NUM_VGC_CONFIGS
+from team_preview_model import TeamPreviewNetV2
+from format_spec import FormatSpec, VGC
 
 from .config import ExperimentConfig
 
@@ -56,6 +57,7 @@ def train_model(
     output_dir: Path,
     device: torch.device | None = None,
     trial=None,
+    format_spec: FormatSpec = VGC,
 ) -> TrainResult:
     """Train a TeamPreviewNetV2 model from a config.
 
@@ -88,6 +90,7 @@ def train_model(
         num_abilities=vocab['num_abilities'],
         num_items=vocab['num_items'],
         num_tera_types=vocab['num_tera_types'],
+        format_spec=format_spec,
         species_embed_dim=mc.species_embed_dim,
         feat_embed_dim=mc.feat_embed_dim,
         pokemon_dim=mc.pokemon_dim,
@@ -183,8 +186,8 @@ def train_model(
                 n_vbatches += 1
 
                 config_acc_sum += _compute_config_accuracy(logits, cfg_tgt)
-                bring_acc_sum += _compute_bring_accuracy(logits, cfg_tgt)
-                lead_acc_sum += _compute_lead_accuracy(logits, cfg_tgt)
+                bring_acc_sum += _compute_bring_accuracy(logits, cfg_tgt, format_spec)
+                lead_acc_sum += _compute_lead_accuracy(logits, cfg_tgt, format_spec)
 
         # Single GPU→CPU sync for validation losses
         v_loss = v_loss_acc.item()
@@ -228,6 +231,7 @@ def train_model(
                 'epoch': epoch + 1,
                 'val_loss': avg_v,
                 'model_version': 2,
+                'format': format_spec.to_dict(),
                 'args': {
                     'embed_dim': mc.species_embed_dim,
                     'feat_embed_dim': mc.feat_embed_dim,
@@ -261,8 +265,12 @@ def load_model_from_checkpoint(
     checkpoint: dict,
     vocab: dict,
     device: torch.device,
+    format_spec: FormatSpec = VGC,
 ) -> TeamPreviewNetV2:
     """Instantiate and load a TeamPreviewNetV2 from a checkpoint dict."""
+    # Reconstruct format_spec from checkpoint if available
+    fmt = (FormatSpec.from_dict(checkpoint['format'])
+           if 'format' in checkpoint else format_spec)
     args = checkpoint['args']
     model = TeamPreviewNetV2(
         num_species=vocab['num_species'],
@@ -270,6 +278,7 @@ def load_model_from_checkpoint(
         num_abilities=vocab['num_abilities'],
         num_items=vocab['num_items'],
         num_tera_types=vocab['num_tera_types'],
+        format_spec=fmt,
         species_embed_dim=args['embed_dim'],
         feat_embed_dim=args['feat_embed_dim'],
         pokemon_dim=args['pokemon_dim'],
@@ -295,30 +304,30 @@ def _compute_config_accuracy(
 
 
 def _compute_bring_accuracy(
-    logits: torch.Tensor, targets: torch.Tensor,
+    logits: torch.Tensor, targets: torch.Tensor, fmt: FormatSpec = VGC,
 ) -> float:
     """Bring-set accuracy: does the predicted config's bring set match?"""
     preds = logits.argmax(dim=1)
     correct = 0
     total = preds.size(0)
     for i in range(total):
-        pred_bring = set(VGC_CONFIGS[preds[i].item()][0])
-        true_bring = set(VGC_CONFIGS[targets[i].item()][0])
+        pred_bring = set(fmt.configs[preds[i].item()][0])
+        true_bring = set(fmt.configs[targets[i].item()][0])
         if pred_bring == true_bring:
             correct += 1
     return correct / max(total, 1)
 
 
 def _compute_lead_accuracy(
-    logits: torch.Tensor, targets: torch.Tensor,
+    logits: torch.Tensor, targets: torch.Tensor, fmt: FormatSpec = VGC,
 ) -> float:
     """Lead-set accuracy: does the predicted config's lead pair match?"""
     preds = logits.argmax(dim=1)
     correct = 0
     total = preds.size(0)
     for i in range(total):
-        pred_lead = set(VGC_CONFIGS[preds[i].item()][1])
-        true_lead = set(VGC_CONFIGS[targets[i].item()][1])
+        pred_lead = set(fmt.configs[preds[i].item()][1])
+        true_lead = set(fmt.configs[targets[i].item()][1])
         if pred_lead == true_lead:
             correct += 1
     return correct / max(total, 1)

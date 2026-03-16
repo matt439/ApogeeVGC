@@ -19,10 +19,15 @@ from team_preview_model import TeamPreviewNet, TeamPreviewNetV2
 
 
 def export_battle(checkpoint_path: str, output_path: str) -> None:
+    from format_spec import FormatSpec, VGC
+
     checkpoint = torch.load(checkpoint_path, map_location='cpu',
                             weights_only=False)
     vocab = checkpoint['vocab']
     train_args = checkpoint['args']
+
+    fmt = (FormatSpec.from_dict(checkpoint['format'])
+           if 'format' in checkpoint else VGC)
 
     model_version = checkpoint.get('model_version', 1)
 
@@ -34,6 +39,7 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
             num_abilities=vocab['num_abilities'],
             num_items=vocab['num_items'],
             num_tera_types=vocab['num_tera_types'],
+            format_spec=fmt,
             embed_dim=train_args['embed_dim'],
             feat_embed_dim=train_args['feat_embed_dim'],
             pokemon_dim=train_args['pokemon_dim'],
@@ -53,6 +59,7 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
             num_abilities=vocab['num_abilities'],
             num_items=vocab['num_items'],
             num_tera_types=vocab['num_tera_types'],
+            format_spec=fmt,
             embed_dim=train_args['embed_dim'],
             feat_embed_dim=train_args['feat_embed_dim'],
             pokemon_dim=train_args['pokemon_dim'],
@@ -62,12 +69,28 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
     model.load_state_dict(state_dict)
     model.eval()
 
-    species_ids = torch.zeros(1, 8, dtype=torch.long)
-    move_ids = torch.zeros(1, 8, 4, dtype=torch.long)
-    ability_ids = torch.zeros(1, 8, dtype=torch.long)
-    item_ids = torch.zeros(1, 8, dtype=torch.long)
-    tera_ids = torch.zeros(1, 8, dtype=torch.long)
-    numeric = torch.zeros(1, 200, dtype=torch.float32)
+    num_slots = fmt.num_battle_slots
+    species_ids = torch.zeros(1, num_slots, dtype=torch.long)
+    move_ids = torch.zeros(1, num_slots, 4, dtype=torch.long)
+    ability_ids = torch.zeros(1, num_slots, dtype=torch.long)
+    item_ids = torch.zeros(1, num_slots, dtype=torch.long)
+    tera_ids = torch.zeros(1, num_slots, dtype=torch.long)
+    numeric = torch.zeros(1, fmt.numeric_dim, dtype=torch.float32)
+
+    # Output names depend on format
+    policy_names = [f'policy_{chr(97+i)}' for i in range(fmt.num_leads)]
+    output_names = ['value'] + policy_names
+    dynamic_axes = {
+        'species_ids': {0: 'batch'},
+        'move_ids': {0: 'batch'},
+        'ability_ids': {0: 'batch'},
+        'item_ids': {0: 'batch'},
+        'tera_ids': {0: 'batch'},
+        'numeric': {0: 'batch'},
+        'value': {0: 'batch'},
+    }
+    for name in policy_names:
+        dynamic_axes[name] = {0: 'batch'}
 
     torch.onnx.export(
         model,
@@ -77,18 +100,8 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
             'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
             'numeric',
         ],
-        output_names=['value', 'policy_a', 'policy_b'],
-        dynamic_axes={
-            'species_ids': {0: 'batch'},
-            'move_ids': {0: 'batch'},
-            'ability_ids': {0: 'batch'},
-            'item_ids': {0: 'batch'},
-            'tera_ids': {0: 'batch'},
-            'numeric': {0: 'batch'},
-            'value': {0: 'batch'},
-            'policy_a': {0: 'batch'},
-            'policy_b': {0: 'batch'},
-        },
+        output_names=output_names,
+        dynamic_axes=dynamic_axes,
         opset_version=17,
     )
 
@@ -97,6 +110,9 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
         json.dump(vocab, f, indent=2)
 
     print(f'Exported BattleNet to {output_path}')
+    print(f'  Format: {fmt.name} ({num_slots} slots, '
+          f'{fmt.num_leads} policy heads, {fmt.numeric_dim}D numeric)')
+    print(f'  Outputs: {output_names}')
     print(f'Exported vocab to {vocab_out}')
     print(f'  Species: {vocab["num_species"]}, Actions: {vocab["num_actions"]}, '
           f'Moves: {vocab["num_moves"]}, Abilities: {vocab["num_abilities"]}, '
@@ -106,12 +122,16 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
 
 
 def export_team_preview(checkpoint_path: str, output_path: str) -> None:
-    from team_preview_model import NUM_VGC_CONFIGS
+    from format_spec import FormatSpec, VGC
 
     checkpoint = torch.load(checkpoint_path, map_location='cpu',
                             weights_only=False)
     vocab = checkpoint['vocab']
     train_args = checkpoint['args']
+
+    # Reconstruct format_spec from checkpoint if available
+    fmt = (FormatSpec.from_dict(checkpoint['format'])
+           if 'format' in checkpoint else VGC)
 
     model_version = checkpoint.get('model_version', 1)
 
@@ -122,6 +142,7 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
             num_abilities=vocab['num_abilities'],
             num_items=vocab['num_items'],
             num_tera_types=vocab['num_tera_types'],
+            format_spec=fmt,
             species_embed_dim=train_args['embed_dim'],
             feat_embed_dim=train_args['feat_embed_dim'],
             pokemon_dim=train_args['pokemon_dim'],
@@ -178,7 +199,8 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
         json.dump(vocab, f, indent=2)
 
     print(f'Exported TeamPreviewNet to {output_path}')
-    print(f'  Output: {NUM_VGC_CONFIGS} config logits (VGC: bring 4, lead 2)')
+    print(f'  Output: {fmt.num_configs} config logits '
+          f'({fmt.name}: bring {fmt.team_size}, lead {fmt.num_leads})')
     print(f'Exported vocab to {vocab_out}')
     print(f'  Species: {vocab["num_species"]}, Moves: {vocab["num_moves"]}, '
           f'Abilities: {vocab["num_abilities"]}, Items: {vocab["num_items"]}, '

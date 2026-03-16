@@ -19,6 +19,7 @@ from torch.utils.data import DataLoader
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from model import BattleNetV2
+from format_spec import FormatSpec, VGC
 
 from .battle_config import BattleExperimentConfig
 
@@ -62,6 +63,7 @@ def train_battle_model(
     output_dir: Path,
     device: torch.device | None = None,
     trial=None,
+    format_spec: FormatSpec = VGC,
 ) -> BattleTrainResult:
     """Train a BattleNetV2 model from a config.
 
@@ -89,6 +91,8 @@ def train_battle_model(
     mc = config.model
     tc = config.train
 
+    num_leads = format_spec.num_leads
+
     model = BattleNetV2(
         num_species=vocab['num_species'],
         num_actions=vocab['num_actions'],
@@ -96,6 +100,7 @@ def train_battle_model(
         num_abilities=vocab['num_abilities'],
         num_items=vocab['num_items'],
         num_tera_types=vocab['num_tera_types'],
+        format_spec=format_spec,
         embed_dim=mc.embed_dim,
         feat_embed_dim=mc.feat_embed_dim,
         pokemon_dim=mc.pokemon_dim,
@@ -191,13 +196,19 @@ def train_battle_model(
                 vtgt = vtgt * (1.0 - uncertainty) + 0.5 * uncertainty
 
             with autocast('cuda', enabled=use_amp):
-                value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                outputs = model(sids, mids, aids, iids, tids, num)
+                value = outputs[0]
+                policies = outputs[1:]
 
             # Losses computed in float32 (BCELoss is unsafe under autocast)
             v_loss = value_loss_fn(value.float(), vtgt)
-            pa_loss = policy_loss_fn(pol_a.float(), pa_tgt)
-            pb_loss = policy_loss_fn(pol_b.float(), pb_tgt)
-            loss = vw * v_loss + pw * (pa_loss + pb_loss)
+            pa_loss = policy_loss_fn(policies[0].float(), pa_tgt)
+            p_loss = pa_loss
+            pb_loss = torch.tensor(0.0, device=device)
+            if num_leads >= 2:
+                pb_loss = policy_loss_fn(policies[1].float(), pb_tgt)
+                p_loss = p_loss + pb_loss
+            loss = vw * v_loss + pw * p_loss
 
             optimizer.zero_grad(set_to_none=True)
             scaler.scale(loss).backward()
@@ -260,11 +271,15 @@ def train_battle_model(
                     vtgt = vtgt * (1.0 - uncertainty) + 0.5 * uncertainty
 
                 with autocast('cuda', enabled=use_amp):
-                    value, pol_a, pol_b = model(sids, mids, aids, iids, tids, num)
+                    outputs = model(sids, mids, aids, iids, tids, num)
+                    value = outputs[0]
+                    policies = outputs[1:]
 
                 vl = value_loss_fn(value.float(), vtgt)
-                pal = policy_loss_fn(pol_a.float(), pa_tgt)
-                pbl = policy_loss_fn(pol_b.float(), pb_tgt)
+                pal = policy_loss_fn(policies[0].float(), pa_tgt)
+                pbl = torch.tensor(0.0, device=device)
+                if num_leads >= 2:
+                    pbl = policy_loss_fn(policies[1].float(), pb_tgt)
 
                 v_loss_acc += (vw * vl + pw * (pal + pbl)).detach()
                 v_vloss_acc += vl.detach()
@@ -278,13 +293,14 @@ def train_battle_model(
                 # Policy accuracy (non-padded only) — avoid .any() sync
                 mask_a = pa_tgt > 0
                 n_a = mask_a.sum()
-                pa_correct_acc += (pol_a.argmax(1)[mask_a] == pa_tgt[mask_a]).sum()
+                pa_correct_acc += (policies[0].argmax(1)[mask_a] == pa_tgt[mask_a]).sum()
                 pa_total_acc += n_a
 
-                mask_b = pb_tgt > 0
-                n_b = mask_b.sum()
-                pb_correct_acc += (pol_b.argmax(1)[mask_b] == pb_tgt[mask_b]).sum()
-                pb_total_acc += n_b
+                if num_leads >= 2:
+                    mask_b = pb_tgt > 0
+                    n_b = mask_b.sum()
+                    pb_correct_acc += (policies[1].argmax(1)[mask_b] == pb_tgt[mask_b]).sum()
+                    pb_total_acc += n_b
 
         # Single GPU→CPU sync for validation
         v_loss_sum = v_loss_acc.item()
@@ -343,6 +359,7 @@ def train_battle_model(
                 'val_loss': avg_v,
                 'model_version': 2,
                 'model_type': 'battle',
+                'format': format_spec.to_dict(),
                 'args': {
                     'embed_dim': mc.embed_dim,
                     'feat_embed_dim': mc.feat_embed_dim,

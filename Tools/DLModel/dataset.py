@@ -58,6 +58,8 @@ import json
 import torch
 from torch.utils.data import Dataset
 
+from format_spec import FormatSpec, VGC, ACTIVE_DIM, BENCH_DIM, FIELD_DIM
+
 # ── Constants ────────────────────────────────────────────────────────────────
 
 STATUSES = ['par', 'brn', 'slp', 'psn', 'tox', 'frz']
@@ -75,11 +77,9 @@ WEATHER_IDX = {w: i + 1 for i, w in enumerate(WEATHERS)}
 TERRAIN_IDX = {t: i + 1 for i, t in enumerate(TERRAINS)}
 TYPE_IDX = {t: i + 1 for i, t in enumerate(TYPES)}
 
-ACTIVE_DIM = 35
-BENCH_DIM = 10
-FIELD_DIM = 20
+# Legacy constants for backward compatibility
 NUM_SPECIES_SLOTS = 8
-NUMERIC_DIM = 4 * ACTIVE_DIM + 4 * BENCH_DIM + FIELD_DIM  # 200
+NUMERIC_DIM = 200
 
 
 # ── Encoding functions ──────────────────────────────────────────────────────
@@ -207,11 +207,15 @@ def build_vocab(parsed_path: str) -> dict:
 
 
 class VGCDataset(Dataset):
-    """PyTorch dataset that encodes parsed VGC replays into tensors.
+    """PyTorch dataset that encodes parsed battle replays into tensors.
 
     Each sample represents one turn from one player's perspective.
     By default, two samples are generated per turn (one per player).
     Set winners_only=True to generate only the winning player's perspective.
+
+    The slot layout is determined by format_spec:
+      [my_active_0..L-1, opp_active_0..L-1, my_bench_0..B-1, opp_bench_0..B-1]
+    where L = num_leads and B = team_size - num_leads.
 
     Per-pokemon features (moves, ability, item, tera) are encoded as:
       - Own team: from end-of-game revealed data (player always knows)
@@ -219,7 +223,8 @@ class VGCDataset(Dataset):
         abilities/items stay 0 since per-turn reveal can't be tracked)
     """
 
-    def __init__(self, games: list[dict], vocab: dict, winners_only: bool = False):
+    def __init__(self, games: list[dict], vocab: dict, winners_only: bool = False,
+                 format_spec: FormatSpec = VGC):
         species_map = vocab['species']
         action_map = vocab['actions']
         move_map = vocab['moves']
@@ -238,12 +243,20 @@ class VGCDataset(Dataset):
         samples_per_turn = 1 if winners_only else 2
         n = sum(len(g.get('decision_points', g.get('turns', []))) * samples_per_turn for g in valid_games)
 
-        self.species_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
-        self.move_ids = torch.zeros(n, NUM_SPECIES_SLOTS, 4, dtype=torch.long)
-        self.ability_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
-        self.item_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
-        self.tera_ids = torch.zeros(n, NUM_SPECIES_SLOTS, dtype=torch.long)
-        self.numeric = torch.zeros(n, NUMERIC_DIM, dtype=torch.float32)
+        num_leads = format_spec.num_leads
+        num_slots = format_spec.num_battle_slots
+        bench_per_side = format_spec.num_bench_per_side
+        numeric_dim = format_spec.numeric_dim
+
+        # Slot suffix letters for active pokemon in replay data
+        slot_letters = [chr(ord('a') + i) for i in range(num_leads)]
+
+        self.species_ids = torch.zeros(n, num_slots, dtype=torch.long)
+        self.move_ids = torch.zeros(n, num_slots, 4, dtype=torch.long)
+        self.ability_ids = torch.zeros(n, num_slots, dtype=torch.long)
+        self.item_ids = torch.zeros(n, num_slots, dtype=torch.long)
+        self.tera_ids = torch.zeros(n, num_slots, dtype=torch.long)
+        self.numeric = torch.zeros(n, numeric_dim, dtype=torch.float32)
         self.value_targets = torch.zeros(n, dtype=torch.float32)
         self.policy_a = torch.zeros(n, dtype=torch.long)
         self.policy_b = torch.zeros(n, dtype=torch.long)
@@ -318,56 +331,47 @@ class VGCDataset(Dataset):
                 for perspective in perspectives:
                     opp = 'p2' if perspective == 'p1' else 'p1'
 
-                    my_a = active.get(f'{perspective}a')
-                    my_b = active.get(f'{perspective}b')
-                    opp_a = active.get(f'{opp}a')
-                    opp_b = active.get(f'{opp}b')
+                    # Gather active pokemon per slot letter
+                    my_active = [active.get(f'{perspective}{l}')
+                                 for l in slot_letters]
+                    opp_active = [active.get(f'{opp}{l}')
+                                  for l in slot_letters]
 
                     my_revealed = game_revealed.get(perspective, {})
                     opp_prog_m = prog_moves[opp]
                     opp_prog_t = prog_tera[opp]
 
-                    # ── Species IDs ──
-                    for si, st in enumerate([my_a, my_b, opp_a, opp_b]):
+                    # ── Species IDs + per-pokemon features (active) ──
+                    feat = self.numeric[idx]
+                    for si, st in enumerate(my_active):
                         if st:
                             self.species_ids[idx, si] = species_map.get(
                                 st['species'], 1)
+                            fill_own(idx, si, st['species'], my_revealed)
+                        encode_active(feat, si * ACTIVE_DIM, st)
 
-                    # ── Per-pokemon features (active) ──
-                    for si, (st, is_own) in enumerate([
-                        (my_a, True), (my_b, True),
-                        (opp_a, False), (opp_b, False),
-                    ]):
-                        if st is None:
-                            continue
-                        sp = st['species']
-                        if is_own:
-                            fill_own(idx, si, sp, my_revealed)
-                        else:
-                            fill_opp(idx, si, sp, opp_prog_m, opp_prog_t)
-
-                    # ── Active numeric features ──
-                    feat = self.numeric[idx]
-                    encode_active(feat, 0 * ACTIVE_DIM, my_a)
-                    encode_active(feat, 1 * ACTIVE_DIM, my_b)
-                    encode_active(feat, 2 * ACTIVE_DIM, opp_a)
-                    encode_active(feat, 3 * ACTIVE_DIM, opp_b)
+                    for si, st in enumerate(opp_active):
+                        slot_idx = num_leads + si
+                        if st:
+                            self.species_ids[idx, slot_idx] = species_map.get(
+                                st['species'], 1)
+                            fill_opp(idx, slot_idx, st['species'],
+                                     opp_prog_m, opp_prog_t)
+                        encode_active(feat, (num_leads + si) * ACTIVE_DIM, st)
 
                     # ── Bench ──
-                    bench_base = 4 * ACTIVE_DIM
+                    bench_base = num_leads * 2 * ACTIVE_DIM
+                    bench_slot_base = num_leads * 2  # first bench slot index
 
-                    my_active_sp = set()
-                    if my_a:
-                        my_active_sp.add(my_a['species'])
-                    if my_b:
-                        my_active_sp.add(my_b['species'])
+                    my_active_sp = {st['species'] for st in my_active if st}
                     my_bench = [s for s in team_brought.get(perspective, [])
                                 if s not in my_active_sp]
 
-                    for bi, sp in enumerate(my_bench[:2]):
+                    for bi, sp in enumerate(my_bench[:bench_per_side]):
                         off = bench_base + bi * BENCH_DIM
-                        self.species_ids[idx, 4 + bi] = species_map.get(sp, 1)
-                        fill_own(idx, 4 + bi, sp, my_revealed)
+                        slot_idx = bench_slot_base + bi
+                        self.species_ids[idx, slot_idx] = species_map.get(sp, 1)
+                        fill_own(idx, slot_idx, sp, my_revealed)
                         lk = last_known.get((perspective, sp))
                         if lk:
                             encode_bench(feat, off, lk['hp'], lk['fainted'],
@@ -375,18 +379,15 @@ class VGCDataset(Dataset):
                         else:
                             encode_bench(feat, off, 100, False, None, True)
 
-                    opp_active_sp = set()
-                    if opp_a:
-                        opp_active_sp.add(opp_a['species'])
-                    if opp_b:
-                        opp_active_sp.add(opp_b['species'])
+                    opp_active_sp = {st['species'] for st in opp_active if st}
                     opp_bench = [s for s in team_brought.get(opp, [])
                                  if s not in opp_active_sp]
 
-                    for bi, sp in enumerate(opp_bench[:2]):
-                        off = bench_base + (2 + bi) * BENCH_DIM
-                        self.species_ids[idx, 6 + bi] = species_map.get(sp, 1)
-                        fill_opp(idx, 6 + bi, sp, opp_prog_m, opp_prog_t)
+                    for bi, sp in enumerate(opp_bench[:bench_per_side]):
+                        off = bench_base + (bench_per_side + bi) * BENCH_DIM
+                        slot_idx = bench_slot_base + bench_per_side + bi
+                        self.species_ids[idx, slot_idx] = species_map.get(sp, 1)
+                        fill_opp(idx, slot_idx, sp, opp_prog_m, opp_prog_t)
                         lk = last_known.get((opp, sp))
                         if lk:
                             encode_bench(feat, off, lk['hp'], lk['fainted'],
@@ -395,7 +396,7 @@ class VGCDataset(Dataset):
                             encode_bench(feat, off, 100, False, None, True)
 
                     # ── Field ──
-                    field_off = bench_base + 4 * BENCH_DIM
+                    field_off = bench_base + bench_per_side * 2 * BENCH_DIM
                     encode_field(feat, field_off,
                                  turn.get('field', {}), perspective)
                     feat[field_off + 19] = turn.get('turn', 1) / 20.0
@@ -413,9 +414,10 @@ class VGCDataset(Dataset):
                     self.policy_a[idx] = self._action_id(
                         actions, f'{perspective}a', action_map, none_id,
                         cant_id)
-                    self.policy_b[idx] = self._action_id(
-                        actions, f'{perspective}b', action_map, none_id,
-                        cant_id)
+                    if num_leads >= 2:
+                        self.policy_b[idx] = self._action_id(
+                            actions, f'{perspective}b', action_map, none_id,
+                            cant_id)
 
                     idx += 1
 

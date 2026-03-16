@@ -27,11 +27,12 @@ from __future__ import annotations
 import torch
 from torch.utils.data import Dataset
 
-from team_preview_model import config_to_index
+from format_spec import FormatSpec, VGC
 
 
 class TeamPreviewDataset(Dataset):
-    def __init__(self, games: list[dict], vocab: dict, winners_only: bool = True):
+    def __init__(self, games: list[dict], vocab: dict, winners_only: bool = True,
+                 format_spec: FormatSpec = VGC):
         species_map = vocab['species']
         move_map = vocab['moves']
         ability_map = vocab['abilities']
@@ -91,8 +92,7 @@ class TeamPreviewDataset(Dataset):
                     if poke['species'] in my_leads:
                         lead_indices.add(i)
 
-                # Must be a valid VGC config: exactly 4 brought, exactly 2 leads
-                cfg_idx = config_to_index(bring_indices, lead_indices)
+                cfg_idx = format_spec.config_to_index(bring_indices, lead_indices)
                 if cfg_idx is None:
                     continue
 

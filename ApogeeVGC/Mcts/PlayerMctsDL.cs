@@ -98,7 +98,7 @@ public sealed class PlayerMctsDL(
         int teamSize = request.Side.Pokemon.Count;
         int bringCount = request.MaxChosenTeamSize ?? 4;
 
-        VgcConfig config = TeamPreviewInference.VgcConfigs[output.ConfigIndex];
+        PreviewConfig config = previewModel.Configs[output.ConfigIndex];
 
         if (PrintDebug)
         {

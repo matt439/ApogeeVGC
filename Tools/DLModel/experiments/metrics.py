@@ -21,7 +21,7 @@ import torch
 from torch.utils.data import DataLoader
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from team_preview_model import VGC_CONFIGS, NUM_VGC_CONFIGS
+from format_spec import FormatSpec, VGC
 
 
 @dataclass
@@ -67,6 +67,7 @@ def evaluate_comprehensive(
     model: torch.nn.Module,
     loader: DataLoader,
     device: torch.device,
+    format_spec: FormatSpec = VGC,
 ) -> ComprehensiveMetrics:
     """Run comprehensive evaluation on a dataset."""
     model.eval()
@@ -119,18 +120,18 @@ def evaluate_comprehensive(
     lead_overlap_sum = 0.0
 
     for i in range(n):
-        pred_bring = set(VGC_CONFIGS[preds[i]][0])
-        true_bring = set(VGC_CONFIGS[targets[i]][0])
-        pred_lead = set(VGC_CONFIGS[preds[i]][1])
-        true_lead = set(VGC_CONFIGS[targets[i]][1])
+        pred_bring = set(format_spec.configs[preds[i]][0])
+        true_bring = set(format_spec.configs[targets[i]][0])
+        pred_lead = set(format_spec.configs[preds[i]][1])
+        true_lead = set(format_spec.configs[targets[i]][1])
 
         if pred_bring == true_bring:
             bring_set_match += 1
-        bring_overlap_sum += len(pred_bring & true_bring) / 4.0
+        bring_overlap_sum += len(pred_bring & true_bring) / format_spec.team_size
 
         if pred_lead == true_lead:
             lead_set_match += 1
-        lead_overlap_sum += len(pred_lead & true_lead) / 2.0
+        lead_overlap_sum += len(pred_lead & true_lead) / format_spec.num_leads
 
     bring_set_accuracy = bring_set_match / max(n, 1)
     bring_overlap_accuracy = bring_overlap_sum / max(n, 1)
