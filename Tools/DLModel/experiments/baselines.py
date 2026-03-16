@@ -32,7 +32,7 @@ def evaluate_random_baseline(
     all_targets = []
     for batch in loader:
         _, _, _, _, _, cfg_tgt, _ = batch
-        all_targets.append(cfg_tgt.numpy())
+        all_targets.append(cfg_tgt.cpu().numpy())
 
     targets = np.concatenate(all_targets, axis=0)  # [N]
     n = len(targets)
@@ -104,7 +104,7 @@ def evaluate_popular_baseline(
     config_counts = np.zeros(format_spec.num_configs, dtype=np.int64)
     for batch in train_loader:
         _, _, _, _, _, cfg_tgt, _ = batch
-        for c in cfg_tgt.numpy():
+        for c in cfg_tgt.cpu().numpy():
             config_counts[c] += 1
 
     most_popular = int(np.argmax(config_counts))
@@ -113,7 +113,7 @@ def evaluate_popular_baseline(
     all_targets = []
     for batch in test_loader:
         _, _, _, _, _, cfg_tgt, _ = batch
-        all_targets.append(cfg_tgt.numpy())
+        all_targets.append(cfg_tgt.cpu().numpy())
 
     targets = np.concatenate(all_targets, axis=0)
     n = len(targets)
