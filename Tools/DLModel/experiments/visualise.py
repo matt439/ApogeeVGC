@@ -59,6 +59,7 @@ def plot_learning_curves(results_dir: Path, fig_dir: Path) -> None:
 
     all_train_loss = []
     all_val_loss = []
+    all_config_acc = []
     all_bring_acc = []
     all_lead_acc = []
 
@@ -71,8 +72,9 @@ def plot_learning_curves(results_dir: Path, fig_dir: Path) -> None:
         epochs = log['epoch_metrics']
         all_train_loss.append([e['train_loss'] for e in epochs])
         all_val_loss.append([e['val_loss'] for e in epochs])
-        all_bring_acc.append([e['val_bring_acc_top4'] for e in epochs])
-        all_lead_acc.append([e['val_lead_acc_top2'] for e in epochs])
+        all_config_acc.append([e['val_config_accuracy'] for e in epochs])
+        all_bring_acc.append([e['val_bring_accuracy'] for e in epochs])
+        all_lead_acc.append([e['val_lead_accuracy'] for e in epochs])
 
     if not all_train_loss:
         return
@@ -83,16 +85,17 @@ def plot_learning_curves(results_dir: Path, fig_dir: Path) -> None:
     _plot_mean_std_band(ax, all_train_loss, label='Train', color='#2196F3')
     _plot_mean_std_band(ax, all_val_loss, label='Validation', color='#FF5722')
     ax.set_xlabel('Epoch')
-    ax.set_ylabel('Loss (BCE)')
+    ax.set_ylabel('Loss (Cross-Entropy)')
     ax.set_title('Training & Validation Loss')
     ax.legend()
     ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
     ax = axes[1]
-    _plot_mean_std_band(ax, all_bring_acc, label='Bring (top-4 set)', color='#4CAF50')
-    _plot_mean_std_band(ax, all_lead_acc, label='Lead (top-2 set)', color='#9C27B0')
+    _plot_mean_std_band(ax, all_config_acc, label='Config (exact)', color='#F44336')
+    _plot_mean_std_band(ax, all_bring_acc, label='Bring (set)', color='#4CAF50')
+    _plot_mean_std_band(ax, all_lead_acc, label='Lead (set)', color='#9C27B0')
     ax.set_xlabel('Epoch')
-    ax.set_ylabel('Set Accuracy')
+    ax.set_ylabel('Accuracy')
     ax.set_title('Validation Accuracy')
     ax.legend()
     ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
@@ -157,16 +160,16 @@ def plot_ablation_bars(results_dir: Path, fig_dir: Path) -> None:
         summary = json.load(f)
 
     names = list(summary.keys())
+    config_acc = [summary[n]['test']['config_accuracy'] for n in names]
     bring_set = [summary[n]['test']['bring_set_accuracy'] for n in names]
-    bring_overlap = [summary[n]['test']['bring_overlap_accuracy'] for n in names]
     lead_set = [summary[n]['test']['lead_set_accuracy'] for n in names]
 
     x = np.arange(len(names))
     width = 0.25
 
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.bar(x - width, bring_set, width, label='Bring Set Acc.', color='#2196F3')
-    ax.bar(x, bring_overlap, width, label='Bring Overlap Acc.', color='#4CAF50')
+    ax.bar(x - width, config_acc, width, label='Config Acc.', color='#F44336')
+    ax.bar(x, bring_set, width, label='Bring Set Acc.', color='#2196F3')
     ax.bar(x + width, lead_set, width, label='Lead Set Acc.', color='#FF9800')
 
     ax.set_xlabel('Feature Configuration')
@@ -187,8 +190,8 @@ def plot_calibration(results_dir: Path, fig_dir: Path) -> None:
     if not multiseed_dir.exists():
         return
 
-    all_bring_mid = []
-    all_bring_acc = []
+    all_mid = []
+    all_acc = []
 
     for seed_dir in sorted(multiseed_dir.glob('seed_*')):
         metrics_path = seed_dir / 'test_metrics.json'
@@ -197,24 +200,24 @@ def plot_calibration(results_dir: Path, fig_dir: Path) -> None:
         with open(metrics_path) as f:
             m = json.load(f)
 
-        rel = m.get('bring_reliability', {})
+        rel = m.get('reliability', {})
         if rel and rel.get('midpoints'):
-            all_bring_mid.append(rel['midpoints'])
-            all_bring_acc.append(rel['accuracies'])
+            all_mid.append(rel['midpoints'])
+            all_acc.append(rel['accuracies'])
 
-    if not all_bring_mid:
+    if not all_mid:
         return
 
-    midpoints = np.mean(all_bring_mid, axis=0)
-    accuracies = np.mean(all_bring_acc, axis=0)
+    midpoints = np.mean(all_mid, axis=0)
+    accuracies = np.mean(all_acc, axis=0)
 
     fig, ax = plt.subplots(figsize=(5, 5))
     ax.plot([0, 1], [0, 1], 'k--', alpha=0.5, label='Perfect calibration')
     ax.bar(midpoints, accuracies, width=0.05, alpha=0.7, color='#2196F3',
            label='Model')
-    ax.set_xlabel('Predicted Probability')
-    ax.set_ylabel('Observed Frequency')
-    ax.set_title('Calibration Plot (Bring Predictions)')
+    ax.set_xlabel('Predicted Confidence')
+    ax.set_ylabel('Observed Accuracy')
+    ax.set_title('Calibration Plot (Config Predictions)')
     ax.legend()
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
@@ -243,8 +246,8 @@ def plot_baseline_comparison(results_dir: Path, fig_dir: Path) -> None:
         with open(summary_path) as fh:
             model_summary = json.load(fh)
         methods['model'] = {
+            'config_accuracy': model_summary['config_accuracy']['mean'],
             'bring_set_accuracy': model_summary['bring_set_accuracy']['mean'],
-            'bring_overlap_accuracy': model_summary['bring_overlap_accuracy']['mean'],
             'lead_set_accuracy': model_summary['lead_set_accuracy']['mean'],
         }
 
@@ -252,16 +255,16 @@ def plot_baseline_comparison(results_dir: Path, fig_dir: Path) -> None:
         return
 
     names = list(methods.keys())
+    config_acc = [methods[n].get('config_accuracy', 0) for n in names]
     bring_set = [methods[n].get('bring_set_accuracy', 0) for n in names]
-    bring_overlap = [methods[n].get('bring_overlap_accuracy', 0) for n in names]
     lead_set = [methods[n].get('lead_set_accuracy', 0) for n in names]
 
     x = np.arange(len(names))
     width = 0.25
 
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.bar(x - width, bring_set, width, label='Bring Set Acc.', color='#2196F3')
-    ax.bar(x, bring_overlap, width, label='Bring Overlap Acc.', color='#4CAF50')
+    ax.bar(x - width, config_acc, width, label='Config Acc.', color='#F44336')
+    ax.bar(x, bring_set, width, label='Bring Set Acc.', color='#2196F3')
     ax.bar(x + width, lead_set, width, label='Lead Set Acc.', color='#FF9800')
 
     ax.set_ylabel('Accuracy')
@@ -284,9 +287,11 @@ def plot_multiseed_distribution(results_dir: Path, fig_dir: Path) -> None:
     with open(summary_path) as f:
         summary = json.load(f)
 
-    metrics = ['bring_set_accuracy', 'bring_overlap_accuracy',
-               'lead_set_accuracy', 'lead_overlap_accuracy']
-    labels = ['Bring\nSet Acc.', 'Bring\nOverlap', 'Lead\nSet Acc.', 'Lead\nOverlap']
+    metrics = ['config_accuracy', 'bring_set_accuracy',
+               'lead_set_accuracy', 'bring_overlap_accuracy',
+               'lead_overlap_accuracy']
+    labels = ['Config\nExact', 'Bring\nSet Acc.', 'Lead\nSet Acc.',
+              'Bring\nOverlap', 'Lead\nOverlap']
 
     data = []
     for m in metrics:
@@ -295,10 +300,10 @@ def plot_multiseed_distribution(results_dir: Path, fig_dir: Path) -> None:
         else:
             return
 
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(7, 4))
     bp = ax.boxplot(data, labels=labels, patch_artist=True)
 
-    colors = ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0']
+    colors = ['#F44336', '#2196F3', '#FF9800', '#4CAF50', '#9C27B0']
     for patch, color in zip(bp['boxes'], colors):
         patch.set_facecolor(color)
         patch.set_alpha(0.6)

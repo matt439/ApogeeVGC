@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from team_preview_model import TeamPreviewNetV2
+from team_preview_model import TeamPreviewNetV2, VGC_CONFIGS, NUM_VGC_CONFIGS
 
 from .config import ExperimentConfig
 
@@ -28,13 +28,10 @@ class EpochMetrics:
     """Metrics recorded for a single epoch."""
     epoch: int
     train_loss: float
-    train_bring_loss: float
-    train_lead_loss: float
     val_loss: float
-    val_bring_loss: float
-    val_lead_loss: float
-    val_bring_acc_top4: float
-    val_lead_acc_top2: float
+    val_config_accuracy: float
+    val_bring_accuracy: float
+    val_lead_accuracy: float
     lr: float
     elapsed_sec: float
 
@@ -122,8 +119,7 @@ def train_model(
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, patience=3, factor=0.5)
 
-    bring_loss_fn = nn.BCELoss()
-    lead_loss_fn = nn.BCELoss(reduction='none')
+    loss_fn = nn.CrossEntropyLoss()
 
     best_val_loss = float('inf')
     best_epoch = 0
@@ -140,28 +136,19 @@ def train_model(
 
         # ── Train ──
         model.train()
-        # Accumulate losses on GPU to avoid per-batch .item() sync
         t_loss_acc = torch.tensor(0.0, device=device)
-        t_bloss_acc = torch.tensor(0.0, device=device)
-        t_lloss_acc = torch.tensor(0.0, device=device)
         n_batches = 0
 
-        for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in train_loader:
+        for sids, mids, aids, iids, tids, cfg_tgt, val_tgt in train_loader:
             sids = sids.to(device, non_blocking=True)
             mids = mids.to(device, non_blocking=True)
             aids = aids.to(device, non_blocking=True)
             iids = iids.to(device, non_blocking=True)
             tids = tids.to(device, non_blocking=True)
-            bring_tgt = bring_tgt.to(device, non_blocking=True)
-            lead_tgt = lead_tgt.to(device, non_blocking=True)
+            cfg_tgt = cfg_tgt.to(device, non_blocking=True)
 
-            bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
-
-            b_loss = bring_loss_fn(bring_pred, bring_tgt)
-            l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-            l_mask = bring_tgt
-            l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-            loss = b_loss + l_loss
+            logits = model(sids, mids, aids, iids, tids)
+            loss = loss_fn(logits, cfg_tgt)
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
@@ -169,56 +156,38 @@ def train_model(
             optimizer.step()
 
             t_loss_acc += loss.detach()
-            t_bloss_acc += b_loss.detach()
-            t_lloss_acc += l_loss.detach()
             n_batches += 1
 
         # Single GPU→CPU sync per epoch
         t_loss = t_loss_acc.item()
-        t_bloss = t_bloss_acc.item()
-        t_lloss = t_lloss_acc.item()
 
         # ── Validate ──
         model.eval()
         v_loss_acc = torch.tensor(0.0, device=device)
-        v_bloss_acc = torch.tensor(0.0, device=device)
-        v_lloss_acc = torch.tensor(0.0, device=device)
-        bring_acc_sum = lead_acc_sum = 0.0
+        config_acc_sum = bring_acc_sum = lead_acc_sum = 0.0
         n_vbatches = 0
 
         with torch.no_grad():
-            for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in val_loader:
+            for sids, mids, aids, iids, tids, cfg_tgt, val_tgt in val_loader:
                 sids = sids.to(device, non_blocking=True)
                 mids = mids.to(device, non_blocking=True)
                 aids = aids.to(device, non_blocking=True)
                 iids = iids.to(device, non_blocking=True)
                 tids = tids.to(device, non_blocking=True)
-                bring_tgt = bring_tgt.to(device, non_blocking=True)
-                lead_tgt = lead_tgt.to(device, non_blocking=True)
+                cfg_tgt = cfg_tgt.to(device, non_blocking=True)
 
-                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
+                logits = model(sids, mids, aids, iids, tids)
+                loss = loss_fn(logits, cfg_tgt)
 
-                b_loss = bring_loss_fn(bring_pred, bring_tgt)
-                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-                l_mask = bring_tgt
-                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-
-                v_loss_acc += (b_loss + l_loss).detach()
-                v_bloss_acc += b_loss.detach()
-                v_lloss_acc += l_loss.detach()
+                v_loss_acc += loss.detach()
                 n_vbatches += 1
 
-                # These already return Python floats via .item() internally
-                bring_acc_sum += _compute_accuracy(bring_pred, bring_tgt, 4)
-
-                lead_masked = lead_pred.clone()
-                lead_masked[bring_tgt < 0.5] = -1e9
-                lead_acc_sum += _compute_accuracy(lead_masked, lead_tgt, 2)
+                config_acc_sum += _compute_config_accuracy(logits, cfg_tgt)
+                bring_acc_sum += _compute_bring_accuracy(logits, cfg_tgt)
+                lead_acc_sum += _compute_lead_accuracy(logits, cfg_tgt)
 
         # Single GPU→CPU sync for validation losses
         v_loss = v_loss_acc.item()
-        v_bloss = v_bloss_acc.item()
-        v_lloss = v_lloss_acc.item()
 
         if tc.scheduler == 'cosine':
             scheduler.step()
@@ -231,13 +200,10 @@ def train_model(
         em = EpochMetrics(
             epoch=epoch + 1,
             train_loss=t_loss / max(n_batches, 1),
-            train_bring_loss=t_bloss / max(n_batches, 1),
-            train_lead_loss=t_lloss / max(n_batches, 1),
             val_loss=avg_v,
-            val_bring_loss=v_bloss / max(n_vbatches, 1),
-            val_lead_loss=v_lloss / max(n_vbatches, 1),
-            val_bring_acc_top4=bring_acc_sum / max(n_vbatches, 1),
-            val_lead_acc_top2=lead_acc_sum / max(n_vbatches, 1),
+            val_config_accuracy=config_acc_sum / max(n_vbatches, 1),
+            val_bring_accuracy=bring_acc_sum / max(n_vbatches, 1),
+            val_lead_accuracy=lead_acc_sum / max(n_vbatches, 1),
             lr=lr,
             elapsed_sec=time.time() - t_epoch,
         )
@@ -320,13 +286,39 @@ def load_model_from_checkpoint(
     return model
 
 
-def _compute_accuracy(
-    scores: torch.Tensor, targets: torch.Tensor, k: int,
+def _compute_config_accuracy(
+    logits: torch.Tensor, targets: torch.Tensor,
 ) -> float:
-    """Top-k set accuracy (order-independent)."""
-    pred_topk = scores.topk(k, dim=1).indices
-    true_topk = targets.topk(k, dim=1).indices
-    pred_sorted = pred_topk.sort(dim=1).values
-    true_sorted = true_topk.sort(dim=1).values
-    match = (pred_sorted == true_sorted).all(dim=1)
-    return match.float().mean().item()
+    """Exact config match accuracy."""
+    preds = logits.argmax(dim=1)
+    return (preds == targets).float().mean().item()
+
+
+def _compute_bring_accuracy(
+    logits: torch.Tensor, targets: torch.Tensor,
+) -> float:
+    """Bring-set accuracy: does the predicted config's bring set match?"""
+    preds = logits.argmax(dim=1)
+    correct = 0
+    total = preds.size(0)
+    for i in range(total):
+        pred_bring = set(VGC_CONFIGS[preds[i].item()][0])
+        true_bring = set(VGC_CONFIGS[targets[i].item()][0])
+        if pred_bring == true_bring:
+            correct += 1
+    return correct / max(total, 1)
+
+
+def _compute_lead_accuracy(
+    logits: torch.Tensor, targets: torch.Tensor,
+) -> float:
+    """Lead-set accuracy: does the predicted config's lead pair match?"""
+    preds = logits.argmax(dim=1)
+    correct = 0
+    total = preds.size(0)
+    for i in range(total):
+        pred_lead = set(VGC_CONFIGS[preds[i].item()][1])
+        true_lead = set(VGC_CONFIGS[targets[i].item()][1])
+        if pred_lead == true_lead:
+            correct += 1
+    return correct / max(total, 1)

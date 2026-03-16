@@ -1,10 +1,12 @@
 """
-TeamPreviewNet — Predicts which Pokemon to bring and lead.
+TeamPreviewNet — Predicts the optimal team preview configuration for VGC.
 
-Per-pokemon features are encoded with shared weights then flattened
-into a trunk that produces bring/lead scores.  Unknown features
-(padding_idx=0) produce zero vectors, so the model gracefully handles
-both OTS (all features known) and CTS (opponent detail features zeroed).
+Outputs a probability distribution over all 90 possible VGC team configurations
+(C(6,4) bring choices × C(4,2) lead choices = 15 × 6 = 90).  Each configuration
+specifies which 4 of your 6 Pokemon to bring and which 2 of those to lead.
+
+This joint formulation captures synergy between lead pairs and bench composition,
+unlike a factored per-Pokemon approach.
 
 Inputs:
   species_ids: [batch, 12] int   — my 6 + opponent's 6 species indices
@@ -14,12 +16,38 @@ Inputs:
   tera_ids:    [batch, 12] int   — tera type per pokemon
 
 Outputs:
-  bring_scores: [batch, 6] float — sigmoid score per my Pokemon (bring or not)
-  lead_scores:  [batch, 6] float — sigmoid score per my Pokemon (lead or not)
+  config_logits: [batch, 90] float — raw logits over VGC configurations
 """
 
 import torch
 import torch.nn as nn
+from itertools import combinations
+
+
+# ── VGC Configuration Enumeration ──────────────────────────────────────────
+# Deterministic lexicographic order shared between Python and C#.
+
+VGC_CONFIGS: list[tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]] = []
+_VGC_CONFIG_INDEX: dict[tuple[frozenset[int], frozenset[int]], int] = {}
+
+for _bring in combinations(range(6), 4):
+    for _lead in combinations(_bring, 2):
+        _bench = tuple(b for b in _bring if b not in _lead)
+        _idx = len(VGC_CONFIGS)
+        VGC_CONFIGS.append((_bring, _lead, _bench))
+        _VGC_CONFIG_INDEX[(frozenset(_bring), frozenset(_lead))] = _idx
+
+NUM_VGC_CONFIGS = len(VGC_CONFIGS)  # 90
+
+
+def config_to_index(bring_set: set[int], lead_set: set[int]) -> int | None:
+    """Map a (bring, lead) pair of index sets to the config index (0–89)."""
+    return _VGC_CONFIG_INDEX.get((frozenset(bring_set), frozenset(lead_set)))
+
+
+def index_to_config(idx: int) -> tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]:
+    """Return (bring, lead, bench) tuples for a given config index."""
+    return VGC_CONFIGS[idx]
 
 
 class TeamPreviewNet(nn.Module):
@@ -34,6 +62,7 @@ class TeamPreviewNet(nn.Module):
         feat_embed_dim: int = 16,
         pokemon_dim: int = 64,
         hidden_dim: int = 256,
+        head_dim: int = 64,
     ):
         super().__init__()
 
@@ -74,16 +103,10 @@ class TeamPreviewNet(nn.Module):
             nn.Dropout(0.2),
         )
 
-        self.bring_head = nn.Sequential(
-            nn.Linear(hidden_dim // 2, 64),
+        self.config_head = nn.Sequential(
+            nn.Linear(hidden_dim // 2, head_dim),
             nn.ReLU(),
-            nn.Linear(64, 6),
-        )
-
-        self.lead_head = nn.Sequential(
-            nn.Linear(hidden_dim // 2, 64),
-            nn.ReLU(),
-            nn.Linear(64, 6),
+            nn.Linear(head_dim, NUM_VGC_CONFIGS),
         )
 
     def forward(
@@ -93,13 +116,7 @@ class TeamPreviewNet(nn.Module):
         ability_ids: torch.Tensor,
         item_ids: torch.Tensor,
         tera_ids: torch.Tensor,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        # species_ids: [B, 12]
-        # move_ids:    [B, 12, 4]
-        # ability_ids: [B, 12]
-        # item_ids:    [B, 12]
-        # tera_ids:    [B, 12]
-
+    ) -> torch.Tensor:
         sp = self.species_embed(species_ids)            # [B, 12, E_s]
         mv = self.move_embed(move_ids).sum(dim=2)       # [B, 12, E_f]
         ab = self.ability_embed(ability_ids)             # [B, 12, E_f]
@@ -112,10 +129,7 @@ class TeamPreviewNet(nn.Module):
 
         x = self.trunk(flat)                                  # [B, H/2]
 
-        bring = torch.sigmoid(self.bring_head(x))             # [B, 6]
-        lead = torch.sigmoid(self.lead_head(x))               # [B, 6]
-
-        return bring, lead
+        return self.config_head(x)                            # [B, 90]
 
 
 class TeamPreviewNetV2(nn.Module):
@@ -129,7 +143,7 @@ class TeamPreviewNetV2(nn.Module):
     New parameters (all backward-compatible with V1 defaults):
       num_trunk_layers: int  — number of trunk MLP blocks (default 3)
       trunk_dropout: float   — dropout rate in trunk (default 0.3)
-      head_dim: int          — intermediate dimension in output heads (default 64)
+      head_dim: int          — intermediate dimension in output head (default 64)
       feature_flags: dict    — which feature groups are active (default all True)
     """
 
@@ -202,17 +216,11 @@ class TeamPreviewNetV2(nn.Module):
             in_dim = out_dim
         self.trunk = nn.Sequential(*trunk_layers)
 
-        # ── Output heads ──
-        self.bring_head = nn.Sequential(
+        # ── Output head ──
+        self.config_head = nn.Sequential(
             nn.Linear(hidden_dim // 2, head_dim),
             nn.ReLU(),
-            nn.Linear(head_dim, 6),
-        )
-
-        self.lead_head = nn.Sequential(
-            nn.Linear(hidden_dim // 2, head_dim),
-            nn.ReLU(),
-            nn.Linear(head_dim, 6),
+            nn.Linear(head_dim, NUM_VGC_CONFIGS),
         )
 
     def forward(
@@ -222,7 +230,7 @@ class TeamPreviewNetV2(nn.Module):
         ability_ids: torch.Tensor,
         item_ids: torch.Tensor,
         tera_ids: torch.Tensor,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    ) -> torch.Tensor:
         parts = [self.species_embed(species_ids)]
 
         if self.feature_flags.get('moves', True):
@@ -240,7 +248,4 @@ class TeamPreviewNetV2(nn.Module):
 
         x = self.trunk(flat)
 
-        bring = torch.sigmoid(self.bring_head(x))
-        lead = torch.sigmoid(self.lead_head(x))
-
-        return bring, lead
+        return self.config_head(x)  # [B, 90] raw logits

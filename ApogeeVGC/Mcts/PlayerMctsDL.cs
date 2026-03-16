@@ -98,60 +98,41 @@ public sealed class PlayerMctsDL(
         int teamSize = request.Side.Pokemon.Count;
         int bringCount = request.MaxChosenTeamSize ?? 4;
 
+        VgcConfig config = TeamPreviewInference.VgcConfigs[output.ConfigIndex];
+
         if (PrintDebug)
         {
-            Console.WriteLine("  ┌─ Team Preview ─ DL Scores ─────────────────────────────────");
+            Console.WriteLine("  ┌─ Team Preview ─ DL Config Selection ───────────────────────");
             Console.WriteLine($"  │ My team ({teamSize} Pokemon, bringing {bringCount}):");
-            Console.WriteLine($"  │   {"Pokemon",-20} {"Bring",8} {"Lead",8}");
-            Console.WriteLine($"  │   {"-------",-20} {"-----",8} {"----",8}");
-            for (int i = 0; i < teamSize && i < output.BringScores.Length; i++)
+            Console.WriteLine($"  │   {"Pokemon",-20} {"Role",8}");
+            Console.WriteLine($"  │   {"-------",-20} {"----",8}");
+            HashSet<int> leadSet = new(config.Lead);
+            HashSet<int> bringSet = new(config.Bring);
+            for (int i = 0; i < teamSize; i++)
             {
                 string name = perspective.PlayerSide.Pokemon[i].Name;
-                Console.WriteLine($"  │   {name,-20} {output.BringScores[i],8:F4} {output.LeadScores[i],8:F4}");
+                string role = leadSet.Contains(i) ? "LEAD" : bringSet.Contains(i) ? "BENCH" : "-";
+                Console.WriteLine($"  │   {name,-20} {role,8}");
             }
             Console.WriteLine($"  │ Opponent team:");
-            Console.WriteLine($"  │   {"Pokemon",-20}");
-            Console.WriteLine($"  │   {"-------",-20}");
             for (int i = 0; i < perspective.OpponentSide.Pokemon.Count; i++)
             {
                 string name = perspective.OpponentSide.Pokemon[i].Name;
                 Console.WriteLine($"  │   {name,-20}");
             }
-        }
-
-        // Select top bringCount Pokemon by bring score
-        var bringIndices = Enumerable.Range(0, teamSize)
-            .OrderByDescending(i => output.BringScores[i])
-            .Take(bringCount)
-            .ToList();
-
-        // Among brought Pokemon, select top 2 by lead score as leads
-        var leadIndices = bringIndices
-            .OrderByDescending(i => output.LeadScores[i])
-            .Take(2)
-            .ToHashSet();
-
-        // Build ordering: leads first, then remaining brought (only bringCount total)
-        var ordered = new List<int>();
-
-        ordered.AddRange(bringIndices.Where(i => leadIndices.Contains(i))
-            .OrderByDescending(i => output.LeadScores[i]));
-
-        ordered.AddRange(bringIndices.Where(i => !leadIndices.Contains(i))
-            .OrderByDescending(i => output.BringScores[i]));
-
-        if (PrintDebug)
-        {
+            Console.WriteLine($"  │ Confidence: {output.Confidence:P1} (config #{output.ConfigIndex})");
             Console.WriteLine($"  │ Decision:");
             Console.Write("  │   Leads: ");
-            Console.WriteLine(string.Join(", ", ordered.Take(2)
+            Console.WriteLine(string.Join(", ", config.Lead
                 .Select(i => perspective.PlayerSide.Pokemon[i].Name)));
             Console.Write("  │   Backs: ");
-            Console.WriteLine(string.Join(", ", ordered.Skip(2)
+            Console.WriteLine(string.Join(", ", config.Bench
                 .Select(i => perspective.PlayerSide.Pokemon[i].Name)));
             Console.WriteLine("  └────────────────────────────────────────────────────────────");
             Console.WriteLine();
         }
+
+        var ordered = output.OrderedIndices;
 
         var actions = ordered.Select((originalIndex, newPosition) => new ChosenAction
         {

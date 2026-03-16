@@ -115,13 +115,10 @@ def run_multiseed(
                     {
                         'epoch': em.epoch,
                         'train_loss': em.train_loss,
-                        'train_bring_loss': em.train_bring_loss,
-                        'train_lead_loss': em.train_lead_loss,
                         'val_loss': em.val_loss,
-                        'val_bring_loss': em.val_bring_loss,
-                        'val_lead_loss': em.val_lead_loss,
-                        'val_bring_acc_top4': em.val_bring_acc_top4,
-                        'val_lead_acc_top2': em.val_lead_acc_top2,
+                        'val_config_accuracy': em.val_config_accuracy,
+                        'val_bring_accuracy': em.val_bring_accuracy,
+                        'val_lead_accuracy': em.val_lead_accuracy,
                         'lr': em.lr,
                         'elapsed_sec': em.elapsed_sec,
                     }
@@ -131,7 +128,8 @@ def run_multiseed(
                 'best_val_loss': result.best_val_loss,
             }, f, indent=2)
 
-        print(f'  bring_set={test_metrics.bring_set_accuracy:.3f} '
+        print(f'  config={test_metrics.config_accuracy:.3f} '
+              f'bring_set={test_metrics.bring_set_accuracy:.3f} '
               f'lead_set={test_metrics.lead_set_accuracy:.3f} '
               f'val_loss={result.best_val_loss:.4f}')
 
@@ -151,11 +149,10 @@ def _compute_summary(
     summary: dict = {'seeds': seeds, 'n_seeds': len(seeds)}
 
     scalar_fields = [
-        'bring_set_accuracy', 'bring_hamming_accuracy', 'bring_overlap_accuracy',
-        'bring_macro_f1', 'bring_ece',
-        'lead_set_accuracy', 'lead_hamming_accuracy', 'lead_overlap_accuracy',
-        'lead_macro_f1', 'lead_ece',
-        'total_loss', 'bring_loss', 'lead_loss',
+        'config_accuracy', 'config_top3_accuracy', 'config_top5_accuracy',
+        'bring_set_accuracy', 'bring_overlap_accuracy',
+        'lead_set_accuracy', 'lead_overlap_accuracy',
+        'loss', 'ece', 'mean_confidence',
     ]
 
     for field_name in scalar_fields:

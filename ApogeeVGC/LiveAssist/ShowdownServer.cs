@@ -205,32 +205,32 @@ public sealed class ShowdownServer
             BattlePerspective perspective = state.BuildTeamPreviewPerspective();
             TeamPreviewOutput output = _previewModel.Evaluate(perspective);
 
-            // Apply sigmoid
-            float[] bringScores = ApplySigmoid(output.BringScores);
-            float[] leadScores = ApplySigmoid(output.LeadScores);
+            VgcConfig config = TeamPreviewInference.VgcConfigs[output.ConfigIndex];
+            HashSet<int> leadSet = new(config.Lead);
+            HashSet<int> bringSet = new(config.Bring);
 
             // Display in terminal
-            Console.WriteLine("\n--- Team Preview ---");
+            Console.WriteLine($"\n--- Team Preview (confidence: {output.Confidence:P1}) ---");
             for (int i = 0; i < state.OwnTeam.Count && i < 6; i++)
             {
-                float bring = i < bringScores.Length ? bringScores[i] * 100 : 0;
-                float lead = i < leadScores.Length ? leadScores[i] * 100 : 0;
-                Console.WriteLine($"  {state.OwnTeam[i].Species,-20} Bring: {bring,5:F0}%  Lead: {lead,5:F0}%");
+                string role = leadSet.Contains(i) ? "LEAD" : bringSet.Contains(i) ? "BENCH" : "-";
+                Console.WriteLine($"  {state.OwnTeam[i].Species,-20} {role}");
             }
 
             // Build response
             var pokemon = new List<object>();
             for (int i = 0; i < state.OwnTeam.Count && i < 6; i++)
             {
+                string role = leadSet.Contains(i) ? "lead" : bringSet.Contains(i) ? "bench" : "not_brought";
                 pokemon.Add(new
                 {
                     species = state.OwnTeam[i].Species,
-                    bringScore = i < bringScores.Length ? bringScores[i] : 0f,
-                    leadScore = i < leadScores.Length ? leadScores[i] : 0f,
+                    role,
+                    confidence = output.Confidence,
                 });
             }
 
-            return JsonSerializer.Serialize(new { type = "team_preview", pokemon });
+            return JsonSerializer.Serialize(new { type = "team_preview", pokemon, configIndex = output.ConfigIndex });
         }
         catch (Exception ex)
         {
@@ -360,14 +360,6 @@ public sealed class ShowdownServer
             Console.WriteLine($"  {ex.StackTrace}");
             return "{}";
         }
-    }
-
-    private static float[] ApplySigmoid(float[] raw)
-    {
-        float[] result = new float[raw.Length];
-        for (int i = 0; i < raw.Length; i++)
-            result[i] = 1f / (1f + MathF.Exp(-raw[i]));
-        return result;
     }
 
     private static async Task SendAsync(WebSocket ws, string message, CancellationToken ct)

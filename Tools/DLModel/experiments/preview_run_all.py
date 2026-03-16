@@ -50,9 +50,9 @@ from .rating_comparison import run_rating_comparison
 ALL_STAGES = ['hparam', 'ablation', 'baselines', 'multiseed', 'figures']
 
 PREVIEW_COMPARISON_METRICS = [
+    'config_accuracy', 'config_top3_accuracy',
     'bring_set_accuracy', 'bring_overlap_accuracy',
     'lead_set_accuracy', 'lead_overlap_accuracy',
-    'bring_macro_f1', 'lead_macro_f1',
 ]
 
 
@@ -218,8 +218,9 @@ def run_tier(
             output_dir=results_dir,
             device=device,
         )
-        for metric in ['bring_set_accuracy', 'lead_set_accuracy',
-                       'bring_overlap_accuracy', 'lead_overlap_accuracy']:
+        for metric in ['config_accuracy', 'bring_set_accuracy',
+                       'lead_set_accuracy', 'bring_overlap_accuracy',
+                       'lead_overlap_accuracy']:
             m = summary[metric]
             print(f'  {metric}: {m["mean"]:.3f} +/- {m["std"]:.3f}')
 

@@ -1,5 +1,8 @@
 """
-Training script for TeamPreviewNet.
+Training script for TeamPreviewNet (VGC — bring 4, lead 2).
+
+Trains the model to classify team preview decisions into one of 90
+configurations (C(6,4) × C(4,2) = 15 × 6 = 90) using cross-entropy loss.
 
 Usage:
   python train_team_preview.py
@@ -21,7 +24,7 @@ from torch.utils.data import DataLoader
 
 from dataset import build_vocab
 from team_preview_dataset import TeamPreviewDataset
-from team_preview_model import TeamPreviewNet
+from team_preview_model import TeamPreviewNet, VGC_CONFIGS, NUM_VGC_CONFIGS
 
 
 def load_games(path: str, min_rating: int = 0) -> list[dict]:
@@ -40,22 +43,36 @@ def load_games(path: str, min_rating: int = 0) -> list[dict]:
     return games
 
 
-def compute_accuracy(
-    scores: torch.Tensor,
-    targets: torch.Tensor,
-    k: int,
-) -> float:
-    """Top-k set accuracy: what fraction of samples have the predicted
-    top-k set exactly matching the target top-k set."""
-    pred_topk = scores.topk(k, dim=1).indices  # [B, k]
-    true_topk = targets.topk(k, dim=1).indices  # [B, k]
+def compute_config_accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
+    """Exact config match accuracy."""
+    preds = logits.argmax(dim=1)
+    return (preds == targets).float().mean().item()
 
-    # Sort both so order doesn't matter
-    pred_sorted = pred_topk.sort(dim=1).values
-    true_sorted = true_topk.sort(dim=1).values
 
-    match = (pred_sorted == true_sorted).all(dim=1)
-    return match.float().mean().item()
+def compute_bring_accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
+    """Bring-set accuracy: does the predicted config's bring set match?"""
+    preds = logits.argmax(dim=1)
+    correct = 0
+    total = preds.size(0)
+    for i in range(total):
+        pred_bring = set(VGC_CONFIGS[preds[i].item()][0])
+        true_bring = set(VGC_CONFIGS[targets[i].item()][0])
+        if pred_bring == true_bring:
+            correct += 1
+    return correct / max(total, 1)
+
+
+def compute_lead_accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
+    """Lead-set accuracy: does the predicted config's lead pair match?"""
+    preds = logits.argmax(dim=1)
+    correct = 0
+    total = preds.size(0)
+    for i in range(total):
+        pred_lead = set(VGC_CONFIGS[preds[i].item()][1])
+        true_lead = set(VGC_CONFIGS[targets[i].item()][1])
+        if pred_lead == true_lead:
+            correct += 1
+    return correct / max(total, 1)
 
 
 def train(args: argparse.Namespace) -> None:
@@ -132,14 +149,14 @@ def train(args: argparse.Namespace) -> None:
     ).to(device)
     total_params = sum(p.numel() for p in model.parameters())
     print(f'Model: {total_params:,} parameters')
+    print(f'Output classes: {NUM_VGC_CONFIGS} VGC configurations')
 
     optimizer = torch.optim.Adam(
         model.parameters(), lr=args.lr, weight_decay=1e-5)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, args.epochs)
 
-    bring_loss_fn = nn.BCELoss()
-    lead_loss_fn = nn.BCELoss(reduction='none')
+    loss_fn = nn.CrossEntropyLoss()
 
     best_val_loss = float('inf')
     patience_counter = 0
@@ -150,33 +167,19 @@ def train(args: argparse.Namespace) -> None:
         # ── Train ──
         model.train()
         t_loss = 0.0
-        t_bloss = 0.0
-        t_lloss = 0.0
         n_batches = 0
 
-        for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in train_loader:
+        for sids, mids, aids, iids, tids, cfg_tgt, val_tgt in train_loader:
             sids = sids.to(device, non_blocking=True)
             mids = mids.to(device, non_blocking=True)
             aids = aids.to(device, non_blocking=True)
             iids = iids.to(device, non_blocking=True)
             tids = tids.to(device, non_blocking=True)
-            bring_tgt = bring_tgt.to(device, non_blocking=True)
-            lead_tgt = lead_tgt.to(device, non_blocking=True)
+            cfg_tgt = cfg_tgt.to(device, non_blocking=True)
 
             with autocast('cuda', enabled=use_amp):
-                bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
-
-            # BCELoss requires float32 — compute loss outside autocast
-            bring_pred = bring_pred.float()
-            lead_pred = lead_pred.float()
-            b_loss = bring_loss_fn(bring_pred, bring_tgt)
-
-            # Lead loss only for brought Pokemon (bring_tgt == 1)
-            l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-            l_mask = bring_tgt  # only compute lead loss where brought
-            l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-
-            loss = b_loss + l_loss
+                logits = model(sids, mids, aids, iids, tids)
+                loss = loss_fn(logits, cfg_tgt)
 
             optimizer.zero_grad()
             scaler.scale(loss).backward()
@@ -186,8 +189,6 @@ def train(args: argparse.Namespace) -> None:
             scaler.update()
 
             t_loss += loss.item()
-            t_bloss += b_loss.item()
-            t_lloss += l_loss.item()
             n_batches += 1
 
         scheduler.step()
@@ -195,61 +196,41 @@ def train(args: argparse.Namespace) -> None:
         # ── Validate ──
         model.eval()
         v_loss = 0.0
-        v_bloss = 0.0
-        v_lloss = 0.0
+        config_acc_sum = 0.0
         bring_acc_sum = 0.0
         lead_acc_sum = 0.0
         n_vbatches = 0
 
         with torch.no_grad():
-            for sids, mids, aids, iids, tids, bring_tgt, lead_tgt, val_tgt in val_loader:
+            for sids, mids, aids, iids, tids, cfg_tgt, val_tgt in val_loader:
                 sids = sids.to(device, non_blocking=True)
                 mids = mids.to(device, non_blocking=True)
                 aids = aids.to(device, non_blocking=True)
                 iids = iids.to(device, non_blocking=True)
                 tids = tids.to(device, non_blocking=True)
-                bring_tgt = bring_tgt.to(device, non_blocking=True)
-                lead_tgt = lead_tgt.to(device, non_blocking=True)
+                cfg_tgt = cfg_tgt.to(device, non_blocking=True)
 
                 with autocast('cuda', enabled=use_amp):
-                    bring_pred, lead_pred = model(sids, mids, aids, iids, tids)
-
-                # BCELoss requires float32 — compute loss outside autocast
-                bring_pred = bring_pred.float()
-                lead_pred = lead_pred.float()
-                b_loss = bring_loss_fn(bring_pred, bring_tgt)
-                l_loss_raw = lead_loss_fn(lead_pred, lead_tgt)
-                l_mask = bring_tgt
-                l_loss = (l_loss_raw * l_mask).sum() / (l_mask.sum() + 1e-8)
-                loss = b_loss + l_loss
+                    logits = model(sids, mids, aids, iids, tids)
+                    loss = loss_fn(logits, cfg_tgt)
 
                 v_loss += loss.item()
-                v_bloss += b_loss.item()
-                v_lloss += l_loss.item()
+                config_acc_sum += compute_config_accuracy(logits, cfg_tgt)
+                bring_acc_sum += compute_bring_accuracy(logits, cfg_tgt)
+                lead_acc_sum += compute_lead_accuracy(logits, cfg_tgt)
                 n_vbatches += 1
-
-                # Bring accuracy: predicted top-4 matches actual top-4
-                bring_acc_sum += compute_accuracy(bring_pred, bring_tgt, 4)
-
-                # Lead accuracy: among brought, predicted top-2 matches leads
-                # Mask non-brought to -inf for lead scoring
-                lead_masked = lead_pred.clone()
-                lead_masked[bring_tgt < 0.5] = -1e9
-                lead_acc_sum += compute_accuracy(lead_masked, lead_tgt, 2)
 
         avg_t = t_loss / n_batches
         avg_v = v_loss / n_vbatches
+        config_acc = config_acc_sum / n_vbatches
         bring_acc = bring_acc_sum / n_vbatches
         lead_acc = lead_acc_sum / n_vbatches
         lr = scheduler.get_last_lr()[0]
 
         print(
             f'Epoch {epoch + 1:2d}/{args.epochs} | '
-            f'Train: {avg_t:.4f} '
-            f'(b={t_bloss / n_batches:.4f} l={t_lloss / n_batches:.4f}) | '
-            f'Val: {avg_v:.4f} '
-            f'(b={v_bloss / n_vbatches:.4f} l={v_lloss / n_vbatches:.4f}) | '
-            f'Acc: bring={bring_acc:.3f} lead={lead_acc:.3f} | '
+            f'Train: {avg_t:.4f} | Val: {avg_v:.4f} | '
+            f'Acc: config={config_acc:.3f} bring={bring_acc:.3f} lead={lead_acc:.3f} | '
             f'LR: {lr:.6f}'
         )
 

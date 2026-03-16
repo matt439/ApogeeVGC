@@ -106,6 +106,8 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
 
 
 def export_team_preview(checkpoint_path: str, output_path: str) -> None:
+    from team_preview_model import NUM_VGC_CONFIGS
+
     checkpoint = torch.load(checkpoint_path, map_location='cpu',
                             weights_only=False)
     vocab = checkpoint['vocab']
@@ -159,15 +161,14 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
         input_names=[
             'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
         ],
-        output_names=['bring_scores', 'lead_scores'],
+        output_names=['config_logits'],
         dynamic_axes={
             'species_ids': {0: 'batch'},
             'move_ids': {0: 'batch'},
             'ability_ids': {0: 'batch'},
             'item_ids': {0: 'batch'},
             'tera_ids': {0: 'batch'},
-            'bring_scores': {0: 'batch'},
-            'lead_scores': {0: 'batch'},
+            'config_logits': {0: 'batch'},
         },
         opset_version=17,
     )
@@ -177,6 +178,7 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
         json.dump(vocab, f, indent=2)
 
     print(f'Exported TeamPreviewNet to {output_path}')
+    print(f'  Output: {NUM_VGC_CONFIGS} config logits (VGC: bring 4, lead 2)')
     print(f'Exported vocab to {vocab_out}')
     print(f'  Species: {vocab["num_species"]}, Moves: {vocab["num_moves"]}, '
           f'Abilities: {vocab["num_abilities"]}, Items: {vocab["num_items"]}, '

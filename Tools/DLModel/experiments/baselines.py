@@ -1,19 +1,22 @@
 """
-Baseline evaluation strategies for comparison.
+Baseline evaluation strategies for comparison (VGC config classification).
 
-1. Random: uniformly random bring/lead selection
-2. Most-popular: always pick the most frequently brought/led Pokemon
+1. Random: uniformly random config selection
+2. Most-popular: always pick the most frequently chosen configuration
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+import sys
+
 import numpy as np
 from torch.utils.data import DataLoader
 
-from .metrics import (
-    ComprehensiveMetrics, _compute_task_metrics,
-    _compute_ece, _compute_reliability,
-)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from team_preview_model import VGC_CONFIGS, NUM_VGC_CONFIGS
+
+from .metrics import ComprehensiveMetrics, _compute_ece, _compute_reliability
 
 
 def evaluate_random_baseline(
@@ -21,60 +24,67 @@ def evaluate_random_baseline(
     n_trials: int = 100,
     seed: int = 42,
 ) -> ComprehensiveMetrics:
-    """Random baseline: randomly select 4 to bring, 2 to lead.
+    """Random baseline: uniformly random config selection.
 
     Averaged over n_trials for stable estimates.
     """
-    all_bring_tgt = []
-    all_lead_tgt = []
-
+    all_targets = []
     for batch in loader:
-        _, _, _, _, _, bring_tgt, lead_tgt, _ = batch
-        all_bring_tgt.append(bring_tgt.cpu().numpy())
-        all_lead_tgt.append(lead_tgt.cpu().numpy())
+        _, _, _, _, _, cfg_tgt, _ = batch
+        all_targets.append(cfg_tgt.numpy())
 
-    bring_tgt = np.concatenate(all_bring_tgt, axis=0)
-    lead_tgt = np.concatenate(all_lead_tgt, axis=0)
-    n = bring_tgt.shape[0]
+    targets = np.concatenate(all_targets, axis=0)  # [N]
+    n = len(targets)
 
     rng = np.random.RandomState(seed)
 
-    all_bring_m = []
-    all_lead_m = []
+    config_accs = []
+    bring_accs = []
+    bring_overlaps = []
+    lead_accs = []
+    lead_overlaps = []
 
     for _ in range(n_trials):
-        random_bring = rng.rand(n, 6)
-        all_bring_m.append(_compute_task_metrics(random_bring, bring_tgt, k=4))
+        preds = rng.randint(0, NUM_VGC_CONFIGS, size=n)
 
-        random_lead = rng.rand(n, 6)
-        random_lead[bring_tgt < 0.5] = -1e9
-        all_lead_m.append(_compute_task_metrics(random_lead, lead_tgt, k=2))
+        config_accs.append(float(np.mean(preds == targets)))
 
-    avg_bring = _average_metrics(all_bring_m)
-    avg_lead = _average_metrics(all_lead_m)
+        bring_match = 0
+        bring_overlap_sum = 0.0
+        lead_match = 0
+        lead_overlap_sum = 0.0
+
+        for i in range(n):
+            pred_bring = set(VGC_CONFIGS[preds[i]][0])
+            true_bring = set(VGC_CONFIGS[targets[i]][0])
+            pred_lead = set(VGC_CONFIGS[preds[i]][1])
+            true_lead = set(VGC_CONFIGS[targets[i]][1])
+
+            if pred_bring == true_bring:
+                bring_match += 1
+            bring_overlap_sum += len(pred_bring & true_bring) / 4.0
+
+            if pred_lead == true_lead:
+                lead_match += 1
+            lead_overlap_sum += len(pred_lead & true_lead) / 2.0
+
+        bring_accs.append(bring_match / n)
+        bring_overlaps.append(bring_overlap_sum / n)
+        lead_accs.append(lead_match / n)
+        lead_overlaps.append(lead_overlap_sum / n)
 
     return ComprehensiveMetrics(
-        bring_set_accuracy=avg_bring['set_accuracy'],
-        bring_hamming_accuracy=avg_bring['hamming_accuracy'],
-        bring_overlap_accuracy=avg_bring['overlap_accuracy'],
-        bring_precision_per_slot=avg_bring['precision_per_slot'],
-        bring_recall_per_slot=avg_bring['recall_per_slot'],
-        bring_f1_per_slot=avg_bring['f1_per_slot'],
-        bring_macro_f1=avg_bring['macro_f1'],
-        bring_ece=0.0,
-        bring_reliability={'midpoints': [], 'accuracies': [], 'counts': []},
-        lead_set_accuracy=avg_lead['set_accuracy'],
-        lead_hamming_accuracy=avg_lead['hamming_accuracy'],
-        lead_overlap_accuracy=avg_lead['overlap_accuracy'],
-        lead_precision_per_slot=avg_lead['precision_per_slot'],
-        lead_recall_per_slot=avg_lead['recall_per_slot'],
-        lead_f1_per_slot=avg_lead['f1_per_slot'],
-        lead_macro_f1=avg_lead['macro_f1'],
-        lead_ece=0.0,
-        lead_reliability={'midpoints': [], 'accuracies': [], 'counts': []},
-        total_loss=float('nan'),
-        bring_loss=float('nan'),
-        lead_loss=float('nan'),
+        config_accuracy=float(np.mean(config_accs)),
+        config_top3_accuracy=3 / NUM_VGC_CONFIGS,  # analytical
+        config_top5_accuracy=5 / NUM_VGC_CONFIGS,
+        bring_set_accuracy=float(np.mean(bring_accs)),
+        bring_overlap_accuracy=float(np.mean(bring_overlaps)),
+        lead_set_accuracy=float(np.mean(lead_accs)),
+        lead_overlap_accuracy=float(np.mean(lead_overlaps)),
+        loss=float('nan'),
+        ece=0.0,
+        reliability={'midpoints': [], 'accuracies': [], 'counts': []},
+        mean_confidence=1.0 / NUM_VGC_CONFIGS,
         n_samples=n,
     )
 
@@ -83,81 +93,63 @@ def evaluate_popular_baseline(
     train_loader: DataLoader,
     test_loader: DataLoader,
 ) -> ComprehensiveMetrics:
-    """Most-popular baseline: predict slot-wise bring/lead frequencies.
+    """Most-popular baseline: always predict the most frequent config from training.
 
-    Computes marginal probability of each slot being brought/led
-    from the training set, then uses those as constant predictions.
+    Computes the empirical config frequency distribution from training data,
+    then predicts the mode config for every test sample.
     """
-    bring_sum = np.zeros(6, dtype=np.float64)
-    lead_sum = np.zeros(6, dtype=np.float64)
-    n_train = 0
-
+    # Count config frequencies in training data
+    config_counts = np.zeros(NUM_VGC_CONFIGS, dtype=np.int64)
     for batch in train_loader:
-        _, _, _, _, _, bring_tgt, lead_tgt, _ = batch
-        bring_sum += bring_tgt.cpu().numpy().sum(axis=0)
-        lead_sum += lead_tgt.cpu().numpy().sum(axis=0)
-        n_train += bring_tgt.shape[0]
+        _, _, _, _, _, cfg_tgt, _ = batch
+        for c in cfg_tgt.numpy():
+            config_counts[c] += 1
 
-    bring_freq = bring_sum / n_train
-    lead_freq = lead_sum / n_train
+    most_popular = int(np.argmax(config_counts))
 
-    all_bring_tgt = []
-    all_lead_tgt = []
-
+    # Collect test targets
+    all_targets = []
     for batch in test_loader:
-        _, _, _, _, _, bring_tgt, lead_tgt, _ = batch
-        all_bring_tgt.append(bring_tgt.cpu().numpy())
-        all_lead_tgt.append(lead_tgt.cpu().numpy())
+        _, _, _, _, _, cfg_tgt, _ = batch
+        all_targets.append(cfg_tgt.numpy())
 
-    bring_tgt = np.concatenate(all_bring_tgt, axis=0)
-    lead_tgt = np.concatenate(all_lead_tgt, axis=0)
-    n = bring_tgt.shape[0]
+    targets = np.concatenate(all_targets, axis=0)
+    n = len(targets)
 
-    bring_pred = np.tile(bring_freq, (n, 1))
-    lead_pred = np.tile(lead_freq, (n, 1))
+    preds = np.full(n, most_popular)
 
-    bring_metrics = _compute_task_metrics(bring_pred, bring_tgt, k=4)
-    lead_pred_masked = lead_pred.copy()
-    lead_pred_masked[bring_tgt < 0.5] = -1e9
-    lead_metrics = _compute_task_metrics(lead_pred_masked, lead_tgt, k=2)
+    config_accuracy = float(np.mean(preds == targets))
 
-    bring_ece = _compute_ece(bring_pred, bring_tgt)
-    bring_rel = _compute_reliability(bring_pred, bring_tgt)
+    bring_match = 0
+    bring_overlap_sum = 0.0
+    lead_match = 0
+    lead_overlap_sum = 0.0
+
+    for i in range(n):
+        pred_bring = set(VGC_CONFIGS[preds[i]][0])
+        true_bring = set(VGC_CONFIGS[targets[i]][0])
+        pred_lead = set(VGC_CONFIGS[preds[i]][1])
+        true_lead = set(VGC_CONFIGS[targets[i]][1])
+
+        if pred_bring == true_bring:
+            bring_match += 1
+        bring_overlap_sum += len(pred_bring & true_bring) / 4.0
+
+        if pred_lead == true_lead:
+            lead_match += 1
+        lead_overlap_sum += len(pred_lead & true_lead) / 2.0
 
     return ComprehensiveMetrics(
-        bring_set_accuracy=bring_metrics['set_accuracy'],
-        bring_hamming_accuracy=bring_metrics['hamming_accuracy'],
-        bring_overlap_accuracy=bring_metrics['overlap_accuracy'],
-        bring_precision_per_slot=bring_metrics['precision_per_slot'],
-        bring_recall_per_slot=bring_metrics['recall_per_slot'],
-        bring_f1_per_slot=bring_metrics['f1_per_slot'],
-        bring_macro_f1=bring_metrics['macro_f1'],
-        bring_ece=bring_ece,
-        bring_reliability=bring_rel,
-        lead_set_accuracy=lead_metrics['set_accuracy'],
-        lead_hamming_accuracy=lead_metrics['hamming_accuracy'],
-        lead_overlap_accuracy=lead_metrics['overlap_accuracy'],
-        lead_precision_per_slot=lead_metrics['precision_per_slot'],
-        lead_recall_per_slot=lead_metrics['recall_per_slot'],
-        lead_f1_per_slot=lead_metrics['f1_per_slot'],
-        lead_macro_f1=lead_metrics['macro_f1'],
-        lead_ece=0.0,
-        lead_reliability={'midpoints': [], 'accuracies': [], 'counts': []},
-        total_loss=float('nan'),
-        bring_loss=float('nan'),
-        lead_loss=float('nan'),
+        config_accuracy=config_accuracy,
+        config_top3_accuracy=config_accuracy,  # single prediction = same as top-1
+        config_top5_accuracy=config_accuracy,
+        bring_set_accuracy=bring_match / max(n, 1),
+        bring_overlap_accuracy=bring_overlap_sum / max(n, 1),
+        lead_set_accuracy=lead_match / max(n, 1),
+        lead_overlap_accuracy=lead_overlap_sum / max(n, 1),
+        loss=float('nan'),
+        ece=0.0,
+        reliability={'midpoints': [], 'accuracies': [], 'counts': []},
+        mean_confidence=0.0,
         n_samples=n,
     )
-
-
-def _average_metrics(metrics_list: list[dict]) -> dict:
-    """Average a list of metric dicts across trials."""
-    result = {}
-    for key in metrics_list[0]:
-        vals = [m[key] for m in metrics_list]
-        if isinstance(vals[0], list):
-            result[key] = [float(np.mean([v[i] for v in vals]))
-                           for i in range(len(vals[0]))]
-        else:
-            result[key] = float(np.mean(vals))
-    return result

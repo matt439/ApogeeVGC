@@ -160,26 +160,7 @@ public sealed class PlayerDLGreedy(
         BattlePerspective perspective = perspectiveFactory();
         TeamPreviewOutput output = previewModel.Evaluate(perspective);
 
-        int teamSize = request.Side.Pokemon.Count;
-        int bringCount = request.MaxChosenTeamSize ?? 4;
-
-        var bringIndices = Enumerable.Range(0, teamSize)
-            .OrderByDescending(i => output.BringScores[i])
-            .Take(bringCount)
-            .ToList();
-
-        var leadIndices = bringIndices
-            .OrderByDescending(i => output.LeadScores[i])
-            .Take(2)
-            .ToHashSet();
-
-        var ordered = new List<int>();
-
-        ordered.AddRange(bringIndices.Where(i => leadIndices.Contains(i))
-            .OrderByDescending(i => output.LeadScores[i]));
-
-        ordered.AddRange(bringIndices.Where(i => !leadIndices.Contains(i))
-            .OrderByDescending(i => output.BringScores[i]));
+        var ordered = output.OrderedIndices;
 
         var actions = ordered.Select((originalIndex, newPosition) => new ChosenAction
         {

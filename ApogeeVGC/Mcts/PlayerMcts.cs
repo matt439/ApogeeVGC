@@ -124,42 +124,16 @@ public sealed class PlayerMcts(
         int teamSize = request.Side.Pokemon.Count;
         int bringCount = request.MaxChosenTeamSize ?? 4;
 
-        if (PrintDebug)
-        {
-            Console.WriteLine($"[PlayerMcts] Team preview model scores for {SideId}:");
-            for (var i = 0; i < teamSize; i++)
-                Console.WriteLine($"  [{i}] {request.Side.Pokemon[i].Details}: bring={output.BringScores[i]:F3} lead={output.LeadScores[i]:F3}");
-        }
-
-        // Select top bringCount Pokemon by bring score
-        var bringIndices = Enumerable.Range(0, teamSize)
-            .OrderByDescending(i => output.BringScores[i])
-            .Take(bringCount)
-            .ToList();
-
-        // Among brought Pokemon, select top 2 by lead score as leads
-        var leadIndices = bringIndices
-            .OrderByDescending(i => output.LeadScores[i])
-            .Take(2)
-            .ToHashSet();
-
-        // Build ordering: leads first, then remaining brought (only bringCount total)
-        var ordered = new List<int>();
-
-        // Leads first (ordered by lead score descending)
-        ordered.AddRange(bringIndices.Where(i => leadIndices.Contains(i))
-            .OrderByDescending(i => output.LeadScores[i]));
-
-        // Remaining brought (ordered by bring score descending)
-        ordered.AddRange(bringIndices.Where(i => !leadIndices.Contains(i))
-            .OrderByDescending(i => output.BringScores[i]));
+        VgcConfig config = TeamPreviewInference.VgcConfigs[output.ConfigIndex];
 
         if (PrintDebug)
         {
-            Console.WriteLine($"[PlayerMcts] Team preview order: [{string.Join(", ", ordered)}]");
-            Console.WriteLine($"  Bringing: {string.Join(", ", bringIndices.Select(i => request.Side.Pokemon[i].Details))}");
-            Console.WriteLine($"  Leading:  {string.Join(", ", ordered.Take(2).Select(i => request.Side.Pokemon[i].Details))}");
+            Console.WriteLine($"[PlayerMcts] Team preview config #{output.ConfigIndex} for {SideId} ({output.Confidence:P1}):");
+            Console.WriteLine($"  Leads: {string.Join(", ", config.Lead.Select(i => request.Side.Pokemon[i].Details))}");
+            Console.WriteLine($"  Bench: {string.Join(", ", config.Bench.Select(i => request.Side.Pokemon[i].Details))}");
         }
+
+        var ordered = output.OrderedIndices;
 
         // Build Choice: map each original index to its new position
         var actions = ordered.Select((originalIndex, newPosition) => new ChosenAction

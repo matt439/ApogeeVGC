@@ -1,34 +1,33 @@
 """
-Team Preview Dataset
+Team Preview Dataset (VGC — bring 4, lead 2)
 
-Encodes team preview decisions from parsed replays.
+Encodes team preview decisions from parsed replays as a single configuration
+index (0–89) representing the joint choice of which 4 Pokemon to bring and
+which 2 to lead.
 
 Per sample:
-  species_ids:  [12] int    — my 6 Pokemon + opponent's 6 Pokemon
-  move_ids:     [12, 4] int — up to 4 moves per Pokemon (from revealed data)
-  ability_ids:  [12] int    — ability per Pokemon
-  item_ids:     [12] int    — held item per Pokemon
-  tera_ids:     [12] int    — tera type per Pokemon
+  species_ids:   [12] int    — my 6 Pokemon + opponent's 6 Pokemon
+  move_ids:      [12, 4] int — up to 4 moves per Pokemon (from revealed data)
+  ability_ids:   [12] int    — ability per Pokemon
+  item_ids:      [12] int    — held item per Pokemon
+  tera_ids:      [12] int    — tera type per Pokemon
 
-  bring_target: [6] float   — binary, which of my 6 were brought
-  lead_target:  [6] float   — binary, which of my 6 were leads
-  value_target: float        — 1.0 if this player won, 0.0 if lost
+  config_target: int          — index into VGC_CONFIGS (0–89)
+  value_target:  float        — 1.0 if this player won, 0.0 if lost
 
 By default, only the winning player's perspective is used (winners_only=True).
 Set winners_only=False to get two samples per game (both perspectives).
 
-Feature sources:
-  Own team features come from revealed[perspective] — a lower bound of
-  what the player actually knew (they always know their full team).
-  Opponent features come from revealed[opponent] — under OTS the player
-  knew everything, but the replay only records what was publicly observed.
-  Unknown features stay at index 0 (padding) → zero embeddings.
+Samples where the actual bring/lead decision doesn't map to a valid VGC
+configuration (e.g. didn't bring exactly 4 or lead exactly 2) are skipped.
 """
 
 from __future__ import annotations
 
 import torch
 from torch.utils.data import Dataset
+
+from team_preview_model import config_to_index
 
 
 class TeamPreviewDataset(Dataset):
@@ -53,8 +52,7 @@ class TeamPreviewDataset(Dataset):
         self.ability_ids = torch.zeros(n, 12, dtype=torch.long)
         self.item_ids = torch.zeros(n, 12, dtype=torch.long)
         self.tera_ids = torch.zeros(n, 12, dtype=torch.long)
-        self.bring_target = torch.zeros(n, 6, dtype=torch.float32)
-        self.lead_target = torch.zeros(n, 6, dtype=torch.float32)
+        self.config_target = torch.zeros(n, dtype=torch.long)
         self.value_target = torch.zeros(n, dtype=torch.float32)
 
         idx = 0
@@ -84,6 +82,20 @@ class TeamPreviewDataset(Dataset):
                 my_revealed = revealed.get(perspective, {})
                 opp_revealed = revealed.get(opp, {})
 
+                # Map species names to slot indices (0-5)
+                bring_indices: set[int] = set()
+                lead_indices: set[int] = set()
+                for i, poke in enumerate(my_preview[:6]):
+                    if poke['species'] in my_brought:
+                        bring_indices.add(i)
+                    if poke['species'] in my_leads:
+                        lead_indices.add(i)
+
+                # Must be a valid VGC config: exactly 4 brought, exactly 2 leads
+                cfg_idx = config_to_index(bring_indices, lead_indices)
+                if cfg_idx is None:
+                    continue
+
                 # ── Encode my 6 Pokemon (slots 0..5) ──
                 for i, poke in enumerate(my_preview[:6]):
                     sp = poke['species']
@@ -104,17 +116,7 @@ class TeamPreviewDataset(Dataset):
                         mv_unk, ab_unk, it_unk, te_unk,
                     )
 
-                # Bring targets
-                for i, poke in enumerate(my_preview[:6]):
-                    if poke['species'] in my_brought:
-                        self.bring_target[idx, i] = 1.0
-
-                # Lead targets
-                for i, poke in enumerate(my_preview[:6]):
-                    if poke['species'] in my_leads:
-                        self.lead_target[idx, i] = 1.0
-
-                # Value
+                self.config_target[idx] = cfg_idx
                 self.value_target[idx] = 1.0 if winner == perspective else 0.0
 
                 idx += 1
@@ -124,8 +126,7 @@ class TeamPreviewDataset(Dataset):
         self.ability_ids = self.ability_ids[:idx]
         self.item_ids = self.item_ids[:idx]
         self.tera_ids = self.tera_ids[:idx]
-        self.bring_target = self.bring_target[:idx]
-        self.lead_target = self.lead_target[:idx]
+        self.config_target = self.config_target[:idx]
         self.value_target = self.value_target[:idx]
         self.n = idx
 
@@ -171,8 +172,7 @@ class TeamPreviewDataset(Dataset):
         self.ability_ids = self.ability_ids.to(device)
         self.item_ids = self.item_ids.to(device)
         self.tera_ids = self.tera_ids.to(device)
-        self.bring_target = self.bring_target.to(device)
-        self.lead_target = self.lead_target.to(device)
+        self.config_target = self.config_target.to(device)
         self.value_target = self.value_target.to(device)
         return self
 
@@ -186,7 +186,6 @@ class TeamPreviewDataset(Dataset):
             self.ability_ids[idx],
             self.item_ids[idx],
             self.tera_ids[idx],
-            self.bring_target[idx],
-            self.lead_target[idx],
+            self.config_target[idx],
             self.value_target[idx],
         )
