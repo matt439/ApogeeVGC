@@ -8,12 +8,13 @@
  *   node generate_batch_cache.js --count 100000 --format gen9randomdoublesbattle --outdir batch_cache
  *   node generate_batch_cache.js --count 100000 --start 50000  # resume from index 50000
  *
- * Writes to <outdir>/battle_NNNNNN.fixture.json and battle_NNNNNN.log
- * Skips battles that already have both files in the cache (for resumability).
+ * Writes to <outdir>/<format>.db (SQLite database).
+ * Skips battles that already exist in the database (for resumability).
  */
 
 const path = require('path');
 const fs = require('fs');
+const Database = require('better-sqlite3');
 
 // Showdown setup
 const showdownPath = fs.existsSync(path.resolve(__dirname, '../../../pokemon-showdown'))
@@ -143,8 +144,47 @@ async function main() {
 
     fs.mkdirSync(outdir, { recursive: true });
 
+    // Open SQLite database
+    const dbPath = path.join(outdir, `${formatid}.db`);
+    const db = new Database(dbPath);
+    db.pragma('journal_mode = WAL');
+    db.pragma('synchronous = NORMAL');
+    db.pragma('cache_size = -64000');
+
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS battles (
+            id INTEGER PRIMARY KEY,
+            fixture_json TEXT NOT NULL,
+            log TEXT NOT NULL,
+            inputlog TEXT
+        );
+        CREATE TABLE IF NOT EXISTS metadata (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
+    `);
+
+    // Store showdown version
+    try {
+        const { execSync } = require('child_process');
+        const commit = execSync('git rev-parse HEAD', { cwd: showdownPath, encoding: 'utf-8' }).trim();
+        db.prepare('INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)').run('showdown_version', commit);
+    } catch (e) { /* ignore */ }
+
+    const insertStmt = db.prepare(`
+        INSERT OR IGNORE INTO battles (id, fixture_json, log, inputlog)
+        VALUES (?, ?, ?, ?)
+    `);
+    const existsStmt = db.prepare('SELECT 1 FROM battles WHERE id = ?');
+
+    const insertBatch = db.transaction((entries) => {
+        for (const e of entries) {
+            insertStmt.run(e.id, e.fixture, e.log, e.inputlog);
+        }
+    });
+
     console.log(`Generating ${count} battles (${formatid})`);
-    console.log(`Output: ${outdir}/`);
+    console.log(`Output: ${dbPath}`);
     console.log(`Starting from index: ${startFrom}`);
     console.log(`Concurrency: ${concurrency}`);
 
@@ -157,14 +197,11 @@ async function main() {
     for (let batchStart = startFrom; batchStart < count; batchStart += concurrency) {
         const batchEnd = Math.min(batchStart + concurrency, count);
         const promises = [];
+        const results = [];
 
         for (let i = batchStart; i < batchEnd; i++) {
-            const base = path.join(outdir, `battle_${String(i).padStart(6, '0')}`);
-            const fixturePath = base + '.fixture.json';
-            const logPath = base + '.log';
-
-            // Skip if already cached
-            if (fs.existsSync(fixturePath) && fs.existsSync(logPath)) {
+            // Skip if already in database
+            if (existsStmt.get(i)) {
                 skipped++;
                 continue;
             }
@@ -172,8 +209,12 @@ async function main() {
             promises.push(
                 generateBattle(formatid, i)
                     .then(({ fixture, log }) => {
-                        fs.writeFileSync(fixturePath, JSON.stringify(fixture, null, 2));
-                        fs.writeFileSync(logPath, log);
+                        results.push({
+                            id: i,
+                            fixture: JSON.stringify(fixture, null, 2),
+                            log,
+                            inputlog: null,
+                        });
                         generated++;
                     })
                     .catch(err => {
@@ -185,6 +226,11 @@ async function main() {
 
         await Promise.all(promises);
 
+        // Write batch to database in a single transaction
+        if (results.length > 0) {
+            insertBatch(results);
+        }
+
         // Progress update every 1000 battles
         const total = generated + skipped + errors;
         if (total % 1000 < concurrency || batchStart + concurrency >= count) {
@@ -194,6 +240,8 @@ async function main() {
             console.log(`  [${total}/${count - startFrom}] generated=${generated} skipped=${skipped} errors=${errors} rate=${rate}/s ETA=${eta}min`);
         }
     }
+
+    db.close();
 
     const elapsed = (Date.now() - startTime) / 1000;
     console.log();

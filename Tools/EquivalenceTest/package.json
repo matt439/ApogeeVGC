@@ -1,0 +1,8 @@
+{
+  "name": "equivalence-test",
+  "private": true,
+  "description": "Showdown equivalence test fixture generator and cache tools",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0"
+  }
+}

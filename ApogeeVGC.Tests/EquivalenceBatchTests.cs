@@ -31,33 +31,37 @@ public class EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper out
     {
         string solutionRoot = EquivalenceTestHelper.FindSolutionRoot(AppContext.BaseDirectory);
         string toolDir = Path.Combine(solutionRoot, "Tools", "EquivalenceTest");
-        string cacheDir = Path.Combine(toolDir, "batch_cache", DefaultFormat);
-        string tempDir = Path.Combine(toolDir, "batch_temp", DefaultFormat);
+        string cacheDir = Path.Combine(toolDir, "batch_cache");
 
         Directory.CreateDirectory(cacheDir);
-        Directory.CreateDirectory(tempDir);
+
+        string dbPath = Path.Combine(cacheDir, $"{DefaultFormat}.db");
+        if (!File.Exists(dbPath))
+        {
+            output.WriteLine($"ERROR: SQLite cache not found at {dbPath}");
+            output.WriteLine("Generate it with: node generate_batch_cache.js --format " + DefaultFormat);
+            Assert.Fail($"Cache database not found: {dbPath}");
+            return;
+        }
+
+        using var cacheDb = new BatchCacheDb(dbPath);
 
         // Validate Showdown version against cache
         string showdownDir = Path.Combine(solutionRoot, "pokemon-showdown");
         string currentCommit = EquivalenceTestHelper.GetShowdownCommitId(showdownDir);
-        string versionFile = Path.Combine(cacheDir, "showdown_version.txt");
-        if (File.Exists(versionFile))
+        string? cachedCommit = cacheDb.GetMetadata("showdown_version");
+        if (cachedCommit != null && cachedCommit != currentCommit)
         {
-            string cachedCommit = File.ReadAllText(versionFile).Trim();
-            if (cachedCommit != currentCommit)
-            {
-                output.WriteLine($"WARNING: Showdown version mismatch! Cache={cachedCommit}, Current={currentCommit}");
-            }
+            output.WriteLine($"WARNING: Showdown version mismatch! Cache={cachedCommit}, Current={currentCommit}");
         }
-        else if (currentCommit != "unknown")
+        else if (cachedCommit == null && currentCommit != "unknown")
         {
-            File.WriteAllText(versionFile, currentCommit);
+            cacheDb.SetMetadata("showdown_version", currentCommit);
         }
 
         var failures = new ConcurrentBag<string>();
         var passed = 0;
         var errors = 0;
-        var cacheHits = 0;
 
         Parallel.For(0, DefaultNumTests, new ParallelOptions { MaxDegreeOfParallelism = 32 }, i =>
         {
@@ -67,42 +71,18 @@ public class EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper out
             int s4 = (i * 31 + 4) % 65536;
             var seedStr = $"{s1},{s2},{s3},{s4}";
 
-            var p1Seed = $"{(i * 41 + 10) % 65536},{(i * 43 + 20) % 65536},{(i * 47 + 30) % 65536},{(i * 53 + 40) % 65536}";
-            var p2Seed = $"{(i * 59 + 50) % 65536},{(i * 61 + 60) % 65536},{(i * 67 + 70) % 65536},{(i * 71 + 80) % 65536}";
-
-            string cacheBase = Path.Combine(cacheDir, $"battle_{i:D6}");
-            string cachedFixture = cacheBase + ".fixture.json";
-            string cachedLog = cacheBase + ".log";
-
             try
             {
-                string fixtureFile;
-                string logFile;
-
-                if (File.Exists(cachedFixture) && File.Exists(cachedLog))
+                var battle = cacheDb.GetBattle(i);
+                if (battle == null)
                 {
-                    fixtureFile = cachedFixture;
-                    logFile = cachedLog;
-                    Interlocked.Increment(ref cacheHits);
-                }
-                else
-                {
-                    bool generated = EquivalenceTestHelper.GenerateShowdownFixture(
-                        toolDir, DefaultFormat, seedStr, p1Seed, p2Seed, cacheBase, cachedLog);
-
-                    if (!generated)
-                    {
-                        failures.Add($"SEED {seedStr} — Showdown generation failed");
-                        Interlocked.Increment(ref errors);
-                        return;
-                    }
-
-                    fixtureFile = cachedFixture;
-                    logFile = cachedLog;
+                    failures.Add($"SEED {seedStr} — battle {i} not found in cache database");
+                    Interlocked.Increment(ref errors);
+                    return;
                 }
 
                 (int matches, int mismatches, int totalLines, string? firstMismatch, Exception? ex)
-                    = RunComparison(fixtureFile, logFile);
+                    = RunComparison(battle.Value.FixtureJson, battle.Value.Log);
 
                 if (ex != null)
                 {
@@ -128,7 +108,6 @@ public class EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper out
         });
 
         output.WriteLine($"Total: {DefaultNumTests}, Passed: {passed}, Failed: {failures.Count - errors}, Errors: {errors}");
-        output.WriteLine($"Cache: {cacheHits}/{DefaultNumTests} hits");
 
         if (!failures.IsEmpty)
         {
@@ -140,26 +119,18 @@ public class EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper out
             }
         }
 
-        // Clean up temp directory
-        try
-        {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
-        }
-        catch { /* ignore cleanup errors */ }
-
         Assert.Empty(failures);
     }
 
     /// <summary>
     /// Runs the equivalence comparison for a single fixture against the C# sim.
+    /// Accepts the raw fixture JSON and log content strings (from SQLite cache).
     /// </summary>
     private (int Matches, int Mismatches, int TotalLines, string? FirstMismatch, Exception? Exception)
-        RunComparison(string fixturePath, string showdownLogPath)
+        RunComparison(string fixtureJson, string showdownLog)
     {
         try
         {
-            string fixtureJson = File.ReadAllText(fixturePath);
             using JsonDocument doc = JsonDocument.Parse(fixtureJson);
             JsonElement root = doc.RootElement;
 
@@ -261,7 +232,7 @@ public class EquivalenceBatchTests(LibraryFixture fixture, ITestOutputHelper out
             }
 
             // Compare protocol output
-            string[] showdownLines = File.ReadAllLines(showdownLogPath);
+            string[] showdownLines = showdownLog.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
             var csharpFiltered = EquivalenceTestHelper.FilterProtocolLines(battle.Log);
             var showdownFiltered = EquivalenceTestHelper.FilterProtocolLines(showdownLines);
 

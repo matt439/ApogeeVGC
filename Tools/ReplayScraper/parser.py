@@ -1084,6 +1084,29 @@ def _parse_file(filepath: str) -> tuple[str | None, str, int | None]:
         return None, "error", None
 
 
+def _parse_json_str(json_str: str) -> tuple[str | None, str, int | None]:
+    """Parse a replay from its raw JSON string (from SQLite).
+
+    Returns (json_line | None, status, min_player_rating | None).
+    """
+    try:
+        data = json_loads(json_str if isinstance(json_str, bytes) else json_str.encode())
+
+        result = parse_replay(data)
+        if result is None:
+            return None, "error", None
+
+        players = result.get("players", {})
+        r1 = players.get("p1", {}).get("rating_before")
+        r2 = players.get("p2", {}).get("rating_before")
+        min_rating = min(r1, r2) if r1 is not None and r2 is not None else None
+
+        return json_dumps(result) + "\n", "ok", min_rating
+
+    except Exception:
+        return None, "error", None
+
+
 # -- Batch processing ----------------------------------------------------------
 
 _WRITE_BUFFER_SIZE = 4096  # flush to disk every N results
@@ -1106,9 +1129,15 @@ def parse_all(
             print("Failed to parse replay", file=sys.stderr)
         return
 
+    # Determine replay source: SQLite database or flat files
+    from replay_db import get_db_path, iter_all_replays, count_replays, open_db
+
+    db_path = get_db_path(format_id)
     replay_dir = Path(__file__).parent / "data" / format_id / "replays"
-    if not replay_dir.exists():
-        print(f"Replay directory not found: {replay_dir}")
+    use_sqlite = db_path.exists()
+
+    if not use_sqlite and not replay_dir.exists():
+        print(f"No replay source found (checked {db_path} and {replay_dir})")
         return
 
     if output_dir is None:
@@ -1117,8 +1146,16 @@ def parse_all(
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    files = [str(f) for f in replay_dir.glob("*.json")]
-    total = len(files)
+    if use_sqlite:
+        conn = open_db(format_id, readonly=True)
+        total = count_replays(conn)
+        source_desc = str(db_path)
+    else:
+        conn = None
+        files = [str(f) for f in replay_dir.glob("*.json")]
+        total = len(files)
+        source_desc = str(replay_dir)
+
     if workers is None:
         workers = min(multiprocessing.cpu_count(), 16)
 
@@ -1126,7 +1163,7 @@ def parse_all(
         name: out_dir / tier_filename(name) for name, _ in RATING_TIERS
     }
 
-    print(f"Parsing {total} replays from {replay_dir}")
+    print(f"Parsing {total} replays from {source_desc}")
     print(f"Output directory: {out_dir}")
     for name, min_r in RATING_TIERS:
         print(f"  {name} (min rating {min_r}): {tier_paths[name].name}")
@@ -1144,9 +1181,18 @@ def parse_all(
 
     try:
         with multiprocessing.Pool(processes=workers) as pool:
-            for i, (line, status, min_player_rating) in enumerate(
-                pool.imap_unordered(_parse_file, files, chunksize=256)
-            ):
+            if use_sqlite:
+                # Read JSON strings from SQLite, send to workers for parsing
+                json_strs = (json_str for _, json_str in iter_all_replays(conn))
+                results_iter = pool.imap_unordered(
+                    _parse_json_str, json_strs, chunksize=256
+                )
+            else:
+                results_iter = pool.imap_unordered(
+                    _parse_file, files, chunksize=256
+                )
+
+            for i, (line, status, min_player_rating) in enumerate(results_iter):
                 if status == "ok":
                     parsed += 1
                     for name, min_r in RATING_TIERS:
@@ -1172,6 +1218,8 @@ def parse_all(
     finally:
         for fh in tier_files.values():
             fh.close()
+        if conn is not None:
+            conn.close()
 
     print(f"\nDone:")
     print(f"  Total parsed: {parsed}")

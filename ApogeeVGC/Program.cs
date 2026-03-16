@@ -8,7 +8,7 @@ public class Program
     {
         Driver driver = new();
         // Parse --mode argument
-        DriverMode mode = DriverMode.MctsDlSingleBattleDebug;
+        DriverMode mode = DriverMode.EquivalenceTest;
         string? format = null;
         // First bare argument is the mode name
         if (args.Length > 0 && Enum.TryParse(args[0], true, out DriverMode parsedMode))

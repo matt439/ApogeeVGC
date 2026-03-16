@@ -8,6 +8,8 @@ Two-phase approach:
 
 Supports resumption — skips already-fetched replays on restart.
 Uses JSONL for the IDs file so resumption is fast (append-only, no full reload).
+Replays are stored in a SQLite database (data/<format_id>.db) instead of
+individual files.
 
 Usage:
   python scraper.py                          # uses defaults
@@ -20,11 +22,14 @@ Usage:
 
 import argparse
 import json
+import threading
 import time
 import urllib.request
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+
+from replay_db import open_db, replay_exists, count_replays, iter_all_replay_ids
 
 BASE_URL = "https://replay.pokemonshowdown.com"
 SEARCH_PAGE_SIZE = 51  # API returns up to 51 results per page
@@ -43,16 +48,6 @@ def get_output_dir(format_id: str) -> Path:
 
 def get_ids_file(format_id: str) -> Path:
     return get_output_dir(format_id) / "_replay_ids.jsonl"
-
-
-def get_replay_dir(format_id: str) -> Path:
-    d = get_output_dir(format_id) / "replays"
-    d.mkdir(parents=True, exist_ok=True)
-    return d
-
-
-def replay_filename(replay_id: str) -> str:
-    return replay_id.replace("/", "_") + ".json"
 
 
 def _migrate_json_to_jsonl(format_id: str) -> None:
@@ -197,15 +192,29 @@ def collect_all_ids(format_id: str, delay: float) -> int:
 
 # ── Phase 2: Fetch full replays ──────────────────────────────────────────────
 
+# Thread-local storage for SQLite connections (sqlite3 connections are not
+# thread-safe, so each worker thread gets its own).
+_thread_local = threading.local()
+
+
+def _get_thread_conn(format_id: str):
+    """Get or create a thread-local SQLite connection."""
+    conn = getattr(_thread_local, "conn", None)
+    if conn is None:
+        conn = open_db(format_id)
+        _thread_local.conn = conn
+    return conn
+
 
 def fetch_replay(
     replay_id: str,
-    replay_dir: Path,
+    format_id: str,
     delay: float,
 ) -> bool:
-    """Fetch a single replay's full JSON and save to disk. Returns True on success."""
-    filename = replay_dir / replay_filename(replay_id)
-    if filename.exists():
+    """Fetch a single replay's full JSON and save to SQLite. Returns True on success."""
+    conn = _get_thread_conn(format_id)
+
+    if replay_exists(conn, replay_id):
         return True  # Already fetched
 
     url = f"{BASE_URL}/{replay_id}.json"
@@ -217,13 +226,18 @@ def fetch_replay(
             if resp.status != 200:
                 print(f"  HTTP {resp.status}: {replay_id}", flush=True)
                 return False
-            data = json.loads(resp.read().decode("utf-8"))
+            raw = resp.read().decode("utf-8")
+            # Validate it's valid JSON
+            json.loads(raw)
     except Exception as e:
         print(f"  Error fetching {replay_id}: {e}", flush=True)
         return False
 
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(data, f)
+    conn.execute(
+        "INSERT OR IGNORE INTO replays (id, json) VALUES (?, ?)",
+        (replay_id, raw),
+    )
+    conn.commit()
 
     time.sleep(delay)
     return True
@@ -250,13 +264,11 @@ def fetch_all_replays(
             r = json.loads(line)
             all_ids.append(r["id"])
 
-    replay_dir = get_replay_dir(format_id)
-
     # Figure out which ones still need fetching
-    already_fetched = {
-        p.stem.replace("_", "/")
-        for p in replay_dir.glob("*.json")
-    }
+    conn = open_db(format_id)
+    already_fetched = set(iter_all_replay_ids(conn))
+    conn.close()
+
     to_fetch = [rid for rid in all_ids if rid not in already_fetched]
 
     print(f"  Total IDs: {len(all_ids)}", flush=True)
@@ -277,7 +289,7 @@ def fetch_all_replays(
         for i in range(0, len(to_fetch), batch_size):
             batch = to_fetch[i : i + batch_size]
             futures = {
-                executor.submit(fetch_replay, rid, replay_dir, delay): rid
+                executor.submit(fetch_replay, rid, format_id, delay): rid
                 for rid in batch
             }
             for future in as_completed(futures):

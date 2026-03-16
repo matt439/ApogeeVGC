@@ -74,10 +74,16 @@ public partial class Driver
                 RunGen5RngVerification();
                 break;
             case DriverMode.EquivalenceTest:
-                RunEquivalenceTest(
-                    "Tools/EquivalenceTest/batch_cache/battle_000000.fixture.json",
-                    "Tools/EquivalenceTest/batch_cache/battle_000000.log");
+            {
+                string solutionRoot = EquivalenceTestHelper.FindSolutionRoot(AppContext.BaseDirectory);
+                string dbPath = Path.Combine(solutionRoot, "Tools", "EquivalenceTest", "batch_cache",
+                    "gen9randomdoublesbattle.db");
+                using var cacheDb = new BatchCacheDb(dbPath);
+                (string fixtureJson, string log) = cacheDb.GetBattle(0)
+                    ?? throw new FileNotFoundException($"Battle 0 not found in {dbPath}");
+                RunEquivalenceTest(fixtureJson, log);
                 break;
+            }
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
