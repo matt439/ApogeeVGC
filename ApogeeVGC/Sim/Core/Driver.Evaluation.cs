@@ -982,10 +982,7 @@ public partial class Driver
                     localState.Turns.Add(turn);
 
                     int completed = Interlocked.Increment(ref completedBattles);
-                    if (completed % 10 == 0)
-                    {
-                        Console.WriteLine($"[Driver] Completed {completed}/{MctsDlEvaluationNumTest} battles");
-                    }
+                    Console.WriteLine($"[Driver] Completed {completed}/{MctsDlEvaluationNumTest} battles");
                 }
                 catch (Exception ex)
                 {
