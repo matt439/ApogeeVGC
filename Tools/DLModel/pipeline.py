@@ -98,7 +98,6 @@ def stage_train(args: argparse.Namespace) -> bool:
         '--results-root', args.results_root,
         '--n-trials', str(args.n_trials),
         '--epochs', str(args.epochs),
-        '--tiers', args.tier,
         '--clean',
     ]
 
@@ -382,8 +381,8 @@ def main() -> None:
     # Core args
     parser.add_argument('--format', required=True,
                         help='Regulation name (e.g. gen9vgc2025regi)')
-    parser.add_argument('--tier', default='1500+',
-                        help='Rating tier for export and evaluation (default: 1500+)')
+    parser.add_argument('--tier', default='all',
+                        help='Rating tier for export and evaluation (default: all)')
     parser.add_argument('--stages', nargs='+', default=ALL_STAGES,
                         choices=ALL_STAGES,
                         help='Pipeline stages to run (default: all)')
