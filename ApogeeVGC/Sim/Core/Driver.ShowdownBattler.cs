@@ -8,11 +8,15 @@ namespace ApogeeVGC.Sim.Core;
 
 public partial class Driver
 {
-    private const string ShowdownConfigPath = "showdown_config.json";
+    private const string ShowdownConfigFileName = "showdown_config.json";
 
     private void RunShowdownBattler(FormatId formatId)
     {
         Console.WriteLine("[Driver] Starting Showdown Battler mode");
+
+        // Resolve paths relative to solution root (exe runs from bin/)
+        string solutionRoot = EquivalenceTestHelper.FindSolutionRoot(AppContext.BaseDirectory);
+        string ShowdownConfigPath = Path.Combine(solutionRoot, ShowdownConfigFileName);
 
         // Load config
         if (!File.Exists(ShowdownConfigPath))
@@ -38,15 +42,18 @@ public partial class Driver
             return;
         }
 
-        // Load team from export paste file
-        if (!File.Exists(config.TeamFile))
+        // Load team from export paste file (resolve relative to solution root)
+        string teamFilePath = Path.IsPathRooted(config.TeamFile)
+            ? config.TeamFile
+            : Path.Combine(solutionRoot, config.TeamFile);
+        if (!File.Exists(teamFilePath))
         {
-            Console.WriteLine($"[Driver] Team file not found: {config.TeamFile}");
+            Console.WriteLine($"[Driver] Team file not found: {teamFilePath}");
             Console.WriteLine("[Driver] Create a team file in Showdown's export format (copy from teambuilder).");
             return;
         }
 
-        string teamText = File.ReadAllText(config.TeamFile);
+        string teamText = File.ReadAllText(teamFilePath);
         List<PokemonSet> team = ShowdownTeamPacker.ImportExportPaste(teamText, Library);
         string packedTeam = ShowdownTeamPacker.Pack(team, Library);
 
@@ -54,6 +61,10 @@ public partial class Driver
         foreach (PokemonSet set in team)
             Console.WriteLine($"  {Library.Species[set.Species].Name} @ {Library.Items[set.Item].Name}");
         Console.WriteLine();
+
+        // Resolve log directory relative to solution root
+        if (!Path.IsPathRooted(config.LogDirectory))
+            config.LogDirectory = Path.Combine(solutionRoot, config.LogDirectory);
 
         // Load models
         Console.WriteLine("[Driver] Loading models...");

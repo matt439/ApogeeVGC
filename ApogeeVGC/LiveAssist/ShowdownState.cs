@@ -411,10 +411,14 @@ public sealed class ShowdownState
 
         if (root.TryGetProperty("active", out JsonElement active))
         {
+            // Determine which active slots have alive Pokemon
+            // (fainted actives still appear in the request but shouldn't get choices)
+            bool[] slotAlive = GetActiveSlotAliveStatus(root);
+
             // Move request
-            if (active.GetArrayLength() > 0)
+            if (active.GetArrayLength() > 0 && slotAlive[0])
                 slotAActions = BuildSlotActions(active[0], vocab, slotIndex: 0);
-            if (active.GetArrayLength() > 1)
+            if (active.GetArrayLength() > 1 && slotAlive[1])
                 slotBActions = BuildSlotActions(active[1], vocab, slotIndex: 1);
         }
         else if (root.TryGetProperty("forceSwitch", out JsonElement forceSwitch))
@@ -1089,6 +1093,34 @@ public sealed class ShowdownState
         }
 
         return actions;
+    }
+
+    /// <summary>
+    /// Check which active slots have alive (non-fainted) Pokemon.
+    /// Returns a 2-element array [slotA, slotB].
+    /// </summary>
+    private static bool[] GetActiveSlotAliveStatus(JsonElement root)
+    {
+        bool[] alive = [true, true];
+        if (!root.TryGetProperty("side", out JsonElement side)) return alive;
+        if (!side.TryGetProperty("pokemon", out JsonElement pokemon)) return alive;
+
+        int activeIdx = 0;
+        foreach (JsonElement poke in pokemon.EnumerateArray())
+        {
+            bool isActive = poke.TryGetProperty("active", out JsonElement act) &&
+                            act.ValueKind == JsonValueKind.True;
+            if (!isActive) continue;
+
+            string condition = poke.TryGetProperty("condition", out JsonElement cond)
+                ? cond.GetString() ?? "" : "";
+            bool fainted = condition == "0 fnt" || condition.StartsWith("0 fnt");
+
+            if (activeIdx < 2)
+                alive[activeIdx] = !fainted;
+            activeIdx++;
+        }
+        return alive;
     }
 
     private Dictionary<ConditionId, int?> BuildSideConditions(string side)

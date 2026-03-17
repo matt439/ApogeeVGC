@@ -20,6 +20,7 @@ public sealed class ShowdownClient : IAsyncDisposable
     // Auth state
     private TaskCompletionSource<string>? _challstrTcs;
     private TaskCompletionSource<bool>? _loginTcs;
+    private string? _bufferedChallstr; // buffer in case challstr arrives before AuthenticateAsync
     private string? _username;
 
     // Battle room state
@@ -76,7 +77,11 @@ public sealed class ShowdownClient : IAsyncDisposable
         _challstrTcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
         _loginTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        // Wait for challstr (set by message loop)
+        // If challstr was already buffered (arrived before we started auth), use it immediately
+        if (_bufferedChallstr != null)
+            _challstrTcs.TrySetResult(_bufferedChallstr);
+
+        // Wait for challstr (set by message loop or from buffer above)
         string challstr = await _challstrTcs.Task.WaitAsync(ct);
 
         // POST to login API
@@ -91,16 +96,24 @@ public sealed class ShowdownClient : IAsyncDisposable
         HttpResponseMessage response = await http.PostAsync(_loginUrl, content, ct);
         string body = await response.Content.ReadAsStringAsync(ct);
 
+        Console.WriteLine($"[ShowdownClient] Login API status: {response.StatusCode}");
+
         // Response starts with ']' followed by JSON
         if (!body.StartsWith(']'))
-            throw new InvalidOperationException($"Unexpected login response: {body[..Math.Min(100, body.Length)]}");
+            throw new InvalidOperationException($"Unexpected login response: {body[..Math.Min(200, body.Length)]}");
 
         string json = body[1..];
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement root = doc.RootElement;
 
         if (!root.TryGetProperty("assertion", out JsonElement assertionElem))
-            throw new InvalidOperationException("Login failed: no assertion in response");
+        {
+            // Extract actionerror if present
+            string errorDetail = root.TryGetProperty("actionerror", out JsonElement err)
+                ? err.GetString() ?? "unknown error"
+                : json[..Math.Min(300, json.Length)];
+            throw new InvalidOperationException($"Login failed: {errorDetail}");
+        }
 
         string assertion = assertionElem.GetString()
             ?? throw new InvalidOperationException("Login failed: null assertion");
@@ -239,7 +252,10 @@ public sealed class ShowdownClient : IAsyncDisposable
                 case "challstr":
                     // |challstr|CHALLSTR (challstr may contain |)
                     string challstr = line[("|challstr|".Length)..];
-                    _challstrTcs?.TrySetResult(challstr);
+                    if (_challstrTcs != null)
+                        _challstrTcs.TrySetResult(challstr);
+                    else
+                        _bufferedChallstr = challstr; // buffer for later
                     break;
 
                 case "updateuser":
