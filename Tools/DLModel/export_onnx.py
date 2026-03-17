@@ -31,8 +31,16 @@ class _BattleNetWithSigmoid(nn.Module):
         super().__init__()
         self.model = model
 
-    def forward(self, *args):
-        outputs = self.model(*args)
+    def forward(
+        self,
+        species_ids: torch.Tensor,
+        move_ids: torch.Tensor,
+        ability_ids: torch.Tensor,
+        item_ids: torch.Tensor,
+        tera_ids: torch.Tensor,
+        numeric: torch.Tensor,
+    ) -> tuple[torch.Tensor, ...]:
+        outputs = self.model(species_ids, move_ids, ability_ids, item_ids, tera_ids, numeric)
         value = torch.sigmoid(outputs[0])
         return (value, *outputs[1:])
 
@@ -103,17 +111,16 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
     # Output names depend on format
     policy_names = [f'policy_{chr(97+i)}' for i in range(fmt.num_leads)]
     output_names = ['value'] + policy_names
-    dynamic_axes = {
-        'species_ids': {0: 'batch'},
-        'move_ids': {0: 'batch'},
-        'ability_ids': {0: 'batch'},
-        'item_ids': {0: 'batch'},
-        'tera_ids': {0: 'batch'},
-        'numeric': {0: 'batch'},
-        'value': {0: 'batch'},
+
+    batch = torch.export.Dim("batch", min=1)
+    dynamic_shapes = {
+        'species_ids': {0: batch},
+        'move_ids': {0: batch},
+        'ability_ids': {0: batch},
+        'item_ids': {0: batch},
+        'tera_ids': {0: batch},
+        'numeric': {0: batch},
     }
-    for name in policy_names:
-        dynamic_axes[name] = {0: 'batch'}
 
     torch.onnx.export(
         model,
@@ -124,7 +131,7 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
             'numeric',
         ],
         output_names=output_names,
-        dynamic_axes=dynamic_axes,
+        dynamic_shapes=dynamic_shapes,
         opset_version=17,
     )
 
@@ -198,6 +205,15 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
     item_ids = torch.zeros(1, 12, dtype=torch.long)
     tera_ids = torch.zeros(1, 12, dtype=torch.long)
 
+    batch = torch.export.Dim("batch", min=1)
+    dynamic_shapes = {
+        'species_ids': {0: batch},
+        'move_ids': {0: batch},
+        'ability_ids': {0: batch},
+        'item_ids': {0: batch},
+        'tera_ids': {0: batch},
+    }
+
     torch.onnx.export(
         model,
         (species_ids, move_ids, ability_ids, item_ids, tera_ids),
@@ -206,14 +222,7 @@ def export_team_preview(checkpoint_path: str, output_path: str) -> None:
             'species_ids', 'move_ids', 'ability_ids', 'item_ids', 'tera_ids',
         ],
         output_names=['config_logits'],
-        dynamic_axes={
-            'species_ids': {0: 'batch'},
-            'move_ids': {0: 'batch'},
-            'ability_ids': {0: 'batch'},
-            'item_ids': {0: 'batch'},
-            'tera_ids': {0: 'batch'},
-            'config_logits': {0: 'batch'},
-        },
+        dynamic_shapes=dynamic_shapes,
         opset_version=17,
     )
 
