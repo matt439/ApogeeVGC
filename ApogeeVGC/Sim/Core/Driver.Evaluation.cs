@@ -20,29 +20,29 @@ public partial class Driver
 
     // Random vs Random evaluation settings
     private const int RandomEvaluationNumTest = 100000;
-    private const int NumThreads = 16;
+    private const int NumThreads = CpuCoreCount;
 
     // Greedy evaluation settings
     private const int GreedyEvaluationNumTest = 200000;
-    private const int GreedyNumThreads = 32;
+    private const int GreedyNumThreads = CpuThreadCount;
 
     // MCTS evaluation settings
     private const int MctsEvaluationNumTest = 1000;
-    private const int MctsNumThreads = 32;
+    private const int MctsNumThreads = CpuThreadCount;
 
     // Standalone MCTS evaluation settings
     private const int MctsStandaloneEvaluationNumTest = 100;
-    private const int MctsStandaloneNumThreads = 32;
+    private const int MctsStandaloneNumThreads = CpuThreadCount;
     private const int MctsStandaloneIterations = 1000;
 
     // MCTS-DL evaluation settings (DL priors + value, no info tracking)
     private const int MctsDlEvaluationNumTest = 20;
-    private const int MctsDlNumThreads = 32;
+    private const int MctsDlNumThreads = CpuThreadCount;
     private const int MctsDlIterations = 10000;
 
     // DL-Greedy evaluation settings (argmax policy, no search)
     private const int DlGreedyEvaluationNumTest = 30000;
-    private const int DlGreedyNumThreads = 32;
+    private const int DlGreedyNumThreads = CpuThreadCount;
 
     /// <summary>
     /// Thread-local accumulator for parallel battle evaluation.

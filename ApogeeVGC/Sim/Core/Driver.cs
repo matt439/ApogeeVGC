@@ -12,6 +12,10 @@ public partial class Driver
 
     private Library Library { get; } = new();
 
+    // Hardware topology — single place to update when changing machines
+    private const int CpuCoreCount = 16;
+    private const int CpuThreadCount = 32;
+
     // Seeds for random team generation (shared between evaluation and interactive)
     private const int Team1EvalSeed = 54321;
     private const int Team2EvalSeed = 67890;
@@ -125,7 +129,7 @@ public partial class Driver
         FormatId formatId = format != null ? ParseFormatFromRegulation(format) : ActiveFormatId;
         string regulation = format ?? GetRegulationName(ActiveFormatId);
         int numBattles = battles ?? 200;
-        int numThreads = threads ?? 16;
+        int numThreads = threads ?? CpuCoreCount;
         int mctsIters = mctsIterations ?? 1000;
         string outputPath = output ?? $"results/{regulation}/evaluation/matchups/{player1}_vs_{player2}.json";
 
