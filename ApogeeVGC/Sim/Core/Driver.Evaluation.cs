@@ -1,10 +1,13 @@
 using ApogeeVGC.Mcts;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
+
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -1286,6 +1289,337 @@ public partial class Driver
 
         Console.WriteLine("Press Enter key to exit...");
         if (WaitForInput) Console.ReadLine();
+    }
+
+    #endregion
+
+    #region Bot-vs-Bot Evaluation
+
+    /// <summary>
+    /// Maps a CLI player type string to a <see cref="Player.PlayerType"/> enum.
+    /// </summary>
+    private static Player.PlayerType ParsePlayerType(string name) => name.ToLowerInvariant() switch
+    {
+        "random" => Player.PlayerType.Random,
+        "greedy" => Player.PlayerType.Greedy,
+        "mcts_standalone" or "mctsstandalone" => Player.PlayerType.MctsStandalone,
+        "dlgreedy" or "dl_greedy" => Player.PlayerType.DLGreedy,
+        "mctsdl" or "mcts_dl" => Player.PlayerType.MctsDL,
+        "mcts" => Player.PlayerType.Mcts,
+        _ => throw new ArgumentException($"Unknown player type: {name}"),
+    };
+
+    /// <summary>
+    /// Returns true if the given player type requires DL model resources.
+    /// </summary>
+    private static bool NeedsDlModel(Player.PlayerType type) =>
+        type is Player.PlayerType.DLGreedy or Player.PlayerType.MctsDL or Player.PlayerType.Mcts;
+
+    /// <summary>
+    /// Per-battle result for JSON output.
+    /// </summary>
+    private sealed class BattleResult
+    {
+        public int Index { get; init; }
+        public int P1Side { get; init; }
+        public string Result { get; init; } = "";
+        public int Turns { get; init; }
+    }
+
+    /// <summary>
+    /// Runs a configurable bot-vs-bot evaluation between any two player types.
+    /// Supports side-swapping: runs half the battles with P1 as side 1, half as side 2.
+    /// Outputs structured JSON results for the pipeline orchestrator.
+    /// </summary>
+    private void RunBotVsBotEvaluation(
+        FormatId formatId,
+        string player1Name,
+        string player2Name,
+        int numBattles,
+        int mctsIterations,
+        int numThreads,
+        string outputPath)
+    {
+        Player.PlayerType p1Type = ParsePlayerType(player1Name);
+        Player.PlayerType p2Type = ParsePlayerType(player2Name);
+        string formatLabel = Library.Formats[formatId].Name;
+        string regulation = GetRegulationName(formatId);
+
+        Console.WriteLine($"[Evaluate] {player1Name} vs {player2Name} — {formatLabel}");
+        Console.WriteLine($"[Evaluate] {numBattles} battles, {numThreads} threads, MCTS iterations: {mctsIterations}");
+
+        // Initialize DL resources if needed
+        bool needsDl = NeedsDlModel(p1Type) || NeedsDlModel(p2Type);
+        if (needsDl)
+        {
+            string modelPath = $"Tools/DLModel/models/{regulation}/battle_model.onnx";
+            string vocabPath = $"Tools/DLModel/models/{regulation}/battle_model_vocab.json";
+            string previewPath = $"Tools/DLModel/models/{regulation}/team_preview_model.onnx";
+
+            if (!File.Exists(modelPath))
+            {
+                Console.WriteLine($"[Evaluate] ERROR: Model not found at: {modelPath}");
+                return;
+            }
+
+            if (!File.Exists(vocabPath))
+            {
+                Console.WriteLine($"[Evaluate] ERROR: Vocab not found at: {vocabPath}");
+                return;
+            }
+
+            MctsConfig mctsConfig = new() { NumIterations = mctsIterations };
+            MctsResources.Initialize(modelPath, vocabPath, Library, mctsConfig,
+                teamPreviewModelPath: File.Exists(previewPath) ? previewPath : null);
+            Console.WriteLine("[Evaluate] DL resources initialized");
+        }
+
+        // Pre-generate teams
+        Console.WriteLine("[Evaluate] Pre-generating teams...");
+        EvaluationBattleInput[] battles = new EvaluationBattleInput[numBattles];
+        for (int i = 0; i < numBattles; i++)
+        {
+            int baseOffset = i * 5 + 1;
+            int team1Seed = Team1EvalSeed + baseOffset;
+            int team2Seed = Team2EvalSeed + baseOffset + 1;
+
+            List<PokemonSet> team1 = new RandomTeamGenerator(Library, formatId, team1Seed).GenerateTeam();
+            List<PokemonSet> team2 = new RandomTeamGenerator(Library, formatId, team2Seed).GenerateTeam();
+
+            battles[i] = new EvaluationBattleInput(
+                team1, team2,
+                team1Seed, team2Seed,
+                PlayerRandom1EvalSeed + baseOffset + 2,
+                PlayerRandom2EvalSeed + baseOffset + 3,
+                BattleEvalSeed + baseOffset + 4);
+        }
+
+        Console.WriteLine("[Evaluate] Starting battles...");
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        int completedBattles = 0;
+
+        MctsConfig? sharedMctsConfig = new() { NumIterations = mctsIterations };
+        ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = numThreads };
+
+        // Indexed arrays so results stay ordered despite parallel execution
+        SimulatorResult[] orderedResults = new SimulatorResult[numBattles];
+        int[] orderedTurns = new int[numBattles];
+        bool[] orderedCompleted = new bool[numBattles];
+        List<(int Team1Seed, int Team2Seed, int Player1Seed, int Player2Seed, int BattleSeed, Exception Exception)>
+            allExceptions = [];
+
+        Parallel.For(0, numBattles, parallelOptions,
+            () => new List<(int T1, int T2, int P1, int P2, int B, Exception Error)>(),
+            (i, _, localExceptions) =>
+            {
+                EvaluationBattleInput battle = battles[i];
+
+                // Side swap: first half P1 is side1, second half P1 is side2
+                bool swapSides = i >= numBattles / 2;
+
+                Player.PlayerType side1Type = swapSides ? p2Type : p1Type;
+                Player.PlayerType side2Type = swapSides ? p1Type : p2Type;
+                string side1Name = swapSides ? player2Name : player1Name;
+                string side2Name = swapSides ? player1Name : player2Name;
+
+                try
+                {
+                    PlayerOptions side1Options = new()
+                    {
+                        Type = side1Type,
+                        Name = side1Name,
+                        Team = battle.Team1,
+                        Seed = new PrngSeed(battle.Player1Seed),
+                        PrintDebug = false,
+                        MctsConfig = sharedMctsConfig,
+                    };
+
+                    PlayerOptions side2Options = new()
+                    {
+                        Type = side2Type,
+                        Name = side2Name,
+                        Team = battle.Team2,
+                        Seed = new PrngSeed(battle.Player2Seed),
+                        PrintDebug = false,
+                        MctsConfig = sharedMctsConfig,
+                    };
+
+                    BattleOptions battleOptions = new()
+                    {
+                        Id = formatId,
+                        Player1Options = side1Options,
+                        Player2Options = side2Options,
+                        Debug = false,
+                        Sync = true,
+                        Seed = new PrngSeed(battle.BattleRandSeed),
+                        MaxTurns = 5000,
+                    };
+
+                    SimulatorSync simulator = new();
+                    SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: false);
+                    int turn = simulator.Battle?.Turn ?? 0;
+
+                    orderedResults[i] = result;
+                    orderedTurns[i] = turn;
+                    orderedCompleted[i] = true;
+
+                    int completed = Interlocked.Increment(ref completedBattles);
+                    if (completed % Math.Max(1, numBattles / 20) == 0)
+                    {
+                        Console.WriteLine($"[Evaluate] Completed {completed}/{numBattles} battles");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    localExceptions.Add((battle.Team1Seed, battle.Team2Seed,
+                        battle.Player1Seed, battle.Player2Seed, battle.BattleRandSeed, ex));
+                }
+
+                return localExceptions;
+            },
+            localExceptions =>
+            {
+                lock (allExceptions)
+                {
+                    allExceptions.AddRange(localExceptions);
+                }
+            });
+
+        stopwatch.Stop();
+
+        if (needsDl)
+            MctsResources.Shutdown();
+
+        // Compute stats split by side assignment
+        int p1AsSide1Wins = 0, p1AsSide1Losses = 0, p1AsSide1Ties = 0;
+        int p1AsSide2Wins = 0, p1AsSide2Losses = 0, p1AsSide2Ties = 0;
+        List<BattleResult> perBattle = [];
+        List<int> turnsList = [];
+
+        for (int i = 0; i < numBattles; i++)
+        {
+            if (!orderedCompleted[i]) continue;
+
+            bool swapSides = i >= numBattles / 2;
+            SimulatorResult simResult = orderedResults[i];
+            int turns = orderedTurns[i];
+            turnsList.Add(turns);
+
+            // Determine result from P1's perspective
+            string p1Result;
+            if (swapSides)
+            {
+                // P1 is side2
+                p1Result = simResult switch
+                {
+                    SimulatorResult.Player2Win => "win",
+                    SimulatorResult.Player1Win => "loss",
+                    _ => "tie",
+                };
+                if (p1Result == "win") p1AsSide2Wins++;
+                else if (p1Result == "loss") p1AsSide2Losses++;
+                else p1AsSide2Ties++;
+            }
+            else
+            {
+                // P1 is side1
+                p1Result = simResult switch
+                {
+                    SimulatorResult.Player1Win => "win",
+                    SimulatorResult.Player2Win => "loss",
+                    _ => "tie",
+                };
+                if (p1Result == "win") p1AsSide1Wins++;
+                else if (p1Result == "loss") p1AsSide1Losses++;
+                else p1AsSide1Ties++;
+            }
+
+            perBattle.Add(new BattleResult
+            {
+                Index = i,
+                P1Side = swapSides ? 2 : 1,
+                Result = p1Result,
+                Turns = turns,
+            });
+        }
+
+        int totalP1Wins = p1AsSide1Wins + p1AsSide2Wins;
+        int totalP2Wins = p1AsSide1Losses + p1AsSide2Losses;
+        int totalTies = p1AsSide1Ties + p1AsSide2Ties;
+        int successfulBattles = totalP1Wins + totalP2Wins + totalTies;
+        double p1WinRate = successfulBattles > 0 ? (double)totalP1Wins / successfulBattles : 0;
+        double avgTurns = turnsList.Count > 0 ? turnsList.Average() : 0;
+
+        // Build JSON output
+        int halfBattles = numBattles / 2;
+        var jsonOutput = new
+        {
+            player1 = player1Name,
+            player2 = player2Name,
+            format = regulation,
+            mcts_iterations = mctsIterations,
+            total_battles = numBattles,
+            successful_battles = successfulBattles,
+            failed_battles = allExceptions.Count,
+            p1_as_side1 = new
+            {
+                wins = p1AsSide1Wins,
+                losses = p1AsSide1Losses,
+                ties = p1AsSide1Ties,
+                battles = halfBattles,
+            },
+            p1_as_side2 = new
+            {
+                wins = p1AsSide2Wins,
+                losses = p1AsSide2Losses,
+                ties = p1AsSide2Ties,
+                battles = numBattles - halfBattles,
+            },
+            combined = new
+            {
+                p1_wins = totalP1Wins,
+                p2_wins = totalP2Wins,
+                ties = totalTies,
+                p1_win_rate = Math.Round(p1WinRate, 4),
+            },
+            avg_turns = Math.Round(avgTurns, 1),
+            elapsed_seconds = Math.Round(stopwatch.Elapsed.TotalSeconds, 1),
+            per_battle = perBattle.Select(b => new
+            {
+                index = b.Index,
+                p1_side = b.P1Side,
+                result = b.Result,
+                turns = b.Turns,
+            }),
+        };
+
+        string json = JsonSerializer.Serialize(jsonOutput, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        });
+
+        // Ensure output directory exists
+        string? outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        File.WriteAllText(outputPath, json);
+
+        // Console summary
+        Console.WriteLine();
+        Console.WriteLine($"[Evaluate] {player1Name} vs {player2Name} — {successfulBattles} battles completed");
+        Console.WriteLine($"[Evaluate] {player1Name} wins: {totalP1Wins} ({p1WinRate:P1})");
+        Console.WriteLine($"[Evaluate] {player2Name} wins: {totalP2Wins} ({1 - p1WinRate - (double)totalTies / Math.Max(1, successfulBattles):P1})");
+        Console.WriteLine($"[Evaluate] Ties: {totalTies}");
+        Console.WriteLine($"[Evaluate] Avg turns: {avgTurns:F1}");
+        Console.WriteLine($"[Evaluate] Time: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}");
+        Console.WriteLine($"[Evaluate] Results written to: {outputPath}");
+
+        if (allExceptions.Count > 0)
+        {
+            Console.WriteLine($"[Evaluate] WARNING: {allExceptions.Count} battles failed with exceptions");
+        }
     }
 
     #endregion

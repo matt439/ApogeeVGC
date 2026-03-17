@@ -61,4 +61,11 @@ public enum DriverMode
     /// Configure via showdown_config.json.
     /// </summary>
     ShowdownBattler,
+
+    /// <summary>
+    /// Bot-vs-bot evaluation: runs N battles between any two player types using the internal
+    /// simulator. Outputs structured JSON results for the automated pipeline.
+    /// CLI args: --player1, --player2, --battles, --mcts-iterations, --threads, --output
+    /// </summary>
+    Evaluate,
 }

@@ -87,8 +87,48 @@ public partial class Driver
             case DriverMode.ShowdownBattler:
                 RunShowdownBattler(ActiveFormatId);
                 break;
+            case DriverMode.Evaluate:
+                throw new InvalidOperationException(
+                    "Evaluate mode requires CLI args. Use Driver.StartEvaluation() instead.");
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
+    }
+
+    /// <summary>
+    /// Parses a regulation name string (e.g., "gen9vgc2025regi") to a FormatId.
+    /// </summary>
+    private static FormatId ParseFormatFromRegulation(string regulation) => regulation.ToLowerInvariant() switch
+    {
+        "gen9vgc2024regg" => FormatId.Gen9VgcRegulationG,
+        "gen9vgc2024regh" => FormatId.Gen9VgcRegulationH,
+        "gen9vgc2025regi" => FormatId.Gen9VgcRegulationI,
+        "gen9vgcmega" => FormatId.Gen9VgcMega,
+        _ => throw new ArgumentException($"Unknown regulation: {regulation}"),
+    };
+
+    /// <summary>
+    /// Entry point for bot-vs-bot evaluation mode, called from Program.cs with parsed CLI args.
+    /// </summary>
+    public void StartEvaluation(
+        string? format,
+        string? player1,
+        string? player2,
+        int? battles,
+        int? mctsIterations,
+        int? threads,
+        string? output)
+    {
+        if (string.IsNullOrEmpty(player1) || string.IsNullOrEmpty(player2))
+            throw new ArgumentException("--player1 and --player2 are required for Evaluate mode.");
+
+        FormatId formatId = format != null ? ParseFormatFromRegulation(format) : ActiveFormatId;
+        string regulation = format ?? GetRegulationName(ActiveFormatId);
+        int numBattles = battles ?? 200;
+        int numThreads = threads ?? 16;
+        int mctsIters = mctsIterations ?? 1000;
+        string outputPath = output ?? $"results/{regulation}/evaluation/matchups/{player1}_vs_{player2}.json";
+
+        RunBotVsBotEvaluation(formatId, player1, player2, numBattles, mctsIters, numThreads, outputPath);
     }
 }

@@ -1,0 +1,437 @@
+"""
+Automated train-export-evaluate pipeline.
+
+Trains both models (TeamPreviewNet + BattleNet), exports to ONNX, then runs
+bot-vs-bot round-robin evaluation using the C# internal battle simulator.
+Designed for overnight runs with structured JSON output.
+
+Usage:
+  # Full pipeline (train + export + evaluate + report)
+  python pipeline.py --format gen9vgc2025regi
+
+  # Skip training, just evaluate existing models
+  python pipeline.py --format gen9vgc2025regi --stages export evaluate report
+
+  # Quick smoke test (no DL models needed)
+  python pipeline.py --format gen9vgc2025regi --stages evaluate report \
+      --eval-ai-types random --eval-controls greedy --eval-battles 10
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+import sys
+import time
+from itertools import combinations
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).parent.resolve()
+CSHARP_PROJECT_DEFAULT = (SCRIPT_DIR / '..' / '..' / 'ApogeeVGC').resolve()
+
+ALL_STAGES = ['train', 'export', 'evaluate', 'report']
+DEFAULT_AI_TYPES = ['dlgreedy', 'mctsdl']
+DEFAULT_CONTROLS = ['random', 'greedy', 'mcts_standalone']
+
+DL_PLAYER_TYPES = {'dlgreedy', 'mctsdl', 'mcts', 'dl_greedy', 'mcts_dl'}
+
+
+def log(msg: str) -> None:
+    ts = time.strftime('%H:%M:%S')
+    print(f'[pipeline {ts}] {msg}', flush=True)
+
+
+def run_cmd(cmd: list[str], cwd: str | Path | None = None,
+            label: str = '') -> int:
+    """Run a subprocess, streaming output. Returns exit code."""
+    cmd_str = ' '.join(str(c) for c in cmd)
+    log(f'Running: {cmd_str}')
+    if label:
+        log(f'  ({label})')
+
+    result = subprocess.run(cmd, cwd=cwd)
+    if result.returncode != 0:
+        log(f'ERROR: command exited with code {result.returncode}')
+    return result.returncode
+
+
+def load_state(state_path: Path) -> dict:
+    if state_path.exists():
+        with open(state_path) as f:
+            return json.load(f)
+    return {}
+
+
+def save_state(state_path: Path, state: dict) -> None:
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(state_path, 'w') as f:
+        json.dump(state, f, indent=2)
+
+
+# ── Stage: Train ──────────────────────────────────────────────────────────
+
+def stage_train(args: argparse.Namespace) -> bool:
+    """Train TeamPreviewNet and BattleNet via experiment orchestrators."""
+    log('=== STAGE: TRAIN ===')
+
+    common_args = [
+        '--regulation', args.format,
+        '--data-root', args.data_root,
+        '--results-root', args.results_root,
+        '--n-trials', str(args.n_trials),
+        '--epochs', str(args.epochs),
+        '--tiers', args.tier,
+        '--clean',
+    ]
+
+    # Train TeamPreviewNet
+    log('Training TeamPreviewNet...')
+    rc = run_cmd(
+        [sys.executable, '-m', 'experiments.preview_run_all'] + common_args,
+        cwd=SCRIPT_DIR,
+        label='TeamPreviewNet experiment pipeline',
+    )
+    if rc != 0:
+        log('TeamPreviewNet training failed')
+        return False
+
+    # Train BattleNet
+    log('Training BattleNet...')
+    rc = run_cmd(
+        [sys.executable, '-m', 'experiments.battle_run_all'] + common_args,
+        cwd=SCRIPT_DIR,
+        label='BattleNet experiment pipeline',
+    )
+    if rc != 0:
+        log('BattleNet training failed')
+        return False
+
+    log('Training complete')
+    return True
+
+
+# ── Stage: Export ─────────────────────────────────────────────────────────
+
+def stage_export(args: argparse.Namespace) -> bool:
+    """Export best models to ONNX."""
+    log('=== STAGE: EXPORT ===')
+
+    rc = run_cmd(
+        [sys.executable, 'export_best.py',
+         '--regulation', args.format,
+         '--tier', args.tier],
+        cwd=SCRIPT_DIR,
+        label='ONNX export',
+    )
+    if rc != 0:
+        log('ONNX export failed')
+        return False
+
+    log('Export complete')
+    return True
+
+
+# ── Stage: Evaluate ───────────────────────────────────────────────────────
+
+def build_matchups(ai_types: list[str],
+                   controls: list[str]) -> list[tuple[str, str]]:
+    """Build round-robin matchups: AI vs controls + AI vs AI."""
+    matchups = []
+
+    # Each AI type vs each control
+    for ai in ai_types:
+        for ctrl in controls:
+            matchups.append((ai, ctrl))
+
+    # AI types vs each other (if more than one)
+    for a, b in combinations(ai_types, 2):
+        matchups.append((a, b))
+
+    return matchups
+
+
+def stage_evaluate(args: argparse.Namespace) -> bool:
+    """Run bot-vs-bot round-robin via C# evaluator."""
+    log('=== STAGE: EVALUATE ===')
+
+    eval_dir = (Path(args.results_root) / args.format / 'evaluation' / args.tier)
+    matchup_dir = eval_dir / 'matchups'
+    matchup_dir.mkdir(parents=True, exist_ok=True)
+
+    matchups = build_matchups(args.eval_ai_types, args.eval_controls)
+    log(f'{len(matchups)} matchups to evaluate')
+
+    # Check if DL models are needed but missing
+    all_players = set(args.eval_ai_types) | set(args.eval_controls)
+    needs_dl = bool(all_players & DL_PLAYER_TYPES)
+    if needs_dl:
+        model_dir = SCRIPT_DIR / 'models' / args.format
+        onnx_path = model_dir / 'battle_model.onnx'
+        if not onnx_path.exists():
+            log(f'ERROR: DL model not found at {onnx_path}')
+            log('Run with --stages train export first, or remove DL player types')
+            return False
+
+    # Build C# project once
+    log('Building C# project...')
+    rc = run_cmd(
+        ['dotnet', 'build', '-c', 'Release', '--nologo', '-v', 'quiet',
+         str(args.csharp_project / 'ApogeeVGC.csproj')],
+        label='dotnet build',
+    )
+    if rc != 0:
+        log('C# build failed')
+        return False
+
+    failed = 0
+    for i, (p1, p2) in enumerate(matchups, 1):
+        output_path = matchup_dir / f'{p1}_vs_{p2}.json'
+
+        # Skip if already completed
+        if output_path.exists():
+            log(f'[{i}/{len(matchups)}] {p1} vs {p2} — already done, skipping')
+            continue
+
+        log(f'[{i}/{len(matchups)}] {p1} vs {p2} ({args.eval_battles} battles)')
+
+        rc = run_cmd(
+            ['dotnet', 'run', '--project',
+             str(args.csharp_project / 'ApogeeVGC.csproj'),
+             '-c', 'Release', '--no-build', '--',
+             '--mode', 'Evaluate',
+             '--format', args.format,
+             '--player1', p1,
+             '--player2', p2,
+             '--battles', str(args.eval_battles),
+             '--mcts-iterations', str(args.mcts_iterations),
+             '--threads', str(args.eval_threads),
+             '--output', str(output_path)],
+            label=f'{p1} vs {p2}',
+        )
+        if rc != 0:
+            log(f'WARNING: {p1} vs {p2} failed')
+            failed += 1
+
+    if failed > 0:
+        log(f'{failed}/{len(matchups)} matchups failed')
+        return False
+
+    log('Evaluation complete')
+    return True
+
+
+# ── Stage: Report ─────────────────────────────────────────────────────────
+
+def stage_report(args: argparse.Namespace) -> bool:
+    """Generate summary report from evaluation results."""
+    log('=== STAGE: REPORT ===')
+
+    eval_dir = Path(args.results_root) / args.format / 'evaluation' / args.tier
+    matchup_dir = eval_dir / 'matchups'
+
+    if not matchup_dir.exists():
+        log('No matchup results found — run evaluate stage first')
+        return False
+
+    # Collect all matchup results
+    results = {}
+    for f in sorted(matchup_dir.glob('*.json')):
+        with open(f) as fh:
+            data = json.load(fh)
+        key = f'{data["player1"]} vs {data["player2"]}'
+        results[key] = data
+
+    if not results:
+        log('No matchup JSON files found')
+        return False
+
+    # Build summary
+    summary = {
+        'format': args.format,
+        'tier': args.tier,
+        'num_matchups': len(results),
+        'matchups': {},
+    }
+
+    # Collect all unique players for win rate matrix
+    all_players: set[str] = set()
+    for data in results.values():
+        all_players.add(data['player1'])
+        all_players.add(data['player2'])
+    player_list = sorted(all_players)
+
+    # Win rate matrix (row = player, col = opponent)
+    win_matrix: dict[str, dict[str, float | None]] = {
+        p: {q: None for q in player_list} for p in player_list
+    }
+
+    for data in results.values():
+        p1 = data['player1']
+        p2 = data['player2']
+        combined = data['combined']
+        total = combined['p1_wins'] + combined['p2_wins'] + combined['ties']
+        if total > 0:
+            p1_wr = combined['p1_wins'] / total
+            win_matrix[p1][p2] = round(p1_wr, 3)
+            win_matrix[p2][p1] = round(1 - p1_wr, 3)
+
+        summary['matchups'][f'{p1}_vs_{p2}'] = {
+            'p1': p1,
+            'p2': p2,
+            'p1_wins': combined['p1_wins'],
+            'p2_wins': combined['p2_wins'],
+            'ties': combined['ties'],
+            'p1_win_rate': combined['p1_win_rate'],
+            'avg_turns': data['avg_turns'],
+        }
+
+    summary['win_rate_matrix'] = {
+        'players': player_list,
+        'matrix': win_matrix,
+    }
+
+    # Write summary
+    summary_path = eval_dir / 'round_robin_summary.json'
+    with open(summary_path, 'w') as f:
+        json.dump(summary, f, indent=2)
+    log(f'Summary written to {summary_path}')
+
+    # Print console summary
+    print()
+    print('=' * 70)
+    print(f'  Round-Robin Results: {args.format} (tier: {args.tier})')
+    print('=' * 70)
+    print()
+
+    # Win rate table
+    col_w = max(len(p) for p in player_list)
+    header = f'{"":>{col_w}}  ' + '  '.join(f'{p:>{col_w}}' for p in player_list)
+    print(header)
+    print('-' * len(header))
+    for row_player in player_list:
+        cells = []
+        for col_player in player_list:
+            val = win_matrix[row_player][col_player]
+            if val is None:
+                cells.append(f'{"—":>{col_w}}')
+            else:
+                cells.append(f'{val:>{col_w}.1%}')
+        print(f'{row_player:>{col_w}}  ' + '  '.join(cells))
+
+    print()
+
+    # Per-matchup details
+    for key, data in sorted(summary['matchups'].items()):
+        p1, p2 = data['p1'], data['p2']
+        wr = data['p1_win_rate']
+        turns = data['avg_turns']
+        print(f'  {p1} vs {p2}: {wr:.1%} win rate, {turns:.1f} avg turns')
+
+    print()
+    print('=' * 70)
+
+    # Try to generate figures
+    try:
+        from experiments.report import generate_evaluation_figures
+        figures_dir = eval_dir / 'figures'
+        figures_dir.mkdir(parents=True, exist_ok=True)
+        generate_evaluation_figures(summary, figures_dir)
+        log(f'Figures saved to {figures_dir}')
+    except ImportError:
+        log('Skipping figure generation (experiments.report not found)')
+    except Exception as e:
+        log(f'Figure generation failed: {e}')
+
+    log('Report complete')
+    return True
+
+
+# ── Main ──────────────────────────────────────────────────────────────────
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description='Automated train-export-evaluate pipeline',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+
+    # Core args
+    parser.add_argument('--format', required=True,
+                        help='Regulation name (e.g. gen9vgc2025regi)')
+    parser.add_argument('--tier', default='1500+',
+                        help='Rating tier for export and evaluation (default: 1500+)')
+    parser.add_argument('--stages', nargs='+', default=ALL_STAGES,
+                        choices=ALL_STAGES,
+                        help='Pipeline stages to run (default: all)')
+
+    # Training args (passed through to experiment orchestrators)
+    parser.add_argument('--data-root', default='../ReplayScraper/data',
+                        help='Data directory (default: ../ReplayScraper/data)')
+    parser.add_argument('--results-root', default='results',
+                        help='Results directory (default: results)')
+    parser.add_argument('--n-trials', type=int, default=100,
+                        help='Optuna trials for hparam search (default: 100)')
+    parser.add_argument('--epochs', type=int, default=50,
+                        help='Max training epochs (default: 50)')
+
+    # Evaluation args
+    parser.add_argument('--eval-ai-types', nargs='+', default=DEFAULT_AI_TYPES,
+                        help='AI player types to evaluate (default: dlgreedy mctsdl)')
+    parser.add_argument('--eval-controls', nargs='+', default=DEFAULT_CONTROLS,
+                        help='Control bot types (default: random greedy mcts_standalone)')
+    parser.add_argument('--eval-battles', type=int, default=200,
+                        help='Battles per matchup, split for side-swap (default: 200)')
+    parser.add_argument('--mcts-iterations', type=int, default=1000,
+                        help='MCTS iteration budget (default: 1000)')
+    parser.add_argument('--eval-threads', type=int, default=16,
+                        help='Parallel threads for evaluation (default: 16)')
+
+    # Paths
+    parser.add_argument('--csharp-project', type=Path,
+                        default=CSHARP_PROJECT_DEFAULT,
+                        help='Path to C# project directory')
+
+    args = parser.parse_args()
+
+    log(f'Pipeline starting: format={args.format}, tier={args.tier}')
+    log(f'Stages: {", ".join(args.stages)}')
+
+    # Pipeline state for resumability
+    state_path = (Path(args.results_root) / args.format / 'evaluation'
+                  / args.tier / 'pipeline_state.json')
+    state = load_state(state_path)
+
+    start_time = time.time()
+    stage_funcs = {
+        'train': stage_train,
+        'export': stage_export,
+        'evaluate': stage_evaluate,
+        'report': stage_report,
+    }
+
+    for stage_name in args.stages:
+        # Check if already completed (skip for report — always regenerate)
+        if stage_name != 'report' and state.get(f'{stage_name}_completed'):
+            log(f'Skipping {stage_name} (already completed)')
+            continue
+
+        func = stage_funcs[stage_name]
+        ok = func(args)
+
+        if ok:
+            state[f'{stage_name}_completed'] = True
+            state[f'{stage_name}_timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S')
+            save_state(state_path, state)
+        else:
+            log(f'Stage {stage_name} failed — aborting pipeline')
+            sys.exit(1)
+
+    elapsed = time.time() - start_time
+    hours = int(elapsed // 3600)
+    minutes = int((elapsed % 3600) // 60)
+    log(f'Pipeline complete in {hours}h {minutes}m')
+
+
+if __name__ == '__main__':
+    main()

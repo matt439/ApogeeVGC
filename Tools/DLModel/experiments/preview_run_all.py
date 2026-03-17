@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -280,6 +281,9 @@ def main():
         '--tiers', nargs='+', default=None,
         help='Rating tiers to run (default: all). '
              'Options: ' + ', '.join(t[0] for t in RATING_TIERS))
+    parser.add_argument(
+        '--clean', action='store_true',
+        help='Delete existing results before starting (fresh run)')
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -305,6 +309,19 @@ def main():
             print(f'Warning: unknown tiers ignored: {unknown}')
     else:
         tiers = RATING_TIERS
+
+    # Clean old results if requested
+    if args.clean:
+        for tier_name, _ in tiers:
+            tier_dir = results_root / tier_name
+            if tier_dir.exists():
+                print(f'Cleaning {tier_dir}...')
+                shutil.rmtree(tier_dir)
+        # Also clean cross-tier comparison
+        comparison_dir = results_root / 'rating_comparison'
+        if comparison_dir.exists():
+            print(f'Cleaning {comparison_dir}...')
+            shutil.rmtree(comparison_dir)
 
     print(f'\nRegulation: {reg}')
     print(f'Training strategy: {strategy}')
