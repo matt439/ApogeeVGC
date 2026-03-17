@@ -33,8 +33,8 @@ class TrainConfig:
     lr: float = 1e-3
     weight_decay: float = 1e-5
     batch_size: int = 16384
-    epochs: int = 50
-    patience: int = 7
+    epochs: int = 100
+    patience: int = 15
     grad_clip: float = 1.0
     scheduler: str = 'cosine'
     seed: int = 42
@@ -43,7 +43,7 @@ class TrainConfig:
     # Phase 1 training improvements
     label_smoothing: float = 0.0       # Policy CrossEntropyLoss label smoothing (0.0 = off)
     value_smoothing: float = 0.0       # Turn-dependent value target smoothing (0.0 = hard 0/1)
-    value_weight: float = 1.0          # Weight for value loss in combined loss
+    value_weight: float = 2.0          # Weight for value loss in combined loss
     policy_weight: float = 1.0         # Weight for policy loss in combined loss
     warmup_frac: float = 0.0           # Fraction of total steps for LR warmup (0.0 = off)
 

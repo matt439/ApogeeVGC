@@ -138,7 +138,7 @@ def train_battle_model(
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, patience=3, factor=0.5)
 
-    value_loss_fn = nn.BCELoss()
+    value_loss_fn = nn.BCEWithLogitsLoss()
     policy_loss_fn = nn.CrossEntropyLoss(ignore_index=0,
                                           label_smoothing=tc.label_smoothing)
 
@@ -200,7 +200,6 @@ def train_battle_model(
                 value = outputs[0]
                 policies = outputs[1:]
 
-            # Losses computed in float32 (BCELoss is unsafe under autocast)
             v_loss = value_loss_fn(value.float(), vtgt)
             pa_loss = policy_loss_fn(policies[0].float(), pa_tgt)
             p_loss = pa_loss
@@ -287,8 +286,8 @@ def train_battle_model(
                 v_pbloss_acc += pbl.detach()
                 n_vbatches += 1
 
-                # Value accuracy
-                val_acc_acc += ((value > 0.5).float() == vtgt).float().mean()
+                # Value accuracy (model outputs logits; >0 ↔ sigmoid > 0.5)
+                val_acc_acc += ((value > 0.0).float() == vtgt).float().mean()
 
                 # Policy accuracy (non-padded only) — avoid .any() sync
                 mask_a = pa_tgt > 0
