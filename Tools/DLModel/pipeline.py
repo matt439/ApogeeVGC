@@ -29,12 +29,29 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.resolve()
 CSHARP_PROJECT_DEFAULT = (SCRIPT_DIR / '..' / '..' / 'ApogeeVGC').resolve()
+RESULTS_DIR = SCRIPT_DIR / 'results'
 
 ALL_STAGES = ['train', 'export', 'evaluate', 'report']
 DEFAULT_AI_TYPES = ['dlgreedy', 'mctsdl']
 DEFAULT_CONTROLS = ['random', 'greedy', 'mcts_standalone']
 
 DL_PLAYER_TYPES = {'dlgreedy', 'mctsdl', 'mcts', 'dl_greedy', 'mcts_dl'}
+
+
+def resolve_eval_dir(args: argparse.Namespace) -> Path:
+    """Build the evaluation directory from battle + preview commit hashes.
+
+    Returns a path like:
+      results/<format>/evaluation/battle-<hash>_preview-<hash>/<tier>/
+    """
+    from experiments.git_utils import resolve_commit
+
+    reg_dir = RESULTS_DIR / args.format
+    battle_commit = resolve_commit(reg_dir, args.battle_commit or args.commit)
+    preview_commit = resolve_commit(reg_dir, args.preview_commit or args.commit)
+
+    combo = f'battle-{battle_commit}_preview-{preview_commit}'
+    return reg_dir / 'evaluation' / combo / args.tier
 
 
 def log(msg: str) -> None:
@@ -117,13 +134,19 @@ def stage_export(args: argparse.Namespace) -> bool:
     """Export best models to ONNX."""
     log('=== STAGE: EXPORT ===')
 
-    rc = run_cmd(
-        [sys.executable, 'export_best.py',
-         '--regulation', args.format,
-         '--tier', args.tier],
-        cwd=SCRIPT_DIR,
-        label='ONNX export',
-    )
+    cmd = [
+        sys.executable, 'export_best.py',
+        '--regulation', args.format,
+        '--tier', args.tier,
+        '--commit', args.commit,
+        '--also-deploy',
+    ]
+    if args.battle_commit:
+        cmd.extend(['--battle-commit', args.battle_commit])
+    if args.preview_commit:
+        cmd.extend(['--preview-commit', args.preview_commit])
+
+    rc = run_cmd(cmd, cwd=SCRIPT_DIR, label='ONNX export')
     if rc != 0:
         log('ONNX export failed')
         return False
@@ -155,7 +178,7 @@ def stage_evaluate(args: argparse.Namespace) -> bool:
     """Run bot-vs-bot round-robin via C# evaluator."""
     log('=== STAGE: EVALUATE ===')
 
-    eval_dir = (Path(args.results_root) / args.format / 'evaluation' / args.tier)
+    eval_dir = resolve_eval_dir(args)
     matchup_dir = eval_dir / 'matchups'
     matchup_dir.mkdir(parents=True, exist_ok=True)
 
@@ -227,7 +250,7 @@ def stage_report(args: argparse.Namespace) -> bool:
     """Generate summary report from evaluation results."""
     log('=== STAGE: REPORT ===')
 
-    eval_dir = Path(args.results_root) / args.format / 'evaluation' / args.tier
+    eval_dir = resolve_eval_dir(args)
     matchup_dir = eval_dir / 'matchups'
 
     if not matchup_dir.exists():
@@ -387,6 +410,14 @@ def main() -> None:
     parser.add_argument('--eval-threads', type=int, default=16,
                         help='Parallel threads for evaluation (default: 16)')
 
+    # Commit versioning
+    parser.add_argument('--commit', default='latest',
+                        help='Commit hash for both models (default: latest)')
+    parser.add_argument('--battle-commit', default=None,
+                        help='Override commit for battle model (mix-and-match)')
+    parser.add_argument('--preview-commit', default=None,
+                        help='Override commit for preview model (mix-and-match)')
+
     # Paths
     parser.add_argument('--csharp-project', type=Path,
                         default=CSHARP_PROJECT_DEFAULT,
@@ -397,35 +428,49 @@ def main() -> None:
     log(f'Pipeline starting: format={args.format}, tier={args.tier}')
     log(f'Stages: {", ".join(args.stages)}')
 
-    # Pipeline state for resumability
-    state_path = (Path(args.results_root) / args.format / 'evaluation'
-                  / args.tier / 'pipeline_state.json')
-    state = load_state(state_path)
-
     start_time = time.time()
-    stage_funcs = {
-        'train': stage_train,
-        'export': stage_export,
-        'evaluate': stage_evaluate,
-        'report': stage_report,
-    }
 
-    for stage_name in args.stages:
-        # Check if already completed (skip for report — always regenerate)
-        if stage_name != 'report' and state.get(f'{stage_name}_completed'):
-            log(f'Skipping {stage_name} (already completed)')
-            continue
+    # Train and export don't need the eval dir
+    needs_eval = bool({'evaluate', 'report'} & set(args.stages))
 
-        func = stage_funcs[stage_name]
-        ok = func(args)
-
-        if ok:
-            state[f'{stage_name}_completed'] = True
-            state[f'{stage_name}_timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S')
-            save_state(state_path, state)
-        else:
-            log(f'Stage {stage_name} failed — aborting pipeline')
+    # ── Train ──
+    if 'train' in args.stages:
+        ok = stage_train(args)
+        if not ok:
+            log('Stage train failed — aborting pipeline')
             sys.exit(1)
+
+    # ── Export ──
+    if 'export' in args.stages:
+        ok = stage_export(args)
+        if not ok:
+            log('Stage export failed — aborting pipeline')
+            sys.exit(1)
+
+    # ── Evaluate + Report (need commit-versioned eval dir) ──
+    if needs_eval:
+        eval_dir = resolve_eval_dir(args)
+        state_path = eval_dir / 'pipeline_state.json'
+        state = load_state(state_path)
+        log(f'Evaluation dir: {eval_dir}')
+
+        for stage_name in ('evaluate', 'report'):
+            if stage_name not in args.stages:
+                continue
+            if stage_name != 'report' and state.get(f'{stage_name}_completed'):
+                log(f'Skipping {stage_name} (already completed)')
+                continue
+
+            func = {'evaluate': stage_evaluate, 'report': stage_report}[stage_name]
+            ok = func(args)
+
+            if ok:
+                state[f'{stage_name}_completed'] = True
+                state[f'{stage_name}_timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S')
+                save_state(state_path, state)
+            else:
+                log(f'Stage {stage_name} failed — aborting pipeline')
+                sys.exit(1)
 
     elapsed = time.time() - start_time
     hours = int(elapsed // 3600)

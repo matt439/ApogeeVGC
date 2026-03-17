@@ -2,13 +2,15 @@
 
 **Timeline**: 9 weeks until thesis due. Overnight experiment runs are the bottleneck.
 
-## Night 1: Code Fixes (batch together)
+## Night 1: Code Fixes (REVERTED)
 
-- [ ] **BCEWithLogitsLoss**: Remove sigmoid from value head forward pass, switch training loss to `BCEWithLogitsLoss`. Apply sigmoid only at inference. Pure correctness fix.
-- [ ] **Loss weight rebalancing**: Add configurable `value_weight` to training. Default to `value_weight=2.0` so value head gets proportional gradient signal (currently drowned out by 2× policy losses).
-- [ ] **Increase max epochs**: Raise cap from 50 to 100+, increase patience to 15+. Every ablation run hit epoch 49 — training may have been cut short.
+All three changes were tested and **reverted** — they made performance worse:
 
-Run full experiment pipeline (hparam → ablation → multiseed) overnight.
+- [x] ~~**BCEWithLogitsLoss**~~: Tested. Disrupted shared trunk representations — value head gradients without sigmoid saturation dominated the trunk, hurting policy accuracy. Win rate dropped from 49% to 45%. **Reverted.**
+- [x] ~~**Loss weight rebalancing**~~: `value_weight=2.0` starved policy head. Policy top-1 dropped 1.6%. **Reverted.**
+- [x] **Increase max epochs**: Raised to 100 with patience 15. Harmless — early stopping kicks in naturally. **Kept.**
+
+Lesson: the sigmoid saturation in the original BCELoss setup was acting as implicit gradient clipping on the value head, preventing it from dominating the shared trunk.
 
 ## Night 2: MCTS Ablation + Diagnostics
 

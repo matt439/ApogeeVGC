@@ -107,14 +107,34 @@ def create_splits(
 
 
 def get_or_build_vocab(data_path: str | Path, output_dir: Path) -> dict:
-    """Load vocab from cache or build and cache it."""
-    vocab_path = output_dir / 'vocab.json'
-    if vocab_path.exists():
-        with open(vocab_path) as f:
+    """Load vocab from cache or build and cache it.
+
+    Checks two cache locations:
+    1. ``output_dir/vocab.json`` — results-local (per-commit, fast path)
+    2. ``<data_dir>/vocab.json`` — data-level (shared across commits)
+
+    If neither exists, builds from parsed data and writes both caches.
+    """
+    # Fast path: results-local cache
+    local_vocab = output_dir / 'vocab.json'
+    if local_vocab.exists():
+        with open(local_vocab) as f:
             return json.load(f)
-    vocab = build_vocab(str(data_path))
-    vocab_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(vocab_path, 'w') as f:
+
+    # Check data-level cache (shared across commits for same parsed data)
+    data_vocab = Path(data_path).parent / 'vocab.json'
+    if data_vocab.exists():
+        with open(data_vocab) as f:
+            vocab = json.load(f)
+    else:
+        vocab = build_vocab(str(data_path))
+        data_vocab.parent.mkdir(parents=True, exist_ok=True)
+        with open(data_vocab, 'w') as f:
+            json.dump(vocab, f, indent=2)
+
+    # Copy to results-local for reproducibility
+    local_vocab.parent.mkdir(parents=True, exist_ok=True)
+    with open(local_vocab, 'w') as f:
         json.dump(vocab, f, indent=2)
     return vocab
 

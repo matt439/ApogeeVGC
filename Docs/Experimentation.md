@@ -68,7 +68,7 @@ After all tiers complete, a cross-tier statistical comparison is generated with:
 - Grouped bar charts with significance brackets
 - Box plots showing metric distributions per tier
 
-**Output:** `results/<regulation>/rating_comparison/` (preview) or `results/<regulation>/battle/rating_comparison/` (battle)
+**Output:** `results/<regulation>/<commit>/preview/rating_comparison/` or `results/<regulation>/<commit>/battle/rating_comparison/`
 
 ## Training Strategy
 
@@ -103,7 +103,7 @@ Uses [Optuna](https://optuna.org/) with Tree-structured Parzen Estimator (TPE) s
 
 **Storage:** Results are stored in an SQLite database (`optuna_study.db`) so the search can be resumed if interrupted. All trials are also exported to `trials.csv` for analysis.
 
-**Output:** `results/<regulation>/<tier>/hparam_search/best_config.json`
+**Output:** `results/<regulation>/<commit>/preview/<tier>/hparam_search/best_config.json`
 
 ### Stage 2: Feature Ablation (`ablation`)
 
@@ -119,7 +119,7 @@ Trains the model with progressively more feature groups enabled, using the best 
 
 Each variant is evaluated on the held-out test set with comprehensive metrics.
 
-**Output:** `results/<regulation>/<tier>/ablation/summary.json`
+**Output:** `results/<regulation>/<commit>/preview/<tier>/ablation/summary.json`
 
 ### Stage 3: Baselines (`baselines`)
 
@@ -128,7 +128,7 @@ Evaluates two non-learned baselines on the test set for comparison:
 1. **Random** — Uniformly random bring/lead selection, averaged over 100 trials to reduce variance
 2. **Most-popular** — Computes the slot-wise marginal probability of each position being brought/led from the training set, and uses those as constant predictions
 
-**Output:** `results/<regulation>/<tier>/baselines/random_metrics.json`, `popular_metrics.json`
+**Output:** `results/<regulation>/<commit>/preview/<tier>/baselines/random_metrics.json`, `popular_metrics.json`
 
 ### Stage 4: Multi-Seed Evaluation (`multiseed`)
 
@@ -136,7 +136,7 @@ Trains the best configuration across 5 random seeds (42, 123, 456, 789, 1024) an
 
 This demonstrates that results are not an artefact of a particular random initialisation or data ordering.
 
-**Output:** `results/<regulation>/<tier>/multiseed/summary.json`
+**Output:** `results/<regulation>/<commit>/preview/<tier>/multiseed/summary.json`
 
 ### Stage 5: Figures (`figures`)
 
@@ -151,7 +151,7 @@ Generates thesis-quality visualisations as both PDF (for LaTeX) and PNG:
 | `baseline_comparison` | baselines + multiseed | Bar chart comparing model vs baselines |
 | `multiseed_distribution` | multiseed summary | Box plot of metric distribution across seeds |
 
-**Output:** `results/<regulation>/<tier>/figures/`
+**Output:** `results/<regulation>/<commit>/preview/<tier>/figures/`
 
 ## Data Management
 
@@ -159,11 +159,11 @@ Generates thesis-quality visualisations as both PDF (for LaTeX) and PNG:
 
 Games are split 70/15/15 into train/validation/test sets. The split is performed at the **game level**, not the sample level — both player perspectives of the same game always land in the same split. This prevents data leakage (the model cannot learn from the opponent's perspective of a game it will be tested on).
 
-Split indices are persisted to `results/<regulation>/splits/` so every experiment uses identical data.
+Split indices are persisted to `results/<regulation>/<commit>/preview/<tier>/splits/` so every experiment within a commit uses identical data.
 
 ### Vocabulary
 
-The vocabulary (species, moves, abilities, items, tera type mappings) is built from the full dataset and cached at `results/<regulation>/vocab.json`. All experiments for a regulation share the same vocabulary.
+The vocabulary (species, moves, abilities, items, tera type mappings) is built from the full dataset and cached at two levels: a data-level cache next to the parsed JSONL (shared across commits) and a per-tier copy in the results directory for reproducibility.
 
 ### Multi-Regulation Support
 
@@ -171,14 +171,15 @@ Each regulation is fully independent — separate data, vocabulary, splits, and 
 
 ```
 results/
-  gen9vgc2025regi/    # Regulation I (current)
-    splits/
-    hparam_search/
-    ablation/
-    baselines/
-    multiseed/
-    figures/
-  gen9vgc2024regf/    # Regulation F (when data is available)
+  gen9vgc2025regi/          # Regulation I
+    latest.txt              # Points to most recent commit hash
+    9483713e/               # Commit-versioned results
+      preview/<tier>/...
+      battle/<tier>/...
+      models/               # Exported ONNX models for this commit
+    f22f721e/               # Older commit's results (preserved)
+      ...
+  gen9vgc2024regf/          # Regulation F (when data is available)
     ...
 ```
 
@@ -231,8 +232,10 @@ The original `TeamPreviewNet` class is untouched for backward compatibility. Exi
 
 ## Results Directory Structure
 
+Results are versioned by git commit hash. Each experiment run creates a commit-specific directory, preserving historical results for comparison.
+
 ```
-results/<regulation>/
+results/<regulation>/<commit>/preview/<tier>/
   splits/
     train_indices.json       # Persisted game-level split indices
     val_indices.json
@@ -290,6 +293,7 @@ results/<regulation>/
 | `experiments/multiseed.py` | `run_multiseed()` → trains across seeds, computes mean +/- std |
 | `experiments/visualise.py` | `generate_all_figures()` → PDF + PNG plots |
 | `experiments/preview_run_all.py` | CLI orchestrator, `python -m experiments.preview_run_all` |
+| `experiments/git_utils.py` | `get_commit_hash()`, `update_latest_pointer()`, `resolve_commit()` — commit-based result versioning |
 | `experiments/utils.py` | `timer()`, `save_json()`, `load_json()` |
 
 ## Dependencies
@@ -369,13 +373,13 @@ Same Optuna TPE + median pruner approach as Team Preview. Search space:
 
 Note: batch size is capped at 1024 (no 2048) due to larger per-sample memory from 200 numeric features.
 
-**Output:** `results/<regulation>/battle/<tier>/hparam_search/best_config.json`
+**Output:** `results/<regulation>/<commit>/battle/<tier>/hparam_search/best_config.json`
 
 ### Stage 2: Feature Ablation (`ablation`)
 
 Same cumulative feature ablation as Team Preview (species only → full). Each variant uses the best hyperparameters with only `feature_flags` changed.
 
-**Output:** `results/<regulation>/battle/<tier>/ablation/summary.json`
+**Output:** `results/<regulation>/<commit>/battle/<tier>/ablation/summary.json`
 
 ### Stage 3: Baselines (`baselines`)
 
@@ -384,13 +388,13 @@ Two non-learned baselines:
 1. **Random** — Value = 0.5 (coin flip), policy = uniform over actions, averaged over 100 trials
 2. **Most-popular** — Value = training set win rate, policy = slot-wise action frequency from training set
 
-**Output:** `results/<regulation>/battle/<tier>/baselines/random_metrics.json`, `popular_metrics.json`
+**Output:** `results/<regulation>/<commit>/battle/<tier>/baselines/random_metrics.json`, `popular_metrics.json`
 
 ### Stage 4: Multi-Seed Evaluation (`multiseed`)
 
 Same 5-seed evaluation (42, 123, 456, 789, 1024) as Team Preview.
 
-**Output:** `results/<regulation>/battle/<tier>/multiseed/summary.json`
+**Output:** `results/<regulation>/<commit>/battle/<tier>/multiseed/summary.json`
 
 ### Stage 5: Figures (`figures`)
 
@@ -403,7 +407,7 @@ Same 5-seed evaluation (42, 123, 456, 789, 1024) as Team Preview.
 | `baseline_comparison` | Model vs baselines on value accuracy and policy top-1 |
 | `multiseed_distribution` | Box plot of value/policy accuracies across seeds |
 
-**Output:** `results/<regulation>/battle/<tier>/figures/`
+**Output:** `results/<regulation>/<commit>/battle/<tier>/figures/`
 
 ## Evaluation Metrics
 
@@ -438,18 +442,12 @@ The original `BattleNet` class is untouched. ONNX export detects `model_version:
 
 ## Results Directory Structure
 
-BattleNet results are stored under `battle/` to separate from Team Preview. Vocab and splits are shared at the regulation level.
+BattleNet results are stored under `battle/` alongside `preview/` within the same commit directory.
 
 ```
-results/<regulation>/
-  splits/                        # Shared: same splits for both models
-  vocab.json                     # Shared: same vocabulary
-  hparam_search/                 # Team Preview results
-  ablation/
-  baselines/
-  multiseed/
-  figures/
-  battle/                        # BattleNet results
+results/<regulation>/<commit>/
+  preview/<tier>/...             # Team Preview results (per tier)
+  battle/<tier>/                 # BattleNet results (per tier)
     hparam_search/
       optuna_study.db
       trials.csv
@@ -472,6 +470,11 @@ results/<regulation>/
       seed_1024/
       summary.json
     figures/
+  models/                        # Exported ONNX models (from export_best.py)
+    battle_model.onnx
+    battle_model_vocab.json
+    team_preview_model.onnx
+    team_preview_model_vocab.json
 ```
 
 ## BattleNet Module Reference

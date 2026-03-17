@@ -284,6 +284,10 @@ def main():
     parser.add_argument(
         '--clean', action='store_true',
         help='Delete existing results before starting (fresh run)')
+    parser.add_argument(
+        '--commit', default=None,
+        help='Override commit hash for results directory '
+             '(default: auto-detect from HEAD)')
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -294,11 +298,16 @@ def main():
         print(f'  VRAM: {mem:.1f} GB')
         print(f'  CUDA: {torch.version.cuda}  |  cuDNN: {torch.backends.cudnn.version()}')
 
+    from .git_utils import get_commit_hash, update_latest_pointer
+    commit_hash = args.commit or get_commit_hash()
+
     reg = args.regulation
     strategy = args.training_strategy
-    # Preview results go under preview/ subdirectory (parallel to battle/)
-    results_root = Path(args.results_root) / reg / 'preview'
+    # Preview results go under <commit>/preview/ subdirectory
+    results_root = Path(args.results_root) / reg / commit_hash / 'preview'
     results_root.mkdir(parents=True, exist_ok=True)
+    print(f'Commit: {commit_hash}')
+    print(f'Results: {results_root}')
 
     # Determine which tiers to run
     if args.tiers:
@@ -361,7 +370,8 @@ def main():
             model_name='TeamPreviewNet',
         )
 
-    print('\nDone.')
+    update_latest_pointer(Path(args.results_root) / reg, commit_hash)
+    print(f'\nDone. Latest pointer updated to {commit_hash}')
 
 
 if __name__ == '__main__':

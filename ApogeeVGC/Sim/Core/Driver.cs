@@ -23,10 +23,16 @@ public partial class Driver
     // !! EDIT THIS to change the format for all driver modes (except DeterministicRegressionTest) !!
     private const FormatId ActiveFormatId = FormatId.Gen9VgcRegulationI;
 
-    // Model paths derived from the active regulation
-    private static string MctsModelPath => $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/battle_model.onnx";
-    private static string MctsVocabPath => $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/battle_model_vocab.json";
-    private static string MctsTeamPreviewModelPath => $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/team_preview_model.onnx";
+    // Model paths derived from the active regulation (overridable via env vars for mix-and-match)
+    private static string MctsModelPath =>
+        Environment.GetEnvironmentVariable("APOGEE_BATTLE_MODEL")
+        ?? $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/battle_model.onnx";
+    private static string MctsVocabPath =>
+        Environment.GetEnvironmentVariable("APOGEE_BATTLE_VOCAB")
+        ?? $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/battle_model_vocab.json";
+    private static string MctsTeamPreviewModelPath =>
+        Environment.GetEnvironmentVariable("APOGEE_PREVIEW_MODEL")
+        ?? $"Tools/DLModel/models/{GetRegulationName(ActiveFormatId)}/team_preview_model.onnx";
 
     private static string GetRegulationName(FormatId formatId) => formatId switch
     {

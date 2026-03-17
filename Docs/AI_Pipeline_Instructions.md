@@ -44,10 +44,17 @@ python -m experiments.preview_run_all --regulation gen9vgc2025regi
 python -m experiments.battle_run_all --regulation gen9vgc2025regi
 ```
 
-#### Generate ONNX files (pick one tier for production — each overwrites the same output folder)
+#### Generate ONNX files (exports to commit-versioned dir + deploys to models/ for C#)
 
 ```bash
-python export_best.py --regulation gen9vgc2025regi --tier all
+python export_best.py --regulation gen9vgc2025regi --tier all --also-deploy
+```
+
+#### Mix-and-match: use battle model from one commit, preview from another
+
+```bash
+python export_best.py --regulation gen9vgc2025regi \
+    --battle-commit 9483713e --preview-commit f22f721e --also-deploy
 ```
 
 ## Automated Pipeline (overnight run)
