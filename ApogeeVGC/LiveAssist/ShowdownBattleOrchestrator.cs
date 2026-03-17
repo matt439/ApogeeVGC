@@ -16,6 +16,7 @@ public sealed class ShowdownBotConfig
     public string Password { get; set; } = "";
     public string Format { get; set; } = "gen9vgc2026regi";
     public string TeamFile { get; set; } = "team.txt";
+    public string Player { get; set; } = "dlgreedy";
     public int NumBattles { get; set; } = 100;
     public string LogDirectory { get; set; } = "logs/showdown";
     public int DelayBetweenBattlesMs { get; set; } = 5000;
@@ -43,8 +44,8 @@ public sealed class ShowdownBattleOrchestrator
     private readonly ShowdownBotConfig _config;
     private readonly Library _library;
     private readonly Vocab _vocab;
-    private readonly ModelInference _battleModel;
     private readonly TeamPreviewInference _previewModel;
+    private readonly IShowdownPlayer _player;
     private readonly string _packedTeam;
 
     private int _wins;
@@ -57,15 +58,15 @@ public sealed class ShowdownBattleOrchestrator
         ShowdownBotConfig config,
         Library library,
         Vocab vocab,
-        ModelInference battleModel,
         TeamPreviewInference previewModel,
+        IShowdownPlayer player,
         string packedTeam)
     {
         _config = config;
         _library = library;
         _vocab = vocab;
-        _battleModel = battleModel;
         _previewModel = previewModel;
+        _player = player;
         _packedTeam = packedTeam;
     }
 
@@ -75,6 +76,7 @@ public sealed class ShowdownBattleOrchestrator
         Directory.CreateDirectory(_config.LogDirectory);
 
         Console.WriteLine($"[Orchestrator] Starting {_config.NumBattles} ladder battles");
+        Console.WriteLine($"[Orchestrator] Player: {_player.Name}");
         Console.WriteLine($"[Orchestrator] Format: {_config.Format}");
         Console.WriteLine($"[Orchestrator] User: {_config.Username}");
         Console.WriteLine($"[Orchestrator] Logs: {_config.LogDirectory}");
@@ -129,7 +131,7 @@ public sealed class ShowdownBattleOrchestrator
         string timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
         client.ResetBattleLog();
 
-        var agent = new ShowdownBattleAgent(_library, _vocab, _battleModel, _previewModel);
+        var agent = new ShowdownBattleAgent(_library, _vocab, _previewModel, _player);
         string? opponent = null;
         int turns = 0;
         string resultStr = "error";
@@ -207,6 +209,9 @@ public sealed class ShowdownBattleOrchestrator
             searchCts.CancelAfter(TimeSpan.FromSeconds(_config.BattleTimeoutSeconds));
             string roomId = await battleRoomTask.WaitAsync(searchCts.Token);
             Console.WriteLine($"[Battle {battleId}] Battle started in {roomId}");
+
+            // Start the battle timer to prevent opponent stalling
+            await client.SendRoomAsync(roomId, "/timer on", ct);
 
             // Wait for battle to end
             Task<string> battleEndTask = client.WaitForBattleEndAsync(ct);

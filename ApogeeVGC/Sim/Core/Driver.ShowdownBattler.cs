@@ -63,10 +63,25 @@ public partial class Driver
         using TeamPreviewInference previewModel = new(MctsTeamPreviewModelPath, vocab);
         Console.WriteLine("[Driver] Models loaded.");
 
+        // Create the configured player
+        IShowdownPlayer player = CreateShowdownPlayer(config, battleModel);
+        Console.WriteLine($"[Driver] Player: {player.Name}");
+
         // Create and run orchestrator
         var orchestrator = new ShowdownBattleOrchestrator(
-            config, Library, vocab, battleModel, previewModel, packedTeam);
+            config, Library, vocab, previewModel, player, packedTeam);
 
         orchestrator.RunAsync().GetAwaiter().GetResult();
+    }
+
+    private static IShowdownPlayer CreateShowdownPlayer(ShowdownBotConfig config, ModelInference battleModel)
+    {
+        return config.Player.ToLowerInvariant() switch
+        {
+            "dlgreedy" or "dl-greedy" or "greedy" => new ShowdownPlayerDLGreedy(battleModel),
+            "random" => new ShowdownPlayerRandom(),
+            _ => throw new InvalidOperationException(
+                $"Unknown player type: '{config.Player}'. Valid options: dlgreedy, random"),
+        };
     }
 }

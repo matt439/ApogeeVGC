@@ -7,30 +7,31 @@ namespace ApogeeVGC.LiveAssist;
 
 /// <summary>
 /// Handles AI decision-making for a single Showdown battle.
-/// Uses ShowdownState for protocol tracking and DL models for inference.
-/// Pattern follows ShowdownServer.HandleBattlePolicyOnly().
+/// Delegates battle decisions to an IShowdownPlayer implementation
+/// (DL-Greedy, Random, or future MCTS-DL).
+/// Team preview always uses TeamPreviewInference.
 /// </summary>
 public sealed class ShowdownBattleAgent
 {
     private readonly ShowdownState _state;
     private readonly Vocab _vocab;
     private readonly ActionMapper _actionMapper;
-    private readonly ModelInference _battleModel;
     private readonly TeamPreviewInference _previewModel;
+    private readonly IShowdownPlayer _player;
 
     public ShowdownState State => _state;
 
     public ShowdownBattleAgent(
         Library library,
         Vocab vocab,
-        ModelInference battleModel,
-        TeamPreviewInference previewModel)
+        TeamPreviewInference previewModel,
+        IShowdownPlayer player)
     {
         _state = new ShowdownState(library);
         _vocab = vocab;
         _actionMapper = new ActionMapper(vocab);
-        _battleModel = battleModel;
         _previewModel = previewModel;
+        _player = player;
     }
 
     /// <summary>
@@ -66,14 +67,9 @@ public sealed class ShowdownBattleAgent
             return HandleTeamPreview();
         }
 
-        // Force switch
-        if (root.TryGetProperty("forceSwitch", out _))
-        {
-            return HandleBattle();
-        }
-
-        // Normal move request
-        if (root.TryGetProperty("active", out _))
+        // Force switch or normal move request
+        if (root.TryGetProperty("forceSwitch", out _) ||
+            root.TryGetProperty("active", out _))
         {
             return HandleBattle();
         }
@@ -100,13 +96,12 @@ public sealed class ShowdownBattleAgent
             }
 
             string choice = ShowdownChoiceSerializer.SerializeTeamPreview(output.OrderedIndices);
-            Console.WriteLine($"  → /choose {choice}");
+            Console.WriteLine($"  -> /choose {choice}");
             return choice;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[Agent] Team preview error: {ex.Message}");
-            // Fallback: bring first 4 in order
             return "team 1234";
         }
     }
@@ -118,30 +113,15 @@ public sealed class ShowdownBattleAgent
             BattlePerspective perspective = _state.BuildPerspective();
             var (actionSet, maskA, maskB) = _state.BuildLegalActions(_vocab, _actionMapper);
 
-            // Model inference
-            ModelOutput output = _battleModel.Evaluate(perspective);
-            float value = output.Value;
+            Console.WriteLine($"\n--- Turn {_state.CurrentTurn} [{_player.Name}] ---");
 
-            // Masked softmax
-            float[] probsA = ModelInference.MaskedSoftmax(output.PolicyA, maskA);
-            float[] probsB = actionSet.SlotB.Count > 0
-                ? ModelInference.MaskedSoftmax(output.PolicyB, maskB)
-                : [];
-
-            // Pick best action per slot (argmax)
-            LegalAction bestA = PickBest(actionSet.SlotA, probsA);
-            LegalAction? bestB = actionSet.SlotB.Count > 0
-                ? PickBestB(actionSet.SlotB, probsB, bestA)
-                : null;
+            // Delegate decision to the configured player
+            (LegalAction bestA, LegalAction? bestB) =
+                _player.ChooseBattle(perspective, actionSet, maskA, maskB);
 
             // Serialize to /choose format
             string choice = ShowdownChoiceSerializer.SerializeBattleChoice(bestA, bestB, _state);
-
-            // Log
-            float pct = value * 100;
-            string indicator = pct >= 55 ? "+" : pct >= 45 ? "~" : "-";
-            Console.WriteLine($"\n--- Turn {_state.CurrentTurn} --- Win: {pct:F1}% [{indicator}]");
-            Console.WriteLine($"  → /choose {choice}");
+            Console.WriteLine($"  -> /choose {choice}");
 
             return choice;
         }
@@ -151,49 +131,5 @@ public sealed class ShowdownBattleAgent
             Console.WriteLine($"  {ex.StackTrace}");
             return "default";
         }
-    }
-
-    /// <summary>Pick highest-probability legal action for slot A.</summary>
-    private static LegalAction PickBest(IReadOnlyList<LegalAction> actions, float[] probs)
-    {
-        LegalAction best = actions[0];
-        float bestProb = -1f;
-        foreach (LegalAction action in actions)
-        {
-            float p = action.VocabIndex < probs.Length ? probs[action.VocabIndex] : 0f;
-            if (p > bestProb)
-            {
-                bestProb = p;
-                best = action;
-            }
-        }
-        return best;
-    }
-
-    /// <summary>
-    /// Pick highest-probability legal action for slot B,
-    /// ensuring no duplicate switch target with slot A.
-    /// </summary>
-    private static LegalAction PickBestB(
-        IReadOnlyList<LegalAction> actions, float[] probs, LegalAction slotA)
-    {
-        LegalAction best = actions[0];
-        float bestProb = -1f;
-        foreach (LegalAction action in actions)
-        {
-            // Prevent both slots switching to the same Pokemon
-            if (action.ChoiceType == Sim.Choices.ChoiceType.Switch &&
-                slotA.ChoiceType == Sim.Choices.ChoiceType.Switch &&
-                action.SwitchIndex == slotA.SwitchIndex)
-                continue;
-
-            float p = action.VocabIndex < probs.Length ? probs[action.VocabIndex] : 0f;
-            if (p > bestProb)
-            {
-                bestProb = p;
-                best = action;
-            }
-        }
-        return best;
     }
 }
