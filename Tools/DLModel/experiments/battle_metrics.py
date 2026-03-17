@@ -74,7 +74,7 @@ def evaluate_battle_comprehensive(
     all_pa_tgt = []
     all_pb_tgt = []
 
-    value_loss_fn = nn.BCEWithLogitsLoss()
+    value_loss_fn = nn.BCELoss()
     policy_loss_fn = nn.CrossEntropyLoss(ignore_index=0)
 
     total_vloss = total_paloss = total_pbloss = 0.0
@@ -112,8 +112,7 @@ def evaluate_battle_comprehensive(
             all_pa_tgt.append(pa_tgt.cpu())
             all_pb_tgt.append(pb_tgt.cpu())
 
-    # Model outputs raw logits; convert to probabilities for metrics
-    value_pred = torch.sigmoid(torch.cat(all_value_pred)).numpy()
+    value_pred = torch.cat(all_value_pred).numpy()
     value_tgt = torch.cat(all_value_tgt).numpy()
     pa_logits = torch.cat(all_pa_logits)
     pb_logits = torch.cat(all_pb_logits)

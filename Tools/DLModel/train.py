@@ -145,7 +145,7 @@ def train(args: argparse.Namespace) -> None:
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, args.epochs)
 
-    value_loss_fn = nn.BCEWithLogitsLoss()
+    value_loss_fn = nn.BCELoss()
     policy_loss_fn = nn.CrossEntropyLoss(ignore_index=0)  # ignore <pad>
 
     best_val_loss = float('inf')
@@ -230,7 +230,7 @@ def train(args: argparse.Namespace) -> None:
 
                 bs = vtgt.size(0)
                 n_val_samples += bs
-                val_vacc += ((value > 0.0).float() == vtgt).sum().item()
+                val_vacc += ((value > 0.5).float() == vtgt).sum().item()
 
                 mask_a = pa_tgt > 0
                 if mask_a.any():
@@ -303,7 +303,7 @@ def main():
     parser.add_argument(
         '--min-rating', type=int, default=0,
         help='Minimum player rating filter (0 = all)')
-    parser.add_argument('--epochs', type=int, default=100)
+    parser.add_argument('--epochs', type=int, default=30)
     parser.add_argument('--batch-size', type=int, default=16384)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--embed-dim', type=int, default=32)
@@ -311,7 +311,7 @@ def main():
     parser.add_argument('--pokemon-dim', type=int, default=48)
     parser.add_argument('--hidden-dim', type=int, default=256)
     parser.add_argument('--val-split', type=float, default=0.2)
-    parser.add_argument('--patience', type=int, default=15)
+    parser.add_argument('--patience', type=int, default=5)
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--format', default='vgc',
                         choices=list(FORMAT_REGISTRY.keys()),

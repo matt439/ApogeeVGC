@@ -14,35 +14,8 @@ import json
 
 import torch
 
-import torch.nn as nn
-
 from model import BattleNet, BattleNetV2
 from team_preview_model import TeamPreviewNet, TeamPreviewNetV2
-
-
-class _BattleNetWithSigmoid(nn.Module):
-    """Wrapper that applies sigmoid to the value head output for ONNX export.
-
-    Training uses BCEWithLogitsLoss (raw logits), but C# inference expects
-    a [0,1] probability from the value head.
-    """
-
-    def __init__(self, model: nn.Module):
-        super().__init__()
-        self.model = model
-
-    def forward(
-        self,
-        species_ids: torch.Tensor,
-        move_ids: torch.Tensor,
-        ability_ids: torch.Tensor,
-        item_ids: torch.Tensor,
-        tera_ids: torch.Tensor,
-        numeric: torch.Tensor,
-    ) -> tuple[torch.Tensor, ...]:
-        outputs = self.model(species_ids, move_ids, ability_ids, item_ids, tera_ids, numeric)
-        value = torch.sigmoid(outputs[0])
-        return (value, *outputs[1:])
 
 
 def export_battle(checkpoint_path: str, output_path: str) -> None:
@@ -94,10 +67,6 @@ def export_battle(checkpoint_path: str, output_path: str) -> None:
         )
     state_dict = {k.removeprefix('_orig_mod.'): v for k, v in checkpoint['model_state_dict'].items()}
     model.load_state_dict(state_dict)
-    model.eval()
-
-    # Wrap with sigmoid so ONNX output is a [0,1] probability (C# expects this)
-    model = _BattleNetWithSigmoid(model)
     model.eval()
 
     num_slots = fmt.num_battle_slots

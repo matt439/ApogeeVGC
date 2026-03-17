@@ -26,7 +26,7 @@ Inputs:
   numeric:     [batch, D] float      — encoded battle state features
 
 Outputs:
-  value:    [batch] float — raw logits (apply sigmoid externally for probability)
+  value:    [batch] float — win probability (sigmoid)
   policy_i: [batch, num_actions] float — action logits per active slot (L outputs)
 """
 
@@ -127,7 +127,7 @@ class BattleNet(nn.Module):
         x = torch.cat([flat, numeric], dim=1)
         x = self.trunk(x)
 
-        value = self.value_head(x).squeeze(-1)
+        value = torch.sigmoid(self.value_head(x)).squeeze(-1)
 
         # Slot-conditioned policy for each active slot
         policies = []
@@ -279,7 +279,7 @@ class BattleNetV2(nn.Module):
         x = torch.cat([flat, numeric], dim=1)
         x = self.trunk(x)
 
-        value = self.value_head(x).squeeze(-1)
+        value = torch.sigmoid(self.value_head(x)).squeeze(-1)
 
         # Slot-conditioned policy for each active slot
         policies = []
