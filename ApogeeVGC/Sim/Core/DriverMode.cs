@@ -53,4 +53,12 @@ public enum DriverMode
     /// Use for debugging specific seeds that fail in the EquivalenceBatchTests xUnit test.
     /// </summary>
     EquivalenceTest,
+
+    /// <summary>
+    /// Automated Showdown battler: connects to play.pokemonshowdown.com via WebSocket,
+    /// authenticates, searches for VGC ladder games, and plays using DL-Greedy.
+    /// Logs full battle transcripts and structured results for thesis analysis.
+    /// Configure via showdown_config.json.
+    /// </summary>
+    ShowdownBattler,
 }

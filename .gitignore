@@ -7,6 +7,9 @@
 *.rsuser
 *.suo
 *.user
+
+# Showdown bot credentials
+showdown_config.json
 *.userosscache
 *.sln.docstates
 

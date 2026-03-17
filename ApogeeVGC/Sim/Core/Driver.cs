@@ -84,6 +84,9 @@ public partial class Driver
                 RunEquivalenceTest(fixtureJson, log);
                 break;
             }
+            case DriverMode.ShowdownBattler:
+                RunShowdownBattler(ActiveFormatId);
+                break;
             default:
                 throw new InvalidOperationException($"Driver mode {mode} is not implemented.");
         }
