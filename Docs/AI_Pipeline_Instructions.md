@@ -1,6 +1,8 @@
 # AI Pipeline Instructions for Local PC
 
-## Terminal 1 — Tools/ReplayScraper
+## Manual Pipeline
+
+### Terminal 1 — Tools/ReplayScraper
 
 pip install -r requirements.txt
 
@@ -10,7 +12,7 @@ python scraper.py --format gen9vgc2025regi
 #### Parse replays (produces parsed.jsonl, parsed_1200.jsonl, parsed_1500.jsonl)
 python parser.py --format gen9vgc2025regi
 
-## Terminal 2 — Tools/DLModel
+### Terminal 2 — Tools/DLModel
 
 pip install -r requirements.txt
 
