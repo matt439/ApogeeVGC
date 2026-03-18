@@ -25,7 +25,7 @@ namespace ApogeeVGC.Tests;
 [Collection(LibraryCollection.Name)]
 public class ParserEquivalenceTests(LibraryFixture fixture, ITestOutputHelper output)
 {
-    private const int NumFixtures = 50;
+    private const int NumFixtures = 1000;
     private const int BaseSeed = 77777;
     private static readonly string FixtureDir = Path.Combine(
         AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
