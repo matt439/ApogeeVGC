@@ -1352,9 +1352,12 @@ public partial class Driver
         bool needsDl = NeedsDlModel(p1Type) || NeedsDlModel(p2Type);
         if (needsDl)
         {
-            string modelPath = $"Tools/DLModel/models/{regulation}/battle_model.onnx";
-            string vocabPath = $"Tools/DLModel/models/{regulation}/battle_model_vocab.json";
-            string previewPath = $"Tools/DLModel/models/{regulation}/team_preview_model.onnx";
+            string modelPath = Environment.GetEnvironmentVariable("APOGEE_BATTLE_MODEL")
+                ?? $"Tools/DLModel/models/{regulation}/battle_model.onnx";
+            string vocabPath = Environment.GetEnvironmentVariable("APOGEE_BATTLE_VOCAB")
+                ?? $"Tools/DLModel/models/{regulation}/battle_model_vocab.json";
+            string previewPath = Environment.GetEnvironmentVariable("APOGEE_PREVIEW_MODEL")
+                ?? $"Tools/DLModel/models/{regulation}/team_preview_model.onnx";
 
             if (!File.Exists(modelPath))
             {

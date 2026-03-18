@@ -28,7 +28,8 @@ from itertools import combinations
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.resolve()
-CSHARP_PROJECT_DEFAULT = (SCRIPT_DIR / '..' / '..' / 'ApogeeVGC').resolve()
+REPO_ROOT = (SCRIPT_DIR / '..' / '..').resolve()
+CSHARP_PROJECT_DEFAULT = REPO_ROOT / 'ApogeeVGC'
 RESULTS_DIR = SCRIPT_DIR / 'results'
 
 ALL_STAGES = ['train', 'export', 'evaluate', 'report']
@@ -60,14 +61,19 @@ def log(msg: str) -> None:
 
 
 def run_cmd(cmd: list[str], cwd: str | Path | None = None,
-            label: str = '') -> int:
+            label: str = '', env: dict[str, str] | None = None) -> int:
     """Run a subprocess, streaming output. Returns exit code."""
     cmd_str = ' '.join(str(c) for c in cmd)
     log(f'Running: {cmd_str}')
     if label:
         log(f'  ({label})')
 
-    result = subprocess.run(cmd, cwd=cwd)
+    run_env = None
+    if env:
+        import os
+        run_env = {**os.environ, **env}
+
+    result = subprocess.run(cmd, cwd=cwd, env=run_env)
     if result.returncode != 0:
         log(f'ERROR: command exited with code {result.returncode}')
     return result.returncode
@@ -206,6 +212,14 @@ def stage_evaluate(args: argparse.Namespace) -> bool:
         log('C# build failed')
         return False
 
+    # Pass absolute model paths via env vars so the C# app doesn't depend on cwd
+    model_dir = SCRIPT_DIR / 'models' / args.format
+    model_env = {
+        'APOGEE_BATTLE_MODEL': str(model_dir / 'battle_model.onnx'),
+        'APOGEE_BATTLE_VOCAB': str(model_dir / 'battle_model_vocab.json'),
+        'APOGEE_PREVIEW_MODEL': str(model_dir / 'team_preview_model.onnx'),
+    }
+
     failed = 0
     for i, (p1, p2) in enumerate(matchups, 1):
         output_path = matchup_dir / f'{p1}_vs_{p2}.json'
@@ -229,6 +243,7 @@ def stage_evaluate(args: argparse.Namespace) -> bool:
              '--mcts-iterations', str(args.mcts_iterations),
              '--threads', str(args.eval_threads),
              '--output', str(output_path)],
+            env=model_env,
             label=f'{p1} vs {p2}',
         )
         if rc != 0:
@@ -237,6 +252,13 @@ def stage_evaluate(args: argparse.Namespace) -> bool:
 
     if failed > 0:
         log(f'{failed}/{len(matchups)} matchups failed')
+        return False
+
+    # Verify that output files were actually produced (catches silent failures
+    # where the C# process exits 0 but writes no output, e.g. model-not-found)
+    produced = list(matchup_dir.glob('*.json'))
+    if not produced:
+        log('ERROR: No matchup output files were produced — evaluation failed silently')
         return False
 
     log('Evaluation complete')
