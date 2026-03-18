@@ -267,6 +267,7 @@ def parse_replay(replay_data: dict) -> dict | None:
                 snap[slot] = {
                     "species": poke.species,
                     "hp": poke.hp,
+                    "max_hp": poke.max_hp,
                     "status": poke.status,
                     "boosts": dict(poke.boosts) if poke.boosts else {},
                     "tera": poke.tera_type,
