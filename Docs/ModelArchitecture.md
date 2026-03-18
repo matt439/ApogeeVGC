@@ -205,23 +205,23 @@ The 8 slots are arranged as:
 
 | Tensor | Shape | Dtype | Description |
 |--------|-------|-------|-------------|
-| `numeric` | `[batch, 200]` | float32 | Encoded battle state features. |
+| `numeric` | `[batch, 244]` | float32 | Encoded battle state features. |
 
-The 200-dimensional numeric vector encodes:
+The 244-dimensional numeric vector encodes:
 
 | Offset | Dim | Content |
 |--------|-----|---------|
-| 0–34 | 35 | My active A features |
-| 35–69 | 35 | My active B features |
-| 70–104 | 35 | Opponent active A features |
-| 105–139 | 35 | Opponent active B features |
-| 140–149 | 10 | My bench 0 features |
-| 150–159 | 10 | My bench 1 features |
-| 160–169 | 10 | Opponent bench 0 features |
-| 170–179 | 10 | Opponent bench 1 features |
-| 180–199 | 20 | Field + context features |
+| 0–45 | 46 | My active A features |
+| 46–91 | 46 | My active B features |
+| 92–137 | 46 | Opponent active A features |
+| 138–183 | 46 | Opponent active B features |
+| 184–193 | 10 | My bench 0 features |
+| 194–203 | 10 | My bench 1 features |
+| 204–213 | 10 | Opponent bench 0 features |
+| 214–223 | 10 | Opponent bench 1 features |
+| 224–243 | 20 | Field + context features |
 
-**Active Pokemon features (35 per slot):**
+**Active Pokemon features (46 per slot):**
 
 | Offset | Feature | Encoding |
 |--------|---------|----------|
@@ -231,6 +231,17 @@ The 200-dimensional numeric vector encodes:
 | 9–13 | Stat boosts | 5 values (atk/def/spa/spd/spe), each normalised by /6 to [−1, 1] |
 | 14 | Terastallised | Binary {0, 1} |
 | 15–34 | Tera type | One-hot [20]: none + 19 types |
+| 35 | Substitute | Binary {0, 1} — behind a substitute |
+| 36 | Confusion | Binary {0, 1} — confused |
+| 37 | Taunt | Binary {0, 1} — taunted (can't use status moves) |
+| 38 | Encore | Binary {0, 1} — encored (locked into one move) |
+| 39 | Disable | Binary {0, 1} — one move disabled |
+| 40 | Yawn | Binary {0, 1} — will fall asleep next turn |
+| 41 | Leech Seed | Binary {0, 1} — seeded (HP drained each turn) |
+| 42 | Perish Song | Binary {0, 1} — perish song active (must switch or faint) |
+| 43 | Protected | Binary {0, 1} — used a protection move this turn |
+| 44 | Torment | Binary {0, 1} — can't use same move consecutively |
+| 45 | Imprison | Binary {0, 1} — opponent's shared moves are blocked |
 
 **Bench Pokemon features (10 per slot):**
 
@@ -318,7 +329,7 @@ tera_ids ─────→ tera_embed (dim=16) ─────┘
                                          │
                                   flatten → [batch, 8 × pokemon_dim]
                                          │
-                         concat with numeric → [batch, 8 × pokemon_dim + 200]
+                         concat with numeric → [batch, 8 × pokemon_dim + 244]
                                          │
                          trunk (Linear → BN → ReLU → Dropout) × N
                                          │
@@ -342,7 +353,7 @@ Identical design to TeamPreviewNet (shared-weight encoder across all 8 slots), w
 
 The trunk receives the concatenation of:
 1. **Flattened Pokemon encodings** — `8 × pokemon_dim` dimensions capturing species, moves, abilities, items, and tera types.
-2. **Numeric features** — 200 dimensions encoding HP, statuses, boosts, field conditions, and turn number.
+2. **Numeric features** — 244 dimensions encoding HP, statuses, boosts, volatile conditions, field conditions, and turn number.
 
 This concatenation gives the trunk simultaneous access to *what* is on the field (categorical) and *what state it's in* (numeric).
 
@@ -422,7 +433,7 @@ A shared vocabulary maps string identifiers (species names, move names, etc.) to
 | **Task** | Select bring-4 + lead-2 from team sheet | Evaluate state + recommend actions |
 | **Input slots** | 12 (6 own + 6 opponent team sheet) | 8 (2+2 active + 2+2 bench) |
 | **Categorical inputs** | species, moves, ability, item, tera | species, moves, ability, item, tera |
-| **Numeric input** | None | 200-dim battle state vector |
+| **Numeric input** | None | 244-dim battle state vector |
 | **Output** | 90-class config logits | value (scalar) + 2 policy heads (action logits) |
 | **Ground truth** | Configuration index from replay | Win/loss outcome + chosen actions |
 | **Loss** | CrossEntropyLoss | BCELoss (value) + CrossEntropyLoss × 2 (policy) |

@@ -21,10 +21,10 @@ public sealed class StateEncoder(Vocab vocab)
 {
     public const int NumSpeciesSlots = 8;
     public const int NumMoveSlotsPerPokemon = 4;
-    public const int ActiveDim = 35;
+    public const int ActiveDim = 46; // 35 base + 11 volatile flags
     public const int BenchDim = 10;
     public const int FieldDim = 20;
-    public const int NumericDim = 4 * ActiveDim + 4 * BenchDim + FieldDim; // 200
+    public const int NumericDim = 4 * ActiveDim + 4 * BenchDim + FieldDim; // 244
 
     public EncodedState Encode(BattlePerspective perspective)
     {
@@ -185,7 +185,36 @@ public sealed class StateEncoder(Vocab vocab)
         {
             feat[off + 15] = 1f; // "none" tera slot
         }
+
+        // [35..45] Volatile conditions (11 binary flags)
+        IReadOnlyList<ConditionId> volatiles = p.Volatiles;
+        foreach (ConditionId vol in volatiles)
+        {
+            int vi = GetVolatileIndex(vol);
+            if (vi >= 0)
+                feat[off + 35 + vi] = 1f;
+        }
     }
+
+    /// <summary>
+    /// Maps ConditionId volatiles to feature index (0-10). Returns -1 if not tracked.
+    /// Order must match Python VOLATILES list in dataset.py.
+    /// </summary>
+    private static int GetVolatileIndex(ConditionId vol) => vol switch
+    {
+        ConditionId.Substitute => 0,
+        ConditionId.Confusion => 1,
+        ConditionId.Taunt => 2,
+        ConditionId.Encore => 3,
+        ConditionId.Disable => 4,
+        ConditionId.Yawn => 5,
+        ConditionId.LeechSeed => 6,
+        ConditionId.PerishSong => 7,
+        ConditionId.Protect => 8,
+        ConditionId.Torment => 9,
+        ConditionId.Imprison => 10,
+        _ => -1,
+    };
 
     private static void EncodeBench(float[] feat, int off, PokemonPerspective? p)
     {

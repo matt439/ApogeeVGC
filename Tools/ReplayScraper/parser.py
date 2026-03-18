@@ -97,6 +97,7 @@ class ActivePokemon:
     boosts: dict[str, int] = field(default_factory=dict)
     tera_type: str | None = None  # set when terastallized
     fainted: bool = False
+    volatiles: set[str] = field(default_factory=set)  # active volatile conditions
 
 
 @dataclass
@@ -270,6 +271,7 @@ def parse_replay(replay_data: dict) -> dict | None:
                     "boosts": dict(poke.boosts) if poke.boosts else {},
                     "tera": poke.tera_type,
                     "fainted": poke.fainted,
+                    "volatiles": sorted(poke.volatiles) if poke.volatiles else [],
                 }
         return snap
 
@@ -475,6 +477,12 @@ def parse_replay(replay_data: dict) -> dict | None:
                 phase = Phase.TURN_ACTIVE
                 turn_actions = []
                 turn_tera = {}
+
+                # Clear per-turn volatiles (protect only lasts one turn)
+                for poke in active.values():
+                    if poke is not None:
+                        poke.volatiles.discard("protected")
+
                 pending_state = snapshot_active()
                 pending_field = field_state.to_dict()
                 pending_bench = snapshot_bench()
@@ -825,6 +833,73 @@ def parse_replay(replay_data: dict) -> dict | None:
                 side = player_side(slot)
                 species = resolve_species(slot, nickname)
                 get_revealed(side, species).tera_type = tera_type
+
+            # -- Volatile conditions (start/end) --
+            elif cmd == "-start" and len(parts) >= 4:
+                slot, nickname = parse_slot(parts[2].strip())
+                effect = parts[3].strip()
+                if slot in active:
+                    # Normalize effect names to canonical keys
+                    eff_lower = effect.lower()
+                    if eff_lower == "substitute":
+                        active[slot].volatiles.add("substitute")
+                    elif eff_lower == "confusion":
+                        active[slot].volatiles.add("confusion")
+                    elif "taunt" in eff_lower:
+                        active[slot].volatiles.add("taunt")
+                    elif "encore" in eff_lower:
+                        active[slot].volatiles.add("encore")
+                    elif eff_lower.startswith("disable"):
+                        active[slot].volatiles.add("disable")
+                    elif "yawn" in eff_lower:
+                        active[slot].volatiles.add("yawn")
+                    elif "leech seed" in eff_lower:
+                        active[slot].volatiles.add("leech_seed")
+                    elif eff_lower.startswith("perish"):
+                        active[slot].volatiles.add("perish_song")
+                    elif eff_lower == "torment":
+                        active[slot].volatiles.add("torment")
+                    elif "imprison" in eff_lower:
+                        active[slot].volatiles.add("imprison")
+
+            elif cmd == "-end" and len(parts) >= 4:
+                slot, nickname = parse_slot(parts[2].strip())
+                effect = parts[3].strip()
+                if slot in active:
+                    eff_lower = effect.lower()
+                    if eff_lower == "substitute":
+                        active[slot].volatiles.discard("substitute")
+                    elif eff_lower == "confusion":
+                        active[slot].volatiles.discard("confusion")
+                    elif "taunt" in eff_lower:
+                        active[slot].volatiles.discard("taunt")
+                    elif "encore" in eff_lower:
+                        active[slot].volatiles.discard("encore")
+                    elif eff_lower.startswith("disable"):
+                        active[slot].volatiles.discard("disable")
+                    elif "yawn" in eff_lower:
+                        active[slot].volatiles.discard("yawn")
+                    elif "leech seed" in eff_lower:
+                        active[slot].volatiles.discard("leech_seed")
+                    elif eff_lower.startswith("perish"):
+                        active[slot].volatiles.discard("perish_song")
+                    elif eff_lower == "torment":
+                        active[slot].volatiles.discard("torment")
+                    elif "imprison" in eff_lower:
+                        active[slot].volatiles.discard("imprison")
+
+            # -- Protect tracking via singleturn --
+            elif cmd == "-singleturn" and len(parts) >= 4:
+                slot, nickname = parse_slot(parts[2].strip())
+                effect = parts[3].strip().lower()
+                if slot in active and ("protect" in effect or "detect" in effect
+                                       or "baneful bunker" in effect
+                                       or "king" in effect  # King's Shield
+                                       or "silk trap" in effect
+                                       or "spiky shield" in effect
+                                       or "burning bulwark" in effect
+                                       or "obstruct" in effect):
+                    active[slot].volatiles.add("protected")
 
             # -- Weather --
             elif cmd == "-weather" and len(parts) >= 3:

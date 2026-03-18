@@ -22,7 +22,7 @@ from itertools import combinations
 
 
 # Per-slot numeric feature dimensions (shared across all formats)
-ACTIVE_DIM = 35
+ACTIVE_DIM = 46  # 35 base + 11 volatile flags
 BENCH_DIM = 10
 FIELD_DIM = 20
 

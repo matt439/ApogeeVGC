@@ -424,8 +424,8 @@ def main() -> None:
                         help='AI player types to evaluate (default: dlgreedy mctsdl)')
     parser.add_argument('--eval-controls', nargs='+', default=DEFAULT_CONTROLS,
                         help='Control bot types (default: random greedy mcts_standalone)')
-    parser.add_argument('--eval-battles', type=int, default=200,
-                        help='Battles per matchup, split for side-swap (default: 200)')
+    parser.add_argument('--eval-battles', type=int, default=1000,
+                        help='Battles per matchup, split for side-swap (default: 1000)')
     parser.add_argument('--mcts-iterations', type=int, default=1000,
                         help='MCTS iteration budget (default: 1000)')
     parser.add_argument('--eval-threads', type=int, default=16,

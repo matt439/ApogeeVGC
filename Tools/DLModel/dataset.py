@@ -17,24 +17,35 @@ State encoding (per sample):
   actions only — no forward leak). Opponent abilities/items stay at 0
   since per-turn revelation can't be tracked from parsed actions.
 
-  numeric: [200] float — concatenated feature vector:
-    [0..34]    my_a active features (35)
-    [35..69]   my_b active features (35)
-    [70..104]  opp_a active features (35)
-    [105..139] opp_b active features (35)
-    [140..149] my_bench_0 features (10)
-    [150..159] my_bench_1 features (10)
-    [160..169] opp_bench_0 features (10)
-    [170..179] opp_bench_1 features (10)
-    [180..199] field + context (20)
+  numeric: [244] float — concatenated feature vector:
+    [0..45]    my_a active features (46)
+    [46..91]   my_b active features (46)
+    [92..137]  opp_a active features (46)
+    [138..183] opp_b active features (46)
+    [184..193] my_bench_0 features (10)
+    [194..203] my_bench_1 features (10)
+    [204..213] opp_bench_0 features (10)
+    [214..223] opp_bench_1 features (10)
+    [224..243] field + context (20)
 
-  Active pokemon features (35 per slot):
+  Active pokemon features (46 per slot):
     0:      hp [0,1]
     1:      is_fainted {0,1}
     2..8:   status one-hot [7] (none/par/brn/slp/psn/tox/frz)
     9..13:  boosts [5] (atk/def/spa/spd/spe) normalized /6
     14:     is_tera {0,1}
     15..34: tera_type one-hot [20] (none + 19 types)
+    35:     substitute {0,1}
+    36:     confusion {0,1}
+    37:     taunt {0,1}
+    38:     encore {0,1}
+    39:     disable {0,1}
+    40:     yawn {0,1}
+    41:     leech_seed {0,1}
+    42:     perish_song {0,1}
+    43:     protected {0,1}
+    44:     torment {0,1}
+    45:     imprison {0,1}
 
   Bench pokemon features (10 per slot):
     0:     hp [0,1]
@@ -64,6 +75,12 @@ from format_spec import FormatSpec, VGC, ACTIVE_DIM, BENCH_DIM, FIELD_DIM
 
 STATUSES = ['par', 'brn', 'slp', 'psn', 'tox', 'frz']
 STAT_NAMES = ['atk', 'def', 'spa', 'spd', 'spe']
+VOLATILES = [
+    'substitute', 'confusion', 'taunt', 'encore', 'disable',
+    'yawn', 'leech_seed', 'perish_song', 'protected', 'torment',
+    'imprison',
+]
+VOLATILE_IDX = {v: i for i, v in enumerate(VOLATILES)}
 WEATHERS = ['SunnyDay', 'RainDance', 'Sandstorm', 'Snow']
 TERRAINS = ['Electric Terrain', 'Grassy Terrain', 'Psychic Terrain', 'Misty Terrain']
 TYPES = [
@@ -79,14 +96,14 @@ TYPE_IDX = {t: i + 1 for i, t in enumerate(TYPES)}
 
 # Legacy constants for backward compatibility
 NUM_SPECIES_SLOTS = 8
-NUMERIC_DIM = 200
+NUMERIC_DIM = 244
 
 
 # ── Encoding functions ──────────────────────────────────────────────────────
 
 
 def encode_active(feat: torch.Tensor, off: int, state: dict | None) -> None:
-    """Encode one active pokemon's 35 numeric features at offset."""
+    """Encode one active pokemon's 46 numeric features at offset."""
     if state is None:
         return
     feat[off] = state.get('hp', 0) / 100.0
@@ -105,6 +122,12 @@ def encode_active(feat: torch.Tensor, off: int, state: dict | None) -> None:
         feat[off + 15 + TYPE_IDX.get(tera, 0)] = 1.0
     else:
         feat[off + 15] = 1.0  # none slot
+
+    # Volatile conditions (11 binary flags at indices 35..45)
+    for vol in state.get('volatiles', []):
+        vi = VOLATILE_IDX.get(vol)
+        if vi is not None:
+            feat[off + 35 + vi] = 1.0
 
 
 def encode_bench(feat: torch.Tensor, off: int, hp: float, fainted: bool,
