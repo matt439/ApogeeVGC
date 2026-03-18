@@ -81,7 +81,7 @@ VOLATILES = [
     'imprison',
 ]
 VOLATILE_IDX = {v: i for i, v in enumerate(VOLATILES)}
-WEATHERS = ['SunnyDay', 'RainDance', 'Sandstorm', 'Snow']
+WEATHERS = ['SunnyDay', 'RainDance', 'Sandstorm', 'Snowscape']
 TERRAINS = ['Electric Terrain', 'Grassy Terrain', 'Psychic Terrain', 'Misty Terrain']
 TYPES = [
     'Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice',
@@ -91,6 +91,8 @@ TYPES = [
 
 STATUS_IDX = {s: i + 1 for i, s in enumerate(STATUSES)}  # 0 = none
 WEATHER_IDX = {w: i + 1 for i, w in enumerate(WEATHERS)}
+WEATHER_IDX['DesolateLand'] = WEATHER_IDX['SunnyDay']      # Primal sun → Sun
+WEATHER_IDX['PrimordialSea'] = WEATHER_IDX['RainDance']    # Primal rain → Rain
 TERRAIN_IDX = {t: i + 1 for i, t in enumerate(TERRAINS)}
 TYPE_IDX = {t: i + 1 for i, t in enumerate(TYPES)}
 
@@ -328,13 +330,17 @@ class VGCDataset(Dataset):
             }
             prog_tera: dict[str, dict[str, str]] = {'p1': {}, 'p2': {}}
 
+            # Track which pokemon have been seen per side (prevents
+            # future-knowledge leakage from using final team_brought)
+            seen_pokemon: dict[str, list[str]] = {'p1': [], 'p2': []}
+
             game_turns = game.get('decision_points', game.get('turns', []))
             max_turn = max(len(game_turns), 1)
 
             for turn in game_turns:
                 active = turn.get('active', {})
 
-                # Update last-known from active slots
+                # Update last-known and seen-pokemon from active slots
                 for slot, state in active.items():
                     side = slot[:2]
                     sp = state['species']
@@ -344,6 +350,8 @@ class VGCDataset(Dataset):
                                     or state.get('hp', 0) == 0,
                         'status': state.get('status'),
                     }
+                    if sp not in seen_pokemon[side]:
+                        seen_pokemon[side].append(sp)
 
                 # Build slot → species for progressive update later
                 slot_species: dict[str, str] = {}
@@ -386,8 +394,10 @@ class VGCDataset(Dataset):
                     bench_base = num_leads * 2 * ACTIVE_DIM
                     bench_slot_base = num_leads * 2  # first bench slot index
 
+                    # Use seen_pokemon (not team_brought) to avoid
+                    # future-knowledge leakage
                     my_active_sp = {st['species'] for st in my_active if st}
-                    my_bench = [s for s in team_brought.get(perspective, [])
+                    my_bench = [s for s in seen_pokemon[perspective]
                                 if s not in my_active_sp]
 
                     for bi, sp in enumerate(my_bench[:bench_per_side]):
@@ -403,7 +413,7 @@ class VGCDataset(Dataset):
                             encode_bench(feat, off, 100, False, None, True)
 
                     opp_active_sp = {st['species'] for st in opp_active if st}
-                    opp_bench = [s for s in team_brought.get(opp, [])
+                    opp_bench = [s for s in seen_pokemon[opp]
                                  if s not in opp_active_sp]
 
                     for bi, sp in enumerate(opp_bench[:bench_per_side]):

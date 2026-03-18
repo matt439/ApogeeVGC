@@ -75,14 +75,14 @@ public sealed class StateEncoder(Vocab vocab)
         EncodeOpponentSlot(speciesIds, teraIds, 7, oppBench1);
 
         // Encode bench numeric features
-        const int benchOffset = 4 * ActiveDim; // 140
+        const int benchOffset = 4 * ActiveDim; // 184
         EncodeBench(numeric, benchOffset, myBench0);
         EncodeBench(numeric, benchOffset + BenchDim, myBench1);
         EncodeBench(numeric, benchOffset + 2 * BenchDim, oppBench0);
         EncodeBench(numeric, benchOffset + 3 * BenchDim, oppBench1);
 
         // Field features
-        const int fieldOffset = 4 * ActiveDim + 4 * BenchDim; // 180
+        const int fieldOffset = 4 * ActiveDim + 4 * BenchDim; // 224
         EncodeField(
             numeric, fieldOffset,
             perspective.Field,
