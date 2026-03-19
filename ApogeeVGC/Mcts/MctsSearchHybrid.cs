@@ -117,11 +117,16 @@ public sealed class MctsSearchHybrid(MctsConfig config, ModelInference model)
                 }
             }
 
-            // Evaluate with DL value head (thread-safe, no lock needed)
+            // Evaluate with confidence-weighted blend of DL value head and heuristic.
+            // Confidence = how far the DL prediction is from 0.5 (uncertain).
+            // When DL is uncertain (near 0.5), trust the heuristic more.
             BattlePerspective perspective = sim.GetPerspectiveForSide(sideId);
             ModelOutput output = model.Evaluate(perspective);
-            MctsLogger.LogValue(output.Value);
-            leafValue = output.Value;
+            float dlValue = output.Value;
+            float heuristicValue = HeuristicEval.Evaluate(sim, sideId);
+            float confidence = MathF.Abs(dlValue - 0.5f) * 2f; // 0 = uncertain, 1 = confident
+            leafValue = confidence * dlValue + (1f - confidence) * heuristicValue;
+            MctsLogger.LogValue(leafValue);
         }
         else
         {
