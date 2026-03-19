@@ -108,15 +108,18 @@ def stage_train(args: argparse.Namespace) -> bool:
     ]
 
     # Train TeamPreviewNet
-    log('Training TeamPreviewNet...')
-    rc = run_cmd(
-        [sys.executable, '-m', 'experiments.preview_run_all'] + common_args,
-        cwd=SCRIPT_DIR,
-        label='TeamPreviewNet experiment pipeline',
-    )
-    if rc != 0:
-        log('TeamPreviewNet training failed')
-        return False
+    if args.battle_only:
+        log('Skipping TeamPreviewNet training (--battle-only)')
+    else:
+        log('Training TeamPreviewNet...')
+        rc = run_cmd(
+            [sys.executable, '-m', 'experiments.preview_run_all'] + common_args,
+            cwd=SCRIPT_DIR,
+            label='TeamPreviewNet experiment pipeline',
+        )
+        if rc != 0:
+            log('TeamPreviewNet training failed')
+            return False
 
     # Train BattleNet
     log('Training BattleNet...')
@@ -418,6 +421,8 @@ def main() -> None:
                         help='Optuna trials for hparam search (default: 100)')
     parser.add_argument('--epochs', type=int, default=50,
                         help='Max training epochs (default: 50)')
+    parser.add_argument('--battle-only', action='store_true',
+                        help='Skip TeamPreviewNet training (only train BattleNet)')
 
     # Evaluation args
     parser.add_argument('--eval-ai-types', nargs='+', default=DEFAULT_AI_TYPES,
