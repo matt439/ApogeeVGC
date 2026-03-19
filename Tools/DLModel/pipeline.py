@@ -33,10 +33,10 @@ CSHARP_PROJECT_DEFAULT = REPO_ROOT / 'ApogeeVGC'
 RESULTS_DIR = SCRIPT_DIR / 'results'
 
 ALL_STAGES = ['train', 'export', 'evaluate', 'report']
-DEFAULT_AI_TYPES = ['dlgreedy', 'mctsdl']
+DEFAULT_AI_TYPES = ['dlgreedy', 'mctsdl', 'mctshybrid']
 DEFAULT_CONTROLS = ['random', 'greedy', 'mcts_standalone']
 
-DL_PLAYER_TYPES = {'dlgreedy', 'mctsdl', 'mcts', 'dl_greedy', 'mcts_dl'}
+DL_PLAYER_TYPES = {'dlgreedy', 'mctsdl', 'mcts', 'dl_greedy', 'mcts_dl', 'mctshybrid', 'mcts_hybrid'}
 
 
 def resolve_eval_dir(args: argparse.Namespace) -> Path:
@@ -426,8 +426,8 @@ def main() -> None:
                         help='Control bot types (default: random greedy mcts_standalone)')
     parser.add_argument('--eval-battles', type=int, default=1000,
                         help='Battles per matchup, split for side-swap (default: 1000)')
-    parser.add_argument('--mcts-iterations', type=int, default=1000,
-                        help='MCTS iteration budget (default: 1000)')
+    parser.add_argument('--mcts-iterations', type=int, default=10000,
+                        help='MCTS iteration budget (default: 10000)')
     parser.add_argument('--eval-threads', type=int, default=16,
                         help='Parallel threads for evaluation (default: 16)')
 

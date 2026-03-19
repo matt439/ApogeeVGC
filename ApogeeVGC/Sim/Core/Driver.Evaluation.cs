@@ -33,7 +33,7 @@ public partial class Driver
     // Standalone MCTS evaluation settings
     private const int MctsStandaloneEvaluationNumTest = 100;
     private const int MctsStandaloneNumThreads = CpuThreadCount;
-    private const int MctsStandaloneIterations = 1000;
+    private const int MctsStandaloneIterations = 10000;
 
     // MCTS-DL evaluation settings (DL priors + value, no info tracking)
     private const int MctsDlEvaluationNumTest = 20;
@@ -1306,6 +1306,7 @@ public partial class Driver
         "dlgreedy" or "dl_greedy" => Player.PlayerType.DLGreedy,
         "mctsdl" or "mcts_dl" => Player.PlayerType.MctsDL,
         "mcts" => Player.PlayerType.Mcts,
+        "mctshybrid" or "mcts_hybrid" => Player.PlayerType.MctsHybrid,
         _ => throw new ArgumentException($"Unknown player type: {name}"),
     };
 
@@ -1313,7 +1314,8 @@ public partial class Driver
     /// Returns true if the given player type requires DL model resources.
     /// </summary>
     private static bool NeedsDlModel(Player.PlayerType type) =>
-        type is Player.PlayerType.DLGreedy or Player.PlayerType.MctsDL or Player.PlayerType.Mcts;
+        type is Player.PlayerType.DLGreedy or Player.PlayerType.MctsDL or Player.PlayerType.Mcts
+            or Player.PlayerType.MctsHybrid;
 
     /// <summary>
     /// Per-battle result for JSON output.

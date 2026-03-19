@@ -9,7 +9,7 @@ public sealed class MctsConfig
     public float CPuct { get; init; } = 1.5f;
 
     /// <summary>Number of MCTS iterations per search call.</summary>
-    public int NumIterations { get; init; } = 200;
+    public int NumIterations { get; init; } = 10000;
 
     /// <summary>Number of determinizations (K). 1 = perfect info mode.</summary>
     public int NumDeterminizations { get; init; } = 1;
