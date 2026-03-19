@@ -17,7 +17,7 @@ State encoding (per sample):
   actions only — no forward leak). Opponent abilities/items stay at 0
   since per-turn revelation can't be tracked from parsed actions.
 
-  numeric: [244] float — concatenated feature vector:
+  numeric: [264] float — concatenated feature vector:
     [0..45]    my_a active features (46)
     [46..91]   my_b active features (46)
     [92..137]  opp_a active features (46)
@@ -27,6 +27,12 @@ State encoding (per sample):
     [204..213] opp_bench_0 features (10)
     [214..223] opp_bench_1 features (10)
     [224..243] field + context (20)
+    [244..263] matchup features (20):
+      244..251: damage matrix [8] (my_a→opp_a, my_a→opp_b, my_b→opp_a, my_b→opp_b,
+                                    opp_a→my_a, opp_a→my_b, opp_b→my_a, opp_b→my_b)
+      252..255: speed comparison [4] (my_a>opp_a, my_a>opp_b, my_b>opp_a, my_b>opp_b)
+      256..263: pokemon types [8] (my_a type1/type2, my_b type1/type2,
+                                    opp_a type1/type2, opp_b type1/type2)
 
   Active pokemon features (46 per slot):
     0:      hp [0,1]
@@ -69,7 +75,11 @@ import json
 import torch
 from torch.utils.data import Dataset
 
-from format_spec import FormatSpec, VGC, ACTIVE_DIM, BENCH_DIM, FIELD_DIM
+from format_spec import FormatSpec, VGC, ACTIVE_DIM, BENCH_DIM, FIELD_DIM, MATCHUP_DIM
+from game_data import (
+    estimate_damage_fraction, get_species_types, get_species_base_speed,
+    TYPE_INDEX,
+)
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -161,6 +171,84 @@ def encode_field(feat: torch.Tensor, off: int, field: dict,
     feat[off + 16] = float(field.get(f'{opp}_light_screen', False))
     feat[off + 17] = float(field.get(f'{perspective}_aurora_veil', False))
     feat[off + 18] = float(field.get(f'{opp}_aurora_veil', False))
+
+
+def encode_matchup(feat: torch.Tensor, off: int,
+                   my_active: list, opp_active: list,
+                   my_revealed: dict, opp_prog_moves: dict,
+                   trick_room: bool) -> None:
+    """Encode 20 matchup features: damage matrix (8), speed (4), types (8)."""
+    num_types = len(TYPE_INDEX)
+
+    # Collect species and known moves for each active slot
+    my_species = []
+    my_moves_list = []
+    for st in my_active:
+        if st:
+            sp = st['species']
+            my_species.append(sp)
+            # Own moves: from end-of-game revealed data (always known)
+            rev = my_revealed.get(sp, {})
+            my_moves_list.append(rev.get('moves', []))
+        else:
+            my_species.append(None)
+            my_moves_list.append([])
+
+    opp_species = []
+    opp_moves_list = []
+    for st in opp_active:
+        if st:
+            sp = st['species']
+            opp_species.append(sp)
+            # Opponent moves: only progressively revealed
+            opp_moves_list.append(opp_prog_moves.get(sp, []))
+        else:
+            opp_species.append(None)
+            opp_moves_list.append([])
+
+    # ── Damage matrix (8 floats) ──
+    # my_a→opp_a, my_a→opp_b, my_b→opp_a, my_b→opp_b,
+    # opp_a→my_a, opp_a→my_b, opp_b→my_a, opp_b→my_b
+    di = 0
+    for mi in range(2):
+        for oi in range(2):
+            if my_species[mi] and opp_species[oi] and my_moves_list[mi]:
+                feat[off + di] = min(estimate_damage_fraction(
+                    my_species[mi], my_moves_list[mi], opp_species[oi]), 2.0) / 2.0
+            di += 1
+    for oi in range(2):
+        for mi in range(2):
+            if opp_species[oi] and my_species[mi] and opp_moves_list[oi]:
+                feat[off + di] = min(estimate_damage_fraction(
+                    opp_species[oi], opp_moves_list[oi], my_species[mi]), 2.0) / 2.0
+            di += 1
+
+    # ── Speed comparison (4 floats) ──
+    # my_a>opp_a, my_a>opp_b, my_b>opp_a, my_b>opp_b
+    si = 8
+    for mi in range(2):
+        for oi in range(2):
+            if my_species[mi] and opp_species[oi]:
+                my_spd = get_species_base_speed(my_species[mi])
+                opp_spd = get_species_base_speed(opp_species[oi])
+                # In Trick Room, slower is better
+                if trick_room:
+                    feat[off + si] = 1.0 if my_spd < opp_spd else 0.0
+                else:
+                    feat[off + si] = 1.0 if my_spd > opp_spd else 0.0
+            si += 1
+
+    # ── Pokemon types (8 floats) ──
+    # my_a type1/type2, my_b type1/type2, opp_a type1/type2, opp_b type1/type2
+    ti = 12
+    for sp_list in [my_species, opp_species]:
+        for sp in sp_list:
+            if sp:
+                types = get_species_types(sp)
+                feat[off + ti] = (TYPE_INDEX.get(types[0], 0) + 1) / num_types
+                if len(types) > 1:
+                    feat[off + ti + 1] = (TYPE_INDEX.get(types[1], 0) + 1) / num_types
+            ti += 2
 
 
 # ── Vocabulary ───────────────────────────────────────────────────────────────
@@ -433,6 +521,14 @@ class VGCDataset(Dataset):
                     encode_field(feat, field_off,
                                  turn.get('field', {}), perspective)
                     feat[field_off + 19] = turn.get('turn', 1) / 20.0
+
+                    # ── Matchup features ──
+                    matchup_off = field_off + FIELD_DIM
+                    trick_room = bool(turn.get('field', {}).get('trick_room'))
+                    encode_matchup(feat, matchup_off,
+                                   my_active, opp_active,
+                                   my_revealed, opp_prog_m,
+                                   trick_room)
 
                     # ── Value target ──
                     self.value_targets[idx] = (

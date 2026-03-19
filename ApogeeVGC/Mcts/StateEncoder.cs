@@ -1,9 +1,11 @@
+using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Mcts;
 
@@ -17,14 +19,17 @@ public readonly struct EncodedState
     public required float[] Numeric { get; init; }
 }
 
-public sealed class StateEncoder(Vocab vocab)
+public sealed class StateEncoder(Vocab vocab, Library library)
 {
     public const int NumSpeciesSlots = 8;
     public const int NumMoveSlotsPerPokemon = 4;
     public const int ActiveDim = 46; // 35 base + 11 volatile flags
     public const int BenchDim = 10;
     public const int FieldDim = 20;
-    public const int NumericDim = 4 * ActiveDim + 4 * BenchDim + FieldDim; // 244
+    public const int MatchupDim = 20; // 8 damage matrix + 4 speed + 8 types
+    public const int NumericDim = 4 * ActiveDim + 4 * BenchDim + FieldDim + MatchupDim; // 264
+
+    private static readonly TypeChart TypeChartInstance = new();
 
     public EncodedState Encode(BattlePerspective perspective)
     {
@@ -89,6 +94,12 @@ public sealed class StateEncoder(Vocab vocab)
             playerSide.SideConditionsWithDuration,
             opponentSide.SideConditionsWithDuration,
             perspective.TurnCounter);
+
+        // Matchup features (damage matrix, speed, types)
+        const int matchupOffset = fieldOffset + FieldDim; // 244
+        bool trickRoom = perspective.Field.PseudoWeather.Contains(ConditionId.TrickRoom);
+        EncodeMatchup(numeric, matchupOffset,
+            myActiveA, myActiveB, oppActiveA, oppActiveB, trickRoom);
 
         return new EncodedState
         {
@@ -310,5 +321,131 @@ public sealed class StateEncoder(Vocab vocab)
     {
         int idx = (int)teraType + 1;
         return idx is >= 1 and <= 19 ? idx : 0;
+    }
+
+    // ── Matchup features ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Encode 20 matchup features: damage matrix (8), speed comparison (4), pokemon types (8).
+    /// </summary>
+    private void EncodeMatchup(float[] feat, int off,
+        PokemonPerspective? myA, PokemonPerspective? myB,
+        PokemonPerspective? oppA, PokemonPerspective? oppB,
+        bool trickRoom)
+    {
+        PokemonPerspective?[] myActive = [myA, myB];
+        PokemonPerspective?[] oppActive = [oppA, oppB];
+
+        // [0..7] Damage matrix
+        int di = 0;
+        for (int mi = 0; mi < 2; mi++)
+        {
+            for (int oi = 0; oi < 2; oi++)
+            {
+                feat[off + di] = BestDamageFraction(myActive[mi], oppActive[oi]);
+                di++;
+            }
+        }
+        for (int oi = 0; oi < 2; oi++)
+        {
+            for (int mi = 0; mi < 2; mi++)
+            {
+                feat[off + di] = BestDamageFraction(oppActive[oi], myActive[mi]);
+                di++;
+            }
+        }
+
+        // [8..11] Speed comparison
+        int si = 8;
+        for (int mi = 0; mi < 2; mi++)
+        {
+            for (int oi = 0; oi < 2; oi++)
+            {
+                if (myActive[mi] != null && oppActive[oi] != null &&
+                    !myActive[mi]!.Fainted && !oppActive[oi]!.Fainted)
+                {
+                    int mySpd = myActive[mi]!.StoredStats.Spe;
+                    int oppSpd = oppActive[oi]!.StoredStats.Spe;
+                    feat[off + si] = trickRoom
+                        ? (mySpd < oppSpd ? 1f : 0f)
+                        : (mySpd > oppSpd ? 1f : 0f);
+                }
+                si++;
+            }
+        }
+
+        // [12..19] Pokemon types (type1/type2 for each active slot, normalized)
+        const int numTypes = 18;
+        int ti = 12;
+        foreach (PokemonPerspective?[] side in new[] { myActive, oppActive })
+        {
+            foreach (PokemonPerspective? p in side)
+            {
+                if (p != null && !p.Fainted)
+                {
+                    IReadOnlyList<PokemonType> types = p.Types;
+                    if (types.Count > 0)
+                        feat[off + ti] = ((int)types[0] + 1f) / numTypes;
+                    if (types.Count > 1)
+                        feat[off + ti + 1] = ((int)types[1] + 1f) / numTypes;
+                }
+                ti += 2;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Compute best damage fraction for attacker's moves against defender.
+    /// Returns value in [0, 1] (clamped at 1.0 = can OHKO).
+    /// </summary>
+    private float BestDamageFraction(PokemonPerspective? attacker, PokemonPerspective? defender)
+    {
+        if (attacker == null || defender == null || attacker.Fainted || defender.Fainted)
+            return 0f;
+
+        float best = 0f;
+        PokemonType[] defTypes = defender.Types.ToArray();
+
+        foreach (MoveSlot moveSlot in attacker.MoveSlots)
+        {
+            if (!library.Moves.TryGetValue(moveSlot.Id, out Move? move))
+                continue;
+
+            if (move.Category == MoveCategory.Status || move.BasePower <= 0)
+                continue;
+
+            MoveEffectiveness eff = TypeChartInstance.GetMoveEffectiveness(defTypes, move.Type);
+            float mult = (float)eff.ToMultiplier();
+            if (mult == 0f) continue;
+
+            // STAB
+            float stab = 1f;
+            if (move.Type is not (MoveType.Stellar or MoveType.Unknown))
+            {
+                PokemonType moveAsPokemonType = move.Type.ConvertToPokemonType();
+                if (attacker.Types.Contains(moveAsPokemonType))
+                    stab = 1.5f;
+            }
+
+            // Spread penalty
+            bool isSpread = move.Target is MoveTarget.AllAdjacentFoes
+                or MoveTarget.AllAdjacent or MoveTarget.All;
+            float spread = isSpread ? 0.75f : 1f;
+
+            // Simplified damage using stored stats (actual stats at level 50 with EVs/nature)
+            bool isPhysical = move.Category == MoveCategory.Physical;
+            int atkStat = isPhysical ? attacker.StoredStats.Atk : attacker.StoredStats.SpA;
+            int defStat = isPhysical ? defender.StoredStats.Def : defender.StoredStats.SpD;
+
+            int targetHp = defender.MaxHp > 0 ? defender.MaxHp : 1;
+
+            float damage = ((2f * 50 / 5 + 2) * move.BasePower * atkStat / defStat / 50 + 2)
+                           * mult * stab * spread;
+
+            float frac = damage / targetHp;
+            if (frac > best) best = frac;
+        }
+
+        return MathF.Min(best / 2f, 1f); // normalize: 2.0 damage/hp → 1.0
     }
 }

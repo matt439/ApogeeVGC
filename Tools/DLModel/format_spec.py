@@ -25,6 +25,7 @@ from itertools import combinations
 ACTIVE_DIM = 46  # 35 base + 11 volatile flags
 BENCH_DIM = 10
 FIELD_DIM = 20
+MATCHUP_DIM = 20  # 8 damage matrix + 4 speed comparison + 8 pokemon types
 
 
 @dataclass(frozen=True)
@@ -94,7 +95,7 @@ class FormatSpec:
         """Total numeric feature vector dimension for battle state."""
         num_active = self.num_leads * 2
         num_bench = self.num_bench_per_side * 2
-        return num_active * ACTIVE_DIM + num_bench * BENCH_DIM + FIELD_DIM
+        return num_active * ACTIVE_DIM + num_bench * BENCH_DIM + FIELD_DIM + MATCHUP_DIM
 
     def to_dict(self) -> dict:
         """Serialize for storing in checkpoints and vocab JSON."""

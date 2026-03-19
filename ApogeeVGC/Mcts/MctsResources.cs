@@ -52,7 +52,7 @@ public static class MctsResources
     {
         _library = library;
         _vocab = Vocab.Load(vocabPath, library);
-        _encoder = new StateEncoder(_vocab);
+        _encoder = new StateEncoder(_vocab, library);
         _model = new ModelInference(modelPath, _encoder);
         Config = config ?? new MctsConfig();
 

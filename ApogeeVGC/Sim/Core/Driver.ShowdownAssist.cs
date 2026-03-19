@@ -12,7 +12,7 @@ public partial class Driver
         Console.WriteLine("[Driver] Loading library and models...");
 
         Vocab vocab = Vocab.Load(MctsVocabPath, Library);
-        StateEncoder encoder = new(vocab);
+        StateEncoder encoder = new(vocab, Library);
 
         using ModelInference battleModel = new(MctsModelPath, encoder);
         using TeamPreviewInference previewModel = new(MctsTeamPreviewModelPath, vocab);

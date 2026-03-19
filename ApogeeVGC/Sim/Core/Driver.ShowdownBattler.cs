@@ -69,7 +69,7 @@ public partial class Driver
         // Load models
         Console.WriteLine("[Driver] Loading models...");
         Vocab vocab = Vocab.Load(MctsVocabPath, Library);
-        StateEncoder encoder = new(vocab);
+        StateEncoder encoder = new(vocab, Library);
         using ModelInference battleModel = new(MctsModelPath, encoder);
         using TeamPreviewInference previewModel = new(MctsTeamPreviewModelPath, vocab);
         Console.WriteLine("[Driver] Models loaded.");
