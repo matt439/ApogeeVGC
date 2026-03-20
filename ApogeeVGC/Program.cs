@@ -8,7 +8,7 @@ public class Program
     {
         Driver driver = new();
         // Parse --mode argument
-        DriverMode mode = DriverMode.DlGreedyVsRndEvaluation;
+        DriverMode mode = DriverMode.ShowdownBattler;
         string? format = null;
 
         // Evaluate mode args
