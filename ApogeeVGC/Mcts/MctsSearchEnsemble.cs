@@ -25,7 +25,8 @@ public sealed class MctsSearchEnsemble(
     public (LegalAction ActionA, LegalAction? ActionB) Search(
         Battle battle,
         SideId sideId,
-        LegalActionSet legalActions)
+        LegalActionSet legalActions,
+        CancellationToken cancellationToken = default)
     {
         if (legalActions.SlotA.Count == 1 && legalActions.SlotB.Count <= 1)
         {
@@ -40,13 +41,30 @@ public sealed class MctsSearchEnsemble(
         AddDirichletNoise(root);
 
         int maxParallelism = config.MaxDegreeOfParallelism ?? Environment.ProcessorCount;
-        Parallel.For(0, config.NumIterations,
-            new ParallelOptions { MaxDegreeOfParallelism = maxParallelism },
-            _ =>
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = maxParallelism };
+
+        if (cancellationToken.CanBeCanceled)
+        {
+            parallelOptions.CancellationToken = cancellationToken;
+            try
+            {
+                Parallel.For(0, int.MaxValue, parallelOptions, _ =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    Battle sim = battle.Copy();
+                    RunIteration(root, sim, sideId);
+                });
+            }
+            catch (OperationCanceledException) { }
+        }
+        else
+        {
+            Parallel.For(0, config.NumIterations, parallelOptions, _ =>
             {
                 Battle sim = battle.Copy();
                 RunIteration(root, sim, sideId);
             });
+        }
 
         return SelectBestAction(root);
     }

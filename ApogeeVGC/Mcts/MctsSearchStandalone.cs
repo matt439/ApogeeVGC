@@ -25,7 +25,8 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
     public (LegalAction ActionA, LegalAction? ActionB) Search(
         Battle battle,
         SideId sideId,
-        LegalActionSet legalActions)
+        LegalActionSet legalActions,
+        CancellationToken cancellationToken = default)
     {
         // Single action, no search needed
         if (legalActions.SlotA.Count == 1 && legalActions.SlotB.Count <= 1)
@@ -40,15 +41,33 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
         // Add Dirichlet noise to root priors for exploration
         AddDirichletNoise(root);
 
-        // Run MCTS iterations in parallel
         int maxParallelism = config.MaxDegreeOfParallelism ?? Environment.ProcessorCount;
-        Parallel.For(0, config.NumIterations,
-            new ParallelOptions { MaxDegreeOfParallelism = maxParallelism },
-            _ =>
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = maxParallelism };
+
+        if (cancellationToken.CanBeCanceled)
+        {
+            // Time-based: run until cancelled
+            parallelOptions.CancellationToken = cancellationToken;
+            try
+            {
+                Parallel.For(0, int.MaxValue, parallelOptions, _ =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    Battle sim = battle.Copy();
+                    RunIteration(root, sim, sideId);
+                });
+            }
+            catch (OperationCanceledException) { }
+        }
+        else
+        {
+            // Fixed iterations
+            Parallel.For(0, config.NumIterations, parallelOptions, _ =>
             {
                 Battle sim = battle.Copy();
                 RunIteration(root, sim, sideId);
             });
+        }
 
         // Select the action pair with the most visits
         return SelectBestAction(root);
