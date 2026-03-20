@@ -53,52 +53,75 @@ value = sigmoid(3 × diff)
 
 **File:** `HeuristicEval.cs`
 
-### 3. Domain Knowledge Features for BattleNet
+### 3. Mini-Model Heuristic Ensemble (`MctsSearchEnsemble`)
 
-The most significant change. The DL model previously received only embedding IDs (species, moves, abilities, items, tera) and basic numeric features (HP, status, boosts, field conditions). It had to implicitly learn the entire type effectiveness chart, move base powers, STAB relationships, and speed tiers purely from win/loss signal — requiring orders of magnitude more data than available.
-
-20 new numeric features are added to the battle state encoding (dimension 244 → 264):
-
-**Damage matrix (8 floats)** — estimated best damage fraction for each attacker→target pair among the 4 active Pokemon. Computes `max(BasePower × TypeEff × STAB × SpreadPenalty × StatRatio) / TargetHP` across the attacker's known moves. This is the single feature that makes the greedy player so strong.
+Replaced the monolithic DL model with an ensemble of 8 focused heuristic mini-models. Each mini-model evaluates candidate actions from one strategic perspective and returns preferences + a confidence score. The ensemble aggregates these into informed MCTS root priors via weighted averaging:
 
 ```
-[0] my_a → opp_a    [1] my_a → opp_b
-[2] my_b → opp_a    [3] my_b → opp_b
-[4] opp_a → my_a    [5] opp_a → my_b
-[6] opp_b → my_a    [7] opp_b → my_b
+final(action) = Sum(weight_i × confidence_i × pref_i(action)) / Sum(weight_i × confidence_i)
 ```
 
-Information asymmetry is preserved:
-- Own moves: always fully known (end-of-game revealed data in training, full info in C#)
-- Opponent moves: only progressively revealed moves used (matches training data distribution)
+**Mini-models:**
 
-**Speed comparison (4 floats)** — binary flags indicating whether each of our active Pokemon is faster than each opponent active. Accounts for Trick Room (reverses the comparison).
+| Mini-Model | Purpose | Confidence |
+|---|---|---|
+| DamageMax | Prefer highest damage actions | Always high (0.9) |
+| KOSeeking | Strongly prefer guaranteed KOs | High if KO possible, low otherwise |
+| KOAvoidance | Prefer Protect/switch when in KO range | Scales with threat level |
+| TypePositioning | Prefer switches to favorable matchups | Moderate (0.5) |
+| DamageMin | Prefer defensive plays when threatened | Scales with threat level |
+| SpeedAdvantage | Exploit speed tiers, Trick Room, priority | Moderate (0.6) |
+| StatusSpreading | Prefer status moves on unstatused targets | Low-moderate (0.4) |
+| ProtectPrediction | Deprioritize single-target into likely Protect | From opponent model or heuristic |
 
-**Pokemon types (8 floats)** — type1 and type2 indices for each active slot, normalized by /18. Lets the model reason about resistances without re-deriving types from species embeddings.
+**Key design:** The ensemble only affects root priors (which actions to explore first). Leaf evaluation uses the proven `HeuristicEval`. Internal nodes use uniform priors. This means the ensemble can only help search efficiency, never degrade leaf evaluation quality.
 
-Spread moves apply a 0.75× damage penalty (standard doubles mechanic) to prevent overvaluing moves like Dazzling Gleam in the damage matrix.
+**Architecture:** `PlayerMctsEnsemble` is a thin factory that creates a `PlayerMctsStandalone` backed by `MctsSearchEnsemble`, reusing all proven player infrastructure (legal action enumeration, choice building, team preview).
 
-**Python files:** `game_data.py` (type chart, damage estimation), `dataset.py` (encode_matchup), `format_spec.py` (MATCHUP_DIM)
-**C# files:** `StateEncoder.cs` (EncodeMatchup, BestDamageFraction)
-**Data files:** `game_data/species_data.json` (1321 species), `game_data/move_data.json` (686 moves)
+**Files:**
+- `ApogeeVGC/Mcts/Ensemble/IMiniModel.cs` — interface
+- `ApogeeVGC/Mcts/Ensemble/EnsembleEvaluator.cs` — weighted aggregation
+- `ApogeeVGC/Mcts/Ensemble/MiniModels/` — 8 mini-model implementations
+- `ApogeeVGC/Mcts/Ensemble/ProtectDetector.cs` — Protect move identification
+- `ApogeeVGC/Mcts/MctsSearchEnsemble.cs` — ensemble search
+- `ApogeeVGC/Mcts/PlayerMctsEnsemble.cs` — factory
+- `ApogeeVGC/Mcts/IMctsSearch.cs` — common search interface
 
-### 4. MCTS Configuration Changes
+**CLI name:** `ensemble`
 
-- Default iterations: 200 → 10,000
-- Standalone iterations: 1,000 → 10,000
-- Pipeline evaluation iterations: 1,000 → 10,000
+### 4. Opponent Prediction Model (DL)
 
-With ~400 joint actions in VGC doubles (20 moves × 20 moves), 200 iterations couldn't visit each action even once. 10,000 provides ~25 visits per action on average.
+A focused DL model that predicts the opponent's next action. Unlike BattleNet (which suffered from distribution shift), this model predicts at the current state — no hypothetical future states — so distribution shift does not apply.
 
-### 5. Pipeline Changes
+- Same input encoding as BattleNet (species/move/ability/item/tera embeddings + 264D numeric)
+- Two output heads: opponent slot A and B action logits
+- ~254K parameters (much smaller than BattleNet's 1.6M)
+- Feeds into ProtectPrediction and KOAvoidance mini-models
 
-- `--battle-only` flag to skip TeamPreviewNet training (only retrain BattleNet)
-- `mctshybrid` added to default evaluation matchups
-- Evaluation battle count default remains 1000 per matchup
+**Python files:** `opponent_dataset.py`, `opponent_model.py`, `train_opponent.py`
+**C# files:** `OpponentInference.cs`
+**Export:** `python export_onnx.py opponent`
+
+### 5. Ensemble Weight Tuning
+
+Global weights for each mini-model are tuned via Optuna by playing evaluation games:
+- 8 float parameters (one per mini-model), range [0, 5]
+- Each trial plays 50 games, measures win rate
+- 200 trials, ~1.5 hours total (no GPU needed)
+- Best weights saved to `ensemble_config.json`
+
+**File:** `Tools/DLModel/tune_ensemble.py`
+
+### 6. Pipeline Changes
+
+- `ensemble` added to default evaluation matchups
+- `APOGEE_ENSEMBLE_CONFIG` env var for ensemble weights
+- `APOGEE_OPPONENT_MODEL` env var for opponent prediction model
+- `--battle-only` flag to skip TeamPreviewNet training
 
 ## Experimental Results
 
-### Isolating the problem (with old HP-only heuristic)
+### Phase 1: Isolating the DL problem (with old HP-only heuristic)
 
 | Configuration | vs Random | vs Standalone |
 |---|---|---|
@@ -109,7 +132,7 @@ With ~400 joint actions in VGC doubles (20 moves × 20 moves), 200 iterations co
 
 Removing the bad policy improved results (+7%). Adding confidence blending closed the gap further (+5.5%). But the value head still underperformed the heuristic.
 
-### With improved heuristic
+### Phase 2: Improved heuristic
 
 | Configuration | vs Random | vs Standalone |
 |---|---|---|
@@ -118,22 +141,47 @@ Removing the bad policy improved results (+7%). Adding confidence blending close
 
 The improved heuristic was a major win for standalone (55% → 73.5% vs random). The DL value head still slightly degrades performance when blended in, confirming the distribution shift problem.
 
-## Design Rationale: Domain Knowledge as Input Features
+### Phase 3: Mini-model ensemble
 
-The BattleNet model must learn from ~300K replays with ~780K decision points. Without explicit domain knowledge, it must implicitly discover:
-- The 18×18 type effectiveness chart (324 entries)
-- Base power and category of 272 moves
-- STAB relationships for 978 species
-- Speed tier orderings
+| Configuration | vs Random | vs Standalone |
+|---|---|---|
+| Standalone (improved heuristic) | 68% (1k iter) | 50.0% |
+| Ensemble (equal weights, 1k iter) | 70% | 51.0% |
+| Ensemble (Optuna-tuned, 1k iter) | **88%** | 51.0% |
+| Ensemble (Optuna-tuned, 10k iter) | — | **54.5%** |
 
-These are static lookup tables that don't change between games. Asking the model to rediscover them from win/loss signal alone would require billions of samples (as in AlphaZero-style self-play) rather than the hundreds of thousands available from human replays.
+The tuned ensemble beats standalone by 20 percentage points vs random (88% vs 68%) and shows a growing advantage with more iterations (51% → 54.5% head-to-head as iterations increase from 1k to 10k).
 
-The 20 new features encode this static game knowledge explicitly, freeing the model to focus on learning dynamic strategic patterns: when to Protect, optimal switching, tera timing, and team composition interactions. This is a principled design choice that reduces sample complexity from self-play scale to behavioral cloning scale.
+**Optimal weights (from 200-trial Optuna tuning):**
 
-## Retraining Required
+| Mini-Model | Weight | Interpretation |
+|---|---|---|
+| ProtectPrediction | 4.31 | Most important — even heuristic Protect prediction is valuable |
+| DamageMax | 3.65 | Damage output is a strong signal |
+| SpeedAdvantage | 3.31 | Speed exploitation matters in VGC |
+| TypePositioning | 2.32 | Type matchups guide switching |
+| KOSeeking | 1.78 | KO opportunities are important but situational |
+| DamageMin | 1.55 | Defensive play has moderate value |
+| StatusSpreading | 1.10 | Status moves are low priority |
+| KOAvoidance | 0.88 | Largely redundant with DamageMin + ProtectPred |
 
-Only BattleNet requires retraining (numeric input dimension changed 244 → 264). TeamPreviewNet is unaffected — it uses separate embedding-only inputs with no numeric features.
+## Design Rationale
 
-```bash
-python pipeline.py --format gen9vgc2025regi --battle-only
-```
+### Why Mini-Models Over Monolithic DL
+
+The monolithic BattleNet had 72% offline value accuracy but failed in live MCTS play due to distribution shift — it was trained on human replay states but evaluated on novel states MCTS explores during search. The mini-model ensemble avoids this entirely:
+
+1. **No training data needed** — heuristics work on any state, no distribution shift
+2. **Interpretable** — each model's contribution is visible and tunable
+3. **Fast to iterate** — weight tuning takes hours, not overnight training runs
+4. **Compositional** — new strategic insights become new mini-models
+5. **Graceful degradation** — if a model is wrong, its low confidence limits damage
+
+### Role of DL in the New Architecture
+
+DL is repositioned from evaluation (where distribution shift kills it) to prediction (where it works):
+- **TeamPreviewNet** (95% bring accuracy) — predicts which Pokemon to bring
+- **OpponentPredictionNet** (planned) — predicts opponent's next action, feeds into mini-models
+- Both predict at the current state, avoiding distribution shift
+
+This separation — DL for prediction, heuristics for evaluation — plays to each approach's strengths.
