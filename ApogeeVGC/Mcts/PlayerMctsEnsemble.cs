@@ -28,6 +28,7 @@ public static class PlayerMctsEnsemble
             new SpeedAdvantageMiniModel(),
             new StatusSpreadingMiniModel(),
             new ProtectPredictionMiniModel(),
+            new SwitchMomentumMiniModel(),
         ];
 
         string configPath = Environment.GetEnvironmentVariable("APOGEE_ENSEMBLE_CONFIG")

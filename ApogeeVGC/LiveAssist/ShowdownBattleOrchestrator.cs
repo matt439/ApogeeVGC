@@ -184,6 +184,11 @@ public sealed class ShowdownBattleOrchestrator
         };
         client.OnTie += () => { battleEndResult = "tie"; };
 
+        client.OnTimer += timerMsg =>
+        {
+            Console.WriteLine($"  [Timer] {timerMsg}");
+        };
+
         client.OnError += errorMsg =>
         {
             Console.WriteLine($"[Orchestrator] Error: {errorMsg}");

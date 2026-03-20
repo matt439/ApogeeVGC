@@ -46,6 +46,9 @@ public sealed class ShowdownClient : IAsyncDisposable
     /// <summary>Fires on |error| messages.</summary>
     public event Action<string>? OnError;
 
+    /// <summary>Fires on |inactive| timer messages (e.g. "Time left: 90 sec").</summary>
+    public event Action<string>? OnTimer;
+
     /// <summary>Full protocol transcript for the current battle.</summary>
     public IReadOnlyList<string> BattleLog => _battleLog;
 
@@ -57,6 +60,7 @@ public sealed class ShowdownClient : IAsyncDisposable
         OnWin = null;
         OnTie = null;
         OnError = null;
+        OnTimer = null;
     }
 
     public string? CurrentBattleRoomId => _currentBattleRoomId;
@@ -312,6 +316,13 @@ public sealed class ShowdownClient : IAsyncDisposable
                     // |error|MESSAGE
                     string errorMsg = line[("|error|".Length)..];
                     OnError?.Invoke(errorMsg);
+                    break;
+
+                case "inactive":
+                case "inactiveoff":
+                    // |inactive|Time left: 90 sec this turn | 420 sec total
+                    string timerMsg = line.Split('|', 3).Length > 2 ? line.Split('|', 3)[2] : "";
+                    OnTimer?.Invoke(timerMsg);
                     break;
 
                 case "popup":

@@ -40,7 +40,17 @@ public static partial class ShowdownChoiceSerializer
         if (slotB == null)
             return choiceA;
 
-        string choiceB = SerializeSlotChoice(slotB.Value, root, slotIndex: 1);
+        // Prevent both slots switching to the same Pokemon
+        LegalAction finalB = slotB.Value;
+        if (slotA.ChoiceType == ChoiceType.Switch &&
+            finalB.ChoiceType == ChoiceType.Switch &&
+            slotA.SwitchIndex == finalB.SwitchIndex)
+        {
+            Console.WriteLine($"  [Serializer] WARNING: Both slots switching to slot {slotA.SwitchIndex + 1} — sending pass for slot B");
+            return $"{choiceA}, pass";
+        }
+
+        string choiceB = SerializeSlotChoice(finalB, root, slotIndex: 1);
         return $"{choiceA}, {choiceB}";
     }
 
