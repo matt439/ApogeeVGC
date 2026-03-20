@@ -136,6 +136,9 @@ public sealed class ShowdownBattleOrchestrator
         int turns = 0;
         string resultStr = "error";
 
+        // Clear any leftover handlers from previous battles
+        client.ClearEventHandlers();
+
         // Wire up events
         client.OnBattleMessage += (roomId, lines) =>
         {

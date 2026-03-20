@@ -49,6 +49,16 @@ public sealed class ShowdownClient : IAsyncDisposable
     /// <summary>Full protocol transcript for the current battle.</summary>
     public IReadOnlyList<string> BattleLog => _battleLog;
 
+    /// <summary>Clear all event handlers between battles to prevent stacking.</summary>
+    public void ClearEventHandlers()
+    {
+        OnBattleMessage = null;
+        OnRequest = null;
+        OnWin = null;
+        OnTie = null;
+        OnError = null;
+    }
+
     public string? CurrentBattleRoomId => _currentBattleRoomId;
 
     public ShowdownClient(string serverUrl, string loginUrl)
