@@ -7,6 +7,7 @@
     "DamageMin": 1.5521479306923003,
     "SpeedAdvantage": 3.313930432691471,
     "StatusSpreading": 1.1048224618982925,
-    "ProtectPrediction": 4.314479083185647
+    "ProtectPrediction": 4.314479083185647,
+    "SwitchMomentum": 4.0
   }
 }

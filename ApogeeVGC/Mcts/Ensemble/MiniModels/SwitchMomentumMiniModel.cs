@@ -69,22 +69,22 @@ public sealed class SwitchMomentumMiniModel : IMiniModel
             // Penalize switching slot A if it just came in or has boosts
             if (edge.ActionA.ChoiceType is ChoiceType.Switch or ChoiceType.InstaSwitch)
             {
-                if (justSwitchedIn.Length > 0 && justSwitchedIn[0]) penalty += 0.3f;
-                if (hasBoosted.Length > 0 && hasBoosted[0]) penalty += 0.2f;
+                if (justSwitchedIn.Length > 0 && justSwitchedIn[0]) penalty += 0.5f;
+                if (hasBoosted.Length > 0 && hasBoosted[0]) penalty += 0.3f;
             }
 
             // Penalize switching slot B if it just came in or has boosts
             if (edge.ActionB.HasValue &&
                 edge.ActionB.Value.ChoiceType is ChoiceType.Switch or ChoiceType.InstaSwitch)
             {
-                if (justSwitchedIn.Length > 1 && justSwitchedIn[1]) penalty += 0.3f;
-                if (hasBoosted.Length > 1 && hasBoosted[1]) penalty += 0.2f;
+                if (justSwitchedIn.Length > 1 && justSwitchedIn[1]) penalty += 0.5f;
+                if (hasBoosted.Length > 1 && hasBoosted[1]) penalty += 0.3f;
             }
 
             scores[i] = new MiniModelScore
             {
                 Preference = MathF.Max(0f, 0.7f - penalty),
-                Confidence = anyRelevant ? 0.7f : 0.1f,
+                Confidence = anyRelevant ? 0.9f : 0.1f,
             };
         }
 
