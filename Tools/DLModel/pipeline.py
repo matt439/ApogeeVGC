@@ -438,8 +438,8 @@ def main() -> None:
                         help='Battles per matchup, split for side-swap (default: 1000)')
     parser.add_argument('--mcts-iterations', type=int, default=10000,
                         help='MCTS iteration budget (default: 10000)')
-    parser.add_argument('--eval-threads', type=int, default=16,
-                        help='Parallel threads for evaluation (default: 16)')
+    parser.add_argument('--eval-threads', type=int, default=32,
+                        help='Parallel threads for evaluation (default: 32)')
 
     # Commit versioning
     parser.add_argument('--commit', default='latest',

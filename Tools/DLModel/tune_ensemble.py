@@ -151,7 +151,7 @@ def main():
                         help='Games per evaluation')
     parser.add_argument('--mcts-iterations', type=int, default=1000,
                         help='MCTS iterations per search (lower for speed during tuning)')
-    parser.add_argument('--threads', type=int, default=8)
+    parser.add_argument('--threads', type=int, default=32)
     parser.add_argument('--study-name', default='ensemble_weights')
     parser.add_argument('--storage', default=None,
                         help='Optuna storage URL (default: in-memory)')
