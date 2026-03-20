@@ -18,7 +18,7 @@ public sealed class MctsSearchEnsemble(
     MctsConfig config,
     EnsembleEvaluator ensemble,
     OpponentInference? opponentModel = null,
-    StateEncoder? stateEncoder = null)
+    StateEncoder? stateEncoder = null) : IMctsSearch
 {
     private readonly ThreadLocal<Random> _targetRng = new(() => new Random());
 
@@ -86,12 +86,21 @@ public sealed class MctsSearchEnsemble(
         return root;
     }
 
-    private float RunIteration(MctsNode node, Battle sim, SideId sideId)
+    private const int MaxDepth = 50;
+
+    private float RunIteration(MctsNode node, Battle sim, SideId sideId, int depth = 0)
     {
         if (node.IsTerminal)
         {
             Interlocked.Increment(ref node._visitCount);
             return node.TerminalValue;
+        }
+
+        if (depth >= MaxDepth)
+        {
+            // Prevent infinite recursion — evaluate and return
+            Interlocked.Increment(ref node._visitCount);
+            return HeuristicEval.Evaluate(sim, sideId);
         }
 
         MctsEdge? edge = SelectEdge(node);
@@ -144,7 +153,7 @@ public sealed class MctsSearchEnsemble(
         }
         else
         {
-            leafValue = RunIteration(edge.Child, sim, sideId);
+            leafValue = RunIteration(edge.Child, sim, sideId, depth + 1);
         }
 
         Interlocked.Increment(ref edge._visitCount);

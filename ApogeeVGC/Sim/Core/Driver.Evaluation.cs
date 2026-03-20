@@ -1316,7 +1316,10 @@ public partial class Driver
     /// </summary>
     private static bool NeedsDlModel(Player.PlayerType type) =>
         type is Player.PlayerType.DLGreedy or Player.PlayerType.MctsDL or Player.PlayerType.Mcts
-            or Player.PlayerType.MctsHybrid or Player.PlayerType.MctsEnsemble;
+            or Player.PlayerType.MctsHybrid;
+
+    private static bool NeedsAnyDlResources(Player.PlayerType type) =>
+        NeedsDlModel(type) || type is Player.PlayerType.MctsEnsemble;
 
     /// <summary>
     /// Per-battle result for JSON output.
@@ -1352,8 +1355,10 @@ public partial class Driver
         Console.WriteLine($"[Evaluate] {numBattles} battles, {numThreads} threads, MCTS iterations: {mctsIterations}");
 
         // Initialize DL resources if needed
-        bool needsDl = NeedsDlModel(p1Type) || NeedsDlModel(p2Type);
-        if (needsDl)
+        bool needsBattleModel = NeedsDlModel(p1Type) || NeedsDlModel(p2Type);
+        bool needsAnyResources = needsBattleModel;
+
+        if (needsAnyResources)
         {
             string modelPath = Environment.GetEnvironmentVariable("APOGEE_BATTLE_MODEL")
                 ?? $"Tools/DLModel/models/{regulation}/battle_model.onnx";
@@ -1361,8 +1366,10 @@ public partial class Driver
                 ?? $"Tools/DLModel/models/{regulation}/battle_model_vocab.json";
             string previewPath = Environment.GetEnvironmentVariable("APOGEE_PREVIEW_MODEL")
                 ?? $"Tools/DLModel/models/{regulation}/team_preview_model.onnx";
+            string? opponentPath = Environment.GetEnvironmentVariable("APOGEE_OPPONENT_MODEL")
+                ?? $"Tools/DLModel/models/{regulation}/opponent_model.onnx";
 
-            if (!File.Exists(modelPath))
+            if (needsBattleModel && !File.Exists(modelPath))
             {
                 Console.WriteLine($"[Evaluate] ERROR: Model not found at: {modelPath}");
                 return;
@@ -1376,8 +1383,11 @@ public partial class Driver
 
             MctsConfig mctsConfig = new() { NumIterations = mctsIterations };
             MctsResources.Initialize(modelPath, vocabPath, Library, mctsConfig,
-                teamPreviewModelPath: File.Exists(previewPath) ? previewPath : null);
-            Console.WriteLine("[Evaluate] DL resources initialized");
+                teamPreviewModelPath: File.Exists(previewPath) ? previewPath : null,
+                opponentModelPath: File.Exists(opponentPath) ? opponentPath : null,
+                loadBattleModel: needsBattleModel);
+            Console.WriteLine("[Evaluate] DL resources initialized"
+                + (needsBattleModel ? "" : " (no battle model — ensemble only)"));
         }
 
         // Pre-generate teams
@@ -1493,7 +1503,7 @@ public partial class Driver
 
         stopwatch.Stop();
 
-        if (needsDl)
+        if (needsAnyResources)
             MctsResources.Shutdown();
 
         // Compute stats split by side assignment

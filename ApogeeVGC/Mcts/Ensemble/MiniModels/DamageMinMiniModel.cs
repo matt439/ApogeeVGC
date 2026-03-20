@@ -91,7 +91,7 @@ public sealed class DamageMinMiniModel : IMiniModel
                 if (!battle.Library.Moves.TryGetValue(ms.Id, out Move? move)) continue;
                 if (move.Category == MoveCategory.Status || move.BasePower <= 0) continue;
 
-                float eff = (float)TypeChart.GetMoveEffectiveness(target.GetTypes(), move.Type).ToMultiplier();
+                float eff = (float)TypeChart.GetMoveEffectiveness(target.Types, move.Type).ToMultiplier();
                 if (eff == 0f) continue;
 
                 float stab = 1f;

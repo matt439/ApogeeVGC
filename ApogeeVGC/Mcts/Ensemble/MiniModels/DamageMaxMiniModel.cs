@@ -88,7 +88,7 @@ public sealed class DamageMaxMiniModel : IMiniModel
             if (target == null || target.Fainted) continue;
 
             float effectiveness = (float)TypeChart
-                .GetMoveEffectiveness(target.GetTypes(), move.Type)
+                .GetMoveEffectiveness(target.Types, move.Type)
                 .ToMultiplier();
             if (effectiveness == 0f) continue;
 

@@ -125,7 +125,7 @@ public static class HeuristicEval
     private static float BestMoveScore(Battle battle, Pokemon attacker, Pokemon target)
     {
         float best = 0f;
-        PokemonType[] targetTypes = target.GetTypes();
+        PokemonType[] targetTypes = target.Types;
 
         foreach (MoveSlot moveSlot in attacker.MoveSlots)
         {

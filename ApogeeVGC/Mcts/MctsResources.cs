@@ -54,12 +54,14 @@ public static class MctsResources
     /// <param name="config">Optional MCTS configuration. Uses defaults if null.</param>
     /// <param name="teamPreviewModelPath">Optional path to team_preview_model.onnx. If null or missing, team preview falls back to random.</param>
     public static void Initialize(string modelPath, string vocabPath, Library library, MctsConfig? config = null,
-        string? teamPreviewModelPath = null, string? opponentModelPath = null)
+        string? teamPreviewModelPath = null, string? opponentModelPath = null,
+        bool loadBattleModel = true)
     {
         _library = library;
         _vocab = Vocab.Load(vocabPath, library);
         _encoder = new StateEncoder(_vocab, library);
-        _model = new ModelInference(modelPath, _encoder);
+        if (loadBattleModel && File.Exists(modelPath))
+            _model = new ModelInference(modelPath, _encoder);
         Config = config ?? new MctsConfig();
 
         if (teamPreviewModelPath != null && File.Exists(teamPreviewModelPath))

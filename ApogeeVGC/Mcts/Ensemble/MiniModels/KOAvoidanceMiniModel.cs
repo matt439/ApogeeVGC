@@ -121,7 +121,7 @@ public sealed class KOAvoidanceMiniModel : IMiniModel
                     continue;
 
                 float effectiveness = (float)TypeChart
-                    .GetMoveEffectiveness(target.GetTypes(), move.Type)
+                    .GetMoveEffectiveness(target.Types, move.Type)
                     .ToMultiplier();
                 if (effectiveness == 0f) continue;
 

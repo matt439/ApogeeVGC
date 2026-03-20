@@ -14,7 +14,7 @@ namespace ApogeeVGC.Mcts;
 /// Uses uniform priors and heuristic leaf evaluation.
 /// Iterations run in parallel with locked node expansion and atomic backpropagation.
 /// </summary>
-public sealed class MctsSearchStandalone(MctsConfig config)
+public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
 {
     private readonly ThreadLocal<Random> _targetRng = new(() => new Random());
 

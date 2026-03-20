@@ -18,7 +18,7 @@ public sealed class PlayerMctsStandalone(
     SideId sideId,
     PlayerOptions options,
     IBattleController battleController,
-    MctsSearchStandalone search)
+    IMctsSearch search)
     : IPlayer
 {
     public SideId SideId { get; } = sideId;
