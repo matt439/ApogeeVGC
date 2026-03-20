@@ -22,6 +22,12 @@ public sealed class MctsSearchEnsemble(
 {
     private readonly ThreadLocal<Random> _targetRng = new(() => new Random());
 
+    /// <summary>
+    /// Optional revealed info tracker for CTS/OTS observability restriction.
+    /// Set by the player before each search. Null = full observability.
+    /// </summary>
+    public BattleInfoTracker? Tracker { get; set; }
+
     public (LegalAction ActionA, LegalAction? ActionB) Search(
         Battle battle,
         SideId sideId,
@@ -96,7 +102,7 @@ public sealed class MctsSearchEnsemble(
         }
 
         // Get ensemble priors
-        float[] priors = ensemble.ScoreEdges(battle, sideId, root.Edges, oppPred);
+        float[] priors = ensemble.ScoreEdges(battle, sideId, root.Edges, oppPred, Tracker);
 
         for (int i = 0; i < root.Edges.Count; i++)
             root.Edges[i].PriorP = priors[i];
@@ -167,7 +173,7 @@ public sealed class MctsSearchEnsemble(
                 }
             }
             // Leaf evaluation: proven heuristic
-            leafValue = HeuristicEval.Evaluate(sim, sideId);
+            leafValue = HeuristicEval.Evaluate(sim, sideId, Tracker);
         }
         else
         {

@@ -35,7 +35,8 @@ public sealed class StatusSpreadingMiniModel : IMiniModel
     public MiniModelScore[] Evaluate(
         Battle battle, SideId sideId,
         IReadOnlyList<MctsEdge> edges,
-        OpponentPrediction? opponentPrediction)
+        OpponentPrediction? opponentPrediction,
+        BattleInfoTracker? tracker = null)
     {
         Side oppSide = sideId == SideId.P1 ? battle.P2 : battle.P1;
 

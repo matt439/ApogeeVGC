@@ -20,7 +20,8 @@ public sealed class SpeedAdvantageMiniModel : IMiniModel
     public MiniModelScore[] Evaluate(
         Battle battle, SideId sideId,
         IReadOnlyList<MctsEdge> edges,
-        OpponentPrediction? opponentPrediction)
+        OpponentPrediction? opponentPrediction,
+        BattleInfoTracker? tracker = null)
     {
         Side ourSide = sideId == SideId.P1 ? battle.P1 : battle.P2;
         Side oppSide = sideId == SideId.P1 ? battle.P2 : battle.P1;

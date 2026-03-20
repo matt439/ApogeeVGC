@@ -23,7 +23,7 @@ public static class HeuristicEval
     /// <summary>
     /// Evaluate a battle state using HP, type matchups, status, and boosts.
     /// </summary>
-    public static float Evaluate(Battle battle, SideId sideId)
+    public static float Evaluate(Battle battle, SideId sideId, BattleInfoTracker? tracker = null)
     {
         Side ourSide = sideId == SideId.P1 ? battle.P1 : battle.P2;
         Side oppSide = sideId == SideId.P1 ? battle.P2 : battle.P1;
@@ -31,7 +31,7 @@ public static class HeuristicEval
         float ourScore = ComputeSideScore(ourSide);
         float oppScore = ComputeSideScore(oppSide);
 
-        float matchupAdv = ComputeMatchupAdvantage(battle, ourSide, oppSide);
+        float matchupAdv = ComputeMatchupAdvantage(battle, ourSide, oppSide, tracker);
         float statusAdv = ComputeStatusAdvantage(ourSide, oppSide);
         float boostAdv = ComputeBoostAdvantage(ourSide, oppSide);
 
@@ -75,7 +75,8 @@ public static class HeuristicEval
     /// Positive = our active Pokemon have better offensive coverage.
     /// Returns roughly [-1, 1].
     /// </summary>
-    private static float ComputeMatchupAdvantage(Battle battle, Side ourSide, Side oppSide)
+    private static float ComputeMatchupAdvantage(Battle battle, Side ourSide, Side oppSide,
+        BattleInfoTracker? tracker = null)
     {
         float ourThreat = 0f;
         float oppThreat = 0f;
@@ -91,7 +92,7 @@ public static class HeuristicEval
             {
                 if (oppPoke == null || oppPoke.Fainted) continue;
 
-                float best = BestMoveScore(battle, ourPoke, oppPoke);
+                float best = BestMoveScore(battle, ourPoke, oppPoke, false, tracker);
                 ourThreat += best;
                 ourCount++;
             }
@@ -106,7 +107,7 @@ public static class HeuristicEval
             {
                 if (ourPoke == null || ourPoke.Fainted) continue;
 
-                float best = BestMoveScore(battle, oppPoke, ourPoke);
+                float best = BestMoveScore(battle, oppPoke, ourPoke, true, tracker);
                 oppThreat += best;
                 oppCount++;
             }
@@ -122,12 +123,14 @@ public static class HeuristicEval
     /// Best move score for attacker against target.
     /// Returns a normalized score where 1.0 = strong super-effective STAB, 0 = no damaging moves.
     /// </summary>
-    private static float BestMoveScore(Battle battle, Pokemon attacker, Pokemon target)
+    internal static float BestMoveScore(Battle battle, Pokemon attacker, Pokemon target,
+        bool attackerIsOpponent = false, BattleInfoTracker? tracker = null)
     {
         float best = 0f;
         PokemonType[] targetTypes = target.Types;
 
-        foreach (MoveSlot moveSlot in attacker.MoveSlots)
+        foreach (MoveSlot moveSlot in BattleInfoTracker.FilterMovesForEval(
+                     attacker, attackerIsOpponent, tracker))
         {
             if (!battle.Library.Moves.TryGetValue(moveSlot.Id, out Move? move))
                 continue;

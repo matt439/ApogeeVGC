@@ -19,6 +19,11 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
     private readonly ThreadLocal<Random> _targetRng = new(() => new Random());
 
     /// <summary>
+    /// Optional revealed info tracker. Null = full observability.
+    /// </summary>
+    public BattleInfoTracker? Tracker { get; set; }
+
+    /// <summary>
     /// Run MCTS from the given state and return the best action pair.
     /// Builds a multi-depth tree with PUCT selection and heuristic evaluation.
     /// </summary>
@@ -139,7 +144,7 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
                     ExpandNodeFromBattle(edge.Child, sim, sideId);
                 }
             }
-            leafValue = HeuristicEval.Evaluate(sim, sideId);
+            leafValue = HeuristicEval.Evaluate(sim, sideId, Tracker);
         }
         else
         {

@@ -58,7 +58,8 @@ public sealed class EnsembleEvaluator
         Battle battle,
         SideId sideId,
         IReadOnlyList<MctsEdge> edges,
-        OpponentPrediction? opponentPrediction)
+        OpponentPrediction? opponentPrediction,
+        BattleInfoTracker? tracker = null)
     {
         int n = edges.Count;
         if (n == 0) return [];
@@ -72,7 +73,7 @@ public sealed class EnsembleEvaluator
             if (globalWeight <= 0f) continue;
 
             MiniModelScore[] scores = model.Evaluate(
-                battle, sideId, edges, opponentPrediction);
+                battle, sideId, edges, opponentPrediction, tracker);
 
             for (int i = 0; i < n; i++)
             {

@@ -33,5 +33,6 @@ public interface IMiniModel
         Sim.BattleClasses.Battle battle,
         Sim.Core.SideId sideId,
         IReadOnlyList<MctsEdge> edges,
-        OpponentPrediction? opponentPrediction);
+        OpponentPrediction? opponentPrediction,
+        BattleInfoTracker? tracker = null);
 }

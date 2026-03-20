@@ -269,6 +269,27 @@ public sealed class BattleInfoTracker
         return _opponentInfo.TryGetValue(species, out info);
     }
 
+    // ── Move Filtering for Heuristic/Mini-Models ──────────────────────
+
+    /// <summary>
+    /// Filter a Pokemon's move slots to only revealed moves.
+    /// Own Pokemon: always returns all moves.
+    /// Opponent Pokemon under CTS: returns only moves that have been seen.
+    /// If tracker is null: returns all moves (full observability).
+    /// </summary>
+    public static IEnumerable<MoveSlot> FilterMovesForEval(
+        Pokemon pokemon, bool isOpponent, BattleInfoTracker? tracker)
+    {
+        if (!isOpponent || tracker == null)
+            return pokemon.MoveSlots;
+
+        RevealedPokemonInfo? info = tracker.GetInfo(pokemon.Species.Id);
+        if (info == null || info.RevealedMoves.Count == 0)
+            return []; // No moves known
+
+        return pokemon.MoveSlots.Where(ms => info.RevealedMoves.Contains(ms.Id));
+    }
+
     // ── Perspective Filtering ───────────────────────────────────────────
 
     /// <summary>
