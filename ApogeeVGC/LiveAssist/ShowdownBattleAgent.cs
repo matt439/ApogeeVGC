@@ -2,14 +2,16 @@ using System.Text.Json;
 using ApogeeVGC.Data;
 using ApogeeVGC.Mcts;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.LiveAssist;
 
 /// <summary>
 /// Handles AI decision-making for a single Showdown battle.
 /// Delegates battle decisions to an IShowdownPlayer implementation
-/// (DL-Greedy, Random, or future MCTS-DL).
+/// (DL-Greedy, Random, Ensemble).
 /// Team preview always uses TeamPreviewInference.
+/// For ensemble players, manages the shadow battle lifecycle.
 /// </summary>
 public sealed class ShowdownBattleAgent
 {
@@ -18,6 +20,7 @@ public sealed class ShowdownBattleAgent
     private readonly ActionMapper _actionMapper;
     private readonly TeamPreviewInference _previewModel;
     private readonly IShowdownPlayer _player;
+    private bool _shadowInitialized;
 
     public ShowdownState State => _state;
 
@@ -97,6 +100,15 @@ public sealed class ShowdownBattleAgent
 
             string choice = ShowdownChoiceSerializer.SerializeTeamPreview(output.OrderedIndices);
             Console.WriteLine($"  -> /choose {choice}");
+
+            // Initialize shadow battle for ensemble player
+            if (_player is ShowdownPlayerEnsemble ensemblePlayer && !_shadowInitialized)
+            {
+                SideId sideId = _state.MySide == "p1" ? SideId.P1 : SideId.P2;
+                ensemblePlayer.InitializeShadowBattle(_state, sideId);
+                _shadowInitialized = true;
+            }
+
             return choice;
         }
         catch (Exception ex)

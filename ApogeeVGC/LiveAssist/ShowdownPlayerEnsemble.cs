@@ -27,7 +27,7 @@ public sealed class ShowdownPlayerEnsemble : IShowdownPlayer
     /// Time budget per move decision in seconds.
     /// Showdown's turn timer is ~150s; we use most of it with a safety margin.
     /// </summary>
-    public int TimeBudgetSeconds { get; set; } = 140;
+    public int TimeBudgetSeconds { get; set; } = 8;
 
     public string Name => "Ensemble";
 
