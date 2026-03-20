@@ -1385,7 +1385,8 @@ public partial class Driver
             MctsConfig mctsConfig = new() { NumIterations = mctsIterations };
             MctsResources.Initialize(modelPath, vocabPath, Library, mctsConfig,
                 teamPreviewModelPath: File.Exists(previewPath) ? previewPath : null,
-                opponentModelPath: File.Exists(opponentPath) ? opponentPath : null,
+                // Opponent model disabled — 48% accuracy hurts ensemble (see Docs/OpponentModelAblation.md)
+                // opponentModelPath: File.Exists(opponentPath) ? opponentPath : null,
                 loadBattleModel: needsBattleModel);
             Console.WriteLine("[Evaluate] DL resources initialized"
                 + (needsBattleModel ? "" : " (no battle model — ensemble only)"));
