@@ -1307,6 +1307,7 @@ public partial class Driver
         "mctsdl" or "mcts_dl" => Player.PlayerType.MctsDL,
         "mcts" => Player.PlayerType.Mcts,
         "mctshybrid" or "mcts_hybrid" => Player.PlayerType.MctsHybrid,
+        "mctsensemble" or "mcts_ensemble" or "ensemble" => Player.PlayerType.MctsEnsemble,
         _ => throw new ArgumentException($"Unknown player type: {name}"),
     };
 
@@ -1315,7 +1316,7 @@ public partial class Driver
     /// </summary>
     private static bool NeedsDlModel(Player.PlayerType type) =>
         type is Player.PlayerType.DLGreedy or Player.PlayerType.MctsDL or Player.PlayerType.Mcts
-            or Player.PlayerType.MctsHybrid;
+            or Player.PlayerType.MctsHybrid or Player.PlayerType.MctsEnsemble;
 
     /// <summary>
     /// Per-battle result for JSON output.

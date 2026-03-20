@@ -62,6 +62,8 @@ def main() -> None:
     parser.add_argument('--also-deploy', action='store_true',
                         help='Also copy to models/<reg>/ for C# '
                              'hardcoded paths')
+    parser.add_argument('--battle-only', action='store_true',
+                        help='Only export battle model (skip preview)')
     args = parser.parse_args()
 
     reg_dir = RESULTS_DIR / args.regulation
@@ -84,19 +86,23 @@ def main() -> None:
     errors = []
 
     # ── Team Preview ──
-    preview_summary = (reg_dir / preview_commit / 'preview' / args.tier
-                       / 'multiseed' / 'summary.json')
-    if preview_summary.exists():
-        seed = find_best_seed(preview_summary)
-        checkpoint = preview_summary.parent / f'seed_{seed}' / 'model.pt'
-        if checkpoint.exists():
-            out = str(output_dir / 'team_preview_model.onnx')
-            print(f'[preview] Best seed: {seed} — exporting {checkpoint}')
-            export_team_preview(str(checkpoint), out)
+    if not args.battle_only:
+        preview_summary = (reg_dir / preview_commit / 'preview' / args.tier
+                           / 'multiseed' / 'summary.json')
+        if preview_summary.exists():
+            seed = find_best_seed(preview_summary)
+            checkpoint = preview_summary.parent / f'seed_{seed}' / 'model.pt'
+            if checkpoint.exists():
+                out = str(output_dir / 'team_preview_model.onnx')
+                print(f'[preview] Best seed: {seed} — exporting {checkpoint}')
+                export_team_preview(str(checkpoint), out)
+            else:
+                errors.append(f'Checkpoint not found: {checkpoint}')
         else:
-            errors.append(f'Checkpoint not found: {checkpoint}')
+            errors.append(
+                f'Preview multiseed summary not found: {preview_summary}')
     else:
-        errors.append(f'Preview multiseed summary not found: {preview_summary}')
+        print('[preview] Skipped (--battle-only)')
 
     # ── Battle ──
     battle_summary = (reg_dir / battle_commit / 'battle' / args.tier

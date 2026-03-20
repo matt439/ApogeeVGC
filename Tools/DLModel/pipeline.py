@@ -33,10 +33,11 @@ CSHARP_PROJECT_DEFAULT = REPO_ROOT / 'ApogeeVGC'
 RESULTS_DIR = SCRIPT_DIR / 'results'
 
 ALL_STAGES = ['train', 'export', 'evaluate', 'report']
-DEFAULT_AI_TYPES = ['dlgreedy', 'mctsdl', 'mctshybrid']
+DEFAULT_AI_TYPES = ['dlgreedy', 'mctsdl', 'mctshybrid', 'ensemble']
 DEFAULT_CONTROLS = ['random', 'greedy', 'mcts_standalone']
 
-DL_PLAYER_TYPES = {'dlgreedy', 'mctsdl', 'mcts', 'dl_greedy', 'mcts_dl', 'mctshybrid', 'mcts_hybrid'}
+DL_PLAYER_TYPES = {'dlgreedy', 'mctsdl', 'mcts', 'dl_greedy', 'mcts_dl', 'mctshybrid', 'mcts_hybrid',
+                   'ensemble', 'mctsensemble', 'mcts_ensemble'}
 
 
 def resolve_eval_dir(args: argparse.Namespace) -> Path:
@@ -149,6 +150,8 @@ def stage_export(args: argparse.Namespace) -> bool:
         '--commit', args.commit,
         '--also-deploy',
     ]
+    if args.battle_only:
+        cmd.append('--battle-only')
     if args.battle_commit:
         cmd.extend(['--battle-commit', args.battle_commit])
     if args.preview_commit:
@@ -217,10 +220,12 @@ def stage_evaluate(args: argparse.Namespace) -> bool:
 
     # Pass absolute model paths via env vars so the C# app doesn't depend on cwd
     model_dir = SCRIPT_DIR / 'models' / args.format
+    ensemble_config = SCRIPT_DIR / 'ensemble_config.json'
     model_env = {
         'APOGEE_BATTLE_MODEL': str(model_dir / 'battle_model.onnx'),
         'APOGEE_BATTLE_VOCAB': str(model_dir / 'battle_model_vocab.json'),
         'APOGEE_PREVIEW_MODEL': str(model_dir / 'team_preview_model.onnx'),
+        'APOGEE_ENSEMBLE_CONFIG': str(ensemble_config),
     }
 
     failed = 0

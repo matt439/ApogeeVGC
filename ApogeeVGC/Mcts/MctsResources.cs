@@ -10,6 +10,7 @@ public static class MctsResources
 {
     private static ModelInference? _model;
     private static TeamPreviewInference? _teamPreviewModel;
+    private static OpponentInference? _opponentModel;
     private static Vocab? _vocab;
     private static StateEncoder? _encoder;
     private static Library? _library;
@@ -24,6 +25,11 @@ public static class MctsResources
     /// Team preview model, or null if no team preview ONNX file was provided.
     /// </summary>
     public static TeamPreviewInference? TeamPreviewModel => _teamPreviewModel;
+
+    /// <summary>
+    /// Opponent prediction model, or null if not loaded.
+    /// </summary>
+    public static OpponentInference? OpponentModel => _opponentModel;
 
     public static Vocab Vocab => _vocab
                                  ?? throw new InvalidOperationException(
@@ -48,7 +54,7 @@ public static class MctsResources
     /// <param name="config">Optional MCTS configuration. Uses defaults if null.</param>
     /// <param name="teamPreviewModelPath">Optional path to team_preview_model.onnx. If null or missing, team preview falls back to random.</param>
     public static void Initialize(string modelPath, string vocabPath, Library library, MctsConfig? config = null,
-        string? teamPreviewModelPath = null)
+        string? teamPreviewModelPath = null, string? opponentModelPath = null)
     {
         _library = library;
         _vocab = Vocab.Load(vocabPath, library);
@@ -59,6 +65,11 @@ public static class MctsResources
         if (teamPreviewModelPath != null && File.Exists(teamPreviewModelPath))
         {
             _teamPreviewModel = new TeamPreviewInference(teamPreviewModelPath, _vocab);
+        }
+
+        if (opponentModelPath != null && File.Exists(opponentModelPath))
+        {
+            _opponentModel = new OpponentInference(opponentModelPath, _encoder);
         }
 
         IsInitialized = true;
@@ -73,6 +84,8 @@ public static class MctsResources
         _model = null;
         _teamPreviewModel?.Dispose();
         _teamPreviewModel = null;
+        _opponentModel?.Dispose();
+        _opponentModel = null;
         _vocab = null;
         _encoder = null;
         _library = null;

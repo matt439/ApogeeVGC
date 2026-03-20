@@ -11,4 +11,5 @@ public enum PlayerType
     DLGreedy,
     Greedy,
     MctsHybrid,
+    MctsEnsemble,
 }
