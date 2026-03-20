@@ -7,31 +7,31 @@
   "successful_battles": 100,
   "failed_battles": 0,
   "p1_as_side1": {
-    "wins": 34,
-    "losses": 16,
+    "wins": 35,
+    "losses": 15,
     "ties": 0,
     "battles": 50
   },
   "p1_as_side2": {
-    "wins": 36,
-    "losses": 14,
+    "wins": 33,
+    "losses": 17,
     "ties": 0,
     "battles": 50
   },
   "combined": {
-    "p1_wins": 70,
-    "p2_wins": 30,
+    "p1_wins": 68,
+    "p2_wins": 32,
     "ties": 0,
-    "p1_win_rate": 0.7
+    "p1_win_rate": 0.68
   },
-  "avg_turns": 12.7,
-  "elapsed_seconds": 43.6,
+  "avg_turns": 12.8,
+  "elapsed_seconds": 43.1,
   "per_battle": [
     {
       "index": 0,
       "p1_side": 1,
       "result": "loss",
-      "turns": 13
+      "turns": 15
     },
     {
       "index": 1,
@@ -42,104 +42,104 @@
     {
       "index": 2,
       "p1_side": 1,
-      "result": "win",
-      "turns": 16
+      "result": "loss",
+      "turns": 18
     },
     {
       "index": 3,
       "p1_side": 1,
-      "result": "loss",
+      "result": "win",
       "turns": 18
     },
     {
       "index": 4,
       "p1_side": 1,
       "result": "win",
-      "turns": 11
+      "turns": 10
     },
     {
       "index": 5,
       "p1_side": 1,
       "result": "win",
-      "turns": 8
+      "turns": 13
     },
     {
       "index": 6,
       "p1_side": 1,
       "result": "loss",
-      "turns": 17
+      "turns": 16
     },
     {
       "index": 7,
       "p1_side": 1,
-      "result": "loss",
-      "turns": 17
+      "result": "win",
+      "turns": 10
     },
     {
       "index": 8,
       "p1_side": 1,
-      "result": "loss",
-      "turns": 7
+      "result": "win",
+      "turns": 17
     },
     {
       "index": 9,
       "p1_side": 1,
-      "result": "loss",
-      "turns": 16
+      "result": "win",
+      "turns": 12
     },
     {
       "index": 10,
       "p1_side": 1,
       "result": "win",
-      "turns": 6
+      "turns": 3
     },
     {
       "index": 11,
-      "p1_side": 1,
-      "result": "win",
-      "turns": 9
-    },
-    {
-      "index": 12,
-      "p1_side": 1,
-      "result": "win",
-      "turns": 9
-    },
-    {
-      "index": 13,
       "p1_side": 1,
       "result": "loss",
       "turns": 11
     },
     {
+      "index": 12,
+      "p1_side": 1,
+      "result": "win",
+      "turns": 11
+    },
+    {
+      "index": 13,
+      "p1_side": 1,
+      "result": "win",
+      "turns": 20
+    },
+    {
       "index": 14,
       "p1_side": 1,
       "result": "win",
-      "turns": 15
+      "turns": 9
     },
     {
       "index": 15,
       "p1_side": 1,
-      "result": "loss",
-      "turns": 16
+      "result": "win",
+      "turns": 12
     },
     {
       "index": 16,
       "p1_side": 1,
       "result": "win",
-      "turns": 14
+      "turns": 20
     },
     {
       "index": 17,
       "p1_side": 1,
       "result": "win",
-      "turns": 12
+      "turns": 7
     },
     {
       "index": 18,
       "p1_side": 1,
       "result": "loss",
-      "turns": 12
+      "turns": 11
     },
     {
       "index": 19,
@@ -151,85 +151,85 @@
       "index": 20,
       "p1_side": 1,
       "result": "win",
-      "turns": 14
+      "turns": 15
     },
     {
       "index": 21,
       "p1_side": 1,
       "result": "loss",
-      "turns": 10
+      "turns": 8
     },
     {
       "index": 22,
       "p1_side": 1,
       "result": "win",
-      "turns": 13
+      "turns": 12
     },
     {
       "index": 23,
       "p1_side": 1,
-      "result": "win",
-      "turns": 10
+      "result": "loss",
+      "turns": 17
     },
     {
       "index": 24,
       "p1_side": 1,
       "result": "win",
-      "turns": 15
+      "turns": 13
     },
     {
       "index": 25,
       "p1_side": 1,
       "result": "win",
-      "turns": 13
+      "turns": 15
     },
     {
       "index": 26,
       "p1_side": 1,
       "result": "loss",
-      "turns": 7
+      "turns": 6
     },
     {
       "index": 27,
       "p1_side": 1,
       "result": "win",
-      "turns": 11
+      "turns": 13
     },
     {
       "index": 28,
       "p1_side": 1,
-      "result": "win",
-      "turns": 24
+      "result": "loss",
+      "turns": 18
     },
     {
       "index": 29,
       "p1_side": 1,
       "result": "loss",
-      "turns": 16
+      "turns": 14
     },
     {
       "index": 30,
       "p1_side": 1,
       "result": "win",
-      "turns": 11
+      "turns": 6
     },
     {
       "index": 31,
       "p1_side": 1,
       "result": "loss",
-      "turns": 8
+      "turns": 11
     },
     {
       "index": 32,
       "p1_side": 1,
       "result": "loss",
-      "turns": 12
+      "turns": 10
     },
     {
       "index": 33,
       "p1_side": 1,
       "result": "win",
-      "turns": 9
+      "turns": 13
     },
     {
       "index": 34,
@@ -240,44 +240,44 @@
     {
       "index": 35,
       "p1_side": 1,
-      "result": "loss",
-      "turns": 15
+      "result": "win",
+      "turns": 12
     },
     {
       "index": 36,
       "p1_side": 1,
-      "result": "loss",
-      "turns": 13
+      "result": "win",
+      "turns": 15
     },
     {
       "index": 37,
       "p1_side": 1,
       "result": "win",
-      "turns": 11
+      "turns": 12
     },
     {
       "index": 38,
       "p1_side": 1,
       "result": "win",
-      "turns": 11
+      "turns": 8
     },
     {
       "index": 39,
       "p1_side": 1,
       "result": "win",
-      "turns": 9
+      "turns": 14
     },
     {
       "index": 40,
       "p1_side": 1,
-      "result": "win",
-      "turns": 14
+      "result": "loss",
+      "turns": 10
     },
     {
       "index": 41,
       "p1_side": 1,
       "result": "win",
-      "turns": 9
+      "turns": 19
     },
     {
       "index": 42,
@@ -289,7 +289,7 @@
       "index": 43,
       "p1_side": 1,
       "result": "win",
-      "turns": 12
+      "turns": 9
     },
     {
       "index": 44,
@@ -301,109 +301,109 @@
       "index": 45,
       "p1_side": 1,
       "result": "win",
-      "turns": 16
+      "turns": 15
     },
     {
       "index": 46,
       "p1_side": 1,
-      "result": "win",
-      "turns": 11
+      "result": "loss",
+      "turns": 19
     },
     {
       "index": 47,
       "p1_side": 1,
-      "result": "win",
-      "turns": 10
+      "result": "loss",
+      "turns": 14
     },
     {
       "index": 48,
       "p1_side": 1,
       "result": "win",
-      "turns": 18
+      "turns": 14
     },
     {
       "index": 49,
       "p1_side": 1,
       "result": "win",
-      "turns": 14
+      "turns": 12
     },
     {
       "index": 50,
       "p1_side": 2,
-      "result": "win",
-      "turns": 12
+      "result": "loss",
+      "turns": 22
     },
     {
       "index": 51,
       "p1_side": 2,
       "result": "loss",
-      "turns": 9
+      "turns": 11
     },
     {
       "index": 52,
       "p1_side": 2,
       "result": "win",
-      "turns": 7
+      "turns": 10
     },
     {
       "index": 53,
       "p1_side": 2,
       "result": "win",
-      "turns": 11
+      "turns": 12
     },
     {
       "index": 54,
       "p1_side": 2,
       "result": "win",
-      "turns": 12
+      "turns": 8
     },
     {
       "index": 55,
       "p1_side": 2,
-      "result": "win",
+      "result": "loss",
       "turns": 16
     },
     {
       "index": 56,
       "p1_side": 2,
       "result": "win",
-      "turns": 9
+      "turns": 7
     },
     {
       "index": 57,
       "p1_side": 2,
       "result": "loss",
-      "turns": 35
+      "turns": 36
     },
     {
       "index": 58,
       "p1_side": 2,
       "result": "win",
-      "turns": 14
+      "turns": 12
     },
     {
       "index": 59,
       "p1_side": 2,
-      "result": "win",
-      "turns": 8
+      "result": "loss",
+      "turns": 11
     },
     {
       "index": 60,
       "p1_side": 2,
       "result": "loss",
-      "turns": 12
+      "turns": 15
     },
     {
       "index": 61,
       "p1_side": 2,
       "result": "win",
-      "turns": 11
+      "turns": 15
     },
     {
       "index": 62,
       "p1_side": 2,
       "result": "win",
-      "turns": 11
+      "turns": 10
     },
     {
       "index": 63,
@@ -415,25 +415,25 @@
       "index": 64,
       "p1_side": 2,
       "result": "loss",
-      "turns": 9
+      "turns": 11
     },
     {
       "index": 65,
       "p1_side": 2,
       "result": "win",
-      "turns": 19
+      "turns": 18
     },
     {
       "index": 66,
       "p1_side": 2,
       "result": "loss",
-      "turns": 10
+      "turns": 9
     },
     {
       "index": 67,
       "p1_side": 2,
       "result": "win",
-      "turns": 12
+      "turns": 9
     },
     {
       "index": 68,
@@ -445,97 +445,97 @@
       "index": 69,
       "p1_side": 2,
       "result": "win",
-      "turns": 19
+      "turns": 23
     },
     {
       "index": 70,
       "p1_side": 2,
-      "result": "loss",
-      "turns": 15
+      "result": "win",
+      "turns": 12
     },
     {
       "index": 71,
       "p1_side": 2,
       "result": "win",
-      "turns": 16
+      "turns": 11
     },
     {
       "index": 72,
       "p1_side": 2,
       "result": "win",
-      "turns": 20
+      "turns": 12
     },
     {
       "index": 73,
       "p1_side": 2,
       "result": "loss",
-      "turns": 11
+      "turns": 17
     },
     {
       "index": 74,
       "p1_side": 2,
       "result": "win",
-      "turns": 13
+      "turns": 8
     },
     {
       "index": 75,
       "p1_side": 2,
-      "result": "loss",
+      "result": "win",
       "turns": 14
     },
     {
       "index": 76,
       "p1_side": 2,
       "result": "win",
-      "turns": 12
+      "turns": 10
     },
     {
       "index": 77,
       "p1_side": 2,
       "result": "win",
-      "turns": 7
+      "turns": 12
     },
     {
       "index": 78,
       "p1_side": 2,
       "result": "win",
-      "turns": 8
+      "turns": 18
     },
     {
       "index": 79,
       "p1_side": 2,
-      "result": "win",
-      "turns": 9
+      "result": "loss",
+      "turns": 14
     },
     {
       "index": 80,
       "p1_side": 2,
       "result": "win",
-      "turns": 19
+      "turns": 13
     },
     {
       "index": 81,
       "p1_side": 2,
       "result": "loss",
-      "turns": 10
+      "turns": 11
     },
     {
       "index": 82,
-      "p1_side": 2,
-      "result": "loss",
-      "turns": 12
-    },
-    {
-      "index": 83,
       "p1_side": 2,
       "result": "win",
       "turns": 11
     },
     {
-      "index": 84,
+      "index": 83,
       "p1_side": 2,
       "result": "loss",
-      "turns": 20
+      "turns": 11
+    },
+    {
+      "index": 84,
+      "p1_side": 2,
+      "result": "win",
+      "turns": 17
     },
     {
       "index": 85,
@@ -546,86 +546,86 @@
     {
       "index": 86,
       "p1_side": 2,
-      "result": "win",
-      "turns": 14
+      "result": "loss",
+      "turns": 6
     },
     {
       "index": 87,
       "p1_side": 2,
-      "result": "win",
-      "turns": 18
+      "result": "loss",
+      "turns": 16
     },
     {
       "index": 88,
       "p1_side": 2,
       "result": "win",
-      "turns": 11
+      "turns": 16
     },
     {
       "index": 89,
       "p1_side": 2,
       "result": "win",
-      "turns": 10
+      "turns": 9
     },
     {
       "index": 90,
       "p1_side": 2,
       "result": "win",
-      "turns": 15
+      "turns": 14
     },
     {
       "index": 91,
       "p1_side": 2,
       "result": "win",
-      "turns": 10
+      "turns": 11
     },
     {
       "index": 92,
-      "p1_side": 2,
-      "result": "loss",
-      "turns": 14
-    },
-    {
-      "index": 93,
-      "p1_side": 2,
-      "result": "win",
-      "turns": 16
-    },
-    {
-      "index": 94,
-      "p1_side": 2,
-      "result": "loss",
-      "turns": 15
-    },
-    {
-      "index": 95,
       "p1_side": 2,
       "result": "win",
       "turns": 11
     },
     {
+      "index": 93,
+      "p1_side": 2,
+      "result": "win",
+      "turns": 15
+    },
+    {
+      "index": 94,
+      "p1_side": 2,
+      "result": "loss",
+      "turns": 12
+    },
+    {
+      "index": 95,
+      "p1_side": 2,
+      "result": "win",
+      "turns": 10
+    },
+    {
       "index": 96,
       "p1_side": 2,
       "result": "loss",
-      "turns": 24
+      "turns": 15
     },
     {
       "index": 97,
       "p1_side": 2,
       "result": "win",
-      "turns": 8
+      "turns": 9
     },
     {
       "index": 98,
       "p1_side": 2,
-      "result": "win",
-      "turns": 12
+      "result": "loss",
+      "turns": 15
     },
     {
       "index": 99,
       "p1_side": 2,
       "result": "win",
-      "turns": 13
+      "turns": 16
     }
   ]
 }

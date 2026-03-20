@@ -1356,7 +1356,8 @@ public partial class Driver
 
         // Initialize DL resources if needed
         bool needsBattleModel = NeedsDlModel(p1Type) || NeedsDlModel(p2Type);
-        bool needsAnyResources = needsBattleModel;
+        bool needsAnyResources = needsBattleModel
+            || NeedsAnyDlResources(p1Type) || NeedsAnyDlResources(p2Type);
 
         if (needsAnyResources)
         {
