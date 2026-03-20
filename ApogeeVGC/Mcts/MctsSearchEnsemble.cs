@@ -28,6 +28,9 @@ public sealed class MctsSearchEnsemble(
     /// </summary>
     public BattleInfoTracker? Tracker { get; set; }
 
+    /// <summary>Iteration count from the last search (for diagnostics).</summary>
+    public int LastSearchIterations { get; private set; }
+
     public (LegalAction ActionA, LegalAction? ActionB) Search(
         Battle battle,
         SideId sideId,
@@ -72,6 +75,7 @@ public sealed class MctsSearchEnsemble(
             });
         }
 
+        LastSearchIterations = root.VisitCount;
         return SelectBestAction(root);
     }
 

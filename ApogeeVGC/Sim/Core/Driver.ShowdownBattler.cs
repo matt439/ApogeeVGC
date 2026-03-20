@@ -70,12 +70,15 @@ public partial class Driver
         Console.WriteLine("[Driver] Loading models...");
         Vocab vocab = Vocab.Load(MctsVocabPath, Library);
         StateEncoder encoder = new(vocab, Library);
-        using ModelInference battleModel = new(MctsModelPath, encoder);
+        bool needsBattleModel = config.Player.ToLowerInvariant()
+            is "dlgreedy" or "dl-greedy" or "greedy";
+        ModelInference? battleModel = needsBattleModel
+            ? new ModelInference(MctsModelPath, encoder) : null;
         using TeamPreviewInference previewModel = new(MctsTeamPreviewModelPath, vocab);
         Console.WriteLine("[Driver] Models loaded.");
 
         // Create the configured player
-        IShowdownPlayer player = CreateShowdownPlayer(config, battleModel);
+        IShowdownPlayer player = CreateShowdownPlayer(config, battleModel, formatId);
         Console.WriteLine($"[Driver] Player: {player.Name}");
 
         // Create and run orchestrator
@@ -83,16 +86,23 @@ public partial class Driver
             config, Library, vocab, previewModel, player, packedTeam);
 
         orchestrator.RunAsync().GetAwaiter().GetResult();
+
+        // Dispose battle model if loaded
+        battleModel?.Dispose();
     }
 
-    private static IShowdownPlayer CreateShowdownPlayer(ShowdownBotConfig config, ModelInference battleModel)
+    private IShowdownPlayer CreateShowdownPlayer(
+        ShowdownBotConfig config, ModelInference? battleModel, FormatId formatId)
     {
         return config.Player.ToLowerInvariant() switch
         {
-            "dlgreedy" or "dl-greedy" or "greedy" => new ShowdownPlayerDLGreedy(battleModel),
+            "dlgreedy" or "dl-greedy" or "greedy" =>
+                new ShowdownPlayerDLGreedy(battleModel
+                    ?? throw new InvalidOperationException("DL-Greedy requires battle model")),
             "random" => new ShowdownPlayerRandom(),
+            "ensemble" => new ShowdownPlayerEnsemble(Library, formatId),
             _ => throw new InvalidOperationException(
-                $"Unknown player type: '{config.Player}'. Valid options: dlgreedy, random"),
+                $"Unknown player type: '{config.Player}'. Valid options: dlgreedy, random, ensemble"),
         };
     }
 }
