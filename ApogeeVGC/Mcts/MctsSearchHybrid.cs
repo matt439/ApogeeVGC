@@ -80,7 +80,7 @@ public sealed class MctsSearchHybrid(MctsConfig config, ModelInference model)
         try
         {
             ourSide.Choose(ourChoice);
-            oppSide.AutoChoose();
+            oppSide.RandomAutoChoose(_targetRng.Value!);
             sim.CommitChoices();
         }
         catch

@@ -59,35 +59,34 @@ public sealed class MctsSearchEnsemble(
         int maxParallelism = config.MaxDegreeOfParallelism ?? Environment.ProcessorCount;
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = maxParallelism };
 
-        if (cancellationToken.CanBeCanceled)
+        if (cancellationToken.CanBeCanceled || config.TimeBudgetMs > 0)
         {
-            parallelOptions.CancellationToken = cancellationToken;
-            try
+            // Time-based or externally cancelled: spin up worker threads that
+            // loop until the token fires.  Parallel.For with int.MaxValue
+            // partitions poorly, so we use explicit threads instead.
+            using var cts = config.TimeBudgetMs > 0
+                ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
+                : null;
+            if (cts != null && config.TimeBudgetMs > 0)
+                cts.CancelAfter(config.TimeBudgetMs);
+
+            CancellationToken token = cts?.Token ?? cancellationToken;
+
+            Thread[] workers = new Thread[maxParallelism];
+            for (int t = 0; t < maxParallelism; t++)
             {
-                Parallel.For(0, int.MaxValue, parallelOptions, _ =>
+                workers[t] = new Thread(() =>
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    Battle sim = battle.Copy();
-                    RunIteration(root, sim, sideId);
-                });
+                    while (!token.IsCancellationRequested)
+                    {
+                        Battle sim = battle.Copy();
+                        RunIteration(root, sim, sideId);
+                    }
+                }) { IsBackground = true };
+                workers[t].Start();
             }
-            catch (OperationCanceledException) { }
-        }
-        else if (config.TimeBudgetMs > 0)
-        {
-            // Time-based: run until budget expires
-            using var cts = new CancellationTokenSource(config.TimeBudgetMs);
-            parallelOptions.CancellationToken = cts.Token;
-            try
-            {
-                Parallel.For(0, int.MaxValue, parallelOptions, _ =>
-                {
-                    cts.Token.ThrowIfCancellationRequested();
-                    Battle sim = battle.Copy();
-                    RunIteration(root, sim, sideId);
-                });
-            }
-            catch (OperationCanceledException) { }
+            for (int t = 0; t < maxParallelism; t++)
+                workers[t].Join();
         }
         else
         {
@@ -167,7 +166,7 @@ public sealed class MctsSearchEnsemble(
         try
         {
             ourSide.Choose(ourChoice);
-            oppSide.AutoChoose();
+            oppSide.RandomAutoChoose(_targetRng.Value!);
             sim.CommitChoices();
         }
         catch
@@ -232,8 +231,8 @@ public sealed class MctsSearchEnsemble(
             {
                 Side s1 = sim.P1;
                 Side s2 = sim.P2;
-                s1.AutoChoose();
-                s2.AutoChoose();
+                s1.RandomAutoChoose(_targetRng.Value!);
+                s2.RandomAutoChoose(_targetRng.Value!);
                 sim.CommitChoices();
             }
             catch

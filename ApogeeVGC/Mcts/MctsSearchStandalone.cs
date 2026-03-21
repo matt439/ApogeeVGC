@@ -121,7 +121,7 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
         try
         {
             ourSide.Choose(ourChoice);
-            oppSide.AutoChoose();
+            oppSide.RandomAutoChoose(_targetRng.Value!);
             sim.CommitChoices();
         }
         catch

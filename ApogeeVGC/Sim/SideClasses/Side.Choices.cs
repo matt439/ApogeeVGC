@@ -1176,6 +1176,66 @@ public partial class Side
     }
 
     /// <summary>
+    /// Like AutoChoose but randomizes the move selection.
+    /// Used in MCTS simulation so the opponent doesn't always pick move slot 1.
+    /// </summary>
+    public bool RandomAutoChoose(Random rng)
+    {
+        if (RequestState == RequestState.TeamPreview)
+        {
+            if (!IsChoiceDone()) ChooseTeam();
+        }
+        else if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
+        {
+            int i = 0;
+            while (!IsChoiceDone())
+            {
+                // Pick a random available switch target
+                var activeSet = new HashSet<Pokemon>(Active.Where(p => p != null)!);
+                var available = new List<int>();
+                for (int j = 0; j < Pokemon.Count; j++)
+                {
+                    if (!Pokemon[j].Fainted && !activeSet.Contains(Pokemon[j]))
+                        available.Add(j + 1); // 1-based
+                }
+                if (available.Count == 0)
+                {
+                    if (!ChooseSwitch().IsTrue()) return false;
+                }
+                else
+                {
+                    int pick = available[rng.Next(available.Count)];
+                    if (!ChooseSwitch(pick).IsTrue())
+                    {
+                        // Fallback to default
+                        if (!ChooseSwitch().IsTrue()) return false;
+                    }
+                }
+                if (++i > 10) return false;
+            }
+        }
+        else if (RequestState == RequestState.Move)
+        {
+            int i = 0;
+            while (!IsChoiceDone())
+            {
+                // Pick a random legal move (or switch)
+                int moveCount = ActiveRequest is MoveRequest mr && mr.Active.Count > 0
+                    ? mr.Active[Math.Min(i, mr.Active.Count - 1)]?.Moves.Length ?? 1
+                    : 1;
+                int pick = rng.Next(moveCount) + 1; // 1-based move slot
+                if (!ChooseMove(pick))
+                {
+                    // Random pick failed — fall back to default
+                    if (!ChooseMove()) return false;
+                }
+                if (++i > 10) return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
     /// The number of pokemon you must choose in Team Preview.
     /// 
     /// Note that PS doesn't support choosing fewer than this number of pokemon.
