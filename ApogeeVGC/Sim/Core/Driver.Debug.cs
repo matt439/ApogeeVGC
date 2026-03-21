@@ -18,11 +18,11 @@ public partial class Driver
     {
         // !! EDIT THESE VALUES TO DEBUG SPECIFIC BATTLES !!
         // Copy the 5 seeds from the evaluation exception output.
-        const int debugTeam1Seed = 57357;
-        const int debugTeam2Seed = 70927;
-        const int debugPlayer1Seed = 15383;
-        const int debugPlayer2Seed = 4857;
-        const int debugBattleSeed = 12916;
+        const int debugTeam1Seed = 1425057;
+        const int debugTeam2Seed = 1438627;
+        const int debugPlayer1Seed = 1383083;
+        const int debugPlayer2Seed = 1372557;
+        const int debugBattleSeed = 1380616;
 
         string formatLabel = Library.Formats[formatId].Name;
         const bool debug = true;

@@ -150,6 +150,8 @@ public partial record Abilities
                         return new VoidReturn();
 
                     MoveType type = move.Type;
+                    if (type == MoveType.Unknown) return new VoidReturn();
+
                     PokemonType pokemonType = type.ConvertToPokemonType();
                     var currentTypes = source.GetTypes();
 
@@ -159,7 +161,7 @@ public partial record Abilities
                     string joinedTypes = string.Join(",", currentTypes.Select(t => t.ToString()));
                     var moveTypeStr = pokemonType.ToString();
 
-                    if (type != MoveType.Unknown && joinedTypes != moveTypeStr)
+                    if (joinedTypes != moveTypeStr)
                     {
                         if (!source.SetType(pokemonType)) return new VoidReturn();
                         source.AbilityState.Libero = true;
