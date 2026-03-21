@@ -151,9 +151,15 @@ public partial class Battle
     private readonly Dictionary<MoveId, Stack<ActiveMove>> _activeMovePool = new();
 
     /// <summary>
-    /// Rents an <see cref="ActiveMove"/> from the per-Battle pool, or creates a new clone
-    /// from the template if none is available. The returned instance has all mutable fields
-    /// reset to match the immutable template.
+    /// Thread-local pool of <see cref="ActiveMove"/> instances keyed by <see cref="MoveId"/>.
+    /// Persists across MCTS iterations so copied battles start with a warm pool.
+    /// </summary>
+    [ThreadStatic] private static Dictionary<MoveId, Stack<ActiveMove>>? _threadActiveMovePool;
+
+    /// <summary>
+    /// Rents an <see cref="ActiveMove"/> from the per-Battle pool, thread-local pool,
+    /// or creates a new clone from the template if none is available.
+    /// The returned instance has all mutable fields reset to match the immutable template.
     /// </summary>
     internal ActiveMove RentActiveMove(Move move)
     {
@@ -163,6 +169,15 @@ public partial class Battle
         if (_activeMovePool.TryGetValue(moveId, out var stack) && stack.Count > 0)
         {
             ActiveMove pooled = stack.Pop();
+            pooled.ResetFromTemplate(template);
+            return pooled;
+        }
+
+        // Fall back to thread-local pool (warm across MCTS iterations)
+        _threadActiveMovePool ??= new Dictionary<MoveId, Stack<ActiveMove>>();
+        if (_threadActiveMovePool.TryGetValue(moveId, out var tlStack) && tlStack.Count > 0)
+        {
+            ActiveMove pooled = tlStack.Pop();
             pooled.ResetFromTemplate(template);
             return pooled;
         }
@@ -264,13 +279,32 @@ public partial class Battle
     /// <summary>
     /// Returns all EffectState instances that were rented during Battle.Copy()
     /// back to the thread-local pool for reuse by future copies.
+    /// Also drains the per-battle ActiveMove pool into the thread-local pool.
     /// </summary>
     public void RecycleClonedStates()
     {
-        if (_clonedEffectStates is null) return;
-        foreach (var state in _clonedEffectStates)
-            EffectState.ReturnToClonePool(state);
-        _clonedEffectStates.Clear();
+        if (_clonedEffectStates is not null)
+        {
+            foreach (var state in _clonedEffectStates)
+                EffectState.ReturnToClonePool(state);
+            _clonedEffectStates.Clear();
+        }
+
+        // Drain per-battle ActiveMove pool into thread-local pool
+        if (_activeMovePool.Count > 0)
+        {
+            _threadActiveMovePool ??= new Dictionary<MoveId, Stack<ActiveMove>>();
+            foreach (var (moveId, stack) in _activeMovePool)
+            {
+                if (!_threadActiveMovePool.TryGetValue(moveId, out var tlStack))
+                {
+                    tlStack = new Stack<ActiveMove>(4);
+                    _threadActiveMovePool[moveId] = tlStack;
+                }
+                while (stack.Count > 0)
+                    tlStack.Push(stack.Pop());
+            }
+        }
     }
 
     /// <summary>

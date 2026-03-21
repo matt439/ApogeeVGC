@@ -275,7 +275,7 @@ public partial class BattleActions
         bool suppressMessages = false)
     {
         var move = Library.Moves[moveId];
-        return GetDamage(source, target, move.ToActiveMove(), suppressMessages);
+        return GetDamage(source, target, Battle.RentActiveMove(move), suppressMessages);
     }
 
     public IntUndefinedFalseUnion GetDamage(Pokemon source, Pokemon target, int basePower,

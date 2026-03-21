@@ -61,10 +61,7 @@ public partial class BattleActions(Battle battle)
 
     private void ClearActiveMove(bool failed)
     {
-        if (failed)
-        {
-            Battle.ReturnActiveMove(Battle.ActiveMove);
-        }
+        Battle.ReturnActiveMove(Battle.ActiveMove);
         Battle.ActiveMove = null;
         if (failed)
         {

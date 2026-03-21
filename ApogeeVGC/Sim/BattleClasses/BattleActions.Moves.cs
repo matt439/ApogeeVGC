@@ -55,7 +55,7 @@ public partial class BattleActions
 
         // Get the target for this move
         Pokemon? target = Battle.GetTarget(pokemon, move, targetLoc, originalTarget);
-        var baseMove = move as ActiveMove ?? move.ToActiveMove();
+        var baseMove = move as ActiveMove ?? Battle.RentActiveMove(move);
         int priority = baseMove.Priority;
         bool pranksterBoosted = baseMove.PranksterBoosted ?? false;
 
@@ -66,7 +66,8 @@ public partial class BattleActions
                 RunEventSource.FromNullablePokemon(target), baseMove);
             if (changedMoveResult is MoveIdRelayVar moveIdRv && moveIdRv.MoveId != baseMove.Id)
             {
-                baseMove = Library.Moves[moveIdRv.MoveId].ToActiveMove();
+                Battle.ReturnActiveMove(baseMove); // return the original before replacing
+                baseMove = Battle.RentActiveMove(Library.Moves[moveIdRv.MoveId]);
                 baseMove.Priority = priority;
                 if (pranksterBoosted)
                 {
@@ -348,7 +349,7 @@ public partial class BattleActions
         // reuse it directly instead of creating a redundant copy. Callers that pass an ActiveMove
         // have already created a fresh instance with the correct flags (HasBounced, IsExternal).
         // Only create a new ActiveMove when the input is a base Move from the library.
-        var activeMove = move as ActiveMove ?? move.ToActiveMove();
+        var activeMove = move as ActiveMove ?? Battle.RentActiveMove(move);
 
         pokemon.LastMoveUsed = Battle.Library.Moves[activeMove.Id];
 
