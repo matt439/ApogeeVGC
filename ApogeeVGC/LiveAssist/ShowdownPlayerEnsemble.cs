@@ -28,6 +28,11 @@ public sealed class ShowdownPlayerEnsemble : IShowdownPlayer
     /// </summary>
     public TimeBudgetManager TimeBudget { get; } = new();
 
+    /// <summary>
+    /// Random rollout depth at leaf nodes. 0 = pure heuristic (default).
+    /// </summary>
+    public int RolloutDepth { get => _search.RolloutDepth; set => _search.RolloutDepth = value; }
+
     public string Name => "Ensemble";
 
     public ShowdownPlayerEnsemble(Library library, FormatId formatId)

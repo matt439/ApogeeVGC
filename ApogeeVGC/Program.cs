@@ -22,6 +22,7 @@ public class Program
         // Remote MCTS args
         string? workerHost = null;
         int? workerPort = null;
+        int? rolloutDepth = null;
 
         // First bare argument is the mode name
         if (args.Length > 0 && Enum.TryParse(args[0], true, out DriverMode parsedMode))
@@ -75,10 +76,14 @@ public class Program
             {
                 workerPort = p;
             }
+            else if (args[i] == "--rollout-depth" && int.TryParse(args[i + 1], out int rd))
+            {
+                rolloutDepth = rd;
+            }
         }
 
         // Set remote MCTS args before starting
-        Driver.SetRemoteArgs(workerHost, workerPort);
+        Driver.SetRemoteArgs(workerHost, workerPort, rolloutDepth);
 
         if (mode == DriverMode.Evaluate)
         {

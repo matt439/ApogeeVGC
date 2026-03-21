@@ -31,6 +31,13 @@ public sealed class MctsSearchEnsemble(
     /// <summary>Iteration count from the last search (for diagnostics).</summary>
     public int LastSearchIterations { get; private set; }
 
+    /// <summary>
+    /// Number of random turns to simulate at leaf nodes before applying heuristic evaluation.
+    /// 0 = pure heuristic (current default). Higher = deeper lookahead but fewer iterations.
+    /// Typical values: 0-5. Set via MctsConfig or directly.
+    /// </summary>
+    public int RolloutDepth { get; set; }
+
     public (LegalAction ActionA, LegalAction? ActionB) Search(
         Battle battle,
         SideId sideId,
@@ -176,8 +183,8 @@ public sealed class MctsSearchEnsemble(
                     ExpandNodeFromBattle(edge.Child, sim, sideId);
                 }
             }
-            // Leaf evaluation: proven heuristic
-            leafValue = HeuristicEval.Evaluate(sim, sideId, Tracker);
+            // Leaf evaluation: optional random rollout then heuristic
+            leafValue = EvaluateLeaf(sim, sideId);
         }
         else
         {
@@ -189,6 +196,40 @@ public sealed class MctsSearchEnsemble(
         Interlocked.Increment(ref node._visitCount);
 
         return leafValue;
+    }
+
+    /// <summary>
+    /// Evaluate a leaf node: run K random turns then apply heuristic.
+    /// If RolloutDepth=0, just applies heuristic directly (fastest).
+    /// </summary>
+    private float EvaluateLeaf(Battle sim, SideId sideId)
+    {
+        if (RolloutDepth <= 0)
+            return HeuristicEval.Evaluate(sim, sideId, Tracker);
+
+        // Random rollout for K turns
+        for (int k = 0; k < RolloutDepth; k++)
+        {
+            if (sim.Ended) break;
+
+            try
+            {
+                Side s1 = sim.P1;
+                Side s2 = sim.P2;
+                s1.AutoChoose();
+                s2.AutoChoose();
+                sim.CommitChoices();
+            }
+            catch
+            {
+                break; // Simulation error — stop rollout
+            }
+        }
+
+        if (sim.Ended)
+            return GetTerminalValue(sim, sideId);
+
+        return HeuristicEval.Evaluate(sim, sideId, Tracker);
     }
 
     // ── Shared infrastructure (same as MctsSearchStandalone) ─────────

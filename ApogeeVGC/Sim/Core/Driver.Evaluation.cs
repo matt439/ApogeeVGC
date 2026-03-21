@@ -1416,7 +1416,11 @@ public partial class Driver
         Stopwatch stopwatch = Stopwatch.StartNew();
         int completedBattles = 0;
 
-        MctsConfig? sharedMctsConfig = new() { NumIterations = mctsIterations };
+        MctsConfig? sharedMctsConfig = new()
+        {
+            NumIterations = mctsIterations,
+            RolloutDepth = RolloutDepthArg,
+        };
         ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = numThreads };
 
         // Indexed arrays so results stay ordered despite parallel execution

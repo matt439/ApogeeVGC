@@ -13,14 +13,16 @@ public partial class Driver
     /// </summary>
     private static string? WorkerHost;
     private static int WorkerPort = 9100;
+    public static int RolloutDepthArg { get; private set; }
 
     /// <summary>
     /// Parse remote MCTS CLI args.
     /// </summary>
-    public static void SetRemoteArgs(string? workerHost, int? workerPort)
+    public static void SetRemoteArgs(string? workerHost, int? workerPort, int? rolloutDepth = null)
     {
         WorkerHost = workerHost;
         if (workerPort.HasValue) WorkerPort = workerPort.Value;
+        if (rolloutDepth.HasValue) RolloutDepthArg = rolloutDepth.Value;
     }
 
     /// <summary>

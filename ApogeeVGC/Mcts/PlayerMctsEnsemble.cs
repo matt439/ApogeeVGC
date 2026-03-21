@@ -47,7 +47,10 @@ public static class PlayerMctsEnsemble
 
         MctsConfig mctsConfig = options.MctsConfig ?? new MctsConfig();
         var search = new MctsSearchEnsemble(
-            mctsConfig, ensemble, opponentModel, stateEncoder);
+            mctsConfig, ensemble, opponentModel, stateEncoder)
+        {
+            RolloutDepth = mctsConfig.RolloutDepth,
+        };
 
         return new PlayerMctsStandalone(sideId, options, battleController, search);
     }

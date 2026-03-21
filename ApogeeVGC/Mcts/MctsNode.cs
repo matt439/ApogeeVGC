@@ -22,6 +22,9 @@ public sealed class MctsConfig
 
     /// <summary>Max threads for parallel MCTS iterations. null = Environment.ProcessorCount.</summary>
     public int? MaxDegreeOfParallelism { get; init; }
+
+    /// <summary>Random rollout turns at leaf nodes before heuristic evaluation. 0 = pure heuristic.</summary>
+    public int RolloutDepth { get; init; }
 }
 
 /// <summary>
