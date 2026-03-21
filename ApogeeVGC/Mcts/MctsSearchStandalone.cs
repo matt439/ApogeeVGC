@@ -64,9 +64,23 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
             }
             catch (OperationCanceledException) { }
         }
+        else if (config.TimeBudgetMs > 0)
+        {
+            using var cts = new CancellationTokenSource(config.TimeBudgetMs);
+            parallelOptions.CancellationToken = cts.Token;
+            try
+            {
+                Parallel.For(0, int.MaxValue, parallelOptions, _ =>
+                {
+                    cts.Token.ThrowIfCancellationRequested();
+                    Battle sim = battle.Copy();
+                    RunIteration(root, sim, sideId);
+                });
+            }
+            catch (OperationCanceledException) { }
+        }
         else
         {
-            // Fixed iterations
             Parallel.For(0, config.NumIterations, parallelOptions, _ =>
             {
                 Battle sim = battle.Copy();

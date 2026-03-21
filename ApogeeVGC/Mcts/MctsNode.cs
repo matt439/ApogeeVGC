@@ -25,6 +25,9 @@ public sealed class MctsConfig
 
     /// <summary>Random rollout turns at leaf nodes before heuristic evaluation. 0 = pure heuristic. Default 2.</summary>
     public int RolloutDepth { get; init; } = 2;
+
+    /// <summary>Time budget per search in milliseconds. 0 = use NumIterations instead.</summary>
+    public int TimeBudgetMs { get; init; }
 }
 
 /// <summary>

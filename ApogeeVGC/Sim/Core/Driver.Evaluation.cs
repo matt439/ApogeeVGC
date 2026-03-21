@@ -1420,6 +1420,7 @@ public partial class Driver
         {
             NumIterations = mctsIterations,
             RolloutDepth = RolloutDepthArg,
+            TimeBudgetMs = TimePerMoveMsArg,
         };
         ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = numThreads };
 

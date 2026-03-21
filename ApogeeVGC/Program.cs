@@ -31,6 +31,7 @@ public class Program
         string? workerHost = null;
         int? workerPort = null;
         int? rolloutDepth = null;
+        int? timePerMoveMs = null;
 
         // First bare argument is the mode name
         if (args.Length > 0 && Enum.TryParse(args[0], true, out DriverMode parsedMode))
@@ -88,10 +89,14 @@ public class Program
             {
                 rolloutDepth = rd;
             }
+            else if (args[i] == "--time-per-move" && int.TryParse(args[i + 1], out int tpm))
+            {
+                timePerMoveMs = tpm;
+            }
         }
 
         // Set remote MCTS args before starting
-        Driver.SetRemoteArgs(workerHost, workerPort, rolloutDepth);
+        Driver.SetRemoteArgs(workerHost, workerPort, rolloutDepth, timePerMoveMs);
 
         if (mode == DriverMode.Evaluate)
         {
