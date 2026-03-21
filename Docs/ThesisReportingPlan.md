@@ -84,11 +84,18 @@ Key finding: removing the policy head helped (+7%), but value head still worse t
 - Final weights reveal VGC strategy priorities
 
 #### 5.4 Rollout Depth Experiment
-- K=0: pure heuristic evaluation (fastest, most iterations)
-- K=1,2,3: partial rollout + heuristic (fewer iterations, deeper lookahead)
-- K=∞: full rollout to completion (fewest iterations, ground truth value)
-- Exploits the 6000 battles/sec simulator speed
-- **Report as win rate vs rollout depth chart**
+Tested search breadth vs depth tradeoff at fixed computation budget (10K iterations, 200 battles each):
+
+| Rollout Depth | Win Rate vs Random | Time | Iterations/turn |
+|---|---|---|---|
+| K=0 (pure heuristic) | 72.0% | 20m | ~300K |
+| **K=2 (2-turn rollout)** | **73.5%** | 23m | ~100K |
+| K=5 (5-turn rollout) | 69.0% | 24m | ~30K |
+| K=100 (full rollout) | 66.5% | 38m | ~5K |
+
+**Finding: K=2 is optimal.** A 2-turn lookahead reveals immediate tactical consequences (KOs, switch-ins) without sacrificing iteration count. Full rollouts are worse — random playout noise and drastically fewer iterations outweigh the unbiased value estimates. Search breadth beats search depth at fixed compute.
+
+K=2 set as default for all subsequent evaluation.
 
 ### Chapter 6: Evaluation
 
