@@ -17,9 +17,9 @@ public sealed class TimeBudgetManager
     private int _turnTimerSec = 55;
     private int _totalTimerSec = 420;
     private int _currentTurn;
-    private const int SafetyMarginSec = 3;
+    private const int SafetyMarginSec = 5;
     private const int MinBudgetSec = 3;
-    private const int MaxBudgetSec = 30;
+    private const int MaxBudgetSec = 15;
     private const int EstimatedTotalTurns = 12;
 
     /// <summary>
@@ -69,9 +69,9 @@ public sealed class TimeBudgetManager
         // Early turn bonus: spend more on turns 1-3
         float turnMultiplier = _currentTurn switch
         {
-            <= 1 => 1.5f,
-            2 => 1.3f,
-            3 => 1.2f,
+            <= 1 => 1.3f,
+            2 => 1.2f,
+            3 => 1.1f,
             >= 10 => 0.7f,
             _ => 1.0f,
         };

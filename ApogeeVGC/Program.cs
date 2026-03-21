@@ -6,6 +6,14 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        // Global exception handler to prevent silent crashes
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            Console.WriteLine($"\n[FATAL] Unhandled exception: {e.ExceptionObject}");
+            Console.WriteLine("Press Enter to exit...");
+            Console.ReadLine();
+        };
+
         Driver driver = new();
         // Parse --mode argument
         DriverMode mode = DriverMode.ShowdownBattler;
