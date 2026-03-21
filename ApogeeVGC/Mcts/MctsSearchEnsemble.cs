@@ -158,6 +158,12 @@ public sealed class MctsSearchEnsemble(
         MctsEdge? edge = SelectEdge(node);
         if (edge == null) return 0.5f;
 
+        // Virtual loss: immediately claim this edge so other threads explore elsewhere.
+        // Increment visit count now (with implicit value 0 = pessimistic) to lower
+        // this edge's Q and PUCT score for concurrent readers.
+        Interlocked.Increment(ref edge._visitCount);
+        Interlocked.Increment(ref node._visitCount);
+
         Side ourSide = sideId == SideId.P1 ? sim.P1 : sim.P2;
         Side oppSide = sideId == SideId.P1 ? sim.P2 : sim.P1;
 
@@ -173,10 +179,10 @@ public sealed class MctsSearchEnsemble(
         }
         catch
         {
+            // Simulation error — keep virtual loss as the real result (0.5 neutral).
+            // Visit already counted above; just add the value.
             leafValue = 0.5f;
-            Interlocked.Increment(ref edge._visitCount);
             InterlockedAddFloat(ref edge._totalValue, leafValue);
-            Interlocked.Increment(ref node._visitCount);
             return leafValue;
         }
 
@@ -208,9 +214,9 @@ public sealed class MctsSearchEnsemble(
             leafValue = RunIteration(edge.Child, sim, sideId, depth + 1);
         }
 
-        Interlocked.Increment(ref edge._visitCount);
+        // Backpropagate: visit already counted by virtual loss above,
+        // just add the real evaluation value.
         InterlockedAddFloat(ref edge._totalValue, leafValue);
-        Interlocked.Increment(ref node._visitCount);
 
         return leafValue;
     }
