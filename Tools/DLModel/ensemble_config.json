@@ -1,13 +1,13 @@
 {
   "Weights": {
-    "DamageMax": 3.6542048912900738,
-    "KOSeeking": 1.7823640417828523,
-    "KOAvoidance": 0.8824756030194366,
-    "TypePositioning": 2.315591969515063,
-    "DamageMin": 1.5521479306923003,
-    "SpeedAdvantage": 3.313930432691471,
-    "StatusSpreading": 1.1048224618982925,
-    "ProtectPrediction": 4.314479083185647,
-    "SwitchMomentum": 4.0
+    "DamageMax": 3.389170719359381,
+    "KOSeeking": 0.3359803112635107,
+    "KOAvoidance": 1.7570082892063672,
+    "TypePositioning": 1.552561205143041,
+    "DamageMin": 4.194290041938661,
+    "SpeedAdvantage": 3.3555210694708784,
+    "StatusSpreading": 1.6581417293733542,
+    "ProtectPrediction": 3.1816395058725337,
+    "SwitchMomentum": 1.2280954299007008
   }
 }

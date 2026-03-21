@@ -39,6 +39,7 @@ MINI_MODEL_NAMES = [
     'SpeedAdvantage',
     'StatusSpreading',
     'ProtectPrediction',
+    'SwitchMomentum',
 ]
 
 
@@ -152,7 +153,8 @@ def main():
     parser.add_argument('--mcts-iterations', type=int, default=1000,
                         help='MCTS iterations per search (lower for speed during tuning)')
     parser.add_argument('--threads', type=int, default=32)
-    parser.add_argument('--study-name', default='ensemble_weights')
+    parser.add_argument('--study-name', default=None,
+                        help='Optuna study name (default: auto-generated with timestamp)')
     parser.add_argument('--storage', default=None,
                         help='Optuna storage URL (default: in-memory)')
     args = parser.parse_args()
@@ -170,8 +172,10 @@ def main():
     print('Build succeeded.')
 
     # Create Optuna study
+    import datetime
+    study_name = args.study_name or f'ensemble_{datetime.datetime.now():%Y%m%d_%H%M%S}'
     study = optuna.create_study(
-        study_name=args.study_name,
+        study_name=study_name,
         storage=args.storage,
         direction='maximize',
         load_if_exists=True,

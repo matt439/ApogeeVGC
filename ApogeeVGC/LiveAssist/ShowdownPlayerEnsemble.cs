@@ -24,10 +24,9 @@ public sealed class ShowdownPlayerEnsemble : IShowdownPlayer
     private SideId _sideId;
 
     /// <summary>
-    /// Time budget per move decision in seconds.
-    /// Showdown's turn timer is ~150s; we use most of it with a safety margin.
+    /// Adaptive time budget manager based on Showdown timer state.
     /// </summary>
-    public int TimeBudgetSeconds { get; set; } = 8;
+    public TimeBudgetManager TimeBudget { get; } = new();
 
     public string Name => "Ensemble";
 
@@ -107,8 +106,10 @@ public sealed class ShowdownPlayerEnsemble : IShowdownPlayer
                 actions.SlotB.Count > 0 ? actions.SlotB[0] : null);
         }
 
-        // Time-based search: run until budget expires
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(TimeBudgetSeconds));
+        // Time-based search: adaptive budget from timer state
+        int budgetSec = TimeBudget.GetBudgetSeconds();
+        Console.WriteLine($"  {TimeBudget.GetDiagnostics()}");
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(budgetSec));
         var stopwatch = Stopwatch.StartNew();
 
         (LegalAction bestA, LegalAction? bestB) = _search.Search(

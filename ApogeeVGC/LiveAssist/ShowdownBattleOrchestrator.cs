@@ -179,7 +179,11 @@ public sealed class ShowdownBattleOrchestrator
                 {
                     string[] parts = line.Split('|');
                     if (parts.Length > 2 && int.TryParse(parts[2], out int t))
+                    {
                         turns = t;
+                        if (_player is ShowdownPlayerEnsemble ensemble2)
+                            ensemble2.TimeBudget.OnTurnStart(t);
+                    }
                 }
                 // Parse rating change from end-of-battle raw message
                 // Format: |raw|Matt439's rating: 1000 &rarr; <strong>1040</strong>
@@ -218,6 +222,9 @@ public sealed class ShowdownBattleOrchestrator
         client.OnTimer += timerMsg =>
         {
             Console.WriteLine($"  [Timer] {timerMsg}");
+            // Feed timer state to ensemble player for adaptive time budgeting
+            if (_player is ShowdownPlayerEnsemble ensemble)
+                ensemble.TimeBudget.UpdateFromTimerMessage(timerMsg);
         };
 
         client.OnError += errorMsg =>
