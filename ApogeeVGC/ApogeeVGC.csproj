@@ -18,6 +18,8 @@
     <TieredPGO>true</TieredPGO>
     <DynamicPGO>true</DynamicPGO>
     <PublishReadyToRun>false</PublishReadyToRun>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
