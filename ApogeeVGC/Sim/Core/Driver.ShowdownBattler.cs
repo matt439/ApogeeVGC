@@ -90,11 +90,13 @@ public partial class Driver
         // Dispose battle model if loaded
         battleModel?.Dispose();
 
+#if !HEADLESS
         if (WaitForInput)
         {
             Console.WriteLine("\nPress Enter to exit...");
             Console.ReadLine();
         }
+#endif
     }
 
     private IShowdownPlayer CreateShowdownPlayer(

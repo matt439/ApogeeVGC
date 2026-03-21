@@ -68,4 +68,19 @@ public enum DriverMode
     /// CLI args: --player1, --player2, --battles, --mcts-iterations, --threads, --output
     /// </summary>
     Evaluate,
+
+    /// <summary>
+    /// MCTS worker server: listens for TCP connections from the home client,
+    /// receives Showdown protocol, runs MCTS search, returns decisions.
+    /// Deploy on EC2 for high-iteration search.
+    /// CLI args: --port (default 9100)
+    /// </summary>
+    MctsWorker,
+
+    /// <summary>
+    /// Remote Showdown battler: connects to Showdown from home IP,
+    /// forwards game state to a remote MCTS worker for decisions.
+    /// CLI args: --worker-host, --worker-port
+    /// </summary>
+    ShowdownBattlerRemote,
 }

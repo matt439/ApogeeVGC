@@ -1,4 +1,6 @@
-﻿using ApogeeVGC.Gui;
+#if !HEADLESS
+using ApogeeVGC.Gui;
+#endif
 using ApogeeVGC.Mcts;
 using ApogeeVGC.Sim.Player;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -12,8 +14,10 @@ public record PlayerOptions
     public required string Name { get; init; }
     public required IReadOnlyList<PokemonSet> Team { get; init; }
     public PrngSeed? Seed { get; init; }
-    public BattleGame? GuiWindow { get; init; } // BattleGame instance for GUI players
-    public GuiChoiceCoordinator? GuiChoiceCoordinator { get; init; } // Choice coordinator for thread-safe communication with the GUI
+#if !HEADLESS
+    public BattleGame? GuiWindow { get; init; }
+    public GuiChoiceCoordinator? GuiChoiceCoordinator { get; init; }
+#endif
     public bool PrintDebug { get; init; }
-    public MctsConfig? MctsConfig { get; init; } // Optional MCTS configuration for MCTS/MctsStandalone players
+    public MctsConfig? MctsConfig { get; init; }
 }

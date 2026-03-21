@@ -73,8 +73,8 @@ public static class EquivalenceTestHelper
             dir = Directory.GetParent(dir)?.FullName;
         }
 
-        throw new DirectoryNotFoundException(
-            $"Could not find solution root (containing *.sln) starting from {startDir}");
+        // No .sln found (e.g. headless deployment) — fall back to exe directory
+        return startDir;
     }
 
     /// <summary>

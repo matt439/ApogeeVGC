@@ -30,6 +30,7 @@ public class SimulatorAsync : SimulatorBase
             Console.WriteLine("[SimulatorAsync.ClearMessages] Called");
         }
 
+#if !HEADLESS
         // Directly call ClearMessages on GUI players' BattleGame windows
         if (Player1 is PlayerGui gui1)
         {
@@ -54,6 +55,7 @@ public class SimulatorAsync : SimulatorBase
 
             gui2.GuiWindow.ClearMessages();
         }
+#endif
 
         if (PrintDebug)
         {
@@ -620,7 +622,9 @@ public class SimulatorAsync : SimulatorBase
         return options.Type switch
         {
             Player.PlayerType.Random => new PlayerRandom(sideId, options, this),
+#if !HEADLESS
             Player.PlayerType.Gui => new PlayerGui(sideId, options, this),
+#endif
             Player.PlayerType.Console => new PlayerConsole(sideId, options, this),
             Player.PlayerType.Mcts => throw new NotImplementedException(
                 "MCTS player not implemented yet"),

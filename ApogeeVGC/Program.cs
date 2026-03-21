@@ -19,6 +19,10 @@ public class Program
         int? threads = null;
         string? output = null;
 
+        // Remote MCTS args
+        string? workerHost = null;
+        int? workerPort = null;
+
         // First bare argument is the mode name
         if (args.Length > 0 && Enum.TryParse(args[0], true, out DriverMode parsedMode))
         {
@@ -59,7 +63,22 @@ public class Program
             {
                 output = args[i + 1];
             }
+            else if (args[i] == "--worker-host")
+            {
+                workerHost = args[i + 1];
+            }
+            else if (args[i] == "--worker-port" && int.TryParse(args[i + 1], out int wp))
+            {
+                workerPort = wp;
+            }
+            else if (args[i] == "--port" && int.TryParse(args[i + 1], out int p))
+            {
+                workerPort = p;
+            }
         }
+
+        // Set remote MCTS args before starting
+        Driver.SetRemoteArgs(workerHost, workerPort);
 
         if (mode == DriverMode.Evaluate)
         {

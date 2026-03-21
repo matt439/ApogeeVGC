@@ -10,6 +10,13 @@
 
 # Showdown bot credentials
 showdown_config.json
+
+# AWS keys
+*.pem
+
+# Deploy artifacts
+apogee.tar.gz
+publish/
 *.userosscache
 *.sln.docstates
 

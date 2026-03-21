@@ -48,10 +48,14 @@ public partial class Driver
         switch (mode)
         {
             case DriverMode.ConsoleVsRandom:
+#if !HEADLESS
                 RunConsoleVsRandom(ActiveFormatId);
+#endif
                 break;
             case DriverMode.GuiVsRandom:
+#if !HEADLESS
                 RunGuiVsRandom(ActiveFormatId);
+#endif
                 break;
             case DriverMode.RndVsRndEvaluation:
                 RunRandomTeamEvaluation(ActiveFormatId);
@@ -96,6 +100,12 @@ public partial class Driver
             }
             case DriverMode.ShowdownBattler:
                 RunShowdownBattler(ActiveFormatId);
+                break;
+            case DriverMode.MctsWorker:
+                RunMctsWorker(ActiveFormatId);
+                break;
+            case DriverMode.ShowdownBattlerRemote:
+                RunShowdownBattlerRemote(ActiveFormatId);
                 break;
             case DriverMode.Evaluate:
                 throw new InvalidOperationException(

@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework Condition="'$(Headless)' != 'true'">net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework Condition="'$(Headless)' == 'true'">net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
-    <MonoGameContentReference>Content\Content.mgcb</MonoGameContentReference>
+    <MonoGameContentReference Condition="'$(Headless)' != 'true'">Content\Content.mgcb</MonoGameContentReference>
   </PropertyGroup>
 
   <!-- Performance optimization settings for Release builds -->
@@ -32,13 +33,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.3" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4.1" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" Condition="'$(Headless)' != 'true'" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4.1" Condition="'$(Headless)' != 'true'" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />
     <PackageReference Include="Spectre.Console" Version="0.53.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Headless)' != 'true'">
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
 
@@ -53,6 +54,21 @@
     <EmbeddedResource Remove="Sim\Ui\**" />
     <None Remove="Sim\Ui\**" />
   </ItemGroup>
+
+  <!-- Headless mode: exclude GUI, MonoGame content, and GUI-dependent files -->
+  <ItemGroup Condition="'$(Headless)' == 'true'">
+    <Compile Remove="Gui\**" />
+    <EmbeddedResource Remove="Gui\**" />
+    <None Remove="Gui\**" />
+    <Content Remove="Content\**" />
+    <Compile Remove="Sim\Player\PlayerGui.cs" />
+    <Compile Remove="Sim\Core\Driver.Interactive.cs" />
+  </ItemGroup>
+
+  <!-- Headless mode: define HEADLESS constant for conditional compilation -->
+  <PropertyGroup Condition="'$(Headless)' == 'true'">
+    <DefineConstants>$(DefineConstants);HEADLESS</DefineConstants>
+  </PropertyGroup>
 
   <!-- Learnsets JSON data file - copied to output directory when present -->
   <ItemGroup>
