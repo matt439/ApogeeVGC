@@ -158,17 +158,37 @@ public sealed class MctsWorkerServer
             return JsonSerializer.Serialize(new { type = "error", message = "Not initialized" });
 
         string requestJson = root.GetProperty("json").GetString() ?? "{}";
-        string? choice = _agent.HandleRequest(requestJson);
+
+        // Capture console output during request handling
+        var logCapture = new System.IO.StringWriter();
+        TextWriter originalOut = Console.Out;
+        Console.SetOut(logCapture);
+
+        string? choice;
+        try
+        {
+            choice = _agent.HandleRequest(requestJson);
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+
+        string logs = logCapture.ToString().TrimEnd();
+
+        // Also print to worker console
+        if (!string.IsNullOrEmpty(logs))
+            Console.WriteLine(logs);
 
         if (choice == null)
-            return JsonSerializer.Serialize(new { type = "none" });
+            return JsonSerializer.Serialize(new { type = "none", logs });
 
-        // Determine if it's a team preview or battle choice
         bool isTeam = choice.StartsWith("team ");
         return JsonSerializer.Serialize(new
         {
             type = isTeam ? "team" : "choice",
             value = choice,
+            logs,
         });
     }
 

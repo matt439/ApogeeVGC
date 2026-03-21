@@ -7,13 +7,14 @@ namespace ApogeeVGC.LiveAssist;
 /// <summary>
 /// Client that connects to a remote MctsWorkerServer.
 /// Forwards Showdown protocol to the worker and receives decisions back.
-/// Used by the home machine to offload MCTS computation to EC2.
+/// Thread-safe: uses a semaphore to serialize access to the TCP stream.
 /// </summary>
 public sealed class MctsWorkerClient : IDisposable
 {
     private readonly TcpClient _tcp;
     private readonly StreamReader _reader;
     private readonly StreamWriter _writer;
+    private readonly SemaphoreSlim _lock = new(1, 1);
 
     public bool IsConnected => _tcp.Connected;
 
@@ -24,9 +25,6 @@ public sealed class MctsWorkerClient : IDisposable
         _writer = writer;
     }
 
-    /// <summary>
-    /// Connect to the MCTS worker server.
-    /// </summary>
     public static async Task<MctsWorkerClient> ConnectAsync(string host, int port, CancellationToken ct = default)
     {
         var tcp = new TcpClient();
@@ -39,28 +37,18 @@ public sealed class MctsWorkerClient : IDisposable
         return new MctsWorkerClient(tcp, reader, writer);
     }
 
-    /// <summary>
-    /// Send init message to start a new battle session on the worker.
-    /// </summary>
     public async Task<string> SendInitAsync(string format, CancellationToken ct = default)
     {
         string msg = JsonSerializer.Serialize(new { type = "init", format });
         return await SendAndReceiveAsync(msg, ct);
     }
 
-    /// <summary>
-    /// Forward battle protocol lines to the worker.
-    /// </summary>
     public async Task<string> SendBattleLinesAsync(string[] lines, CancellationToken ct = default)
     {
         string msg = JsonSerializer.Serialize(new { type = "battle", lines });
         return await SendAndReceiveAsync(msg, ct);
     }
 
-    /// <summary>
-    /// Forward a request JSON and get the decision back.
-    /// Returns the /choose command string, or null if no decision needed.
-    /// </summary>
     public async Task<string?> SendRequestAsync(string requestJson, CancellationToken ct = default)
     {
         string msg = JsonSerializer.Serialize(new { type = "request", json = requestJson });
@@ -69,18 +57,23 @@ public sealed class MctsWorkerClient : IDisposable
         using JsonDocument doc = JsonDocument.Parse(response);
         string responseType = doc.RootElement.GetProperty("type").GetString() ?? "";
 
+        // Print worker logs if present
+        if (doc.RootElement.TryGetProperty("logs", out JsonElement logsElem))
+        {
+            string? logs = logsElem.GetString();
+            if (!string.IsNullOrEmpty(logs))
+                Console.WriteLine(logs);
+        }
+
         return responseType switch
         {
             "choice" or "team" => doc.RootElement.GetProperty("value").GetString(),
             "error" => throw new InvalidOperationException(
                 $"Worker error: {doc.RootElement.GetProperty("message").GetString()}"),
-            _ => null, // "none"
+            _ => null,
         };
     }
 
-    /// <summary>
-    /// Reset the worker for the next battle.
-    /// </summary>
     public async Task SendResetAsync(CancellationToken ct = default)
     {
         string msg = JsonSerializer.Serialize(new { type = "reset" });
@@ -89,13 +82,22 @@ public sealed class MctsWorkerClient : IDisposable
 
     private async Task<string> SendAndReceiveAsync(string message, CancellationToken ct)
     {
-        await _writer.WriteLineAsync(message.AsMemory(), ct);
-        string? response = await _reader.ReadLineAsync(ct);
-        return response ?? throw new InvalidOperationException("Worker disconnected");
+        await _lock.WaitAsync(ct);
+        try
+        {
+            await _writer.WriteLineAsync(message.AsMemory(), ct);
+            string? response = await _reader.ReadLineAsync(ct);
+            return response ?? throw new InvalidOperationException("Worker disconnected");
+        }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     public void Dispose()
     {
+        _lock.Dispose();
         _reader.Dispose();
         _writer.Dispose();
         _tcp.Dispose();

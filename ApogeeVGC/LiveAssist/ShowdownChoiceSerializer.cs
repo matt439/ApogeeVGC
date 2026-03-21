@@ -81,8 +81,8 @@ public static partial class ShowdownChoiceSerializer
                 sb.Append($" {action.TargetLoc}");
         }
 
-        // Modifiers
-        if (action.Terastallize.HasValue)
+        // Modifiers — only include terastallize if Showdown's request actually allows it
+        if (action.Terastallize.HasValue && CanTerastallize(root, slotIndex))
             sb.Append(" terastallize");
         if (action.Mega.HasValue)
             sb.Append(" mega");
@@ -142,6 +142,21 @@ public static partial class ShowdownChoiceSerializer
     private static string ToShowdownId(string name)
     {
         return ShowdownIdRegex().Replace(name.ToLowerInvariant(), "");
+    }
+
+    /// <summary>
+    /// Check if the Showdown request allows terastallization for the given slot.
+    /// </summary>
+    private static bool CanTerastallize(JsonElement root, int slotIndex)
+    {
+        if (!root.TryGetProperty("active", out JsonElement active))
+            return false;
+        if (slotIndex >= active.GetArrayLength())
+            return false;
+        JsonElement slotData = active[slotIndex];
+        return slotData.TryGetProperty("canTerastallize", out JsonElement canTera)
+               && canTera.ValueKind == JsonValueKind.String
+               && !string.IsNullOrEmpty(canTera.GetString());
     }
 
     [GeneratedRegex(@"[^a-z0-9]")]

@@ -55,9 +55,16 @@ public sealed class ShowdownRemoteOrchestrator
 
             int total = _wins + _losses + _ties + _errors;
             float winRate = total > 0 ? _wins * 100f / total : 0;
+            string ratingStr = result.MyRatingAfter.HasValue
+                ? $" | Rating: {result.MyRatingAfter}" +
+                  (result.MyRatingBefore.HasValue ? $" ({(result.MyRatingAfter.Value >= result.MyRatingBefore.Value ? "+" : "")}{result.MyRatingAfter.Value - result.MyRatingBefore.Value})" : "")
+                : "";
+            string oppStr = result.Opponent != null
+                ? $" vs {result.Opponent}" + (result.OpponentRating.HasValue ? $" ({result.OpponentRating})" : "")
+                : "";
             Console.WriteLine(
-                $"[Battle {i + 1}/{_config.NumBattles}] {result.Result} " +
-                $"({result.Turns} turns) — Win rate: {winRate:F1}% " +
+                $"[Battle {i + 1}/{_config.NumBattles}] {result.Result}{oppStr} " +
+                $"({result.Turns} turns){ratingStr} — Win rate: {winRate:F1}% " +
                 $"({_wins}W/{_losses}L/{_ties}T/{_errors}E)");
             Console.WriteLine();
 
@@ -83,27 +90,47 @@ public sealed class ShowdownRemoteOrchestrator
         await _worker.SendInitAsync(_config.Format, ct);
 
         string? opponent = null;
+        int? opponentRating = null;
+        int? myRatingBefore = null;
+        int? myRatingAfter = null;
         int turns = 0;
         string resultStr = "error";
         string? battleEndResult = null;
 
-        // Forward battle lines to worker
+        // Forward battle lines to worker (must complete before request is processed)
         client.OnBattleMessage += (roomId, lines) =>
         {
-            // Forward to worker (fire and forget — worker processes asynchronously)
-            _ = _worker.SendBattleLinesAsync(lines, ct);
+            try { _worker.SendBattleLinesAsync(lines, ct).GetAwaiter().GetResult(); }
+            catch (Exception ex) { Console.WriteLine($"[Remote] Battle lines error: {ex.Message}"); }
 
             foreach (string line in lines)
             {
-                if (line.StartsWith("|player|") && !line.Contains(_config.Username))
+                if (line.StartsWith("|player|"))
                 {
                     string[] parts = line.Split('|');
-                    if (parts.Length > 3) opponent = parts[3];
+                    if (parts.Length > 3 && !parts[3].Equals(_config.Username, StringComparison.OrdinalIgnoreCase))
+                    {
+                        opponent = parts[3];
+                        if (parts.Length > 5 && int.TryParse(parts[5], out int oppR))
+                            opponentRating = oppR;
+                    }
+                    else if (parts.Length > 5 && parts[3].Equals(_config.Username, StringComparison.OrdinalIgnoreCase)
+                             && int.TryParse(parts[5], out int myR))
+                    {
+                        myRatingBefore = myR;
+                    }
                 }
                 if (line.StartsWith("|turn|"))
                 {
                     string[] parts = line.Split('|');
                     if (parts.Length > 2 && int.TryParse(parts[2], out int t)) turns = t;
+                }
+                if (line.StartsWith("|raw|") && line.Contains(_config.Username) && line.Contains("rating:"))
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(
+                        line, @"<strong>(\d+)</strong>");
+                    if (match.Success && int.TryParse(match.Groups[1].Value, out int newRating))
+                        myRatingAfter = newRating;
                 }
             }
         };
@@ -212,6 +239,9 @@ public sealed class ShowdownRemoteOrchestrator
             BattleId = battleId,
             Result = resultStr,
             Opponent = opponent,
+            OpponentRating = opponentRating,
+            MyRatingBefore = myRatingBefore,
+            MyRatingAfter = myRatingAfter,
             Turns = turns,
             Timestamp = timestamp,
             LogFile = logFile,
@@ -254,6 +284,18 @@ public sealed class ShowdownRemoteOrchestrator
         Console.WriteLine($"  Ties:           {_ties}");
         Console.WriteLine($"  Errors:         {_errors}");
         Console.WriteLine($"  Win rate:       {winRate:F1}%");
+
+        BattleResult? first = _results.FirstOrDefault(r => r.MyRatingBefore.HasValue);
+        BattleResult? last = _results.LastOrDefault(r => r.MyRatingAfter.HasValue);
+        if (first?.MyRatingBefore != null && last?.MyRatingAfter != null)
+        {
+            int startRating = first.MyRatingBefore.Value;
+            int endRating = last.MyRatingAfter.Value;
+            int change = endRating - startRating;
+            Console.WriteLine($"  Start rating:   {startRating}");
+            Console.WriteLine($"  Final rating:   {endRating} ({(change >= 0 ? "+" : "")}{change})");
+        }
+
         Console.WriteLine($"  Total time:     {elapsed:hh\\:mm\\:ss}");
         if (total > 0)
             Console.WriteLine($"  Avg per battle: {elapsed.TotalSeconds / total:F1}s");

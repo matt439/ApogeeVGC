@@ -181,26 +181,33 @@ def upload_and_extract(ip: str, key_path: str, archive_path: Path):
          str(archive_path), f'ec2-user@{ip}:~/'])
 
     print('\n=== Extracting on EC2 ===')
-    ssh(ip, key_path, f'mkdir -p ~/apogee && cd ~/apogee && tar -xzf ~/{ARCHIVE_NAME} && chmod +x ApogeeVGC && sudo yum install -y libicu 2>/dev/null || true')
+    ssh(ip, key_path, f'mkdir -p ~/apogee && cd ~/apogee && tar -xzf ~/{ARCHIVE_NAME} && chmod +x ApogeeVGC',
+        timeout=120)
+    print('  Extracted. Installing dependencies...')
+    ssh(ip, key_path, 'sudo yum install -y libicu 2>/dev/null; true', timeout=120)
+    print('  Done.')
 
 
-def ssh(ip: str, key_path: str, command: str, stream: bool = False) -> subprocess.CompletedProcess:
+def ssh(ip: str, key_path: str, command: str, stream: bool = False,
+        timeout: int | None = 60) -> subprocess.CompletedProcess:
     """Run command on EC2 via SSH."""
     cmd = ['ssh', '-i', key_path, '-o', 'StrictHostKeyChecking=no',
            f'ec2-user@{ip}', command]
     if stream:
         return subprocess.run(cmd)
-    return subprocess.run(cmd, capture_output=True, text=True)
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
 
 def start_worker(ip: str, key_path: str, args: argparse.Namespace):
     """Start the MCTS worker on EC2 in background."""
     print('\n=== Starting MCTS Worker on EC2 ===')
 
-    # Start worker in background via nohup
-    ssh(ip, key_path,
-        f'cd ~/apogee && nohup ./ApogeeVGC --mode MctsWorker --format {args.format} --port 9100 '
-        f'> worker.log 2>&1 &')
+    # Start worker in background using ssh -f (forks SSH to background after command starts)
+    cmd = ['ssh', '-i', key_path, '-o', 'StrictHostKeyChecking=no', '-f',
+           f'ec2-user@{ip}',
+           f'cd ~/apogee && nohup ./ApogeeVGC --mode MctsWorker --format {args.format} --port 9100 '
+           f'> worker.log 2>&1 < /dev/null &']
+    subprocess.run(cmd, timeout=30)
 
     # Wait for worker to start listening
     print('  Waiting for worker to start...')
@@ -234,16 +241,17 @@ def run_local_client(ip: str, args: argparse.Namespace):
          '--worker-port', '9100'])
 
 
-def download_results(ip: str, key_path: str):
-    """Download battle logs and results from EC2."""
-    print('\n=== Downloading results ===')
-    local_dir = PROJECT_ROOT / 'logs' / 'ec2_results'
+def download_worker_logs(ip: str, key_path: str):
+    """Download worker log from EC2 for diagnostics."""
+    print('\n=== Downloading worker logs ===')
+    local_dir = PROJECT_ROOT / 'logs' / 'ec2_worker'
     local_dir.mkdir(parents=True, exist_ok=True)
 
     run(['scp', '-i', key_path, '-o', 'StrictHostKeyChecking=no',
-         '-r', f'ec2-user@{ip}:~/apogee/logs/showdown/*',
-         str(local_dir)], check=False)
-    print(f'  Results saved to: {local_dir}')
+         f'ec2-user@{ip}:~/apogee/worker.log',
+         str(local_dir / 'worker.log')], check=False)
+    print(f'  Worker log saved to: {local_dir / "worker.log"}')
+    print(f'  Battle results are in: {PROJECT_ROOT / "logs" / "showdown"}')
 
 
 def terminate_instance(instance_id: str, region: str):
@@ -330,14 +338,14 @@ def main():
         # Run local client (connects to Showdown from home IP, forwards to EC2)
         run_local_client(ip, args)
 
-        # Download results (logs are local, but worker logs are on EC2)
-        download_results(ip, args.key_path)
+        # Download worker logs from EC2 (battle logs are already local)
+        download_worker_logs(ip, args.key_path)
 
     except KeyboardInterrupt:
         print('\n\nInterrupted by user.')
         if ip:
-            print('Downloading partial results...')
-            download_results(ip, args.key_path)
+            print('Downloading worker logs...')
+            download_worker_logs(ip, args.key_path)
 
     finally:
         if instance_id and not args.no_terminate and not args.instance_id:
