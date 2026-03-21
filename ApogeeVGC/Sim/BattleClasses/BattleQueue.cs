@@ -65,8 +65,8 @@ public class BattleQueue(Battle battle)
                 return [];
         }
 
-        // Start with the action itself
-        List<IAction> actions = new(1);
+        // Start with the action itself (rented from pool to avoid GC pressure)
+        List<IAction> actions = Battle.RentActionList();
 
         // Populate side from pokemon if not already set (matches TS: if (!action.side && action.pokemon) action.side = action.pokemon.side;)
         // Note: In C# we don't have a mutable side property on IAction, so this is handled implicitly through Pokemon.Side
@@ -201,7 +201,7 @@ public class BattleQueue(Battle battle)
                 // Add BeforeTurnMove action if the move has a beforeTurnCallback (e.g., Focus Punch)
                 if (ma.Move.BeforeTurnCallback != null)
                 {
-                    actions.InsertRange(0, ResolveAction(new MoveAction
+                    var resolved = ResolveAction(new MoveAction
                     {
                         Choice = ActionId.BeforeTurnMove,
                         Pokemon = ma.Pokemon,
@@ -209,18 +209,22 @@ public class BattleQueue(Battle battle)
                         TargetLoc = ma.TargetLoc,
                         Order = 5, // BeforeTurnMove order
                         OriginalTarget = ma.Pokemon, // Will be updated later with actual target
-                    }));
+                    });
+                    actions.InsertRange(0, resolved);
+                    Battle.ReturnActionList(resolved);
                 }
 
                 // Add MegaEvo action if the player chose to mega evolve
                 if (ma.Mega.HasValue &&
                     ma.Pokemon is { CanMegaEvo: not null })
                 {
-                    actions.InsertRange(0, ResolveAction(new PokemonAction
+                    var resolved = ResolveAction(new PokemonAction
                     {
                         Choice = ActionId.MegaEvo,
                         Pokemon = ma.Pokemon,
-                    }));
+                    });
+                    actions.InsertRange(0, resolved);
+                    Battle.ReturnActionList(resolved);
                 }
 
                 // Add Terastallize action if the player chose to terastallize
@@ -228,24 +232,28 @@ public class BattleQueue(Battle battle)
                     ma.Pokemon is { CanTerastallize: MoveTypeMoveTypeFalseUnion, Terastallized: null })
                 {
                     // Insert Terastallize action before the move
-                    actions.InsertRange(0, ResolveAction(new PokemonAction
+                    var resolved = ResolveAction(new PokemonAction
                     {
                         Choice = ActionId.Terastallize,
                         Pokemon = ma.Pokemon,
-                    }));
+                    });
+                    actions.InsertRange(0, resolved);
+                    Battle.ReturnActionList(resolved);
                 }
 
                 // Add PriorityChargeMove action if the move has a priorityChargeCallback (e.g., Beak Blast, Shell Trap)
                 if (ma.Move.PriorityChargeCallback != null)
                 {
-                    actions.InsertRange(0, ResolveAction(new MoveAction
+                    var resolved = ResolveAction(new MoveAction
                     {
                         Choice = ActionId.PriorityChargeMove,
                         Pokemon = ma.Pokemon,
                         Move = ma.Move,
                         Order = 107, // PriorityChargeMove order
                         OriginalTarget = ma.Pokemon, // Will be updated later with actual target
-                    }));
+                    });
+                    actions.InsertRange(0, resolved);
+                    Battle.ReturnActionList(resolved);
                 }
 
                 // Calculate fractional priority from events
@@ -422,6 +430,8 @@ public class BattleQueue(Battle battle)
                 ma.Pokemon.Side.LastSelectedMove = ma.Move.Id;
             }
         }
+
+        Battle.ReturnActionList(resolvedChoices);
     }
 
     public void AddChoice(IEnumerable<IActionChoice> choices)
@@ -440,6 +450,8 @@ public class BattleQueue(Battle battle)
                     ma.Pokemon.Side.LastSelectedMove = ma.Move.Id;
                 }
             }
+
+            Battle.ReturnActionList(resolvedChoices);
         }
     }
 
@@ -563,8 +575,8 @@ public class BattleQueue(Battle battle)
         // Resolve the choice into one or more actions
         var actions = ResolveAction(choice, midTurn);
 
-        // If no actions were generated, nothing to insert
-        if (actions.Count == 0) return;
+        // If no actions were generated, return pooled list and exit
+        if (actions.Count == 0) { Battle.ReturnActionList(actions); return; }
 
         // Find the insertion range based on priority comparison
         int? firstIndex = null;
@@ -607,6 +619,8 @@ public class BattleQueue(Battle battle)
             // Insert the actions at the selected position
             List.InsertRange(index, actions);
         }
+
+        Battle.ReturnActionList(actions);
     }
 
     /// <summary>

@@ -2060,6 +2060,7 @@ public partial record Moves
                         battle.Queue.PrioritizeAction(ma);
                     }
 
+                    battle.ReturnActionList(resolvedActions);
                     return new VoidReturn();
                 }),
             },

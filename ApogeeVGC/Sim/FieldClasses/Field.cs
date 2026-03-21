@@ -542,12 +542,12 @@ Battle.Debug($"[RemovePseudoWeather] Removed {status.Id}, still exists: {PseudoW
         {
             PseudoWeather = PseudoWeather.ToDictionary(
                 kvp => kvp.Key,
-                kvp => kvp.Value.DeepClone()),
+                kvp => newBattle.CloneEffectState(kvp.Value)),
         };
         copy.Weather = Weather;
-        copy.WeatherState = WeatherState.DeepClone();
+        copy.WeatherState = newBattle.CloneEffectState(WeatherState);
         copy.Terrain = Terrain;
-        copy.TerrainState = TerrainState.DeepClone();
+        copy.TerrainState = newBattle.CloneEffectState(TerrainState);
         return copy;
     }
 

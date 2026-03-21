@@ -701,9 +701,11 @@ public partial class BattleActions
                               Library.Moves.TryGetValue(mesi.MoveId, out Move? sourceMove) &&
                               sourceMove.SleepUsable == true);
 
-        var targetsCopy = new List<Pokemon?>(targets.Count);
+        var targetsCopy = Battle.RentNullablePokemonList();
         int hit;
 
+        try
+        {
         for (hit = 1; hit <= targetHitResult; hit++)
         {
             if (Battle.DebugMode) Battle.Debug($"[HitStepMoveHitLoop] Starting hit #{hit} of {targetHitResult}");
@@ -1131,5 +1133,10 @@ public partial class BattleActions
         }
 
         return damage;
+        }
+        finally
+        {
+            Battle.ReturnNullablePokemonList(targetsCopy);
+        }
     }
 }

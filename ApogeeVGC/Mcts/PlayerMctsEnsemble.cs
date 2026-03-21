@@ -29,6 +29,9 @@ public static class PlayerMctsEnsemble
             new StatusSpreadingMiniModel(),
             new ProtectPredictionMiniModel(),
             new SwitchMomentumMiniModel(),
+            new CoordinatedActionMiniModel(),
+            new WinConditionAwarenessMiniModel(),
+            new TempoPreservationMiniModel(),
         ];
 
         string configPath = Environment.GetEnvironmentVariable("APOGEE_ENSEMBLE_CONFIG")

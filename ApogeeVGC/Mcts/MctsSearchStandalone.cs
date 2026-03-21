@@ -60,6 +60,7 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
                     cancellationToken.ThrowIfCancellationRequested();
                     Battle sim = battle.Copy();
                     RunIteration(root, sim, sideId);
+                    sim.RecycleClonedStates();
                 });
             }
             catch (OperationCanceledException) { }
@@ -75,6 +76,7 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
                     cts.Token.ThrowIfCancellationRequested();
                     Battle sim = battle.Copy();
                     RunIteration(root, sim, sideId);
+                    sim.RecycleClonedStates();
                 });
             }
             catch (OperationCanceledException) { }
@@ -85,6 +87,7 @@ public sealed class MctsSearchStandalone(MctsConfig config) : IMctsSearch
             {
                 Battle sim = battle.Copy();
                 RunIteration(root, sim, sideId);
+                sim.RecycleClonedStates();
             });
         }
 

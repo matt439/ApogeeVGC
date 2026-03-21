@@ -40,6 +40,9 @@ MINI_MODEL_NAMES = [
     'StatusSpreading',
     'ProtectPrediction',
     'SwitchMomentum',
+    'CoordinatedAction',
+    'WinConditionAwareness',
+    'TempoPreservation',
 ]
 
 

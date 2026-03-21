@@ -85,6 +85,112 @@ public class EffectState
     public int? Damage { get; set; }
     public Pokemon? LastDamageSource { get; set; } // For Counter/Mirror Coat damage source
 
+    // ── Thread-local pool for MCTS Battle.Copy() ──
+
+    [ThreadStatic] private static Stack<EffectState>? _clonePool;
+
+    /// <summary>
+    /// Rents an EffectState from the thread-local pool (or allocates one),
+    /// deep-copies all fields from <paramref name="source"/>, and nulls
+    /// Pokemon references for later remapping.
+    /// </summary>
+    public static EffectState DeepClonePooled(EffectState source)
+    {
+        _clonePool ??= new Stack<EffectState>(64);
+        EffectState clone = _clonePool.Count > 0
+            ? _clonePool.Pop()
+            : new EffectState { Id = EffectStateId.FromEmpty() };
+
+        clone.CopyFieldsFrom(source);
+        return clone;
+    }
+
+    /// <summary>Returns an EffectState to the thread-local pool.</summary>
+    public static void ReturnToClonePool(EffectState state)
+    {
+        _clonePool ??= new Stack<EffectState>(64);
+        state.ResetForPool();
+        _clonePool.Push(state);
+    }
+
+    /// <summary>
+    /// Copies all fields from <paramref name="source"/> into this instance,
+    /// deep-copies mutable reference types, and nulls Pokemon references.
+    /// Equivalent to DeepClone but without allocation.
+    /// </summary>
+    private void CopyFieldsFrom(EffectState source)
+    {
+        // Core
+        Id = source.Id;
+        EffectOrder = source.EffectOrder;
+        Duration = source.Duration;
+
+        // Shared references (library objects / structs)
+        Target = source.Target;
+        SourceEffect = source.SourceEffect;
+        SourceSlot = source.SourceSlot;
+        LinkedStatus = source.LinkedStatus;
+        Berry = source.Berry;
+        MoveData = source.MoveData;
+
+        // Pokemon references → null (remapped in Pass 2)
+        Source = null;
+        LinkedPokemon = null;
+        LastDamageSource = null;
+
+        // Value-type fields
+        Started = source.Started;
+        Ending = source.Ending;
+        FromBooster = source.FromBooster;
+        BestStat = source.BestStat;
+        Unnerved = source.Unnerved;
+        StartTime = source.StartTime;
+        Time = source.Time;
+        Stage = source.Stage;
+        Move = source.Move;
+        Counter = source.Counter;
+        KnockedOff = source.KnockedOff;
+        Resisted = source.Resisted;
+        IsSlotCondition = source.IsSlotCondition;
+        HasDragonType = source.HasDragonType;
+        ContactHitCount = source.ContactHitCount;
+        CheckedAngerShell = source.CheckedAngerShell;
+        CheckedBerserk = source.CheckedBerserk;
+        Embodied = source.Embodied;
+        Gluttony = source.Gluttony;
+        ChoiceLock = source.ChoiceLock;
+        Busted = source.Busted;
+        Libero = source.Libero;
+        Protean = source.Protean;
+        BerryWeaken = source.BerryWeaken;
+        Seek = source.Seek;
+        Ready = source.Ready;
+        LastMove = source.LastMove;
+        NumConsecutive = source.NumConsecutive;
+        Eject = source.Eject;
+        Inactive = source.Inactive;
+        LostFocus = source.LostFocus;
+        HitCount = source.HitCount;
+        Multiplier = source.Multiplier;
+        DoubleMultiplier = source.DoubleMultiplier;
+        TargetSlot = source.TargetSlot;
+        TargetLoc = source.TargetLoc;
+        EndingTurn = source.EndingTurn;
+        TrueDuration = source.TrueDuration;
+        Layers = source.Layers;
+        Def = source.Def;
+        Spd = source.Spd;
+        BoundDivisor = source.BoundDivisor;
+        Hp = source.Hp;
+        StartingTurn = source.StartingTurn;
+        Slot = source.Slot;
+        Damage = source.Damage;
+
+        // Deep copy mutable reference types
+        TypeWas = source.TypeWas is not null ? (PokemonType[])source.TypeWas.Clone() : null;
+        Boosts = source.Boosts?.Copy();
+    }
+
     /// <summary>
     /// Resets all fields to the default "empty" state so this instance can be
     /// returned to a pool and reused without stale data leaking across events.
@@ -238,83 +344,25 @@ public class EffectState
 
     /// <summary>
     /// Creates a complete deep clone of this EffectState.
+    /// Uses MemberwiseClone for a single native memcpy of all ~60 fields,
+    /// then fixes up reference types that need deep copying.
     /// Pokemon references (Source, LinkedPokemon, LastDamageSource) are set to null
     /// and must be remapped via <see cref="RemapPokemonReferences"/> after all Pokemon are copied.
     /// </summary>
     public EffectState DeepClone()
     {
-        return new EffectState
-        {
-            // Core
-            Id = Id,
-            EffectOrder = EffectOrder,
-            Duration = Duration,
+        var clone = (EffectState)MemberwiseClone();
 
-            // Shared references (library objects / structs)
-            Target = Target,
-            SourceEffect = SourceEffect,
-            SourceSlot = SourceSlot,
-            LinkedStatus = LinkedStatus,
-            Berry = Berry,
-            MoveData = MoveData,
+        // Deep copy reference types that have mutable state
+        if (TypeWas is not null) clone.TypeWas = (PokemonType[])TypeWas.Clone();
+        if (Boosts is not null) clone.Boosts = Boosts.Copy();
 
-            // Pokemon references → null (remapped in Pass 2)
-            Source = null,
-            LinkedPokemon = null,
-            LastDamageSource = null,
+        // Pokemon references → null (remapped in Pass 2)
+        clone.Source = null;
+        clone.LinkedPokemon = null;
+        clone.LastDamageSource = null;
 
-            // Value-type fields
-            Started = Started,
-            Ending = Ending,
-            FromBooster = FromBooster,
-            BestStat = BestStat,
-            Unnerved = Unnerved,
-            StartTime = StartTime,
-            Time = Time,
-            Stage = Stage,
-            Move = Move,
-            Counter = Counter,
-            KnockedOff = KnockedOff,
-            Resisted = Resisted,
-            IsSlotCondition = IsSlotCondition,
-            HasDragonType = HasDragonType,
-            ContactHitCount = ContactHitCount,
-            CheckedAngerShell = CheckedAngerShell,
-            CheckedBerserk = CheckedBerserk,
-            Embodied = Embodied,
-            Gluttony = Gluttony,
-            ChoiceLock = ChoiceLock,
-            Busted = Busted,
-            Libero = Libero,
-            Protean = Protean,
-            BerryWeaken = BerryWeaken,
-            Seek = Seek,
-            Ready = Ready,
-            LastMove = LastMove,
-            NumConsecutive = NumConsecutive,
-            Eject = Eject,
-            Inactive = Inactive,
-            LostFocus = LostFocus,
-            HitCount = HitCount,
-            Multiplier = Multiplier,
-            DoubleMultiplier = DoubleMultiplier,
-            TargetSlot = TargetSlot,
-            TargetLoc = TargetLoc,
-            EndingTurn = EndingTurn,
-            TrueDuration = TrueDuration,
-            Layers = Layers,
-            Def = Def,
-            Spd = Spd,
-            BoundDivisor = BoundDivisor,
-            Hp = Hp,
-            StartingTurn = StartingTurn,
-            Slot = Slot,
-            Damage = Damage,
-
-            // Deep copy reference types
-            TypeWas = TypeWas?.ToArray(),
-            Boosts = Boosts?.Copy(),
-        };
+        return clone;
     }
 
     /// <summary>

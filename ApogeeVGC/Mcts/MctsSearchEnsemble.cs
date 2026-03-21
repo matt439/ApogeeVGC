@@ -81,6 +81,7 @@ public sealed class MctsSearchEnsemble(
                     {
                         Battle sim = battle.Copy();
                         RunIteration(root, sim, sideId);
+                        sim.RecycleClonedStates();
                     }
                 }) { IsBackground = true };
                 workers[t].Start();
@@ -94,6 +95,7 @@ public sealed class MctsSearchEnsemble(
             {
                 Battle sim = battle.Copy();
                 RunIteration(root, sim, sideId);
+                sim.RecycleClonedStates();
             });
         }
 

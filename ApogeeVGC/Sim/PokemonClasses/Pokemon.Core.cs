@@ -553,14 +553,14 @@ public partial class Pokemon : IPriorityComparison
             TeraType = source.Details.TeraType,
         };
 
-        // EffectStates — deep clone values, Pokemon refs are null (remapped in Pass 2)
-        SpeciesState = source.SpeciesState.DeepClone();
-        StatusState = source.StatusState.DeepClone();
-        AbilityState = source.AbilityState.DeepClone();
-        ItemState = source.ItemState.DeepClone();
+        // EffectStates — pooled deep clone, Pokemon refs are null (remapped in Pass 2)
+        SpeciesState = Battle.CloneEffectState(source.SpeciesState);
+        StatusState = Battle.CloneEffectState(source.StatusState);
+        AbilityState = Battle.CloneEffectState(source.AbilityState);
+        ItemState = Battle.CloneEffectState(source.ItemState);
         Volatiles = source.Volatiles.ToDictionary(
             kvp => kvp.Key,
-            kvp => kvp.Value.DeepClone());
+            kvp => Battle.CloneEffectState(kvp.Value));
         _volatileOrder = new List<ConditionId>(source._volatileOrder);
 
         // Pokemon references — null/empty (remapped in Pass 2)

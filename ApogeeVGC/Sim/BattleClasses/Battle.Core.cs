@@ -206,6 +206,30 @@ public partial class Battle
     }
 
     /// <summary>
+    /// Pool of reusable <see cref="List{Pokemon}"/> instances (nullable element variant)
+    /// to eliminate per-call allocations in hit-step methods that track
+    /// targets which may become null (e.g., when Substitute absorbs a hit).
+    /// </summary>
+    private readonly Stack<List<Pokemon?>> _nullablePokemonListPool = new();
+
+    internal List<Pokemon?> RentNullablePokemonList()
+    {
+        if (_nullablePokemonListPool.Count > 0)
+        {
+            var list = _nullablePokemonListPool.Pop();
+            list.Clear();
+            return list;
+        }
+        return new List<Pokemon?>(4);
+    }
+
+    internal void ReturnNullablePokemonList(List<Pokemon?> list)
+    {
+        list.Clear();
+        _nullablePokemonListPool.Push(list);
+    }
+
+    /// <summary>
     /// Pool of reusable <see cref="EffectState"/> instances to eliminate per-event
     /// allocations when a handler has no state of its own (the common path in
     /// <see cref="SingleEvent"/> and <see cref="RunEvent"/>).
@@ -226,6 +250,44 @@ public partial class Battle
     {
         state.ResetForPool();
         _effectStatePool.Push(state);
+    }
+
+    /// <summary>
+    /// EffectState instances rented from the thread-local clone pool during
+    /// <see cref="Battle(Battle, Dictionary{Pokemon, Pokemon})"/> (copy constructor).
+    /// Call <see cref="RecycleClonedStates"/> after the copied battle is no longer needed
+    /// (e.g., after each MCTS iteration) to return them to the pool.
+    /// Null for the original (non-copy) battle.
+    /// </summary>
+    private List<EffectState>? _clonedEffectStates;
+
+    /// <summary>
+    /// Returns all EffectState instances that were rented during Battle.Copy()
+    /// back to the thread-local pool for reuse by future copies.
+    /// </summary>
+    public void RecycleClonedStates()
+    {
+        if (_clonedEffectStates is null) return;
+        foreach (var state in _clonedEffectStates)
+            EffectState.ReturnToClonePool(state);
+        _clonedEffectStates.Clear();
+    }
+
+    /// <summary>
+    /// Deep-clones an <see cref="EffectState"/> using the thread-local pool
+    /// and registers it for later recycling via <see cref="RecycleClonedStates"/>.
+    /// Falls back to normal <see cref="EffectState.DeepClone"/> when there is
+    /// no clone tracking list (i.e., on the original battle, not a copy).
+    /// </summary>
+    internal EffectState CloneEffectState(EffectState source)
+    {
+        if (_clonedEffectStates is not null)
+        {
+            var clone = EffectState.DeepClonePooled(source);
+            _clonedEffectStates.Add(clone);
+            return clone;
+        }
+        return source.DeepClone();
     }
 
     /// <summary>
@@ -565,6 +627,9 @@ public partial class Battle
         // Fresh RNG for simulation
         Prng = new Prng(null);
 
+        // Initialize clone tracking for EffectState pooling
+        _clonedEffectStates = new List<EffectState>(64);
+
         // --- Pass 1: Deep copy Sides (which creates all Pokemon copies) ---
         var side1 = source.P1.Copy(this, pokemonMap);
         var side2 = source.P2.Copy(this, pokemonMap);
@@ -608,7 +673,7 @@ public partial class Battle
 
         // Effect (library reference, share)
         Effect = source.Effect;
-        EffectState = source.EffectState.DeepClone();
+        EffectState = CloneEffectState(source.EffectState);
         EffectState.RemapPokemonReferences(pokemonMap);
 
         // Event system (fresh)

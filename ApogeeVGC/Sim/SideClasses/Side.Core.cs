@@ -211,13 +211,13 @@ public partial class Side
         // Deep clone side conditions
         SideConditions = source.SideConditions.ToDictionary(
             kvp => kvp.Key,
-            kvp => kvp.Value.DeepClone());
+            kvp => Battle.CloneEffectState(kvp.Value));
         _sideConditionOrder = new List<ConditionId>(source._sideConditionOrder);
 
         SlotConditions = source.SlotConditions
             .Select(dict => dict.ToDictionary(
                 kvp => kvp.Key,
-                kvp => kvp.Value.DeepClone()))
+                kvp => Battle.CloneEffectState(kvp.Value)))
             .ToList();
 
         // Fresh choice state
