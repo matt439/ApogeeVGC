@@ -19,8 +19,8 @@ public partial class Driver
     private const int BattleEvalSeed = 9876;
 
     // Random vs Random evaluation settings
-    private const int RandomEvaluationNumTest = 300000;
-    private const int NumThreads = CpuCoreCount;
+    private const int RandomEvaluationNumTest = 300_000;
+    private const int NumThreads = CpuThreadCount;
 
     // Greedy evaluation settings
     private const int GreedyEvaluationNumTest = 200000;

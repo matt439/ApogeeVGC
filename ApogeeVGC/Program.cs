@@ -7,7 +7,7 @@ public class Program
     public static void Main(string[] args)
     {
         // Override args for profiling
-        //args = ["--mode", "Evaluate", "--format", "gen9vgc2025regi", "--player1", "ensemble", "--player2", "random", "--battles", "5", "--time-per-move", "8000", "--rollout-depth", "0", "--threads", "16"];
+        args = ["--mode", "Evaluate", "--format", "gen9vgc2025regi", "--player1", "ensemble", "--player2", "random", "--battles", "5", "--time-per-move", "8000", "--rollout-depth", "0", "--threads", "32"];
 
         // Global exception handler to prevent silent crashes
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
