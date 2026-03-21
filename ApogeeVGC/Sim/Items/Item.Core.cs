@@ -311,20 +311,23 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     //    };
     //}
 
-    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache;
-    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache
-    {
-        get
-        {
-            var cache = Volatile.Read(ref _handlerCache);
-            if (cache is not null) return cache;
+    private EventHandlerInfo?[]? _handlerArray;
+    private bool _hasAnyHandlers;
 
-            var newCache = EventHandlerInfoMapper.BuildHandlerCache(this);
-            return Interlocked.CompareExchange(ref _handlerCache, newCache, null) ?? newCache;
-        }
+    private void EnsureHandlerArray()
+    {
+        if (Volatile.Read(ref _handlerArray) is not null) return;
+
+        var (array, hasAny, hasPrefixed) = EventHandlerInfoMapper.BuildHandlerArray(this);
+        Interlocked.CompareExchange(ref _hasPrefixedHandlers, hasPrefixed ? 1 : 0, -1);
+        _hasAnyHandlers = hasAny;
+        Interlocked.CompareExchange(ref _handlerArray, array, null);
     }
 
-    public bool HasAnyEventHandlers => HandlerCache.Count > 0;
+    public bool HasAnyEventHandlers
+    {
+        get { EnsureHandlerArray(); return _hasAnyHandlers; }
+    }
 
     private int _hasPrefixedHandlers = -1; // -1 = unset, 0 = false, 1 = true
     public bool HasPrefixedHandlers
@@ -334,18 +337,23 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
             int cached = Volatile.Read(ref _hasPrefixedHandlers);
             if (cached >= 0) return cached == 1;
 
-            bool result = EventHandlerInfoMapper.CacheHasPrefixedHandlers(HandlerCache);
-            Interlocked.CompareExchange(ref _hasPrefixedHandlers, result ? 1 : 0, -1);
-            return result;
+            EnsureHandlerArray();
+            return Volatile.Read(ref _hasPrefixedHandlers) == 1;
         }
     }
 
     /// <summary>
     /// Gets event handler information for the specified event.
-    /// Uses a pre-computed cache for O(1) lookups.
+    /// Uses a pre-computed flat array for O(1) lookups without hashing.
     /// </summary>
     public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return HandlerCache.TryGetValue((id, prefix, suffix), out var info) ? info : null;
+        return EventHandlerInfoMapper.LookupHandler(_handlerArray ?? InitAndGetArray(), id, prefix, suffix);
+    }
+
+    private EventHandlerInfo?[] InitAndGetArray()
+    {
+        EnsureHandlerArray();
+        return _handlerArray!;
     }
 }

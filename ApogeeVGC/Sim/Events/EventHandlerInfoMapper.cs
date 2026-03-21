@@ -16,6 +16,20 @@ public static class EventHandlerInfoMapper
     private static readonly EventPrefix[] CachedEventPrefixes = Enum.GetValues<EventPrefix>();
     private static readonly EventSuffix[] CachedEventSuffixes = Enum.GetValues<EventSuffix>();
 
+    /// <summary>Number of <see cref="EventPrefix"/> values (None, Ally, Foe, Source, Any).</summary>
+    internal const int PrefixCount = 5;
+
+    /// <summary>Number of <see cref="EventId"/> values, computed once at startup.</summary>
+    internal static readonly int EventIdCount = Enum.GetValues<EventId>().Length;
+
+    /// <summary>Total slot count for flat handler arrays: EventIdCount × PrefixCount.</summary>
+    internal static readonly int HandlerArraySize = EventIdCount * PrefixCount;
+
+    /// <summary>Computes a flat array index for the given (EventId, EventPrefix) pair.</summary>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    internal static int GetHandlerIndex(EventId id, EventPrefix prefix)
+        => (int)id * PrefixCount + (int)prefix;
+
     /// <summary>
     /// Maps EventId to property accessor functions for IEventMethodsV2.
     /// Each function takes an IEventMethodsV2 and returns the corresponding EventHandlerInfo.
@@ -811,5 +825,65 @@ public static class EventHandlerInfoMapper
         }
 
         return cache;
+    }
+
+    /// <summary>
+    /// Builds a flat array-based handler cache from the dictionary-based cache.
+    /// Indexed by <c>(int)eventId * PrefixCount + (int)prefix</c> for O(1) lookups
+    /// without hashing overhead. Returns the array, whether any handlers exist,
+    /// and whether any prefixed handlers exist.
+    /// </summary>
+    public static (EventHandlerInfo?[] Array, bool HasAny, bool HasPrefixed) BuildHandlerArray(IEffect effect)
+    {
+        var dict = BuildHandlerCache(effect);
+        return ConvertDictToArray(dict);
+    }
+
+    /// <summary>
+    /// Builds a flat array-based handler cache for a move effect.
+    /// </summary>
+    public static (EventHandlerInfo?[] Array, bool HasAny, bool HasPrefixed) BuildMoveHandlerArray(IMoveEventMethods moveMethods)
+    {
+        var dict = BuildMoveHandlerCache(moveMethods);
+        return ConvertDictToArray(dict);
+    }
+
+    private static (EventHandlerInfo?[] Array, bool HasAny, bool HasPrefixed) ConvertDictToArray(
+        Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> dict)
+    {
+        var array = new EventHandlerInfo?[HandlerArraySize];
+        bool hasAny = false;
+        bool hasPrefixed = false;
+
+        foreach (var ((id, prefix, suffix), info) in dict)
+        {
+            // Only store the suffix=None entries; the hot path never queries other suffixes.
+            // StoreHandler always writes suffix=None, so this captures every unique (id, prefix).
+            if (suffix != EventSuffix.None) continue;
+
+            int index = GetHandlerIndex(id, prefix);
+            array[index] = info;
+            hasAny = true;
+            if (prefix != EventPrefix.None) hasPrefixed = true;
+        }
+
+        return (array, hasAny, hasPrefixed);
+    }
+
+    /// <summary>
+    /// Looks up a handler in a flat array cache.
+    /// For the common case (suffix == None), this is a single array index.
+    /// For rare suffix queries, also checks the handler's Suffix property.
+    /// </summary>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    internal static EventHandlerInfo? LookupHandler(EventHandlerInfo?[] array, EventId id, EventPrefix prefix, EventSuffix suffix)
+    {
+        int index = GetHandlerIndex(id, prefix);
+        if ((uint)index >= (uint)array.Length) return null;
+        var info = array[index];
+        if (info == null) return null;
+        // suffix == None is the hot path and always matches (StoreHandler stores under None unconditionally).
+        if (suffix != EventSuffix.None && info.Suffix != suffix) return null;
+        return info;
     }
 }

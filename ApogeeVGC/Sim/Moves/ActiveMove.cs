@@ -106,7 +106,8 @@ public record ActiveMove : Move, IEffect
         HitEffect = null;
 
         // Restore shared handler cache from template (must be last)
-        _handlerCache = template._handlerCache;
+        _handlerArray = template._handlerArray;
+        _hasAnyHandlers = template._hasAnyHandlers;
     }
 
     /// <summary>
@@ -126,8 +127,10 @@ public record ActiveMove : Move, IEffect
         // so the record copy constructor doesn't propagate it automatically)
         Weather = source.Weather;
 
-        // Share pre-built handler cache from base Move
-        _handlerCache = source.MoveHandlerCache;
+        // Share pre-built handler array from base Move
+        var (arr, hasAny) = source.MoveHandlerArrayData;
+        _handlerArray = arr;
+        _hasAnyHandlers = hasAny;
 
         // Set ActiveMove-specific required property
         MoveSlot = new MoveSlot
@@ -167,7 +170,7 @@ public record ActiveMove : Move, IEffect
     /// <summary>
     /// Hides Move.OnHit to invalidate the handler cache when a move handler is mutated at runtime
     /// (e.g. Curse's non-Ghost branch nulls OnHit in OnTryHit).
-    /// Instead of a full rebuild, derives a new cache from the shared Move cache minus the stale key.
+    /// Instead of a full rebuild, clears the Hit slot in the array or triggers a full rebuild.
     /// </summary>
     public new OnHitEventInfo? OnHit
     {
@@ -175,20 +178,20 @@ public record ActiveMove : Move, IEffect
         set
         {
             base.OnHit = value;
-            var current = _handlerCache;
+            var current = _handlerArray;
             if (current is null) return;
 
             if (value is null)
             {
-                // Remove all Hit-event entries from the shared cache (cheap: filters ~1-3 keys out of ~5-30)
-                _handlerCache = current
-                    .Where(kvp => kvp.Key.Item1 != EventId.Hit)
-                    .ToDictionary();
+                // Clear Hit-event slot in the array (moves only use prefix=None)
+                int index = EventHandlerInfoMapper.GetHandlerIndex(EventId.Hit, EventPrefix.None);
+                if ((uint)index < (uint)current.Length)
+                    current[index] = null;
             }
             else
             {
                 // Handler replaced — full rebuild required
-                _handlerCache = null;
+                _handlerArray = null;
             }
         }
     }
@@ -280,20 +283,29 @@ public record ActiveMove : Move, IEffect
     /// </summary>
     public HitEffect? HitEffect { get; set; }
 
-    internal Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _handlerCache { get; set; }
-    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> HandlerCache =>
-        _handlerCache ??= EventHandlerInfoMapper.BuildMoveHandlerCache(this);
+    internal EventHandlerInfo?[]? _handlerArray { get; set; }
+    private bool _hasAnyHandlers;
 
-    public bool HasAnyEventHandlers => HandlerCache.Count > 0;
+    private EventHandlerInfo?[] EnsureHandlerArray()
+    {
+        var arr = _handlerArray;
+        if (arr is not null) return arr;
+        var (array, hasAny, _) = EventHandlerInfoMapper.BuildMoveHandlerArray(this);
+        _hasAnyHandlers = hasAny;
+        _handlerArray = array;
+        return array;
+    }
+
+    public bool HasAnyEventHandlers { get { EnsureHandlerArray(); return _hasAnyHandlers; } }
     public bool HasPrefixedHandlers => false; // Moves don't have prefixed handlers
 
     /// <summary>
     /// Gets event handler information for the specified event.
-    /// Uses a pre-computed cache for O(1) lookups.
+    /// Uses a pre-computed flat array for O(1) lookups without hashing.
     /// </summary>
     public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return HandlerCache.TryGetValue((id, prefix, suffix), out var info) ? info : null;
+        return EventHandlerInfoMapper.LookupHandler(EnsureHandlerArray(), id, prefix, suffix);
     }
 }
 

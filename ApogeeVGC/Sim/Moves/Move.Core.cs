@@ -184,25 +184,28 @@ public partial record Move : HitEffect, IBasicEffect, ICopyable<Move>
     public ActiveMove ToActiveMove() => AsActiveMove().ShallowClone();
 
     /// <summary>
-    /// Pre-computed move handler cache, shared by all ActiveMove instances created from this Move.
+    /// Pre-computed move handler array, shared by all ActiveMove instances created from this Move.
     /// Built lazily on first access; thread-safe via Volatile.Read/CompareExchange.
     /// </summary>
-    private Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo>? _moveHandlerCache;
+    private EventHandlerInfo?[]? _moveHandlerArray;
+    private bool _moveHasAnyHandlers;
 
     /// <summary>
     /// Cached ActiveMove template. Built once per Move; cloned via record <c>with</c> for each
     /// <see cref="ToActiveMove"/> call to avoid MoveSlot/Secondaries/handler-cache construction overhead.
     /// </summary>
     private ActiveMove? _activeMoveTemplate;
-    internal Dictionary<(EventId, EventPrefix, EventSuffix), EventHandlerInfo> MoveHandlerCache
+    internal (EventHandlerInfo?[] Array, bool HasAny) MoveHandlerArrayData
     {
         get
         {
-            var cache = Volatile.Read(ref _moveHandlerCache);
-            if (cache is not null) return cache;
+            var arr = Volatile.Read(ref _moveHandlerArray);
+            if (arr is not null) return (arr, _moveHasAnyHandlers);
 
-            var newCache = EventHandlerInfoMapper.BuildMoveHandlerCache(this);
-            return Interlocked.CompareExchange(ref _moveHandlerCache, newCache, null) ?? newCache;
+            var (newArray, hasAny, _) = EventHandlerInfoMapper.BuildMoveHandlerArray(this);
+            _moveHasAnyHandlers = hasAny;
+            var result = Interlocked.CompareExchange(ref _moveHandlerArray, newArray, null);
+            return result is not null ? (result, _moveHasAnyHandlers) : (newArray, hasAny);
         }
     }
 
